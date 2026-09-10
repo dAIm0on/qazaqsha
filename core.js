@@ -8,6 +8,16 @@
     if(kind==='number-text')return s.replace(/\s+/g,'');
     return s.replace(/[.!?,;:]+$/g,'').replace(/\s+/g,' ').trim();
   }
+  function tokens(value){
+    return [...new Set(normalize(value).split(/[\s,;/+]+/).filter(Boolean))];
+  }
+  function sameSet(a,b){
+    const A=new Set(a),B=new Set(b);
+    return A.size===B.size&&[...A].every(x=>B.has(x));
+  }
+  function expectedTokens(f){
+    return [...new Set(f.answers.flatMap(a=>tokens(a)))];
+  }
   function evaluate(q,answers){
     if(q.kind==='multi'){
       const actual=new Set((answers||[]).map(x=>normalize(x)));
@@ -15,7 +25,7 @@
       const correct=actual.size===expected.size&&[...expected].every(x=>actual.has(x));
       return {correct,parts:q.options.map(x=>actual.has(normalize(x))===expected.has(normalize(x)))};
     }
-    const parts=q.fields.map((f,i)=>f.answers.some(a=>normalize(a,f.kind)===normalize(answers[i],f.kind)));
+    const parts=q.fields.map((f,i)=>f.kind==='set-text'?sameSet(tokens(answers[i]),expectedTokens(f)):f.answers.some(a=>normalize(a,f.kind)===normalize(answers[i],f.kind)));
     return {correct:parts.every(Boolean),parts};
   }
   const DAY=86400000;

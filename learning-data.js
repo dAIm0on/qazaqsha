@@ -4,20 +4,18 @@
   const c=window.COURSE,core=window.TrainerCore,extra=[],lessons=[];
   c.originalCount=c.questions.length;
   c.sources.plus={title:'Дополнительная практика',url:'#learn',additional:true};
-  const f=(label,answers,options)=>({label,answers:Array.isArray(answers)?answers:[answers],kind:options?'select':'text',...(options?{options}:{})});
+  const f=(label,answers,kind='text')=>({label,answers:Array.isArray(answers)?answers:[answers],kind});
   function card(id,topic,title,stimulus,fields,explanation,phase='Применить',hint=''){
     const q={id:'learn-'+id,source:'plus',group:String(extra.length+1),part:'1',topic,kind:'fields',title,stimulus,fields,explanation,phase,hint};extra.push(q);return q.id;
   }
-  function optionsAt(values,index){
-    const out=[values[index]];let offset=1;
-    while(out.length<Math.min(4,values.length)&&offset<values.length){const v=values[(index+offset*3)%values.length];if(!out.includes(v))out.push(v);offset++;}
-    for(const v of values)if(out.length<4&&!out.includes(v))out.push(v);
-    const shift=index%out.length;return [...out.slice(shift),...out.slice(0,shift)];
-  }
-  const vocabChoice=c.vocabulary.map(([kk,ru],i)=>card('word-'+(i+1),'vocab','Выбери слово на казахском',ru[0],
-    [f('Одно слово',kk,optionsAt(c.vocabulary.map(x=>x[0]),i))],`${kk} — ${ru.join(' / ')}. Произнеси слово и представь его значение.`, 'Узнать'));
-  const numberChoice=c.numbers.map(([kk,ru],i)=>card('number-'+(i+1),'numbers','Выбери название',ru,
-    [f('По-казахски',kk,optionsAt(c.numbers.map(x=>x[0]),i))],`${ru} — ${kk.toLowerCase()}. Теперь закрой ответ и произнеси его по памяти.`, 'Узнать'));
+  const vocabChoice=c.vocabulary.map(([kk,ru],i)=>card('word-'+(i+1),'vocab','Напиши слово на казахском',ru[0],
+    [f('Одно слово',kk)],`${kk} — ${ru.join(' / ')}. Произнеси слово и представь его значение.`, 'Вспомнить'));
+  const vocabRead=c.vocabulary.map(([kk,ru],i)=>card('word-'+(i+1)+'-ru','vocab','Напиши перевод на русский',kk,
+    [f('По-русски',ru)],`${kk} — ${ru.join(' / ')}.`, 'Вспомнить'));
+  const numberChoice=c.numbers.map(([kk,ru],i)=>card('number-'+(i+1),'numbers','Напиши название',ru,
+    [f('По-казахски',kk)],`${ru} — ${kk.toLowerCase()}. Теперь закрой ответ и произнеси его по памяти.`, 'Вспомнить'));
+  const numberRead=c.numbers.map(([kk,ru],i)=>card('number-'+(i+1)+'-ru','numbers',String(ru).match(/^\d+$/)?'Запиши число цифрами':'Напиши перевод на русский',kk,
+    [f(String(ru).match(/^\d+$/)?'Число':'По-русски',String(ru),String(ru).match(/^\d+$/)?'number-text':'text')],`${kk.toLowerCase()} — ${ru}.`, 'Вспомнить'));
   const wordCues=[
     'Вспомни знакомого человека. Вообрази подпись «адам» рядом с ним.',
     'Представь знакомую девушку. Рядом подпись «қыз». Қ — отдельная казахская буква.',
@@ -39,9 +37,9 @@
   };
   function numberLesson(id,title,indices,intro,note=''){
     lessons.push({id,topic:'numbers',title,intro,method:'Число → образ → слово',note,tool:'number',
-      steps:['Посмотри на число и назови слово вслух. Свяжи его с образом.','Скрой ответы и назови числа в другом порядке.','Проверь себя: сначала выбор, затем ответ по памяти.'],
+      steps:['Посмотри на число и назови слово вслух. Свяжи его с образом.','Скрой ответы и назови числа в другом порядке.','Проверь себя: напиши слово по памяти, затем перевод обратно.'],
       items:indices.map(i=>({front:c.numbers[i][1],back:c.numbers[i][0].toLowerCase(),cue:numCues[c.numbers[i][1]]})),
-      questionIds:[...indices.map(i=>numberChoice[i]),...indices.map(i=>`hw2-${i+1}-kk`),...indices.map(i=>`hw2-${i+1}-ru`)]});
+      questionIds:[...indices.map(i=>numberChoice[i]),...indices.map(i=>numberRead[i]),...indices.map(i=>`hw2-${i+1}-kk`),...indices.map(i=>`hw2-${i+1}-ru`)]});
   }
   numberLesson('numbers-0','Числа 0–4',[0,1,2,3,4],'Начни с пяти чисел. Образы помогают зацепиться за значение, а проверка без подсказки — вспомнить слово.');
   numberLesson('numbers-1','Числа 5–10',[5,6,7,8,9,10],'Свяжи каждое число с конкретным предметом или группой предметов.');
@@ -68,13 +66,13 @@
     note:'Ассоциации — необязательные крючки памяти. Они не объясняют происхождение слова и не заменяют образец произношения. Можно записать свой образ ниже.',
     steps:['Посмотри на казахское слово и представь его значение.','Скрой ответ. Вспомни казахское слово по русскому значению.','После проверки составь в уме пару: слово → значение и значение → слово.'],
     items:indices.map(i=>({front:c.vocabulary[i][1].join(' / '),back:c.vocabulary[i][0].toLowerCase(),cue:wordCues[i]})),
-    questionIds:[...indices.map(i=>vocabChoice[i]),...indices.map(i=>`hw1-${i+1}-kk`),...indices.map(i=>`hw1-${i+1}-ru`)]});
+    questionIds:[...indices.map(i=>vocabChoice[i]),...indices.map(i=>vocabRead[i]),...indices.map(i=>`hw1-${i+1}-kk`),...indices.map(i=>`hw1-${i+1}-ru`)]});
   const harmonyPairs=[['А','Ә'],['О','Ө'],['Ұ','Ү'],['Ы','І']];
   const pairQuestions=harmonyPairs.map(([a,b],i)=>card('pair-'+i,'sounds','Вспомни переднюю («мягкую») пару',a,
     [f('Парная гласная',b)],`${a} — ${b}: задняя и передняя гласные. Сравни четыре пары: А–Ә, О–Ө, Ұ–Ү, Ы–І. Е входит в переднюю группу.`, 'Вспомнить'));
-  pairQuestions.push(card('front-vowels','sounds','Выбери ряд передних гласных','Жіңішке',
-    [f('Ряд букв','Ә Ө Ү І Е',['А О Ұ Ы','Ә Ө Ү І Е','А Ә О Ө','И У Ю Я'])],
-    'Передние гласные: Ә, Ө, Ү, І, Е. Задние: А, О, Ұ, Ы. Для И и У нужен контекст слова.','Узнать'));
+  pairQuestions.push(card('front-vowels','sounds','Напиши передние гласные','Жіңішке',
+    [f('Передние гласные через пробел',['Ә','Ө','Ү','І','Е'],'set-text')],
+    'Передние гласные: Ә, Ө, Ү, І, Е. Задние: А, О, Ұ, Ы. Для И и У нужен контекст слова.','Вспомнить'));
   lessons.push({id:'harmony-pairs',topic:'sounds',title:'Сингармонизм: две группы гласных',method:'Четыре пары + Е',tool:'harmony',
     intro:'Сингармонизм — согласование звуков в слове. Здесь изучаем его основную для окончаний часть: гармонию гласных. В казахских словах гласные часто относятся к одной группе, и окончание подстраивается под неё.',
     steps:['Задние гласные («твёрдые», жуан): А О Ұ Ы.','Передние («мягкие», жіңішке): Ә Ө Ү І Е.','Запомни четыре пары. Для множественного числа задняя группа ведёт к А, передняя — к Е.'],
@@ -93,14 +91,14 @@
     {word:'іссапар',split:'іс-са-пар',last:'пар',vowel:'а',family:'Задняя',start:'л',suffix:'лар',plural:'іссапарлар',reason:'Последняя буква Р: лар/лер.'}
   ];
   const harmonyWords=analyses.slice(0,6).map((a,i)=>card('harmony-'+i,'sounds','Какую гласную выбрать для множественного окончания?',a.word,
-    [f('Гласная окончания',a.vowel,['а','е'])],`${a.split}: последний слог — ${a.last}. ${a.family} группа → ${a.vowel.toUpperCase()} в окончании: ${a.plural}.`,'Применить',`Раздели слово: ${a.split}. Смотри только на последний слог.`));
+    [f('Гласная окончания: а или е',a.vowel)],`${a.split}: последний слог — ${a.last}. ${a.family} группа → ${a.vowel.toUpperCase()} в окончании: ${a.plural}.`,'Применить',`Раздели слово: ${a.split}. Смотри только на последний слог.`));
   lessons.push({id:'harmony-syllables',topic:'sounds',title:'Смешанное слово: смотри на конец',method:'Последний слог → А или Е',tool:'harmony',
     intro:'В заимствованных и сложных словах группы могут смешиваться. Для наших множественных окончаний решает последний слог, а не первая гласная.',
     steps:['кі-тап: І в начале передняя, но последний слог тап задний → кітаптар.','мұ-ға-лім: Ұ и А задние, но последний лім передний → мұғалімдер.','Сначала найди последний слог. Затем выбери гласную окончания.'],
     items:analyses.slice(0,4).map(a=>({front:a.word+' → А или Е?',back:a.vowel.toUpperCase(),cue:`${a.split} → ${a.last} → ${a.plural}`})),questionIds:harmonyWords});
   const special=[['ит','иттер','Передняя','собака'],['би','билер','Передняя','танец'],['ми','милар','Задняя','мозг'],['су','сулар','Задняя','вода'],['ту','тулар','Задняя','флаг'],['у','улар','Задняя','яд']];
-  const specialQs=special.map(([w,p,g,tr],i)=>card('special-'+i,'sounds','Выбери правильную форму множественного числа',`${w} — ${tr}`,
-    [f('Форма слова',p,(i%2?[p.replace(/а/g,'е')===p?p.replace(/е/g,'а'):p.replace(/а/g,'е'),p]:[p,p.replace(/а/g,'е')===p?p.replace(/е/g,'а'):p.replace(/а/g,'е')]))],
+  const specialQs=special.map(([w,p,g,tr],i)=>card('special-'+i,'sounds','Напиши форму множественного числа',`${w} — ${tr}`,
+    [f('Форма слова',p)],
     `${w} запоминаем целиком: ${g.toLowerCase()} группа, ${p}. Буквы И и У сами по себе не дают надёжного ответа.`,'Применить'));
   lessons.push({id:'harmony-special',topic:'sounds',title:'И и У: запоминаем слово целиком',method:'Слово сразу с окончанием',
     intro:'Не назначай И и У одну группу на все случаи. Заучи короткие пары «слово → форма», чтобы не угадывать.',
@@ -108,7 +106,7 @@
     note:'І — отдельная передняя гласная, её не путай с И. Особое падежное окончание -мен не чередуется по А/Е: досыммен. Его не нужно превращать в -ман.',
     items:special.map(([w,p,g,tr])=>({front:`${w} (${tr}) → много?`,back:p,cue:g+' группа'})),questionIds:specialQs});
   const pluralIds=analyses.slice(0,9).map((a,i)=>card('plural-'+i,'plural','Собери окончание в два шага',a.word,
-    [f('1. Гласная окончания',a.vowel,['а','е']),f('2. Начало окончания',a.start,['л','д','т']),f('3. Слово целиком',a.plural)],
+    [f('1. Гласная окончания: а или е',a.vowel),f('2. Начало окончания: л, д или т',a.start),f('3. Слово целиком',a.plural)],
     `${a.split} → последний слог ${a.last} → ${a.vowel.toUpperCase()}. ${a.reason} Соединяем: ${a.word} + ${a.suffix} = ${a.plural}.`,
     'Применить','Гласную выбираем по последнему слогу. Начальную согласную — по последней букве. Эти два решения независимы.'));
   for(const [id,title,indices] of [['plural-1','Много предметов: Л, Д или Т?',[0,2,4,8]],['plural-2','Много предметов: мягкий вариант',[1,3,5,6,7]]])lessons.push({id,topic:'plural',title,method:'Два решения → одно окончание',tool:'plural',
@@ -118,10 +116,12 @@
     items:indices.map(i=>({front:analyses[i].word+' → много?',back:analyses[i].plural,cue:`${analyses[i].last} → ${analyses[i].vowel.toUpperCase()}; ${analyses[i].word.slice(-1).toUpperCase()} → ${analyses[i].start.toUpperCase()}`})),
     questionIds:indices.map(i=>pluralIds[i])});
   const quantity=[['две книги','екі кітап','екі кітаптар'],['три девушки','үш қыз','үш қыздар'],['много людей','көп адам','көп адамдар'],['мало слов','аз сөз','аз сөздер']];
-  const quantityIds=quantity.map(([ru,kk,wrong],i)=>card('quantity-choice-'+i,'plural','Количество уже названо. Выбери фразу',ru,
-    [f('Правильная фраза',kk,i%2?[wrong,kk]:[kk,wrong])],`${ru} — ${kk}. В таких сочетаниях существительное стоит без множественного окончания: количество уже указано.`, 'Узнать'));
-  for(const [i,ru,kk] of [[0,'пять книг','бес кітап'],[1,'десять улиц','он көше'],[2,'двадцать три человека','жиырма үш адам'],[3,'много слов','көп сөз']])
+  const quantityIds=quantity.map(([ru,kk],i)=>card('quantity-choice-'+i,'plural','Количество уже названо. Напиши фразу',ru,
+    [f('Правильная фраза',kk)],`${ru} — ${kk}. В таких сочетаниях существительное стоит без множественного окончания: количество уже указано.`, 'Вспомнить'));
+  for(const [i,ru,kk] of [[0,'пять книг','бес кітап'],[1,'десять улиц','он көше'],[2,'двадцать три человека','жиырма үш адам'],[3,'много слов','көп сөз']]){
     quantityIds.push(card('quantity-write-'+i,'plural','Переведи сочетание',ru,[f('Ответ на казахском',kk)],`${ru} — ${kk}. Сначала количество, затем существительное без множественного окончания.`, 'Вспомнить'));
+    quantityIds.push(card('quantity-write-'+i+'-ru','plural','Переведи сочетание',kk,[f('Ответ на русском',ru)],`${kk} — ${ru}. Сначала количество, затем существительное без множественного окончания.`, 'Вспомнить'));
+  }
   lessons.push({id:'quantity',topic:'plural',title:'«Две книги»: количество + слово',method:'Сколько? → что?',
     intro:'В русском говорим «две книги». В казахском в таком сочетании число стоит первым, а существительное сохраняет основную форму: екі кітап.',
     steps:['Просто «книги» → кітаптар.','«Две книги» → екі кітап. Окончание -тар здесь не нужно.','То же в обычных сочетаниях с көп и аз: көп адам, аз сөз.'],

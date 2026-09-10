@@ -18,7 +18,7 @@
    p.exercises=list(raw.exercises,'упражнения',2).map(q=>{
      if(!obj(q)||!['vocab','numbers','plural','sounds'].includes(q.topic))fail('неизвестный раздел упражнения');
      return {id:id(q.id),topic:q.topic,title:text(q.title,'вопрос',300),stimulus:text(q.stimulus,'пример',1000),explanation:text(q.explanation,'объяснение'),
-       fields:list(q.fields,'поля ответа',1,12).map(f=>{if(!obj(f)||!['text','number-text','select'].includes(f.kind))fail('тип поля');const field={kind:f.kind,label:text(f.label,'подпись',200),answers:list(f.answers,'ответы',1,12).map(a=>text(a,'ответ',300))};if(f.kind==='select'){field.options=list(f.options,'варианты',2,20).map(a=>text(a,'вариант',300));if(field.answers.some(a=>!field.options.includes(a)))fail('ответ отсутствует в вариантах');}return field;})};
+       fields:list(q.fields,'поля ответа',1,12).map(f=>{if(!obj(f)||!['text','number-text','select','set-text','syllables'].includes(f.kind))fail('тип поля');const field={kind:f.kind,label:text(f.label,'подпись',200),answers:list(f.answers,'ответы',1,12).map(a=>text(a,'ответ',300))};if(f.kind==='select'){field.options=list(f.options,'варианты',2,20).map(a=>text(a,'вариант',300));if(field.answers.some(a=>!field.options.includes(a)))fail('ответ отсутствует в вариантах');}return field;})};
    });
    const ids=new Set(p.exercises.map(q=>q.id));if(ids.size!==p.exercises.length)fail('повторяются идентификаторы упражнений');
    p.blocks=list(raw.blocks,'маленькие объяснения',1,250).map(b=>{

@@ -3998,6 +3998,1052 @@ window.LESSON_PACKS = [
         ],
         "explanation": "емес — не.",
         "note": null
+      },
+      {
+        "id": "m3-3-1-rev",
+        "source": "m3",
+        "group": "3",
+        "part": "1-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "екі сөз",
+        "explanation": "Количество перед существительным: окончание множественного числа не добавляем.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Два слова",
+              "два слова"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "m3-3-2-rev",
+        "source": "m3",
+        "group": "3",
+        "part": "2-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "бір қыз",
+        "explanation": "Количество перед существительным: окончание множественного числа не добавляем.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Одна девушка",
+              "одна девушка"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "m3-3-3-rev",
+        "source": "m3",
+        "group": "3",
+        "part": "3-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "үш ұл",
+        "explanation": "Количество перед существительным: окончание множественного числа не добавляем.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Три сына",
+              "три сына"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "m3-3-4-rev",
+        "source": "m3",
+        "group": "3",
+        "part": "4-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "бес кітап",
+        "explanation": "Количество перед существительным: окончание множественного числа не добавляем.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Пять книг",
+              "пять книг"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "m3-3-5-rev",
+        "source": "m3",
+        "group": "3",
+        "part": "5-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "он қала",
+        "explanation": "Количество перед существительным: окончание множественного числа не добавляем.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Десять городов",
+              "десять городов"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "m3-4-1-rev",
+        "source": "m3",
+        "group": "4",
+        "part": "1-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "он үш",
+        "explanation": "13 = он үш. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "13"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-4-2-rev",
+        "source": "m3",
+        "group": "4",
+        "part": "2-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "жиырма бір",
+        "explanation": "21 = жиырма бір. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "21"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-4-4-rev",
+        "source": "m3",
+        "group": "4",
+        "part": "4-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "жетпіс алты",
+        "explanation": "76 = жетпіс алты. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "76"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-4-5-rev",
+        "source": "m3",
+        "group": "4",
+        "part": "5-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "сексен тоғыз",
+        "explanation": "89 = сексен тоғыз. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "89"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-5-1-rev",
+        "source": "m3",
+        "group": "5",
+        "part": "1-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "жүз жеті",
+        "explanation": "107 = жүз жеті. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "107"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-5-2-rev",
+        "source": "m3",
+        "group": "5",
+        "part": "2-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "төрт жүз тоқсан сегіз",
+        "explanation": "498 = төрт жүз тоқсан сегіз. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "498"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-5-3-rev",
+        "source": "m3",
+        "group": "5",
+        "part": "3-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "екі жүз он",
+        "explanation": "210 = екі жүз он. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "210"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-5-4-rev",
+        "source": "m3",
+        "group": "5",
+        "part": "4-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "сегіз жүз елу үш",
+        "explanation": "853 = сегіз жүз елу үш. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "853"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-5-5-rev",
+        "source": "m3",
+        "group": "5",
+        "part": "5-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "үш жүз отыз төрт",
+        "explanation": "334 = үш жүз отыз төрт. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "334"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-6-1-rev",
+        "source": "m3",
+        "group": "6",
+        "part": "1-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "бір мың бес жүз төрт",
+        "explanation": "1504 = бір мың бес жүз төрт. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "1504"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-6-2-rev",
+        "source": "m3",
+        "group": "6",
+        "part": "2-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "алты мың сегіз жүз отыз бір",
+        "explanation": "6831 = алты мың сегіз жүз отыз бір. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "6831"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-6-3-rev",
+        "source": "m3",
+        "group": "6",
+        "part": "3-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "он бір мың жеті жүз қырық үш",
+        "explanation": "11743 = он бір мың жеті жүз қырық үш. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "11743"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "m3-6-4-rev",
+        "source": "m3",
+        "group": "6",
+        "part": "4-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "жетпіс бес мың тоғыз жүз елу",
+        "explanation": "75950 = жетпіс бес мың тоғыз жүз елу. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "75950"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "note": "В ключе пропущено «мың». Здесь принято «жетпіс бес мың тоғыз жүз елу», согласно разрядному правилу этой же методички."
+      },
+      {
+        "id": "m3-6-5-rev",
+        "source": "m3",
+        "group": "6",
+        "part": "5-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "бес жүз тоқсан екі мың отыз тоғыз",
+        "explanation": "592039 = бес жүз тоқсан екі мың отыз тоғыз. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "592039"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-1-1-rev",
+        "source": "e3",
+        "group": "1-1",
+        "part": "1-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "он жеті",
+        "explanation": "17 = он жеті. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "17"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-1-2-rev",
+        "source": "e3",
+        "group": "1-1",
+        "part": "2-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "отыз екі",
+        "explanation": "32 = отыз екі. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "32"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-1-3-rev",
+        "source": "e3",
+        "group": "1-1",
+        "part": "3-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "қырық бір",
+        "explanation": "41 = қырық бір. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "41"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-1-4-rev",
+        "source": "e3",
+        "group": "1-1",
+        "part": "4-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "алпыс сегіз",
+        "explanation": "68 = алпыс сегіз. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "68"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-1-5-rev",
+        "source": "e3",
+        "group": "1-1",
+        "part": "5-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "сексен үш",
+        "explanation": "83 = сексен үш. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "83"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-2-1-rev",
+        "source": "e3",
+        "group": "1-2",
+        "part": "1-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "жүз тоқсан алты",
+        "explanation": "196 = жүз тоқсан алты. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "196"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-2-2-rev",
+        "source": "e3",
+        "group": "1-2",
+        "part": "2-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "екі жүз бес",
+        "explanation": "205 = екі жүз бес. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "205"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-2-3-rev",
+        "source": "e3",
+        "group": "1-2",
+        "part": "3-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "тоғыз жүз елу төрт",
+        "explanation": "954 = тоғыз жүз елу төрт. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "954"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-2-4-rev",
+        "source": "e3",
+        "group": "1-2",
+        "part": "4-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "төрт жүз жиырма тоғыз",
+        "explanation": "429 = төрт жүз жиырма тоғыз. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "429"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-2-5-rev",
+        "source": "e3",
+        "group": "1-2",
+        "part": "5-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "жеті жүз он бір",
+        "explanation": "711 = жеті жүз он бір. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "711"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-3-1-rev",
+        "source": "e3",
+        "group": "1-3",
+        "part": "1-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "бір мың тоқсан төрт",
+        "explanation": "1094 = бір мың тоқсан төрт. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "1094"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-3-2-rev",
+        "source": "e3",
+        "group": "1-3",
+        "part": "2-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "жеті мың үш жүз бір",
+        "explanation": "7301 = жеті мың үш жүз бір. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "7301"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-3-3-rev",
+        "source": "e3",
+        "group": "1-3",
+        "part": "3-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "жиырма бір мың жеті жүз алпыс",
+        "explanation": "21760 = жиырма бір мың жеті жүз алпыс. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "21760"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-3-4-rev",
+        "source": "e3",
+        "group": "1-3",
+        "part": "4-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "сексен екі мың жеті жүз жиырма тоғыз",
+        "explanation": "82729 = сексен екі мың жеті жүз жиырма тоғыз. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "82729"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-1-3-5-rev",
+        "source": "e3",
+        "group": "1-3",
+        "part": "5-rev",
+        "topic": "numbers",
+        "kind": "fields",
+        "title": "Запиши число цифрами",
+        "stimulus": "бес жүз он жеті мың төрт жүз он төрт",
+        "explanation": "517414 = бес жүз он жеті мың төрт жүз он төрт. Большие разряды идут перед меньшими.",
+        "fields": [
+          {
+            "label": "Число",
+            "kind": "number-text",
+            "answers": [
+              "517414"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "e3-4-1-1-rev",
+        "source": "e3",
+        "group": "4-1",
+        "part": "1-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "көп адам",
+        "explanation": "Количество, көп, аз, қанша и неше уже обозначают количество. Без них используем обычное множественное окончание.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Много людей",
+              "много людей"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "e3-4-1-2-rev",
+        "source": "e3",
+        "group": "4-1",
+        "part": "2-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "қанша қыз",
+        "explanation": "Количество, көп, аз, қанша и неше уже обозначают количество. Без них используем обычное множественное окончание.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Сколько девушек?",
+              "сколько девушек?"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "e3-4-1-3-rev",
+        "source": "e3",
+        "group": "4-1",
+        "part": "3-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "жүз қырық бес мың сөз",
+        "explanation": "Количество, көп, аз, қанша и неше уже обозначают количество. Без них используем обычное множественное окончание.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Сто сорок пять тысяч слов",
+              "сто сорок пять тысяч слов"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "e3-4-1-4-rev",
+        "source": "e3",
+        "group": "4-1",
+        "part": "4-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "қалалар",
+        "explanation": "Количество, көп, аз, қанша и неше уже обозначают количество. Без них используем обычное множественное окончание.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Города",
+              "города"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "plural-l"
+        ]
+      },
+      {
+        "id": "e3-4-1-5-rev",
+        "source": "e3",
+        "group": "4-1",
+        "part": "5-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "екі көше",
+        "explanation": "Количество, көп, аз, қанша и неше уже обозначают количество. Без них используем обычное множественное окончание.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Две улицы",
+              "две улицы"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "e3-4-2-1-rev",
+        "source": "e3",
+        "group": "4-2",
+        "part": "1-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "аз жер",
+        "explanation": "Количество, көп, аз, қанша и неше уже обозначают количество. Без них используем обычное множественное окончание.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Мало земли",
+              "мало земли"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "e3-4-2-3-rev",
+        "source": "e3",
+        "group": "4-2",
+        "part": "3-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "көп су",
+        "explanation": "Количество, көп, аз, қанша и неше уже обозначают количество. Без них используем обычное множественное окончание.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Много воды",
+              "много воды"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "e3-4-2-4-rev",
+        "source": "e3",
+        "group": "4-2",
+        "part": "4-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "жиырма кітап",
+        "explanation": "Количество, көп, аз, қанша и неше уже обозначают количество. Без них используем обычное множественное окончание.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Двадцать книг",
+              "двадцать книг"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "e3-4-2-5-rev",
+        "source": "e3",
+        "group": "4-2",
+        "part": "5-rev",
+        "topic": "plural",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "бес жігіт",
+        "explanation": "Количество, көп, аз, қанша и неше уже обозначают количество. Без них используем обычное множественное окончание.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Пять парней",
+              "пять парней"
+            ]
+          }
+        ],
+        "lessonId": "1-3",
+        "ruleIds": [
+          "quantity"
+        ]
+      },
+      {
+        "id": "hw3-4-kk-rev",
+        "source": "hw3",
+        "group": "4",
+        "part": "kk-rev",
+        "topic": "vocab",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "ғалым",
+        "explanation": "ғалым — учёный.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "учёный"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "hw3-13-kk-rev",
+        "source": "hw3",
+        "group": "13",
+        "part": "kk-rev",
+        "topic": "vocab",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "сіз",
+        "explanation": "сіз — Вы — один человек уважительно.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Вы — один человек уважительно",
+              "вы — один человек уважительно"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "hw3-14-kk-rev",
+        "source": "hw3",
+        "group": "14",
+        "part": "kk-rev",
+        "topic": "vocab",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "сіздер",
+        "explanation": "сіздер — Вы — несколько людей уважительно.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "Вы — несколько людей уважительно",
+              "вы — несколько людей уважительно"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
+      },
+      {
+        "id": "hw3-15-kk-rev",
+        "source": "hw3",
+        "group": "15",
+        "part": "kk-rev",
+        "topic": "vocab",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "ол",
+        "explanation": "ол — он / она / оно.",
+        "fields": [
+          {
+            "label": "Ответ на русском",
+            "kind": "text",
+            "answers": [
+              "он / она / оно"
+            ]
+          }
+        ],
+        "lessonId": "1-3"
       }
     ],
     "generated_exercises": []

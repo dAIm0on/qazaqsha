@@ -29,3 +29,12 @@
 input,select,textarea{font-size:max(16px,1em)}
 .question-body{overflow-wrap:anywhere}
 @media(max-width:760px){.question-actions{flex-wrap:wrap}.question-actions .primary-button{min-height:50px}.finish-actions{display:flex;gap:12px;flex-wrap:wrap}.finish-actions button{flex:1 1 170px}body{scroll-padding-bottom:150px}.field-control input{min-width:0}.field-control{min-width:0}}
+.primary-slot{display:grid;min-width:12rem;flex:0 0 auto}
+.primary-slot>.primary-button{grid-area:1/1;width:100%}
+#answer-form #feedback{margin:0 32px 24px;margin-top:0}
+@media(max-width:950px){#answer-form #feedback{margin-inline:24px}}
+@media(max-width:690px){
+  #answer-form #feedback{margin:0 12px 16px}
+  #answer-form.answered .question-actions{position:static;box-shadow:none}
+  .primary-slot{min-width:0;width:100%}
+}
