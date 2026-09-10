@@ -2,6 +2,16 @@
 (function(){
  'use strict';
  const course=window.COURSE, core=window.TrainerCore, questions=course.questions;
+ function coerceTyped(q){
+   if(q.kind==='multi'){
+     q.kind='fields';
+     if(!q.stimulus)q.stimulus=(q.options||[]).join(' · ');
+     q.fields=[{label:'Ответ',kind:'set-text',answers:q.correct||[]}];
+     q.note=q.note||'Напиши подходящие через запятую или пробел.';
+   }
+   for(const f of q.fields||[])if(f.kind==='select'){f.kind='text';delete f.options;}
+ }
+ for(const q of questions)coerceTyped(q);
  const byId=new Map(questions.map(q=>[q.id,q]));
  const topics=[['all','Все задания','∞'],['sounds','Звуки и слоги','01'],['plural','Множественное число','02'],['vocab','Слова','03'],['numbers','Числа и количество','04']];
  const KEY='qazaq-kris-course-v1', BACKUP=KEY+'-before-import', MIGRATION=KEY+'-before-schema-5';
@@ -12,7 +22,7 @@
  try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);}}
  catch(error){storageAvailable=false;storageReadError=error;}
  let records=state.records,learningState=state.learning;
- try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);
+ try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
@@ -96,8 +106,8 @@
    renderNav();
  }
  function answerMarkup(q){
-   if(q.kind==='multi')return `<p class="question-meta">Отметь все подходящие варианты.</p><div class="choices" role="group" aria-label="Варианты ответа">${q.options.map((o,i)=>`<label class="choice" id="choice-${i}"><input type="checkbox" name="choice" value="${esc(o)}"><span lang="kk">${esc(o)}</span><span class="choice-result" aria-hidden="true"></span></label>`).join('')}</div>`;
-   return `<div class="fields">${q.fields.map((f,i)=>`<div class="field-row"><label class="field-label" for="answer-${i}">${esc(f.label)}</label><div class="field-control">${f.kind==='select'?`<select id="answer-${i}" name="answer-${i}" aria-describedby="correction-${i}"><option value="">Выбрать…</option>${f.options.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('')}</select>`:`<input id="answer-${i}" name="answer-${i}" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${f.kind==='number-text'?'inputmode="numeric"':''} aria-describedby="correction-${i}">`}<span class="field-correction" id="correction-${i}"></span></div></div>`).join('')}</div>`;
+   const fields=q.fields||[{label:'Ответ',kind:'text'}];
+   return `<div class="fields">${fields.map((f,i)=>`<div class="field-row"><label class="field-label" for="answer-${i}">${esc(f.label)}</label><div class="field-control"><input id="answer-${i}" name="answer-${i}" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${f.kind==='number-text'?'inputmode="numeric"':''} aria-describedby="correction-${i}"><span class="field-correction" id="correction-${i}"></span></div></div>`).join('')}</div>`;
  }
  function render(){
    introOpen=false;pauseTimer();elapsedMs=0;checked=false;hinted=false;lastTextInput=null;renderStats();
@@ -106,7 +116,7 @@
    window.NumberPractice.prepare(q,variants);confusionIndex=P.answerIndex(questions);
    const source=course.sources[q.source], streak=records[q.id]?.streak||0;
    const location=q.source.startsWith('hw')?'Слово '+q.group:`Задание ${q.group}${q.part!=='1'?' · пункт '+q.part:''}`;
-   const hasText=q.kind==='fields'&&q.fields.some(f=>f.kind!=='select'&&f.kind!=='number-text');
+   const hasText=q.kind==='fields'&&q.fields.some(f=>f.kind!=='number-text');
    $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${source.additional?esc(source.title):`<a href="${source.url}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`}<br>${esc(location)}</div><span class="mastery-label">${cfg.labels[records[q.id]?.mastery_level||'NEW']}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p><h2 id="question-title">${esc(q.title)}</h2>${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}${answerMarkup(q)}${hasText?`<div class="letter-keyboard" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div><div class="keyboard-label">Буква вставится в выбранное поле.</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="hint-button">Подсказка</button><button type="button" class="text-button" id="reveal-button">Не знаю</button><button type="button" class="text-button" id="association-button">Моя подсказка</button></div><div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
    $('#answer-form').addEventListener('submit',e=>{e.preventDefault();if(checked)nextQuestion();else checkAnswer(q);});
    $('#hint-button').onclick=()=>showHint(q);
