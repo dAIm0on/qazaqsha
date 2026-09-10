@@ -6,6 +6,7 @@
  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;install.hidden=false;});
  install.onclick=async()=>{if(!prompt)return;await prompt.prompt();await prompt.userChoice;prompt=null;install.hidden=true;};
  window.addEventListener('appinstalled',()=>{install.hidden=true;status.textContent='Приложение добавлено на главный экран.';});
+ if(navigator.storage?.persist)navigator.storage.persist().catch(()=>{});
  if(!('serviceWorker' in navigator)||!window.isSecureContext){status.textContent='В этом браузере офлайн-копия недоступна. Можно скачать полный HTML из папки с исходниками.';return;}
  navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>{
    const ready=()=>{status.textContent=reg.active?'Учебные материалы сохранены для работы без сети. Внешние оригиналы открываются с интернетом.':'Сохраняю учебные материалы для работы без сети…';};ready();
