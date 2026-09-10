@@ -134,9 +134,12 @@
  function hintEvent(q,kind){state.events.push({type:'hint',card_id:q.id,at:Date.now(),hint_kind:kind,response_time_ms:elapsed(),hinted:true});}
  function showHint(q){
    hintEvent(q,'explanation');hinted=true;$('#hint-button').disabled=true;
-   const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Остальные зависят от слова. В смешанном слове для окончания важен последний слог. И и У требуют внимания к конкретному слову.',plural:'Сначала выбери А или Е по последнему слогу. Затем посмотри на последнюю букву: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Произнеси слово и вспомни его пару в словаре. Первый знак ответа: ',numbers:'Вспомни слово из списка чисел и количества. Первый знак ответа: '};
-   let hint=q.hint||hints[q.topic];
-   if(!q.hint&&(q.topic==='vocab'||q.topic==='numbers'))hint+=(q.fields?.[0]?.answers?.[0]||q.correct?.[0]||'')[0]?.toUpperCase()+'.';
+   const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Остальные зависят от слова. В смешанном слове для окончания важен последний слог. И и У требуют внимания к конкретному слову.',plural:'Сначала выбери А или Е по последнему слогу. Затем посмотри на последнюю букву: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Произнеси слово и вспомни его пару в словаре.',numbers:'Вспомни слово из списка чисел и количества.'};
+   let hint=q.hint||hints[q.topic]||'';
+   if(!q.hint&&(q.topic==='vocab'||q.topic==='numbers')){
+     const pair=q.fields?.[0]?.answers?.[0]||q.correct?.[0]||'';
+     if(pair)hint=(hint?hint+' ':'')+pair;
+   }
    const box=$('#hint-box');box.textContent=hint;box.hidden=false;save();
  }
  function readAnswers(q){return q.kind==='multi'?$$('input[name=choice]:checked').map(el=>el.value):q.fields.map((_,i)=>$('#answer-'+i).value);}

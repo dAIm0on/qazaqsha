@@ -83,7 +83,7 @@ window.LESSON_PACKS = [
       },
       {
         "kazakh": "сендер",
-        "translation": "вы — несколько людей на «ты»"
+        "translation": "вы"
       },
       {
         "kazakh": "сіз",
@@ -91,7 +91,7 @@ window.LESSON_PACKS = [
       },
       {
         "kazakh": "сіздер",
-        "translation": "Вы — несколько людей уважительно"
+        "translation": "вы"
       },
       {
         "kazakh": "ол",
@@ -3663,7 +3663,7 @@ window.LESSON_PACKS = [
             ]
           }
         ],
-        "explanation": "сендер — вы — несколько людей на «ты».",
+        "explanation": "сендер — вы. Несколько людей, на «ты».",
         "note": null
       },
       {
@@ -3681,11 +3681,13 @@ window.LESSON_PACKS = [
             "label": "Ответ",
             "kind": "text",
             "answers": [
+              "вы",
               "вы — несколько людей на «ты»"
             ]
           }
         ],
-        "explanation": "сендер — вы — несколько людей на «ты».",
+        "explanation": "сендер — вы. Несколько людей, на «ты».",
+        "hint": "вы",
         "note": null
       },
       {
@@ -3731,6 +3733,7 @@ window.LESSON_PACKS = [
           }
         ],
         "explanation": "сіз — вы. Один человек, уважительно.",
+        "hint": "вы",
         "note": null
       },
       {
@@ -3752,7 +3755,7 @@ window.LESSON_PACKS = [
             ]
           }
         ],
-        "explanation": "сіздер — Вы — несколько людей уважительно.",
+        "explanation": "сіздер — вы. Несколько людей, уважительно.",
         "note": null
       },
       {
@@ -3770,11 +3773,13 @@ window.LESSON_PACKS = [
             "label": "Ответ",
             "kind": "text",
             "answers": [
+              "вы",
               "Вы — несколько людей уважительно"
             ]
           }
         ],
-        "explanation": "сіздер — Вы — несколько людей уважительно.",
+        "explanation": "сіздер — вы. Несколько людей, уважительно.",
+        "hint": "вы",
         "note": null
       },
       {
@@ -5004,6 +5009,7 @@ window.LESSON_PACKS = [
             ]
           }
         ],
+        "hint": "вы",
         "lessonId": "1-3"
       },
       {
@@ -5015,12 +5021,14 @@ window.LESSON_PACKS = [
         "kind": "fields",
         "title": "Переведи на русский",
         "stimulus": "сіздер",
-        "explanation": "сіздер — Вы — несколько людей уважительно.",
+        "explanation": "сіздер — вы. Несколько людей, уважительно.",
+        "hint": "вы",
         "fields": [
           {
             "label": "Ответ на русском",
             "kind": "text",
             "answers": [
+              "вы",
               "Вы — несколько людей уважительно",
               "вы — несколько людей уважительно"
             ]
