@@ -42,7 +42,18 @@
      ['phone','Телефон: сохраняем ведущие нули','numbers',q=>q.skillBindings?.some(b=>b.item_id==='rule:phone-groups'),'Телефон делим на четыре группы после +7. Для 022 произносим нөл жиырма екі; для 00 — нөл нөл. Каждую группу вводим в отдельное поле.']
    ];
    for(const [key,title,topic,match,intro] of sections){const qs=pack.original_exercises.filter(match),chunks=[];
-     for(let i=0;i<qs.length;i+=4){const group=qs.slice(i,i+4);if(group.length===1&&i)group.unshift(qs[i-1]);chunks.push({title:title+' · '+(Math.floor(i/4)+1),explanation:intro,items:group.slice(0,2).map(q=>({front:q.stimulus,back:q.fields.map(f=>f.answers[0]).join(' · '),cue:q.note||''})),questionIds:group.map(q=>q.id),associationKey:'lesson:school-'+pack.lesson_id+'-'+key});}
+     for(let i=0;i<qs.length;i+=4){
+       const group=qs.slice(i,i+4);if(group.length===1&&i)group.unshift(qs[i-1]);
+       const seen=new Set(),items=[];
+       for(const q of group){
+         if(!q.fields?.length)continue;
+         const toKk=/на казахский|по-казахски|на казахском/i.test(q.title);
+         const kk=toKk?q.fields[0].answers[0]:q.stimulus,ru=toKk?q.stimulus:q.fields[0].answers[0],keyWord=core.normalize(kk||q.id);
+         if(seen.has(keyWord))continue;seen.add(keyWord);
+         items.push({front:kk||q.stimulus,back:ru||q.fields.map(f=>f.answers[0]).join(' · '),cue:q.note||q.explanation||''});
+       }
+       chunks.push({title:title+' · '+(Math.floor(i/4)+1),explanation:intro,items:items.length?items:group.slice(0,2).map(q=>({front:q.stimulus,back:q.fields.map(f=>f.answers[0]).join(' · '),cue:q.note||''})),questionIds:group.map(q=>q.id),associationKey:'lesson:school-'+pack.lesson_id+'-'+key});
+     }
      window.LEARNING.lessons.push({id:'school-'+pack.lesson_id+'-'+key,title,topic,courseLesson:pack.lesson_id,intro,items:[],questionIds:qs.map(q=>q.id),chunks});
    }
  }

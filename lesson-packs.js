@@ -3844,6 +3844,7 @@ window.LESSON_PACKS = [
           }
         ],
         "explanation": "олар — они.",
+        "hint": "олар",
         "note": null
       },
       {
@@ -3866,6 +3867,7 @@ window.LESSON_PACKS = [
           }
         ],
         "explanation": "олар — они.",
+        "hint": "они",
         "note": null
       },
       {
