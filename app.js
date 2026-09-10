@@ -1,0 +1,335 @@
+/* All answers are checked locally against the reviewed course key. */
+(function(){
+ 'use strict';
+ const course=window.COURSE, core=window.TrainerCore, questions=course.questions;
+ const byId=new Map(questions.map(q=>[q.id,q]));
+ const topics=[['all','Все задания','∞'],['sounds','Звуки и слоги','01'],['plural','Множественное число','02'],['vocab','Слова','03'],['numbers','Числа и количество','04']];
+ const KEY='qazaq-kris-course-v1', BACKUP=KEY+'-before-import', MIGRATION=KEY+'-before-schema-5';
+ const cfg=window.TRAINER_CONFIG, P=window.ProgressStore, catalog=window.CURRICULUM;
+ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ let state=P.empty(),savedSession=null,storageAvailable=true,storageReadError=null;
+ try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);}}
+ catch(error){storageAvailable=false;storageReadError=error;}
+ let records=state.records,learningState=state.learning;
+ try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);
+ let confusionIndex=P.answerIndex(questions);
+ let topic='all',mode='ordered',sourceFilter=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
+ let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
+ let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false;
+ function captureDraft(){const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,answers:readAnswers(q)};}
+ function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;}
+ function elapsed(){return Math.round(elapsedMs+(timerSince===null?0:Math.max(0,performance.now()-timerSince)));}
+ function pauseTimer(){elapsedMs=elapsed();timerSince=null;}
+ function startTimer(){if(!introOpen&&view==='practice'&&!checked&&!document.hidden&&timerSince===null&&byId.has(queue[position]))timerSince=performance.now();}
+ function eligible(value){const q=typeof value==='string'?byId.get(value):value;return !!q&&catalog.eligible(q,state)&&(!q.promotedWord||state.vocabulary[q.promotedWord]?.target_or_context==='target');}
+ function activateCard(){
+   if(introOpen||view!=='practice'||checked||document.hidden)return;
+   const q=byId.get(queue[position]);if(!q)return;
+   const token=queueEpoch+':'+position;
+   if(presented!==token){
+     presented=token;records[q.id]=window.ReviewScheduler.shown(records[q.id]);
+     for(const id of q.vocabIds||[]){const w=catalog.words.find(w=>w.id===id),p=state.vocabulary[id]||{times_seen:0,target_or_context:w?.target_or_context||'context'};state.vocabulary[id]={...p,times_seen:p.times_seen+1,last_seen:Date.now(),last_seen_lesson:q.lessonId};}
+   }startTimer();
+ }
+ function save(){
+   captureDraft();state.records=records;state.learning=learningState;
+   state.session={topic,mode,sourceFilter,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation};
+   try{if(storageReadError)throw storageReadError;localStorage.setItem(KEY,JSON.stringify(state));storageAvailable=true;}catch{storageAvailable=false;}
+   $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?'Прогресс в этом браузере · резервная копия в «Сегодня».':'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
+ }
+ function subset(){if(activeLesson){const ids=new Set(window.LEARNING.lessons.find(l=>l.id===activeLesson).questionIds);return questions.filter(q=>ids.has(q.id));}return questions.filter(q=>eligible(q)&&(topic==='all'||q.topic===topic)&&(!sourceFilter||q.source===sourceFilter));}
+ function shuffled(items){
+   const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
+ }
+ function startQueue({all=false}={}){
+   activeLesson=null;activeStep=null;stepEvidence={};let list=subset();
+   if(mode==='smart'){list=shuffled(list).sort((a,b)=>Number(window.Knowledge.bindings(b).some(x=>x.skill_type==='production'))-Number(window.Knowledge.bindings(a).some(x=>x.skill_type==='production')));list=core.chooseShortSession(list,records,Date.now(),questions.length);}
+   else if(mode==='review')list=list.filter(q=>core.isDue(records[q.id])).sort((a,b)=>records[a.id].dueAt-records[b.id].dueAt);
+   else if(mode==='mistakes')list=list.filter(q=>records[q.id]?.needsReview);
+   else if(!all)list=list.filter(q=>(records[q.id]?.streak||0)<2||core.isDue(records[q.id]));
+   if(mode==='shuffle'||mode==='mistakes')list=shuffled(list);
+   if(['smart','review','mistakes'].includes(mode)){const recent=state.events.filter(e=>e.type==='answer'&&Date.now()-e.at<cfg.session.recentWindowMs).slice(-cfg.session.minIntervening).map(e=>e.card_id);list=core.spaceRecent(window.Knowledge.choose(list,state,Infinity),recent).slice(0,cfg.session.size);}
+   queue=list.map(q=>q.id);practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;resetCounts();render();
+ }
+ function startLesson(id,step=learningState.steps[id]||0){
+   const lesson=window.LEARNING.lessons.find(l=>l.id===id),chunk=lesson?.chunks[step];if(!chunk)return;
+   if(!chunk.questionIds.every(eligible)){showView('learn');return;}
+   activeLesson=id;activeStep=step;learningState.lessonId=id;learningState.steps[id]=step;topic=lesson.topic;mode='lesson';sourceFilter=null;
+   queue=lesson.topic==='numbers'?shuffled(chunk.questionIds):[...chunk.questionIds];practiceIds=[...queue];stepEvidence={};queueEpoch=Date.now()+Math.random();
+   position=0;variants={};checked=false;resetCounts();render();showView('practice');$('#exercise').scrollIntoView({block:'start'});
+ }
+ function startContrast(pair){
+   activeLesson=null;activeStep=null;topic='all';sourceFilter=null;mode='contrast';
+   queue=shuffled(P.contrastIds(pair,confusionIndex,questions).filter(eligible));practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;resetCounts();
+   render();showView('practice');
+ }
+ function showView(next){
+   pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
+   view=next;document.body.dataset.view=next;
+   ['today','learn','review','vocabulary','practice','rules','materials'].forEach(v=>{$('#'+v+'-view').hidden=v!==next;});
+   $$('[data-view]').forEach(b=>{if(b.dataset.view===(next==='practice'?'review':next))b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='practice')activateCard();save();
+ }
+ function renderNav(){
+   $('#lesson-nav').innerHTML=topics.map(([id,name,num])=>{
+     const list=questions.filter(q=>id==='all'||q.topic===id), n=list.filter(q=>(records[q.id]?.streak||0)>=2).length;
+     return `<button type="button" class="topic-button" data-topic="${id}" ${topic===id?'aria-current="page"':''}><span class="topic-num">${num}</span><span><span class="topic-name">${name}</span><span class="topic-count">${n} / ${list.length} закреплено</span></span></button>`;
+   }).join('');
+   $$('[data-topic]').forEach(b=>b.addEventListener('click',()=>{topic=b.dataset.topic;sourceFilter=null;activeLesson=null;mode='smart';startQueue();showView('practice');}));
+ }
+ function renderStats(){
+   const recallCards=questions.filter(q=>q.kind==='fields'&&q.fields.some(f=>f.kind!=='select'));
+   const learned=recallCards.filter(q=>['REMEMBERED','MASTERED'].includes(records[q.id]?.mastery_level)).length;
+   $('#mastery-count').textContent=`${learned} / ${recallCards.length}`;$('#mastery-progress').max=recallCards.length;$('#mastery-progress').value=learned;
+   $('#mistake-count').textContent=subset().filter(q=>records[q.id]?.needsReview).length;
+   $('#due-count').textContent=subset().filter(q=>core.isDue(records[q.id])).length;
+   $('#pause-session').hidden=queue.length===0||position>=queue.length;
+   const scope=subset(), tried=scope.filter(q=>records[q.id]?.attempts>0).length;
+   $('#session-position').textContent=['smart','lesson','review','contrast'].includes(mode)?`В подходе ${new Set(queue).size} разных карточек · шаг ${Math.min(position+1,queue.length)} из ${queue.length}`:`Встречалось ${tried} из ${scope.length} карточек`;
+   $('#session-score').textContent=sessionAttempts?`Без подсказки: ${sessionCorrect} / ${sessionAttempts} · с подсказкой: ${sessionAssisted}`:'Можно отвечать сразу';
+   $('#practice-title').textContent=activeLesson?window.LEARNING.lessons.find(l=>l.id===activeLesson).title:topic==='all'?'Практика казахского':topics.find(x=>x[0]===topic)[1];
+   $('.course-badge').textContent=`${scope.length} карточек`;
+   $$('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
+   const sf=$('#source-filter');sf.hidden=!sourceFilter;
+   if(sourceFilter){sf.innerHTML=`<span>${esc(course.sources[sourceFilter].title)}</span><button type="button">Все материалы</button>`;sf.querySelector('button').onclick=()=>{sourceFilter=null;startQueue();};}
+   renderNav();
+ }
+ function answerMarkup(q){
+   if(q.kind==='multi')return `<p class="question-meta">Отметь все подходящие варианты.</p><div class="choices" role="group" aria-label="Варианты ответа">${q.options.map((o,i)=>`<label class="choice" id="choice-${i}"><input type="checkbox" name="choice" value="${esc(o)}"><span lang="kk">${esc(o)}</span><span class="choice-result" aria-hidden="true"></span></label>`).join('')}</div>`;
+   return `<div class="fields">${q.fields.map((f,i)=>`<div class="field-row"><label class="field-label" for="answer-${i}">${esc(f.label)}</label><div class="field-control">${f.kind==='select'?`<select id="answer-${i}" name="answer-${i}" aria-describedby="correction-${i}"><option value="">Выбрать…</option>${f.options.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('')}</select>`:`<input id="answer-${i}" name="answer-${i}" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${f.kind==='number-text'?'inputmode="numeric"':''} aria-describedby="correction-${i}">`}<span class="field-correction" id="correction-${i}"></span></div></div>`).join('')}</div>`;
+ }
+ function render(){
+   introOpen=false;pauseTimer();elapsedMs=0;checked=false;hinted=false;lastTextInput=null;renderStats();
+   const q=byId.get(queue[position]);
+   if(!q){renderEmpty();return;}
+   window.NumberPractice.prepare(q,variants);confusionIndex=P.answerIndex(questions);
+   const source=course.sources[q.source], streak=records[q.id]?.streak||0;
+   const location=q.source.startsWith('hw')?'Слово '+q.group:`Задание ${q.group}${q.part!=='1'?' · пункт '+q.part:''}`;
+   const hasText=q.kind==='fields'&&q.fields.some(f=>f.kind!=='select'&&f.kind!=='number-text');
+   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${source.additional?esc(source.title):`<a href="${source.url}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`}<br>${esc(location)}</div><span class="mastery-label">${cfg.labels[records[q.id]?.mastery_level||'NEW']}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p><h2 id="question-title">${esc(q.title)}</h2>${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}${answerMarkup(q)}${hasText?`<div class="letter-keyboard" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div><div class="keyboard-label">Буква вставится в выбранное поле.</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="hint-button">Подсказка</button><button type="button" class="text-button" id="reveal-button">Не знаю</button><button type="button" class="text-button" id="association-button">Моя подсказка</button></div><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="next-button" hidden>Дальше →</button></div></form>`;
+   $('#answer-form').addEventListener('submit',e=>{e.preventDefault();if(checked)nextQuestion();else checkAnswer(q);});
+   $('#hint-button').onclick=()=>showHint(q);
+   $('#reveal-button').onclick=()=>checkAnswer(q,true);
+   $('#next-button').onclick=nextQuestion;
+   $('#association-button').onclick=()=>openAssociation(q);
+   $$('#answer-form input[type=text]').forEach(el=>el.addEventListener('focus',()=>{lastTextInput=el;}));
+   $$('[data-letter]').forEach(b=>{
+     b.addEventListener('mousedown',e=>e.preventDefault());
+     b.addEventListener('click',()=>{
+       if(checked)return;
+       const target=lastTextInput||$('#answer-form input[type=text]');if(!target)return;
+       const start=target.selectionStart??target.value.length,end=target.selectionEnd??start;
+       target.value=target.value.slice(0,start)+b.dataset.letter+target.value.slice(end);
+       target.focus();target.setSelectionRange(start+1,start+1);lastTextInput=target;save();
+     });
+   });
+   if(draft?.token===queueEpoch+':'+position){
+     if(q.kind==='multi')$$('input[name=choice]').forEach(el=>{el.checked=draft.answers.includes(el.value);});
+     else q.fields.forEach((f,i)=>{$('#answer-'+i).value=String(draft.answers[i]||'');});
+   }
+   $('#answer-form').addEventListener('input',save);$('#answer-form').addEventListener('change',save);
+   activateCard();save();
+ }
+ function hintEvent(q,kind){state.events.push({type:'hint',card_id:q.id,at:Date.now(),hint_kind:kind,response_time_ms:elapsed(),hinted:true});}
+ function showHint(q){
+   hintEvent(q,'explanation');hinted=true;$('#hint-button').disabled=true;
+   const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Остальные зависят от слова. В смешанном слове для окончания важен последний слог. И и У требуют внимания к конкретному слову.',plural:'Сначала выбери А или Е по последнему слогу. Затем посмотри на последнюю букву: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Произнеси слово и вспомни его пару в словаре. Первый знак ответа: ',numbers:'Вспомни слово из списка чисел и количества. Первый знак ответа: '};
+   let hint=q.hint||hints[q.topic];
+   if(!q.hint&&(q.topic==='vocab'||q.topic==='numbers'))hint+=(q.fields?.[0]?.answers?.[0]||q.correct?.[0]||'')[0]?.toUpperCase()+'.';
+   const box=$('#hint-box');box.textContent=hint;box.hidden=false;save();
+ }
+ function readAnswers(q){return q.kind==='multi'?$$('input[name=choice]:checked').map(el=>el.value):q.fields.map((_,i)=>$('#answer-'+i).value);}
+ function checkAnswer(q,reveal=false){
+   if(checked)return;
+   const answers=readAnswers(q), warning=$('#validation');
+   if(!reveal){
+     const missing=q.kind==='multi'?answers.length===0:answers.some(a=>!a.trim());
+     if(missing){warning.textContent=q.kind==='multi'?'Выбери хотя бы один вариант.':'Заполни все поля — проверим разбор целиком.';warning.hidden=false;if(q.kind==='fields')$('#answer-'+answers.findIndex(a=>!a.trim())).focus();return;}
+   }
+   warning.hidden=true;
+   const result=reveal?{correct:false,parts:q.kind==='multi'?q.options.map(()=>false):q.fields.map(()=>false)}:core.evaluate(q,answers);
+   checked=true;if(reveal){hintEvent(q,'reveal');hinted=true;}
+   pauseTimer();const now=Date.now(),recall=q.kind==='fields'&&q.fields.some(f=>f.kind!=='select');
+   let rec=core.updateRecord(records[q.id],result.correct,hinted,now,{responseTime:elapsedMs,recall});records[q.id]=rec;
+   const errors=reveal?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);state.errors.push(...errors);
+   const event={session_id:String(queueEpoch),presentation:position,type:'answer',card_id:q.id,at:now,correct:result.correct,hinted,response_time_ms:elapsedMs,response_time:elapsedMs,recall,answers};
+   event.skills=window.Knowledge.observe(state,q,result,event,errors);state.events.push(event);rec=records[q.id];
+   P.observeConfusions(state,q,answers,result,now,confusionIndex,hinted||reveal);
+   for(const pair of Object.values(state.confusions)){pair.expected_item=[...confusionIndex.get(pair.expected_answer)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.given_item=[...confusionIndex.get(pair.wrong_answer_given)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.last_confused=pair.last_wrong;}
+   if(activeLesson&&practiceIds.includes(q.id))stepEvidence[q.id]=result.correct&&!hinted;
+   sessionAttempts++;if(result.correct){if(hinted)sessionAssisted++;else sessionCorrect++;}
+   core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id));
+   const deferred=rec.streak<cfg.schedule.cleanAnswersToConsolidate&&!queue.slice(position+1).includes(q.id);
+   if(q.kind==='multi'){
+     q.options.forEach((o,i)=>{
+       const label=$('#choice-'+i),expected=q.correct.includes(o),selected=answers.includes(o);
+       if(expected){label.classList.add(selected&&!reveal?'correct':'missed');label.querySelector('.choice-result').textContent='✓';}
+       else if(selected){label.classList.add('incorrect');label.querySelector('.choice-result').textContent='×';}
+     });
+   }else{
+     q.fields.forEach((f,i)=>{
+       const el=$('#answer-'+i);el.classList.add(result.parts[i]&&!reveal?'valid':'invalid');
+       if(!result.parts[i]||reveal){el.setAttribute('aria-invalid','true');$('#correction-'+i).textContent='Ответ: '+f.answers.join(' / ');}
+     });
+   }
+   $$('#answer-form input, #answer-form select, #hint-button, #reveal-button, [data-letter]').forEach(el=>{el.disabled=true;});
+   $('#check-button').hidden=true;$('#next-button').hidden=false;
+   const feedback=$('#feedback');feedback.className='feedback '+(!result.correct?'error':hinted?'hinted':'');
+   const headline=reveal?'Разберём ответ':!result.correct?'Пока не всё верно':hinted?'Верно, с подсказкой':rec.streak>=2?'Верно, самостоятельно!':'Верно. Продолжим закрепление';
+   let status=rec.streak>=2?'Следующая проверка по памяти: '+new Date(rec.dueAt).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+'.':!result.correct?'Эта карточка появится снова.':'Для закрепления карточка вернётся позже.';
+   if(deferred)status='Карточка сохранена для следующего подхода: сейчас не хватает других заданий для паузы.';
+   if(result.correct&&hinted)status='Ответ с подсказкой не повышает уровень освоения. Попробуй ещё раз без неё.';
+   feedback.innerHTML=`<h3>${headline}</h3>${q.kind==='multi'?`<p><strong>Ответ:</strong> ${q.correct.map(esc).join(', ')}.</p>`:''}${errors.length?'<p><strong>Где ошибка:</strong> '+[...new Set(errors.map(e=>window.ErrorDiagnostics.labels[e.error_type]))].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p><p class="small">${cfg.labels[rec.mastery_level]} · время ответа ${(elapsedMs/1000).toFixed(1)} с (без штрафа).</p>`;feedback.hidden=false;
+   renderStats();save();$('#next-button').focus({preventScroll:true});
+ }
+ function nextQuestion(){draft=null;position++;if(!['ordered','shuffle'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});const title=$('#question-title');if(title){title.tabIndex=-1;title.focus({preventScroll:true});}}
+ function renderEmpty(){
+   const lesson=activeLesson&&window.LEARNING.lessons.find(l=>l.id===activeLesson);
+   const complete=!!lesson&&practiceIds.length>0&&practiceIds.every(id=>stepEvidence[id]);
+   if(complete)learningState.completedSteps[activeLesson+':'+activeStep]=true;
+   const waiting=practiceIds.filter(id=>(records[id]?.streak||0)<cfg.schedule.cleanAnswersToConsolidate).length;
+   const help=window.LearningSupport.suggestions(state,questions)[0];
+   $('#exercise').innerHTML='<div class="empty-state"><span class="empty-letter" lang="kk">✓</span><h2>'+(complete?'Проверка идеи пройдена':'Подход завершён')+'</h2><p>Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'. Ошибок: '+(sessionAttempts-sessionCorrect-sessionAssisted)+'.</p><p>'+(waiting?'Ещё закрепляем '+waiting+' карточек. Они сохраняются для повторения.':'Можно остановиться; карточки вернутся по расписанию.')+'</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">'+(lesson?(complete?(activeStep<lesson.chunks.length-1?'Следующая идея':'Выбрать следующий урок'):'Вернуться к объяснению'):'Ещё несколько заданий')+'</button><button type="button" class="secondary-button" id="back-to-learning">Закончить</button></div>'+(help?'<div class="panel"><h3>'+esc(help.title)+'</h3><p>Эта ошибка повторялась. Можно отдельно потренировать трудный шаг.</p><button type="button" class="secondary-button" id="start-remedy">Разобрать и проверить</button></div>':'')+'</div>';
+   $('#restart').onclick=()=>{if(lesson){if(complete&&activeStep<lesson.chunks.length-1)learningState.steps[lesson.id]=activeStep+1;else if(complete){const next=window.LEARNING.lessons[window.LEARNING.lessons.indexOf(lesson)+1];if(next)learningState.lessonId=next.id;}showView('learn');}else{mode='smart';startQueue();showView('practice');}};
+   $('#back-to-learning').onclick=()=>showView('today');
+   if($('#start-remedy'))$('#start-remedy').onclick=()=>startRemedy(help.type);
+   save();
+ }
+ function startRemedy(type){
+   const help=window.LearningSupport.suggestions(state,questions).find(h=>h.type===type);if(!help)return;
+   showView('practice');captureDraft();pauseTimer();introOpen=true;const current=byId.get(queue[position]);if(current&&!checked){hintEvent(current,'remediation');hinted=true;}save();const priorExercise=document.createDocumentFragment();while($('#exercise').firstChild)priorExercise.append($('#exercise').firstChild);
+   $('#exercise').innerHTML='<div class="panel"><h2>'+esc(help.title)+'</h2><p>'+esc(help.explanation)+'</p><p>Сначала '+(help.ids.length-1)+' коротких проверок, затем исходный пример.</p><button type="button" class="primary-button" id="remedy-check">Понятно → проверить</button><button type="button" class="text-button" id="remedy-cancel">Вернуться</button></div>';
+   $('#remedy-cancel').onclick=()=>{introOpen=false;$('#exercise').replaceChildren(priorExercise);showView('today');};
+   $('#remedy-check').onclick=()=>{startCustom(help.ids,'remediation');remediation=type;save();};
+ }
+ function startCustom(ids,kind='words'){
+   activeLesson=null;activeStep=null;sourceFilter=null;topic='all';mode=kind;
+   queue=ids.filter(eligible);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;resetCounts();render();showView('practice');
+ }
+ function practiceWords(ids){
+   const wanted=new Set(ids),qs=questions.filter(q=>window.Knowledge.bindings(q).some(b=>wanted.has(b.item_id)&&['production','digit_to_word'].includes(b.skill_type)));
+   startCustom(window.Knowledge.choose(shuffled(qs),state).map(q=>q.id));
+
+ }
+ function setAssociation(key,text){state.associations[key]={text:text.slice(0,cfg.storage.maxAssociationLength),updated_at:Date.now()};save();}
+ function openAssociation(q){
+   if(!checked){hintEvent(q,'association');hinted=true;}
+   const relevant=window.LEARNING.lessons.filter(l=>l.questionIds.includes(q.id));
+   const keys=[...new Set([...(q.associationKeys||[]),...relevant.map(l=>'lesson:'+l.id),...(activeLesson?[window.LEARNING.lessons.find(l=>l.id===activeLesson).chunks[activeStep].associationKey]:[])])];
+   const title=key=>key.startsWith('word:')?key.slice(5):key.startsWith('rule:')?(catalog.rules.find(r=>r.id===key.slice(5))?.title||key):key.startsWith('ending:')?'Окончание '+key.slice(7):key.startsWith('lesson:')?'Идея урока':'Этот пример';
+   const chosen=keys.find(k=>state.associations[k]?.text)||keys[0],box=$('#association-box');
+   box.innerHTML='<p>Это подсказка: ответ после просмотра не повышает уровень самостоятельного воспроизведения.</p><label for="association-target">К чему относится<select id="association-target">'+keys.map(k=>'<option value="'+esc(k)+'" '+(k===chosen?'selected':'')+'>'+esc(title(k))+'</option>').join('')+'</select></label><label for="association-text">Моя ассоциация<textarea id="association-text" rows="2" maxlength="1200">'+esc(state.associations[chosen]?.text||'')+'</textarea></label>';
+   box.hidden=false;$('#association-target').onchange=e=>{$('#association-text').value=state.associations[e.target.value]?.text||'';};
+   $('#association-text').oninput=e=>setAssociation($('#association-target').value,e.target.value);save();
+ }
+ function downloadProgress(text,name='progress.json'){
+   const blob=new Blob([text],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ }
+ function promote(id){
+   const w=catalog.words.find(w=>w.id===id);if(!w)return;
+   state.vocabulary[id]={...(state.vocabulary[id]||{times_seen:0,last_seen:0}),target_or_context:'target'};
+   window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);save();
+ }
+ function importProgress(incoming,mode){
+   const backup=P.serialize(state);
+   try{localStorage.setItem(BACKUP,backup);}catch{throw Error('Не удалось сохранить копию перед импортом. Сначала скачай текущий прогресс; импорт не выполнен.');}
+   const next=mode==='replace'?P.migrate(incoming):P.merge(state,incoming);next.session=null;next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
+   try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
+   state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;
+   window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);
+   activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;checked=false;presented=null;pauseTimer();elapsedMs=0;showView('today');
+ }
+ function vocabTable(rows){return `<div class="table-wrap"><table><thead><tr><th scope="col">Қазақша</th><th scope="col">По-русски / число</th></tr></thead><tbody>${rows.map(([k,r])=>`<tr><td lang="kk">${esc(k)}</td><td>${esc(Array.isArray(r)?r.join(', '):r)}</td></tr>`).join('')}</tbody></table></div>`;}
+ function renderRules(){
+   $('#rules-content').innerHTML=`
+     <div class="panel"><h2>Сингармонизм без путаницы</h2><p>Для выбора окончания нужны две опоры: <strong>последний слог</strong> определяет гласную, <strong>последняя буква</strong> — первую согласную. Не пытайся запомнить шесть окончаний как шесть отдельных правил.</p><div class="table-wrap"><table><thead><tr><th scope="col">Последняя буква слова</th><th scope="col">Последний слог задний<br>А О Ұ Ы</th><th scope="col">Последний слог передний<br>Ә Ө Ү І Е</th></tr></thead><tbody><tr><th scope="row">Гласная, Р, Й, У → Л</th><td lang="kk">-лар · қалалар</td><td lang="kk">-лер · көшелер</td></tr><tr><th scope="row">Л, М, Н, Ң, Ж, З → Д</th><td lang="kk">-дар · адамдар</td><td lang="kk">-дер · сөздер</td></tr><tr><th scope="row">Глухая; Б, В, Г, Д → Т</th><td lang="kk">-тар · кітаптар</td><td lang="kk">-тер · жігіттер</td></tr></tbody></table></div><p>Пример рассуждения: кі-<strong>тап</strong> → последний слог задний → А. Последняя буква П → Т. Получаем кітап + тар = <span lang="kk">кітаптар</span>.</p><p>И и У разбираем в составе слова: иттер, но милар. -мен — особое падежное окончание без чередования А/Е. Остальные группы букв в методичке — учебная схема; полный алфавит не нужно смешивать с двумя основными группами гласных.</p><p><a href="https://kaz-tili.kz/su_mn1.htm" target="_blank" rel="noopener noreferrer">Правило множественного числа и примеры</a></p></div>
+     <div class="panel"><h2>Числа: складывай части, а не зубри каждое число</h2><p>47 = 40 + 7 → <span lang="kk">қырық жеті</span>. 243 = 200 + 40 + 3 → <span lang="kk">екі жүз қырық үш</span>. Сначала большие разряды, затем маленькие. Между словами — пробел, слова «и» нет.</p><p>Для 60–90 держи рядом пары: алты → алпыс, жеті → жетпіс, сегіз → сексен, тоғыз → тоқсан. Это опора для памяти; названия десятков запоминаем точно.</p><p>Число перед существительным уже сообщает количество: екі кітап, көп адам. Сравни: кітаптар — книги; екі кітап — две книги.</p><p class="small">В разделе «Учиться» есть конструктор чисел и разбор окончаний на примерах.</p></div>
+     <div class="panel"><h2>Мягкое или твёрдое?</h2><p>Это названия групп из твоего курса для выбора окончаний. Они не совпадают с русской классификацией согласных по мягкости.</p><div class="pair-strip">${['Ә — А','Ө — О','І — Ы','Ү — Ұ','К — Қ','Г — Ғ'].map(s=>`<span lang="kk">${s}</span>`).join('')}</div><p><strong>Мягкая группа:</strong> Ә, Ө, І, Ү, Е, К, Г; в таблице курса также Э.</p><p><strong>Твёрдая группа:</strong> А, О, Ы, Ұ, Қ, Ғ, Я; в таблице курса также Ё.</p><p><strong>Остальные буквы зависят от слова.</strong> Например, Ң не является «всегда твёрдой»: сравни таң и тең.</p><p class="small">И, У и Ю не нужно угадывать отдельно от слова. Ит и би — мягкие; ми («мозг»), су, ту и у — твёрдые. Сүю — мягкое; аю и ою — твёрдые.</p><details><summary>Смешанные слова и разбор по слогам</summary><p>В мұғалім есть твёрдые и мягкий слог. Для окончания смотрим на последний лім: мұғалімдер. В іссапар последний слог пар твёрдый.</p><p>В учебном разборе слог только с И или У согласуется с предыдущим определённым слогом. Если предыдущего нет — со следующим: ғы-лы-ми, и-не. Для конкретных слов здесь сохранены разборы из ключей курса.</p><p>Окончание -мен — особый случай: досыммен не становится целиком мягким словом. В упражнении с Аманкелдіұлымен разбираем написанные слоги; новое множественное окончание к готовой падежной форме не прибавляем.</p></details></div>
+     <div class="panel"><h2>Как выбрать множественное окончание</h2><p>1. По последнему слогу выбери твёрдый вариант с <strong>А</strong> или мягкий с <strong>Е</strong>.<br>2. По последней букве выбери начало окончания.</p><div class="table-wrap"><table><thead><tr><th scope="col">Последняя буква</th><th scope="col">Окончание</th><th scope="col">Пример</th></tr></thead><tbody><tr><td>К, Қ, П, С, Т, Ф, Х, Һ, Ц, Ч, Ш, Щ; Б, В, Г, Д</td><td>тар / тер</td><td>кітаптар<br>жігіттер</td></tr><tr><td>Л, М, Н, Ң, Ж, З</td><td>дар / дер</td><td>адамдар<br>сөздер</td></tr><tr><td>Гласные, Р, Й, У</td><td>лар / лер</td><td>қалалар<br>жерлер</td></tr></tbody></table></div><p class="small">Запоминалка для дар/дер: согласные в «ЛиМоН» + Ң, Ж, З. Чтобы получить единственное число, убери только окончание: дәрігерлер → дәрігер; иелер → ие.</p><details><summary>Число и количество перед существительным</summary><p>После числительного и слов көп, аз множественное окончание обычно не нужно: екі кітап, көп адам, аз қалам.</p><p class="small"><a href="https://kaz-tili.kz/su_mn1.htm" target="_blank" rel="noopener noreferrer">Объяснение и примеры на kaz-tili.kz</a> — дополнительный материал из методички.</p></details></div>
+     <div class="panel"><h2>Алфавит и произношение</h2><p lang="kk" style="font-size:1.15rem;line-height:1.95">А Ә Б В Г Ғ Д Е Ё Ж З И Й К Қ Л М Н Ң О Ө П Р С Т У Ұ Ү Ф Х Һ Ц Ч Ш Щ Ъ Ы І Ь Э Ю Я</p><p>Смотри на точную букву: Н ≠ Ң, К ≠ Қ, У ≠ Ұ ≠ Ү, И ≠ І.</p><div class="table-wrap"><table><thead><tr><th scope="col">Буква</th><th scope="col">Ориентир из урока</th><th scope="col">Примеры</th></tr></thead><tbody><tr><td>Ң</td><td>Носовой звук, как ng в sing. Не отдельные Н + Г.</td><td>шын — правда<br>шың — вершина</td></tr><tr><td>Қ, Ғ</td><td>Произносятся глубже, чем К, Г; Ғ — звонкий.</td><td>қол, ғасыр, сағат</td></tr><tr><td>Ы, І</td><td>Краткие гласные; І — передняя пара Ы.</td><td>жыл, алтын; тіс, кім</td></tr><tr><td>Ұ, Ү</td><td>Губы округлены; у Ү язык продвинут вперёд.</td><td>ұн, тұрмыс; үн, күн</td></tr><tr><td>Ә, Ө</td><td>Передние пары А и О; произносятся без добавочного Й.</td><td>ән, мән; өзен, өрт</td></tr><tr><td>Һ</td><td>Лёгкий выдох; встречается в заимствованных словах.</td><td>жиһаз, қаһарман</td></tr><tr><td>И, У, Ю</td><td>Чтение зависит от слова и его звукового состава.</td><td>ит, ми; су, ту; сүю, аю</td></tr><tr><td>Я, О, Е, Щ</td><td>Я — йа; не заменяй безударное О на А; Е в примерах курса — мягкой группы; Щ в ащы читается как шш.</td><td>ұя; орман / арман; ащы, тұщы</td></tr></tbody></table></div><div class="link-list"><a href="https://www.youtube.com/watch?v=CeGuG3jeRgo" target="_blank" rel="noopener noreferrer">Гласные: видео из методички</a><a href="https://www.youtube.com/watch?v=IjbaQlBEwkw" target="_blank" rel="noopener noreferrer">Согласные: видео из методички</a></div><p class="small">Произноси примеры вслух по образцу из видео. Проверка произношения голосом в этой версии не предусмотрена.</p></div>
+     <div class="panel"><h2>11 слов из домашней работы 1–1</h2>${vocabTable(course.vocabulary)}<p><button type="button" class="secondary-button" data-rule-topic="vocab">Тренировать слова</button></p></div>
+     <div class="panel"><h2>Числа и количество из домашней работы 1–2</h2>${vocabTable(course.numbers)}<p><button type="button" class="secondary-button" data-rule-topic="numbers">Тренировать числа</button></p></div>`;
+   $$('[data-rule-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.ruleTopic;sourceFilter=null;mode='ordered';showView('practice');startQueue();});
+ }
+ function renderMaterials(){
+   const cards=Object.entries(course.sources).filter(([,s])=>!s.additional).map(([key,s])=>{
+     const n=questions.filter(q=>q.source===key).length;
+     return `<div class="source-card"><div><h3>${esc(s.title)}</h3><p>${s.groups?s.groups+' групп заданий · ':''}${n} карточек</p></div><div class="source-actions"><button type="button" class="secondary-button" data-source="${key}">Тренировать</button><a href="${s.url}" target="_blank" rel="noopener noreferrer">Открыть оригинал</a></div></div>`;
+   }).join('');
+   $('#materials-content').innerHTML=`<div class="panel"><div class="coverage-stats"><div><span class="coverage-number">12</span><p>файлов проверено</p></div><div><span class="coverage-number">79</span><p>групп упражнений</p></div><div><span class="coverage-number">353</span><p>исходных карточек</p></div></div><p>Дополнительно: ${window.LEARNING.lessons.length} маленьких уроков и ${questions.filter(q=>q.source==='plus').length} карточек и шаблонов для постепенного обучения. Они разработаны для тренажёра и не выданы за задания автора курса.</p><p>Включены пронумерованные упражнения уроков 1–1, 1–2 и 1–3. Для урока 1–3 сохранены ссылки на оригиналы и пояснения к расхождениям ключей. В составных заданиях проверяются все буквы, слоги и поля перевода. Слова и числа из домашней работы тренируются в обе стороны.</p><p class="coverage-note">220 исходных карточек 1–1/1–2 сохранены; добавлены 133 карточки по источникам 1–3. Материалы проверены 9 сентября 2026; файлы из Drive не добавляются автоматически.</p><a href="${course.folder}" target="_blank" rel="noopener noreferrer">Открыть папку с исходными материалами</a></div><div class="panel"><h2>Упражнения и домашняя работа</h2>${cards}</div><div class="panel"><h2>Остальные файлы учтены</h2><p><a href="https://drive.google.com/file/d/1HIVPE51FqFOcHBOOXFNfsmDKxvfCKpui/view" target="_blank" rel="noopener noreferrer">«Мягкие и твёрдые.pdf»</a> — шпаргалка; её схема включена в «Правила».</p><p><a href="https://docs.google.com/document/d/1Y-dWGwCJL04Pbp015V3_T91_n2f15-ep/edit" target="_blank" rel="noopener noreferrer">Uroki_1_1_Otvety.docx</a> — ответы к сборнику 1–1; использованы для сверки.</p><p><a href="https://drive.google.com/file/d/1P45V0RTvcpKEAjutHpPXM6KARx1MZbgd/view" target="_blank" rel="noopener noreferrer">Вторая копия методички 1–1</a> — текст полностью совпадает с первой. Задания не удваивались.</p><p class="small">Ключи воспроизведены по курсу, для перевода добавлены допустимые синонимы. Исправлена опечатка «Дукен» → «дүкен». Особенность задания с -мен объяснена прямо в карточке.</p></div><div class="panel"><h2>Завершение домашней работы на сайте курса</h2><p>Чтобы преподаватель получил результат, выполни официальный тест и нажми «Зафиксировать результат» на сайте BatylBol. При необходимости войди в свой аккаунт.</p><div class="link-list"><a href="https://batylbol.kz/test/Zvuki.html" target="_blank" rel="noopener noreferrer">BatylBol · твёрдые и мягкие звуки</a><a href="https://batylbol.kz/test/MnozhChislo.html" target="_blank" rel="noopener noreferrer">BatylBol · множественное число</a></div><p class="small">Эти внешние банки вопросов не были доступны для переноса. Здесь сохранены ссылки из домашней работы; результаты личной тренировки в BatylBol не передаются.</p><p>Для заданий на письмо используй казахскую раскладку или кнопки букв под ответом. Шпаргалка всегда доступна в разделе «Правила».</p><details><summary>Дополнительные ссылки из методичек</summary><div class="link-list"><a href="https://kaz-tili.kz/su_fonetika.htm" target="_blank" rel="noopener noreferrer">Фонетика</a><a href="https://kaz-tili.kz/su_prav.htm" target="_blank" rel="noopener noreferrer">Мягкие и твёрдые слова</a><a href="https://kaz-tili.kz/progd/prog_mnozhestv_chislo.html" target="_blank" rel="noopener noreferrer">Множественное число · первый уровень</a><a href="https://kaz-tili.kz/prog/prog_mnozhestv_chislo.html" target="_blank" rel="noopener noreferrer">Множественное число · второй уровень</a><a href="https://sozdik.kz/" target="_blank" rel="noopener noreferrer">Русско-казахский словарь</a></div></details></div>`;
+   renderPackageImport();
+   $$('[data-source]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.source;topic='all';mode='ordered';showView('practice');startQueue();});
+ }
+ function renderPackageImport(){
+   const panel=document.createElement('details');panel.className='panel';
+   panel.innerHTML='<summary>Добавить полученный школьный урок</summary><p>Загрузи подготовленный JSON-пакет с исходной ссылкой, проверенными ответами и небольшими объяснениями. PDF и исследования напрямую не добавляются. Будущие уроки тренажёр не создаёт.</p><label>Пакет урока<input id="lesson-package-file" type="file" accept=".json,application/json"></label><div id="lesson-package-preview" role="status"></div>';
+   $('#materials-content').append(panel);
+   $('#lesson-package-file').onchange=async e=>{
+     const file=e.target.files[0],out=$('#lesson-package-preview');if(!file)return;
+     try{
+       if(file.size>2000000)throw Error('Пакет должен быть не больше 2 МБ.');
+       const pack=window.LessonPackageSchema.validate(JSON.parse(await file.text()));
+       const combined=window.LessonPackageSchema.merge(state.lesson_packages,[pack]);window.LessonPackages.prepare(combined);
+       if(state.lesson_packages.some(p=>p.lesson_id===pack.lesson_id)){out.textContent='Этот пакет уже добавлен.';return;}
+       const comparison=catalog.compareLesson({vocabulary:pack.words,rules:[]});
+       out.innerHTML='<h3>'+esc(pack.lesson_title)+'</h3><p>Новых слов: '+comparison.newWords.length+'; уже в словаре: '+comparison.knownWords.length+'; проверок: '+pack.exercises.length+'.</p><p><a target="_blank" rel="noopener noreferrer" href="'+esc(pack.source.url)+'">'+esc(pack.source.title)+'</a></p><details><summary>Проверить содержание</summary>'+pack.blocks.map(b=>'<h4>'+esc(b.title)+'</h4><p>'+esc(b.explanation)+'</p>').join('')+pack.exercises.map(q=>'<p><strong>'+esc(q.stimulus)+'</strong> → '+esc(q.fields.map(f=>f.answers.join(' / ')).join('; '))+'</p>').join('')+'</details><label class="import-label"><input type="checkbox" id="received-lesson"> Этот урок действительно получен на занятиях; содержание и ответы проверены.</label><button type="button" class="primary-button" id="confirm-lesson" disabled>Добавить урок</button>';
+       $('#received-lesson').onchange=e=>{$('#confirm-lesson').disabled=!e.target.checked;};
+       $('#confirm-lesson').onclick=()=>{try{
+         if(!$('#received-lesson').checked)return;
+         const next={...state,lesson_packages:combined};localStorage.setItem(BACKUP,P.serialize(state));localStorage.setItem(KEY,JSON.stringify(next));
+         state.lesson_packages=combined;window.LessonPackages.install(combined);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);questions.forEach(q=>byId.set(q.id,q));confusionIndex=P.answerIndex(questions);save();renderMaterials();showView('learn');
+       }catch(error){out.textContent='Урок не добавлен: '+error.message;}};
+     }catch(error){out.textContent=error.message;}
+   };
+ }
+ $$('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+ $$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;startQueue();}));
+ $('#reset-progress').onclick=()=>{
+   if(!window.confirm('Сбросить весь прогресс в этом браузере? Ответы, ошибки, заметки и ассоциации будут очищены.'))return;
+   try{localStorage.setItem(BACKUP,P.serialize(state));}catch{}const retainedPackages=state.lesson_packages;state=P.empty();state.lesson_packages=retainedPackages;records=state.records;learningState=state.learning;storageReadError=null;topic='all';mode='smart';sourceFilter=null;activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;showView('today');
+ };
+ const learning=window.LearningUI.create({
+   get state(){return learningState;},save,startLesson,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today')
+ });
+ const dashboard=window.DashboardUI.create({
+   state:()=>state,questions:()=>questions,eligible,hasSession:()=>queue.length>position,
+   action(next){
+     if(next.startsWith('remedy:')){startRemedy(next.slice(7));return;}
+     if(next.startsWith('number:')){activeLesson=null;activeStep=null;sourceFilter=null;topic='numbers';mode='numbers';queue=window.NumberPractice.session(next.split(':')[1],state).filter(eligible).map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;resetCounts();render();showView('practice');return;}
+     if(next==='reset'){$('#reset-progress').click();return;}
+     if(next==='new'){
+       const lessons=[...window.LEARNING.lessons].sort((a,b)=>(b.id===learningState.lessonId?1:0)-(a.id===learningState.lessonId?1:0));
+       for(const lesson of lessons){const i=lesson.chunks.findIndex(step=>step.questionIds.every(eligible)&&step.questionIds.some(id=>!records[id]?.seen));if(i>=0){learningState.lessonId=lesson.id;learningState.steps[lesson.id]=i;break;}}
+       showView('learn');return;
+     }
+     if(next==='learn'){showView('learn');return;}
+     if(next==='resume'){showView('practice');return;}
+     if(['today','vocabulary','materials'].includes(next)){showView(next);return;}
+     if(next==='confusions'){showView('review');return;}
+     topic='all';sourceFilter=null;activeLesson=null;mode=next;startQueue();showView('practice');
+   },
+   contrast:startContrast,setAssociation,promote,export:()=>{save();downloadProgress(P.serialize(state));},import:importProgress,
+   restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
+ });
+ $('#pause-session').onclick=()=>showView('today');
+ renderRules();renderMaterials();
+ const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','contrast','numbers','remediation','words'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
+ if(validSaved){
+   variants=savedSession.variants||{};
+   queueEpoch=typeof savedSession.queueEpoch==='number'?savedSession.queueEpoch:queueEpoch;
+   presented=typeof savedSession.presented==='string'?savedSession.presented:null;
+   sessionAttempts=Math.max(0,Number(savedSession.sessionAttempts)||0);sessionCorrect=Math.min(sessionAttempts,Math.max(0,Number(savedSession.sessionCorrect)||0));sessionAssisted=Math.min(sessionAttempts-sessionCorrect,Math.max(0,Number(savedSession.sessionAssisted)||0));
+   draft=savedSession.draft&&Array.isArray(savedSession.draft.answers)?savedSession.draft:null;remediation=savedSession.remediation||null;
+   topic=savedSession.topic;mode=savedSession.mode;sourceFilter=savedSession.sourceFilter||null;activeLesson=mode==='lesson'?savedSession.activeLesson:null;
+   activeStep=activeLesson?Math.min(window.LEARNING.lessons.find(l=>l.id===activeLesson).chunks.length-1,Math.max(0,Number(savedSession.activeStep)||0)):null;
+   queue=savedSession.queue;practiceIds=Array.isArray(savedSession.practiceIds)?savedSession.practiceIds.filter(id=>byId.has(id)):[...new Set(queue)];
+   stepEvidence=savedSession.stepEvidence&&typeof savedSession.stepEvidence==='object'?savedSession.stepEvidence:{};
+   position=Math.min(queue.length,savedSession.position+(savedSession.answered?1:0));if(savedSession.answered&&!['ordered','shuffle'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();
+   if(!savedSession.answered){hinted=!!savedSession.hinted;elapsedMs=Number.isFinite(savedSession.elapsed_ms)?Math.max(0,savedSession.elapsed_ms):0;}
+ }else{queue=[];practiceIds=[];renderStats();}
+ showView(validSaved&&savedSession.view==='practice'?'practice':'today');
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else{renderStats();if(view==='practice')activateCard();if(['today','review','vocabulary'].includes(view))dashboard.render(view);}save();});
+ window.addEventListener('qazaq-before-update',e=>{pauseTimer();save();if(!storageAvailable)e.preventDefault();});
+ window.addEventListener('blur',pauseTimer);window.addEventListener('focus',startTimer);window.addEventListener('pagehide',()=>{pauseTimer();save();});
+})();
