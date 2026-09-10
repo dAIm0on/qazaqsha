@@ -44,7 +44,12 @@
     if(n===0)return [{value:0,word:UNITS[0]}];
     const parts=[];let rest=n;
     for(const [size,label] of [[1000,'мың'],[100,'жүз']]){
-      const digit=Math.floor(rest/size);if(digit){parts.push({value:digit*size,word:(digit===1?'':numberToKazakh(digit)+' ')+label});rest%=size;}
+      const digit=Math.floor(rest/size);
+      if(digit){
+        const omitCount=digit===1&&(label==='жүз'||n===1000);
+        parts.push({value:digit*size,word:(omitCount?'':numberToKazakh(digit)+' ')+label});
+        rest%=size;
+      }
     }
     const tens=Math.floor(rest/10);if(tens)parts.push({value:tens*10,word:TENS[tens]});
     if(rest%10)parts.push({value:rest%10,word:UNITS[rest%10]});

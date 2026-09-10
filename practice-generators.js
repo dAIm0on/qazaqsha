@@ -20,7 +20,9 @@
    const {min,max,reverse}=q.generatedNumber;
    const n=Number.isInteger(variants[q.id])&&variants[q.id]>=min&&variants[q.id]<=max?variants[q.id]:min+Math.floor(random()*(max-min+1));variants[q.id]=n;
    q.stimulus=reverse?core.numberToKazakh(n):String(n);q.fields[0].kind=reverse?'number-text':'text';
-   q.fields[0].answers=reverse?[String(n)]:[core.numberToKazakh(n)];if(n>=1000&&n<2000&&!reverse)q.fields[0].answers.push('бір '+q.fields[0].answers[0]);
+   const spoken=core.numberToKazakh(n);
+   q.fields[0].answers=reverse?[String(n)]:[spoken];
+   if(!reverse&&n>=1000&&n<2000&&spoken.startsWith('бір '))q.fields[0].answers.push(spoken.slice(4));
    q.hint=core.numberParts(n).map(p=>p.value+' → '+p.word).join(' + ');q.explanation=n+' = '+core.numberToKazakh(n)+'. '+core.numberParts(n).map(p=>p.value).join(' + ')+'.';
  }
  function session(range,state){

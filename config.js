@@ -1,7 +1,7 @@
 (function(root){
  'use strict';
  const config={
-   version:'tz2-typed-both-ways-2026-09-10',algorithm:'FSRS-6 / ts-fsrs 5.4.2',provisional:false,
+   version:'tz2-bir-myn-2026-09-10',algorithm:'FSRS-6 / ts-fsrs 5.4.2',provisional:false,
    fsrs:{desired_retention:0.90,enable_fuzz:false,enable_short_term:true},
    schedule:{cleanAnswersToConsolidate:2,spacedRecallsForRemembered:1,spacedRecallsForMastered:2,minSpacedMs:86400000,responseTimeAffectsSchedule:false},
    session:{size:6,maxAttempts:10,recentWindowMs:600000,microSize:4,minIntervening:3,preferredIntervening:4,newLimit:5},
