@@ -38,3 +38,11 @@ input,select,textarea{font-size:max(16px,1em)}
   #answer-form.answered .question-actions{position:static;box-shadow:none}
   .primary-slot{min-width:0;width:100%}
 }
+.account{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto}
+.account .text-button{color:#d0d9e7}
+#account-user{font-size:.8125rem;color:#d0d9e7;max-width:14rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#account-form{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#account-form[hidden]{display:none!important}
+#account-form input{min-height:40px;width:11rem;border:1px solid #4a6580;border-radius:8px;background:#0f2342;color:#fff;padding:6px 10px}
+#account-msg{color:#ffd363;margin:0;flex-basis:100%}
+@media(max-width:690px){.account{margin:10px 0 0;width:100%}}

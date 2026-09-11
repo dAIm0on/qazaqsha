@@ -26,7 +26,7 @@
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
- let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false;
+ let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
  function captureDraft(){const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,answers:readAnswers(q)};}
  function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;}
  function elapsed(){return Math.round(elapsedMs+(timerSince===null?0:Math.max(0,performance.now()-timerSince)));}
@@ -46,7 +46,8 @@
    captureDraft();state.records=records;state.learning=learningState;
    state.session={topic,mode,sourceFilter,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation};
    try{if(storageReadError)throw storageReadError;localStorage.setItem(KEY,JSON.stringify(state));storageAvailable=true;}catch{storageAvailable=false;}
-   $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?'Прогресс в этом браузере · резервная копия в «Сегодня».':'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
+   $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
+   if(!cloudApplying)window.QazaqCloud?.pushSoon?.(state);
  }
  function subset(){if(activeLesson){const ids=new Set(window.LEARNING.lessons.find(l=>l.id===activeLesson).questionIds);return questions.filter(q=>ids.has(q.id));}return questions.filter(q=>eligible(q)&&(topic==='all'||q.topic===topic)&&(!sourceFilter||q.source===sourceFilter));}
  function shuffled(items){
@@ -347,4 +348,45 @@
  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else{renderStats();if(view==='practice')activateCard();if(['today','review','vocabulary'].includes(view))dashboard.render(view);}save();});
  window.addEventListener('qazaq-before-update',e=>{pauseTimer();save();if(!storageAvailable)e.preventDefault();});
  window.addEventListener('blur',pauseTimer);window.addEventListener('focus',startTimer);window.addEventListener('pagehide',()=>{pauseTimer();save();});
+ function applyRemote(incoming){
+   if(!incoming)return;
+   cloudApplying=true;
+   state=P.merge(state,incoming);records=state.records;learningState=state.learning;
+   try{window.LessonPackages.install(state.lesson_packages);}catch{}
+   catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
+   confusionIndex=P.answerIndex(questions);save();cloudApplying=false;renderStats();
+   if(['today','review','vocabulary'].includes(view))dashboard.render(view);
+ }
+ function paintAccount(){
+   const cloud=window.QazaqCloud,toggle=$('#account-toggle'),form=$('#account-form'),userEl=$('#account-user'),out=$('#account-logout');
+   if(!cloud)return;
+   if(!cloud.configured){toggle.hidden=true;form.hidden=true;userEl.hidden=true;out.hidden=true;return;}
+   if(cloud.user){toggle.hidden=true;form.hidden=true;userEl.hidden=false;userEl.textContent=cloud.user.email;out.hidden=false;}
+   else{toggle.hidden=false;userEl.hidden=true;out.hidden=true;}
+ }
+ function accountError(error){
+   const msg=$('#account-msg');if(!msg)return;
+   const text=String(error&&error.message||error);
+   msg.textContent=/email-already-in-use/i.test(text)?'Этот адрес уже зарегистрирован. Войди.':/invalid-credential|user-not-found|wrong-password/i.test(text)?'Почта или пароль не подошли.':/weak-password/i.test(text)?'Пароль короче 6 символов.':text;
+ }
+ (async()=>{
+   const cloud=window.QazaqCloud;if(!cloud)return;
+   await cloud.start();paintAccount();
+   $('#account-toggle').onclick=()=>{$('#account-form').hidden=!$('#account-form').hidden;};
+   $('#account-logout').onclick=async()=>{await cloud.logout();paintAccount();};
+   $('#account-form').onsubmit=async e=>{
+     e.preventDefault();$('#account-msg').textContent='Вхожу…';
+     try{await cloud.login($('#account-email').value.trim(),$('#account-password').value);const remote=await cloud.pull();applyRemote(remote);await cloud.push(state);$('#account-msg').textContent='Прогресс в облаке.';paintAccount();}catch(error){accountError(error);}
+   };
+   $('#account-register').onclick=async()=>{
+     const email=$('#account-email').value.trim(),password=$('#account-password').value;
+     if(!email||password.length<6){$('#account-msg').textContent='Нужны почта и пароль от 6 символов.';return;}
+     $('#account-msg').textContent='Создаю аккаунт…';
+     try{await cloud.register(email,password);await cloud.push(state);$('#account-msg').textContent='Аккаунт создан, этот прогресс сохранён в облаке.';paintAccount();}catch(error){accountError(error);}
+   };
+   window.addEventListener('qazaq-cloud-user',async()=>{
+     paintAccount();
+     if(cloud.user){try{const remote=await cloud.pull();applyRemote(remote);await cloud.push(state);}catch{}}
+   });
+ })();
 })();

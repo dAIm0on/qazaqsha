@@ -29,6 +29,8 @@
   <script defer src="learning-support.js"></script>
   <script defer src="learning.js"></script>
   <script defer src="dashboard.js"></script>
+  <script defer src="firebase-config.js"></script>
+  <script defer src="cloud.js"></script>
   <script defer src="app.js"></script>
   <script defer src="pwa.js"></script>
 </head>
@@ -38,6 +40,18 @@
 <header class="topbar">
   <a class="brand" href="./" aria-label="Қазақша, главная"><span class="brand-mark" lang="kk">Ә</span><span lang="kk">Қазақша<span class="brand-caption" lang="ru">тренажёр Крис</span></span></a>
   <nav class="topnav" aria-label="Разделы"><button type="button" data-view="today" aria-current="page">Сегодня</button><button type="button" data-view="learn">Учить</button><button type="button" data-view="review">Повторять</button><button type="button" data-view="rules">Правила</button></nav>
+  <div class="account" id="account-box">
+    <button type="button" class="text-button" id="account-toggle" hidden>Войти</button>
+    <form id="account-form" hidden>
+      <input id="account-email" type="email" autocomplete="username" placeholder="почта" required>
+      <input id="account-password" type="password" autocomplete="current-password" placeholder="пароль" minlength="6" required>
+      <button type="submit" class="secondary-button" id="account-login">Войти</button>
+      <button type="button" class="secondary-button" id="account-register">Создать аккаунт</button>
+      <p id="account-msg" class="small"></p>
+    </form>
+    <span id="account-user" hidden></span>
+    <button type="button" class="text-button" id="account-logout" hidden>Выйти</button>
+  </div>
 </header>
 <div class="workspace">
   <aside class="sidebar">
