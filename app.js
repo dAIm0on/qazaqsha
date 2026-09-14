@@ -257,6 +257,14 @@
    activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;checked=false;presented=null;pauseTimer();elapsedMs=0;showView('today');
  }
  function vocabTable(rows){return `<div class="table-wrap"><table><thead><tr><th scope="col">Қазақша</th><th scope="col">По-русски / число</th></tr></thead><tbody>${rows.map(([k,r])=>`<tr><td lang="kk">${esc(k)}</td><td>${esc(Array.isArray(r)?r.join(', '):r)}</td></tr>`).join('')}</tbody></table></div>`;}
+ function bankMarkup(){
+   const B=window.WORD_BANK;if(!B)return '';
+   const titles={'1-1':'1–1','1-2':'1–2','1-3':'1–3','2-2':'2–2'};
+   const mustBlocks=Object.entries(B.must).map(([les,rows])=>'<h3>Домашка '+esc(titles[les]||les)+' · '+rows.length+' слов</h3>'+vocabTable(rows.map(w=>[w.kazakh,w.translation]))).join('');
+   const all=[...B.all].sort((a,b)=>a.kazakh.localeCompare(b.kazakh,'kk'));
+   return `<div class="panel"><h2>Слова «выучить» из методичек</h2><p>Сверила домашки 1–1, 1–2, 1–3 и 2–2. Все <strong>${B.mustCount}</strong> позиций уже есть в тренажёре, в обе стороны.</p>${mustBlocks}</div>
+     <div class="panel"><h2>Сборник: все казахские слова из материалов</h2><p>${all.length} слов — и обязательные, и те, что просто встречались в примерах. Отдельная тренировка: только ${B.extraCount} новых, которых не было в списках «выучить».</p>${vocabTable(all.map(w=>[w.kazakh,(Array.isArray(w.translation)?w.translation.join(', '):w.translation)+(w.role==='must'?' · выучить':' · из урока '+w.from_lesson)]))}<p><button type="button" class="secondary-button" data-source="bank">Тренировать слова из материалов</button></p></div>`;
+ }
  function renderRules(){
    $('#rules-content').innerHTML=`
      <div class="panel"><h2>Сингармонизм без путаницы</h2><p>Для выбора окончания нужны две опоры: <strong>последний слог</strong> определяет гласную, <strong>последняя буква</strong> — первую согласную. Не пытайся запомнить шесть окончаний как шесть отдельных правил.</p><div class="table-wrap"><table><thead><tr><th scope="col">Последняя буква слова</th><th scope="col">Последний слог задний<br>А О Ұ Ы</th><th scope="col">Последний слог передний<br>Ә Ө Ү І Е</th></tr></thead><tbody><tr><th scope="row">Гласная, Р, Й, У → Л</th><td lang="kk">-лар · қалалар</td><td lang="kk">-лер · көшелер</td></tr><tr><th scope="row">Л, М, Н, Ң, Ж, З → Д</th><td lang="kk">-дар · адамдар</td><td lang="kk">-дер · сөздер</td></tr><tr><th scope="row">Глухая; Б, В, Г, Д → Т</th><td lang="kk">-тар · кітаптар</td><td lang="kk">-тер · жігіттер</td></tr></tbody></table></div><p>Пример рассуждения: кі-<strong>тап</strong> → последний слог задний → А. Последняя буква П → Т. Получаем кітап + тар = <span lang="kk">кітаптар</span>.</p><p>И и У разбираем в составе слова: иттер, но милар. -мен — особое падежное окончание без чередования А/Е. Остальные группы букв в методичке — учебная схема; полный алфавит не нужно смешивать с двумя основными группами гласных.</p><p><a href="https://kaz-tili.kz/su_mn1.htm" target="_blank" rel="noopener noreferrer">Правило множественного числа и примеры</a></p></div>
@@ -278,8 +286,10 @@
      <p class="small"><a href="https://kaz-tili.kz/lichnie1.htm" target="_blank" rel="noopener noreferrer">Личные окончания</a> · <a href="https://kaz-tili.kz/prilag.htm" target="_blank" rel="noopener noreferrer">Прилагательные</a> · <a href="https://kaz-tili.kz/su_mn3.htm" target="_blank" rel="noopener noreferrer">Вопросительные частицы</a></p></div>
      <div class="panel"><h2>11 слов из домашней работы 1–1</h2>${vocabTable(course.vocabulary)}<p><button type="button" class="secondary-button" data-rule-topic="vocab">Тренировать слова</button></p></div>
      <div class="panel"><h2>Числа и количество из домашней работы 1–2</h2>${vocabTable(course.numbers)}<p><button type="button" class="secondary-button" data-rule-topic="numbers">Тренировать числа</button></p></div>
-     <div class="panel"><h2>Слова урока 2–2</h2>${vocabTable(catalog.words.filter(w=>w.lesson_first_seen==='2-2').map(w=>[w.kazakh,w.translation]))}<p><button type="button" class="secondary-button" data-rule-topic="vocab">Тренировать слова</button></p></div>`;
+     <div class="panel"><h2>Слова урока 2–2</h2>${vocabTable(catalog.words.filter(w=>w.lesson_first_seen==='2-2').map(w=>[w.kazakh,w.translation]))}<p><button type="button" class="secondary-button" data-rule-topic="vocab">Тренировать слова</button></p></div>
+     ${bankMarkup()}`;
    $$('[data-rule-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.ruleTopic;sourceFilter=null;mode='ordered';showView('practice');startQueue();});
+   $$('#rules-content [data-source]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.source;topic='all';mode='ordered';showView('practice');startQueue();});
  }
  function renderMaterials(){
    const cards=Object.entries(course.sources).filter(([,s])=>!s.additional).map(([key,s])=>{
