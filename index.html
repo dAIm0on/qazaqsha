@@ -42,7 +42,7 @@
 <a class="skip-link" href="#main">К заданию</a>
 <header class="topbar">
   <a class="brand" href="./" aria-label="Қазақша, главная"><span class="brand-mark" lang="kk">Ә</span><span lang="kk">Қазақша<span class="brand-caption" lang="ru">тренажёр Крис</span></span></a>
-  <nav class="topnav" aria-label="Разделы"><button type="button" data-view="today" aria-current="page">Сегодня</button><button type="button" data-view="learn">Учить</button><button type="button" data-view="review">Повторять</button><button type="button" data-view="rules">Правила</button></nav>
+  <nav class="topnav" aria-label="Разделы"><button type="button" data-view="today" aria-current="page">Сегодня</button><button type="button" data-view="learn">Учить</button><button type="button" data-view="review">Повторять</button><button type="button" data-view="exam">Экзамен</button><button type="button" data-view="rules">Правила</button></nav>
   <div class="account" id="account-box">
     <button type="button" class="text-button" id="account-toggle" hidden>Войти</button>
     <form id="account-form" hidden>
@@ -73,15 +73,18 @@
       <div class="section-heading"><div><p class="eyebrow">ПО ПОЛУЧЕННЫМ УРОКАМ</p><h1 id="practice-title">Практика казахского</h1></div><span class="course-badge">220 карточек</span></div>
       <div class="modebar" aria-label="Порядок тренировки"><button type="button" data-mode="smart" aria-pressed="false">6 карточек</button><button type="button" data-mode="review" aria-pressed="false">Пора повторить <span id="due-count">0</span></button><button type="button" data-mode="ordered" aria-pressed="true">По материалам</button><button type="button" data-mode="shuffle" aria-pressed="false">Вперемешку</button><button type="button" data-mode="mistakes" aria-pressed="false">Мои ошибки <span id="mistake-count">0</span></button></div>
       <div id="source-filter" hidden></div>
+      <label class="pref-check"><input type="checkbox" id="pref-letters"> Казахские буквы Ә Ғ Қ Ң Ө Ұ Ү Һ І на экране</label>
       <div class="session-line"><span id="session-position"></span><span id="session-score"></span></div>
+      <div id="exam-bar" class="exam-bar" hidden><div id="exam-bar-fill"></div></div>
       <article id="exercise" class="exercise-card"></article>
       <button type="button" id="pause-session" class="text-button">Сделать паузу · Сегодня</button><p class="practice-note">Сначала вспомни ответ сама. Подсказка помогает разобраться, но не засчитывается как самостоятельный ответ.</p>
     </section>
+    <section id="exam-view" hidden aria-labelledby="exam-title"><div class="section-heading"><div><p class="eyebrow">ЗАКРЕПЛЕНИЕ НА ВРЕМЯ</p><h1 id="exam-title">Экзамен</h1></div></div><div id="exam-content"></div></section>
     <section id="rules-view" hidden aria-labelledby="rules-title"><div class="section-heading"><div><p class="eyebrow">ПОД РУКОЙ</p><h1 id="rules-title">Правила и словарь</h1></div></div><div id="rules-content"></div></section>
     <section id="materials-view" hidden aria-labelledby="materials-title"><div class="section-heading"><div><p class="eyebrow">ТВОИ МАТЕРИАЛЫ</p><h1 id="materials-title">Что вошло в тренажёр</h1></div></div><div id="materials-content"></div></section>
   </main>
 </div>
-<nav class="bottom-nav" aria-label="Основная навигация"><button type="button" data-view="today">Сегодня</button><button type="button" data-view="learn">Учить</button><button type="button" data-view="review">Повторять</button><button type="button" data-view="rules">Правила</button></nav>
+<nav class="bottom-nav" aria-label="Основная навигация"><button type="button" data-view="today">Сегодня</button><button type="button" data-view="learn">Учить</button><button type="button" data-view="review">Повторять</button><button type="button" data-view="exam">Экзамен</button><button type="button" data-view="rules">Правила</button></nav>
 <footer class="site-footer"><span lang="kk">Батыл бол!</span><span>Личная практика по материалам курса · версия tz2-bir-myn · <a href="update.html">обновить без потери прогресса</a></span></footer>
 <noscript>Для проверки ответов включи JavaScript в браузере.</noscript>
 </body>

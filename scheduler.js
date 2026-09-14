@@ -29,7 +29,8 @@
    const now=event.at,p=migrate(previous,now),clean=event.correct&&!event.hinted;
    const card=p.fsrs?{...p.fsrs,due:new Date(p.fsrs.due),last_review:p.fsrs.last_review?new Date(p.fsrs.last_review):undefined}:F.createEmptyCard(new Date(now));
    const spaced=clean&&event.recall&&due(p,now)&&p.last_correct&&now-p.last_correct>=cfg.schedule.minSpacedMs;
-   const scheduled=engine.next(card,new Date(now),clean?F.Rating.Good:F.Rating.Again);
+   const rating=Number.isFinite(event.rating)?event.rating:(clean?F.Rating.Good:F.Rating.Again);
+   const scheduled=engine.next(card,new Date(now),rating);
    const fsrs={...scheduled.card,due:scheduled.card.due.getTime(),last_review:scheduled.card.last_review?.getTime()||null};
    const r={...p,seen:p.last_shown&&p.last_shown>(p.last_answer||0)?p.seen:p.seen+1,review_count:p.review_count+1,last_answer:now,
      correct_count:p.correct_count+(event.correct?1:0),wrong_count:p.wrong_count+(!event.correct?1:0),correct_streak:clean?p.correct_streak+1:0,last_seen:now,

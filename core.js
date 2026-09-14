@@ -34,7 +34,7 @@
   }
   function isDue(r,now=Date.now()){return scheduler.due(r,now);}
   function updateRecord(previous,correct,hinted,now=Date.now(),details={}){
-    return scheduler.answer(previous,{at:now,correct,hinted,responseTime:details.responseTime,recall:!!details.recall});
+    return scheduler.answer(previous,{at:now,correct,hinted,responseTime:details.responseTime,recall:!!details.recall,rating:details.rating});
   }
   const UNITS=['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз'];
   const TENS=['','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан'];

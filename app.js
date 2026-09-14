@@ -28,10 +28,11 @@
  let topic='all',mode='ordered',sourceFilter=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
+ let examRaf=null,examTimedOut=false;
  function captureDraft(){const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,answers:readAnswers(q)};}
  function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;}
  function elapsed(){return Math.round(elapsedMs+(timerSince===null?0:Math.max(0,performance.now()-timerSince)));}
- function pauseTimer(){elapsedMs=elapsed();timerSince=null;}
+ function pauseTimer(){elapsedMs=elapsed();timerSince=null;if(examRaf){cancelAnimationFrame(examRaf);examRaf=null;}}
  function startTimer(){if(!introOpen&&view==='practice'&&!checked&&!document.hidden&&timerSince===null&&byId.has(queue[position]))timerSince=performance.now();}
  function eligible(value){const q=typeof value==='string'?byId.get(value):value;return !!q&&catalog.eligible(q,state)&&(!q.promotedWord||state.vocabulary[q.promotedWord]?.target_or_context==='target');}
  function activateCard(){
@@ -41,7 +42,26 @@
    if(presented!==token){
      presented=token;records[q.id]=window.ReviewScheduler.shown(records[q.id]);
      for(const id of q.vocabIds||[]){const w=catalog.words.find(w=>w.id===id),p=state.vocabulary[id]||{times_seen:0,target_or_context:w?.target_or_context||'context'};state.vocabulary[id]={...p,times_seen:p.times_seen+1,last_seen:Date.now(),last_seen_lesson:q.lessonId};}
-   }startTimer();
+   }startTimer();startExamBar();
+ }
+ function startExamBar(){
+   examTimedOut=false;
+   const bar=$('#exam-bar'),fill=$('#exam-bar-fill');
+   if(mode!=='exam'||!bar||!fill){if(bar)bar.hidden=true;return;}
+   bar.hidden=false;fill.style.width='100%';
+   const limit=cfg.session.examMs,t0=performance.now();
+   const tick=now=>{
+     if(checked||mode!=='exam'||view!=='practice')return;
+     const left=limit-(now-t0);
+     fill.style.width=Math.max(0,left/limit*100)+'%';
+     if(left<=0){examTimedOut=true;const q=byId.get(queue[position]);if(q&&!checked)checkAnswer(q,true);return;}
+     examRaf=requestAnimationFrame(tick);
+   };
+   examRaf=requestAnimationFrame(tick);
+ }
+ function renderExam(){
+   $('#exam-content').innerHTML=`<div class="panel"><p>В обычной учёбе время не штрафует. Экзамен — те же задания, но ${cfg.session.examMs/1000} секунды на карточку: быстрый верный ответ укрепляет, медленный считается слабым, пропуск — ошибка.</p><p class="small">${cfg.session.examSize} карточек за подход. Подсказки выключены.</p><div class="review-actions"><button type="button" class="primary-button" data-exam="all">По всему</button><button type="button" class="secondary-button" data-exam="numbers">Числа</button><button type="button" class="secondary-button" data-exam="vocab">Слова</button><button type="button" class="secondary-button" data-exam="person">Окончания</button><button type="button" class="secondary-button" data-exam="plural">Множественное</button></div></div>`;
+   $$('#exam-content [data-exam]').forEach(b=>b.onclick=()=>{topic=b.dataset.exam;mode='exam';sourceFilter=null;activeLesson=null;startQueue({all:true});showView('practice');});
  }
  function save(){
    captureDraft();state.records=records;state.learning=learningState;
@@ -68,7 +88,8 @@
    else if(mode==='review')list=list.filter(q=>core.isDue(records[q.id])).sort((a,b)=>records[a.id].dueAt-records[b.id].dueAt);
    else if(mode==='mistakes')list=list.filter(q=>records[q.id]?.needsReview);
    else if(!all)list=list.filter(q=>(records[q.id]?.streak||0)<2||core.isDue(records[q.id]));
-   if(mode==='shuffle'||mode==='mistakes')list=shuffled(list);
+   if(mode==='shuffle'||mode==='mistakes'||mode==='exam')list=shuffled(list);
+   if(mode==='exam')list=list.slice(0,cfg.session.examSize);
    if(['smart','review','mistakes'].includes(mode)){const recent=state.events.filter(e=>e.type==='answer'&&Date.now()-e.at<cfg.session.recentWindowMs).slice(-cfg.session.minIntervening).map(e=>e.card_id);list=core.spaceRecent(window.Knowledge.choose(list,state,Infinity),recent).slice(0,cfg.session.size);}
    queue=list.map(q=>q.id);practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;resetCounts();render();
  }
@@ -85,11 +106,12 @@
    render();showView('practice');
  }
  function showView(next){
-   pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
+   pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
    view=next;document.body.dataset.view=next;
-   ['today','learn','review','vocabulary','practice','rules','materials'].forEach(v=>{$('#'+v+'-view').hidden=v!==next;});
-   $$('[data-view]').forEach(b=>{if(b.dataset.view===(next==='practice'?'review':next))b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='practice')activateCard();save();
+   ['today','learn','review','vocabulary','practice','rules','materials','exam'].forEach(v=>{$('#'+v+'-view').hidden=v!==next;});
+   const tab=next==='practice'?(mode==='exam'?'exam':'review'):next;
+   $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='exam')renderExam();if(next==='practice')activateCard();save();
  }
  function renderNav(){
    $('#lesson-nav').innerHTML=topics.map(([id,name,num])=>{
@@ -108,7 +130,7 @@
    const scope=subset(), tried=scope.filter(q=>records[q.id]?.attempts>0).length;
    $('#session-position').textContent=['smart','lesson','review','contrast'].includes(mode)?`В подходе ${new Set(queue).size} разных карточек · шаг ${Math.min(position+1,queue.length)} из ${queue.length}`:`Встречалось ${tried} из ${scope.length} карточек`;
    $('#session-score').textContent=sessionAttempts?`Без подсказки: ${sessionCorrect} / ${sessionAttempts} · с подсказкой: ${sessionAssisted}`:'Можно отвечать сразу';
-   $('#practice-title').textContent=activeLesson?window.LEARNING.lessons.find(l=>l.id===activeLesson).title:topic==='all'?'Практика казахского':topics.find(x=>x[0]===topic)[1];
+   $('#practice-title').textContent=mode==='exam'?'Экзамен на время':activeLesson?window.LEARNING.lessons.find(l=>l.id===activeLesson).title:topic==='all'?'Практика казахского':topics.find(x=>x[0]===topic)[1];
    $('.course-badge').textContent=`${scope.length} карточек`;
    $$('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
    const sf=$('#source-filter');sf.hidden=!sourceFilter;
@@ -127,7 +149,9 @@
    const source=course.sources[q.source], streak=records[q.id]?.streak||0;
    const location=q.source.startsWith('hw')?'Слово '+q.group:`Задание ${q.group}${q.part!=='1'?' · пункт '+q.part:''}`;
    const hasText=q.kind==='fields'&&q.fields.some(f=>f.kind!=='number-text');
-   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${source.additional?esc(source.title):`<a href="${source.url}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`}<br>${esc(location)}</div><span class="mastery-label">${cfg.labels[records[q.id]?.mastery_level||'NEW']}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p><h2 id="question-title">${esc(q.title)}</h2>${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}${answerMarkup(q)}${hasText?`<div class="letter-keyboard" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div><div class="keyboard-label">Буква вставится в выбранное поле.</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="hint-button">Подсказка</button><button type="button" class="text-button" id="reveal-button">Не знаю</button><button type="button" class="text-button" id="association-button">Моя подсказка</button></div><div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
+   const letters=hasText&&state.prefs.letters;
+   const exam=mode==='exam';
+   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${source.additional?esc(source.title):`<a href="${source.url}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`}<br>${esc(location)}</div><span class="mastery-label">${exam?'Экзамен':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p><h2 id="question-title">${esc(q.title)}</h2>${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}${answerMarkup(q)}${letters?`<div class="letter-keyboard" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div><div class="keyboard-label">Буква вставится в выбранное поле.</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Моя подсказка</button></div><div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
    $('#answer-form').addEventListener('submit',e=>{e.preventDefault();if(checked)nextQuestion();else checkAnswer(q);});
    $('#hint-button').onclick=()=>showHint(q);
    $('#reveal-button').onclick=()=>checkAnswer(q,true);
@@ -174,7 +198,15 @@
    const result=reveal?{correct:false,parts:q.kind==='multi'?q.options.map(()=>false):q.fields.map(()=>false)}:core.evaluate(q,answers);
    checked=true;if(reveal){hintEvent(q,'reveal');hinted=true;}
    pauseTimer();const now=Date.now(),recall=q.kind==='fields'&&q.fields.some(f=>f.kind!=='select');
-   let rec=core.updateRecord(records[q.id],result.correct,hinted,now,{responseTime:elapsedMs,recall});records[q.id]=rec;
+   let rating;
+   if(mode==='exam'){
+     const F=window.FSRS;
+     if(!result.correct||hinted||examTimedOut)rating=F.Rating.Again;
+     else if(elapsedMs<=cfg.session.examEasyMs)rating=F.Rating.Easy;
+     else if(elapsedMs<=cfg.session.examHardMs)rating=F.Rating.Good;
+     else rating=F.Rating.Hard;
+   }
+   let rec=core.updateRecord(records[q.id],result.correct,hinted,now,{responseTime:elapsedMs,recall,rating});records[q.id]=rec;
    const errors=reveal?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);state.errors.push(...errors);
    const event={session_id:String(queueEpoch),presentation:position,type:'answer',card_id:q.id,at:now,correct:result.correct,hinted,response_time_ms:elapsedMs,response_time:elapsedMs,recall,answers};
    event.skills=window.Knowledge.observe(state,q,result,event,errors);state.events.push(event);rec=records[q.id];
@@ -205,7 +237,8 @@
    if(deferred)status='Карточка сохранена для следующего подхода: сейчас не хватает других заданий для паузы.';
    if(result.correct&&hinted)status='Ответ с подсказкой не повышает уровень освоения. Попробуй ещё раз без неё.';
    const answerLine=q.kind==='multi'?q.correct.join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
-   feedback.innerHTML=`<h3>${headline}</h3><p><strong>Ответ:</strong> ${esc(answerLine)}.</p>${errors.length?'<p><strong>Где ошибка:</strong> '+[...new Set(errors.map(e=>window.ErrorDiagnostics.labels[e.error_type]))].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p><p class="small">${cfg.labels[rec.mastery_level]} · время ответа ${(elapsedMs/1000).toFixed(1)} с (без штрафа).</p>`;feedback.hidden=false;
+   const timeLine=mode==='exam'?(examTimedOut?'Время вышло.':'Время '+(elapsedMs/1000).toFixed(1)+' с'+(elapsedMs>cfg.session.examHardMs&&result.correct?' · медленно, для экзамена это слабо.':' · зачёт по времени.')):(cfg.labels[rec.mastery_level]+' · время '+(elapsedMs/1000).toFixed(1)+' с, без штрафа.');
+   feedback.innerHTML=`<h3>${headline}</h3><p><strong>Ответ:</strong> ${esc(answerLine)}.</p>${errors.length?'<p><strong>Где ошибка:</strong> '+[...new Set(errors.map(e=>window.ErrorDiagnostics.labels[e.error_type]))].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p><p class="small">${timeLine}</p>`;feedback.hidden=false;
    renderStats();save();$('#next-button').focus({preventScroll:true});
  }
  function nextQuestion(){draft=null;position++;if(!['ordered','shuffle'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});const title=$('#question-title');if(title){title.tabIndex=-1;title.focus({preventScroll:true});}}
@@ -365,9 +398,11 @@
    contrast:startContrast,setAssociation,promote,export:()=>{save();downloadProgress(P.serialize(state));},import:importProgress,
    restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
  });
- $('#pause-session').onclick=()=>showView('today');
+ $('#pause-session').onclick=()=>showView(mode==='exam'?'exam':'today');
+ const lettersPref=$('#pref-letters');
+ if(lettersPref){lettersPref.checked=!!state.prefs.letters;lettersPref.onchange=()=>{state.prefs.letters=lettersPref.checked;save();if(view==='practice')render();};}
  renderRules();renderMaterials();
- const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','contrast','numbers','remediation','words'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
+ const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','contrast','numbers','remediation','words','exam'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){
    variants=savedSession.variants||{};
    queueEpoch=typeof savedSession.queueEpoch==='number'?savedSession.queueEpoch:queueEpoch;
