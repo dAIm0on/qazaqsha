@@ -21,6 +21,7 @@
  let state=P.empty(),savedSession=null,storageAvailable=true,storageReadError=null;
  try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);}}
  catch(error){storageAvailable=false;storageReadError=error;}
+ window.NumberLadder?.parkLearn(state.learning,state.records);
  let records=state.records,learningState=state.learning;
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
  let confusionIndex=P.answerIndex(questions);
@@ -49,7 +50,15 @@
    $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
    if(!cloudApplying)window.QazaqCloud?.pushSoon?.(state);
  }
- function subset(){if(activeLesson){const ids=new Set(window.LEARNING.lessons.find(l=>l.id===activeLesson).questionIds);return questions.filter(q=>ids.has(q.id));}return questions.filter(q=>eligible(q)&&(topic==='all'||q.topic===topic)&&(!sourceFilter||q.source===sourceFilter));}
+ function subset(){
+   if(activeLesson){const ids=new Set(window.LEARNING.lessons.find(l=>l.id===activeLesson).questionIds);return questions.filter(q=>ids.has(q.id));}
+   let list=questions.filter(q=>eligible(q)&&(topic==='all'||q.topic===topic)&&(!sourceFilter||q.source===sourceFilter));
+   if(topic==='numbers'&&mode!=='numbers'&&window.NumberLadder){
+     list=window.NumberLadder.filter(list,state);
+     list=[...list].sort((a,b)=>(window.NumberLadder.extractN(a)??0)-(window.NumberLadder.extractN(b)??0));
+   }
+   return list;
+ }
  function shuffled(items){
    const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
  }

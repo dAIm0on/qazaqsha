@@ -131,4 +131,68 @@
    return [...generated,...atoms.sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);
  }
  window.NumberPractice={prepare,session,templates:[...prev.templates,...extraTemplates],POOLS};
+
+ const ORDER=['numbers-0','numbers-1','tens-1','tens-2','numbers-contrast','numbers-echo-2','number-build','numbers-echo-3','hundreds','numbers-echo-4','school-1-3-numbers','school-1-3-phone'];
+ (function reorderNumberLessons(){
+   const byId=new Map(L.lessons.map(l=>[l.id,l]));
+   const placed=new Set();
+   const numbers=ORDER.map(id=>{placed.add(id);return byId.get(id);}).filter(Boolean)
+     .concat(L.lessons.filter(l=>l.topic==='numbers'&&!placed.has(l.id)));
+   const out=[];let inserted=false;
+   for(const l of L.lessons){
+     if(l.topic==='numbers'){if(!inserted){out.push(...numbers);inserted=true;}continue;}
+     out.push(l);
+   }
+   L.lessons.splice(0,L.lessons.length,...out);
+ })();
+
+ function isPhone(q){
+   if(!q)return false;
+   if(q.ruleIds?.includes('phone-groups'))return true;
+   if(q.skillBindings?.some(b=>b.item_id==='rule:phone-groups'))return true;
+   const t=String(q.stimulus||'');
+   return t.includes('+7')||/\d\s+\d{3}\s+\d{2}/.test(t)||(q.id||'').includes('phone');
+ }
+ function extractN(q){
+   if(isPhone(q))return Infinity;
+   const texts=[q.stimulus,...(q.fields||[]).flatMap(f=>f.answers||[])];
+   for(const raw of texts){
+     const s=String(raw).replace(/\s/g,'');
+     if(/^\d{1,6}$/.test(s))return Number(s);
+   }
+   return null;
+ }
+ function band(n){
+   if(n==null)return 1;
+   if(n===Infinity)return 4;
+   if(n<=10)return 0;
+   if(n<=99)return 1;
+   if(n<=999)return 2;
+   return 3;
+ }
+ function practiced(records,pred){
+   const qs=c.questions.filter(q=>q.topic==='numbers'&&pred(q));
+   if(!qs.length)return 1;
+   return qs.filter(q=>(records[q.id]?.streak||0)>=1).length/qs.length;
+ }
+ function capBand(records){
+   if(practiced(records,q=>band(extractN(q))===0)<0.55)return 0;
+   if(practiced(records,q=>band(extractN(q))===1)<0.4)return 1;
+   if(practiced(records,q=>band(extractN(q))===2)<0.35)return 2;
+   return 3;
+ }
+ function allowed(q,state){
+   if(state&&state._numberOverride)return true;
+   const n=extractN(q);
+   const cap=capBand(state?.records||{});
+   if(isPhone(q))return cap>=3&&practiced(state?.records||{},q=>band(extractN(q))===3)>=0.3;
+   return band(n)<=cap;
+ }
+ function filter(list,state){return list.filter(q=>allowed(q,state));}
+ function parkLearn(learning,records){
+   if(!learning)return;
+   if(learning.lessonId==='school-1-3-phone'&&capBand(records)<3)learning.lessonId='numbers-0';
+   if(learning.lessonId==='school-1-3-numbers'&&capBand(records)<2)learning.lessonId='numbers-0';
+ }
+ window.NumberLadder={isPhone,extractN,band,capBand,allowed,filter,parkLearn,ORDER};
 })();
