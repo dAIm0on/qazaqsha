@@ -35,13 +35,24 @@
    Object.assign(meta,{id:pack.lesson_id,title:pack.lesson_title,active:true,status:'reviewed-with-notes',depends_on:pack.dependencies,rules:pack.rules.map(r=>r.id),note:'Исходники сохранены. Расхождения с ключами отмечены в заданиях.'});
    if(!lessonCatalog.includes(meta))lessonCatalog.push(meta);
    for(const q of [...pack.original_exercises,...pack.generated_exercises])if(!c.questions.some(x=>x.id===q.id))c.questions.push(q);
-   const sections=[
-     ['words','Новые слова 1–3','vocab',q=>q.source==='hw3','Сначала пойми слово, затем вспомни его в обе стороны. Местоимения здесь — словарь; новые грамматические окончания не вводятся.'],
-     ['quantity','Количество: окончание не нужно','plural',q=>q.topic==='plural','С числом, көп, аз, қанша и неше окончание множественного числа не добавляем. Сравни: кітаптар — книги; екі кітап — две книги.'],
-     ['numbers','Сотни и тысячи по материалу 1–3','numbers',q=>q.topic==='numbers'&&!q.skillBindings?.some(b=>b.item_id==='rule:phone-groups'),'Сначала большие разряды: 21 760 = 21 тысяча + 700 + 60 → жиырма бір мың жеті жүз алпыс. Нулевые разряды пропускаем.'],
-     ['phone','Телефон: сохраняем ведущие нули','numbers',q=>q.skillBindings?.some(b=>b.item_id==='rule:phone-groups'),'Телефон делим на четыре группы после +7. Для 022 произносим нөл жиырма екі; для 00 — нөл нөл. Каждую группу вводим в отдельное поле.']
-   ];
-   for(const [key,title,topic,match,intro] of sections){const qs=pack.original_exercises.filter(match),chunks=[];
+   const sectionMap={
+     '1-3':[
+       ['words','Новые слова 1–3','vocab',q=>q.source==='hw3','Сначала пойми слово, затем вспомни его в обе стороны. Местоимения здесь — словарь; новые грамматические окончания не вводятся.'],
+       ['quantity','Количество: окончание не нужно','plural',q=>q.topic==='plural','С числом, көп, аз, қанша и неше окончание множественного числа не добавляем. Сравни: кітаптар — книги; екі кітап — две книги.'],
+       ['numbers','Сотни и тысячи по материалу 1–3','numbers',q=>q.topic==='numbers'&&!q.skillBindings?.some(b=>b.item_id==='rule:phone-groups'),'Сначала большие разряды: 21 760 = 21 тысяча + 700 + 60 → жиырма бір мың жеті жүз алпыс. Нулевые разряды пропускаем.'],
+       ['phone','Телефон: сохраняем ведущие нули','numbers',q=>q.skillBindings?.some(b=>b.item_id==='rule:phone-groups'),'Телефон делим на четыре группы после +7. Для 022 произносим нөл жиырма екі; для 00 — нөл нөл. Каждую группу вводим в отдельное поле.']
+     ],
+     '2-2':[
+       ['words','Новые слова 2–2','vocab',q=>q.source==='hw22','Слова домашки и методички 2–2 в обе стороны. Для сәлем / сау бол смотри, к кому обращаешься.'],
+       ['endings','Біз, сендер, сіздер','person',q=>q.group==='form','К слову добавляем личное окончание. С сендер и сіздер множественное -лар не ставим: сендер студентсіңдер, не студенттерсіңдер.'],
+       ['sent','Переведи «мы / вы такие-то»','person',q=>q.group==='sent','Пиши местоимение и форму. Русское «вы» без пометки недостаточно: в задании уже сказано сендер, сіз или сіздер.'],
+       ['neg','Отрицание емес','person',q=>q.group==='neg','Отрицание: основа + емес + окончание. Сараңмын → сараң емеспін. Не сараңмын емес.'],
+       ['ask','Вопрос ба / бе и ма / ме','person',q=>q.group==='ask','После Н, Ң, З — ба/бе. После Р (сыңдар, сіздер) — ма/ме. Гласная частицы следует гармонии.'],
+       ['fix','Найди ошибку','person',q=>q.group==='fix','Если предложение уже верное, перепиши его как есть. Исправление пиши целиком.']
+     ]
+   };
+   const sections=sectionMap[pack.lesson_id]||[];
+   for(const [key,title,topic,match,intro] of sections){const qs=pack.original_exercises.filter(match);if(!qs.length)continue;const chunks=[];
      for(let i=0;i<qs.length;i+=4){
        const group=qs.slice(i,i+4);if(group.length===1&&i)group.unshift(qs[i-1]);
        const seen=new Set(),items=[];

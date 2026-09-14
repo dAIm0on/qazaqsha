@@ -17,6 +17,9 @@
        else if(/[лдт][ае]р$/.test(a)){bind('rule:plural','full_form',i);if(q.fields.length===1){bind('rule:plural','harmony',i,'vowel');bind('rule:plural','initial_consonant',i,'initial');}}
        else bind('exercise:'+q.id,'application',i);
      });
+   }else if(q.topic==='person'&&q.kind==='fields'){
+     const rule='rule:'+(q.ruleIds&&q.ruleIds[0]||'person-biz');
+     q.fields.forEach((f,i)=>bind(rule,'application',i));
    }else if(q.kind==='fields'&&(q.topic==='vocab'||q.topic==='numbers')){
      const w=C.words.find(w=>(q.vocabIds||[]).includes(w.id)&&w.aliases.some(a=>core.normalize(q.stimulus)===a||q.fields[0].answers.some(v=>core.normalize(v)===a)))||C.words.find(w=>q.vocabIds?.includes(w.id));
      const isKazakh=w&&q.fields[0].answers.some(a=>w.aliases.includes(core.normalize(a)));
