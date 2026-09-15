@@ -35,11 +35,13 @@
  }
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
- let examRaf=null,examTimedOut=false;
+ let examRaf=null,examTimedOut=false,advanceTimer=null;
+ function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}
+ function focusAnswer(){const el=$('#answer-0');if(el&&!el.disabled){try{el.focus({preventScroll:false});}catch{el.focus();}}}
  function captureDraft(){const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,answers:readAnswers(q)};}
  function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;}
  function elapsed(){return Math.round(elapsedMs+(timerSince===null?0:Math.max(0,performance.now()-timerSince)));}
- function pauseTimer(){elapsedMs=elapsed();timerSince=null;if(examRaf){cancelAnimationFrame(examRaf);examRaf=null;}}
+ function pauseTimer(){elapsedMs=elapsed();timerSince=null;if(examRaf){cancelAnimationFrame(examRaf);examRaf=null;}cancelAdvance();}
  function startTimer(){if(!introOpen&&view==='practice'&&!checked&&!document.hidden&&timerSince===null&&byId.has(queue[position]))timerSince=performance.now();}
  function eligible(value){const q=typeof value==='string'?byId.get(value):value;return !!q&&catalog.eligible(q,state)&&(!q.promotedWord||state.vocabulary[q.promotedWord]?.target_or_context==='target');}
  function activateCard(){
@@ -49,7 +51,7 @@
    if(presented!==token){
      presented=token;records[q.id]=window.ReviewScheduler.shown(records[q.id]);
      for(const id of q.vocabIds||[]){const w=catalog.words.find(w=>w.id===id),p=state.vocabulary[id]||{times_seen:0,target_or_context:w?.target_or_context||'context'};state.vocabulary[id]={...p,times_seen:p.times_seen+1,last_seen:Date.now(),last_seen_lesson:q.lessonId};}
-   }startTimer();startExamBar();
+   }startTimer();startExamBar();focusAnswer();
  }
  function startExamBar(){
    examTimedOut=false;
@@ -285,9 +287,12 @@
    const answerLine=q.kind==='multi'?q.correct.join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
    const timeLine=mode==='exam'?(examTimedOut?'Время вышло.':'Время '+(elapsedMs/1000).toFixed(1)+' с'+(elapsedMs>cfg.session.examHardMs&&result.correct?' · медленно, для экзамена это слабо.':' · зачёт по времени.')):(cfg.labels[rec.mastery_level]+' · время '+(elapsedMs/1000).toFixed(1)+' с, без штрафа.');
    feedback.innerHTML=`<h3>${headline}</h3><p><strong>Ответ:</strong> ${esc(answerLine)}.</p>${errors.length?'<p><strong>Где ошибка:</strong> '+[...new Set(errors.map(e=>window.ErrorDiagnostics.labels[e.error_type]))].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p><p class="small">${timeLine}</p>`;feedback.hidden=false;
-   renderStats();save();$('#next-button').focus({preventScroll:true});
+   renderStats();save();
+   cancelAdvance();
+   const wait=(!result.correct||reveal)?750:280;
+   advanceTimer=setTimeout(()=>{advanceTimer=null;if(checked)nextQuestion();},wait);
  }
- function nextQuestion(){draft=null;position++;if(!['ordered','shuffle'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});const title=$('#question-title');if(title){title.tabIndex=-1;title.focus({preventScroll:true});}}
+ function nextQuestion(){cancelAdvance();draft=null;position++;if(!['ordered','shuffle'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
  function renderEmpty(){
    const lesson=activeLesson&&window.LEARNING.lessons.find(l=>l.id===activeLesson);
    const complete=!!lesson&&practiceIds.length>0&&practiceIds.every(id=>stepEvidence[id]);
