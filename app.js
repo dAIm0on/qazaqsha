@@ -532,9 +532,32 @@
    const nextBeat=()=>{gp.beat++;save();renderPath();};
    const letters=state.prefs.letters;
    const kb=letters?`<div class="letter-keyboard">${[...'әғқңөұүһі'].map(ch=>'<button type="button" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`:'';
+   function attachPathAsk(){
+     const paper=root.querySelector('.path-paper');if(!paper||paper.querySelector('#path-ask'))return;
+     paper.insertAdjacentHTML('beforeend',`<div class="path-ai-bar"><button type="button" class="text-button" id="path-ask">Не поняла — спросить про это правило</button><div id="path-ask-panel" class="ai-tutor-out" hidden><p class="small">ИИ объясняет текущее правило. Не ставит оценку произношению и не открывает будущие темы.</p><div class="ai-tutor-actions"><button type="button" class="secondary-button" data-path-q="Объясни ещё проще">Объясни ещё проще</button><button type="button" class="secondary-button" data-path-q="Чем это отличается от русского мягкого согласного?">Сравни с русским</button><button type="button" class="secondary-button" data-path-q="Дай ещё 2 пары на знакомых словах.">Ещё 2 примера</button></div><label class="input-label" for="path-ask-q">Свой вопрос</label><input id="path-ask-q" type="text" maxlength="400" autocomplete="off"><button type="button" class="text-button" id="path-ask-send">Спросить</button><div id="path-ask-out" hidden></div></div></div>`);
+     const open=$('#path-ask'),panel=$('#path-ask-panel');
+     if(open)open.onclick=()=>{if(panel)panel.hidden=!panel.hidden;};
+     const send=q=>{
+       const out=$('#path-ask-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
+       if(!window.AiTutor||!window.AiTutor.callTutor){if(out)out.textContent='Разбор сейчас недоступен. Глава работает без ИИ.';return;}
+       const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:ch.title,stimulus:ch.title,fields:[{answers:['']}],ruleIds:ch.rule_ids||[]};
+       const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[]});
+       window.AiTutor.callTutor(req).then(resp=>{if(out)out.textContent=(resp&&resp.message_ru)||'Разбор сейчас недоступен. Можно продолжить главу.';});
+     };
+     $$('[data-path-q]').forEach(b=>b.onclick=()=>send(b.dataset.pathQ));
+     const go=$('#path-ask-send');if(go)go.onclick=()=>send(($('#path-ask-q')&&$('#path-ask-q').value.trim())||'Объясни ещё проще');
+   }
+   if(beat.k==='goal'){
+     root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">ЦЕЛЬ ГЛАВЫ</p><h2>После этой главы</h2><p>${esc(beat.t)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
+     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
+   }
+   if(beat.k==='sound'){
+     root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">КАК ПРИМЕРНО ПОЧУВСТВОВАТЬ</p><h2 lang="kk">${esc(beat.letter)}</h2><p><strong>Русский якорь:</strong> ${esc(beat.anchor)}</p><p>${esc(beat.art)}</p><p lang="kk">${esc(beat.ex)}</p><p class="small">${esc(beat.warn)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
+     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
+   }
    if(beat.k==='why'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>${esc(beat.t)}</h2><p>${esc(beat.b)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='bridge'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Сравни с русским</h2>
@@ -542,18 +565,18 @@
        <p><strong>В казахском иначе…</strong> ${esc(beat.kz)}</p>
        <p><strong>Поэтому делай…</strong> ${esc(beat.do)}</p>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='slots'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Из чего это собирается</h2><p>${esc(beat.t)}</p>
        <div class="path-slots">${(beat.parts||[]).map(p=>'<span class="path-slot">'+esc(p.l)+'</span>').join('<span class="path-plus">+</span>')}</div>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='algo'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>${esc(beat.t)}</h2><ol class="learning-steps">${(beat.items||[]).map(i=>'<li>'+esc(i)+'</li>').join('')}</ol>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='ex'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Разобранный пример</h2>
@@ -561,7 +584,7 @@
        <p>${esc(beat.ru)}</p>
        <p>Слот: <strong lang="kk">${esc(beat.slot)}</strong>. ${esc(beat.why)}</p>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='trap'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Не перепутай</h2>
@@ -569,12 +592,12 @@
        <p>Нужно: <strong lang="kk">${esc(beat.good)}</strong></p>
        <p>${esc(beat.why)}</p>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='fold'){
      root.innerHTML=`<div class="panel path-paper">${head}<details open><summary>${esc(beat.t)}</summary><p>${esc(beat.b)}</p></details>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='ask'){
      root.innerHTML=`<div class="panel path-paper">${head}<p class="phase-label">${beat.type==='one_prod'?'Самостоятельно':beat.type==='trap_choice'?'Ловушка':'Проверь понимание'}</p>

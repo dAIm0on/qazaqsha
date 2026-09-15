@@ -364,6 +364,19 @@ assert.ok(/кітаптар/.test(JSON.stringify(l12))&&/адамдар/.test(JS
 assert.ok(l12.chapters.every(c=>c.beats.some(b=>b.k==='why')&&c.beats.some(b=>b.k==='bridge')&&c.beats.some(b=>b.k==='slots')&&c.beats.filter(b=>b.k==='ex').length>=3&&c.beats.some(b=>b.k==='trap')&&c.beats.some(b=>b.k==='ask')));
 ok('P13 1-2 template why/bridge/slots/3ex/trap/ask');
 
+const ch11ru=GP.chapter('1-1','1-1-ru');
+const blob11=JSON.stringify(ch11ru);
+assert.ok(/қол/.test(blob11)&&/көл/.test(blob11));
+assert.ok(/орман/.test(blob11)&&/арман/.test(blob11));
+assert.ok(/ұн/.test(blob11)&&/үн/.test(blob11));
+assert.ok(/он/.test(blob11)&&/оң/.test(blob11));
+assert.ok(ch11ru.beats.some(b=>b.k==='sound'&&b.letter==='Ө'&&/не русское Ё/i.test(b.warn||'')));
+assert.ok(!/произнес(ено|ла) правильно/i.test(blob11));
+assert.ok(!/падеж|посессив|губн(ая|ой) гармо/i.test(blob11));
+assert.equal(ch11ru.id,'1-1-ru');
+assert.ok(/path-ask/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+ok('Path v5 1-1-ru: қол/көл, орман/арман, sound anchors, no pronunciation scoring, chapter id kept');
+
 const Canon=require('./canonical.js');
 const Gate=require('./curriculum-gate.js');
 const Diag=require('./diagnostics.js');

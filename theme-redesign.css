@@ -264,6 +264,9 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
 .path-plus{color:var(--muted);font-weight:700}
 .path-paper .stimulus{font-size:clamp(1.75rem,4vw,2.6rem)}
 .path-paper details{margin:12px 0;padding:8px 0}
+.path-ai-bar{margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
+.path-ai-bar .ai-tutor-actions{margin:12px 0}
+.path-ai-bar input[type=text]{margin:8px 0}
 .path-chapters .secondary-button{text-align:left;width:100%}
 .homework-head .primary-button{margin-top:16px;min-width:12rem}
 .homework-head h2{margin:8px 0 12px}
