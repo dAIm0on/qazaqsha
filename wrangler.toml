@@ -4,3 +4,8 @@ pages_build_output_dir = "."
 
 [ai]
 binding = "AI"
+
+[[ratelimits]]
+name = "TUTOR_RATE"
+namespace_id = "1001"
+simple = { limit = 25, period = 60 }

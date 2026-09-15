@@ -114,10 +114,21 @@
   r.confidence='medium';
   return r;
  }
+ function canonicalExpected(q,extra){
+  extra=extra||{};
+  let expected=(q&&q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||extra.expected_answer||'';
+  const Canon=node?require('./canonical.js'):root.Canonical;
+  if(Canon&&Canon.applyQuestion){
+   const clone={stimulus:q&&q.stimulus,title:q&&q.title,explanation:q&&q.explanation,fields:[{answers:[expected].concat((q&&q.fields&&q.fields[0]&&q.fields[0].answers)||[])}]};
+   Canon.applyQuestion(clone);
+   if(clone.fields&&clone.fields[0]&&clone.fields[0].answers&&clone.fields[0].answers[0])expected=clone.fields[0].answers[0];
+  }
+  return expected;
+ }
  function buildRequest(mode,q,extra){
   extra=extra||{};
   const lessons=C.ALLOWED_LESSONS;
-  const expected=(q&&q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||extra.expected_answer||'';
+  const expected=canonicalExpected(q,extra);
   const codes=extra.codes||[];
   const cards=R.cardsFor(q,codes[0]).slice(0,2);
   const summary={};
@@ -215,12 +226,8 @@
   }[code]||code;
  }
  function hintLeaks(resp,expected){
-  if(!resp||!expected)return false;
-  const exp=String(expected).trim().toLowerCase();
-  if(exp.length<3)return false;
-  const blob=((resp.message_ru||'')+' '+((resp.contrast&&resp.contrast.correct)||'')+' '+(resp.next_action_ru||'')).toLowerCase();
-  return blob.includes(exp);
+  return C.containsExpected(resp,expected);
  }
- const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,localFallback,buildRequest,callTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,store,load,save,reset};
+ const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,localFallback,buildRequest,callTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset};
  if(node)module.exports=api;else root.AiTutor=api;
 })(typeof window!=='undefined'?window:globalThis);
