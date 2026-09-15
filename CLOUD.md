@@ -45,3 +45,16 @@ Authentication → Settings → Authorized domains → добавь:
 - Прогресс пишется в облако после входа
 - Chrome и Edge видят один аккаунт
 - Старый прогресс из браузера подтягивается в аккаунт при первой регистрации
+
+## 4. ИИ-тьютор (Workers AI binding)
+
+`wrangler.toml` уже объявляет `[ai] binding = "AI"` и `[[ratelimits]] name = "TUTOR_RATE"` (25/мин).
+
+Пока в дашборде нет Workers AI binding, `/api/tutor` отдаёт fallback и Qwen не вызывается. Это не ошибка кода.
+
+1. https://dash.cloudflare.com → Workers & Pages → проект `qazaqsha`
+2. Settings → environment → Bindings → Add → **Workers AI**
+3. Variable name: `AI`
+4. Redeploy (или любой новый `git push`)
+
+Rate Limiting binding из дашборда не добавляется — он идёт из `wrangler.toml`. Isolate Map в коде больше нет.

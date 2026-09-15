@@ -10,6 +10,7 @@ const progress=require('./progress.js');
 const policy=require('./memory-policy.js');
 const fs=require('fs');
 const path=require('path');
+const crypto=require('crypto');
 
 const passed=[];
 function ok(name){passed.push(name);console.log('OK',name);}
@@ -20,11 +21,28 @@ const sandbox={window:{}};
 vm.runInNewContext(fs.readFileSync(path.join(__dirname,'data.js'),'utf8'),sandbox);
 const course=sandbox.window.COURSE;
 assert.ok(course&&Array.isArray(course.questions));
-assert.ok(course.questions.length>=220,'original bank present');
 const ids=course.questions.map(q=>q.id);
 assert.equal(new Set(ids).size,course.questions.length);
 assert.ok(ids.includes('hw1-1-kk')||ids.some(id=>id.startsWith('hw1-')));
-ok('9 bank ids intact (data.js not rewritten this patch)');
+const frozenBank=JSON.parse(fs.readFileSync(path.join(__dirname,'original-bank-ids.json'),'utf8'));
+function bankIdHash(list){
+  return crypto.createHash('sha256').update(list.slice().sort().join('\n'),'utf8').digest('hex');
+}
+function assertOriginal220(label){
+  const live=course.questions.map(q=>q.id);
+  const liveSet=new Set(live);
+  assert.equal(frozenBank.count,220,label+': snapshot must be 220 IDs');
+  assert.equal(frozenBank.ids.length,220,label+': snapshot length');
+  assert.equal(new Set(frozenBank.ids).size,220,label+': snapshot IDs unique');
+  const missing=frozenBank.ids.filter(id=>!liveSet.has(id));
+  assert.deepEqual(missing,[],label+': missing original IDs '+missing.join(','));
+  const frozenSorted=frozenBank.ids.slice().sort();
+  const present=live.filter(id=>frozenBank.ids.includes(id)).sort();
+  assert.deepEqual(present,frozenSorted,label+': original 220 ID set changed (rename/swap)');
+  assert.equal(bankIdHash(present),frozenBank.sha256,label+': original 220 ID hash mismatch');
+}
+assertOriginal220('9');
+ok('9 original 220 bank IDs exact set + hash');
 
 // FSRS-6, retention 0.90, standard weights
 assert.equal(cfg.fsrs.desired_retention,0.90);
@@ -318,8 +336,8 @@ assert.ok(!GP.hasMeningGrammar());
 assert.ok(GP.FORBIDDEN.some(x=>/падеж|посессив|губн|степен/i.test(x)));
 ok('P8 no менің / possessive / labial / degrees chapters');
 
-assert.ok(course.questions.length>=220);
-ok('P9 bank 220 ids intact');
+assertOriginal220('P9');
+ok('P9 original 220 bank IDs exact set + hash');
 
 const stGood=progress.empty();
 stGood.vocabulary={адам:{target_or_context:'target',times_seen:1,last_seen:0}};
@@ -481,9 +499,9 @@ assert.ok(packImport.exercises[0].fields[0].answers.some(a=>/мың/.test(a)));
 assert.ok(!packImport.exercises[0].fields[0].answers.some(a=>core.normalize(a)==='жетпіс бес тоғыз жүз елу'));
 ok('canonical layer overrides bad pack key');
 
-assert.ok(course.questions.length>=220);
+assertOriginal220('A2');
 assert.equal(cfg.fsrs.desired_retention,0.90);
-ok('A2/A4 bank and retention still intact');
+ok('A2/A4 original 220 IDs exact set; retention still intact');
 
 const faded=policy.associationFaded({recall_review_successes:2});
 const fresh=policy.associationFaded({recall_review_successes:0});
@@ -744,8 +762,8 @@ const badRem=AiC.validateResponse({ok:true,mode:'remediation',message_ru:'ok',re
 assert.ok(!badRem.resp.remediation||!badRem.resp.remediation.items.length);
 ok('AI-T22 unknown vocab item rejected');
 
-assert.ok(course.questions.length>=220);
-ok('AI-T23 original bank IDs still present');
+assertOriginal220('AI-T23');
+ok('AI-T23 original 220 bank IDs exact set + hash');
 
 assert.ok(typeof AiT.localFallback==='function');
 assert.ok(/ai-why|Почему\?/.test(appSrc));
@@ -791,9 +809,15 @@ assert.ok(!hijack.req.allowed_rule_ids.includes('T11_ORDINAL'));
 assert.ok(!hijack.req.allowed_vocab.some(w=>/кітабым|падеж/.test(w)));
 ok('AI server whitelist: required fields; future/case rules cannot be injected');
 
-assert.ok(/memLimit|TUTOR_RATE/.test(fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8')));
-assert.ok(/\[\[ratelimits\]\]/.test(fs.readFileSync(path.join(__dirname,'wrangler.toml'),'utf8')));
-ok('AI-T16 public /api/tutor has rate limit binding + in-memory cap');
+const tutorSrc=fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8');
+const wranglerSrc=fs.readFileSync(path.join(__dirname,'wrangler.toml'),'utf8');
+assert.ok(/env\.TUTOR_RATE\.limit/.test(tutorSrc));
+assert.ok(!/memLimit|buckets=new Map/.test(tutorSrc));
+assert.ok(/\[\[ratelimits\]\]/.test(wranglerSrc));
+assert.ok(/name = "TUTOR_RATE"/.test(wranglerSrc));
+assert.ok(/limit = 25/.test(wranglerSrc));
+assert.ok(/period = 60/.test(wranglerSrc));
+ok('AI-T16 public /api/tutor uses TUTOR_RATE binding only, no isolate Map');
 
 assert.ok(!/await window\.AiTutor\.callTutor/.test(appSrc.slice(appSrc.indexOf('function checkAnswer'),appSrc.indexOf('function nextQuestion'))));
 ok('AI-T27/T28 checkAnswer does not wait on the model');
