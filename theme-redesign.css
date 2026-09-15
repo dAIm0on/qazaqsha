@@ -265,7 +265,12 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
 .path-paper .stimulus{font-size:clamp(1.75rem,4vw,2.6rem)}
 .path-paper details{margin:12px 0;padding:8px 0}
 .path-chapters .secondary-button{text-align:left;width:100%}
-.lesson{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:16px;padding:20px 22px;background:var(--surface);border:1px solid var(--line);border-radius:18px;margin:0 0 10px}
+.homework-head .primary-button{margin-top:16px;min-width:12rem}
+.homework-head h2{margin:8px 0 12px}
+.exam-intro h2{margin:0 0 12px}
+.rules-search input[type=search]{margin-top:8px}
+.path-lessons{display:grid;gap:10px}
+.lesson{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:16px;padding:20px 22px;background:var(--surface);border:1px solid var(--line);border-radius:18px;margin:0;width:100%;text-align:left;color:inherit}
 .lesson.current{border-color:var(--primary);background:var(--sage)}
 .lesson .number{font:400 1.6rem var(--display);color:var(--primary)}
 

@@ -83,11 +83,10 @@
    examRaf=requestAnimationFrame(tick);
  }
  function renderExam(){
-   $('#exam-content').innerHTML=`<div class="panel"><p>В обычной учёбе время не штрафует. Экзамен — те же задания, но ${cfg.session.examMs/1000} секунды на карточку.</p><p>Сначала тип, потом урок — можно прыгать.</p>
+   $('#exam-content').innerHTML=`<div class="panel exam-intro"><h2>Закрепление на время</h2><p>В обычной учёбе время не штрафует. Экзамен — те же задания, но ${cfg.session.examMs/1000} секунды на карточку. Подсказки выключены.</p><p class="small">${cfg.session.examSize} карточек. Карточка без двух отложенных слепых успехов сюда не попадает — это не новый замок на весь курс, а действующее условие ядра.</p>
      <div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>`<button type="button" class="chip" data-exam="${id}">${esc(name)}</button>`).join('')}</div>
      <div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-exam-course="${b.id}">${esc(b.title)}</button>`).join('')}</div>
-     <p><button type="button" class="secondary-button" id="exam-rules">Только правила (другие основы)</button></p>
-     <p class="small">${cfg.session.examSize} карточек. Подсказки выключены. «Только правила» — те же ходы, не ключ прошлой домашки. Карточка без двух отложенных слепых успехов сюда не попадает.</p></div>`;
+     <p><button type="button" class="secondary-button" id="exam-rules">Только правила (другие основы)</button></p></div>`;
    $$('#exam-content [data-exam]').forEach(b=>b.onclick=()=>{topic=b.dataset.exam;mode='exam';sourceFilter=null;vocabRole=null;activeLesson=null;startQueue({all:true});showView('practice');});
    $$('#exam-content [data-exam-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.examCourse;mode='exam';activeLesson=null;startQueue({all:true});showView('practice');});
    $('#exam-rules').onclick=()=>{topic='rules';mode='exam';courseBlock=null;sourceFilter=null;vocabRole=null;activeLesson=null;startQueue({all:true});showView('practice');};
@@ -227,7 +226,8 @@
    const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
    const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
    $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${source.additional?esc(source.title):`<a href="${source.url}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`}<br>${esc(location)}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ЛИСТ ДЗ':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(q.title)}</h2>${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}${answerMarkup(q)}${letters?`<div class="letter-keyboard" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div><div class="keyboard-label">Буква вставится в выбранное поле.</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div><div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
-   $('#answer-form').addEventListener('submit',e=>{e.preventDefault();if(checked)nextQuestion();else checkAnswer(q);});
+   $('#answer-form').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.isComposing||e.keyCode===229))e.preventDefault();});
+   $('#answer-form').addEventListener('submit',e=>{e.preventDefault();if(e.isComposing||(e.nativeEvent&&e.nativeEvent.isComposing))return;if(checked)nextQuestion();else checkAnswer(q);});
    if($('#rule-button'))$('#rule-button').onclick=()=>showRule(q);
    $('#hint-button').onclick=()=>showHint(q);
    $('#reveal-button').onclick=()=>mode==='exam'?checkAnswer(q,true):peekAnswer(q);
@@ -448,12 +448,12 @@
    const ready=window.Homework.sheetReady(attempt,pack);
    const exP=window.Homework.partProgress(attempt,h.exercise_ids),wP=window.Homework.partProgress(attempt,h.word_question_ids||[]);
    const exN=window.Homework.sectionCount(h.exercise_ids),wN=window.Homework.sectionCount(h.word_question_ids||[]);
+   const resumeAt=window.Homework.resumeIndex(h.exercise_ids,attempt);
    const check=key=>`<label class="pref-check"><input type="checkbox" data-hw-check="${key}" ${attempt.checklist[key]?'checked':''}> ${{method:'Повторила методичку',exercises:'Упражнения сборника',words:'Слова урока',external_test:'Зафиксировала на сайте',keyboard:'Казахская раскладка на телефоне',cheat:'Шпаргалка сохранена'}[key]||key}</label>`;
    const secBtns=(part,n)=>n<=1?'':`<div class="jump-row">${Array.from({length:n},(_,i)=>`<button type="button" class="chip" data-hw-part="${part}" data-hw-sec="${i}">Часть ${i+1}</button>`).join('')}</div>`;
-   root.innerHTML=`<div class="panel"><h2>Домашка по уроку</h2><p>Это сдача листа, не очередь повторения. Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике. Можно выйти в любой момент: ответы уже в листе.</p>
-     <div class="jump-row">${list.map(p=>`<button type="button" class="chip" data-hw-lesson="${p.lesson_id}" ${p.lesson_id===pack.lesson_id?'aria-pressed="true"':''}>${esc(p.homework.title)}</button>`).join('')}</div></div>
-     <div class="panel"><h2>${esc(h.title)}</h2>
-       <p>Упражнения ${exP.done} из ${exP.total} · слова ${wP.done} из ${wP.total} · внешний тест ${attempt.checklist.external_test?'отмечен':'не отмечен'}.</p>
+   root.innerHTML=`<div class="panel homework-head"><p class="eyebrow">СДАЧА ЛИСТА · УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>Готово ${exP.done} из ${exP.total} упражнений · ${wP.done} из ${wP.total} слов. Это не очередь повторения.</p><button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button></div>
+     <div class="panel"><div class="jump-row">${list.map(p=>`<button type="button" class="chip" data-hw-lesson="${p.lesson_id}" ${p.lesson_id===pack.lesson_id?'aria-pressed="true"':''}>${esc(p.homework.title)}</button>`).join('')}</div>
+       <p class="small">Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике. Можно выйти в любой момент: ответы уже в листе.</p>
        <ol class="learning-steps">
          <li>Повторить методичку — ${h.method_url?`<a href="${esc(h.method_url)}" target="_blank" rel="noopener noreferrer">${esc(h.method_title)}</a>`:'ссылка на материал урока'}${check('method')}</li>
          <li>Упражнения сборника (${h.exercise_ids.length} пунктов, по ${window.Homework.HW_SECTION} в части) <button type="button" class="secondary-button" data-hw-part="exercises">${exP.done?'Продолжить упражнения':'Открыть упражнения'}</button>${secBtns('exercises',exN)}</li>
@@ -503,7 +503,7 @@
      root.innerHTML=`<div class="panel"><h2>Уроки и правила</h2><p>Разбираем только то, что уже было на занятиях. Это не домашка и не «Пора повторить».</p>
        <div class="path-lessons">${list.map(les=>{
          const n=les.chapters.length,done=les.chapters.filter(c=>gp.completedChapters&&gp.completedChapters[les.id+':'+c.id]).length;
-         return `<button type="button" class="today-option" data-les="${les.id}"><span>Урок ${esc(les.id)}</span><strong>${esc(les.title)}</strong><small>Глав ${done} из ${n}</small></button>`;
+         return `<button type="button" class="lesson" data-les="${les.id}"><span class="number">${esc(les.id)}</span><div><h3>${esc(les.title)}</h3><p>Глав ${done} из ${n}</p></div><span class="small">${done?'Можно повторить':'Продолжить'}</span></button>`;
        }).join('')}</div>
        <p class="small">Прохождение не ставит Good словам словаря.</p></div>`;
      root.querySelectorAll('[data-les]').forEach(b=>b.onclick=()=>{G.startLesson(state,b.dataset.les);save();renderPath();});
@@ -591,8 +591,10 @@
      let pathPeek=false;
      $('#path-rule').onclick=()=>{pathPeek=true;$('#path-fb').hidden=false;$('#path-fb').className='feedback hinted';$('#path-fb').innerHTML='<p>'+esc(beat.rule_line||beat.trap||'Собери слот, потом напиши форму целиком.')+'</p>';};
      $('#path-idk').onclick=()=>{pathPeek=true;$('#path-form').requestSubmit();};
+     $('#path-form').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.isComposing||e.keyCode===229))e.preventDefault();});
      $('#path-form').onsubmit=e=>{
        e.preventDefault();
+       if(e.isComposing||(e.nativeEvent&&e.nativeEvent.isComposing))return;
        const val=$('#path-answer').value,ok=G.evalCheck(beat,val);
        G.recordPath(state,beat,ok,pathPeek);
        if(ok&&!pathPeek){nextBeat();return;}
@@ -704,6 +706,7 @@
  }
  function renderRules(){
    $('#rules-content').innerHTML=`
+     <div class="panel rules-search"><label for="rules-q">Найти правило или слово</label><input id="rules-q" type="search" placeholder="казахское слово или тема" autocomplete="off"><p class="small">Поиск по этой странице. Несуществующее слово не становится новой статьёй.</p></div>
      <div class="panel"><h2>Сингармонизм без путаницы</h2><p>Для выбора окончания нужны две опоры: <strong>последний слог</strong> определяет гласную, <strong>последняя буква</strong> — первую согласную. Не пытайся запомнить шесть окончаний как шесть отдельных правил.</p><div class="table-wrap"><table><thead><tr><th scope="col">Последняя буква слова</th><th scope="col">Последний слог задний<br>А О Ұ Ы</th><th scope="col">Последний слог передний<br>Ә Ө Ү І Е</th></tr></thead><tbody><tr><th scope="row">Гласная, Р, Й, У → Л</th><td lang="kk">-лар · қалалар</td><td lang="kk">-лер · көшелер</td></tr><tr><th scope="row">Л, М, Н, Ң, Ж, З → Д</th><td lang="kk">-дар · адамдар</td><td lang="kk">-дер · сөздер</td></tr><tr><th scope="row">Глухая; Б, В, Г, Д → Т</th><td lang="kk">-тар · кітаптар</td><td lang="kk">-тер · жігіттер</td></tr></tbody></table></div><p>Пример рассуждения: кі-<strong>тап</strong> → последний слог задний → А. Последняя буква П → Т. Получаем кітап + тар = <span lang="kk">кітаптар</span>.</p><p>И и У разбираем в составе слова: иттер, но милар. -мен — особое падежное окончание без чередования А/Е. Остальные группы букв в методичке — учебная схема; полный алфавит не нужно смешивать с двумя основными группами гласных.</p><p><a href="https://kaz-tili.kz/su_mn1.htm" target="_blank" rel="noopener noreferrer">Правило множественного числа и примеры</a></p></div>
      <div class="panel"><h2>Числа: лестница, не список до 9999</h2>
      <p>Мозг не учит «47» как отдельное слово. Сначала <strong>0–10</strong>, потом круглые десятки, потом отличаем пары <span lang="kk">сегіз / сексен</span> (8 и 80). Составные собираем из частей.</p>
@@ -730,6 +733,14 @@
      <div class="panel"><h2>Числа и количество из домашней работы 1–2</h2>${vocabTable(course.numbers)}<p><button type="button" class="secondary-button" data-rule-topic="numbers">Тренировать числа</button></p></div>
      <div class="panel"><h2>Слова урока 2–2</h2>${vocabTable(catalog.words.filter(w=>w.lesson_first_seen==='2-2').map(w=>[w.kazakh,w.translation]))}<p><button type="button" class="secondary-button" data-rule-topic="vocab">Тренировать слова</button></p></div>
      ${bankMarkup()}`;
+   const rulesQ=$('#rules-q');
+   if(rulesQ)rulesQ.oninput=()=>{
+     const n=core.normalize(rulesQ.value);
+     $$('#rules-content .panel').forEach(p=>{
+       if(p.classList.contains('rules-search'))return;
+       p.hidden=!!(n&&!core.normalize(p.textContent).includes(n));
+     });
+   };
    $$('[data-rule-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.ruleTopic;sourceFilter=null;mode='ordered';showView('practice');startQueue();});
    $$('#rules-content [data-source]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.source;vocabRole=null;topic='all';mode='ordered';showView('practice');startQueue();});
    $$('#rules-content [data-vocab]').forEach(b=>b.onclick=()=>{vocabRole=b.dataset.vocab;courseBlock=null;sourceFilter=null;topic='vocab';mode='ordered';startQueue({all:true});showView('practice');});
