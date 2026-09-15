@@ -48,6 +48,9 @@ input,select,textarea{font-size:max(16px,1em)}
 .exam-bar{height:6px;background:#dce5ee;border-radius:4px;overflow:hidden;margin:0 0 10px}
 .exam-bar[hidden]{display:none!important}
 #exam-bar-fill{height:100%;width:100%;background:var(--teal);transform-origin:left center}
+.course-jump{margin:0 0 18px;padding:14px 16px;background:var(--white);border:1px solid var(--line);border-radius:14px}
+.course-jump p{margin:0 0 10px}
+.course-jump .review-actions{margin:0}
 @media(max-width:690px){
   .question-actions{position:static!important;box-shadow:none!important;padding:12px 16px 8px}
   .question-body{padding-bottom:12px}
