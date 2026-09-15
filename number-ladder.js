@@ -10,7 +10,7 @@
    c.questions.push(q);return q.id;
  }
  function both(id,n,note){
-   const kk=core.numberToKazakh(n),parts=core.numberParts(n).map(p=>p.value+' → '+p.word).join(' + ');
+   const kk=core.numberToKazakh(n),parts=core.numberParts(n).map(p=>p.value).join(' + ');
    const expl=n+' = '+kk+'. '+parts+'. '+(note||'Сначала большая часть, потом меньшая. Между словами пробел, без «и».');
    const hint=parts;
    const alt=n>=1000&&n<2000&&kk.startsWith('бір ')?[kk,kk.slice(4)]:[kk];
@@ -125,7 +125,7 @@
      q.fields[0].kind=q.generatedNumber.reverse?'number-text':'text';
      q.fields[0].answers=q.generatedNumber.reverse?[String(n)]:[spoken];
      if(!q.generatedNumber.reverse&&n>=1000&&n<2000&&spoken.startsWith('бір '))q.fields[0].answers.push(spoken.slice(4));
-     q.hint=core.numberParts(n).map(p=>p.value+' → '+p.word).join(' + ');
+     q.hint=core.numberParts(n).map(p=>p.value).join(' + ');
      q.explanation=n+' = '+spoken+'. '+core.numberParts(n).map(p=>p.value).join(' + ')+'.';
      return;
    }

@@ -35,7 +35,7 @@
  }
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
- let examRaf=null,examTimedOut=false,advanceTimer=null;
+ let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null);
  function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}
  function focusAnswer(){const el=$('#answer-0');if(el&&!el.disabled){try{el.focus({preventScroll:false});}catch{el.focus();}}}
  function captureDraft(){const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,answers:readAnswers(q)};}
@@ -72,9 +72,11 @@
    $('#exam-content').innerHTML=`<div class="panel"><p>В обычной учёбе время не штрафует. Экзамен — те же задания, но ${cfg.session.examMs/1000} секунды на карточку.</p><p>Сначала тип, потом урок — можно прыгать.</p>
      <div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>`<button type="button" class="chip" data-exam="${id}">${esc(name)}</button>`).join('')}</div>
      <div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-exam-course="${b.id}">${esc(b.title)}</button>`).join('')}</div>
-     <p class="small">${cfg.session.examSize} карточек. Подсказки выключены. Отдельная кнопка «Только правила» — без слов, только окончания и гармония.</p></div>`;
+     <p><button type="button" class="secondary-button" id="exam-rules">Только правила (другие основы)</button></p>
+     <p class="small">${cfg.session.examSize} карточек. Подсказки выключены. «Только правила» — те же ходы, не ключ прошлой домашки. Карточка без двух отложенных слепых успехов сюда не попадает.</p></div>`;
    $$('#exam-content [data-exam]').forEach(b=>b.onclick=()=>{topic=b.dataset.exam;mode='exam';sourceFilter=null;vocabRole=null;activeLesson=null;startQueue({all:true});showView('practice');});
    $$('#exam-content [data-exam-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.examCourse;mode='exam';activeLesson=null;startQueue({all:true});showView('practice');});
+   $('#exam-rules').onclick=()=>{topic='rules';mode='exam';courseBlock=null;sourceFilter=null;vocabRole=null;activeLesson=null;startQueue({all:true});showView('practice');};
  }
  function save(){
    captureDraft();state.records=records;state.learning=learningState;
@@ -105,7 +107,7 @@
  function shuffled(items){
    const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
  }
- function examReady(r){return !!r&&((r.recall_review_successes||0)>=1||((r.correct_streak||0)>=2&&r.last_successful_review));}
+ function examReady(r){return window.MemoryPolicy?window.MemoryPolicy.examReady(r):!!r&&(r.recall_review_successes||0)>=2;}
  function startQueue({all=false}={}){
    activeLesson=null;activeStep=null;stepEvidence={};let list=subset();
    if(!vocabRole)list=list.filter(q=>q.wordRole!=='used');
@@ -121,7 +123,9 @@
      list=[...fresh.slice(0,cfg.session.newLimit),...old].slice(0,cfg.session.size+cfg.session.newLimit);
    }
    if(['smart','review','mistakes'].includes(mode)){const recent=state.events.filter(e=>e.type==='answer'&&Date.now()-e.at<cfg.session.recentWindowMs).slice(-cfg.session.minIntervening).map(e=>e.card_id);list=core.spaceRecent(window.Knowledge.choose(list,state,Infinity),recent).slice(0,cfg.session.size);}
-   queue=list.map(q=>q.id);practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;resetCounts();render();
+   let ids=list.map(q=>q.id);
+   if(window.MemoryPolicy)ids=window.MemoryPolicy.breakRuns(ids,questions);
+   queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);resetCounts();render();
  }
  function startLesson(id,step=learningState.steps[id]||0){
    const lesson=window.LEARNING.lessons.find(l=>l.id===id),chunk=lesson?.chunks[step];if(!chunk)return;
@@ -244,7 +248,7 @@
    focusAnswer();save();
  }
  function showHint(q){
-   hintEvent(q,'explanation');if($('#hint-button'))$('#hint-button').disabled=true;
+   hinted=true;hintEvent(q,'explanation');if($('#hint-button'))$('#hint-button').disabled=true;
    const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Для окончания важен последний слог.',plural:'Последний слог: А или Е. Потом последняя буква: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Сначала слепая попытка. Не открывай готовое слово — иначе это не вспоминание.',numbers:'Собери разряды: сначала большая часть. Не считай по порядку.',person:'Мен: пын/бын/мын. Сен: сың. Сіз: сыз. Біз после м/н/ң: біз. Сендер/сіздер без -лар на основу. Отрицание: основа + емес + окончание.',rules:'Набери суффикс или короткое слово правила, не целое новое существительное.'};
    const box=$('#hint-box');box.textContent=q.hint&&!/^[А-Яа-яӘәІіҢңҒғҚқӨөҰұҮүҺһ ]{1,24}$/.test(q.hint)?q.hint:(hints[q.topic]||'Вспомни правило, потом форму.');box.hidden=false;save();
  }
@@ -267,17 +271,34 @@
      if(elapsedMs<=cfg.session.examEasyMs)rating=F.Rating.Easy;
      else if(elapsedMs<=cfg.session.examHardMs)rating=F.Rating.Good;
      else rating=F.Rating.Hard;
-   }else if((records[q.id]?.review_count||0)<4&&elapsedMs>(cfg.session.slowMs||8000))rating=F.Rating.Hard;
-   else rating=F.Rating.Good;
-   let rec=core.updateRecord(records[q.id],result.correct,hinted,now,{responseTime:elapsedMs,recall,rating});records[q.id]=rec;
+   }else rating=F.Rating.Good;
+   const previous=records[q.id];
+   const predicted=window.ReviewScheduler.retrievability?window.ReviewScheduler.retrievability(previous,now):null;
+   const hours=previous?.last_correct?(now-previous.last_correct)/3600000:null;
+   let rec=core.updateRecord(previous,result.correct,hinted,now,{responseTime:elapsedMs,recall,rating});records[q.id]=rec;
    const errors=reveal?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);state.errors.push(...errors);
-   const event={session_id:String(queueEpoch),presentation:position,type:'answer',card_id:q.id,at:now,correct:result.correct,hinted,response_time_ms:elapsedMs,response_time:elapsedMs,recall,answers};
+   const policy=window.MemoryPolicy;
+   const flags=policy&&policy.answerFlags?policy.answerFlags({hinted,correct:result.correct}):{first_try_correct:hinted?0:(result.correct?1:0),peek:hinted?1:0,retype_after_peek_ok:hinted?(result.correct?1:0):null};
+   const event={session_id:String(queueEpoch),presentation:position,type:'answer',card_id:q.id,at:now,correct:result.correct,hinted,response_time_ms:elapsedMs,response_time:elapsedMs,latency_ms:elapsedMs,recall,answers,
+     item_type:policy?policy.classify(q):null,direction:policy?policy.direction(q):null,
+     first_try_correct:flags.first_try_correct,peek:flags.peek,retype_after_peek_ok:flags.retype_after_peek_ok,
+     confusion_tag:policy?policy.confusionTag(q,answers,result):'',
+     confuse_pair_id:policy&&policy.contrastSide(q)?String(policy.contrastSide(q).pair):'',
+     official_like:(mode==='exam'||q.topic==='rules')?1:0,
+     predicted_R:predicted,
+     hours_since_last:hours};
    event.skills=window.Knowledge.observe(state,q,result,event,errors);state.events.push(event);rec=records[q.id];
    P.observeConfusions(state,q,answers,result,now,confusionIndex,hinted||reveal);
    for(const pair of Object.values(state.confusions)){pair.expected_item=[...confusionIndex.get(pair.expected_answer)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.given_item=[...confusionIndex.get(pair.wrong_answer_given)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.last_confused=pair.last_wrong;}
    if(activeLesson&&practiceIds.includes(q.id))stepEvidence[q.id]=result.correct&&!hinted;
    sessionAttempts++;if(result.correct){if(hinted)sessionAssisted++;else sessionCorrect++;}
-   core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id));
+   if(!hinted&&!result.correct)sessionBlindFails[q.id]=(sessionBlindFails[q.id]||0)+1;
+   if((sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id));
+   const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);
+   if(mate&&!result.correct&&!hinted){
+     const other=questions.find(x=>x.id!==q.id&&window.MemoryPolicy.contrastSide(x)?.pair===mate.pair&&window.MemoryPolicy.contrastSide(x)?.side!==mate.side);
+     if(other&&!queue.slice(position+1).includes(other.id))queue.splice(Math.min(position+4,queue.length),0,other.id);
+   }
    const deferred=rec.streak<cfg.schedule.cleanAnswersToConsolidate&&!queue.slice(position+1).includes(q.id);
    if(q.kind==='multi'){
      q.options.forEach((o,i)=>{
@@ -360,7 +381,14 @@
  }
  function promote(id){
    const w=catalog.words.find(w=>w.id===id);if(!w)return;
+   const policy=window.MemoryPolicy;
+   if(policy&&!policy.canAddIncidental(state)){
+     const msg=$('#save-status');
+     if(msg){msg.hidden=false;msg.textContent='На этой неделе уже 8 контекстных слов в обязательное. Дальше только глоссарий.';}
+     return;
+   }
    state.vocabulary[id]={...(state.vocabulary[id]||{times_seen:0,last_seen:0}),target_or_context:'target'};
+   if(policy){const week=policy.incidentalWeek(state);week.added+=1;state.incidentalWeek=week;}
    window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);save();
  }
  function importProgress(incoming,mode){

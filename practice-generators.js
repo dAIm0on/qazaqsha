@@ -23,7 +23,7 @@
    const spoken=core.numberToKazakh(n);
    q.fields[0].answers=reverse?[String(n)]:[spoken];
    if(!reverse&&n>=1000&&n<2000&&spoken.startsWith('бір '))q.fields[0].answers.push(spoken.slice(4));
-   q.hint=core.numberParts(n).map(p=>p.value+' → '+p.word).join(' + ');q.explanation=n+' = '+core.numberToKazakh(n)+'. '+core.numberParts(n).map(p=>p.value).join(' + ')+'.';
+   q.hint=core.numberParts(n).map(p=>p.value).join(' + ');q.explanation=n+' = '+core.numberToKazakh(n)+'. '+core.numberParts(n).map(p=>p.value).join(' + ')+'.';
  }
  function session(range,state){
    const generated=templates.filter(q=>q.generatedNumber.range===range),atoms=c.questions.filter(q=>q.topic==='numbers'&&q.source==='hw2');

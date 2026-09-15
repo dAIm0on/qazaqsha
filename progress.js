@@ -6,7 +6,7 @@
  const obj=v=>v&&typeof v==='object'&&!Array.isArray(v);
  const safe=k=>typeof k==='string'&&k.length<=300&&!['__proto__','prototype','constructor'].includes(k);
  function dictionary(value,transform){const out=Object.create(null);if(obj(value))for(const [k,v] of Object.entries(value))if(safe(k)){const next=transform(v,k);if(next!==undefined)out[k]=next;}return out;}
- function empty(){return {schema:5,records:Object.create(null),skills:Object.create(null),errors:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:false},session:null,lesson_packages:[]};}
+ function empty(){return {schema:6,records:Object.create(null),skills:Object.create(null),errors:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:false},incidentalWeek:{key:'',added:0},session:null,lesson_packages:[]};}
  function migrate(raw={},now=Date.now()){
    const state=empty();state.lesson_packages=packages.merge([],raw.lesson_packages||[]);state.skills=dictionary(raw.skills,r=>obj(r)?core.migrateRecord(r,now):undefined);state.errors=Array.isArray(raw.errors)?raw.errors.filter(e=>obj(e)&&typeof e.error_type==='string'&&Number.isFinite(e.timestamp)):[];state.records=dictionary(raw.records,r=>obj(r)?core.migrateRecord(r,now):undefined);
    state.associations=dictionary(raw.associations,v=>typeof v==='string'?{text:v.slice(0,cfg.storage.maxAssociationLength),updated_at:now}:obj(v)&&typeof v.text==='string'?{text:v.text.slice(0,cfg.storage.maxAssociationLength),updated_at:Number(v.updated_at)||0}:undefined);
@@ -15,7 +15,8 @@
      card_ids:Array.isArray(c.card_ids)?c.card_ids.filter(safe).slice(0,100):[],last_wrong:Number(c.last_wrong)||0,
      known_alternative:!!c.known_alternative,successes:dictionary(c.successes,v=>Math.min(2,Math.max(0,Number(v)||0))),resolved:!!c.resolved}:undefined);
    state.vocabulary=dictionary(raw.vocabulary,v=>obj(v)?{times_seen:Math.max(0,Number(v.times_seen)||0),last_seen:Number(v.last_seen)||0,last_seen_lesson:typeof v.last_seen_lesson==='string'?v.last_seen_lesson:null,target_or_context:v.target_or_context==='target'?'target':'context'}:undefined);
-   state.events=Array.isArray(raw.events)?raw.events.slice(-cfg.storage.maxEvents).filter(e=>obj(e)&&safe(e.card_id)&&Number.isFinite(e.at)).map(e=>({...e,card_id:e.card_id,at:e.at,correct:!!e.correct,hinted:!!e.hinted,response_time:Number.isFinite(e.response_time)?Math.max(0,e.response_time):null,recall:!!e.recall,answers:Array.isArray(e.answers)?e.answers.slice(0,50).map(a=>String(a).slice(0,300)):[]})):[];
+   state.events=Array.isArray(raw.events)?raw.events.slice(-cfg.storage.maxEvents).filter(e=>obj(e)&&safe(e.card_id)&&Number.isFinite(e.at)).map(e=>({...e,card_id:e.card_id,at:e.at,correct:!!e.correct,hinted:!!e.hinted,response_time:Number.isFinite(e.response_time)?Math.max(0,e.response_time):null,latency_ms:Number.isFinite(e.latency_ms)?e.latency_ms:(Number.isFinite(e.response_time)?e.response_time:null),recall:!!e.recall,answers:Array.isArray(e.answers)?e.answers.slice(0,50).map(a=>String(a).slice(0,300)):[],item_type:typeof e.item_type==='string'?e.item_type:null,direction:typeof e.direction==='string'?e.direction:null,first_try_correct:e.first_try_correct==null?null:Number(e.first_try_correct)?1:0,peek:e.peek==null?null:Number(e.peek)?1:0,retype_after_peek_ok:e.retype_after_peek_ok==null?null:e.retype_after_peek_ok,confusion_tag:typeof e.confusion_tag==='string'?e.confusion_tag:'',confuse_pair_id:typeof e.confuse_pair_id==='string'?e.confuse_pair_id:'',official_like:e.official_like?1:0,predicted_R:Number.isFinite(e.predicted_R)?e.predicted_R:null,hours_since_last:Number.isFinite(e.hours_since_last)?e.hours_since_last:null})):[];
+   if(obj(raw.incidentalWeek))state.incidentalWeek={key:String(raw.incidentalWeek.key||''),added:Math.max(0,Number(raw.incidentalWeek.added)||0)};
    if(obj(raw.learning)){
      state.learning.lessonId=typeof raw.learning.lessonId==='string'?raw.learning.lessonId:'numbers-0';
      state.learning.notes=dictionary(raw.learning.notes,n=>typeof n==='string'?n.slice(0,1200):undefined);
@@ -26,12 +27,12 @@
    state.prefs={letters:!!(obj(raw.prefs)&&raw.prefs.letters)};
    state.session=obj(raw.session)?raw.session:null;return state;
  }
- function serialize(state){return JSON.stringify({app:'qazaq-trainer',schema:5,exported_at:new Date().toISOString(),policy_version:cfg.version,scheduler_config:{implementation:cfg.algorithm,desired_retention:cfg.fsrs.desired_retention,standard_weights:true},...state});}
+ function serialize(state){return JSON.stringify({app:'qazaq-trainer',schema:6,exported_at:new Date().toISOString(),policy_version:cfg.version,scheduler_config:{implementation:cfg.algorithm,desired_retention:cfg.fsrs.desired_retention,standard_weights:true},...state});}
  function validate(text,knownIds,now=Date.now()){
    if(new TextEncoder().encode(text).length>cfg.storage.maxImportBytes)throw Error('Файл слишком большой: максимум 20 МБ.');
    let raw;try{raw=JSON.parse(text);}catch{throw Error('Это не корректный JSON-файл.');}
    if(!obj(raw)||!obj(raw.records)||(raw.app&&raw.app!=='qazaq-trainer'))throw Error('Файл не похож на резервную копию тренажёра.');
-   if(raw.schema!==undefined&&![1,2,3,4,5].includes(raw.schema))throw Error('Эта версия резервной копии пока не поддерживается.');
+   if(raw.schema!==undefined&&![1,2,3,4,5,6].includes(raw.schema))throw Error('Эта версия резервной копии пока не поддерживается.');
    if(Object.keys(raw.records).length+Object.keys(raw.skills||{}).length>20000)throw Error('Слишком много карточек в файле.');
    for(const [id,r] of [...Object.entries(raw.records),...Object.entries(raw.skills||{})]){
      if(!safe(id)||!obj(r))throw Error('В файле есть некорректная запись карточки.');
@@ -60,7 +61,28 @@
    out.prefs={letters:!!(incoming.prefs&&incoming.prefs.letters)||!!out.prefs.letters};
    Object.assign(out.learning.steps,incoming.learning.steps);
    Object.assign(out.learning.notes,incoming.learning.notes);Object.assign(out.learning.completedSteps,incoming.learning.completedSteps);
+   if(incoming.incidentalWeek){
+     const a=out.incidentalWeek||{key:'',added:0},b=incoming.incidentalWeek;
+     out.incidentalWeek=a.key===b.key?{key:a.key,added:Math.max(a.added||0,b.added||0)}:(b.key||'')>(a.key||'')?{key:b.key,added:b.added||0}:a;
+   }
    return out;
+ }
+ function memoryStats(state,now=Date.now()){
+   const hw=(state.events||[]).filter(e=>e.type==='answer'&&String(e.card_id||'').startsWith('hw'));
+   const first=hw.filter(e=>e.first_try_correct!=null);
+   const days=Object.create(null);
+   for(const e of hw){
+     const day=new Date(e.at).toISOString().slice(0,10);
+     if(!days[day])days[day]={n:0,peek:0};
+     days[day].n++;if(e.peek||e.hinted)days[day].peek++;
+   }
+   const last3=Object.keys(days).sort().slice(-3);
+   const stop=last3.length===3&&last3.every(d=>days[d].n&&days[d].peek/days[d].n>0.5);
+   return {
+     firstTry:first.length?Math.round(100*first.filter(e=>e.first_try_correct).length/first.length):null,
+     peekRate:hw.length?Math.round(100*hw.filter(e=>e.peek||e.hinted).length/hw.length):null,
+     stop
+   };
  }
  function answerIndex(questions){
    const index=new Map();
@@ -102,6 +124,6 @@
    for(let i=0;i<Math.max(left.length,right.length);i++){if(left[i]&&!out.includes(left[i]))out.push(left[i]);if(right[i]&&!out.includes(right[i]))out.push(right[i]);if(out.length>=cfg.session.size)break;}
    return out.slice(0,cfg.session.size);
  }
- const api={empty,migrate,serialize,validate,merge,answerIndex,observeConfusions,pairs,contrastIds};
+ const api={empty,migrate,serialize,validate,merge,answerIndex,observeConfusions,pairs,contrastIds,memoryStats};
  if(node)module.exports=api;else root.ProgressStore=api;
 })(typeof window!=='undefined'?window:globalThis);

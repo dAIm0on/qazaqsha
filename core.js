@@ -56,7 +56,12 @@
     return parts;
   }
   function numberToKazakh(value){const parts=numberParts(value);return parts?parts.map(p=>p.word).join(' '):null;}
+  function assembleOnly(q){
+    const pol=typeof module!=='undefined'&&module.exports?require('./memory-policy.js'):root.MemoryPolicy;
+    return !!(pol&&pol.isAssembleOnlyCard(q));
+  }
   function chooseShortSession(items,records,now=Date.now(),limit=config.session.size){
+    items=(items||[]).filter(q=>q&&!q.contextOnly&&q.wordRole!=='used'&&!String(q.id||'').startsWith('learn-compose-')&&!assembleOnly(q));
     const errors=items.filter(q=>records[q.id]?.needsReview);
     const due=items.filter(q=>!records[q.id]?.needsReview&&isDue(records[q.id],now)).sort((a,b)=>records[a.id].dueAt-records[b.id].dueAt);
     const learning=items.filter(q=>!records[q.id]?.needsReview&&!isDue(records[q.id],now)&&(records[q.id]?.streak||0)<2);
