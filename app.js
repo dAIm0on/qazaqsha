@@ -25,10 +25,10 @@
  let records=state.records,learningState=state.learning;
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
  let confusionIndex=P.answerIndex(questions);
- let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
- const COURSE_BLOCKS=[{id:'1-1',title:'1–1',hint:'Звуки и первые слова'},{id:'1-2',title:'1–2',hint:'Окончания и десятки'},{id:'1-3',title:'1–3',hint:'Числа и новые слова'},{id:'2-2',title:'2–2',hint:'Біз, сендер, сіздер'}];
+ let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
+ const COURSE_BLOCKS=[{id:'1-1',title:'1–1',hint:'Звуки и первые слова'},{id:'1-2',title:'1–2',hint:'Окончания и десятки'},{id:'1-3',title:'1–3',hint:'Числа и новые слова'},{id:'2-1',title:'2–1',hint:'Мен, сен, сіз'},{id:'2-2',title:'2–2',hint:'Біз, сендер, сіздер'}];
  function courseJumpMarkup(id){
-   return `<div class="course-jump" id="${id}"><p>Открыть любой урок сразу, без прохождения предыдущих:</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>Урок ${b.title}</button>`).join('')}</div><p class="small">Урока 2–1 в полученных материалах нет — есть 2–2.</p></div>`;
+   return `<div class="course-jump" id="${id}"><p>Открыть любой урок сразу, без прохождения предыдущих:</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>Урок ${b.title}</button>`).join('')}</div></div>`;
  }
  function bindCourseJump(root){
    (root?root.querySelectorAll('[data-course]'):[]).forEach(b=>b.onclick=()=>startCourse(b.dataset.course));
@@ -79,6 +79,7 @@
  }
  function subset(){
    if(activeLesson){const ids=new Set(window.LEARNING.lessons.find(l=>l.id===activeLesson).questionIds);return questions.filter(q=>ids.has(q.id));}
+   if(vocabRole)return questions.filter(q=>q.topic==='vocab'&&q.wordRole===vocabRole);
    if(courseBlock)return questions.filter(q=>q.lessonId===courseBlock);
    let list=questions.filter(q=>eligible(q)&&(topic==='all'||q.topic===topic)&&(!sourceFilter||q.source===sourceFilter));
    if(topic==='numbers'&&mode!=='numbers'&&window.NumberLadder){
@@ -88,7 +89,7 @@
    return list;
  }
  function startCourse(block){
-   courseBlock=block;sourceFilter=null;activeLesson=null;activeStep=null;topic='all';mode='ordered';
+   courseBlock=block;vocabRole=null;sourceFilter=null;activeLesson=null;activeStep=null;topic='all';mode='ordered';
    const first=window.LEARNING.lessons.find(l=>l.courseLesson===block);
    if(first)learningState.lessonId=first.id;
    startQueue({all:true});showView('practice');
@@ -132,7 +133,7 @@
      const list=questions.filter(q=>id==='all'||q.topic===id), n=list.filter(q=>(records[q.id]?.streak||0)>=2).length;
      return `<button type="button" class="topic-button" data-topic="${id}" ${topic===id?'aria-current="page"':''}><span class="topic-num">${num}</span><span><span class="topic-name">${name}</span><span class="topic-count">${n} / ${list.length} закреплено</span></span></button>`;
    }).join('');
-   $$('[data-topic]').forEach(b=>b.addEventListener('click',()=>{topic=b.dataset.topic;sourceFilter=null;courseBlock=null;activeLesson=null;mode='smart';startQueue();showView('practice');}));
+   $$('[data-topic]').forEach(b=>b.addEventListener('click',()=>{topic=b.dataset.topic;sourceFilter=null;courseBlock=null;vocabRole=null;activeLesson=null;mode='smart';startQueue();showView('practice');}));
  }
  function renderStats(){
    const recallCards=questions.filter(q=>q.kind==='fields'&&q.fields.some(f=>f.kind!=='select'));
@@ -324,8 +325,12 @@
    const titles={'1-1':'1–1','1-2':'1–2','1-3':'1–3','2-2':'2–2'};
    const mustBlocks=Object.entries(B.must).map(([les,rows])=>'<h3>Домашка '+esc(titles[les]||les)+' · '+rows.length+' слов</h3>'+vocabTable(rows.map(w=>[w.kazakh,w.translation]))).join('');
    const all=[...B.all].sort((a,b)=>a.kazakh.localeCompare(b.kazakh,'kk'));
-   return `<div class="panel"><h2>Слова «выучить» из методичек</h2><p>Сверила домашки 1–1, 1–2, 1–3 и 2–2. Все <strong>${B.mustCount}</strong> позиций уже есть в тренажёре, в обе стороны.</p>${mustBlocks}</div>
-     <div class="panel"><h2>Сборник: все казахские слова из материалов</h2><p>${all.length} слов — и обязательные, и те, что просто встречались в примерах. Отдельная тренировка: только ${B.extraCount} новых, которых не было в списках «выучить».</p>${vocabTable(all.map(w=>[w.kazakh,(Array.isArray(w.translation)?w.translation.join(', '):w.translation)+(w.role==='must'?' · выучить':' · из урока '+w.from_lesson)]))}<p><button type="button" class="secondary-button" data-source="bank">Тренировать слова из материалов</button></p></div>`;
+   return `<div class="panel"><h2>Как запоминать слова</h2>
+     <p>Два разных набора — два разных упражнения. Не смешивай.</p>
+     <ol class="learning-steps"><li><strong>Задали выучить</strong> — домашка. Смотри пару → закрой → скажи вслух → напиши. Свою ассоциацию (дос = «доска друга») держи 1–2 раза, потом убери.</li><li><strong>Просто встречались</strong> — сначала только узнать (казахский → русский). Писать казахский — отдельным шагом, позже.</li><li>Маленькие пачки по 4. Интервал считает сам тренажёр. Подсказка не считается самостоятельным ответом.</li></ol>
+     <p class="small">Опора: retrieval practice (Karpicke), keyword+retrieval (Memory & Cognition 2019), FSRS уже в тренажёре. Chrome для ChatGPT/Gemini сейчас закрыт — методика сверена с папкой ИССЛЕДОВАНИЯ и этими работами.</p></div>
+     <div class="panel"><h2>Слова «выучить» из методичек</h2><p>Домашки 1–1, 1–2, 1–3, 2–1 и 2–2. Все <strong>${B.mustCount}</strong> позиций в тренажёре.</p>${mustBlocks}<p><button type="button" class="secondary-button" data-vocab="must">Тренировать заданные слова</button></p></div>
+     <div class="panel"><h2>Слова, которые просто встречались</h2><p>${B.extraCount} слов не зубрить списком. Сначала узнать, потом писать.</p>${vocabTable(all.filter(w=>w.role==='used').map(w=>[w.kazakh,(Array.isArray(w.translation)?w.translation.join(', '):w.translation)+' · урок '+w.from_lesson]))}<p><button type="button" class="secondary-button" data-vocab="used">Тренировать встретившиеся слова</button></p></div>`;
  }
  function renderRules(){
    $('#rules-content').innerHTML=`
@@ -356,7 +361,8 @@
      <div class="panel"><h2>Слова урока 2–2</h2>${vocabTable(catalog.words.filter(w=>w.lesson_first_seen==='2-2').map(w=>[w.kazakh,w.translation]))}<p><button type="button" class="secondary-button" data-rule-topic="vocab">Тренировать слова</button></p></div>
      ${bankMarkup()}`;
    $$('[data-rule-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.ruleTopic;sourceFilter=null;mode='ordered';showView('practice');startQueue();});
-   $$('#rules-content [data-source]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.source;topic='all';mode='ordered';showView('practice');startQueue();});
+   $$('#rules-content [data-source]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.source;vocabRole=null;topic='all';mode='ordered';showView('practice');startQueue();});
+   $$('#rules-content [data-vocab]').forEach(b=>b.onclick=()=>{vocabRole=b.dataset.vocab;courseBlock=null;sourceFilter=null;topic='vocab';mode='ordered';startQueue({all:true});showView('practice');});
  }
  function renderMaterials(){
    const cards=Object.entries(course.sources).filter(([,s])=>!s.additional).map(([key,s])=>{

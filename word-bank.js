@@ -370,98 +370,7 @@ window.WORD_BANK = {
         ]
       }
     ],
-    "2-2": [
-      {
-        "kazakh": "көрші",
-        "translation": [
-          "сосед",
-          "соседка"
-        ]
-      },
-      {
-        "kazakh": "әріптес",
-        "translation": [
-          "коллега"
-        ]
-      },
-      {
-        "kazakh": "жау",
-        "translation": [
-          "враг"
-        ]
-      },
-      {
-        "kazakh": "қонақ",
-        "translation": [
-          "гость",
-          "гостья"
-        ]
-      },
-      {
-        "kazakh": "туыс",
-        "translation": [
-          "родственник",
-          "родственница"
-        ]
-      },
-      {
-        "kazakh": "маман",
-        "translation": [
-          "специалист"
-        ]
-      },
-      {
-        "kazakh": "таныс",
-        "translation": [
-          "знакомый",
-          "знакомая"
-        ]
-      },
-      {
-        "kazakh": "қазақ",
-        "translation": [
-          "казах",
-          "казашка"
-        ]
-      },
-      {
-        "kazakh": "орыс",
-        "translation": [
-          "русский",
-          "русская"
-        ]
-      },
-      {
-        "kazakh": "семіз",
-        "translation": [
-          "толстый",
-          "толстая"
-        ]
-      },
-      {
-        "kazakh": "сау бол",
-        "translation": [
-          "до свидания"
-        ]
-      },
-      {
-        "kazakh": "сау болыңдар",
-        "translation": [
-          "до свидания"
-        ]
-      },
-      {
-        "kazakh": "сау болыңыз",
-        "translation": [
-          "до свидания"
-        ]
-      },
-      {
-        "kazakh": "сау болыңыздар",
-        "translation": [
-          "до свидания"
-        ]
-      },
+    "2-1": [
       {
         "kazakh": "әдемі",
         "translation": [
@@ -629,6 +538,99 @@ window.WORD_BANK = {
         "kazakh": "уағалейкумассалам",
         "translation": [
           "ваалейкум ассалам"
+        ]
+      }
+    ],
+    "2-2": [
+      {
+        "kazakh": "көрші",
+        "translation": [
+          "сосед",
+          "соседка"
+        ]
+      },
+      {
+        "kazakh": "әріптес",
+        "translation": [
+          "коллега"
+        ]
+      },
+      {
+        "kazakh": "жау",
+        "translation": [
+          "враг"
+        ]
+      },
+      {
+        "kazakh": "қонақ",
+        "translation": [
+          "гость",
+          "гостья"
+        ]
+      },
+      {
+        "kazakh": "туыс",
+        "translation": [
+          "родственник",
+          "родственница"
+        ]
+      },
+      {
+        "kazakh": "маман",
+        "translation": [
+          "специалист"
+        ]
+      },
+      {
+        "kazakh": "таныс",
+        "translation": [
+          "знакомый",
+          "знакомая"
+        ]
+      },
+      {
+        "kazakh": "қазақ",
+        "translation": [
+          "казах",
+          "казашка"
+        ]
+      },
+      {
+        "kazakh": "орыс",
+        "translation": [
+          "русский",
+          "русская"
+        ]
+      },
+      {
+        "kazakh": "семіз",
+        "translation": [
+          "толстый",
+          "толстая"
+        ]
+      },
+      {
+        "kazakh": "сау бол",
+        "translation": [
+          "до свидания"
+        ]
+      },
+      {
+        "kazakh": "сау болыңдар",
+        "translation": [
+          "до свидания"
+        ]
+      },
+      {
+        "kazakh": "сау болыңыз",
+        "translation": [
+          "до свидания"
+        ]
+      },
+      {
+        "kazakh": "сау болыңыздар",
+        "translation": [
+          "до свидания"
         ]
       }
     ]
@@ -1109,6 +1111,225 @@ window.WORD_BANK = {
       "from_lesson": "1-3"
     },
     {
+      "kazakh": "әдемі",
+      "translation": [
+        "красивый",
+        "красивая"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "сұлу",
+      "translation": [
+        "красивый",
+        "красивая"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "ақылды",
+      "translation": [
+        "умный",
+        "умная"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "жомарт",
+      "translation": [
+        "щедрый",
+        "щедрая"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "сараң",
+      "translation": [
+        "скупой",
+        "скупая"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "бай",
+      "translation": [
+        "богатый",
+        "богатая"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "кедей",
+      "translation": [
+        "бедный",
+        "бедная"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "жас",
+      "translation": [
+        "молодой",
+        "молодая"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "зейнеткер",
+      "translation": [
+        "пенсионер",
+        "пенсионерка"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "есепші",
+      "translation": [
+        "бухгалтер"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "жұмыссыз",
+      "translation": [
+        "безработный",
+        "безработная"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "жұмысшы",
+      "translation": [
+        "рабочий",
+        "рабочая"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "бастық",
+      "translation": [
+        "начальник",
+        "начальница"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "жолсерік",
+      "translation": [
+        "проводник",
+        "проводница"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "ақын",
+      "translation": [
+        "поэт",
+        "поэтесса"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "жазушы",
+      "translation": [
+        "писатель",
+        "писательница"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "жүргізуші",
+      "translation": [
+        "водитель",
+        "водительница"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "кәсіпкер",
+      "translation": [
+        "бизнесмен",
+        "предприниматель"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "оқырман",
+      "translation": [
+        "читатель",
+        "читательница"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "аспаз",
+      "translation": [
+        "повар",
+        "повариха"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "сәлем",
+      "translation": [
+        "привет"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "сәлеметсіз бе",
+      "translation": [
+        "здравствуйте"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "сәлеметсіздер ме",
+      "translation": [
+        "здравствуйте"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "ассалаумағалейкум",
+      "translation": [
+        "здравствуйте"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
+      "kazakh": "уағалейкумассалам",
+      "translation": [
+        "ваалейкум ассалам"
+      ],
+      "role": "must",
+      "from_lesson": "2-1"
+    },
+    {
       "kazakh": "көрші",
       "translation": [
         "сосед",
@@ -1223,225 +1444,6 @@ window.WORD_BANK = {
       "kazakh": "сау болыңыздар",
       "translation": [
         "до свидания"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "әдемі",
-      "translation": [
-        "красивый",
-        "красивая"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "сұлу",
-      "translation": [
-        "красивый",
-        "красивая"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "ақылды",
-      "translation": [
-        "умный",
-        "умная"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "жомарт",
-      "translation": [
-        "щедрый",
-        "щедрая"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "сараң",
-      "translation": [
-        "скупой",
-        "скупая"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "бай",
-      "translation": [
-        "богатый",
-        "богатая"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "кедей",
-      "translation": [
-        "бедный",
-        "бедная"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "жас",
-      "translation": [
-        "молодой",
-        "молодая"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "зейнеткер",
-      "translation": [
-        "пенсионер",
-        "пенсионерка"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "есепші",
-      "translation": [
-        "бухгалтер"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "жұмыссыз",
-      "translation": [
-        "безработный",
-        "безработная"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "жұмысшы",
-      "translation": [
-        "рабочий",
-        "рабочая"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "бастық",
-      "translation": [
-        "начальник",
-        "начальница"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "жолсерік",
-      "translation": [
-        "проводник",
-        "проводница"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "ақын",
-      "translation": [
-        "поэт",
-        "поэтесса"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "жазушы",
-      "translation": [
-        "писатель",
-        "писательница"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "жүргізуші",
-      "translation": [
-        "водитель",
-        "водительница"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "кәсіпкер",
-      "translation": [
-        "бизнесмен",
-        "предприниматель"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "оқырман",
-      "translation": [
-        "читатель",
-        "читательница"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "аспаз",
-      "translation": [
-        "повар",
-        "повариха"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "сәлем",
-      "translation": [
-        "привет"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "сәлеметсіз бе",
-      "translation": [
-        "здравствуйте"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "сәлеметсіздер ме",
-      "translation": [
-        "здравствуйте"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "ассалаумағалейкум",
-      "translation": [
-        "здравствуйте"
-      ],
-      "role": "must",
-      "from_lesson": "2-2"
-    },
-    {
-      "kazakh": "уағалейкумассалам",
-      "translation": [
-        "ваалейкум ассалам"
       ],
       "role": "must",
       "from_lesson": "2-2"
