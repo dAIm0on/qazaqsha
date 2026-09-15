@@ -11,18 +11,25 @@
    quantity:'После числительного множественное окончание не ставится.\nТо же после аз, көп, қанша, неше.\nКоличество уже сказано числом или словом количества.\nБез числа окончание нужно: это другой случай.',
    numbers:'Составное число — сборка разрядов, не новое слово.\nСначала большая часть, потом меньшая. Между частями пробел, без «и».\n0–10 и круглые десятки — отдельные слова.\n100 = жүз. 1001–1999 начинай с бір мың.',
    contrast:'Единица и десяток одной семьи различаются окончанием, не началом.\n6 алты — 60 алпыс.\n7 жеті — 70 жетпіс.\n8 сегіз — 80 сексен.\n9 тоғыз — 90 тоқсан.',
-   'phone-groups':'Телефон читаем группами после +7, не одной длинной лентой.\nНоль в группе — нөл, затем уже знакомые разряды.\nСначала цифры и сотни, потом номер.'
+   'phone-groups':'Телефон читаем группами после +7, не одной длинной лентой.\nНоль в группе — нөл, затем уже знакомые разряды.\nСначала цифры и сотни, потом номер.',
+   person:'Мен: пың / бын / мын — по последнему звуку основы.\nСен: сың / сің. Сіз: сыз / сіз.\nГласная окончания следует гармонии основы.\nФорма уже показывает лицо: местоимение можно не писать.\nУдарение на основу, не на окончание.',
+   'person-pl':'Біз: пыз / быз / мыз. После м, н, ң — быз / біз.\nСендер: сыңдар / сіңдер. Сіздер: сыздар / сіздер.\nС сендер и сіздер множественное -лар на основу не ставим.\nС біз в упражнениях пишем без -лар на основу.',
+   emes_ba:'Отрицание: основа + емес + окончание. Не наоборот.\nВопрос после н, ң, з — ба / бе.\nПосле р (сыңдар, сіздер) — ма / ме.\nГласная частицы — по гармонии последнего слога.\nБез частицы вопрос неправильный.'
  };
  const EXTERNAL={
    '1-1':'https://batylbol.kz/test/Zvuki.html',
    '1-2':'https://batylbol.kz/test/MnozhChislo.html',
-   '1-3':'https://batylbol.kz/test/Chislitielniye.html'
+   '1-3':'https://batylbol.kz/test/Chislitielniye.html',
+   '2-1':'https://batylbol.kz/test/LichnyeEdChislo.html',
+   '2-2':'https://batylbol.kz/test/LichnyeLitso1-2.html'
  };
- const EXTRAS={'1-1':['keyboard','cheat'],'1-2':['keyboard'],'1-3':[]};
+ const EXTRAS={'1-1':['keyboard','cheat'],'1-2':['keyboard'],'1-3':[],'2-1':[],'2-2':[]};
  const WORD_LEMMAS={
    '1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],
    '1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],
-   '1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес']
+   '1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],
+   '2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз','сәлем','сәлеметсіз бе','сәлеметсіздер ме','ассалаумағалейкум','уағалейкумассалам'],
+   '2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз','сау бол','сау болыңдар','сау болыңыз','сау болыңыздар']
  };
  function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
  function bySource(questions,source){return (questions||[]).filter(q=>q&&q.source===source&&q.id);}
@@ -30,14 +37,17 @@
  function inferRule(q){
    if(!q)return '';
    const ids=q.ruleIds||[];
-   if(ids.includes('quantity')||/после (числ|количеств)|без окончания|көп|аз|қанша/i.test((q.title||'')+' '+(q.explanation||'')))return 'quantity';
+   if(ids.includes('quantity')||q.topic==='plural'&&/после (числ|количеств)|без окончания|\bкөп\b|\bаз\b|\bқанша\b|\bнеше\b/i.test((q.title||'')+' '+(q.explanation||'')))return 'quantity';
    if((q.skillBindings||[]).some(b=>b.item_id==='rule:phone-groups')||ids.includes('phone-groups'))return 'phone-groups';
    const n=Number(q.stimulus);
    if((q.topic==='numbers'||ids.includes('numbers'))&&[6,60,7,70,8,80,9,90].includes(n))return 'contrast';
    if(q.topic==='numbers'||ids.includes('numbers')||ids.includes('number-composition'))return 'numbers';
    if(q.topic==='sounds'||ids.includes('harmony'))return 'harmony';
    if(q.topic==='plural')return 'plural';
-   if(q.topic==='person')return 'person';
+   if(ids.includes('person-neg')||q.group==='neg')return 'emes_ba';
+   if(ids.includes('person-q')||q.group==='ask'||q.group==='qa')return 'emes_ba';
+   if(ids.some(id=>['person-biz','person-sender','person-sizder'].includes(id))||q.lessonId==='2-2'&&q.topic==='person'&&q.group==='form')return 'person-pl';
+   if(q.topic==='person'||ids.includes('person-sg'))return 'person';
    return '';
  }
  function ruleText(q,ruleId){
@@ -66,15 +76,25 @@
    return [...ru,...kk].filter(q=>!/-rev$/.test(q.id));
  }
  function methodSource(lessonId,course){
-   const key={ '1-1':'m1','1-2':'m2','1-3':'m3' }[lessonId];
+   const key={ '1-1':'m1','1-2':'m2','1-3':'m3','2-1':'m21','2-2':'m22' }[lessonId];
    const s=course&&course.sources&&course.sources[key];
    return s?{title:s.title,url:s.url}:{title:'Методичка '+lessonId,url:''};
  }
- function buildPack(lessonId,questions,course){
-   const exSource={ '1-1':'e1','1-2':'e2','1-3':'e3' }[lessonId];
+ function vocabLemma(q){
+   if(!q||q.topic!=='vocab')return '';
+   if(/казахск/i.test(q.title||''))return core.normalize((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'');
+   return core.normalize(q.stimulus||'');
+ }
+ function wordsForLesson(questions,lessonId){
    const hwSource={ '1-1':'hw1','1-2':'hw2','1-3':'hw3' }[lessonId];
+   if(hwSource)return orderedWords(bySource(questions,hwSource));
+   const lemmas=new Set((WORD_LEMMAS[lessonId]||[]).map(w=>core.normalize(w)));
+   return orderedWords((questions||[]).filter(q=>lemmas.has(vocabLemma(q))));
+ }
+ function buildPack(lessonId,questions,course){
+   const exSource={ '1-1':'e1','1-2':'e2','1-3':'e3','2-1':'e21','2-2':'e22' }[lessonId];
    const exercises=bySource(questions,exSource);
-   const words=orderedWords(bySource(questions,hwSource));
+   const words=wordsForLesson(questions,lessonId);
    const all=[...exercises,...words];
    const rule_map=Object.create(null);
    for(const q of all){const r=ruleId(q);if(r)rule_map[q.id]=r;}
@@ -96,7 +116,7 @@
    };
  }
  function packs(questions,course){
-   return ['1-1','1-2','1-3'].map(id=>buildPack(id,questions,course)).filter(p=>p.homework.exercise_ids.length||p.homework.word_ids.length);
+   return ['1-1','1-2','1-3','2-1','2-2'].map(id=>buildPack(id,questions,course)).filter(p=>p.homework.exercise_ids.length||p.homework.word_ids.length);
  }
  function validateHomework(raw,knownIds){
    return schema.validateHomework(raw,knownIds);

@@ -187,4 +187,34 @@ assert.ok(imported.state.homeworkAttempts);
 assert.equal(Object.keys(imported.state.homeworkAttempts).length,0);
 ok('hw10 schema without homeworkAttempts imports');
 
+function packExercises(file){
+  const box={window:{LESSON_PACKS:[]}};
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname,file),'utf8'),box);
+  return (box.window.LESSON_PACKS||[]).flatMap(p=>p.original_exercises||[]);
+}
+const qs21=packExercises('lesson-pack-2-1.js');
+const qs22=packExercises('lesson-pack-2-2.js');
+const all2=[...qs21,...qs22];
+const p21=hw.buildPack('2-1',all2,{sources:{}});
+const p22=hw.buildPack('2-2',all2,{sources:{}});
+assert.ok(p21.homework.exercise_ids.includes('e21-form-1'));
+assert.ok(p21.homework.exercise_ids.length>10);
+assert.ok(p21.homework.word_question_ids.includes('hw22-20-ru'));
+assert.ok(!p21.homework.word_question_ids.includes('hw22-1-ru'));
+assert.ok(p21.homework.external_test_url.includes('LichnyeEdChislo'));
+assert.ok(p22.homework.exercise_ids.includes('e22-form-1'));
+assert.ok(p22.homework.word_question_ids.includes('hw22-1-ru'));
+assert.ok(!p22.homework.word_question_ids.includes('hw22-20-ru'));
+assert.ok(p22.homework.external_test_url.includes('LichnyeLitso1-2'));
+schema.validateHomework({lesson_id:'2-1',homework:p21.homework},new Set(all2.map(q=>q.id)));
+schema.validateHomework({lesson_id:'2-2',homework:p22.homework},new Set(all2.map(q=>q.id)));
+const form21=qs21.find(q=>q.id==='e21-form-1');
+const personRule=hw.ruleText(form21);
+assert.ok(personRule);
+assert.ok(!/жігітпін/i.test(personRule));
+assert.equal(hw.ruleId(form21),'person');
+const neg21=qs21.find(q=>q.id==='e21-neg-1');
+if(neg21)assert.equal(hw.ruleId(neg21),'emes_ba');
+ok('hw11 2-1 and 2-2 sheets from existing bank');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
