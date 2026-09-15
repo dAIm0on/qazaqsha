@@ -49,6 +49,16 @@
      state.records[q.id]={...p,next_review:Number.isFinite(next)?next:null,dueAt:Number.isFinite(next)?next:0,mastery_level:rank[minimum]||'NEW',needsReview:rows.some(r=>r.needsReview),streak:missing?0:Math.min(...rows.map(r=>r.streak))};
    }
  }
+ const RECOG=new Set(['recognition','visual_recognition','word_to_digit']);
+ const PROD=new Set(['production','digit_to_word','full_form','application']);
+ function isChoice(q){return q&&q.kind==='multi';}
+ function canMasterProduction(q,event){
+   if(!q||isChoice(q))return false;
+   if(event&&(event.hinted||event.rule_peek||event.peek))return false;
+   const types=bindings(q).map(b=>b.skill_type);
+   if(types.every(t=>RECOG.has(t)))return false;
+   return types.some(t=>PROD.has(t)||t==='harmony'||t==='initial_consonant'||t==='plural_suppression');
+ }
  function observe(state,q,result,event,errors){
    register(q);const updates=new Map(),logs=[];
    for(const b of bindings(q)){
@@ -60,14 +70,17 @@
    }
    for(const error of errors){const skill={vowel_harmony:'harmony',plural_initial_consonant:'initial_consonant',plural_after_numeral:'plural_suppression'}[error.error_type];if(skill){const b={item_id:'rule:plural',skill_type:skill,field:error.field};updates.set(key(b),{b,correct:false});}}
    for(const [k,{b,correct}] of updates){
-     const old=state.skills[k],recall=event.recall&&!['recognition','visual_recognition'].includes(b.skill_type)||['harmony','initial_consonant'].includes(b.skill_type);
-     const r=S.answer(old,{at:event.at,correct,hinted:event.hinted,responseTime:event.response_time_ms,recall});
+     const recSkill=RECOG.has(b.skill_type)||isChoice(q);
+     const old=state.skills[k],recall=!recSkill&&!event.rule_peek&&(event.recall&&!RECOG.has(b.skill_type)||['harmony','initial_consonant'].includes(b.skill_type));
+     const r=S.answer(old,{at:event.at,correct,hinted:!!(event.hinted||event.rule_peek),responseTime:event.response_time_ms,recall});
      r.item_id=b.item_id;r.skill_type=b.skill_type;r.lesson_id=q.lessonId;
-     r.successful_prompts=Array.from(new Set([...(old?.successful_prompts||[]),...(correct&&!event.hinted?[q.stimulus||q.id]:[])]));
+     r.successful_prompts=Array.from(new Set([...(old?.successful_prompts||[]),...(correct&&!event.hinted&&!event.rule_peek?[q.stimulus||q.id]:[])]));
      if(b.item_id==='rule:plural'&&r.mastery_level==='MASTERED'&&r.successful_prompts.length<2)r.mastery_level='REMEMBERED';
+     if(recSkill&&r.mastery_level==='MASTERED')r.mastery_level='FAMILIAR';
+     if(PROD.has(b.skill_type)&&!canMasterProduction(q,event)&&r.mastery_level==='MASTERED')r.mastery_level='REMEMBERED';
      r.status=r.mastery_level;
      r.error_history=[...(old?.error_history||[]),...errors.filter(e=>b.field===null||e.field===b.field)];
-     state.skills[k]=r;logs.push({skill_id:k,item_id:b.item_id,skill_type:b.skill_type,correct,independent:correct&&!event.hinted,previous_answer_at:old?.last_answer||null,rating:r.fsrs_log.rating,fsrs_log:r.fsrs_log,fsrs_state:r.fsrs});
+     state.skills[k]=r;logs.push({skill_id:k,item_id:b.item_id,skill_type:b.skill_type,correct,independent:correct&&!event.hinted&&!event.rule_peek,previous_answer_at:old?.last_answer||null,rating:r.fsrs_log.rating,fsrs_log:r.fsrs_log,fsrs_state:r.fsrs});
    }
    sync(state,window.COURSE.questions);return logs;
  }
@@ -76,5 +89,5 @@
    for(const q of questions){const keys=bindings(q).map(key);if(keys.every(k=>used.has(k)))continue;out.push(q);keys.forEach(k=>used.add(k));if(out.length>=limit)break;}return out;
  }
  function wordSkills(w,state){const item=items.get(w.id);return Object.entries(item?.skills||{}).map(([type,k])=>({type,label:labels[type]||type,record:state.skills[k]}));}
- window.Knowledge={items,labels,bindings,key,register,hydrate,sync,observe,choose,wordSkills};
+ window.Knowledge={items,labels,bindings,key,register,hydrate,sync,observe,choose,wordSkills,isChoice,canMasterProduction};
 })();

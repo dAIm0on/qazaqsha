@@ -99,6 +99,11 @@
  function examReady(r){
    return !!r&&(r.recall_review_successes||0)>=2;
  }
+ function canMasterProduction(q,event){
+   if(!q||q.kind==='multi')return false;
+   if(event&&(event.hinted||event.rule_peek||event.peek))return false;
+   return classify(q)!=='rec';
+ }
  function incidentalWeek(state,at=Date.now()){
    const key=weekKey(at);
    const cur=state.incidentalWeek&&state.incidentalWeek.key===key?state.incidentalWeek:{key,added:0};
@@ -117,6 +122,6 @@
    if((q.ruleIds||[]).includes('quantity'))return 'extra_plural';
    return 'other';
  }
- const api={PAIRS,PARTICLES,weekKey,contrastSide,breakRuns,classify,direction,isContextOnly,examReady,incidentalWeek,canAddIncidental,confusionTag,isAtomicNumber,isAssembleOnlyCard,answerFlags};
+ const api={PAIRS,PARTICLES,weekKey,contrastSide,breakRuns,classify,direction,isContextOnly,examReady,canMasterProduction,incidentalWeek,canAddIncidental,confusionTag,isAtomicNumber,isAssembleOnlyCard,answerFlags};
  if(node)module.exports=api;else root.MemoryPolicy=api;
 })(typeof window!=='undefined'?window:globalThis);

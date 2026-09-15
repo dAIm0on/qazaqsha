@@ -18,6 +18,39 @@
   function expectedTokens(f){
     return [...new Set(f.answers.flatMap(a=>tokens(a)))];
   }
+  const NUM_U={нөл:0,бір:1,екі:2,үш:3,төрт:4,бес:5,алты:6,жеті:7,сегіз:8,тоғыз:9};
+  const NUM_T={он:10,жиырма:20,отыз:30,қырық:40,елу:50,алпыс:60,жетпіс:70,сексен:80,тоқсан:90};
+  function numberValue(s){
+    const t=normalize(s).split(/\s+/).filter(Boolean);
+    if(!t.length)return null;
+    let i=0;
+    function upToHundreds(){
+      let n=0;
+      if(t[i]==='жүз'){i++;n=100;}
+      else if(NUM_U[t[i]]!=null&&t[i+1]==='жүз'){n=NUM_U[t[i]]*100;i+=2;}
+      if(NUM_T[t[i]]!=null){n+=NUM_T[t[i]];i++;}
+      if(NUM_U[t[i]]!=null){n+=NUM_U[t[i]];i++;}
+      return n;
+    }
+    let total=0;
+    const my=t.indexOf('мың');
+    if(my>=0){
+      const left=t.slice(0,my);
+      const save=t.slice();
+      t.length=0;t.push(...left);
+      const thou=left.length?upToHundreds():1;
+      t.length=0;t.push(...save);
+      i=my+1;
+      total=thou*1000+upToHundreds();
+    }else total=upToHundreds();
+    if(i!==t.length&&t.some(w=>NUM_U[w]==null&&NUM_T[w]==null&&w!=='жүз'&&w!=='мың'))return null;
+    return Number.isFinite(total)?total:null;
+  }
+  function numberMatch(expected,actual,kind){
+    if(normalize(expected,kind)===normalize(actual,kind))return true;
+    const ev=numberValue(actual),ex=numberValue(expected);
+    return ev!=null&&ex!=null&&ev===ex;
+  }
   function evaluate(q,answers){
     if(q.kind==='multi'){
       const actual=new Set((answers||[]).map(x=>normalize(x)));
@@ -25,7 +58,13 @@
       const correct=actual.size===expected.size&&[...expected].every(x=>actual.has(x));
       return {correct,parts:q.options.map(x=>actual.has(normalize(x))===expected.has(normalize(x)))};
     }
-    const parts=q.fields.map((f,i)=>f.kind==='set-text'?sameSet(tokens(answers[i]),expectedTokens(f)):f.answers.some(a=>normalize(a,f.kind)===normalize(answers[i],f.kind)));
+    const phone=!!(q.ruleIds||[]).includes('phone-groups')||(q.skillBindings||[]).some(b=>b.item_id==='rule:phone-groups');
+    const parts=q.fields.map((f,i)=>{
+      if(f.kind==='set-text')return sameSet(tokens(answers[i]),expectedTokens(f));
+      if(f.answers.some(a=>normalize(a,f.kind)===normalize(answers[i],f.kind)))return true;
+      if((phone||f.kind==='number-text'||q.topic==='numbers')&&f.answers.some(a=>numberMatch(a,answers[i],f.kind)))return true;
+      return false;
+    });
     return {correct:parts.every(Boolean),parts};
   }
   const DAY=86400000;
@@ -95,6 +134,6 @@
     if(out[0]===failedId&&out.length>1){out.shift();out.push(failedId);}
     return out;
   }
-  const api={normalize,evaluate,migrateRecord,updateRecord,isDue,scheduleRepeat,chooseShortSession,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,DAY};
+  const api={normalize,evaluate,migrateRecord,updateRecord,isDue,scheduleRepeat,chooseShortSession,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TrainerCore=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -28,6 +28,7 @@
      'https://drive.google.com/file/d/1HwRDYC7mpcoplaDJIKnoBb6MJd2mbPUX/view']}
  ];
  for(const pack of window.LESSON_PACKS||[]){
+   if(window.Canonical){window.Canonical.applyAll(pack.original_exercises||[]);window.Canonical.applyAll(pack.generated_exercises||[]);}
    Object.assign(c.sources,pack.sources||{});
    for(const w of pack.target_vocabulary||[])addWord(w.kazakh,w.translation,pack.lesson_id,'target');
    for(const r of pack.rules||[])if(!rules.some(x=>x.id===r.id))rules.push({...r,lesson_first_seen:pack.lesson_id});
@@ -143,5 +144,6 @@
      c.questions.push(q);w.card_ids.push(id);
    }
  }
+ if(window.Canonical)window.Canonical.applyAll(c.questions);
  window.CURRICULUM={words,rules,lessons:lessonCatalog,known,eligible,missingPrerequisites,wordStats,compareLesson,activatePromotions,examples,addWord};
 })();

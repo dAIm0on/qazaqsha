@@ -346,4 +346,143 @@ assert.ok(/кітаптар/.test(JSON.stringify(l12))&&/адамдар/.test(JS
 assert.ok(l12.chapters.every(c=>c.beats.some(b=>b.k==='why')&&c.beats.some(b=>b.k==='bridge')&&c.beats.some(b=>b.k==='slots')&&c.beats.filter(b=>b.k==='ex').length>=3&&c.beats.some(b=>b.k==='trap')&&c.beats.some(b=>b.k==='ask')));
 ok('P13 1-2 template why/bridge/slots/3ex/trap/ask');
 
+const Canon=require('./canonical.js');
+const Gate=require('./curriculum-gate.js');
+const Diag=require('./diagnostics.js');
+const qs23all=packExercises('lesson-pack-2-3.js');
+Canon.applyAll(qs23all);
+Canon.applyAll(qs21);Canon.applyAll(qs22);
+
+assert.equal(core.numberValue('жетпіс бес мың тоғыз жүз елу'),75950);
+assert.ok(core.evaluate({kind:'fields',topic:'numbers',fields:[{kind:'text',answers:['жетпіс бес мың тоғыз жүз елу']}]},['жетпіс бес мың тоғыз жүз елу']).correct);
+assert.ok(!core.evaluate({kind:'fields',topic:'numbers',fields:[{kind:'text',answers:['жетпіс бес мың тоғыз жүз елу']}]},['жетпіс бес тоғыз жүз елу']).correct);
+ok('B1/B2 75950 requires мың');
+
+const qtyQ={kind:'fields',topic:'plural',ruleIds:['quantity'],fields:[{kind:'text',answers:['он кітап']}],stimulus:'он'};
+assert.ok(core.evaluate(qtyQ,['он кітап']).correct);
+assert.ok(!core.evaluate(qtyQ,['он кітаптар']).correct);
+assert.ok(Diag.classify('он кітап','он кітаптар',qtyQ).includes('plural_after_numeral'));
+assert.equal(Diag.skillTag('plural_after_numeral',qtyQ,'он кітап','он кітаптар'),'rule:plural_after_num');
+ok('B3 он кітап vs *он кітаптар tagged plural_after_num');
+
+const ord20=qs23all.find(q=>/жиырмасыншы/i.test(JSON.stringify(q.fields))&&/жиырманшы/i.test(q.stimulus||''));
+assert.ok(ord20);
+assert.ok(ord20.fields[0].answers.some(a=>/жиырмасыншы/i.test(a)));
+assert.ok(!ord20.fields[0].answers.some(a=>/^жиырманшы$/i.test(core.normalize(a).replace(/[?.]/g,''))));
+ok('B4 жиырмасыншы canonical, жиырманшы not accepted');
+
+const fix8=qs23all.find(q=>q.id==='e23-fix-8');
+assert.ok(fix8);
+assert.ok(fix8.fields[0].answers.some(a=>/жиырмасыншысыңдар ма/i.test(a)));
+assert.ok(!fix8.fields[0].answers.some(a=>/отызыншы бірінші/i.test(a)));
+ok('B5/B6 Жиырмасыншысыңдар ма? not crossed key');
+
+const kur=qs23all.find(q=>q.id==='e23-fix-10');
+assert.ok(kur);
+assert.ok(kur.fields[0].answers.some(a=>/құрбысыңдар ма/i.test(a)));
+assert.ok(!kur.fields[0].answers.some(a=>/құрбысындар ма/i.test(a)));
+ok('B7 құрбысыңдар ма? has ң');
+
+assert.equal(Canon.farewellRole('сау болыңыздар'),'respectful_plural');
+const sau=qs22.find(q=>/сау болыңыздар/i.test((q.fields&&q.fields[0]&&q.fields[0].answers||[]).join(' ')))||qs23all.find(q=>/сау болыңыздар/i.test(JSON.stringify(q)));
+if(sau){Canon.applyQuestion(sau);assert.equal(sau.chunk_role,'respectful_plural');}
+ok('B8 сау болыңыздар respectful plural');
+
+const zhom=qs23all.find(q=>q.id==='m23-ol-10');
+assert.ok(zhom);
+assert.ok(/втор/i.test(zhom.stimulus));
+assert.ok(!/сороков/i.test(zhom.stimulus+' '+(zhom.explanation||'')+' '+(zhom.note||'')+' '+(zhom.key_heading||'')));
+ok('B9 щедрые – вторые, no сороковые heading');
+
+const qaz=qs23all.find(q=>q.id==='e23-fix-1');
+assert.ok(qaz.fields[0].answers.some(a=>/қазақпын/i.test(a)));
+assert.ok(!qaz.fields[0].answers.some(a=>/қазақпін/i.test(a)));
+ok('B10 Мен қазақпын is the correction');
+
+const mam=qs23all.find(q=>q.id==='e23-fix-2');
+assert.ok(mam.fields[0].answers.some(a=>/сіз мамансыз/i.test(a)));
+assert.ok(mam.fields[0].answers.some(a=>/біз маманбыз/i.test(a)));
+ok('B11 сіз маманбыз accepts both repairs');
+
+const bay=qs23all.find(q=>q.id==='e23-fix-7');
+assert.ok(bay.fields[0].answers.some(a=>/олар байлар/i.test(a)));
+ok('B12 олар байлар kept');
+
+assert.ok(qs23all.some(q=>q.topic==='vocab'&&/менің|сенің/.test(JSON.stringify(q))));
+assert.equal(Gate.futureHits(qs23all.filter(q=>q.topic!=='vocab'&&q.topic!=='rules')).filter(q=>Gate.isPossessiveProduction(q)).length,0);
+ok('C1/C2 2-3 менің vocab only, no possessive production');
+
+assert.ok(qs23all.some(q=>q.topic==='vocab'&&/бар|жоқ/.test(JSON.stringify(q.fields||q))));
+assert.equal(Gate.futureHits(qs23all).filter(q=>Gate.isExistenceGrammar(q)).length,0);
+ok('C3/C4 бар/жоқ vocab, no existence grammar');
+
+assert.equal(Gate.futureHits(qs23all).filter(q=>Gate.isCaseDrill(q)||Gate.isLabialRule(q)||Gate.isDegreeDrill(q)).length,0);
+ok('C5-C8 no case/labial/degree drills');
+
+assert.equal(Canon.suffixRow('мұғалім'),'soft');
+assert.equal(Canon.suffixRow('кітап'),'hard');
+assert.equal(Canon.suffixRow('мұхит'),'hard');
+ok('mixed-word suffix row uses last relevant syllable');
+
+const recQ={kind:'fields',topic:'vocab',title:'Переведи на русский',stimulus:'адам',fields:[{answers:['человек']}]};
+assert.equal(policy.classify(recQ),'rec');
+assert.equal(policy.canMasterProduction(recQ,{hinted:false}),false);
+const prodQ={kind:'fields',topic:'vocab',title:'Переведи на казахский',stimulus:'человек',fields:[{answers:['адам']}]};
+assert.equal(policy.canMasterProduction(prodQ,{hinted:false}),true);
+assert.equal(policy.canMasterProduction(prodQ,{hinted:true}),false);
+assert.equal(policy.canMasterProduction({kind:'multi',topic:'plural',correct:['а']},{hinted:false}),false);
+ok('D1/D3 recognition and MCQ cannot master production');
+
+let rExam=scheduler.migrate({},1);
+rExam=scheduler.answer(rExam,{at:2,correct:true,hinted:false,recall:true,responseTime:800});
+rExam=scheduler.answer(rExam,{at:3,correct:true,hinted:false,recall:true,responseTime:800});
+assert.ok((rExam.recall_review_successes||0)<2);
+assert.ok(!policy.examReady(rExam));
+ok('D7 two same-session successes do not unlock exam');
+
+const peeked2=scheduler.answer(scheduler.migrate({},1),{at:2,correct:true,hinted:true,recall:true,responseTime:400});
+assert.equal(peeked2.correct_streak,0);
+ok('D5 answer peek remains Again');
+
+assert.equal(Diag.skillTag('plural_initial_consonant',{topic:'plural'},'адамдар','адамлар'),'rule:plural::ldt');
+assert.ok(Diag.classify('адамдар','адамлар',{topic:'plural'}).includes('plural_initial_consonant'));
+assert.ok(!Diag.classify('адамдар','адамлар',{topic:'plural'}).includes('vowel_harmony')||Diag.classify('қыздар','қыздер',{topic:'plural'}).includes('vowel_harmony'));
+ok('E1/E2 harmony and L/D/T are different tags');
+
+assert.equal(Diag.skillTag('number_confusion',{topic:'numbers'},'алты','алпыс'),'confuse:алты_алпыс');
+assert.equal(Diag.skillTag('number_confusion',{topic:'numbers'},'сегіз','сексен'),'confuse:сегіз_сексен');
+ok('E4/E5 number confuse pairs');
+
+assert.ok(Diag.classify('ғалым емеспін','ғалыммын емес',{topic:'person'}).includes('emes_position')||Diag.skillTag('emes_position')==='rule:emes::position');
+ok('E7 emes position tag');
+
+assert.ok(Diag.classify('жиырмасыншы','жиырманшы',{topic:'numbers',ruleIds:['ordinal']}).includes('ordinal_20'));
+ok('E8 ordinal 20 tag');
+
+const stSkill=progress.empty();
+stSkill.events=[
+  {type:'answer',card_id:'p1',at:dayA,correct:false,first_try_correct:0,peek:0,answers:['адамлар']},
+  {type:'answer',card_id:'p2',at:dayB,correct:false,first_try_correct:0,peek:0,answers:['қызлар']}
+];
+const pluralQs=[{id:'p1',topic:'plural',fields:[{answers:['адамдар']}]},{id:'p2',topic:'plural',fields:[{answers:['қыздар']}]}];
+const spotsSkill=hw.weakSpots(stSkill,pluralQs);
+assert.ok(spotsSkill.some(s=>s.key==='rule:plural::ldt'||s.key==='rule:plural::harmony'));
+ok('E9 same skill aggregates across question IDs');
+
+const phoneQ={kind:'fields',topic:'numbers',ruleIds:['phone-groups'],skillBindings:[{item_id:'rule:phone-groups'}],fields:[{kind:'text',answers:['жеті жүз']}]};
+assert.ok(core.evaluate(phoneQ,['жеті жүз']).correct);
+assert.ok(core.evaluate(phoneQ,['жеті  жүз']).correct);
+assert.ok(!core.evaluate(phoneQ,['алты жүз']).correct);
+ok('F3/F4 phone grouping spaces ok, wrong number rejected');
+
+const packImport={lesson_id:'9-9',exercises:[{id:'x',stimulus:'75950',fields:[{answers:['жетпіс бес тоғыз жүз елу']}]}]};
+Canon.applyQuestion(packImport.exercises[0]);
+assert.ok(packImport.exercises[0].fields[0].answers.some(a=>/мың/.test(a)));
+assert.ok(!packImport.exercises[0].fields[0].answers.some(a=>core.normalize(a)==='жетпіс бес тоғыз жүз елу'));
+ok('canonical layer overrides bad pack key');
+
+assert.ok(course.questions.length>=220);
+assert.equal(cfg.fsrs.desired_retention,0.90);
+ok('A2/A4 bank and retention still intact');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

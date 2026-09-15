@@ -217,12 +217,25 @@
  }
  function fileStamp(at=Date.now()){return new Date(at).toISOString().slice(0,10);}
  function weaknessKey(event,q){
+   const D=typeof window!=='undefined'?window.ErrorDiagnostics:(typeof require==='function'?require('./diagnostics.js'):null);
+   const actual=(event.answers||[])[0]||event.actual_answer||'';
+   const expected=(q&&q.fields&&q.fields[0]&&q.fields[0].answers[0])||event.expected_answer||'';
+   if(D&&D.classify&&q){
+     const types=D.classify(expected,actual,q,q.fields&&q.fields[0]||{});
+     if(types[0]&&D.skillTag)return D.skillTag(types[0],q,expected,actual);
+   }
    if(event.confuse_pair_id==='lex-0'||/алты|алпыс/.test((q&&q.stimulus||'')+' '+(event.answers||[]).join(' ')))return 'confuse:алты_алпыс';
+   if(event.confuse_pair_id==='lex-2'||/сегіз|сексен/.test((q&&q.stimulus||'')+' '+actual))return 'confuse:сегіз_сексен';
    if(q&&(q.ruleIds||[]).includes('quantity'))return 'rule:plural_after_num';
    if(event.confusion_tag==='harmony'||(q&&q.topic==='sounds'))return 'rule:plural::harmony';
    if(q&&q.topic==='plural')return event.confusion_tag==='harmony'?'rule:plural::harmony':'rule:plural::ldt';
+   if(q&&(q.ruleIds||[]).includes('ordinal'))return /жиырманшы/.test(actual)?'rule:ordinal::exception_20':'rule:ordinal::suffix_family';
    if(q&&q.topic==='numbers')return 'rule:numeral::assemble';
-   if(q&&q.topic==='person')return /емес|ба|бе|ма|ме/.test((q.title||'')+(q.stimulus||''))?'rule:emes_ba':'rule:person';
+   if(q&&q.topic==='person'){
+     if(/емес/.test((q.stimulus||'')+expected))return 'rule:emes::position';
+     if(/сен|сіз/.test(expected+actual))return 'rule:person::sen_siz';
+     return 'rule:person::men';
+   }
    if(q&&q.topic==='vocab'){
      const lemma=(q.vocabIds&&q.vocabIds[0])||(q.fields&&q.fields[0]&&/казахск/i.test(q.title||'')?'word:'+core.normalize(q.fields[0].answers[0]):'word:'+core.normalize(q.stimulus||q.id));
      return lemma+'::production';
