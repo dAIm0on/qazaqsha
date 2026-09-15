@@ -576,4 +576,86 @@ assert.ok(/font-size:max\(16px/.test(theme));
 assert.ok(/min-height:44px/.test(theme));
 ok('I1/I2 CSS: input ≥16px, kazakh keys ≥44px');
 
+const appSrc=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+const dashSrc=fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8');
+const knSrc=fs.readFileSync(path.join(__dirname,'knowledge.js'),'utf8');
+const pwaSrc=fs.readFileSync(path.join(__dirname,'pwa.js'),'utf8');
+const swSrc=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
+const indexSrc=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
+
+assert.ok(/associationFaded/.test(appSrc));
+assert.ok(/encoding-cue/.test(appSrc));
+assert.ok(/encodingMarkup\(q\)/.test(appSrc));
+assert.ok(/Ассоциация/.test(appSrc));
+ok('P1.2/H1 association on card until fade; button remains Ассоциация');
+
+assert.ok(/isChunk/.test(dashSrc));
+assert.ok(/data-action="chunks"/.test(dashSrc));
+assert.ok(/Приветствия и прощания/.test(dashSrc));
+assert.ok(/next==='chunks'/.test(appSrc));
+ok('P1.5 chunk channel for greetings/farewells, not verb paradigm');
+
+assert.ok(/rule:ordinal/.test(knSrc));
+assert.ok(/exception_20/.test(knSrc));
+assert.ok(/suffix_family/.test(knSrc));
+assert.ok(/last_component/.test(knSrc));
+ok('P1.8 knowledge ordinal skillBindings: exception_20 / suffix_family / last_component');
+
+const rq=hw.remediationQueue('fail',['a','b'],['x','y','z']);
+assert.deepStrictEqual(rq,['a','b','fail','x','y','z','fail']);
+assert.ok(rq.indexOf('fail')>0);
+assert.ok(rq.lastIndexOf('fail')>rq.indexOf('fail'));
+assert.ok(/remediation-rule/.test(appSrc));
+ok('P1.10 remediation: same-skill examples → failed → other IDs → blind return');
+
+const stClose=progress.empty();
+const tFail1=Date.now()-10*86400000,tFail2=Date.now()-8*86400000,tOk1=Date.now()-3*86400000,tOk2=Date.now()-1*86400000;
+stClose.events=[
+  {type:'answer',card_id:'p1',at:tFail1,correct:false,first_try_correct:0,peek:0,answers:['адамлар']},
+  {type:'answer',card_id:'p1',at:tFail2,correct:false,first_try_correct:0,peek:0,answers:['адамлар']},
+  {type:'answer',card_id:'p1',at:tOk1,correct:true,first_try_correct:1,peek:0,answers:['адамдар']},
+  {type:'answer',card_id:'p1',at:tOk2,correct:true,first_try_correct:1,peek:0,answers:['адамдар']}
+];
+const closeQs=[{id:'p1',topic:'plural',fields:[{answers:['адамдар']}]}];
+const spotsClosed=hw.weakSpots(stClose,closeQs);
+assert.ok(!spotsClosed.some(s=>s.key==='rule:plural::ldt'||s.key==='rule:plural::harmony'));
+ok('E11 two delayed blind successes on different days close weakness');
+
+const stSame=progress.empty();
+const sameDay=Date.now()-1*86400000;
+stSame.events=[
+  {type:'answer',card_id:'p1',at:tFail1,correct:false,first_try_correct:0,peek:0,answers:['адамлар']},
+  {type:'answer',card_id:'p1',at:tFail2,correct:false,first_try_correct:0,peek:0,answers:['адамлар']},
+  {type:'answer',card_id:'p1',at:sameDay,correct:true,first_try_correct:1,peek:0,answers:['адамдар']},
+  {type:'answer',card_id:'p1',at:sameDay+1000,correct:true,first_try_correct:1,peek:0,answers:['адамдар']}
+];
+const spotsSame=hw.weakSpots(stSame,closeQs);
+assert.ok(spotsSame.some(s=>s.key==='rule:plural::ldt'||s.key==='rule:plural::harmony'));
+ok('E11 same-day two successes do not close weakness');
+
+assert.ok(/id="hint-button"[^`]*exam\?'hidden'/.test(appSrc)||/id="hint-button" \$\{exam\?'hidden':''\}/.test(appSrc));
+assert.ok(/exam\?'Пропустить'/.test(appSrc));
+assert.ok(/id="association-button"[^`]*exam\?'hidden'/.test(appSrc)||/association-button" \$\{exam\?'hidden':''\}/.test(appSrc));
+ok('D8 exam has no answer peek; hint/association hidden; reveal is skip');
+
+const futureExam={id:'future-case',topic:'rules',kind:'fields',stimulus:'балаларымыздан',explanation:'падежн форма',ruleIds:['case']};
+assert.equal(Gate.examEligible(futureExam),false);
+assert.equal(Gate.examEligible({id:'ok',topic:'plural',kind:'fields',stimulus:'кітап',ruleIds:['plural']}),true);
+assert.ok(/examEligible/.test(appSrc));
+ok('D9 exam excludes unintroduced/future grammar skills');
+
+assert.ok(/serviceWorker\.register/.test(pwaSrc));
+assert.ok(/qazaq-offline-/.test(swSrc));
+assert.ok(/id="today-view"/.test(indexSrc));
+assert.ok(fs.existsSync(path.join(__dirname,'manifest.webmanifest')));
+ok('A10 PWA boot smoke: SW register, cache name, today-view, manifest');
+
+assert.ok(/data-action="weak:/.test(dashSrc));
+assert.ok(/startBlockReview/.test(appSrc));
+assert.ok(/data-weak/.test(appSrc));
+ok('I8 Разобрать wires to skill block review');
+
+assert.ok(/Сделать паузу · Домашка/.test(appSrc));
+ok('P1.6 pause copy returns to homework, not Today, from homework/remediation');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

@@ -2,7 +2,7 @@
 (function(){
  'use strict';
  const core=window.TrainerCore,S=window.ReviewScheduler,C=window.CURRICULUM,items=new Map(),rank=['NEW','LEARNING','FAMILIAR','REMEMBERED','MASTERED'];
- const labels={recognition:'Понимаю перевод',production:'Пишу по-казахски',context:'Применяю в предложении',digit_to_word:'Цифры → слово',word_to_digit:'Слово → цифры',harmony:'А / Е',initial_consonant:'Л / Д / Т',full_form:'Полная форма',plural_suppression:'Без окончания после количества',composition:'Составляю число',visual_recognition:'Различаю варианты',application:'Применяю правило'};
+ const labels={recognition:'Понимаю перевод',production:'Пишу по-казахски',context:'Применяю в предложении',digit_to_word:'Цифры → слово',word_to_digit:'Слово → цифры',harmony:'А / Е',initial_consonant:'Л / Д / Т',full_form:'Полная форма',plural_suppression:'Без окончания после количества',composition:'Составляю число',visual_recognition:'Различаю варианты',application:'Применяю правило',exception_20:'жиырмасыншы, не жиырманшы',suffix_family:'Порядковый суффикс',last_component:'Наклейка на последний кусок'};
  function bindings(q){
    if(q.skillBindings)return q.skillBindings;
    const out=[],bind=(item,skill,field=0,facet=null)=>out.push({item_id:item,skill_type:skill,field,facet});
@@ -20,6 +20,10 @@
    }else if((q.topic==='person'||q.topic==='rules')&&q.kind==='fields'){
      const rule='rule:'+(q.ruleIds&&q.ruleIds[0]||'person-biz');
      q.fields.forEach((f,i)=>bind(rule,'application',i));
+   }else if((q.ruleIds||[]).includes('ordinal')||q.group==='ord'){
+     const blob=((q.stimulus||'')+' '+((q.fields||[]).flatMap(f=>f.answers||[]).join(' ')));
+     const skill=/жиырма/.test(blob)?'exception_20':/\s/.test(String(q.stimulus||''))?'last_component':'suffix_family';
+     q.fields.forEach((f,i)=>bind('rule:ordinal',skill,i));
    }else if(q.kind==='fields'&&(q.topic==='vocab'||q.topic==='numbers')){
      const w=C.words.find(w=>(q.vocabIds||[]).includes(w.id)&&w.aliases.some(a=>core.normalize(q.stimulus)===a||q.fields[0].answers.some(v=>core.normalize(v)===a)))||C.words.find(w=>q.vocabIds?.includes(w.id));
      const isKazakh=w&&q.fields[0].answers.some(a=>w.aliases.includes(core.normalize(a)));
@@ -50,7 +54,7 @@
    }
  }
  const RECOG=new Set(['recognition','visual_recognition','word_to_digit']);
- const PROD=new Set(['production','digit_to_word','full_form','application']);
+ const PROD=new Set(['production','digit_to_word','full_form','application','suffix_family','exception_20','last_component']);
  function isChoice(q){return q&&q.kind==='multi';}
  function canMasterProduction(q,event){
    if(!q||isChoice(q))return false;

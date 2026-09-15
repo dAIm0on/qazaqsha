@@ -73,6 +73,13 @@
   if(les==='2-3')return 'full';
   return 'none';
  }
- const api={INTRODUCED,FUTURE,lessonRank,installedLessons,currentMax,introducedAt,allows,isPossessiveProduction,isExistenceGrammar,isCaseDrill,isLabialRule,isDegreeDrill,futureHits,questionParticleScope,isVocabOnly};
+ function examEligible(q,catalog){
+  if(!q||q.contextOnly)return false;
+  if(futureHits([q]).length)return false;
+  const skill=(q.ruleIds||[])[0];
+  if(skill==='case'||skill==='possessive'||skill==='labial'||skill==='degrees')return false;
+  return true;
+ }
+ const api={INTRODUCED,FUTURE,lessonRank,installedLessons,currentMax,introducedAt,allows,isPossessiveProduction,isExistenceGrammar,isCaseDrill,isLabialRule,isDegreeDrill,futureHits,questionParticleScope,isVocabOnly,examEligible};
  if(node)module.exports=api;else root.CurriculumGate=api;
 })(typeof window!=='undefined'?window:globalThis);

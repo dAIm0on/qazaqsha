@@ -206,6 +206,8 @@
    'rule:person::sen_siz':'Сен / сіз',
    'rule:person::men':'Личное окончание',
    'rule:ordinal::exception_20':'Порядковое: 20-е',
+   'rule:ordinal::suffix_family':'Порядковое окончание',
+   'rule:ordinal::last_component':'Порядковое: наклейка на последний кусок',
    'rule:numeral::assemble':'Сборка числа',
    'confuse:алты_алпыс':'6 и 60',
    'confuse:сегіз_сексен':'8 и 80',
@@ -345,11 +347,26 @@
      const days=b.days.size;
      const weak=days>=2&&b.n>=2||b.n>=3||(String(b.key).startsWith('confuse:')&&b.n>=2);
      if(!weak)continue;
+     if(blindCloseDays(state,questions,b.key,b.lastAt)>=2)continue;
      const recency=1/(1+(now-b.lastAt)/DAY);
      const cost=b.n*(b.target?1.4:1)* (0.5+recency);
      out.push({key:b.key,count:b.n,days,lastAt:b.lastAt,expected:b.expected,actual:b.actual,cardId:b.cardId,target:b.target,cost});
    }
    return out.sort((a,b)=>b.cost-a.cost).slice(0,8);
+ }
+ function blindCloseDays(state,questions,key,afterAt){
+   const byId=new Map((questions||[]).map(q=>[q.id,q]));
+   const days=new Set();
+   for(const e of state.events||[]){
+     if(e.type!=='answer'||!(e.at>afterAt))continue;
+     if(e.peek||e.hinted||e.answer_peek||e.rule_peek)continue;
+     if(e.first_try_correct===0||e.correct===false)continue;
+     if(!(e.correct||e.first_try_correct===1))continue;
+     const q=byId.get(e.card_id);
+     if(weaknessKey(e,q)!==key)continue;
+     days.add(new Date(e.at).toISOString().slice(0,10));
+   }
+   return days.size;
  }
  function stillWeak(spots,key){return (spots||[]).some(s=>s.key===key);}
  function inferBlock(q,mode,lessonId,activeLesson){
@@ -373,14 +390,36 @@
    if(!failed)return [];
    const seen=id=>!!(state&&state.records&&state.records[id]&&state.records[id].seen);
    const stem=core.normalize(String(failed.stimulus||'').split(/\s+/)[0]||'');
+   const rule=inferRule(failed);
    const pool=(questions||[]).filter(q=>{
-     if(!q||q.id===failed.id||q.topic!==failed.topic||q.contextOnly)return false;
+     if(!q||q.id===failed.id||q.contextOnly)return false;
+     if(rule){if(inferRule(q)!==rule)return false;}
+     else if(q.topic!==failed.topic)return false;
      if(!(seen(q.id)||String(q.id).startsWith('facet-')||q.source==='plus'))return false;
      const other=core.normalize(String(q.stimulus||'').split(/\s+/)[0]||'');
      return !stem||other!==stem||String(q.id).startsWith('facet-');
    });
    return pool.slice(0,4).map(q=>q.id);
  }
- const api={RULES,EXTERNAL,inferRule,ruleId,ruleText,missingRules,buildPack,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,sliceSection,sectionCount,sectionOf,partProgress,vocabDirections,HW_SECTION,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
+ function otherTopicFillers(failed,questions,state,n=5){
+   if(!failed)return [];
+   const seen=id=>!!(state&&state.records&&state.records[id]&&state.records[id].seen);
+   const pool=(questions||[]).filter(q=>q&&q.id!==failed.id&&q.topic!==failed.topic&&!q.contextOnly);
+   const known=pool.filter(q=>seen(q.id));
+   const rest=pool.filter(q=>!seen(q.id));
+   return [...known,...rest].slice(0,Math.max(3,n)).slice(0,5).map(q=>q.id);
+ }
+ function remediationQueue(failedId,isolatedIds,otherIds){
+   const iso=[...new Set((isolatedIds||[]).filter(id=>id&&id!==failedId))].slice(0,4);
+   const others=[...new Set((otherIds||[]).filter(id=>id&&id!==failedId&&!iso.includes(id)))].slice(0,5);
+   const out=iso.slice();
+   if(failedId)out.push(failedId);
+   if(others.length){
+     out.push(...others);
+     if(failedId)out.push(failedId);
+   }
+   return out;
+ }
+ const api={RULES,EXTERNAL,inferRule,ruleId,ruleText,missingRules,buildPack,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,sliceSection,sectionCount,sectionOf,partProgress,vocabDirections,HW_SECTION,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,otherTopicFillers,remediationQueue,blindCloseDays,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
  if(node)module.exports=api;else root.Homework=api;
 })(typeof window!=='undefined'?window:globalThis);
