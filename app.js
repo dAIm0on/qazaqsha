@@ -105,14 +105,21 @@
  function shuffled(items){
    const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
  }
+ function examReady(r){return !!r&&((r.recall_review_successes||0)>=1||((r.correct_streak||0)>=2&&r.last_successful_review));}
  function startQueue({all=false}={}){
    activeLesson=null;activeStep=null;stepEvidence={};let list=subset();
+   if(!vocabRole)list=list.filter(q=>q.wordRole!=='used');
    if(mode==='smart'){list=shuffled(list).sort((a,b)=>Number(window.Knowledge.bindings(b).some(x=>x.skill_type==='production'))-Number(window.Knowledge.bindings(a).some(x=>x.skill_type==='production')));list=core.chooseShortSession(list,records,Date.now(),questions.length);}
    else if(mode==='review')list=list.filter(q=>core.isDue(records[q.id])).sort((a,b)=>records[a.id].dueAt-records[b.id].dueAt);
    else if(mode==='mistakes')list=list.filter(q=>records[q.id]?.needsReview);
+   else if(mode==='exam')list=list.filter(q=>examReady(records[q.id]));
    else if(!all)list=list.filter(q=>(records[q.id]?.streak||0)<2||core.isDue(records[q.id]));
    if(mode==='shuffle'||mode==='mistakes'||mode==='exam')list=shuffled(list);
    if(mode==='exam')list=list.slice(0,cfg.session.examSize);
+   if(mode==='ordered'||mode==='shuffle'){
+     const fresh=list.filter(q=>!(records[q.id]?.seen)),old=list.filter(q=>records[q.id]?.seen);
+     list=[...fresh.slice(0,cfg.session.newLimit),...old].slice(0,cfg.session.size+cfg.session.newLimit);
+   }
    if(['smart','review','mistakes'].includes(mode)){const recent=state.events.filter(e=>e.type==='answer'&&Date.now()-e.at<cfg.session.recentWindowMs).slice(-cfg.session.minIntervening).map(e=>e.card_id);list=core.spaceRecent(window.Knowledge.choose(list,state,Infinity),recent).slice(0,cfg.session.size);}
    queue=list.map(q=>q.id);practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;resetCounts();render();
  }
@@ -213,26 +220,33 @@
  }
  function hintEvent(q,kind){state.events.push({type:'hint',card_id:q.id,at:Date.now(),hint_kind:kind,response_time_ms:elapsed(),hinted:true});}
  function peekAnswer(q){
-   if(checked)return;
+   if(checked||mode==='exam')return;
    hinted=true;hintEvent(q,'reveal');
    const answerLine=q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
+   const why=q.explanation?('<p class="small">'+esc(q.explanation)+'</p>'):'';
    const box=$('#hint-box');
-   box.innerHTML='<strong>Ответ показан.</strong> Теперь впиши его сама — так лучше запоминается. Проверка с подсказкой не повышает уровень. <span lang="kk">'+esc(answerLine)+'</span>';
+   box.innerHTML='<strong>Сначала слепая попытка, теперь перенабор.</strong> Подсказка = провал для интервала. Набери форму целиком, потом она вернётся ещё раз без подсказки. <p lang="kk"><strong>'+esc(answerLine)+'</strong></p>'+why;
    box.hidden=false;
-   const rev=$('#reveal-button');if(rev)rev.disabled=true;
-   const hb=$('#hint-button');if(hb)hb.disabled=true;
-   const inp=$('#answer-0');if(inp)inp.focus();
-   save();
+   (q.fields||[]).forEach((_,i)=>{const el=$('#answer-'+i);if(el)el.value='';});
+   if($('#reveal-button'))$('#reveal-button').disabled=true;
+   if($('#hint-button'))$('#hint-button').disabled=true;
+   if(!$('.letter-keyboard')&&q.kind==='fields'&&q.fields.some(f=>f.kind!=='number-text')){
+     const keys=document.createElement('div');keys.className='letter-keyboard';keys.innerHTML=[...'әғқңөұүһі'].map(c=>`<button type="button" data-letter="${c}">${c}</button>`).join('');
+     box.after(keys);
+     keys.querySelectorAll('[data-letter]').forEach(b=>b.addEventListener('mousedown',e=>{
+       e.preventDefault();
+       const target=lastTextInput||$('#answer-0');if(!target||target.disabled)return;
+       const start=target.selectionStart??target.value.length,end=target.selectionEnd??start;
+       target.value=target.value.slice(0,start)+b.dataset.letter+target.value.slice(end);
+       target.focus();target.setSelectionRange(start+1,start+1);lastTextInput=target;
+     }));
+   }
+   focusAnswer();save();
  }
  function showHint(q){
-   hintEvent(q,'explanation');hinted=true;if($('#hint-button'))$('#hint-button').disabled=true;
-   const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Остальные зависят от слова. В смешанном слове для окончания важен последний слог. И и У требуют внимания к конкретному слову.',plural:'Сначала выбери А или Е по последнему слогу. Затем посмотри на последнюю букву: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Произнеси слово и вспомни его пару в словаре.',numbers:'Вспомни слово из списка чисел и количества.',person:'Біз: пыз/піз после глухих и б,в,г,д; быз/біз после м,н,ң и ж,з; иначе мыз/міз. Сендер: сыңдар/сіңдер. Сіздер: сыздар/сіздер. С сендер/сіздер множественное на слово не ставим. Отрицание: основа + емес + окончание.'};
-   let hint=q.hint||hints[q.topic]||'';
-   if(!q.hint&&(q.topic==='vocab'||q.topic==='numbers')){
-     const pair=q.fields?.[0]?.answers?.[0]||q.correct?.[0]||'';
-     if(pair)hint=(hint?hint+' ':'')+pair;
-   }
-   const box=$('#hint-box');box.textContent=hint;box.hidden=false;save();
+   hintEvent(q,'explanation');if($('#hint-button'))$('#hint-button').disabled=true;
+   const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Для окончания важен последний слог.',plural:'Последний слог: А или Е. Потом последняя буква: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Сначала слепая попытка. Не открывай готовое слово — иначе это не вспоминание.',numbers:'Собери разряды: сначала большая часть. Не считай по порядку.',person:'Мен: пын/бын/мын. Сен: сың. Сіз: сыз. Біз после м/н/ң: біз. Сендер/сіздер без -лар на основу. Отрицание: основа + емес + окончание.',rules:'Набери суффикс или короткое слово правила, не целое новое существительное.'};
+   const box=$('#hint-box');box.textContent=q.hint&&!/^[А-Яа-яӘәІіҢңҒғҚқӨөҰұҮүҺһ ]{1,24}$/.test(q.hint)?q.hint:(hints[q.topic]||'Вспомни правило, потом форму.');box.hidden=false;save();
  }
  function readAnswers(q){return q.kind==='multi'?$$('input[name=choice]:checked').map(el=>el.value):q.fields.map((_,i)=>$('#answer-'+i).value);}
  function checkAnswer(q,reveal=false){
@@ -246,14 +260,15 @@
    const result=reveal?{correct:false,parts:q.kind==='multi'?q.options.map(()=>false):q.fields.map(()=>false)}:core.evaluate(q,answers);
    checked=true;if(reveal){hintEvent(q,'reveal');hinted=true;}
    pauseTimer();const now=Date.now(),recall=q.kind==='fields'&&q.fields.some(f=>f.kind!=='select');
+   const F=window.FSRS;
    let rating;
-   if(mode==='exam'){
-     const F=window.FSRS;
-     if(!result.correct||hinted||examTimedOut)rating=F.Rating.Again;
-     else if(elapsedMs<=cfg.session.examEasyMs)rating=F.Rating.Easy;
+   if(!result.correct||hinted||examTimedOut)rating=F.Rating.Again;
+   else if(mode==='exam'){
+     if(elapsedMs<=cfg.session.examEasyMs)rating=F.Rating.Easy;
      else if(elapsedMs<=cfg.session.examHardMs)rating=F.Rating.Good;
      else rating=F.Rating.Hard;
-   }
+   }else if((records[q.id]?.review_count||0)<4&&elapsedMs>(cfg.session.slowMs||8000))rating=F.Rating.Hard;
+   else rating=F.Rating.Good;
    let rec=core.updateRecord(records[q.id],result.correct,hinted,now,{responseTime:elapsedMs,recall,rating});records[q.id]=rec;
    const errors=reveal?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);state.errors.push(...errors);
    const event={session_id:String(queueEpoch),presentation:position,type:'answer',card_id:q.id,at:now,correct:result.correct,hinted,response_time_ms:elapsedMs,response_time:elapsedMs,recall,answers};
@@ -283,13 +298,13 @@
    const headline=reveal?'Разберём ответ':!result.correct?'Пока не всё верно':hinted?'Верно, с подсказкой':rec.streak>=2?'Верно, самостоятельно!':'Верно. Продолжим закрепление';
    let status=rec.streak>=2?'Следующая проверка по памяти: '+new Date(rec.dueAt).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+'.':!result.correct?'Эта карточка появится снова.':'Для закрепления карточка вернётся позже.';
    if(deferred)status='Карточка сохранена для следующего подхода: сейчас не хватает других заданий для паузы.';
-   if(result.correct&&hinted)status='Ответ с подсказкой не повышает уровень освоения. Попробуй ещё раз без неё.';
+   if(result.correct&&hinted)status='Перенабор засчитан как обучение, не как самостоятельный успех. Карточка вернётся в этом подходе слепой.';
    const answerLine=q.kind==='multi'?q.correct.join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
    const timeLine=mode==='exam'?(examTimedOut?'Время вышло.':'Время '+(elapsedMs/1000).toFixed(1)+' с'+(elapsedMs>cfg.session.examHardMs&&result.correct?' · медленно, для экзамена это слабо.':' · зачёт по времени.')):(cfg.labels[rec.mastery_level]+' · время '+(elapsedMs/1000).toFixed(1)+' с, без штрафа.');
    feedback.innerHTML=`<h3>${headline}</h3><p><strong>Ответ:</strong> ${esc(answerLine)}.</p>${errors.length?'<p><strong>Где ошибка:</strong> '+[...new Set(errors.map(e=>window.ErrorDiagnostics.labels[e.error_type]))].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p><p class="small">${timeLine}</p>`;feedback.hidden=false;
    renderStats();save();
    cancelAdvance();
-   if(result.correct&&!reveal){
+   if(result.correct&&!reveal&&!hinted){
      advanceTimer=setTimeout(()=>{advanceTimer=null;if(checked)nextQuestion();},180);
    }else{
      const next=$('#next-button');if(next)next.focus({preventScroll:true});
@@ -297,6 +312,11 @@
  }
  function nextQuestion(){cancelAdvance();draft=null;position++;if(!['ordered','shuffle'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
  function renderEmpty(){
+   if(mode==='exam'&&!sessionAttempts){
+     $('#exercise').innerHTML='<div class="empty-state"><h2>Экзамен ещё рано</h2><p>По исследованию таймер только на формах, которые уже дважды вспоминались в разные дни. Сначала обычная учёба без часов.</p><button type="button" class="primary-button" id="back-to-learning">К учёбе</button></div>';
+     $('#back-to-learning').onclick=()=>{mode='ordered';showView('today');};
+     save();return;
+   }
    const lesson=activeLesson&&window.LEARNING.lessons.find(l=>l.id===activeLesson);
    const complete=!!lesson&&practiceIds.length>0&&practiceIds.every(id=>stepEvidence[id]);
    if(complete)learningState.completedSteps[activeLesson+':'+activeStep]=true;
