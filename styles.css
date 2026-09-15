@@ -41,8 +41,8 @@ input,select,textarea{font-size:max(16px,1em)}
 #answer-form #feedback{margin:0 32px 24px;margin-top:0}
 @media(max-width:950px){#answer-form #feedback{margin-inline:24px}}
 @media(max-width:690px){
-  #answer-form #feedback{margin:0 12px 16px}
-  #answer-form.answered .question-actions{position:static;box-shadow:none}
+  #answer-form #feedback{margin:0 12px calc(16px + var(--bottom-nav-height,64px))}
+  #answer-form.answered .question-actions{position:sticky;bottom:var(--bottom-nav-height,64px);box-shadow:0 -10px 18px rgba(11,13,16,.12)}
   .primary-slot{min-width:0;width:100%}
 }
 .account{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto}
@@ -63,9 +63,9 @@ input,select,textarea{font-size:max(16px,1em)}
 .jump-row>span{font-size:.75rem;color:var(--muted);min-width:3.2rem}
 .chip{border:1px solid var(--line);background:var(--white);border-radius:999px;padding:6px 12px;min-height:36px;font-size:.8125rem}
 .chip[aria-pressed=true]{background:var(--teal);color:white;border-color:var(--teal)}
-@media(max-width:690px){body[data-view=practice] .jump-bar{display:flex}body[data-view=practice] .modebar{display:none!important}}
+@media(max-width:690px){body[data-view=practice] .jump-bar{display:none!important}body[data-view=practice] .modebar{display:none!important}}
 @media(max-width:690px){
-  .question-actions{position:static!important;box-shadow:none!important;padding:12px 16px 8px}
+  .question-actions{position:sticky!important;bottom:var(--bottom-nav-height,64px)!important;z-index:25;box-shadow:0 -10px 18px rgba(11,13,16,.12)!important;padding:10px 16px 12px}
   .question-body{padding-bottom:12px}
   .fields{margin-bottom:8px}
   .field-control input{scroll-margin-bottom:24px}

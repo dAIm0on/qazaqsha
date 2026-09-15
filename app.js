@@ -35,7 +35,7 @@
  }
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
- let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null;
+ let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null,hwSection=0,hwReturn=null;
  function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}
  function focusAnswer(){const el=$('#answer-0');if(el&&!el.disabled){try{el.focus({preventScroll:false});}catch{el.focus();}}}
  function captureDraft(){const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,answers:readAnswers(q)};}
@@ -125,6 +125,7 @@
    if(['smart','review','mistakes'].includes(mode)){const recent=state.events.filter(e=>e.type==='answer'&&Date.now()-e.at<cfg.session.recentWindowMs).slice(-cfg.session.minIntervening).map(e=>e.card_id);list=core.spaceRecent(window.Knowledge.choose(list,state,Infinity),recent).slice(0,cfg.session.size);}
    let ids=list.map(q=>q.id);
    if(window.MemoryPolicy)ids=window.MemoryPolicy.breakRuns(ids,questions);
+   if(window.MemoryPolicy&&window.MemoryPolicy.mixRulesProbes&&['smart','review','ordered'].includes(mode))ids=window.MemoryPolicy.mixRulesProbes(ids,questions,state);
    queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);resetCounts();render();
  }
  function startLesson(id,step=learningState.steps[id]||0){
@@ -360,18 +361,23 @@
    }
  }
  function nextQuestion(){cancelAdvance();draft=null;position++;if(!['ordered','shuffle','homework'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
- function startHomework(lessonId,part){
+ function startHomework(lessonId,part,section){
    const H=window.Homework,pack=(H.packs(questions,course).find(p=>p.lesson_id===lessonId));
    if(!pack)return;
    hwLesson=lessonId;hwPart=part||'exercises';mode='homework';topic='all';sourceFilter=null;vocabRole=null;activeLesson=null;activeStep=null;courseBlock=lessonId;
    const attempt=H.ensureAttempt(state,lessonId);
-   const ids=part==='words'?pack.homework.word_question_ids||[]:pack.homework.exercise_ids;
-   queue=ids.filter(id=>byId.has(id));practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=H.resumeIndex(queue,attempt);checked=false;resetCounts();
+   const all=(part==='words'?pack.homework.word_question_ids||[]:pack.homework.exercise_ids).filter(id=>byId.has(id));
+   const n=H.sectionCount(all);
+   let sec=section==null?H.sectionOf(H.resumeIndex(all,attempt)):Math.floor(Number(section)||0);
+   sec=Math.max(0,Math.min(n-1,sec));
+   hwSection=sec;
+   queue=H.sliceSection(all,sec);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=H.resumeIndex(queue,attempt);checked=false;resetCounts();
    if(!queue.length){renderHomework();showView('homework');return;}
    render();showView('practice');
  }
  function startBlockReview(failedId){
    const q=byId.get(failedId);if(!q||!window.Homework)return;
+   if(hwLesson)hwReturn={lesson:hwLesson,part:hwPart,section:hwSection};
    const iso=window.Homework.isolatedFor(q,questions,state);
    const fillers=questions.filter(x=>x.topic===q.topic&&eligible(x)).map(x=>x.id);
    startCustom(core.blockReviewQueue(failedId,iso,fillers),'remediation');
@@ -384,18 +390,22 @@
    if(!pick){root.innerHTML='<div class="panel"><p>Пакеты ДЗ 1–1…1–3 ещё не собраны из банка.</p></div>';return;}
    const pack=pick,attempt=window.Homework.ensureAttempt(state,pack.lesson_id),h=pack.homework;
    const ready=window.Homework.sheetReady(attempt,pack);
+   const exP=window.Homework.partProgress(attempt,h.exercise_ids),wP=window.Homework.partProgress(attempt,h.word_question_ids||[]);
+   const exN=window.Homework.sectionCount(h.exercise_ids),wN=window.Homework.sectionCount(h.word_question_ids||[]);
    const check=key=>`<label class="pref-check"><input type="checkbox" data-hw-check="${key}" ${attempt.checklist[key]?'checked':''}> ${{method:'Повторила методичку',exercises:'Упражнения сборника',words:'Слова урока',external_test:'Зафиксировала на сайте',keyboard:'Казахская раскладка на телефоне',cheat:'Шпаргалка сохранена'}[key]||key}</label>`;
-   root.innerHTML=`<div class="panel"><h2>Домашка по уроку</h2><p>Это сдача листа, не очередь повторения. Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике.</p>
+   const secBtns=(part,n)=>n<=1?'':`<div class="jump-row">${Array.from({length:n},(_,i)=>`<button type="button" class="chip" data-hw-part="${part}" data-hw-sec="${i}">Часть ${i+1}</button>`).join('')}</div>`;
+   root.innerHTML=`<div class="panel"><h2>Домашка по уроку</h2><p>Это сдача листа, не очередь повторения. Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике. Можно выйти в любой момент: ответы уже в листе.</p>
      <div class="jump-row">${list.map(p=>`<button type="button" class="chip" data-hw-lesson="${p.lesson_id}" ${p.lesson_id===pack.lesson_id?'aria-pressed="true"':''}>${esc(p.homework.title)}</button>`).join('')}</div></div>
      <div class="panel"><h2>${esc(h.title)}</h2>
+       <p>Упражнения ${exP.done} из ${exP.total} · слова ${wP.done} из ${wP.total} · внешний тест ${attempt.checklist.external_test?'отмечен':'не отмечен'}.</p>
        <ol class="learning-steps">
          <li>Повторить методичку — ${h.method_url?`<a href="${esc(h.method_url)}" target="_blank" rel="noopener noreferrer">${esc(h.method_title)}</a>`:'ссылка на материал урока'}${check('method')}</li>
-         <li>Упражнения сборника (${h.exercise_ids.length} пунктов) <button type="button" class="secondary-button" data-hw-part="exercises">${attempt.items.some(i=>h.exercise_ids.includes(i.id))?'Продолжить упражнения':'Открыть упражнения'}</button></li>
-         <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${h.word_ids.length} слов. <button type="button" class="secondary-button" data-hw-part="words">${attempt.items.some(i=>(h.word_question_ids||[]).includes(i.id))?'Продолжить слова':'Открыть слова'}</button></li>
+         <li>Упражнения сборника (${h.exercise_ids.length} пунктов, по ${window.Homework.HW_SECTION} в части) <button type="button" class="secondary-button" data-hw-part="exercises">${exP.done?'Продолжить упражнения':'Открыть упражнения'}</button>${secBtns('exercises',exN)}</li>
+         <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${h.word_ids.length} слов. <button type="button" class="secondary-button" data-hw-part="words">${wP.done?'Продолжить слова':'Открыть слова'}</button>${secBtns('words',wN)}</li>
          <li>Внешний тест: ${(h.external_tests&&h.external_tests.length?h.external_tests:[h.external_test_url]).filter(Boolean).map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u)}</a>`).join(' · ')||'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
          ${(h.extras||[]).map(x=>'<li>'+check(x)+'</li>').join('')}
        </ol>
-       <p class="small">Повторно открыть лист можно. «Новая сдача» не стирает прошлый файл.</p>
+       <p class="small">Повторно открыть лист можно. «Новая сдача» не стирает прошлый файл. Пауза на карточке возвращает сюда без потери набора.</p>
        <div class="review-actions"><button type="button" class="text-button" data-hw-new>Новая сдача</button></div>
      </div>
      <div class="panel"><h2>Слабые места</h2>${weak.length?weak.map(w=>`<div class="confusion-row"><div><strong>${esc(window.Homework.weakLabel(w.key))}</strong><p class="small">${w.count} раз за 14 дней. Ждали: ${esc(w.expected)} · написала: ${esc(w.actual)}</p></div><button type="button" class="secondary-button" data-weak="${esc(w.cardId)}">Разобрать</button></div>`).join(''):'<p>Пока нет устойчивых слабых мест.</p>'}</div>
@@ -408,7 +418,7 @@
        </div>
      </div>`;
    root.querySelectorAll('[data-hw-lesson]').forEach(b=>b.onclick=()=>{hwLesson=b.dataset.hwLesson;renderHomework();});
-   root.querySelectorAll('[data-hw-part]').forEach(b=>b.onclick=()=>startHomework(pack.lesson_id,b.dataset.hwPart));
+   root.querySelectorAll('[data-hw-part]').forEach(b=>b.onclick=()=>startHomework(pack.lesson_id,b.dataset.hwPart,b.dataset.hwSec==null?undefined:Number(b.dataset.hwSec)));
    root.querySelectorAll('[data-hw-check]').forEach(el=>el.onchange=()=>{window.Homework.markChecklist(state,pack.lesson_id,el.dataset.hwCheck,el.checked);save();});
    const neu=root.querySelector('[data-hw-new]');if(neu)neu.onclick=()=>{if(!window.confirm('Начать новую сдачу? Прошлый экспорт останется в истории попытки.'))return;window.Homework.newAttempt(state,pack.lesson_id);save();renderHomework();};
    root.querySelectorAll('[data-weak]').forEach(b=>b.onclick=()=>startBlockReview(b.dataset.weak));
@@ -541,9 +551,19 @@
    nextBeat();
  }
  function renderEmpty(){
+   if(hwReturn&&mode==='remediation'){
+     const back=hwReturn;hwReturn=null;hwLesson=back.lesson;hwPart=back.part;hwSection=back.section||0;mode='homework';showView('homework');save();return;
+   }
    if(mode==='homework'){
-     if(hwPart==='exercises'&&hwLesson)window.Homework.markChecklist(state,hwLesson,'exercises',true);
-     if(hwPart==='words'&&hwLesson)window.Homework.markChecklist(state,hwLesson,'words',true);
+     const pack=window.Homework.packs(questions,course).find(p=>p.lesson_id===hwLesson);
+     if(pack){
+       const all=hwPart==='words'?pack.homework.word_question_ids||[]:pack.homework.exercise_ids;
+       const done=new Set((state.homeworkAttempts[hwLesson]&&state.homeworkAttempts[hwLesson].items||[]).map(i=>i.id));
+       if(all.every(id=>done.has(id))){
+         if(hwPart==='exercises')window.Homework.markChecklist(state,hwLesson,'exercises',true);
+         if(hwPart==='words')window.Homework.markChecklist(state,hwLesson,'words',true);
+       }
+     }
      showView('homework');save();return;
    }
    if(mode==='exam'&&!sessionAttempts){
@@ -722,7 +742,7 @@
    contrast:startContrast,setAssociation,promote,export:()=>{save();downloadProgress(P.serialize(state));},import:importProgress,
    restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
  });
- $('#pause-session').onclick=()=>showView(mode==='exam'?'exam':'today');
+ $('#pause-session').onclick=()=>showView(mode==='homework'?'homework':mode==='exam'?'exam':'today');
  const lettersPref=$('#pref-letters');
  if(lettersPref){lettersPref.checked=!!state.prefs.letters;lettersPref.onchange=()=>{state.prefs.letters=lettersPref.checked;save();if(view==='practice')render();};}
  renderRules();renderMaterials();

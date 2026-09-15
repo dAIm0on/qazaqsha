@@ -521,4 +521,59 @@ ok('G4/G5 homework resume and human weakness label');
 assert.ok(policy.isChunk({stimulus:'сау болыңыздар',title:'до свидания'}));
 ok('P1.5 farewell is a chunk, not a verb paradigm');
 
+assert.equal(policy.canMasterProduction(prodQ,{hinted:true}),false);
+assert.equal(policy.answerFlags({hinted:true,correct:true}).first_try_correct,0);
+ok('H2 opening faded association / peek does not raise mastery');
+
+const probeMix=policy.mixRulesProbes(['keep-a'],probeQs,probeState);
+assert.ok(probeMix.includes('facet-harmony-0'));
+assert.ok(probeMix.includes('keep-a'));
+assert.ok(!probeMix.includes('future-case'));
+assert.ok(probeQs.filter(q=>probeMix.includes(q.id)).every(q=>q.kind==='fields'));
+ok('H3-auto mixRulesProbes injects typed introduced probe, not future lemma');
+
+const p23words=hw.buildPack('2-3',qs23all,{sources:{}});
+const dirs=hw.vocabDirections(p23words.homework.word_question_ids);
+assert.ok(dirs.production.length>0);
+assert.equal(dirs.missing_recognition.length,0);
+assert.ok(dirs.ru_before_kk);
+assert.equal(policy.canMasterProduction({kind:'fields',topic:'vocab',title:'Переведи на русский',fields:[{answers:['человек']}]},{hinted:false}),false);
+ok('P1.4 TARGET homework has RU→KZ production after L2→L1 recognition');
+
+assert.equal(hw.sliceSection(Array.from({length:45},(_,i)=>'e'+i),0).length,20);
+assert.equal(hw.sectionCount(Array.from({length:135},(_,i)=>'e'+i))>1,true);
+assert.ok(hw.sliceSection(Array.from({length:135},(_,i)=>'e'+i),0).length<=hw.HW_SECTION);
+const prog=hw.partProgress({items:[{id:'e1'},{id:'e2'}]},['e1','e2','e3']);
+assert.equal(prog.done,2);assert.equal(prog.total,3);
+ok('P1.6 homework sections ≤20, separate part progress, no 100-card wall');
+
+const ordPack=qs23all.filter(q=>(q.ruleIds||[]).includes('ordinal')||/порядков/i.test(q.explanation||''));
+assert.ok(ordPack.some(q=>q.kind==='fields'&&/бірінші/i.test(JSON.stringify(q.fields))));
+assert.ok(ordPack.some(q=>/жиырмасыншы/i.test(JSON.stringify(q.fields))));
+assert.ok(ordPack.some(q=>/қырқыншы/i.test(JSON.stringify(q.fields))));
+assert.ok(ordPack.some(q=>/он екінші/i.test(JSON.stringify(q.fields))||/жиырма бірінші/i.test(JSON.stringify(q.fields))));
+assert.ok(ordPack.every(q=>q.kind!=='multi'));
+ok('P1.8 typed ordinal skills: cardinal→ordinal, ыншы/ншы, қырқыншы, suffix on last piece');
+
+const dash=fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8');
+assert.ok(/Сейчас по порядку/.test(dash));
+assert.ok(/не % языка|не считается/.test(dash));
+ok('P1.11 Today UX: due / lesson / homework first; no language-percent claim');
+
+assert.ok(/Произношение голосом приложение не проверяет/.test(dash));
+ok('P1.13 phonetics boundary stated; no pronunciation scoring');
+
+const phone700={kind:'fields',topic:'numbers',ruleIds:['phone-groups'],skillBindings:[{item_id:'rule:phone-groups'}],fields:[{kind:'text',answers:['жеті жүз']}]};
+assert.ok(core.evaluate(phone700,['жеті жүз']).correct);
+assert.ok(core.evaluate(phone700,['жеті  жүз']).correct);
+assert.ok(core.evaluate(phone700,['жеті жүз нөл нөл']).correct);
+assert.ok(!core.evaluate(phone700,['алты жүз']).correct);
+assert.ok(!core.evaluate(phone700,['жеті жоз']).correct);
+ok('F3/F4/F5 phone grouping variants accepted; wrong value and misspelling rejected');
+
+const theme=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
+assert.ok(/font-size:max\(16px/.test(theme));
+assert.ok(/min-height:44px/.test(theme));
+ok('I1/I2 CSS: input ≥16px, kazakh keys ≥44px');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

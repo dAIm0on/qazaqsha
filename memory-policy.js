@@ -115,6 +115,7 @@
    const out=[],stems=new Set();
    for(const q of questions||[]){
      if(!q||q.contextOnly||q.kind!=='fields')continue;
+     if(q.kind==='multi')continue;
      if(!(q.topic==='plural'||(q.ruleIds||[]).includes('harmony')||(q.ruleIds||[]).includes('plural')))continue;
      const rec=state&&state.records&&state.records[q.id];
      if(!rec||!(rec.recall_review_successes||rec.seen))continue;
@@ -123,6 +124,14 @@
      stems.add(stem);out.push(q.id);
      if(out.length>=3)break;
    }
+   return out;
+ }
+ function mixRulesProbes(ids,questions,state){
+   const have=new Set(ids||[]);
+   const add=rulesProbe(questions,state).filter(id=>!have.has(id)).slice(0,2);
+   if(!add.length)return ids||[];
+   const out=[...(ids||[])];
+   out.splice(Math.min(2,out.length),0,...add);
    return out;
  }
  function incidentalWeek(state,at=Date.now()){
@@ -143,6 +152,6 @@
    if((q.ruleIds||[]).includes('quantity'))return 'extra_plural';
    return 'other';
  }
- const api={PAIRS,PARTICLES,weekKey,contrastSide,breakRuns,classify,direction,isContextOnly,examReady,canMasterProduction,associationFaded,isChunk,rulesProbe,incidentalWeek,canAddIncidental,confusionTag,isAtomicNumber,isAssembleOnlyCard,answerFlags};
+ const api={PAIRS,PARTICLES,weekKey,contrastSide,breakRuns,classify,direction,isContextOnly,examReady,canMasterProduction,associationFaded,isChunk,rulesProbe,mixRulesProbes,incidentalWeek,canAddIncidental,confusionTag,isAtomicNumber,isAssembleOnlyCard,answerFlags};
  if(node)module.exports=api;else root.MemoryPolicy=api;
 })(typeof window!=='undefined'?window:globalThis);

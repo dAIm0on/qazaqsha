@@ -175,6 +175,29 @@
    const firstOpen=list.findIndex(id=>!done.has(id));
    return firstOpen<0?0:firstOpen;
  }
+ const HW_SECTION=20;
+ function sliceSection(ids,section){
+   const n=Math.max(0,Math.floor(Number(section)||0));
+   return (ids||[]).slice(n*HW_SECTION,(n+1)*HW_SECTION);
+ }
+ function sectionCount(ids){return Math.max(1,Math.ceil((ids||[]).length/HW_SECTION));}
+ function sectionOf(index){return Math.floor(Math.max(0,Number(index)||0)/HW_SECTION);}
+ function partProgress(attempt,ids){
+   const done=new Set((attempt&&attempt.items||[]).map(i=>i.id));
+   const list=ids||[];
+   return {done:list.filter(id=>done.has(id)).length,total:list.length};
+ }
+ function vocabDirections(wordQuestionIds){
+   const ids=wordQuestionIds||[];
+   const ru=ids.filter(id=>/-ru$/.test(id)),kk=ids.filter(id=>/-kk$/.test(id)&&!/-rev$/.test(id));
+   const missing=[];
+   for(const id of kk){
+     const rec=id.replace(/-kk$/,'-ru');
+     if(!ids.includes(rec))missing.push(id);
+   }
+   const firstRu=ids.findIndex(id=>/-ru$/.test(id)),firstKk=ids.findIndex(id=>/-kk$/.test(id)&&!/-rev$/.test(id));
+   return {recognition:ru,production:kk,missing_recognition:missing,ru_before_kk:firstRu>=0&&firstKk>=0&&firstRu<firstKk};
+ }
  const WEAK_LABELS={
    'rule:plural::ldt':'Множественное: Л/Д/Т',
    'rule:plural::harmony':'Множественное: А/Е',
@@ -358,6 +381,6 @@
    });
    return pool.slice(0,4).map(q=>q.id);
  }
- const api={RULES,EXTERNAL,inferRule,ruleId,ruleText,missingRules,buildPack,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
+ const api={RULES,EXTERNAL,inferRule,ruleId,ruleText,missingRules,buildPack,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,sliceSection,sectionCount,sectionOf,partProgress,vocabDirections,HW_SECTION,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
  if(node)module.exports=api;else root.Homework=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -171,6 +171,7 @@ body[data-view=practice] .exercise-card{box-shadow:0 24px 60px rgba(0,0,0,.34)}
   .primary-button,.today-main,.chip,.topic-button{transition:background-color .14s,border-color .14s,transform .12s}
 }
 @media(max-width:690px){
+  .exercise-card{margin-bottom:var(--bottom-nav-height,64px)}
   .stimulus{font-size:clamp(2.125rem,8vw,2.75rem)}
   .bottom-nav button[aria-current=page]{color:var(--lime)}
   .question-actions{background:var(--paper-0)}
