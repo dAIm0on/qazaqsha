@@ -37,5 +37,8 @@
      return [{type,...remedy,ids}];
    });
  }
- window.LearningSupport={retention,suggestions};
+ function weakSpots(state,questions,now=Date.now()){
+   return window.Homework?window.Homework.weakSpots(state,questions,now):[];
+ }
+ window.LearningSupport={retention,suggestions,weakSpots,remedies};
 })();

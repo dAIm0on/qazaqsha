@@ -35,7 +35,7 @@
  }
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
- let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null);
+ let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null;
  function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}
  function focusAnswer(){const el=$('#answer-0');if(el&&!el.disabled){try{el.focus({preventScroll:false});}catch{el.focus();}}}
  function captureDraft(){const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,answers:readAnswers(q)};}
@@ -142,10 +142,10 @@
  function showView(next){
    pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
    view=next;document.body.dataset.view=next;
-   ['today','learn','review','vocabulary','practice','rules','materials','exam'].forEach(v=>{$('#'+v+'-view').hidden=v!==next;});
+   ['today','learn','review','vocabulary','practice','rules','materials','exam','homework'].forEach(v=>{const el=$('#'+v+'-view');if(el)el.hidden=v!==next;});
    const tab=next==='practice'?(mode==='exam'?'exam':'review'):next;
    $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='exam')renderExam();if(next==='practice')activateCard();save();
+   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='practice')activateCard();save();
  }
  function renderNav(){
    $('#lesson-nav').innerHTML=topics.map(([id,name,num])=>{
@@ -189,7 +189,7 @@
    return `<div class="fields">${fields.map((f,i)=>`<div class="field-row"><label class="field-label" for="answer-${i}">${esc(f.label)}</label><div class="field-control"><input id="answer-${i}" name="answer-${i}" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${f.kind==='number-text'?'inputmode="numeric"':''} aria-describedby="correction-${i}"><span class="field-correction" id="correction-${i}"></span></div></div>`).join('')}</div>`;
  }
  function render(){
-   introOpen=false;pauseTimer();elapsedMs=0;checked=false;hinted=false;lastTextInput=null;renderStats();
+   introOpen=false;pauseTimer();elapsedMs=0;checked=false;hinted=false;rulePeeked=false;lastTextInput=null;renderStats();
    const q=byId.get(queue[position]);
    if(!q){renderEmpty();return;}
    window.NumberPractice.prepare(q,variants);confusionIndex=P.answerIndex(questions);
@@ -198,8 +198,12 @@
    const hasText=q.kind==='fields'&&q.fields.some(f=>f.kind!=='number-text');
    const letters=hasText&&state.prefs.letters;
    const exam=mode==='exam';
-   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${source.additional?esc(source.title):`<a href="${source.url}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`}<br>${esc(location)}</div><span class="mastery-label">${exam?'Экзамен':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p><h2 id="question-title">${esc(q.title)}</h2>${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}${answerMarkup(q)}${letters?`<div class="letter-keyboard" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div><div class="keyboard-label">Буква вставится в выбранное поле.</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Моя подсказка</button></div><div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
+   const hw=mode==='homework';
+   const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
+   const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
+   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${source.additional?esc(source.title):`<a href="${source.url}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`}<br>${esc(location)}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ЛИСТ ДЗ':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(q.title)}</h2>${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}${answerMarkup(q)}${letters?`<div class="letter-keyboard" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div><div class="keyboard-label">Буква вставится в выбранное поле.</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Моя подсказка</button></div><div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
    $('#answer-form').addEventListener('submit',e=>{e.preventDefault();if(checked)nextQuestion();else checkAnswer(q);});
+   if($('#rule-button'))$('#rule-button').onclick=()=>showRule(q);
    $('#hint-button').onclick=()=>showHint(q);
    $('#reveal-button').onclick=()=>mode==='exam'?checkAnswer(q,true):peekAnswer(q);
    $('#next-button').onclick=nextQuestion;
@@ -223,6 +227,18 @@
    activateCard();save();
  }
  function hintEvent(q,kind){state.events.push({type:'hint',card_id:q.id,at:Date.now(),hint_kind:kind,response_time_ms:elapsed(),hinted:true});}
+ function showRule(q){
+   if(checked||mode==='exam')return;
+   const text=window.Homework&&window.Homework.ruleText(q);
+   if(!text)return;
+   rulePeeked=true;
+   state.events.push({type:'rule_peek',card_id:q.id,at:Date.now(),rule_id:window.Homework.ruleId(q),homework:mode==='homework'?1:0});
+   const box=$('#hint-box');
+   box.innerHTML='<strong>Правило, не ответ этого пункта.</strong><pre class="rule-pre">'+esc(text)+'</pre>';
+   box.hidden=false;
+   if($('#rule-button'))$('#rule-button').disabled=true;
+   save();
+ }
  function peekAnswer(q){
    if(checked||mode==='exam')return;
    hinted=true;hintEvent(q,'reveal');
@@ -275,10 +291,15 @@
    const previous=records[q.id];
    const predicted=window.ReviewScheduler.retrievability?window.ReviewScheduler.retrievability(previous,now):null;
    const hours=previous?.last_correct?(now-previous.last_correct)/3600000:null;
-   let rec=core.updateRecord(previous,result.correct,hinted,now,{responseTime:elapsedMs,recall,rating});records[q.id]=rec;
+   const homeworkMode=mode==='homework';
+   let rec=previous||core.migrateRecord({},now);
+   if(homeworkMode){
+     if(hinted&&previous){rec=core.updateRecord(previous,result.correct,true,now,{responseTime:elapsedMs,recall,rating:F.Rating.Again});records[q.id]=rec;}
+   }else{rec=core.updateRecord(previous,result.correct,hinted,now,{responseTime:elapsedMs,recall,rating});records[q.id]=rec;}
    const errors=reveal?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);state.errors.push(...errors);
    const policy=window.MemoryPolicy;
    const flags=policy&&policy.answerFlags?policy.answerFlags({hinted,correct:result.correct}):{first_try_correct:hinted?0:(result.correct?1:0),peek:hinted?1:0,retype_after_peek_ok:hinted?(result.correct?1:0):null};
+   if(rulePeeked)flags.first_try_correct=0;
    const event={session_id:String(queueEpoch),presentation:position,type:'answer',card_id:q.id,at:now,correct:result.correct,hinted,response_time_ms:elapsedMs,response_time:elapsedMs,latency_ms:elapsedMs,recall,answers,
      item_type:policy?policy.classify(q):null,direction:policy?policy.direction(q):null,
      first_try_correct:flags.first_try_correct,peek:flags.peek,retype_after_peek_ok:flags.retype_after_peek_ok,
@@ -286,14 +307,20 @@
      confuse_pair_id:policy&&policy.contrastSide(q)?String(policy.contrastSide(q).pair):'',
      official_like:(mode==='exam'||q.topic==='rules')?1:0,
      predicted_R:predicted,
-     hours_since_last:hours};
-   event.skills=window.Knowledge.observe(state,q,result,event,errors);state.events.push(event);rec=records[q.id];
-   P.observeConfusions(state,q,answers,result,now,confusionIndex,hinted||reveal);
+     hours_since_last:hours,
+     rule_peek:rulePeeked?1:0,homework:homeworkMode?1:0,block:window.Homework?window.Homework.inferBlock(q,mode,hwLesson,activeLesson):''};
+   if(!homeworkMode)event.skills=window.Knowledge.observe(state,q,result,event,errors);
+   state.events.push(event);rec=records[q.id]||rec;
+   if(homeworkMode&&hwLesson){
+     const expected=q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers[0]).join('; ');
+     window.Homework.recordItem(state,hwLesson,{id:q.id,answers,correct:result.correct,rule_peek:rulePeeked,answer_peek:hinted,skipped:!!reveal,expected},now);
+   }
+   P.observeConfusions(state,q,answers,result,now,confusionIndex,hinted||reveal||rulePeeked);
    for(const pair of Object.values(state.confusions)){pair.expected_item=[...confusionIndex.get(pair.expected_answer)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.given_item=[...confusionIndex.get(pair.wrong_answer_given)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.last_confused=pair.last_wrong;}
    if(activeLesson&&practiceIds.includes(q.id))stepEvidence[q.id]=result.correct&&!hinted;
    sessionAttempts++;if(result.correct){if(hinted)sessionAssisted++;else sessionCorrect++;}
    if(!hinted&&!result.correct)sessionBlindFails[q.id]=(sessionBlindFails[q.id]||0)+1;
-   if((sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id));
+   if(!homeworkMode&&(sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id));
    const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);
    if(mate&&!result.correct&&!hinted){
      const other=questions.find(x=>x.id!==q.id&&window.MemoryPolicy.contrastSide(x)?.pair===mate.pair&&window.MemoryPolicy.contrastSide(x)?.side!==mate.side);
@@ -331,8 +358,71 @@
      const next=$('#next-button');if(next)next.focus({preventScroll:true});
    }
  }
- function nextQuestion(){cancelAdvance();draft=null;position++;if(!['ordered','shuffle'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
+ function nextQuestion(){cancelAdvance();draft=null;position++;if(!['ordered','shuffle','homework'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
+ function startHomework(lessonId,part){
+   const H=window.Homework,pack=(H.packs(questions,course).find(p=>p.lesson_id===lessonId));
+   if(!pack)return;
+   hwLesson=lessonId;hwPart=part||'exercises';mode='homework';topic='all';sourceFilter=null;vocabRole=null;activeLesson=null;activeStep=null;courseBlock=lessonId;
+   H.ensureAttempt(state,lessonId);
+   const ids=part==='words'?pack.homework.word_question_ids||[]:pack.homework.exercise_ids;
+   queue=ids.filter(id=>byId.has(id));practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;resetCounts();
+   if(!queue.length){renderHomework();showView('homework');return;}
+   render();showView('practice');
+ }
+ function startBlockReview(failedId){
+   const q=byId.get(failedId);if(!q||!window.Homework)return;
+   const iso=window.Homework.isolatedFor(q,questions,state);
+   const fillers=questions.filter(x=>x.topic===q.topic&&eligible(x)).map(x=>x.id);
+   startCustom(core.blockReviewQueue(failedId,iso,fillers),'remediation');
+ }
+ function renderHomework(){
+   const root=$('#homework-content');if(!root||!window.Homework)return;
+   const list=window.Homework.packs(questions,course);
+   const weak=window.Homework.weakSpots(state,questions);
+   const pick=hwLesson&&list.find(p=>p.lesson_id===hwLesson)||list[0];
+   if(!pick){root.innerHTML='<div class="panel"><p>Пакеты ДЗ 1–1…1–3 ещё не собраны из банка.</p></div>';return;}
+   const pack=pick,attempt=window.Homework.ensureAttempt(state,pack.lesson_id),h=pack.homework;
+   const ready=window.Homework.sheetReady(attempt,pack);
+   const check=key=>`<label class="pref-check"><input type="checkbox" data-hw-check="${key}" ${attempt.checklist[key]?'checked':''}> ${{method:'Повторила методичку',exercises:'Упражнения сборника',words:'Слова урока',external_test:'Зафиксировала на сайте',keyboard:'Казахская раскладка на телефоне',cheat:'Шпаргалка сохранена'}[key]||key}</label>`;
+   root.innerHTML=`<div class="panel"><h2>Домашка по уроку</h2><p>Это сдача листа, не очередь повторения. Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике.</p>
+     <div class="jump-row">${list.map(p=>`<button type="button" class="chip" data-hw-lesson="${p.lesson_id}" ${p.lesson_id===pack.lesson_id?'aria-pressed="true"':''}>${esc(p.homework.title)}</button>`).join('')}</div></div>
+     <div class="panel"><h2>${esc(h.title)}</h2>
+       <ol class="learning-steps">
+         <li>Повторить методичку — ${h.method_url?`<a href="${esc(h.method_url)}" target="_blank" rel="noopener noreferrer">${esc(h.method_title)}</a>`:'ссылка на материал урока'}${check('method')}</li>
+         <li>Упражнения сборника (${h.exercise_ids.length} пунктов) <button type="button" class="secondary-button" data-hw-part="exercises">Открыть упражнения</button></li>
+         <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${h.word_ids.length} слов. <button type="button" class="secondary-button" data-hw-part="words">Открыть слова</button></li>
+         <li>Внешний тест: ${h.external_test_url?`<a href="${esc(h.external_test_url)}" target="_blank" rel="noopener noreferrer">${esc(h.external_test_url)}</a>`:'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
+         ${(h.extras||[]).map(x=>'<li>'+check(x)+'</li>').join('')}
+       </ol>
+       <p class="small">Повторно открыть лист можно. «Новая сдача» не стирает прошлый файл.</p>
+       <div class="review-actions"><button type="button" class="text-button" data-hw-new>Новая сдача</button></div>
+     </div>
+     <div class="panel"><h2>Слабые места</h2>${weak.length?weak.map(w=>`<div class="confusion-row"><div><strong>${esc(w.key)}</strong><p class="small">${w.count} раз за 14 дней. Ждали: ${esc(w.expected)} · написала: ${esc(w.actual)}</p></div><button type="button" class="secondary-button" data-weak="${esc(w.cardId)}">Разобрать</button></div>`).join(''):'<p>Пока нет устойчивых слабых мест.</p>'}</div>
+     <div class="panel" ${ready?'':'hidden'}><h2>Выгрузка листа</h2>
+       <p>Упражнения и слова этого листа отмечены. Тест сайта может остаться не отмеченным — в файле это будет видно.</p>
+       <div class="review-actions">
+         <button type="button" class="primary-button" data-hw-html>Скачать лист</button>
+         <button type="button" class="secondary-button" data-hw-json>Скачать данные</button>
+         <button type="button" class="secondary-button" data-hw-print>Печать / PDF</button>
+       </div>
+     </div>`;
+   root.querySelectorAll('[data-hw-lesson]').forEach(b=>b.onclick=()=>{hwLesson=b.dataset.hwLesson;renderHomework();});
+   root.querySelectorAll('[data-hw-part]').forEach(b=>b.onclick=()=>startHomework(pack.lesson_id,b.dataset.hwPart));
+   root.querySelectorAll('[data-hw-check]').forEach(el=>el.onchange=()=>{window.Homework.markChecklist(state,pack.lesson_id,el.dataset.hwCheck,el.checked);save();});
+   const neu=root.querySelector('[data-hw-new]');if(neu)neu.onclick=()=>{if(!window.confirm('Начать новую сдачу? Прошлый экспорт останется в истории попытки.'))return;window.Homework.newAttempt(state,pack.lesson_id);save();renderHomework();};
+   root.querySelectorAll('[data-weak]').forEach(b=>b.onclick=()=>startBlockReview(b.dataset.weak));
+   const stamp=window.Homework.fileStamp();
+   const htmlBtn=root.querySelector('[data-hw-html]'),jsonBtn=root.querySelector('[data-hw-json]'),printBtn=root.querySelector('[data-hw-print]');
+   if(htmlBtn)htmlBtn.onclick=()=>{attempt.submitted_at=Date.now();attempt.export_rev=(attempt.export_rev||0)+1;attempt.weak_tags=weak.map(w=>w.key);save();downloadProgress(window.Homework.exportHtml(attempt,pack,questions),'homework-'+pack.lesson_id+'-'+stamp+'.html');};
+   if(jsonBtn)jsonBtn.onclick=()=>{attempt.submitted_at=Date.now();attempt.export_rev=(attempt.export_rev||0)+1;attempt.weak_tags=weak.map(w=>w.key);save();downloadProgress(JSON.stringify(window.Homework.exportJson(attempt,pack),null,2),'homework-'+pack.lesson_id+'-'+stamp+'.json');};
+   if(printBtn)printBtn.onclick=()=>{attempt.submitted_at=Date.now();save();const html=window.Homework.exportHtml(attempt,pack,questions);const w=window.open('','_blank');if(!w)return;w.document.write(html);w.document.close();w.focus();w.print();};
+ }
  function renderEmpty(){
+   if(mode==='homework'){
+     if(hwPart==='exercises'&&hwLesson)window.Homework.markChecklist(state,hwLesson,'exercises',true);
+     if(hwPart==='words'&&hwLesson)window.Homework.markChecklist(state,hwLesson,'words',true);
+     showView('homework');save();return;
+   }
    if(mode==='exam'&&!sessionAttempts){
      $('#exercise').innerHTML='<div class="empty-state"><h2>Экзамен ещё рано</h2><p>По исследованию таймер только на формах, которые уже дважды вспоминались в разные дни. Сначала обычная учёба без часов.</p><button type="button" class="primary-button" id="back-to-learning">К учёбе</button></div>';
      $('#back-to-learning').onclick=()=>{mode='ordered';showView('today');};
@@ -377,7 +467,7 @@
    $('#association-text').oninput=e=>setAssociation($('#association-target').value,e.target.value);save();
  }
  function downloadProgress(text,name='progress.json'){
-   const blob=new Blob([text],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+   const blob=new Blob([text],{type:/\.html$/i.test(name)?'text/html;charset=utf-8':'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
  }
  function promote(id){
    const w=catalog.words.find(w=>w.id===id);if(!w)return;
@@ -489,6 +579,8 @@
    state:()=>state,questions:()=>questions,eligible,hasSession:()=>queue.length>position,
    action(next){
      if(next.startsWith('remedy:')){startRemedy(next.slice(7));return;}
+     if(next==='homework'){hwLesson=null;showView('homework');return;}
+     if(next.startsWith('weak:')){startBlockReview(next.slice(5));return;}
      if(next.startsWith('number:')){activeLesson=null;activeStep=null;sourceFilter=null;topic='numbers';mode='numbers';queue=window.NumberPractice.session(next.split(':')[1],state).filter(eligible).map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;resetCounts();render();showView('practice');return;}
      if(next==='reset'){$('#reset-progress').click();return;}
      if(next==='new'){
@@ -510,14 +602,14 @@
  const lettersPref=$('#pref-letters');
  if(lettersPref){lettersPref.checked=!!state.prefs.letters;lettersPref.onchange=()=>{state.prefs.letters=lettersPref.checked;save();if(view==='practice')render();};}
  renderRules();renderMaterials();
- const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','contrast','numbers','remediation','words','exam'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
+ const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','contrast','numbers','remediation','words','exam','homework'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){
    variants=savedSession.variants||{};
    queueEpoch=typeof savedSession.queueEpoch==='number'?savedSession.queueEpoch:queueEpoch;
    presented=typeof savedSession.presented==='string'?savedSession.presented:null;
    sessionAttempts=Math.max(0,Number(savedSession.sessionAttempts)||0);sessionCorrect=Math.min(sessionAttempts,Math.max(0,Number(savedSession.sessionCorrect)||0));sessionAssisted=Math.min(sessionAttempts-sessionCorrect,Math.max(0,Number(savedSession.sessionAssisted)||0));
    draft=savedSession.draft&&Array.isArray(savedSession.draft.answers)?savedSession.draft:null;remediation=savedSession.remediation||null;
-   topic=savedSession.topic;mode=savedSession.mode;sourceFilter=savedSession.sourceFilter||null;courseBlock=savedSession.courseBlock||null;activeLesson=mode==='lesson'?savedSession.activeLesson:null;
+   topic=savedSession.topic;mode=savedSession.mode;sourceFilter=savedSession.sourceFilter||null;courseBlock=savedSession.courseBlock||null;hwLesson=mode==='homework'?savedSession.courseBlock||null:null;activeLesson=mode==='lesson'?savedSession.activeLesson:null;
    activeStep=activeLesson?Math.min(window.LEARNING.lessons.find(l=>l.id===activeLesson).chunks.length-1,Math.max(0,Number(savedSession.activeStep)||0)):null;
    queue=savedSession.queue;practiceIds=Array.isArray(savedSession.practiceIds)?savedSession.practiceIds.filter(id=>byId.has(id)):[...new Set(queue)];
    stepEvidence=savedSession.stepEvidence&&typeof savedSession.stepEvidence==='object'?savedSession.stepEvidence:{};

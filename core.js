@@ -86,6 +86,15 @@
     // A new approach does not erase the gap: defer recent prompts if there are too few fillers.
     return fresh.length>=config.session.minIntervening?[...fresh,...rest]:fresh;
   }
-  const api={normalize,evaluate,migrateRecord,updateRecord,isDue,scheduleRepeat,chooseShortSession,spaceRecent,numberParts,numberToKazakh,DAY};
+  function blockReviewQueue(failedId,isolatedIds,fillers=[],min=config.session.minIntervening){
+    const iso=[...new Set((isolatedIds||[]).filter(id=>id&&id!==failedId))].slice(0,4);
+    const extra=(fillers||[]).filter(id=>id&&id!==failedId&&!iso.includes(id));
+    while(iso.length<Math.min(4,Math.max(2,min))&&extra.length)iso.push(extra.shift());
+    const out=iso.slice();
+    if(failedId)out.push(failedId);
+    if(out[0]===failedId&&out.length>1){out.shift();out.push(failedId);}
+    return out;
+  }
+  const api={normalize,evaluate,migrateRecord,updateRecord,isDue,scheduleRepeat,chooseShortSession,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,DAY};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TrainerCore=api;
 })(typeof window!=='undefined'?window:globalThis);

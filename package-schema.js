@@ -29,5 +29,18 @@
    return p;
  }
  function merge(a=[],b=[]){const out=new Map();for(const raw of [...a,...b]){const p=validate(raw),old=out.get(p.lesson_id);if(old&&JSON.stringify(old)!==JSON.stringify(p))fail('разные версии урока '+p.lesson_id+'; существующий материал не заменён');out.set(p.lesson_id,p);}return [...out.values()];}
- const api={validate,merge};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.LessonPackageSchema=api;
+ function validateHomework(raw,knownIds){
+   if(!obj(raw)||typeof raw.lesson_id!=='string'||!obj(raw.homework))fail('нужен объект lesson_id + homework');
+   const h=raw.homework,ids=list(h.exercise_ids||[],'exercise_ids',0,800).map(id);
+   const known=knownIds instanceof Set?knownIds:new Set(knownIds||[]);
+   const unknown=ids.filter(x=>!known.has(x));
+   if(unknown.length)fail('exercise_ids не из банка: '+unknown.slice(0,12).join(', '));
+   const words=Array.isArray(h.word_ids)?h.word_ids.map(x=>text(String(x),'word_id',80)):[];
+   const rule_map=obj(h.rule_map)?h.rule_map:{};
+   for(const k of Object.keys(rule_map))if(known.size&&!known.has(k)&&!ids.includes(k))fail('rule_map ссылается на id вне банка: '+k);
+   const url=h.external_test_url?text(h.external_test_url,'external_test_url',2000):'';
+   if(url&&!/^https:\/\/[^\s<>"']+$/.test(url))fail('ссылка теста должна начинаться с https://');
+   return {lesson_id:id(raw.lesson_id),homework:{title:text(h.title||('Домашка '+raw.lesson_id),'title',200),word_ids:words,exercise_ids:ids,rule_map,external_test_url:url,checklist:Array.isArray(h.checklist)&&h.checklist.length?h.checklist.map(x=>text(x,'checklist',40)):['method','exercises','words','external_test']}};
+ }
+ const api={validate,merge,validateHomework};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.LessonPackageSchema=api;
 })(typeof window!=='undefined'?window:globalThis);

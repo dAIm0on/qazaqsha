@@ -119,4 +119,72 @@ ok('retry pause');
 assert.equal(cfg.fsrs.desired_retention,0.90);
 ok('weights untouched desired_retention');
 
+const hw=require('./homework.js');
+const schema=require('./package-schema.js');
+const pack11=hw.buildPack('1-1',course.questions,course);
+assert.ok(pack11.homework.exercise_ids.length);
+assert.ok(pack11.homework.exercise_ids.every(id=>ids.includes(id)));
+assert.ok(pack11.homework.exercise_ids.length>cfg.session.size);
+const dueHw=core.chooseShortSession(course.questions.filter(q=>q.source==='e1'),{},Date.now(),cfg.session.size);
+assert.ok(dueHw.length<=cfg.session.size);
+const stHw=progress.empty();
+const hwPeek=hw.recordItem(stHw,'1-1',{id:pack11.homework.exercise_ids[0],correct:true,rule_peek:true,answers:['x']});
+assert.equal(hwPeek.status,'с правилом');
+assert.ok(!stHw.records[pack11.homework.exercise_ids[0]]);
+ok('hw1 homework sheet not FSRS due; rule_peek not Good');
+
+const pluralQ=course.questions.find(q=>q.id==='e2-1-1-1');
+const rule=hw.ruleText(pluralQ);
+assert.ok(rule&&rule.length>40);
+assert.ok(!/қора/i.test(rule));
+ok('hw2 rule text has no item answer');
+
+const srs=scheduler.answer(scheduler.migrate({},1),{at:2,correct:true,hinted:true,recall:true,rating:require('./fsrs-vendor.js').Rating.Again});
+assert.equal(srs.correct_streak,0);
+ok('hw3 homework answer peek is Again');
+
+const html=hw.exportHtml(stHw.homeworkAttempts['1-1'],pack11,course.questions);
+assert.ok(html.includes('с правилом'));
+assert.ok(/<table/i.test(html));
+ok('hw4 HTML export has items and statuses');
+
+const json=hw.exportJson(stHw.homeworkAttempts['1-1'],pack11);
+const blob=JSON.stringify(json);
+assert.equal(json.lesson_id,'1-1');
+assert.ok(!blob.includes('fsrs'));
+assert.ok(!json.records);
+assert.ok(!blob.includes('1-2')||json.lesson_id==='1-1');
+ok('hw5 JSON has no FSRS weights or other lessons');
+
+const stWeak=progress.empty();
+const dayA=Date.now()-4*86400000,dayB=Date.now()-1*86400000;
+stWeak.events=[
+  {type:'answer',card_id:'hw1-1-kk',at:dayA,correct:false,first_try_correct:0,peek:0,answers:['адамм']},
+  {type:'answer',card_id:'hw1-1-kk',at:dayB,correct:false,first_try_correct:0,peek:0,answers:['аддам']}
+];
+const qsWeak=[{id:'hw1-1-kk',topic:'vocab',title:'Переведи на казахский',fields:[{answers:['адам']}],vocabIds:['word:адам']}];
+const spots=hw.weakSpots(stWeak,qsWeak);
+assert.ok(spots.some(s=>s.key==='word:адам::production'));
+ok('hw6 two first-try errors on different days are weak');
+
+stWeak.events.push({type:'answer',card_id:'hw1-1-kk',at:Date.now(),correct:true,rule_peek:1,first_try_correct:0,peek:0,answers:['адам']});
+const spots2=hw.weakSpots(stWeak,qsWeak);
+assert.ok(spots2.some(s=>s.key==='word:адам::production'));
+ok('hw7 rule_peek correct does not clear weakness');
+
+const review=core.blockReviewQueue('fail',['a','b','c','d'],['e','f']);
+assert.notEqual(review[0],'fail');
+assert.ok(review.includes('fail'));
+ok('hw8 block review does not start with the failed id');
+
+assert.throws(()=>schema.validateHomework({lesson_id:'1-1',homework:{title:'ДЗ',exercise_ids:['not-in-bank'],word_ids:[],rule_map:{},checklist:['method']}},new Set(ids)));
+ok('hw9 unknown exercise_ids rejected');
+
+const rawNoHw={app:'qazaq-trainer',schema:6,records:{hw1:{seen:1,correct_count:1,wrong_count:0,correct_streak:1,next_review:10}},events:[],skills:{},associations:{}};
+const imported=progress.validate(JSON.stringify(rawNoHw),new Set(['hw1']),20);
+assert.equal(imported.state.schema,6);
+assert.ok(imported.state.homeworkAttempts);
+assert.equal(Object.keys(imported.state.homeworkAttempts).length,0);
+ok('hw10 schema without homeworkAttempts imports');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
