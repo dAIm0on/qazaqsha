@@ -142,10 +142,10 @@
  function showView(next){
    pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
    view=next;document.body.dataset.view=next;
-   ['today','learn','review','vocabulary','practice','rules','materials','exam','homework'].forEach(v=>{const el=$('#'+v+'-view');if(el)el.hidden=v!==next;});
+   ['today','learn','review','vocabulary','practice','rules','materials','exam','homework','path'].forEach(v=>{const el=$('#'+v+'-view');if(el)el.hidden=v!==next;});
    const tab=next==='practice'?(mode==='exam'?'exam':'review'):next;
    $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='practice')activateCard();save();
+   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();save();
  }
  function renderNav(){
    $('#lesson-nav').innerHTML=topics.map(([id,name,num])=>{
@@ -417,6 +417,103 @@
    if(jsonBtn)jsonBtn.onclick=()=>{attempt.submitted_at=Date.now();attempt.export_rev=(attempt.export_rev||0)+1;attempt.weak_tags=weak.map(w=>w.key);save();downloadProgress(JSON.stringify(window.Homework.exportJson(attempt,pack),null,2),'homework-'+pack.lesson_id+'-'+stamp+'.json');};
    if(printBtn)printBtn.onclick=()=>{attempt.submitted_at=Date.now();save();const html=window.Homework.exportHtml(attempt,pack,questions);const w=window.open('','_blank');if(!w)return;w.document.write(html);w.document.close();w.focus();w.print();};
  }
+ function pathCheckById(t,id){
+   for(const s of t.steps||[])for(const c of s.checks||[])if(c.id===id)return c;
+   return (t.mix||[]).find(c=>c.id===id)||null;
+ }
+ function renderPath(){
+   const root=$('#path-content');if(!root||!window.GrammarPath)return;
+   const G=window.GrammarPath;
+   if(!state.grammarPath)state.grammarPath=G.emptyProgress();
+   const gp=state.grammarPath,list=G.topics();
+   if(gp.phase==='pick'||!gp.topicId){
+     root.innerHTML=`<div class="panel"><h2>Прохождение</h2><p>Одна тема за заход. Шаг правила, потом 2 короткие проверки разных типов. Это не домашка и не «Пора повторить».</p>
+       ${gp.blocked?'<p class="question-note">Одна и та же ошибка три раза. Сначала этот шаг ещё раз, новую тему не открываю.</p>':''}
+       <div class="review-actions">${list.map(t=>`<button type="button" class="secondary-button" data-path="${t.id}" ${gp.blocked&&gp.topicId!==t.id?'disabled':''}>${esc(t.id)} · ${esc(t.title)}</button>`).join('')}</div>
+       <p class="small">Следующую тему выбираешь плитки. Автоконвейера T1→T16 нет.</p></div>`;
+     root.querySelectorAll('[data-path]').forEach(b=>b.onclick=()=>{G.startTopic(state,b.dataset.path);save();renderPath();});
+     return;
+   }
+   const t=G.topic(gp.topicId);if(!t){gp.phase='pick';renderPath();return;}
+   const step=t.steps[Math.min(gp.step,t.steps.length-1)];
+   const progressLine='Шаги '+(Math.min(gp.step+1,t.steps.length))+' / '+t.steps.length;
+   if(gp.phase==='screen'){
+     const w=step.screen.worked&&step.screen.worked[0];
+     root.innerHTML=`<div class="panel"><p class="eyebrow">${esc(t.id)} · ${esc(progressLine)}</p><h2>${esc(step.screen.title)}</h2>
+       <p style="white-space:pre-wrap">${esc(step.screen.body)}</p>
+       ${w?`<div class="study-card"><p class="study-front">Разбор</p><p class="study-back" lang="kk">${esc(w.form)}</p><p class="small">${esc(w.why||'')}${w.slots&&w.slots.painted?' · слот: '+esc(w.slots.painted):''}</p></div>`:''}
+       ${step.screen.trap?'<p class="question-note">'+esc(step.screen.trap)+'</p>':''}
+       <div class="lesson-actions"><button type="button" class="primary-button" id="path-go">Дальше · 2 проверки</button>
+         <button type="button" class="secondary-button" id="path-table">Таблица</button>
+         ${t.more?'<button type="button" class="text-button" id="path-more">Ещё объяснение</button>':''}</div>
+       <div id="path-extra" hidden></div></div>`;
+     $('#path-go').onclick=()=>{G.beginChecks(gp,t,step);save();renderPath();};
+     $('#path-table').onclick=()=>{const box=$('#path-extra');box.hidden=false;box.innerHTML='<pre class="rule-pre">'+esc(G.TABLE)+'</pre>';};
+     if($('#path-more'))$('#path-more').onclick=()=>{const box=$('#path-extra');box.hidden=false;box.innerHTML='<p class="small">'+esc(t.more)+'</p>';};
+     return;
+   }
+   if(gp.phase==='done'){
+     if(!gp.completed.includes(t.id))gp.completed.push(t.id);
+     root.innerHTML=`<div class="panel"><h2>${esc(t.title)} · смесь пройдена</h2>
+       <p>Практика урока сама по себе. Прохождение её не закрывает и не ставит Good словам домашки.</p>
+       <div class="finish-actions"><button type="button" class="primary-button" id="path-rules">К Правилам</button>
+         <button type="button" class="secondary-button" id="path-stop">Хватит на сегодня</button></div></div>`;
+     $('#path-rules').onclick=()=>{gp.phase='pick';gp.topicId=null;showView('rules');};
+     $('#path-stop').onclick=()=>{gp.phase='pick';gp.topicId=null;showView('today');};
+     save();return;
+   }
+   const id=gp.queue[gp.index];
+   if(!id){
+     if(gp.phase==='checks'){
+       if(gp.step<t.steps.length-1){gp.step++;gp.phase='screen';save();renderPath();return;}
+       if(G.canMix(gp,t)){gp.phase='mix';gp.queue=G.mixOf(t).map(c=>c.id);gp.index=0;save();renderPath();return;}
+       root.innerHTML=`<div class="panel"><h2>Смесь ещё рано</h2><p>Подсказок на шагах больше половины. Сначала тот же шаг ещё раз.</p>
+         <button type="button" class="primary-button" id="path-retry">Ещё раз этот шаг</button></div>`;
+       $('#path-retry').onclick=()=>{gp.phase='screen';save();renderPath();};
+       return;
+     }
+     gp.phase='done';save();renderPath();return;
+   }
+   const check=pathCheckById(t,id);if(!check){gp.index++;renderPath();return;}
+   const letters=state.prefs.letters;
+   root.innerHTML=`<div class="panel"><p class="eyebrow">${esc(t.id)} · ${gp.phase==='mix'?'Смесь этой темы':progressLine}</p>
+     <p class="phase-label">${esc(check.type)}</p>
+     <h2>${esc(check.prompt)}</h2>
+     ${check.stem?'<p class="stimulus" lang="kk">'+esc(check.stem)+'</p>':''}
+     <form id="path-form"><input id="path-answer" type="text" autocomplete="off" spellcheck="false">
+       ${letters?`<div class="letter-keyboard">${[...'әғқңөұүһі'].map(ch=>'<button type="button" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`:''}
+       <p id="path-msg" class="validation-message" hidden></p>
+       <div id="path-fb" class="feedback" hidden></div>
+       <div class="lesson-actions"><button type="submit" class="primary-button">Проверить</button>
+         <button type="button" class="secondary-button" id="path-rule">Правило</button>
+         <button type="button" class="text-button" id="path-table">Таблица</button>
+         <button type="button" class="text-button" id="path-idk">Не знаю</button></div></form>
+     <div id="path-extra" hidden></div></div>`;
+   const input=$('#path-answer');input.focus();
+   $$('#path-form [data-letter]').forEach(b=>b.onclick=()=>{const s=input.selectionStart||input.value.length,e=input.selectionEnd||s;input.value=input.value.slice(0,s)+b.dataset.letter+input.value.slice(e);input.focus();});
+   let pathPeek=false;
+   $('#path-rule').onclick=()=>{pathPeek=true;const box=$('#path-extra');box.hidden=false;box.innerHTML='<p>'+esc(check.rule_line||step.screen.body.split('\n')[0])+'</p>';};
+   $('#path-table').onclick=()=>{const box=$('#path-extra');box.hidden=false;box.innerHTML='<pre class="rule-pre">'+esc(G.tableText(check))+'</pre>';};
+   $('#path-idk').onclick=()=>{pathPeek=true;$('#path-answer').value='';$('#path-form').requestSubmit();};
+   $('#path-form').onsubmit=e=>{
+     e.preventDefault();
+     const val=$('#path-answer').value,ok=G.evalCheck(check,val);
+     G.recordPath(state,check,ok,pathPeek||!ok&&!String(val).trim());
+     if(ok&&!pathPeek){
+       gp.index++;save();renderPath();return;
+     }
+     const fb=G.feedback(check);
+     const box=$('#path-fb');box.hidden=false;box.className='feedback error';
+     box.innerHTML='<p>Слот: <strong lang="kk">'+esc(fb.slot||check.stem||'')+'</strong></p><p>'+esc(fb.lever)+'</p>'+(fb.trap?'<p>'+esc(fb.trap)+'</p>':'')+'<p>Набери верную форму целиком.</p><p lang="kk"><strong>'+esc([].concat(check.answers||[check.answer])[0])+'</strong></p>';
+     if(!ok){
+       const rest=gp.queue.slice(gp.index+1);
+       const next=G.schedule(check.id,rest.concat((step.checks||[]).map(c=>c.id)));
+       gp.queue=gp.queue.slice(0,gp.index+1).concat(next.filter(id=>id!==gp.queue[gp.index]||next.indexOf(id)>0));
+     }
+     $('#path-form').onsubmit=ev=>{ev.preventDefault();const re=G.evalCheck(check,$('#path-answer').value);if(!re)return;$('#path-answer').value='';gp.index++;save();renderPath();};
+     save();
+   };
+ }
  function renderEmpty(){
    if(mode==='homework'){
      if(hwPart==='exercises'&&hwLesson)window.Homework.markChecklist(state,hwLesson,'exercises',true);
@@ -580,6 +677,7 @@
    action(next){
      if(next.startsWith('remedy:')){startRemedy(next.slice(7));return;}
      if(next==='homework'){hwLesson=null;showView('homework');return;}
+     if(next==='path'){showView('path');return;}
      if(next.startsWith('weak:')){startBlockReview(next.slice(5));return;}
      if(next.startsWith('number:')){activeLesson=null;activeStep=null;sourceFilter=null;topic='numbers';mode='numbers';queue=window.NumberPractice.session(next.split(':')[1],state).filter(eligible).map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;resetCounts();render();showView('practice');return;}
      if(next==='reset'){$('#reset-progress').click();return;}

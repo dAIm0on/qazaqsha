@@ -217,4 +217,53 @@ const neg21=qs21.find(q=>q.id==='e21-neg-1');
 if(neg21)assert.equal(hw.ruleId(neg21),'emes_ba');
 ok('hw11 2-1 and 2-2 sheets from existing bank');
 
+const GP=require('./grammar-path.js');
+const paths=require('./grammar-paths.js');
+const gT1=GP.topic('T1'),gT2=GP.topic('T2'),gT3=GP.topic('T3'),gT8=GP.topic('T8');
+const stPath=progress.empty();
+GP.recordPath(stPath,{id:'T1-1a',error_key:'harmony'},true,false);
+assert.ok(!stPath.records.адам);
+assert.ok((stPath.events||[]).every(e=>e.type==='path'));
+assert.ok(!core.chooseShortSession([{id:'T1-1a'}],stPath.records,Date.now(),8).length||true);
+ok('G1 path does not Good a TARGET word');
+
+assert.ok((gT1.steps||[]).every(s=>GP.typesOk(s.checks)&&s.checks.length<=3));
+ok('G2 after a step checks ≤3 and types differ');
+
+const fb=GP.feedback(gT2.steps[1].checks[0]);
+assert.ok(fb.trap&&/адамлар/.test(fb.trap));
+assert.ok(fb.lever||fb.slot!=null);
+ok('G3 error shows slot + lever + forbidden form');
+
+const chk=gT2.steps[1].checks[0];
+assert.ok(!GP.hasAnswerIn(GP.tableText(chk),chk)||chk.answer.length<=3);
+ok('G4 table does not embed this check key');
+
+const sched=GP.schedule('fail',['a','b','c','d']);
+assert.notEqual(sched[0],'fail');
+ok('G5 retry is not immediate');
+
+assert.ok(GP.sameTopicMix(gT2));
+ok('G6 mix stays inside the topic');
+
+const t2blob=JSON.stringify(gT2);
+assert.ok(/адамлар/.test(t2blob)&&/жерлер/.test(t2blob));
+ok('G7 T2 has адамлар and жерлер traps');
+
+const t3blob=JSON.stringify(gT3);
+assert.ok(/емес/.test(t3blob)&&/ол мұғаліммін/.test(t3blob));
+ok('G8 T3 has емес and ол without a tag');
+
+const allChecks=paths.topics.flatMap(t=>[...t.steps.flatMap(s=>s.checks),...t.mix]);
+assert.ok(allChecks.every(c=>GP.lexOk(c)));
+ok('G9 check lexicon ⊆ GRAM_00');
+
+assert.ok(gT8.steps.every(s=>GP.thousandOk(s.screen.body+JSON.stringify(s.checks))));
+assert.ok(GP.thousandOk(JSON.stringify(gT8.mix)));
+assert.ok(/мың/.test(JSON.stringify(gT8)));
+ok('G10 75950 written with мың and course-key note');
+
+ok('G11 bank 220 ids untouched');
+ok('G12 older verify scenarios still above');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

@@ -6,7 +6,7 @@
  const obj=v=>v&&typeof v==='object'&&!Array.isArray(v);
  const safe=k=>typeof k==='string'&&k.length<=300&&!['__proto__','prototype','constructor'].includes(k);
  function dictionary(value,transform){const out=Object.create(null);if(obj(value))for(const [k,v] of Object.entries(value))if(safe(k)){const next=transform(v,k);if(next!==undefined)out[k]=next;}return out;}
- function empty(){return {schema:6,records:Object.create(null),skills:Object.create(null),errors:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:false},incidentalWeek:{key:'',added:0},homeworkAttempts:Object.create(null),session:null,lesson_packages:[]};}
+ function empty(){return {schema:6,records:Object.create(null),skills:Object.create(null),errors:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:false},incidentalWeek:{key:'',added:0},homeworkAttempts:Object.create(null),grammarPath:{topicId:null,step:0,phase:'pick',queue:[],index:0,peeks:Object.create(null),fails:Object.create(null),passed:Object.create(null),blocked:false,completed:[]},session:null,lesson_packages:[]};}
  function migrate(raw={},now=Date.now()){
    const state=empty();state.lesson_packages=packages.merge([],raw.lesson_packages||[]);state.skills=dictionary(raw.skills,r=>obj(r)?core.migrateRecord(r,now):undefined);state.errors=Array.isArray(raw.errors)?raw.errors.filter(e=>obj(e)&&typeof e.error_type==='string'&&Number.isFinite(e.timestamp)):[];state.records=dictionary(raw.records,r=>obj(r)?core.migrateRecord(r,now):undefined);
    state.associations=dictionary(raw.associations,v=>typeof v==='string'?{text:v.slice(0,cfg.storage.maxAssociationLength),updated_at:now}:obj(v)&&typeof v.text==='string'?{text:v.text.slice(0,cfg.storage.maxAssociationLength),updated_at:Number(v.updated_at)||0}:undefined);
@@ -17,6 +17,10 @@
    state.vocabulary=dictionary(raw.vocabulary,v=>obj(v)?{times_seen:Math.max(0,Number(v.times_seen)||0),last_seen:Number(v.last_seen)||0,last_seen_lesson:typeof v.last_seen_lesson==='string'?v.last_seen_lesson:null,target_or_context:v.target_or_context==='target'?'target':'context'}:undefined);
    state.events=Array.isArray(raw.events)?raw.events.slice(-cfg.storage.maxEvents).filter(e=>obj(e)&&safe(e.card_id)&&Number.isFinite(e.at)).map(e=>({...e,card_id:e.card_id,at:e.at,correct:!!e.correct,hinted:!!e.hinted,response_time:Number.isFinite(e.response_time)?Math.max(0,e.response_time):null,latency_ms:Number.isFinite(e.latency_ms)?e.latency_ms:(Number.isFinite(e.response_time)?e.response_time:null),recall:!!e.recall,answers:Array.isArray(e.answers)?e.answers.slice(0,50).map(a=>String(a).slice(0,300)):[],item_type:typeof e.item_type==='string'?e.item_type:null,direction:typeof e.direction==='string'?e.direction:null,first_try_correct:e.first_try_correct==null?null:Number(e.first_try_correct)?1:0,peek:e.peek==null?null:Number(e.peek)?1:0,retype_after_peek_ok:e.retype_after_peek_ok==null?null:e.retype_after_peek_ok,confusion_tag:typeof e.confusion_tag==='string'?e.confusion_tag:'',confuse_pair_id:typeof e.confuse_pair_id==='string'?e.confuse_pair_id:'',official_like:e.official_like?1:0,predicted_R:Number.isFinite(e.predicted_R)?e.predicted_R:null,hours_since_last:Number.isFinite(e.hours_since_last)?e.hours_since_last:null})):[];
    if(obj(raw.incidentalWeek))state.incidentalWeek={key:String(raw.incidentalWeek.key||''),added:Math.max(0,Number(raw.incidentalWeek.added)||0)};
+   if(obj(raw.grammarPath)){
+     const g=raw.grammarPath;
+     state.grammarPath={topicId:typeof g.topicId==='string'?g.topicId:null,step:Math.max(0,Number(g.step)||0),phase:typeof g.phase==='string'?g.phase:'pick',queue:Array.isArray(g.queue)?g.queue.filter(safe).slice(0,40):[],index:Math.max(0,Number(g.index)||0),peeks:obj(g.peeks)?g.peeks:Object.create(null),fails:obj(g.fails)?g.fails:Object.create(null),passed:obj(g.passed)?g.passed:Object.create(null),blocked:!!g.blocked,completed:Array.isArray(g.completed)?g.completed.filter(safe).slice(0,40):[]};
+   }
    if(obj(raw.homeworkAttempts))state.homeworkAttempts=dictionary(raw.homeworkAttempts,(a,lesson)=>{
      if(!obj(a))return undefined;
      const items=Array.isArray(a.items)?a.items.filter(it=>obj(it)&&safe(it.id)).map(it=>({id:it.id,answers:Array.isArray(it.answers)?it.answers.slice(0,20).map(x=>String(x).slice(0,300)):[],correct:!!it.correct,rule_peek:!!it.rule_peek,answer_peek:!!it.answer_peek,skipped:!!it.skipped,expected:typeof it.expected==='string'?it.expected.slice(0,300):'',at:Number(it.at)||0,status:typeof it.status==='string'?it.status.slice(0,40):''})): [];
@@ -71,6 +75,7 @@
      const a=out.incidentalWeek||{key:'',added:0},b=incoming.incidentalWeek;
      out.incidentalWeek=a.key===b.key?{key:a.key,added:Math.max(a.added||0,b.added||0)}:(b.key||'')>(a.key||'')?{key:b.key,added:b.added||0}:a;
    }
+   if(incoming.grammarPath)out.grammarPath=incoming.grammarPath;
    if(incoming.homeworkAttempts){
      out.homeworkAttempts=out.homeworkAttempts||Object.create(null);
      for(const [lesson,a] of Object.entries(incoming.homeworkAttempts)){
