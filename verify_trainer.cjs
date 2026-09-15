@@ -217,6 +217,19 @@ const neg21=qs21.find(q=>q.id==='e21-neg-1');
 if(neg21)assert.equal(hw.ruleId(neg21),'emes_ba');
 ok('hw11 2-1 and 2-2 sheets from existing bank');
 
+const qs23=packExercises('lesson-pack-2-3.js');
+const p23=hw.buildPack('2-3',qs23,{sources:{}});
+assert.ok(p23.homework.exercise_ids.includes('e23-form-1'));
+assert.ok(p23.homework.word_question_ids.includes('hw23-1-ru'));
+assert.ok(p23.homework.external_tests.includes('https://batylbol.kz/test/Lichnye.html'));
+assert.ok(p23.homework.external_tests.includes('https://batylbol.kz/test/VoprositelnyeChastitsy.html'));
+const olQ=qs23.find(q=>q.id==='m23-ol-2');
+assert.ok(olQ&&olQ.fields[0].answers.includes('Ол жігіт'));
+const hole=qs23.find(q=>q.id==='e23-fix-8');
+assert.ok(hole&&/тридцать первые/.test(hole.explanation));
+schema.validateHomework({lesson_id:'2-3',homework:p23.homework},new Set(qs23.map(q=>q.id)));
+ok('hw12 2-3 homework words and exercises from PDF keys');
+
 const GP=require('./grammar-path.js');
 const paths=require('./grammar-paths.js');
 const gT1=GP.topic('T1'),gT2=GP.topic('T2'),gT3=GP.topic('T3'),gT8=GP.topic('T8');

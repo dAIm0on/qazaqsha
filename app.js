@@ -26,7 +26,7 @@
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
- const COURSE_BLOCKS=[{id:'1-1',title:'1–1',hint:'Звуки и первые слова'},{id:'1-2',title:'1–2',hint:'Окончания и десятки'},{id:'1-3',title:'1–3',hint:'Числа и новые слова'},{id:'2-1',title:'2–1',hint:'Мен, сен, сіз'},{id:'2-2',title:'2–2',hint:'Біз, сендер, сіздер'}];
+ const COURSE_BLOCKS=[{id:'1-1',title:'1–1',hint:'Звуки и первые слова'},{id:'1-2',title:'1–2',hint:'Окончания и десятки'},{id:'1-3',title:'1–3',hint:'Числа и новые слова'},{id:'2-1',title:'2–1',hint:'Мен, сен, сіз'},{id:'2-2',title:'2–2',hint:'Біз, сендер, сіздер'},{id:'2-3',title:'2–3',hint:'Ол, вопрос, порядковые'}];
  function courseJumpMarkup(id){
    return `<div class="course-jump" id="${id}"><p>Открыть любой урок сразу, без прохождения предыдущих:</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>Урок ${b.title}</button>`).join('')}</div></div>`;
  }
@@ -391,7 +391,7 @@
          <li>Повторить методичку — ${h.method_url?`<a href="${esc(h.method_url)}" target="_blank" rel="noopener noreferrer">${esc(h.method_title)}</a>`:'ссылка на материал урока'}${check('method')}</li>
          <li>Упражнения сборника (${h.exercise_ids.length} пунктов) <button type="button" class="secondary-button" data-hw-part="exercises">Открыть упражнения</button></li>
          <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${h.word_ids.length} слов. <button type="button" class="secondary-button" data-hw-part="words">Открыть слова</button></li>
-         <li>Внешний тест: ${h.external_test_url?`<a href="${esc(h.external_test_url)}" target="_blank" rel="noopener noreferrer">${esc(h.external_test_url)}</a>`:'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
+         <li>Внешний тест: ${(h.external_tests&&h.external_tests.length?h.external_tests:[h.external_test_url]).filter(Boolean).map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u)}</a>`).join(' · ')||'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
          ${(h.extras||[]).map(x=>'<li>'+check(x)+'</li>').join('')}
        </ol>
        <p class="small">Повторно открыть лист можно. «Новая сдача» не стирает прошлый файл.</p>
@@ -590,7 +590,7 @@
  function vocabTable(rows){return `<div class="table-wrap"><table><thead><tr><th scope="col">Қазақша</th><th scope="col">По-русски / число</th></tr></thead><tbody>${rows.map(([k,r])=>`<tr><td lang="kk">${esc(k)}</td><td>${esc(Array.isArray(r)?r.join(', '):r)}</td></tr>`).join('')}</tbody></table></div>`;}
  function bankMarkup(){
    const B=window.WORD_BANK;if(!B)return '';
-   const titles={'1-1':'1–1','1-2':'1–2','1-3':'1–3','2-2':'2–2'};
+   const titles={'1-1':'1–1','1-2':'1–2','1-3':'1–3','2-1':'2–1','2-2':'2–2','2-3':'2–3'};
    const mustBlocks=Object.entries(B.must).map(([les,rows])=>'<h3>Домашка '+esc(titles[les]||les)+' · '+rows.length+' слов</h3>'+vocabTable(rows.map(w=>[w.kazakh,w.translation]))).join('');
    const all=[...B.all].sort((a,b)=>a.kazakh.localeCompare(b.kazakh,'kk'));
    return `<div class="panel"><h2>Как запоминать слова</h2>

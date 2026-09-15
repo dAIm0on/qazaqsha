@@ -633,6 +633,36 @@ window.WORD_BANK = {
           "до свидания"
         ]
       }
+    ],
+    "2-3": [
+      {"kazakh": "бала", "translation": ["ребёнок", "ребенок"]},
+      {"kazakh": "әке", "translation": ["отец"]},
+      {"kazakh": "ана", "translation": ["мать", "мама"]},
+      {"kazakh": "әже", "translation": ["бабушка"]},
+      {"kazakh": "апа", "translation": ["бабушка"]},
+      {"kazakh": "ата", "translation": ["дедушка"]},
+      {"kazakh": "тәте", "translation": ["тётя", "тетя"]},
+      {"kazakh": "аға", "translation": ["дядя", "старший брат"]},
+      {"kazakh": "іні", "translation": ["младший брат"]},
+      {"kazakh": "әпке", "translation": ["старшая сестра"]},
+      {"kazakh": "қарындас", "translation": ["младшая сестра"]},
+      {"kazakh": "сіңлі", "translation": ["младшая сестра"]},
+      {"kazakh": "егіз", "translation": ["близнец"]},
+      {"kazakh": "жұмыс", "translation": ["работа"]},
+      {"kazakh": "мамандық", "translation": ["специальность"]},
+      {"kazakh": "ат", "translation": ["имя"]},
+      {"kazakh": "мектеп", "translation": ["школа"]},
+      {"kazakh": "көлік", "translation": ["машина"]},
+      {"kazakh": "пәтер", "translation": ["квартира"]},
+      {"kazakh": "қалам", "translation": ["ручка"]},
+      {"kazakh": "ми", "translation": ["мозг"]},
+      {"kazakh": "аю", "translation": ["медведь"]},
+      {"kazakh": "менің", "translation": ["мой"]},
+      {"kazakh": "сенің", "translation": ["твой"]},
+      {"kazakh": "сіздің", "translation": ["ваш"]},
+      {"kazakh": "оның", "translation": ["его", "её"]},
+      {"kazakh": "бар", "translation": ["есть"]},
+      {"kazakh": "жоқ", "translation": ["нет"]}
     ]
   },
   "all": [

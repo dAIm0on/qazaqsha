@@ -14,22 +14,27 @@
    'phone-groups':'Телефон читаем группами после +7, не одной длинной лентой.\nНоль в группе — нөл, затем уже знакомые разряды.\nСначала цифры и сотни, потом номер.',
    person:'Мен: пың / бын / мын — по последнему звуку основы.\nСен: сың / сің. Сіз: сыз / сіз.\nГласная окончания следует гармонии основы.\nФорма уже показывает лицо: местоимение можно не писать.\nУдарение на основу, не на окончание.',
    'person-pl':'Біз: пыз / быз / мыз. После м, н, ң — быз / біз.\nСендер: сыңдар / сіңдер. Сіздер: сыздар / сіздер.\nС сендер и сіздер множественное -лар на основу не ставим.\nС біз в упражнениях пишем без -лар на основу.',
-   emes_ba:'Отрицание: основа + емес + окончание. Не наоборот.\nВопрос после н, ң, з — ба / бе.\nПосле р (сыңдар, сіздер) — ма / ме.\nГласная частицы — по гармонии последнего слога.\nБез частицы вопрос неправильный.'
+   emes_ba:'Отрицание: основа + емес + окончание. Не наоборот.\nВопрос после н, ң, з — ба / бе.\nПосле р (сыңдар, сіздер) — ма / ме.\nГласная частицы — по гармонии последнего слога.\nБез частицы вопрос неправильный.',
+   ol:'Ол и олар бирки мын/сың/сыз не берут.\nОл мұғалім. Не *ол мұғаліммін.\nПосле олар множественное на слове — только если задание просит.\nемес множественного не получает.',
+   ordinal:'Сначала собери обычное число. Потом наклейка только на последнее слово.\nНа согласную — ыншы/інші. На гласную — ншы/нші.\nЖиырмасыншы, не жиырманшы. Қырқыншы, не қырықыншы.',
+   question:'Частица смотрит на последнюю букву последнего слова, не на ол.\nГлухие → па/пе. М Н Ң Ж З → ба/бе. Иначе ма/ме.\nОл қонақ па? Мен сараңмын ба?'
  };
  const EXTERNAL={
    '1-1':'https://batylbol.kz/test/Zvuki.html',
    '1-2':'https://batylbol.kz/test/MnozhChislo.html',
    '1-3':'https://batylbol.kz/test/Chislitielniye.html',
    '2-1':'https://batylbol.kz/test/LichnyeEdChislo.html',
-   '2-2':'https://batylbol.kz/test/LichnyeLitso1-2.html'
+   '2-2':'https://batylbol.kz/test/LichnyeLitso1-2.html',
+   '2-3':['https://batylbol.kz/test/Lichnye.html','https://batylbol.kz/test/VoprositelnyeChastitsy.html']
  };
- const EXTRAS={'1-1':['keyboard','cheat'],'1-2':['keyboard'],'1-3':[],'2-1':[],'2-2':[]};
+ const EXTRAS={'1-1':['keyboard','cheat'],'1-2':['keyboard'],'1-3':[],'2-1':[],'2-2':[],'2-3':[]};
  const WORD_LEMMAS={
    '1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],
    '1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],
    '1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],
    '2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз','сәлем','сәлеметсіз бе','сәлеметсіздер ме','ассалаумағалейкум','уағалейкумассалам'],
-   '2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз','сау бол','сау болыңдар','сау болыңыз','сау болыңыздар']
+   '2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз','сау бол','сау болыңдар','сау болыңыз','сау болыңыздар'],
+   '2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам','ми','аю','менің','сенің','сіздің','оның','бар','жоқ']
  };
  function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
  function bySource(questions,source){return (questions||[]).filter(q=>q&&q.source===source&&q.id);}
@@ -44,8 +49,10 @@
    if(q.topic==='numbers'||ids.includes('numbers')||ids.includes('number-composition'))return 'numbers';
    if(q.topic==='sounds'||ids.includes('harmony'))return 'harmony';
    if(q.topic==='plural')return 'plural';
+   if(ids.includes('ordinal')||q.group==='ord')return 'ordinal';
+   if(ids.includes('ol-zero')||q.group==='ol')return 'ol';
+   if(ids.includes('person-q')||q.group==='ask'||q.group==='qa')return 'question';
    if(ids.includes('person-neg')||q.group==='neg')return 'emes_ba';
-   if(ids.includes('person-q')||q.group==='ask'||q.group==='qa')return 'emes_ba';
    if(ids.some(id=>['person-biz','person-sender','person-sizder'].includes(id))||q.lessonId==='2-2'&&q.topic==='person'&&q.group==='form')return 'person-pl';
    if(q.topic==='person'||ids.includes('person-sg'))return 'person';
    return '';
@@ -76,7 +83,7 @@
    return [...ru,...kk].filter(q=>!/-rev$/.test(q.id));
  }
  function methodSource(lessonId,course){
-   const key={ '1-1':'m1','1-2':'m2','1-3':'m3','2-1':'m21','2-2':'m22' }[lessonId];
+   const key={ '1-1':'m1','1-2':'m2','1-3':'m3','2-1':'m21','2-2':'m22','2-3':'m23' }[lessonId];
    const s=course&&course.sources&&course.sources[key];
    return s?{title:s.title,url:s.url}:{title:'Методичка '+lessonId,url:''};
  }
@@ -86,13 +93,13 @@
    return core.normalize(q.stimulus||'');
  }
  function wordsForLesson(questions,lessonId){
-   const hwSource={ '1-1':'hw1','1-2':'hw2','1-3':'hw3' }[lessonId];
+   const hwSource={ '1-1':'hw1','1-2':'hw2','1-3':'hw3','2-3':'hw23' }[lessonId];
    if(hwSource)return orderedWords(bySource(questions,hwSource));
    const lemmas=new Set((WORD_LEMMAS[lessonId]||[]).map(w=>core.normalize(w)));
    return orderedWords((questions||[]).filter(q=>lemmas.has(vocabLemma(q))));
  }
  function buildPack(lessonId,questions,course){
-   const exSource={ '1-1':'e1','1-2':'e2','1-3':'e3','2-1':'e21','2-2':'e22' }[lessonId];
+   const exSource={ '1-1':'e1','1-2':'e2','1-3':'e3','2-1':'e21','2-2':'e22','2-3':'e23' }[lessonId];
    const exercises=bySource(questions,exSource);
    const words=wordsForLesson(questions,lessonId);
    const all=[...exercises,...words];
@@ -107,7 +114,8 @@
        exercise_ids:exercises.map(q=>q.id),
        word_question_ids:words.map(q=>q.id),
        rule_map,
-       external_test_url:EXTERNAL[lessonId]||'',
+       external_test_url:(Array.isArray(EXTERNAL[lessonId])?EXTERNAL[lessonId][0]:EXTERNAL[lessonId])||'',
+       external_tests:Array.isArray(EXTERNAL[lessonId])?EXTERNAL[lessonId]:(EXTERNAL[lessonId]?[EXTERNAL[lessonId]]:[]),
        checklist:['method','exercises','words','external_test'],
        extras:EXTRAS[lessonId]||[],
        method_title:method.title,
@@ -116,7 +124,7 @@
    };
  }
  function packs(questions,course){
-   return ['1-1','1-2','1-3','2-1','2-2'].map(id=>buildPack(id,questions,course)).filter(p=>p.homework.exercise_ids.length||p.homework.word_ids.length);
+   return ['1-1','1-2','1-3','2-1','2-2','2-3'].map(id=>buildPack(id,questions,course)).filter(p=>p.homework.exercise_ids.length||p.homework.word_ids.length);
  }
  function validateHomework(raw,knownIds){
    return schema.validateHomework(raw,knownIds);
