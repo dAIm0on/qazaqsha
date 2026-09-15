@@ -40,6 +40,16 @@
    chunks:chunked('Пара единица / десяток','Напиши слово или цифры. Рядом всегда парное число.',contrastIds,PAIR.map(([u,t,uw,tw])=>({front:String(u)+' и '+t,back:uw+' / '+tw,cue:'не путать'})))
  });
 
+ const mix2=[5,52,8,89,6,61,7,73,9,94,4,41,3,32,2,28,1,18];
+ const mix2Ids=mix2.flatMap(n=>both('mix2-'+n,n,n<10?'Сначала единица. Рядом будет двузначное с этим же звуком.':'Двузначное: десяток + единица. Сравни с голой цифрой той же семьи.'));
+ L.lessons.push({
+   id:'numbers-mix2',topic:'numbers',title:'5 и 52 · 8 и 89',courseLesson:'1-2',
+   intro:'Чтобы запомнить, как звучат единица и десяток, чередуем их рядом: бес, потом елу екі; сегіз, потом сексен тоғыз.',
+   method:'Чередование единицы и двузначного',tool:'number',
+   items:[{front:'5 → 52',back:'бес → елу екі',cue:'5 и 50+2'},{front:'8 → 89',back:'сегіз → сексен тоғыз',cue:'8 и 80+9'}],
+   questionIds:mix2Ids,
+   chunks:chunked('Единица рядом с двузначным','5 потом 52, 8 потом 89. Слушай бес / елу, сегіз / сексен.',mix2Ids,mix2.slice(0,8).map(n=>({front:String(n),back:core.numberToKazakh(n),cue:n<10?'единица':'десяток + единица'})))
+ });
  const echo2=[55,66,77,88,99,50,60,70,80,90];
  const echo2Ids=echo2.flatMap(n=>both('echo2-'+n,n,n%11===0?'В одном числе одна и та же цифра: десяток и единица. ':'Круглый десяток из той же семьи, что единица '+((n/10)|0)+'.'));
  L.lessons.push({
@@ -76,6 +86,7 @@
  const POOLS={
    tens:[10,20,30,40,50,60,70,80,90],
    contrast:[6,60,7,70,8,80,9,90],
+   mix2:[5,52,8,89,6,61,7,73,9,94,4,41,3,32,2,28,1,18],
    echo2:[55,66,77,88,99,50,60,70,80,90,15,16,17,18,19],
    echo3:[100,200,500,800,505,550,555,508,580,588,606,660,666,707,770,777,808,880,888,909,990,999],
    echo4:[1000,1505,1550,1555,1808,1880,1888,5000,5050,5500,5555,8000,8008,8080,8088,8800,8880,8888]
@@ -132,7 +143,7 @@
  }
  window.NumberPractice={prepare,session,templates:[...prev.templates,...extraTemplates],POOLS};
 
- const ORDER=['numbers-0','numbers-1','tens-1','tens-2','numbers-contrast','numbers-echo-2','number-build','numbers-echo-3','hundreds','numbers-echo-4','school-1-3-numbers','school-1-3-phone'];
+ const ORDER=['numbers-0','numbers-1','tens-1','tens-2','numbers-contrast','numbers-mix2','numbers-echo-2','number-build','numbers-echo-3','hundreds','numbers-echo-4','school-1-3-numbers','school-1-3-phone'];
  (function reorderNumberLessons(){
    const byId=new Map(L.lessons.map(l=>[l.id,l]));
    const placed=new Set();

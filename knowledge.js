@@ -17,7 +17,7 @@
        else if(/[лдт][ае]р$/.test(a)){bind('rule:plural','full_form',i);if(q.fields.length===1){bind('rule:plural','harmony',i,'vowel');bind('rule:plural','initial_consonant',i,'initial');}}
        else bind('exercise:'+q.id,'application',i);
      });
-   }else if(q.topic==='person'&&q.kind==='fields'){
+   }else if((q.topic==='person'||q.topic==='rules')&&q.kind==='fields'){
      const rule='rule:'+(q.ruleIds&&q.ruleIds[0]||'person-biz');
      q.fields.forEach((f,i)=>bind(rule,'application',i));
    }else if(q.kind==='fields'&&(q.topic==='vocab'||q.topic==='numbers')){

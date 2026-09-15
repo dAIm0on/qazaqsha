@@ -13,7 +13,7 @@
  }
  for(const q of questions)coerceTyped(q);
  const byId=new Map(questions.map(q=>[q.id,q]));
- const topics=[['all','Все задания','∞'],['sounds','Звуки и слоги','01'],['plural','Множественное число','02'],['vocab','Слова','03'],['numbers','Числа и количество','04'],['person','Личные окончания','05']];
+ const topics=[['all','Все задания','∞'],['sounds','Звуки и слоги','01'],['plural','Множественное число','02'],['vocab','Слова','03'],['numbers','Числа и количество','04'],['person','Личные окончания','05'],['rules','Только правила','06']];
  const KEY='qazaq-kris-course-v1', BACKUP=KEY+'-before-import', MIGRATION=KEY+'-before-schema-5';
  const cfg=window.TRAINER_CONFIG, P=window.ProgressStore, catalog=window.CURRICULUM;
  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -67,8 +67,12 @@
    examRaf=requestAnimationFrame(tick);
  }
  function renderExam(){
-   $('#exam-content').innerHTML=`<div class="panel"><p>В обычной учёбе время не штрафует. Экзамен — те же задания, но ${cfg.session.examMs/1000} секунды на карточку: быстрый верный ответ укрепляет, медленный считается слабым, пропуск — ошибка.</p><p class="small">${cfg.session.examSize} карточек за подход. Подсказки выключены.</p><div class="review-actions"><button type="button" class="primary-button" data-exam="all">По всему</button><button type="button" class="secondary-button" data-exam="numbers">Числа</button><button type="button" class="secondary-button" data-exam="vocab">Слова</button><button type="button" class="secondary-button" data-exam="person">Окончания</button><button type="button" class="secondary-button" data-exam="plural">Множественное</button></div></div>`;
-   $$('#exam-content [data-exam]').forEach(b=>b.onclick=()=>{topic=b.dataset.exam;mode='exam';sourceFilter=null;activeLesson=null;startQueue({all:true});showView('practice');});
+   $('#exam-content').innerHTML=`<div class="panel"><p>В обычной учёбе время не штрафует. Экзамен — те же задания, но ${cfg.session.examMs/1000} секунды на карточку.</p><p>Сначала тип, потом урок — можно прыгать.</p>
+     <div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>`<button type="button" class="chip" data-exam="${id}">${esc(name)}</button>`).join('')}</div>
+     <div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-exam-course="${b.id}">${esc(b.title)}</button>`).join('')}</div>
+     <p class="small">${cfg.session.examSize} карточек. Подсказки выключены. Отдельная кнопка «Только правила» — без слов, только окончания и гармония.</p></div>`;
+   $$('#exam-content [data-exam]').forEach(b=>b.onclick=()=>{topic=b.dataset.exam;mode='exam';sourceFilter=null;vocabRole=null;activeLesson=null;startQueue({all:true});showView('practice');});
+   $$('#exam-content [data-exam-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.examCourse;mode='exam';activeLesson=null;startQueue({all:true});showView('practice');});
  }
  function save(){
    captureDraft();state.records=records;state.learning=learningState;
@@ -79,17 +83,19 @@
  }
  function subset(){
    if(activeLesson){const ids=new Set(window.LEARNING.lessons.find(l=>l.id===activeLesson).questionIds);return questions.filter(q=>ids.has(q.id));}
-   if(vocabRole)return questions.filter(q=>q.topic==='vocab'&&q.wordRole===vocabRole);
-   if(courseBlock)return questions.filter(q=>q.lessonId===courseBlock);
-   let list=questions.filter(q=>eligible(q)&&(topic==='all'||q.topic===topic)&&(!sourceFilter||q.source===sourceFilter));
-   if(topic==='numbers'&&mode!=='numbers'&&window.NumberLadder){
+   let list=questions.filter(q=>eligible(q));
+   if(vocabRole)list=list.filter(q=>q.topic==='vocab'&&q.wordRole===vocabRole);
+   if(courseBlock)list=list.filter(q=>q.lessonId===courseBlock);
+   if(topic!=='all')list=list.filter(q=>q.topic===topic);
+   if(sourceFilter)list=list.filter(q=>q.source===sourceFilter);
+   if(topic==='numbers'&&!courseBlock&&mode!=='numbers'&&window.NumberLadder){
      list=window.NumberLadder.filter(list,state);
      list=[...list].sort((a,b)=>(window.NumberLadder.extractN(a)??0)-(window.NumberLadder.extractN(b)??0));
    }
    return list;
  }
  function startCourse(block){
-   courseBlock=block;vocabRole=null;sourceFilter=null;activeLesson=null;activeStep=null;topic='all';mode='ordered';
+   courseBlock=block;vocabRole=null;sourceFilter=null;activeLesson=null;activeStep=null;if(view!=='practice'&&view!=='exam')topic='all';mode=mode==='exam'?'exam':'ordered';
    const first=window.LEARNING.lessons.find(l=>l.courseLesson===block);
    if(first)learningState.lessonId=first.id;
    startQueue({all:true});showView('practice');
@@ -156,7 +162,14 @@
    }else if(sourceFilter){
      sf.hidden=false;sf.innerHTML=`<span>${esc(course.sources[sourceFilter].title)}</span><button type="button">Все материалы</button>`;sf.querySelector('button').onclick=()=>{sourceFilter=null;startQueue();};
    }else sf.hidden=true;
+   renderJumpBar();
    renderNav();
+ }
+ function renderJumpBar(){
+   const bar=$('#jump-bar');if(!bar)return;
+   bar.innerHTML=`<div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>`<button type="button" class="chip" data-jump-topic="${id}" ${topic===id?'aria-pressed="true"':''}>${esc(name)}</button>`).join('')}</div><div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-jump-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>${esc(b.title)}</button>`).join('')}<button type="button" class="chip" data-jump-course="" ${courseBlock?'':'aria-pressed="true"'}>все</button></div>`;
+   $$('#jump-bar [data-jump-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.jumpTopic;activeLesson=null;vocabRole=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');});
+   $$('#jump-bar [data-jump-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.jumpCourse||null;activeLesson=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');});
  }
  function answerMarkup(q){
    const fields=q.fields||[{label:'Ответ',kind:'text'}];
@@ -175,7 +188,7 @@
    $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${source.additional?esc(source.title):`<a href="${source.url}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`}<br>${esc(location)}</div><span class="mastery-label">${exam?'Экзамен':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p><h2 id="question-title">${esc(q.title)}</h2>${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}${answerMarkup(q)}${letters?`<div class="letter-keyboard" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div><div class="keyboard-label">Буква вставится в выбранное поле.</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Моя подсказка</button></div><div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
    $('#answer-form').addEventListener('submit',e=>{e.preventDefault();if(checked)nextQuestion();else checkAnswer(q);});
    $('#hint-button').onclick=()=>showHint(q);
-   $('#reveal-button').onclick=()=>checkAnswer(q,true);
+   $('#reveal-button').onclick=()=>mode==='exam'?checkAnswer(q,true):peekAnswer(q);
    $('#next-button').onclick=nextQuestion;
    $('#association-button').onclick=()=>openAssociation(q);
    $$('#answer-form input[type=text]').forEach(el=>el.addEventListener('focus',()=>{lastTextInput=el;}));
@@ -197,8 +210,20 @@
    activateCard();save();
  }
  function hintEvent(q,kind){state.events.push({type:'hint',card_id:q.id,at:Date.now(),hint_kind:kind,response_time_ms:elapsed(),hinted:true});}
+ function peekAnswer(q){
+   if(checked)return;
+   hinted=true;hintEvent(q,'reveal');
+   const answerLine=q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
+   const box=$('#hint-box');
+   box.innerHTML='<strong>Ответ показан.</strong> Теперь впиши его сама — так лучше запоминается. Проверка с подсказкой не повышает уровень. <span lang="kk">'+esc(answerLine)+'</span>';
+   box.hidden=false;
+   const rev=$('#reveal-button');if(rev)rev.disabled=true;
+   const hb=$('#hint-button');if(hb)hb.disabled=true;
+   const inp=$('#answer-0');if(inp)inp.focus();
+   save();
+ }
  function showHint(q){
-   hintEvent(q,'explanation');hinted=true;$('#hint-button').disabled=true;
+   hintEvent(q,'explanation');hinted=true;if($('#hint-button'))$('#hint-button').disabled=true;
    const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Остальные зависят от слова. В смешанном слове для окончания важен последний слог. И и У требуют внимания к конкретному слову.',plural:'Сначала выбери А или Е по последнему слогу. Затем посмотри на последнюю букву: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Произнеси слово и вспомни его пару в словаре.',numbers:'Вспомни слово из списка чисел и количества.',person:'Біз: пыз/піз после глухих и б,в,г,д; быз/біз после м,н,ң и ж,з; иначе мыз/міз. Сендер: сыңдар/сіңдер. Сіздер: сыздар/сіздер. С сендер/сіздер множественное на слово не ставим. Отрицание: основа + емес + окончание.'};
    let hint=q.hint||hints[q.topic]||'';
    if(!q.hint&&(q.topic==='vocab'||q.topic==='numbers')){
