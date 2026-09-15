@@ -420,6 +420,6 @@
    }
    return out;
  }
- const api={RULES,EXTERNAL,inferRule,ruleId,ruleText,missingRules,buildPack,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,sliceSection,sectionCount,sectionOf,partProgress,vocabDirections,HW_SECTION,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,otherTopicFillers,remediationQueue,blindCloseDays,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
+ const api={RULES,EXTERNAL,WORD_LEMMAS,inferRule,ruleId,ruleText,missingRules,buildPack,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,sliceSection,sectionCount,sectionOf,partProgress,vocabDirections,HW_SECTION,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,otherTopicFillers,remediationQueue,blindCloseDays,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
  if(node)module.exports=api;else root.Homework=api;
 })(typeof window!=='undefined'?window:globalThis);

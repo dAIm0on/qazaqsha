@@ -180,6 +180,11 @@ table td,table th{border-bottom-color:var(--qs-line);color:var(--qs-ink)}
 #exam-bar-fill{background:var(--qs-lime)}
 .storage-warning{background:var(--qs-warning-soft);color:#4A3A12}
 .grammar-chip,.rule-chip{background:var(--qs-violet-soft);color:#5C5167}
+.ai-tutor-panel{margin-top:12px;padding-top:10px;border-top:1px solid var(--qs-line)}
+.ai-tutor-actions{display:flex;flex-wrap:wrap;gap:8px}
+.ai-tutor-out{margin-top:8px;padding:10px 12px;background:var(--qs-violet-soft);border-radius:var(--qs-r-md);color:var(--qs-ink)}
+.ai-tutor-out p{margin:0 0 6px}
+.ai-tutor-out p:last-child{margin:0}
 
 .bottom-nav{background:var(--qs-surface-raised);border-top-color:var(--qs-line)}
 .bottom-nav button{color:var(--qs-muted);border-radius:var(--qs-r-sm)}

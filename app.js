@@ -278,6 +278,14 @@
    hinted=true;hintEvent(q,'explanation');if($('#hint-button'))$('#hint-button').disabled=true;
    const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Для окончания важен последний слог.',plural:'Последний слог: А или Е. Потом последняя буква: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Сначала слепая попытка. Не открывай готовое слово — иначе это не вспоминание.',numbers:'Собери разряды: сначала большая часть. Не считай по порядку.',person:'Мен: пын/бын/мын. Сен: сың. Сіз: сыз. Біз после м/н/ң: біз. Сендер/сіздер без -лар на основу. Отрицание: основа + емес + окончание.',rules:'Набери суффикс или короткое слово правила, не целое новое существительное.'};
    const box=$('#hint-box');box.textContent=q.hint&&!/^[А-Яа-яӘәІіҢңҒғҚқӨөҰұҮүҺһ ]{1,24}$/.test(q.hint)?q.hint:(hints[q.topic]||'Вспомни правило, потом форму.');box.hidden=false;save();
+   if(mode!=='exam'&&window.AiTutor){
+     const expected=(q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'';
+     const req=window.AiTutor.buildRequest('hint',q,{hint_used:true,codes:[]});
+     window.AiTutor.callTutor(req).then(resp=>{
+       if(!resp||!resp.message_ru||window.AiTutor.hintLeaks(resp,expected))return;
+       box.textContent=resp.message_ru+(resp.next_action_ru?' '+resp.next_action_ru:'');
+     });
+   }
  }
  function readAnswers(q){return q.kind==='multi'?$$('input[name=choice]:checked').map(el=>el.value):q.fields.map((_,i)=>$('#answer-'+i).value);}
  function checkAnswer(q,reveal=false){
@@ -303,10 +311,12 @@
    const predicted=window.ReviewScheduler.retrievability?window.ReviewScheduler.retrievability(previous,now):null;
    const hours=previous?.last_correct?(now-previous.last_correct)/3600000:null;
    const homeworkMode=mode==='homework';
+   const aiRemed=String(q.id||'').startsWith('ai-remed:');
    let rec=previous||core.migrateRecord({},now);
    if(homeworkMode){
      if(hinted&&previous){rec=core.updateRecord(previous,result.correct,true,now,{responseTime:elapsedMs,recall,rating:F.Rating.Again});records[q.id]=rec;}
-   }else{rec=core.updateRecord(previous,result.correct,hinted,now,{responseTime:elapsedMs,recall,rating});records[q.id]=rec;}
+   }else if(!aiRemed){rec=core.updateRecord(previous,result.correct,hinted,now,{responseTime:elapsedMs,recall,rating});records[q.id]=rec;}
+   else records[q.id]=rec;
    const errors=reveal?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);state.errors.push(...errors);
    const policy=window.MemoryPolicy;
    const flags=policy&&policy.answerFlags?policy.answerFlags({hinted,correct:result.correct}):{first_try_correct:hinted?0:(result.correct?1:0),peek:hinted?1:0,retype_after_peek_ok:hinted?(result.correct?1:0):null};
@@ -320,7 +330,7 @@
      predicted_R:predicted,
      hours_since_last:hours,
      rule_peek:rulePeeked?1:0,homework:homeworkMode?1:0,block:window.Homework?window.Homework.inferBlock(q,mode,hwLesson,activeLesson):''};
-   if(!homeworkMode)event.skills=window.Knowledge.observe(state,q,result,event,errors);
+   if(!homeworkMode&&!aiRemed)event.skills=window.Knowledge.observe(state,q,result,event,errors);
    state.events.push(event);rec=records[q.id]||rec;
    if(homeworkMode&&hwLesson){
      const expected=q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers[0]).join('; ');
@@ -361,7 +371,26 @@
    const answerLine=q.kind==='multi'?q.correct.join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
    const timeLine=mode==='exam'?(examTimedOut?'Время вышло.':'Время '+(elapsedMs/1000).toFixed(1)+' с'+(elapsedMs>cfg.session.examHardMs&&result.correct?' · медленно, для экзамена это слабо.':' · зачёт по времени.')):(cfg.labels[rec.mastery_level]+' · время '+(elapsedMs/1000).toFixed(1)+' с, без штрафа.');
    const local=errors.map(e=>window.ErrorDiagnostics.line&&window.ErrorDiagnostics.line(e.error_type)||window.ErrorDiagnostics.labels[e.error_type]).filter(Boolean);
-   feedback.innerHTML=`<h3>${headline}</h3><p><strong>Ответ:</strong> ${esc(answerLine)}.</p>${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p><p class="small">${timeLine}</p>`;feedback.hidden=false;
+   const aiCodes=window.AiTutor&&mode!=='exam'?window.AiTutor.noteAnswer(q,answers,result,hinted,errors,now):[];
+   const aiRepeat=window.AiTutor&&aiCodes[0]&&window.AiTutor.shouldOfferExplain(aiCodes[0]);
+   feedback.innerHTML=`<h3>${headline}</h3><p><strong>Ответ:</strong> ${esc(answerLine)}.</p>${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p><p class="small">${timeLine}</p>`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;
+   if(!result.correct&&mode!=='exam'&&window.AiTutor){
+     const paint=(resp)=>{
+       const out=$('#ai-tutor-out');if(!out||!resp)return;
+       out.hidden=false;
+       out.innerHTML='<p>'+esc(resp.message_ru||'')+'</p>'+(resp.micro_rule_ru?'<p class="small">'+esc(resp.micro_rule_ru)+'</p>':'')+(resp.contrast&&(resp.contrast.wrong||resp.contrast.correct)?'<p class="small">'+esc((resp.contrast.wrong||'')+(resp.contrast.wrong&&resp.contrast.correct?' → ':'')+(resp.contrast.correct||''))+'</p>':'')+(resp.next_action_ru?'<p class="small">'+esc(resp.next_action_ru)+'</p>':'');
+     };
+     const ask=(m)=>{
+       const out=$('#ai-tutor-out');if(out){out.hidden=false;out.textContent='Разбираю…';}
+       const req=window.AiTutor.buildRequest(m,q,{user_answer:answers.join(' '),is_correct:false,hint_used:hinted,codes:aiCodes});
+       window.AiTutor.callTutor(req).then(paint);
+     };
+     if($('#ai-why'))$('#ai-why').onclick=()=>ask('explain_error');
+     if($('#ai-rule'))$('#ai-rule').onclick=()=>ask('explain_rule');
+     if(aiRepeat)ask('explain_error');
+     const extra=window.AiTutor.takeRemediation(byId);
+     if(extra.length)window.AiTutor.spliceRemediation(queue,position,extra.map(x=>x.id));
+   }
    renderStats();save();
    cancelAdvance();
    if(result.correct&&!reveal&&!hinted){
@@ -740,6 +769,15 @@
      if(next==='chunks'){
        const ids=questions.filter(q=>window.MemoryPolicy&&window.MemoryPolicy.isChunk(q)&&eligible(q)).map(q=>q.id);
        startCustom(ids,'chunks');return;
+     }
+     if(next==='ai-summary'&&window.AiTutor){
+       const req=window.AiTutor.buildRequest('session_summary',{lessonId:'',id:'',title:'',stimulus:'',fields:[]},{codes:window.AiTutor.topWeak().map(w=>w.error_code)});
+       window.AiTutor.callTutor(req).then(resp=>{
+         const root=document.getElementById('today-content');if(!root||!resp)return;
+         const box=document.createElement('div');box.className='panel ai-tutor-out';box.innerHTML='<h2>Разбор</h2><p>'+esc(resp.message_ru||'')+'</p>';
+         root.prepend(box);
+       });
+       return;
      }
      if(next.startsWith('number:')){activeLesson=null;activeStep=null;sourceFilter=null;topic='numbers';mode='numbers';queue=window.NumberPractice.session(next.split(':')[1],state).filter(eligible).map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;resetCounts();render();showView('practice');return;}
      if(next==='reset'){$('#reset-progress').click();return;}
