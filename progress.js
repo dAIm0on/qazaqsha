@@ -25,7 +25,7 @@
      if(!obj(a))return undefined;
      const items=Array.isArray(a.items)?a.items.filter(it=>obj(it)&&safe(it.id)).map(it=>({id:it.id,answers:Array.isArray(it.answers)?it.answers.slice(0,20).map(x=>String(x).slice(0,300)):[],correct:!!it.correct,rule_peek:!!it.rule_peek,answer_peek:!!it.answer_peek,skipped:!!it.skipped,expected:typeof it.expected==='string'?it.expected.slice(0,300):'',at:Number(it.at)||0,status:typeof it.status==='string'?it.status.slice(0,40):''})): [];
      const previous=Array.isArray(a.previous)?a.previous.filter(obj).slice(-30):[];
-     return {lessonId:safe(a.lessonId)?a.lessonId:lesson,started_at:Number(a.started_at)||0,items,rule_peeks:Math.max(0,Number(a.rule_peeks)||0),answer_peeks:Math.max(0,Number(a.answer_peeks)||0),submitted_at:Number(a.submitted_at)||null,export_rev:Math.max(0,Number(a.export_rev)||0),checklist:obj(a.checklist)?a.checklist:{method:false,exercises:false,words:false,external_test:false,keyboard:false,cheat:false},previous};
+     return {lessonId:safe(a.lessonId)?a.lessonId:lesson,started_at:Number(a.started_at)||0,items,rule_peeks:Math.max(0,Number(a.rule_peeks)||0),answer_peeks:Math.max(0,Number(a.answer_peeks)||0),submitted_at:Number(a.submitted_at)||null,export_rev:Math.max(0,Number(a.export_rev)||0),cursor:typeof a.cursor==='string'?a.cursor.slice(0,80):null,checklist:obj(a.checklist)?a.checklist:{method:false,exercises:false,words:false,external_test:false,keyboard:false,cheat:false},previous};
    });
    if(obj(raw.learning)){
      state.learning.lessonId=typeof raw.learning.lessonId==='string'?raw.learning.lessonId:'numbers-0';

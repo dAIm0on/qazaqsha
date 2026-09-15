@@ -104,6 +104,27 @@
    if(event&&(event.hinted||event.rule_peek||event.peek))return false;
    return classify(q)!=='rec';
  }
+ function associationFaded(record){
+   return (record&&record.recall_review_successes||0)>=2;
+ }
+ function isChunk(q){
+   const t=blob(q);
+   return /сәлем|сәлеметсіз|сау бол|ассалаумағалейкум/i.test(t);
+ }
+ function rulesProbe(questions,state){
+   const out=[],stems=new Set();
+   for(const q of questions||[]){
+     if(!q||q.contextOnly||q.kind!=='fields')continue;
+     if(!(q.topic==='plural'||(q.ruleIds||[]).includes('harmony')||(q.ruleIds||[]).includes('plural')))continue;
+     const rec=state&&state.records&&state.records[q.id];
+     if(!rec||!(rec.recall_review_successes||rec.seen))continue;
+     const stem=String(q.stimulus||q.id);
+     if(stems.has(stem))continue;
+     stems.add(stem);out.push(q.id);
+     if(out.length>=3)break;
+   }
+   return out;
+ }
  function incidentalWeek(state,at=Date.now()){
    const key=weekKey(at);
    const cur=state.incidentalWeek&&state.incidentalWeek.key===key?state.incidentalWeek:{key,added:0};
@@ -122,6 +143,6 @@
    if((q.ruleIds||[]).includes('quantity'))return 'extra_plural';
    return 'other';
  }
- const api={PAIRS,PARTICLES,weekKey,contrastSide,breakRuns,classify,direction,isContextOnly,examReady,canMasterProduction,incidentalWeek,canAddIncidental,confusionTag,isAtomicNumber,isAssembleOnlyCard,answerFlags};
+ const api={PAIRS,PARTICLES,weekKey,contrastSide,breakRuns,classify,direction,isContextOnly,examReady,canMasterProduction,associationFaded,isChunk,rulesProbe,incidentalWeek,canAddIncidental,confusionTag,isAtomicNumber,isAssembleOnlyCard,answerFlags};
  if(node)module.exports=api;else root.MemoryPolicy=api;
 })(typeof window!=='undefined'?window:globalThis);

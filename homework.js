@@ -163,7 +163,37 @@
    if(idx>=0)attempt.items[idx]=item;else attempt.items.push(item);
    if(item.rule_peek)attempt.rule_peeks++;
    if(item.answer_peek)attempt.answer_peeks++;
+   attempt.cursor=item.id;
    return item;
+ }
+ function resumeIndex(ids,attempt){
+   const list=ids||[];
+   if(!list.length)return 0;
+   const done=new Set((attempt&&attempt.items||[]).map(i=>i.id));
+   const fromCursor=attempt&&attempt.cursor?list.indexOf(attempt.cursor):-1;
+   if(fromCursor>=0&&fromCursor+1<list.length)return fromCursor+1;
+   const firstOpen=list.findIndex(id=>!done.has(id));
+   return firstOpen<0?0:firstOpen;
+ }
+ const WEAK_LABELS={
+   'rule:plural::ldt':'Множественное: Л/Д/Т',
+   'rule:plural::harmony':'Множественное: А/Е',
+   'rule:plural_after_num':'Множественное после числа',
+   'rule:emes::position':'Емес: куда ставится личное окончание',
+   'rule:person::sen_siz':'Сен / сіз',
+   'rule:person::men':'Личное окончание',
+   'rule:ordinal::exception_20':'Порядковое: 20-е',
+   'rule:numeral::assemble':'Сборка числа',
+   'confuse:алты_алпыс':'6 и 60',
+   'confuse:сегіз_сексен':'8 и 80',
+   'confuse:жеті_жетпіс':'7 и 70',
+   'confuse:тоғыз_тоқсан':'9 и 90'
+ };
+ function weakLabel(key){
+   if(WEAK_LABELS[key])return WEAK_LABELS[key];
+   if(String(key).startsWith('word:')&&String(key).endsWith('::production'))return 'Слово: написать по-казахски';
+   if(String(key).startsWith('word:')&&String(key).endsWith('::recognition'))return 'Слово: узнать перевод';
+   return key;
  }
  function markChecklist(state,lessonId,key,value){
    const attempt=ensureAttempt(state,lessonId);
@@ -319,9 +349,15 @@
  function isolatedFor(failed,questions,state){
    if(!failed)return [];
    const seen=id=>!!(state&&state.records&&state.records[id]&&state.records[id].seen);
-   const pool=(questions||[]).filter(q=>q&&q.id!==failed.id&&q.topic===failed.topic&&!q.contextOnly&&(seen(q.id)||String(q.id).startsWith('facet-')||q.source==='plus'));
+   const stem=core.normalize(String(failed.stimulus||'').split(/\s+/)[0]||'');
+   const pool=(questions||[]).filter(q=>{
+     if(!q||q.id===failed.id||q.topic!==failed.topic||q.contextOnly)return false;
+     if(!(seen(q.id)||String(q.id).startsWith('facet-')||q.source==='plus'))return false;
+     const other=core.normalize(String(q.stimulus||'').split(/\s+/)[0]||'');
+     return !stem||other!==stem||String(q.id).startsWith('facet-');
+   });
    return pool.slice(0,4).map(q=>q.id);
  }
- const api={RULES,EXTERNAL,inferRule,ruleId,ruleText,missingRules,buildPack,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,firstTryFail,weaknessKey};
+ const api={RULES,EXTERNAL,inferRule,ruleId,ruleText,missingRules,buildPack,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
  if(node)module.exports=api;else root.Homework=api;
 })(typeof window!=='undefined'?window:globalThis);

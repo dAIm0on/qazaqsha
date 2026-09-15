@@ -485,4 +485,40 @@ assert.ok(course.questions.length>=220);
 assert.equal(cfg.fsrs.desired_retention,0.90);
 ok('A2/A4 bank and retention still intact');
 
+const faded=policy.associationFaded({recall_review_successes:2});
+const fresh=policy.associationFaded({recall_review_successes:0});
+assert.equal(faded,true);assert.equal(fresh,false);
+ok('H1 association fades after 2 delayed successes');
+
+const probeQs=[
+  {id:'facet-harmony-0',topic:'plural',kind:'fields',stimulus:'кітап',ruleIds:['harmony'],fields:[{answers:['а']}]},
+  {id:'future-case',topic:'rules',kind:'fields',stimulus:'балаларымыздан',ruleIds:['case']}
+];
+const probeState={records:{'facet-harmony-0':{seen:2,recall_review_successes:1}}};
+const probe=policy.rulesProbe(probeQs,probeState);
+assert.ok(probe.includes('facet-harmony-0'));
+assert.ok(!probe.includes('future-case'));
+ok('H3/H4 rules probe uses introduced known item, not future');
+
+assert.ok(probe.every(id=>probeQs.some(q=>q.id===id&&q.stimulus!=='qwertyroot')));
+ok('H5 no pseudo-root generation');
+
+const isoA=hw.isolatedFor({id:'p1',topic:'plural',stimulus:'кітап'},[
+  {id:'p1',topic:'plural',stimulus:'кітап'},
+  {id:'p2',topic:'plural',stimulus:'адам'},
+  {id:'p3',topic:'plural',stimulus:'жер'},
+  {id:'facet-full_form-0',topic:'plural',stimulus:'сөз',source:'plus'}
+],{records:{p2:{seen:1},p3:{seen:1}}});
+assert.ok(!isoA.includes('p1'));
+assert.ok(isoA.some(id=>id!=='p1'));
+ok('H6 remediation varies the stem');
+
+const att={items:[{id:'e1'},{id:'e2'}],cursor:'e2'};
+assert.equal(hw.resumeIndex(['e1','e2','e3'],att),2);
+assert.equal(hw.weakLabel('rule:plural::ldt'),'Множественное: Л/Д/Т');
+ok('G4/G5 homework resume and human weakness label');
+
+assert.ok(policy.isChunk({stimulus:'сау болыңыздар',title:'до свидания'}));
+ok('P1.5 farewell is a chunk, not a verb paradigm');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

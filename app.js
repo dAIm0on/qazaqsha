@@ -364,9 +364,9 @@
    const H=window.Homework,pack=(H.packs(questions,course).find(p=>p.lesson_id===lessonId));
    if(!pack)return;
    hwLesson=lessonId;hwPart=part||'exercises';mode='homework';topic='all';sourceFilter=null;vocabRole=null;activeLesson=null;activeStep=null;courseBlock=lessonId;
-   H.ensureAttempt(state,lessonId);
+   const attempt=H.ensureAttempt(state,lessonId);
    const ids=part==='words'?pack.homework.word_question_ids||[]:pack.homework.exercise_ids;
-   queue=ids.filter(id=>byId.has(id));practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;resetCounts();
+   queue=ids.filter(id=>byId.has(id));practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=H.resumeIndex(queue,attempt);checked=false;resetCounts();
    if(!queue.length){renderHomework();showView('homework');return;}
    render();showView('practice');
  }
@@ -390,15 +390,15 @@
      <div class="panel"><h2>${esc(h.title)}</h2>
        <ol class="learning-steps">
          <li>Повторить методичку — ${h.method_url?`<a href="${esc(h.method_url)}" target="_blank" rel="noopener noreferrer">${esc(h.method_title)}</a>`:'ссылка на материал урока'}${check('method')}</li>
-         <li>Упражнения сборника (${h.exercise_ids.length} пунктов) <button type="button" class="secondary-button" data-hw-part="exercises">Открыть упражнения</button></li>
-         <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${h.word_ids.length} слов. <button type="button" class="secondary-button" data-hw-part="words">Открыть слова</button></li>
+         <li>Упражнения сборника (${h.exercise_ids.length} пунктов) <button type="button" class="secondary-button" data-hw-part="exercises">${attempt.items.some(i=>h.exercise_ids.includes(i.id))?'Продолжить упражнения':'Открыть упражнения'}</button></li>
+         <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${h.word_ids.length} слов. <button type="button" class="secondary-button" data-hw-part="words">${attempt.items.some(i=>(h.word_question_ids||[]).includes(i.id))?'Продолжить слова':'Открыть слова'}</button></li>
          <li>Внешний тест: ${(h.external_tests&&h.external_tests.length?h.external_tests:[h.external_test_url]).filter(Boolean).map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u)}</a>`).join(' · ')||'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
          ${(h.extras||[]).map(x=>'<li>'+check(x)+'</li>').join('')}
        </ol>
        <p class="small">Повторно открыть лист можно. «Новая сдача» не стирает прошлый файл.</p>
        <div class="review-actions"><button type="button" class="text-button" data-hw-new>Новая сдача</button></div>
      </div>
-     <div class="panel"><h2>Слабые места</h2>${weak.length?weak.map(w=>`<div class="confusion-row"><div><strong>${esc(w.key)}</strong><p class="small">${w.count} раз за 14 дней. Ждали: ${esc(w.expected)} · написала: ${esc(w.actual)}</p></div><button type="button" class="secondary-button" data-weak="${esc(w.cardId)}">Разобрать</button></div>`).join(''):'<p>Пока нет устойчивых слабых мест.</p>'}</div>
+     <div class="panel"><h2>Слабые места</h2>${weak.length?weak.map(w=>`<div class="confusion-row"><div><strong>${esc(window.Homework.weakLabel(w.key))}</strong><p class="small">${w.count} раз за 14 дней. Ждали: ${esc(w.expected)} · написала: ${esc(w.actual)}</p></div><button type="button" class="secondary-button" data-weak="${esc(w.cardId)}">Разобрать</button></div>`).join(''):'<p>Пока нет устойчивых слабых мест.</p>'}</div>
      <div class="panel" ${ready?'':'hidden'}><h2>Выгрузка листа</h2>
        <p>Упражнения и слова этого листа отмечены. Тест сайта может остаться не отмеченным — в файле это будет видно.</p>
        <div class="review-actions">
