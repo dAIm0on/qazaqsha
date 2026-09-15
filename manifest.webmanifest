@@ -1,13 +1,13 @@
 {
   "id": "./",
-  "name": "Қазақша — личный тренажёр",
-  "short_name": "Қазақша",
+  "name": "Qazaqsha — Қазақша",
+  "short_name": "Qazaqsha",
   "lang": "ru",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#EAE2D6",
-  "theme_color": "#335746",
+  "background_color": "#F4EFE7",
+  "theme_color": "#41573F",
   "icons": [
     {
       "src": "icon-192.png",
