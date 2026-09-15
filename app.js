@@ -417,102 +417,127 @@
    if(jsonBtn)jsonBtn.onclick=()=>{attempt.submitted_at=Date.now();attempt.export_rev=(attempt.export_rev||0)+1;attempt.weak_tags=weak.map(w=>w.key);save();downloadProgress(JSON.stringify(window.Homework.exportJson(attempt,pack),null,2),'homework-'+pack.lesson_id+'-'+stamp+'.json');};
    if(printBtn)printBtn.onclick=()=>{attempt.submitted_at=Date.now();save();const html=window.Homework.exportHtml(attempt,pack,questions);const w=window.open('','_blank');if(!w)return;w.document.write(html);w.document.close();w.focus();w.print();};
  }
- function pathCheckById(t,id){
-   for(const s of t.steps||[])for(const c of s.checks||[])if(c.id===id)return c;
-   return (t.mix||[]).find(c=>c.id===id)||null;
- }
  function renderPath(){
    const root=$('#path-content');if(!root||!window.GrammarPath)return;
    const G=window.GrammarPath;
-   if(!state.grammarPath)state.grammarPath=G.emptyProgress();
-   const gp=state.grammarPath,list=G.topics();
-   if(gp.phase==='pick'||!gp.topicId){
-     root.innerHTML=`<div class="panel"><h2>Прохождение</h2><p>Одна тема за заход. Шаг правила, потом 2 короткие проверки разных типов. Это не домашка и не «Пора повторить».</p>
-       ${gp.blocked?'<p class="question-note">Одна и та же ошибка три раза. Сначала этот шаг ещё раз, новую тему не открываю.</p>':''}
-       <div class="review-actions">${list.map(t=>`<button type="button" class="secondary-button" data-path="${t.id}" ${gp.blocked&&gp.topicId!==t.id?'disabled':''}>${esc(t.id)} · ${esc(t.title)}</button>`).join('')}</div>
-       <p class="small">Следующую тему выбираешь плитки. Автоконвейера T1→T16 нет.</p></div>`;
-     root.querySelectorAll('[data-path]').forEach(b=>b.onclick=()=>{G.startTopic(state,b.dataset.path);save();renderPath();});
-     return;
-   }
-   const t=G.topic(gp.topicId);if(!t){gp.phase='pick';renderPath();return;}
-   const step=t.steps[Math.min(gp.step,t.steps.length-1)];
-   const progressLine='Шаги '+(Math.min(gp.step+1,t.steps.length))+' / '+t.steps.length;
-   if(gp.phase==='screen'){
-     const w=step.screen.worked&&step.screen.worked[0];
-     root.innerHTML=`<div class="panel"><p class="eyebrow">${esc(t.id)} · ${esc(progressLine)}</p><h2>${esc(step.screen.title)}</h2>
-       <p style="white-space:pre-wrap">${esc(step.screen.body)}</p>
-       ${w?`<div class="study-card"><p class="study-front">Разбор</p><p class="study-back" lang="kk">${esc(w.form)}</p><p class="small">${esc(w.why||'')}${w.slots&&w.slots.painted?' · слот: '+esc(w.slots.painted):''}</p></div>`:''}
-       ${step.screen.trap?'<p class="question-note">'+esc(step.screen.trap)+'</p>':''}
-       <div class="lesson-actions"><button type="button" class="primary-button" id="path-go">Дальше · 2 проверки</button>
-         <button type="button" class="secondary-button" id="path-table">Таблица</button>
-         ${t.more?'<button type="button" class="text-button" id="path-more">Ещё объяснение</button>':''}</div>
-       <div id="path-extra" hidden></div></div>`;
-     $('#path-go').onclick=()=>{G.beginChecks(gp,t,step);save();renderPath();};
-     $('#path-table').onclick=()=>{const box=$('#path-extra');box.hidden=false;box.innerHTML='<pre class="rule-pre">'+esc(G.TABLE)+'</pre>';};
-     if($('#path-more'))$('#path-more').onclick=()=>{const box=$('#path-extra');box.hidden=false;box.innerHTML='<p class="small">'+esc(t.more)+'</p>';};
-     return;
-   }
-   if(gp.phase==='done'){
-     if(!gp.completed.includes(t.id))gp.completed.push(t.id);
-     root.innerHTML=`<div class="panel"><h2>${esc(t.title)} · смесь пройдена</h2>
-       <p>Практика урока сама по себе. Прохождение её не закрывает и не ставит Good словам домашки.</p>
-       <div class="finish-actions"><button type="button" class="primary-button" id="path-rules">К Правилам</button>
-         <button type="button" class="secondary-button" id="path-stop">Хватит на сегодня</button></div></div>`;
-     $('#path-rules').onclick=()=>{gp.phase='pick';gp.topicId=null;showView('rules');};
-     $('#path-stop').onclick=()=>{gp.phase='pick';gp.topicId=null;showView('today');};
-     save();return;
-   }
-   const id=gp.queue[gp.index];
-   if(!id){
-     if(gp.phase==='checks'){
-       if(gp.step<t.steps.length-1){gp.step++;gp.phase='screen';save();renderPath();return;}
-       if(G.canMix(gp,t)){gp.phase='mix';gp.queue=G.mixOf(t).map(c=>c.id);gp.index=0;save();renderPath();return;}
-       root.innerHTML=`<div class="panel"><h2>Смесь ещё рано</h2><p>Подсказок на шагах больше половины. Сначала тот же шаг ещё раз.</p>
-         <button type="button" class="primary-button" id="path-retry">Ещё раз этот шаг</button></div>`;
-       $('#path-retry').onclick=()=>{gp.phase='screen';save();renderPath();};
-       return;
-     }
-     gp.phase='done';save();renderPath();return;
-   }
-   const check=pathCheckById(t,id);if(!check){gp.index++;renderPath();return;}
-   const letters=state.prefs.letters;
-   root.innerHTML=`<div class="panel"><p class="eyebrow">${esc(t.id)} · ${gp.phase==='mix'?'Смесь этой темы':progressLine}</p>
-     <p class="phase-label">${esc(check.type)}</p>
-     <h2>${esc(check.prompt)}</h2>
-     ${check.stem?'<p class="stimulus" lang="kk">'+esc(check.stem)+'</p>':''}
-     <form id="path-form"><input id="path-answer" type="text" autocomplete="off" spellcheck="false">
-       ${letters?`<div class="letter-keyboard">${[...'әғқңөұүһі'].map(ch=>'<button type="button" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`:''}
-       <p id="path-msg" class="validation-message" hidden></p>
-       <div id="path-fb" class="feedback" hidden></div>
-       <div class="lesson-actions"><button type="submit" class="primary-button">Проверить</button>
-         <button type="button" class="secondary-button" id="path-rule">Правило</button>
-         <button type="button" class="text-button" id="path-table">Таблица</button>
-         <button type="button" class="text-button" id="path-idk">Не знаю</button></div></form>
-     <div id="path-extra" hidden></div></div>`;
-   const input=$('#path-answer');input.focus();
-   $$('#path-form [data-letter]').forEach(b=>b.onclick=()=>{const s=input.selectionStart||input.value.length,e=input.selectionEnd||s;input.value=input.value.slice(0,s)+b.dataset.letter+input.value.slice(e);input.focus();});
-   let pathPeek=false;
-   $('#path-rule').onclick=()=>{pathPeek=true;const box=$('#path-extra');box.hidden=false;box.innerHTML='<p>'+esc(check.rule_line||step.screen.body.split('\n')[0])+'</p>';};
-   $('#path-table').onclick=()=>{const box=$('#path-extra');box.hidden=false;box.innerHTML='<pre class="rule-pre">'+esc(G.tableText(check))+'</pre>';};
-   $('#path-idk').onclick=()=>{pathPeek=true;$('#path-answer').value='';$('#path-form').requestSubmit();};
-   $('#path-form').onsubmit=e=>{
-     e.preventDefault();
-     const val=$('#path-answer').value,ok=G.evalCheck(check,val);
-     G.recordPath(state,check,ok,pathPeek||!ok&&!String(val).trim());
-     if(ok&&!pathPeek){
-       gp.index++;save();renderPath();return;
-     }
-     const fb=G.feedback(check);
-     const box=$('#path-fb');box.hidden=false;box.className='feedback error';
-     box.innerHTML='<p>Слот: <strong lang="kk">'+esc(fb.slot||check.stem||'')+'</strong></p><p>'+esc(fb.lever)+'</p>'+(fb.trap?'<p>'+esc(fb.trap)+'</p>':'')+'<p>Набери верную форму целиком.</p><p lang="kk"><strong>'+esc([].concat(check.answers||[check.answer])[0])+'</strong></p>';
-     if(!ok){
-       const rest=gp.queue.slice(gp.index+1);
-       const next=G.schedule(check.id,rest.concat((step.checks||[]).map(c=>c.id)));
-       gp.queue=gp.queue.slice(0,gp.index+1).concat(next.filter(id=>id!==gp.queue[gp.index]||next.indexOf(id)>0));
-     }
-     $('#path-form').onsubmit=ev=>{ev.preventDefault();const re=G.evalCheck(check,$('#path-answer').value);if(!re)return;$('#path-answer').value='';gp.index++;save();renderPath();};
-     save();
+   state.grammarPath=G.migrateProgress(state.grammarPath||G.emptyProgress());
+   const gp=state.grammarPath,list=G.lessons();
+   const crumb=(les,ch)=>{
+     const bits=['<button type="button" class="text-button" data-path-hub>Уроки</button>'];
+     if(les)bits.push('<span>→</span><button type="button" class="text-button" data-path-les="'+esc(les.id)+'">Урок '+esc(les.id)+'</button>');
+     if(ch)bits.push('<span>→</span><strong>'+esc(ch.title)+'</strong>');
+     return '<nav class="path-crumb">'+bits.join(' ')+'</nav>';
    };
+   const bindCrumb=()=>{
+     const h=root.querySelector('[data-path-hub]');if(h)h.onclick=()=>{gp.phase='hub';gp.lessonId=null;gp.chapterId=null;save();renderPath();};
+     const l=root.querySelector('[data-path-les]');if(l)l.onclick=()=>{G.startLesson(state,l.dataset.pathLes);save();renderPath();};
+   };
+   if(gp.phase==='hub'||gp.phase==='pick'||!gp.lessonId){
+     root.innerHTML=`<div class="panel"><h2>Уроки и правила</h2><p>Разбираем только то, что уже было на занятиях. Это не домашка и не «Пора повторить».</p>
+       <div class="path-lessons">${list.map(les=>{
+         const n=les.chapters.length,done=les.chapters.filter(c=>gp.completedChapters&&gp.completedChapters[les.id+':'+c.id]).length;
+         return `<button type="button" class="today-option" data-les="${les.id}"><span>Урок ${esc(les.id)}</span><strong>${esc(les.title)}</strong><small>Глав ${done} из ${n}</small></button>`;
+       }).join('')}</div>
+       <p class="small">Прохождение не ставит Good словам словаря.</p></div>`;
+     root.querySelectorAll('[data-les]').forEach(b=>b.onclick=()=>{G.startLesson(state,b.dataset.les);save();renderPath();});
+     return;
+   }
+   const les=G.lesson(gp.lessonId);
+   if(!les){gp.phase='hub';renderPath();return;}
+   if(gp.phase==='lesson'||!gp.chapterId){
+     root.innerHTML=`<div class="panel">${crumb(les,null)}<h2>Урок ${esc(les.id)}</h2><p>${esc(les.title)}</p>
+       <p class="small">Глава — один кусок правила. Не прыгай через непонятое.</p>
+       <div class="path-chapters">${les.chapters.map((c,i)=>{
+         const ok=gp.completedChapters&&gp.completedChapters[les.id+':'+c.id];
+         return `<button type="button" class="secondary-button" data-ch="${c.id}">Глава ${i+1} из ${les.chapters.length} · ${esc(c.title)}${ok?' ✓':''}</button>`;
+       }).join('')}</div>
+       <p><button type="button" class="text-button" data-path-hub>Ко всем урокам</button></p></div>`;
+     bindCrumb();
+     root.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{G.startChapter(state,les.id,b.dataset.ch);save();renderPath();});
+     return;
+   }
+   const ch=G.chapter(les.id,gp.chapterId);if(!ch){gp.phase='lesson';renderPath();return;}
+   const beats=ch.beats||[],beat=beats[gp.beat];
+   if(!beat){
+     G.markChapterDone(gp,les.id,ch.id);gp.phase='lesson';gp.chapterId=null;save();renderPath();return;
+   }
+   const head=`${crumb(les,ch)}<p class="small">Глава ${les.chapters.findIndex(c=>c.id===ch.id)+1} из ${les.chapters.length} · шаг ${gp.beat+1} из ${beats.length}</p>`;
+   const nextBeat=()=>{gp.beat++;save();renderPath();};
+   const letters=state.prefs.letters;
+   const kb=letters?`<div class="letter-keyboard">${[...'әғқңөұүһі'].map(ch=>'<button type="button" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`:'';
+   if(beat.k==='why'){
+     root.innerHTML=`<div class="panel path-paper">${head}<h2>${esc(beat.t)}</h2><p>${esc(beat.b)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
+   }
+   if(beat.k==='bridge'){
+     root.innerHTML=`<div class="panel path-paper">${head}<h2>Сравни с русским</h2>
+       <p><strong>В русском ты привыкла…</strong> ${esc(beat.ru)}</p>
+       <p><strong>В казахском иначе…</strong> ${esc(beat.kz)}</p>
+       <p><strong>Поэтому делай…</strong> ${esc(beat.do)}</p>
+       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
+   }
+   if(beat.k==='slots'){
+     root.innerHTML=`<div class="panel path-paper">${head}<h2>Из чего это собирается</h2><p>${esc(beat.t)}</p>
+       <div class="path-slots">${(beat.parts||[]).map(p=>'<span class="path-slot">'+esc(p.l)+'</span>').join('<span class="path-plus">+</span>')}</div>
+       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
+   }
+   if(beat.k==='algo'){
+     root.innerHTML=`<div class="panel path-paper">${head}<h2>${esc(beat.t)}</h2><ol class="learning-steps">${(beat.items||[]).map(i=>'<li>'+esc(i)+'</li>').join('')}</ol>
+       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
+   }
+   if(beat.k==='ex'){
+     root.innerHTML=`<div class="panel path-paper">${head}<h2>Разобранный пример</h2>
+       <p lang="kk" class="stimulus">${esc(beat.from)} → ${esc(beat.to)}</p>
+       <p>${esc(beat.ru)}</p>
+       <p>Слот: <strong lang="kk">${esc(beat.slot)}</strong>. ${esc(beat.why)}</p>
+       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
+   }
+   if(beat.k==='trap'){
+     root.innerHTML=`<div class="panel path-paper">${head}<h2>Не перепутай</h2>
+       <p>Нельзя: <s lang="kk">${esc(beat.bad)}</s></p>
+       <p>Нужно: <strong lang="kk">${esc(beat.good)}</strong></p>
+       <p>${esc(beat.why)}</p>
+       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
+   }
+   if(beat.k==='fold'){
+     root.innerHTML=`<div class="panel path-paper">${head}<details open><summary>${esc(beat.t)}</summary><p>${esc(beat.b)}</p></details>
+       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
+   }
+   if(beat.k==='ask'){
+     root.innerHTML=`<div class="panel path-paper">${head}<p class="phase-label">${beat.type==='one_prod'?'Самостоятельно':beat.type==='trap_choice'?'Ловушка':'Проверь понимание'}</p>
+       <h2>${esc(beat.prompt)}</h2>
+       ${beat.stem?'<p class="stimulus" lang="kk">'+esc(beat.stem)+'</p>':''}
+       <form id="path-form"><input id="path-answer" type="text" autocomplete="off" spellcheck="false">${kb}
+         <div id="path-fb" class="feedback" hidden></div>
+         <div class="lesson-actions"><button type="submit" class="primary-button">Проверить</button>
+           <button type="button" class="secondary-button" id="path-rule">Подсказка</button>
+           <button type="button" class="text-button" id="path-idk">Не знаю</button></div></form></div>`;
+     bindCrumb();
+     const input=$('#path-answer');if(input)input.focus();
+     $$('#path-form [data-letter]').forEach(b=>b.onclick=()=>{const s=input.selectionStart||input.value.length,e=input.selectionEnd||s;input.value=input.value.slice(0,s)+b.dataset.letter+input.value.slice(e);input.focus();});
+     let pathPeek=false;
+     $('#path-rule').onclick=()=>{pathPeek=true;$('#path-fb').hidden=false;$('#path-fb').className='feedback hinted';$('#path-fb').innerHTML='<p>'+esc(beat.rule_line||beat.trap||'Собери слот, потом напиши форму целиком.')+'</p>';};
+     $('#path-idk').onclick=()=>{pathPeek=true;$('#path-form').requestSubmit();};
+     $('#path-form').onsubmit=e=>{
+       e.preventDefault();
+       const val=$('#path-answer').value,ok=G.evalCheck(beat,val);
+       G.recordPath(state,beat,ok,pathPeek);
+       if(ok&&!pathPeek){nextBeat();return;}
+       const box=$('#path-fb');box.hidden=false;box.className='feedback error';
+       const exp=[].concat(beat.answers||[beat.answer])[0];
+       box.innerHTML='<p>'+esc(G.diagnoseProd(exp,val))+'</p>'+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+'<p>Набери верную форму целиком: <strong lang="kk">'+esc(exp)+'</strong></p>';
+       $('#path-form').onsubmit=ev=>{ev.preventDefault();if(!G.evalCheck(beat,$('#path-answer').value))return;nextBeat();};
+       save();
+     };
+     return;
+   }
+   nextBeat();
  }
  function renderEmpty(){
    if(mode==='homework'){

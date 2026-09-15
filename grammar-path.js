@@ -59,7 +59,7 @@
  function schedule(failedId,others){
   return core.blockReviewQueue(failedId,(others||[]).filter(id=>id!==failedId),[],2);
  }
- function emptyProgress(){return {topicId:null,step:0,phase:'pick',queue:[],index:0,peeks:Object.create(null),fails:Object.create(null),passed:Object.create(null),blocked:false,completed:[]};}
+ function emptyProgress(){return {topicId:null,step:0,phase:'hub',queue:[],index:0,peeks:Object.create(null),fails:Object.create(null),passed:Object.create(null),blocked:false,completed:[],lessonId:null,chapterId:null,beat:0,completedChapters:Object.create(null),legacyCompleted:[]};}
  function startTopic(state,topicId){
   const t=topic(topicId);if(!t)return state;
   const gp=state.grammarPath||(state.grammarPath=emptyProgress());
@@ -91,11 +91,11 @@
  }
  function recordPath(state,check,correct,peeked,now=Date.now()){
   const gp=state.grammarPath||(state.grammarPath=emptyProgress());
-  const skill='path:'+(gp.topicId||'T')+'::step:'+(gp.step||0);
+  const skill='path:'+(gp.lessonId||gp.topicId||'T')+'::step:'+(gp.chapterId||gp.step||0);
   state.events=state.events||[];
-  state.events.push({type:'path',card_id:check.id,at:now,correct:!!correct,peek:peeked?1:0,first_try_correct:(peeked||!correct)?0:1,item_type:'path',error_key:check.error_key||'',block:'path:'+(gp.topicId||'')});
+  state.events.push({type:'path',card_id:check.id,at:now,correct:!!correct,peek:peeked?1:0,first_try_correct:(peeked||!correct)?0:1,item_type:'path',error_key:check.error_key||'',block:'path:'+(gp.lessonId||gp.topicId||'')});
   if(correct&&!peeked)gp.passed[check.id]=true;
-  if(!correct)noteFail(gp,check.error_key);
+  if(!correct&&!peeked)noteFail(gp,check.error_key);
   notePeek(gp,(topic(gp.topicId)||{steps:[]}).steps[gp.step]&&(topic(gp.topicId).steps[gp.step].step_id),peeked);
   return skill;
  }
@@ -103,6 +103,57 @@
   if(!/75\s*950|75950/.test(String(text)))return true;
   return /мың/.test(String(text));
  }
- const api={topic,topics,lexOk,typesOk,stepMeta,mixOf,sameTopicMix,tableText,hasAnswerIn,evalCheck,feedback,schedule,emptyProgress,startTopic,beginChecks,peekRate,canMix,recordPath,thousandOk,TABLE:data.TABLE,LEX:data.LEX};
+ const chData=node?require('./grammar-chapters.js'):root.GRAMMAR_CHAPTERS;
+ function lessons(){return (chData&&chData.LESSONS)||[];}
+ function lesson(id){return lessons().find(l=>l.id===id)||null;}
+ function chapter(lessonId,chapterId){const l=lesson(lessonId);return l&&(l.chapters||[]).find(c=>c.id===chapterId)||null;}
+ function asksOf(ch){return (ch&&ch.beats||[]).filter(b=>b.k==='ask');}
+ function productionAsks(ch){return asksOf(ch).filter(b=>b.type==='one_prod');}
+ function flattenText(lessonsList){return JSON.stringify(lessonsList||lessons());}
+ function navIsLessons(){return lessons().every(l=>/^\d-\d$/.test(l.id))&&!lessons().some(l=>/^T\d/.test(l.id));}
+ function chapterLabel(c){return (c.title||'')+' '+(c.rule_ids||[]).join(' ');}
+ function questionTableLesson(){return lessons().filter(l=>l.id==='2-3'&&l.chapters.some(c=>c.id==='2-3-q'||/^Полная таблица вопроса$/i.test(c.title)));}
+ function ordinalLessons(){return lessons().filter(l=>l.chapters.some(c=>(c.rule_ids||[]).includes('порядковые')));}
+ function hasPossessiveGrammar(){return lessons().some(l=>(l.chapters||[]).some(c=>/посессив|притяжательн|губн(ая|ой) гармо|степен(и|ей) сравнен|падеж/i.test(chapterLabel(c))));}
+ function hasMeningGrammar(){return lessons().some(l=>(l.chapters||[]).some(c=>/менің|сенің|сіздің|оның|бар\/жоқ|(^|\s)(бар|жоқ)(\s|$)/i.test(chapterLabel(c))));}
+ function respectfulBye(){return /уважительн/i.test(flattenText())&&/сау болыңыздар/.test(flattenText());}
+ function diagnoseProd(expected,actual){
+  const e=core.normalize(expected||''),a=core.normalize(actual||'');
+  if(e===a)return 'Верно.';
+  if(/тар$|тер$/.test(e)&&/лар$|лер$/.test(a))return 'Ты выбрала стык Л, а нужна Т: после глухой — тар/тер.';
+  if(/дар$|дер$/.test(e)&&/лар$|лер$/.test(a))return 'Ты выбрала стык Л, а нужна Д: после М/Н/З — дар/дер. Не *адамлар.';
+  if(/лар$|лер$/.test(e)&&/дар$|дер$/.test(a))return 'После Р и гласных нужна Л, не Д: жерлер, не жердер.';
+  if(/дар$|дер$/.test(e)&&/тар$|тер$/.test(a))return 'Стык Т, а нужна Д.';
+  if(/а/.test(e.slice(-2))&&/е/.test(a.slice(-2)))return 'Гармония: слово твёрдое, гласная А, не Е.';
+  if(/е/.test(e.slice(-2))&&/а/.test(a.slice(-2)))return 'Гармония: слово мягкое, гласная Е, не А.';
+  if(/мын$|мін$/.test(e)&&!/(мын|мін)$/.test(a))return 'Нужна бирка лица. *Мен дәрігер по курсу нельзя.';
+  if(/емес/.test(e)&&/емес/.test(a)===false)return 'Отрицание: бирка переезжает на емес.';
+  return 'Сверь слот: основа + нужный кусок справа.';
+ }
+ function migrateProgress(gp){
+  if(!gp)return emptyProgress();
+  if(!gp.completedChapters)gp.completedChapters=Object.create(null);
+  if(!gp.legacyCompleted)gp.legacyCompleted=Array.isArray(gp.completed)?gp.completed.slice():[];
+  if(gp.phase==='pick')gp.phase='hub';
+  if(gp.lessonId==null)gp.lessonId=null;
+  if(gp.chapterId==null)gp.chapterId=null;
+  if(!Number.isInteger(gp.beat))gp.beat=0;
+  return gp;
+ }
+ function startLesson(state,lessonId){
+  const gp=migrateProgress(state.grammarPath||(state.grammarPath=emptyProgress()));
+  gp.lessonId=lessonId;gp.chapterId=null;gp.beat=0;gp.phase='lesson';
+  return gp;
+ }
+ function startChapter(state,lessonId,chapterId){
+  const gp=migrateProgress(state.grammarPath||(state.grammarPath=emptyProgress()));
+  gp.lessonId=lessonId;gp.chapterId=chapterId;gp.beat=0;gp.phase='beat';
+  return gp;
+ }
+ function markChapterDone(gp,lessonId,chapterId){
+  gp.completedChapters=gp.completedChapters||Object.create(null);
+  gp.completedChapters[lessonId+':'+chapterId]=true;
+ }
+ const api={topic,topics,lexOk,typesOk,stepMeta,mixOf,sameTopicMix,tableText,hasAnswerIn,evalCheck,feedback,schedule,emptyProgress,startTopic,beginChecks,peekRate,canMix,recordPath,thousandOk,TABLE:data.TABLE,LEX:data.LEX,lessons,lesson,chapter,asksOf,productionAsks,navIsLessons,questionTableLesson,ordinalLessons,hasPossessiveGrammar,hasMeningGrammar,respectfulBye,diagnoseProd,migrateProgress,startLesson,startChapter,markChapterDone,FORBIDDEN:(chData&&chData.FORBIDDEN)||[]};
  if(node)module.exports=api;else root.GrammarPath=api;
 })(typeof window!=='undefined'?window:globalThis);

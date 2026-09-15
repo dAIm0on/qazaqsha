@@ -178,6 +178,18 @@ body[data-view=practice] .exercise-card{box-shadow:0 24px 60px rgba(0,0,0,.34)}
   body[data-view=practice] .topbar{opacity:1}
   .topbar{padding:10px 16px}
 }
+.path-crumb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 12px;font-size:.875rem;color:#6A655C}
+.path-crumb strong{color:var(--ink)}
+.path-lessons,.path-chapters{display:grid;gap:10px;margin:16px 0}
+.path-slots{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0}
+.path-slot{background:var(--paper-1);border:1px dashed #B7B09F;border-radius:10px;padding:10px 14px;font-weight:650}
+.path-plus{color:#6A655C;font-weight:700}
+.path-paper .stimulus{font-size:clamp(1.75rem,4vw,2.6rem)}
+.path-paper details{margin:12px 0;padding:8px 0}
+.path-chapters .secondary-button{text-align:left;width:100%}
+@media(max-width:690px){
+  .path-crumb{position:sticky;top:0;background:var(--paper-0);padding:8px 0;z-index:2}
+}
 @media print{
   body{background:#fff!important;color:#000!important}
   .exercise-card,.panel{background:#fff!important;box-shadow:none!important}

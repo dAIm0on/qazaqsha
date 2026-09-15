@@ -279,4 +279,71 @@ ok('G10 75950 written with мың and course-key note');
 ok('G11 bank 220 ids untouched');
 ok('G12 older verify scenarios still above');
 
+assert.ok(GP.navIsLessons());
+assert.deepEqual(GP.lessons().map(l=>l.id),['1-1','1-2','1-3','2-1','2-2','2-3']);
+assert.ok(!GP.lessons().some(l=>/^T/.test(l.id)));
+ok('P1 nav by lesson_id not T-id');
+
+const glue=GP.chapter('1-2','1-2-glue');
+assert.ok(GP.productionAsks(glue).length>=3);
+assert.ok(GP.productionAsks(glue).every(a=>a.type==='one_prod'&&a.k==='ask'));
+ok('P2 typed production required in 1-2 glue');
+
+const stPeek=progress.empty();
+GP.recordPath(stPeek,{id:'12g1',error_key:'junction_ldt'},true,true);
+assert.ok(!stPeek.grammarPath.passed['12g1']);
+assert.ok(!stPeek.grammarPath.fails.junction_ldt);
+assert.ok(!stPeek.records.кітап&&!stPeek.records.адам);
+ok('P3 peek is not unaided success and no Good TARGET');
+
+assert.deepEqual(GP.questionTableLesson().map(l=>l.id),['2-3']);
+assert.ok(!GP.lesson('2-1').chapters.some(c=>c.id==='2-3-q'||/^Полная таблица вопроса$/i.test(c.title)));
+assert.ok(!GP.lesson('2-2').chapters.some(c=>c.id==='2-3-q'||/^Полная таблица вопроса$/i.test(c.title)));
+ok('P4 full question table only in 2-3');
+
+assert.deepEqual(GP.ordinalLessons().map(l=>l.id),['2-3']);
+assert.ok(!(GP.lesson('1-3').chapters||[]).some(c=>(c.rule_ids||[]).includes('порядковые')));
+ok('P5 ordinals only in 2-3');
+
+assert.ok(GP.thousandOk(JSON.stringify(GP.lesson('1-3'))));
+assert.ok(/жетпіс бес мың тоғыз жүз елу/.test(JSON.stringify(GP.lesson('1-3'))));
+ok('P6 75950 has мың');
+
+assert.ok(GP.respectfulBye());
+assert.ok(/уважительн/.test(JSON.stringify(GP.chapter('2-3','2-3-bye'))));
+ok('P7 сау болыңыздар respectful plural');
+
+assert.ok(!GP.hasPossessiveGrammar());
+assert.ok(!GP.hasMeningGrammar());
+assert.ok(GP.FORBIDDEN.some(x=>/падеж|посессив|губн|степен/i.test(x)));
+ok('P8 no менің / possessive / labial / degrees chapters');
+
+assert.ok(course.questions.length>=220);
+ok('P9 bank 220 ids intact');
+
+const stGood=progress.empty();
+stGood.vocabulary={адам:{target_or_context:'target',times_seen:1,last_seen:0}};
+GP.recordPath(stGood,{id:'12g2',error_key:'junction_ldt'},true,false);
+assert.equal(stGood.vocabulary.адам.target_or_context,'target');
+assert.ok(!stGood.records.адам);
+assert.ok((stGood.events||[]).every(e=>e.type==='path'));
+ok('P10 path does not Good TARGET');
+
+const mig=GP.migrateProgress({phase:'pick',completed:['T1'],topicId:'T1',step:2});
+assert.equal(mig.phase,'hub');
+assert.ok(mig.legacyCompleted.includes('T1'));
+assert.ok(mig.completedChapters);
+ok('P11 migration keeps legacy history');
+
+assert.ok(!!GP.lesson('2-3'));
+assert.ok(GP.lesson('2-3').chapters.some(c=>c.id==='2-3-q'));
+ok('P12 lesson 2-3 present');
+
+const l12=GP.lesson('1-2');
+assert.ok(l12.chapters.length>=5);
+assert.ok(/адамлар/.test(JSON.stringify(l12)));
+assert.ok(/кітаптар/.test(JSON.stringify(l12))&&/адамдар/.test(JSON.stringify(l12))&&/жерлер/.test(JSON.stringify(l12)));
+assert.ok(l12.chapters.every(c=>c.beats.some(b=>b.k==='why')&&c.beats.some(b=>b.k==='bridge')&&c.beats.some(b=>b.k==='slots')&&c.beats.filter(b=>b.k==='ex').length>=3&&c.beats.some(b=>b.k==='trap')&&c.beats.some(b=>b.k==='ask')));
+ok('P13 1-2 template why/bridge/slots/3ex/trap/ask');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
