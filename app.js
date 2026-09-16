@@ -307,7 +307,7 @@
      const expected=(q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'';
      const req=window.AiTutor.buildRequest('hint',q,{hint_used:true,codes:[]});
      window.AiTutor.callTutor(req).then(resp=>{
-       if(!resp||!resp.message_ru||window.AiTutor.hintLeaks(resp,expected))return;
+       if(!resp||!window.AiTutor.isLiveMessage(resp.message_ru)||window.AiTutor.hintLeaks(resp,expected))return;
        box.textContent=resp.message_ru+(resp.next_action_ru?' '+resp.next_action_ru:'');
      });
    }
@@ -422,8 +422,8 @@
      const paint=(resp)=>{
        const out=$('#ai-tutor-out');if(!out||!resp)return;
        out.hidden=false;
-       const leak=resp.mode==='hint'?false:!!(resp.contrast&&resp.contrast.correct);
-       out.innerHTML='<p>'+esc(resp.message_ru||'Разбор по правилу урока сейчас короткий. Можно продолжить упражнение.')+'</p>';
+       const live=window.AiTutor.isLiveMessage(resp.message_ru);
+       out.innerHTML='<p>'+esc(live?resp.message_ru:'Не разобрала этот ответ. Смотри разбор на карточке выше.')+'</p>';
      };
      const ask=(m)=>{
        const out=$('#ai-tutor-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
@@ -685,7 +685,6 @@
        out.hidden=false;
        out.textContent='Не разобрала этот вопрос. Смотри текст шага выше.';
      };
-     const stub=s=>!s||s.length<12||/короткий разбор|Правило уже на карточке|недоступен|Проверь форму по правилу|Проверь правило текущего урока|Полный ответ не показываю/.test(s);
      $$('[data-path-kind]').forEach(b=>b.onclick=()=>showLocal(b.dataset.pathKind||'simplify'));
      const go=$('#path-ask-send');
      if(go)go.onclick=()=>{
@@ -698,7 +697,7 @@
        const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:[les.id]});
        window.AiTutor.callTutor(req,18000).then(resp=>{
          const msg=resp&&typeof resp.message_ru==='string'?resp.message_ru:'';
-         if(!stub(msg)){if(out)out.textContent=msg;return;}
+         if(window.AiTutor.isLiveMessage(msg)){if(out)out.textContent=msg;return;}
          failAsk();
        }).catch(()=>failAsk());
      };
@@ -886,6 +885,7 @@
  function renderRules(){
    $('#rules-content').innerHTML=`
      <div class="panel rules-search"><label for="rules-q">Найти правило или слово</label><input id="rules-q" type="search" placeholder="казахское слово или тема" autocomplete="off"><p class="small">Поиск по этой странице. Несуществующее слово не становится новой статьёй.</p></div>
+     <div class="panel" id="rules-ask-panel"><p class="small">Свой вопрос по правилу этой страницы. Не открывает падежи и будущие темы.</p><label class="input-label" for="rules-ask-q">Не поняла</label><input id="rules-ask-q" type="text" maxlength="400" autocomplete="off"><button type="button" class="text-button" id="rules-ask-send">Спросить</button><div id="rules-ask-out" hidden></div></div>
      <div class="panel"><h2>Сингармонизм без путаницы</h2><p>Для выбора окончания нужны две опоры: <strong>последний слог</strong> определяет гласную, <strong>последняя буква</strong> — первую согласную. Не пытайся запомнить шесть окончаний как шесть отдельных правил.</p><div class="table-wrap"><table><thead><tr><th scope="col">Последняя буква слова</th><th scope="col">Последний слог задний<br>А О Ұ Ы</th><th scope="col">Последний слог передний<br>Ә Ө Ү І Е</th></tr></thead><tbody><tr><th scope="row">Гласная, Р, Й, У → Л</th><td lang="kk">-лар · қалалар</td><td lang="kk">-лер · көшелер</td></tr><tr><th scope="row">Л, М, Н, Ң, Ж, З → Д</th><td lang="kk">-дар · адамдар</td><td lang="kk">-дер · сөздер</td></tr><tr><th scope="row">Глухая; Б, В, Г, Д → Т</th><td lang="kk">-тар · кітаптар</td><td lang="kk">-тер · жігіттер</td></tr></tbody></table></div><p>Пример рассуждения: кі-<strong>тап</strong> → последний слог задний → А. Последняя буква П → Т. Получаем кітап + тар = <span lang="kk">кітаптар</span>.</p><p>И и У разбираем в составе слова: иттер, но ми (мозг) → милар. -мен — особое падежное окончание без чередования А/Е. Остальные группы букв в методичке — учебная схема; полный алфавит не нужно смешивать с двумя основными группами гласных.</p><p><a href="https://kaz-tili.kz/su_mn1.htm" target="_blank" rel="noopener noreferrer">Правило множественного числа и примеры</a></p></div>
      <div class="panel"><h2>Числа: лестница, не список до 9999</h2>
      <p>Мозг не учит «47» как отдельное слово. Сначала <strong>0–10</strong>, потом круглые десятки, потом отличаем пары <span lang="kk">сегіз / сексен</span> (8 и 80). Составные собираем из частей.</p>
@@ -919,6 +919,22 @@
        if(p.classList.contains('rules-search'))return;
        p.hidden=!!(n&&!core.normalize(p.textContent).includes(n));
      });
+   };
+   const rulesSend=$('#rules-ask-send');
+   if(rulesSend)rulesSend.onclick=()=>{
+     const q=($('#rules-ask-q')&&$('#rules-ask-q').value.trim())||'';
+     const out=$('#rules-ask-out');if(!out)return;
+     if(!q){out.hidden=false;out.textContent='Напиши вопрос своими словами.';return;}
+     out.hidden=false;out.textContent='Разбираю этот ответ…';
+     if(!window.AiTutor||!window.AiTutor.callTutor){out.textContent='Не разобрала этот вопрос. Смотри текст правила выше.';return;}
+     const lessons=['1-1','1-2','1-3','2-1','2-2','2-3'];
+     const tRules=(window.AiRules&&window.AiRules.allowedRuleIds(lessons))||[];
+     const dummy={id:'rules:ask',lessonId:'1-1',title:'Правила курса',stimulus:'',fields:[{answers:['']}],ruleIds:tRules};
+     const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:lessons});
+     window.AiTutor.callTutor(req,18000).then(resp=>{
+       const msg=resp&&resp.message_ru||'';
+       out.textContent=window.AiTutor.isLiveMessage(msg)?msg:'Не разобрала этот вопрос. Смотри текст правила выше.';
+     }).catch(()=>{out.textContent='Не разобрала этот вопрос. Смотри текст правила выше.';});
    };
    $$('[data-rule-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.ruleTopic;sourceFilter=null;mode='ordered';showView('practice');startQueue();});
    $$('#rules-content [data-source]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.source;vocabRole=null;topic='all';mode='ordered';showView('practice');startQueue();});
@@ -979,7 +995,8 @@
        const req=window.AiTutor.buildRequest('session_summary',{lessonId:'',id:'',title:'',stimulus:'',fields:[]},{codes:window.AiTutor.topWeak().map(w=>w.error_code)});
        window.AiTutor.callTutor(req).then(resp=>{
          const root=document.getElementById('today-content');if(!root||!resp)return;
-         const box=document.createElement('div');box.className='panel ai-tutor-out';box.innerHTML='<h2>Разбор</h2><p>'+esc(resp.message_ru||'')+'</p>';
+         const msg=window.AiTutor.isLiveMessage(resp.message_ru)?resp.message_ru:'Не разобрала этот разбор. Смотри слабые места выше.';
+         const box=document.createElement('div');box.className='panel ai-tutor-out';box.innerHTML='<h2>Разбор</h2><p>'+esc(msg)+'</p>';
          root.prepend(box);
        });
        return;

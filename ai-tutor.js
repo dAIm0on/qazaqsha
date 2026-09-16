@@ -155,6 +155,11 @@
     user_question:extra.user_question||''
   };
  }
+ function isLiveMessage(s){
+  s=String(s||'').trim();
+  if(s.length<12)return false;
+  return !/короткий разбор|разбор по правилу урока сейчас короткий|Правило уже на карточке|недоступен|Проверь форму по правилу|Проверь правило текущего урока|Полный ответ не показываю|Не разобрала этот вопрос|Разбор сессии сейчас короткий/i.test(s);
+ }
  async function callTutor(req,timeoutMs=18000){
   const v=C.validateRequest(req);
   if(!v.ok)return C.fallback(req&&req.mode,'','bad_req');
@@ -167,7 +172,14 @@
     if(!res.ok)return localFallback(null,v.req.candidate_error_codes,v.req.mode,v.req);
     const json=await res.json();
     const checked=C.validateResponse(json,v.req);
-    return checked.resp;
+    const resp=checked.resp;
+    const live=typeof json.message_ru==='string'?json.message_ru.trim():'';
+    if(isLiveMessage(live)){
+      if(v.req.mode==='hint'&&hintLeaks({message_ru:live,micro_rule_ru:json.micro_rule_ru,next_action_ru:json.next_action_ru,contrast:json.contrast},v.req.expected_answer))return resp;
+      resp.message_ru=live.slice(0,450);
+      return resp;
+    }
+    return resp;
   }catch{
     clearTimeout(t);
     return localFallback(null,v.req.candidate_error_codes,v.req.mode,v.req);
@@ -232,6 +244,6 @@
  function hintLeaks(resp,expected){
   return C.containsExpected(resp,expected);
  }
- const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,localFallback,buildRequest,callTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset};
+ const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,localFallback,isLiveMessage,buildRequest,callTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset};
  if(node)module.exports=api;else root.AiTutor=api;
 })(typeof window!=='undefined'?window:globalThis);
