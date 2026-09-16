@@ -693,10 +693,10 @@
        if(!q){showLocal('simplify');return;}
        const out=$('#path-ask-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
        if(!window.AiTutor||!window.AiTutor.callTutor){failAsk();return;}
-       const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:'Глава: '+ch.title,stimulus:'Шаг: '+beatPlain(beat).slice(0,280),fields:[{answers:['']}],ruleIds:[]};
+       const tRules=(window.AiRules&&window.AiRules.allowedRuleIds([les.id]))||[];
+       const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:'Глава: '+ch.title,stimulus:'Шаг: '+beatPlain(beat).slice(0,280),fields:[{answers:['']}],ruleIds:tRules};
        const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:[les.id]});
        window.AiTutor.callTutor(req,18000).then(resp=>{
-         if(resp&&resp.ok===false){failAsk();return;}
          const msg=resp&&typeof resp.message_ru==='string'?resp.message_ru:'';
          if(!stub(msg)){if(out)out.textContent=msg;return;}
          failAsk();
