@@ -423,7 +423,7 @@
        const out=$('#ai-tutor-out');if(!out||!resp)return;
        out.hidden=false;
        const leak=resp.mode==='hint'?false:!!(resp.contrast&&resp.contrast.correct);
-       out.innerHTML='<p class="eyebrow">Разбор по правилу урока</p><p>'+esc(resp.message_ru||'Разбор по правилу урока сейчас короткий. Можно продолжить упражнение.')+'</p>'+(resp.micro_rule_ru?'<p class="small">'+esc(resp.micro_rule_ru)+'</p>':'')+(resp.contrast&&resp.contrast.wrong?'<p class="small">'+esc(resp.contrast.wrong)+'</p>':'')+(leak?'<p class="small">'+esc(resp.contrast.correct)+'</p>':'')+(resp.next_action_ru?'<p class="small">'+esc(resp.next_action_ru)+'</p>':'');
+       out.innerHTML='<p>'+esc(resp.message_ru||'Разбор по правилу урока сейчас короткий. Можно продолжить упражнение.')+'</p>';
      };
      const ask=(m)=>{
        const out=$('#ai-tutor-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
