@@ -637,8 +637,10 @@ ok('P1.8 typed ordinal skills: cardinal→ordinal, ыншы/ншы, қырқын
 
 const dash=fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8');
 assert.ok(/Сначала текущий урок/.test(dash));
-assert.ok(dash.includes('<h2>Память</h2>'));
+assert.ok(dash.includes('Память'));
 assert.ok(dash.includes('Навыки'));
+assert.ok(!/не SRS/.test(dash));
+assert.ok(!/Часто путаю: \$\{progress.pairs/.test(dash)||/pairN\?/.test(dash));
 assert.ok(!/не % за сегодня/.test(dash));
 assert.ok(!/не % языка/.test(dash));
 assert.ok(/Настройки и перенос данных/.test(dash));

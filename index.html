@@ -72,10 +72,10 @@
     <nav id="lesson-nav" aria-label="Темы упражнений"></nav>
     <div class="mastery-panel"><div class="mastery-line"><span>Помню после паузы</span><strong id="mastery-count">0</strong></div><progress id="mastery-progress" value="0" max="220" aria-label="Самостоятельное воспроизведение после паузы"></progress><p>Ответ всегда вписывается вручную, без выбора из списка.</p></div>
 
-    <button type="button" class="text-button reset-button" id="reset-progress">Сбросить прогресс</button>
+
   </aside>
   <main id="main" tabindex="-1">
-    <section id="today-view" aria-labelledby="today-title"><div class="section-heading"><p class="eyebrow">СЕГОДНЯ</p><h1 id="today-title">Сегодня — ещё немного ближе.</h1></div><div id="today-content"></div><details class="panel" id="installation-panel"><summary>На телефон и без интернета</summary><p id="offline-status" role="status">Проверяю возможность сохранить приложение…</p><button id="install-app" type="button" class="secondary-button" hidden>Установить на телефон</button><button id="update-app" type="button" class="secondary-button" hidden>Сохранить ответ и обновить приложение</button><p>Android: открой сайт в браузере и выбери «Установить приложение» или «Добавить на главный экран». iPhone: открой сайт в Safari → «Поделиться» → «На экран Домой».</p><p class="small">Сначала открой тренажёр с интернетом и дождись сообщения о сохранении материалов. Прогресс зависит от браузера: перед переходом в установленное приложение скачай progress.json и при необходимости импортируй его. Очистка данных браузера удаляет и офлайн-копию, и прогресс.</p></details></section>
+    <section id="today-view" aria-labelledby="today-title"><div class="section-heading"><h1 id="today-title">Сегодня</h1></div><div id="today-content"></div><details class="panel" id="installation-panel"><summary>На телефон и без интернета</summary><p id="offline-status" role="status">Проверяю возможность сохранить приложение…</p><button id="install-app" type="button" class="secondary-button" hidden>Установить на телефон</button><button id="update-app" type="button" class="secondary-button" hidden>Сохранить ответ и обновить приложение</button><p>Android: открой сайт в браузере и выбери «Установить приложение» или «Добавить на главный экран». iPhone: открой сайт в Safari → «Поделиться» → «На экран Домой».</p><p class="small">Сначала открой тренажёр с интернетом и дождись сообщения о сохранении материалов. Прогресс зависит от браузера: перед переходом в установленное приложение скачай progress.json и при необходимости импортируй его. Очистка данных браузера удаляет и офлайн-копию, и прогресс.</p></details></section>
     <section id="review-view" hidden aria-labelledby="review-title"><div class="section-heading"><h1 id="review-title">Повторять</h1></div><div id="review-content"></div></section>
     <section id="vocabulary-view" hidden aria-labelledby="vocabulary-title"><div class="section-heading"><h1 id="vocabulary-title">Мой словарь</h1><button type="button" class="text-button" data-view="today">К сегодняшнему плану</button></div><div id="vocabulary-content"></div></section>
     <section id="learn-view" hidden aria-labelledby="learn-title"><div class="section-heading"><h1 id="learn-title">Учить</h1></div><div id="learn-content"></div></section>
@@ -90,7 +90,7 @@
       <article id="exercise" class="exercise-card"></article>
       <button type="button" id="pause-session" class="text-button">Сделать паузу · Сегодня</button><p class="practice-note">Сначала слепая попытка. «Не знаю» показывает форму — её всё равно нужно набрать. Верно без подсказки сразу идёт дальше; ошибка остаётся на экране.</p>
     </section>
-    <section id="homework-view" hidden aria-labelledby="homework-title"><div class="section-heading"><div><p class="eyebrow">СДАЧА ЛИСТА</p><h1 id="homework-title">Домашка</h1></div><button type="button" class="text-button" data-view="today">К сегодня</button></div><div id="homework-content"></div></section>
+    <section id="homework-view" hidden aria-labelledby="homework-title"><div class="section-heading"><div><h1 id="homework-title">Домашка</h1></div><button type="button" class="text-button" data-view="today">К сегодня</button></div><div id="homework-content"></div></section>
     <section id="path-view" hidden aria-labelledby="path-title"><div class="section-heading"><div><p class="eyebrow">РАЗБИРАЕМ ТО, ЧТО УЖЕ БЫЛО НА ЗАНЯТИЯХ</p><h1 id="path-title">Уроки и правила</h1></div><button type="button" class="text-button" data-view="today">К сегодня</button></div><div id="path-content"></div></section>
     <section id="exam-view" hidden aria-labelledby="exam-title"><div class="section-heading"><div><p class="eyebrow">ЗАКРЕПЛЕНИЕ НА ВРЕМЯ</p><h1 id="exam-title">Экзамен</h1></div></div><div id="exam-content"></div></section>
     <section id="rules-view" hidden aria-labelledby="rules-title"><div class="section-heading"><div><p class="eyebrow">ПОД РУКОЙ</p><h1 id="rules-title">Правила и словарь</h1></div></div><div id="rules-content"></div></section>
@@ -116,12 +116,13 @@
 </dialog>
 <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title">
   <h2 id="settings-title">Оформление</h2>
-  <p class="small">Сезон меняет бумагу и акценты, не правила курса. Зима сохраняет выбранную тему. Фотографии подключим отдельно.</p>
+  <p class="small">Сезон меняет цвет бумаги. На учёбу не влияет.</p>
   <div class="season-swatches" role="group" aria-label="Сезон">
     <button type="button" class="autumn" data-season-pick="autumn" aria-label="Осень" aria-pressed="true"></button>
     <button type="button" class="summer" data-season-pick="summer" aria-label="Лето" aria-pressed="false"></button>
     <button type="button" class="spring" data-season-pick="spring" aria-label="Весна" aria-pressed="false"></button>
   </div>
+  <p class="season-captions"><span>Осень</span><span>Лето</span><span>Весна</span></p>
   <label>Сезон
     <select id="season-select">
       <option value="autumn">Осень</option>

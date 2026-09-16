@@ -316,6 +316,8 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
 .season-swatches .autumn{background:#41573F}
 .season-swatches .summer{background:#416154}
 .season-swatches .spring{background:#456343}
+.season-captions{display:flex;gap:9px;margin:6px 0 0;font-size:.75rem;color:var(--muted)}
+.season-captions span{width:44px;text-align:center}
 .glyph-check{font-size:1.15rem;letter-spacing:.04em;overflow-wrap:anywhere;margin:12px 0 0}
 
 .reset-button{margin-top:24px}
