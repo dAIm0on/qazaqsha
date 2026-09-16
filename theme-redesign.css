@@ -257,7 +257,8 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
 .morpheme.suffix{background:var(--sage);color:var(--primary);border-color:var(--sage)}
 .morpheme.extra{background:var(--error-bg);color:var(--error);border-color:transparent}
 
-.bottom-nav{background:var(--surface);border-top-color:var(--line)}
+.bottom-nav{background:var(--surface);border-top-color:var(--line);grid-template-columns:repeat(5,minmax(0,1fr))!important}
+:root{--bottom-nav-height:calc(64px + env(safe-area-inset-bottom, 0px))}
 .bottom-nav button{color:var(--muted);border-radius:12px;font-size:.6875rem;min-height:52px}
 .bottom-nav button[aria-current=page]{color:var(--primary);background:var(--sage);box-shadow:none}
 
@@ -285,7 +286,14 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
 .homework-head .primary-button{margin-top:16px;min-width:12rem}
 .homework-head h2{margin:8px 0 12px}
 .exam-intro h2{margin:0 0 12px}
-.rules-search input[type=search]{margin-top:8px}
+.rules-search label{display:block;margin-bottom:8px}
+.rules-search input[type=search]{display:block;width:100%;min-height:44px;margin-top:0;font-size:max(16px,1rem)}
+.filter-fold{margin:0 0 12px}
+.filter-fold > summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
+@media(min-width:691px){
+  .filter-fold > summary{display:none}
+  .filter-fold{display:block}
+}
 .path-lessons{display:grid;gap:10px}
 .lesson{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:16px;padding:20px 22px;background:var(--surface);border:1px solid var(--line);border-radius:18px;margin:0;width:100%;text-align:left;color:inherit}
 .lesson.current{border-color:var(--primary);background:var(--sage)}
@@ -352,7 +360,7 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
   .letter-keyboard button{min-width:0;min-height:44px}
   body[data-view=practice] .topbar{opacity:1}
   body[data-view=practice] .bottom-nav{display:none!important}
-  body[data-view=practice]{padding-bottom:12px}
+  body[data-view=practice]{padding-bottom:var(--bottom-nav-height)}
   body[data-view=practice] .question-actions{bottom:0}
   .path-crumb{position:sticky;top:0;background:var(--paper);padding:8px 0;z-index:2}
   .lesson{grid-template-columns:38px minmax(0,1fr);padding:18px}

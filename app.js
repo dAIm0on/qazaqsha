@@ -35,7 +35,7 @@
  }
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
- let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null,hwSection=0,hwReturn=null,remediationNote='';
+ let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null,hwSection=0,hwReturn=null,remediationNote='',retrying=false;
  function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}
  function focusAnswer(){const el=$('#answer-0');if(el&&!el.disabled){try{el.focus({preventScroll:false});}catch{el.focus();}}}
  function captureDraft(){const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};}
@@ -83,13 +83,22 @@
    examRaf=requestAnimationFrame(tick);
  }
  function renderExam(){
-   $('#exam-content').innerHTML=`<div class="panel exam-intro"><h2>Закрепление на время</h2><p>В обычной учёбе время не штрафует. Экзамен — те же задания, но ${cfg.session.examMs/1000} секунды на карточку. Подсказки выключены.</p><p class="small">${cfg.session.examSize} карточек. Карточка без двух отложенных слепых успехов сюда не попадает — это не новый замок на весь курс, а действующее условие ядра.</p>
-     <div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>`<button type="button" class="chip" data-exam="${id}">${esc(name)}</button>`).join('')}</div>
+   const pool=questions.filter(q=>eligible(q)&&examReady(records[q.id])&&(!window.CurriculumGate||window.CurriculumGate.examEligible(q)));
+   const n=Math.min(cfg.session.examSize,pool.length);
+   if(!n){
+     $('#exam-content').innerHTML=`<div class="panel exam-intro"><h2>Пока нечего закреплять</h2><p>Сюда попадают формы, которые ты уже вспоминала после паузы в разные дни.</p><p><button type="button" class="primary-button" data-view="today">К сегодня</button></p></div>`;
+     $('#exam-content [data-view="today"]').onclick=()=>showView('today');
+     return;
+   }
+   $('#exam-content').innerHTML=`<div class="panel exam-intro"><h2>Закрепление на время</h2><button type="button" class="primary-button" id="exam-start">Начать ${n} карточек</button><p class="small">Подсказки выключены. Только то, что уже вспоминалось после паузы. Короткий лимит на карточку.</p>
+     <div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>name?`<button type="button" class="chip" data-exam="${id}">${esc(name)}</button>`:'').join('')}</div>
      <div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-exam-course="${b.id}">${esc(b.title)}</button>`).join('')}</div>
      <p><button type="button" class="secondary-button" id="exam-rules">Только правила (другие основы)</button></p></div>`;
-   $$('#exam-content [data-exam]').forEach(b=>b.onclick=()=>{topic=b.dataset.exam;mode='exam';sourceFilter=null;vocabRole=null;activeLesson=null;startQueue({all:true});showView('practice');});
-   $$('#exam-content [data-exam-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.examCourse;mode='exam';activeLesson=null;startQueue({all:true});showView('practice');});
-   $('#exam-rules').onclick=()=>{topic='rules';mode='exam';courseBlock=null;sourceFilter=null;vocabRole=null;activeLesson=null;startQueue({all:true});showView('practice');};
+   const go=()=>{mode='exam';sourceFilter=null;vocabRole=null;activeLesson=null;startQueue({all:true});showView('practice');};
+   $('#exam-start').onclick=go;
+   $$('#exam-content [data-exam]').forEach(b=>b.onclick=()=>{topic=b.dataset.exam;go();});
+   $$('#exam-content [data-exam-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.examCourse;go();});
+   $('#exam-rules').onclick=()=>{topic='rules';courseBlock=null;go();};
  }
  function save(){
    captureDraft();state.records=records;state.learning=learningState;
@@ -180,7 +189,7 @@
    $('#session-position').textContent=['smart','lesson','review','contrast'].includes(mode)?`В подходе ${new Set(queue).size} разных карточек · шаг ${Math.min(position+1,queue.length)} из ${queue.length}`:`Встречалось ${tried} из ${scope.length} карточек`;
    $('#session-score').textContent=sessionAttempts?`Без подсказки: ${sessionCorrect} / ${sessionAttempts} · с подсказкой: ${sessionAssisted}`:'Можно отвечать сразу';
    $('#practice-title').textContent=mode==='exam'?'Экзамен на время':activeLesson?window.LEARNING.lessons.find(l=>l.id===activeLesson).title:topic==='all'?'Практика казахского':topics.find(x=>x[0]===topic)[1];
-   $('.course-badge').textContent=mode==='homework'?'Лист сдачи':mode==='exam'?'На время':'Письменно';
+   $('.course-badge').textContent=mode==='homework'?'Домашка':mode==='exam'?'На время':'Письменно';
    $$('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
    const sf=$('#source-filter');
    if(courseBlock){
@@ -195,9 +204,10 @@
  }
  function renderJumpBar(){
    const bar=$('#jump-bar');if(!bar)return;
-   bar.innerHTML=`<div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>`<button type="button" class="chip" data-jump-topic="${id}" ${topic===id?'aria-pressed="true"':''}>${esc(name)}</button>`).join('')}</div><div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-jump-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>${esc(b.title)}</button>`).join('')}<button type="button" class="chip" data-jump-course="" ${courseBlock?'':'aria-pressed="true"'}>все</button></div>`;
+   bar.innerHTML=`<details class="filter-fold"><summary>Фильтр</summary><div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>name?`<button type="button" class="chip" data-jump-topic="${id}" ${topic===id?'aria-pressed="true"':''}>${esc(name)}</button>`:'').join('')}</div><div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-jump-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>${esc(b.title)}</button>`).join('')}<button type="button" class="chip" data-jump-course="" ${courseBlock?'':'aria-pressed="true"'}>Все</button></div></details>`;
    $$('#jump-bar [data-jump-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.jumpTopic;activeLesson=null;vocabRole=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');});
    $$('#jump-bar [data-jump-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.jumpCourse||null;activeLesson=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');});
+   const fold=$('#jump-bar details');if(fold&&typeof matchMedia==='function'&&matchMedia('(min-width:691px)').matches)fold.open=true;
  }
  function encodingMarkup(q){
    if(!q||mode==='exam')return '';
@@ -213,6 +223,7 @@
    return `<div class="fields">${fields.map((f,i)=>`<div class="field-row"><label class="field-label" for="answer-${i}">${esc(f.label)}</label><div class="field-control"><input id="answer-${i}" name="answer-${i}" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${f.kind==='number-text'?'inputmode="numeric"':''} aria-describedby="correction-${i}"><span class="field-correction" id="correction-${i}"></span></div></div>`).join('')}</div>`;
  }
  function render(){
+   retrying=false;
    introOpen=false;pauseTimer();elapsedMs=0;checked=false;hinted=false;rulePeeked=false;lastTextInput=null;renderStats();
    const q=byId.get(queue[position]);
    if(!q){renderEmpty();return;}
@@ -303,7 +314,17 @@
  }
  function readAnswers(q){return q.kind==='multi'?$$('input[name=choice]:checked').map(el=>el.value):q.fields.map((_,i)=>$('#answer-'+i).value);}
  function checkAnswer(q,reveal=false){
-   if(checked)return;
+   if(checked&&!retrying)return;
+   if(retrying){
+     const answers=readAnswers(q), warning=$('#validation');
+     if(answers.some(a=>!String(a).trim())&&q.kind!=='multi'){warning.textContent='Набери форму целиком.';warning.hidden=false;return;}
+     warning.hidden=true;
+     const result=core.evaluate(q,answers);
+     if(result.correct){nextQuestion();return;}
+     warning.textContent='Ещё раз целиком.';warning.hidden=false;
+     q.fields.forEach((_,i)=>{const el=$('#answer-'+i);if(el)el.value='';});
+     focusAnswer();return;
+   }
    const answers=readAnswers(q), warning=$('#validation');
    if(!reveal){
      const missing=q.kind==='multi'?answers.length===0:answers.some(a=>!a.trim());
@@ -374,21 +395,29 @@
        if(!result.parts[i]||reveal)el.setAttribute('aria-invalid','true');
      });
    }
-   $$('#answer-form input, #answer-form select, #hint-button, #reveal-button, [data-letter]').forEach(el=>{el.disabled=true;});
-   $('#answer-form').classList.add('answered');
-   $('#check-button').hidden=true;$('#next-button').hidden=false;
+   const allowRetry=!result.correct&&mode!=='exam'&&!reveal;
+   if(!allowRetry){
+     $$('#answer-form input, #answer-form select, #hint-button, #reveal-button, [data-letter]').forEach(el=>{el.disabled=true;});
+     $('#answer-form').classList.add('answered');
+     $('#check-button').hidden=true;$('#next-button').hidden=false;
+   }else{
+     retrying=true;checked=false;
+     $('#check-button').hidden=false;$('#next-button').hidden=true;
+     q.fields.forEach((_,i)=>{const el=$('#answer-'+i);if(el){el.value='';el.classList.remove('valid','invalid');el.removeAttribute('aria-invalid');el.disabled=false;}});
+     focusAnswer();
+   }
    const feedback=$('#feedback');feedback.className='feedback '+(!result.correct?'error':hinted?'hinted':'');
    const headline=reveal?'Разберём ответ':!result.correct?'Пока не всё верно':hinted?'Верно с подсказкой. Позже вернёмся к этому без помощи.':rec.streak>=2?'Верно самостоятельно':'Верно';
    let status=rec.streak>=2?'Следующая проверка по памяти: '+new Date(rec.dueAt).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+'.':!result.correct?'Эта карточка появится снова.':'Для закрепления карточка вернётся позже.';
    if(deferred)status='Карточка сохранена для следующего подхода: сейчас не хватает других заданий для паузы.';
    if(result.correct&&hinted)status='Перенабор засчитан как обучение, не как самостоятельный успех. Карточка вернётся в этом подходе слепой.';
    const answerLine=q.kind==='multi'?q.correct.join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
-   const timeLine=mode==='exam'?(examTimedOut?'Время вышло.':'Время '+(elapsedMs/1000).toFixed(1)+' с'+(elapsedMs>cfg.session.examHardMs&&result.correct?' · медленно, для экзамена это слабо.':' · зачёт по времени.')):(cfg.labels[rec.mastery_level]+' · время '+(elapsedMs/1000).toFixed(1)+' с, без штрафа.');
+   const timeLine=mode==='exam'?(examTimedOut?'Время вышло.':'Короткий лимит на карточку'+(elapsedMs>cfg.session.examHardMs&&result.correct?' · медленно.':' · зачёт.')):'';
    const local=errors.map(e=>window.ErrorDiagnostics.line&&window.ErrorDiagnostics.line(e.error_type)||window.ErrorDiagnostics.labels[e.error_type]).filter(Boolean);
    const aiCodes=window.AiTutor&&mode!=='exam'?window.AiTutor.noteAnswer(q,answers,result,hinted,errors,now):[];
    const aiRepeat=window.AiTutor&&aiCodes[0]&&window.AiTutor.shouldOfferExplain(aiCodes[0]);
    const morph=!result.correct?morphemeRow(errors,answerLine,answers.join(' ')):'';
-   feedback.innerHTML=`<h3>${headline}</h3>${morph}<p><strong>Ответ:</strong> ${esc(answerLine)}.</p>${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p><p class="small">${timeLine}</p>`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;
+   feedback.innerHTML=`<h3>${headline}</h3>${morph}<p><strong>Ответ:</strong> ${esc(answerLine)}.</p>${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;
    if(!result.correct&&mode!=='exam'&&window.AiTutor){
      const paint=(resp)=>{
        const out=$('#ai-tutor-out');if(!out||!resp)return;
@@ -415,7 +444,7 @@
      const next=$('#next-button');if(next)next.focus({preventScroll:true});
    }
  }
- function nextQuestion(){cancelAdvance();draft=null;position++;if(!['ordered','shuffle','homework'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
+ function nextQuestion(){cancelAdvance();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
  function startHomework(lessonId,part,section){
    const H=window.Homework,pack=(H.packs(questions,course).find(p=>p.lesson_id===lessonId));
    if(!pack)return;
@@ -751,7 +780,7 @@
  function renderRules(){
    $('#rules-content').innerHTML=`
      <div class="panel rules-search"><label for="rules-q">Найти правило или слово</label><input id="rules-q" type="search" placeholder="казахское слово или тема" autocomplete="off"><p class="small">Поиск по этой странице. Несуществующее слово не становится новой статьёй.</p></div>
-     <div class="panel"><h2>Сингармонизм без путаницы</h2><p>Для выбора окончания нужны две опоры: <strong>последний слог</strong> определяет гласную, <strong>последняя буква</strong> — первую согласную. Не пытайся запомнить шесть окончаний как шесть отдельных правил.</p><div class="table-wrap"><table><thead><tr><th scope="col">Последняя буква слова</th><th scope="col">Последний слог задний<br>А О Ұ Ы</th><th scope="col">Последний слог передний<br>Ә Ө Ү І Е</th></tr></thead><tbody><tr><th scope="row">Гласная, Р, Й, У → Л</th><td lang="kk">-лар · қалалар</td><td lang="kk">-лер · көшелер</td></tr><tr><th scope="row">Л, М, Н, Ң, Ж, З → Д</th><td lang="kk">-дар · адамдар</td><td lang="kk">-дер · сөздер</td></tr><tr><th scope="row">Глухая; Б, В, Г, Д → Т</th><td lang="kk">-тар · кітаптар</td><td lang="kk">-тер · жігіттер</td></tr></tbody></table></div><p>Пример рассуждения: кі-<strong>тап</strong> → последний слог задний → А. Последняя буква П → Т. Получаем кітап + тар = <span lang="kk">кітаптар</span>.</p><p>И и У разбираем в составе слова: иттер, но милар. -мен — особое падежное окончание без чередования А/Е. Остальные группы букв в методичке — учебная схема; полный алфавит не нужно смешивать с двумя основными группами гласных.</p><p><a href="https://kaz-tili.kz/su_mn1.htm" target="_blank" rel="noopener noreferrer">Правило множественного числа и примеры</a></p></div>
+     <div class="panel"><h2>Сингармонизм без путаницы</h2><p>Для выбора окончания нужны две опоры: <strong>последний слог</strong> определяет гласную, <strong>последняя буква</strong> — первую согласную. Не пытайся запомнить шесть окончаний как шесть отдельных правил.</p><div class="table-wrap"><table><thead><tr><th scope="col">Последняя буква слова</th><th scope="col">Последний слог задний<br>А О Ұ Ы</th><th scope="col">Последний слог передний<br>Ә Ө Ү І Е</th></tr></thead><tbody><tr><th scope="row">Гласная, Р, Й, У → Л</th><td lang="kk">-лар · қалалар</td><td lang="kk">-лер · көшелер</td></tr><tr><th scope="row">Л, М, Н, Ң, Ж, З → Д</th><td lang="kk">-дар · адамдар</td><td lang="kk">-дер · сөздер</td></tr><tr><th scope="row">Глухая; Б, В, Г, Д → Т</th><td lang="kk">-тар · кітаптар</td><td lang="kk">-тер · жігіттер</td></tr></tbody></table></div><p>Пример рассуждения: кі-<strong>тап</strong> → последний слог задний → А. Последняя буква П → Т. Получаем кітап + тар = <span lang="kk">кітаптар</span>.</p><p>И и У разбираем в составе слова: иттер, но ми (мозг) → милар. -мен — особое падежное окончание без чередования А/Е. Остальные группы букв в методичке — учебная схема; полный алфавит не нужно смешивать с двумя основными группами гласных.</p><p><a href="https://kaz-tili.kz/su_mn1.htm" target="_blank" rel="noopener noreferrer">Правило множественного числа и примеры</a></p></div>
      <div class="panel"><h2>Числа: лестница, не список до 9999</h2>
      <p>Мозг не учит «47» как отдельное слово. Сначала <strong>0–10</strong>, потом круглые десятки, потом отличаем пары <span lang="kk">сегіз / сексен</span> (8 и 80). Составные собираем из частей.</p>
      <ol class="learning-steps"><li>0–10 — отдельные слова, вразброс, не считая по порядку.</li><li>10, 20, 30, 40, 50 — тоже отдельные слова (жиырма ≠ екі + он).</li><li>60–90 рядом с 6–9: алты↔алпыс, жеті↔жетпіс, сегіз↔сексен, тоғыз↔тоқсан.</li><li>Двузначные сначала с эхом: 88, 55, 66 — в одном числе 8 и 80, 5 и 50.</li><li>Сотни: жүз. Сначала 550, 880, 808.</li><li>Тысячи: мың. Сначала 1550, 8080, 1888.</li></ol>

@@ -923,4 +923,11 @@ assert.ok(!/\bQwen\b/.test(uiBlob));
 assert.ok(!/нейросеть/.test(uiBlob));
 ok('AI-1 student UI does not name the model');
 
+assert.ok(!/\bSRS\b/.test(dash));
+assert.ok(!/замок на весь курс/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/Начать \$\{n\} карточек|Пока нечего закреплять/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/repeat\(5,/.test(theme));
+assert.ok(/id="homework-title">Домашка/.test(htmlSrc));
+ok('COPY-2/NAV-1 exam start or empty; 5-col nav; homework title');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
