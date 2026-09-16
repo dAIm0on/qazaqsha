@@ -577,7 +577,13 @@
      }
      if(kind==='ru'){
        const br=first('bridge');
-       if(br)return join(['В русском: '+(br.ru||''),'В казахском: '+(br.kz||''),br.do||br.doit||'']);
+       if(br){
+         const ru=String(br.ru||'').trim();
+         const kz=String(br.kz||'').trim();
+         const ruLine=/^в русск/i.test(ru)?ru:(ru?'В русском: '+ru:'');
+         const kzLine=/^в казах/i.test(kz)?kz:(kz?'В казахском: '+kz:'');
+         return join([ruLine,kzLine,br.do||br.doit||'']);
+       }
        const w=beats.find(b=>b.k==='why'&&/русск/i.test((b.b||'')+' '+(b.t||'')));
        if(w)return clip(w.b||w.t);
        const g=first('goal');if(g)return clip(g.t);
@@ -641,7 +647,7 @@
      const open=$('#path-ask'),panel=$('#path-ask-panel');
      if(open)open.onclick=()=>{if(panel)panel.hidden=!panel.hidden;};
      const showLocal=kind=>{const out=$('#path-ask-out');if(!out)return;out.hidden=false;out.textContent=pathLocalText(ch,kind);};
-     const stub=s=>!s||s.length<12||/короткий разбор|Правило уже на карточке|недоступен/.test(s);
+     const stub=s=>!s||s.length<12||/короткий разбор|Правило уже на карточке|недоступен|Проверь форму по правилу|Проверь правило текущего урока|Полный ответ не показываю|Можно продолжить/.test(s);
      $$('[data-path-kind]').forEach(b=>b.onclick=()=>showLocal(b.dataset.pathKind||'simplify'));
      const go=$('#path-ask-send');
      if(go)go.onclick=()=>{
@@ -652,10 +658,11 @@
        const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:ch.title,stimulus:ch.title,fields:[{answers:['']}],ruleIds:ch.rule_ids||[]};
        const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:[les.id]});
        window.AiTutor.callTutor(req).then(resp=>{
+         if(resp&&resp.ok===false){showLocal('rule');return;}
          const msg=resp&&typeof resp.message_ru==='string'?resp.message_ru:'';
          if(!stub(msg)){if(out)out.textContent=msg;return;}
          showLocal('rule');
-       });
+       }).catch(()=>showLocal('rule'));
      };
    }
    if(beat.k==='goal'){

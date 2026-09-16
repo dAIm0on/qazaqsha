@@ -361,6 +361,7 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
   body[data-view=practice] .topbar{opacity:1}
   body[data-view=practice] .bottom-nav{display:none!important}
   body[data-view=practice]{padding-bottom:var(--bottom-nav-height)}
+  body[data-view=path]{padding-bottom:var(--bottom-nav-height)}
   body[data-view=practice] .question-actions{bottom:0}
   .path-crumb{position:sticky;top:0;background:var(--paper);padding:8px 0;z-index:2}
   .lesson{grid-template-columns:38px minmax(0,1fr);padding:18px}
