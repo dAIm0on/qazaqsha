@@ -532,20 +532,40 @@
    const nextBeat=()=>{gp.beat++;save();renderPath();};
    const letters=state.prefs.letters;
    const kb=letters?`<div class="letter-keyboard">${[...'әғқңөұүһі'].map(ch=>'<button type="button" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`:'';
+   function pathAskChips(lessonId,chapter){
+     const id=chapter.id||'';
+     const simplify=['Объясни ещё проще','Объясни ещё проще'];
+     const pair=(label,q)=>[label,q];
+     if(lessonId==='1-1'&&id!=='1-1-ae')return [simplify,pair('Сравни с русским','Чем это отличается от русского мягкого согласного?'),pair('Ещё 2 примера','Дай ещё 2 пары на знакомых словах.')];
+     if(id==='1-1-ae'||id==='1-2-a')return [simplify,pair('Сравни с русским','Почему твёрдое берёт А, а мягкое Е?'),pair('Ещё 2 примера','Дай ещё 2 слова курса: только гласная А или Е.')];
+     if(id==='1-2-b'||id==='1-2-traps')return [simplify,pair('Сравни с русским','Почему не *адамлар и не *жердер?'),pair('Ещё 2 примера','Дай ещё 2 основы: только стык Л, Д или Т.')];
+     if(id==='1-2-slot'||id==='1-2-glue')return [simplify,pair('Сравни с русским','Чем казахское множественное отличается от русской формы «книги»?'),pair('Ещё 2 примера','Собери ещё 2 формы двумя рычагами на словах курса.')];
+     if(id==='1-3-qty'||id==='1-3-qty2')return [simplify,pair('Сравни с русским','Почему «две книги», а по-казахски без -тар?'),pair('Ещё 2 примера','Дай ещё 2 примера без множественного.')];
+     if(lessonId==='1-3')return [simplify,pair('Сравни с русским','Как собрать число по разрядам, не списком?'),pair('Ещё 2 примера','Дай ещё 2 числа из курса.')];
+     if(id==='2-1-emes')return [simplify,pair('Сравни с русским','Куда переезжает окончание при емес?'),pair('Ещё 2 примера','Дай ещё 2 отрицания на знакомых словах.')];
+     if(id==='2-1-ba'||id==='2-2-rq'||id==='2-3-q'||id==='2-3-qstem')return [simplify,pair('Сравни с русским','На какой звук смотрит вопросительная частица?'),pair('Ещё 2 примера','Дай ещё 2 вопроса из этой сетки курса.')];
+     if(lessonId==='2-1')return [simplify,pair('Сравни с русским','Почему по-русски «Я врач» без «есть», а здесь нужна бирка?'),pair('Ещё 2 примера','Дай ещё 2 формы мен/сен/сіз на словах курса.')];
+     if(id==='2-2-hi'||id==='2-3-bye')return [simplify,pair('Сравни с русским','Почему это готовая фраза, а не новое окончание?'),pair('Ещё 2 примера','Покажи сетку по адресату ещё раз.')];
+     if(lessonId==='2-2')return [simplify,pair('Сравни с русским','Почему не переносим умный/умная/умные?'),pair('Ещё 2 примера','Дай ещё 2 формы біз/сендер/сіздер.')];
+     if(id==='2-3-ol'||id==='2-3-olar')return [simplify,pair('Сравни с русским','Почему у ол нет мын?'),pair('Ещё 2 примера','Дай ещё 2 фразы с ол/олар.')];
+     if(lessonId==='2-3')return [simplify,pair('Сравни с русским','Чем порядковое отличается от екі кітап?'),pair('Ещё 2 примера','Дай ещё 2 порядковых из курса.')];
+     return [simplify,pair('Сравни с русским','Чем это правило отличается от русского?'),pair('Ещё 2 примера','Дай ещё 2 примера на словах текущего урока.')];
+   }
    function attachPathAsk(){
      const paper=root.querySelector('.path-paper');if(!paper||paper.querySelector('#path-ask'))return;
-     paper.insertAdjacentHTML('beforeend',`<div class="path-ai-bar"><button type="button" class="text-button" id="path-ask">Не поняла — спросить про это правило</button><div id="path-ask-panel" class="ai-tutor-out" hidden><p class="small">ИИ объясняет текущее правило. Не ставит оценку произношению и не открывает будущие темы.</p><div class="ai-tutor-actions"><button type="button" class="secondary-button" data-path-q="Объясни ещё проще">Объясни ещё проще</button><button type="button" class="secondary-button" data-path-q="Чем это отличается от русского мягкого согласного?">Сравни с русским</button><button type="button" class="secondary-button" data-path-q="Дай ещё 2 пары на знакомых словах.">Ещё 2 примера</button></div><label class="input-label" for="path-ask-q">Свой вопрос</label><input id="path-ask-q" type="text" maxlength="400" autocomplete="off"><button type="button" class="text-button" id="path-ask-send">Спросить</button><div id="path-ask-out" hidden></div></div></div>`);
+     const chips=pathAskChips(les.id,ch);
+     paper.insertAdjacentHTML('beforeend',`<div class="path-ai-bar"><button type="button" class="text-button" id="path-ask">Не поняла — спросить про это правило</button><div id="path-ask-panel" class="ai-tutor-out" hidden><p class="small">ИИ объясняет только эту главу. Не ставит оценку произношению и не открывает будущие темы.</p><div class="ai-tutor-actions">${chips.map(([label,q])=>`<button type="button" class="secondary-button" data-path-q="${esc(q)}" data-path-mode="${/проще/i.test(q)?'simplify':'explain_rule'}">${esc(label)}</button>`).join('')}</div><label class="input-label" for="path-ask-q">Свой вопрос</label><input id="path-ask-q" type="text" maxlength="400" autocomplete="off"><button type="button" class="text-button" id="path-ask-send">Спросить</button><div id="path-ask-out" hidden></div></div></div>`);
      const open=$('#path-ask'),panel=$('#path-ask-panel');
      if(open)open.onclick=()=>{if(panel)panel.hidden=!panel.hidden;};
-     const send=q=>{
+     const send=(q,mode)=>{
        const out=$('#path-ask-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
        if(!window.AiTutor||!window.AiTutor.callTutor){if(out)out.textContent='Разбор сейчас недоступен. Глава работает без ИИ.';return;}
        const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:ch.title,stimulus:ch.title,fields:[{answers:['']}],ruleIds:ch.rule_ids||[]};
-       const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[]});
+       const req=window.AiTutor.buildRequest(mode||'explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:[les.id]});
        window.AiTutor.callTutor(req).then(resp=>{if(out)out.textContent=(resp&&resp.message_ru)||'Разбор сейчас недоступен. Можно продолжить главу.';});
      };
-     $$('[data-path-q]').forEach(b=>b.onclick=()=>send(b.dataset.pathQ));
-     const go=$('#path-ask-send');if(go)go.onclick=()=>send(($('#path-ask-q')&&$('#path-ask-q').value.trim())||'Объясни ещё проще');
+     $$('[data-path-q]').forEach(b=>b.onclick=()=>send(b.dataset.pathQ,b.dataset.pathMode));
+     const go=$('#path-ask-send');if(go)go.onclick=()=>send(($('#path-ask-q')&&$('#path-ask-q').value.trim())||'Объясни ещё проще','simplify');
    }
    if(beat.k==='goal'){
      root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">ЦЕЛЬ ГЛАВЫ</p><h2>После этой главы</h2><p>${esc(beat.t)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;

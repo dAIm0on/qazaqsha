@@ -24,11 +24,18 @@
   if(code)out.push(...byError(code));
   if(q&&q.ruleIds){
    for(const r of q.ruleIds){
-    if(r==='quantity')out.push(...byCourse('quantity'));
-    else if(r==='plural')out.push(...byCourse('plural'));
-    else if(r==='harmony')out.push(...byCourse('harmony'));
-    else if(r==='ordinal')out.push(...byCourse('ordinal'));
-    else if(r==='person')out.push(...byCourse('person'));
+    if(r==='quantity'||r==='без_мн')out.push(...byCourse('quantity'));
+    else if(r==='plural'||r==='стык_мн')out.push(...byCourse('plural'));
+    else if(r==='harmony'||r==='рычаг_A')out.push(...byCourse('harmony'));
+    else if(r==='ordinal'||r==='порядковые')out.push(...byCourse('ordinal'));
+    else if(r==='person'||r==='лицо_мен')out.push(...byCourse('person'));
+    else if(r==='лицо_биз')out.push(...byCourse('person-pl'));
+    else if(r==='емес')out.push(...byCourse('emes_ba'));
+    else if(r==='ol'||r==='ол_без_бирки')out.push(...byCourse('ol'));
+    else if(r==='question'||r==='вопрос'||r==='ba_me')out.push(...byCourse('question'));
+    else if(r==='contrast')out.push(...byCourse('contrast'));
+    else if(r==='numbers'||r==='разряды')out.push(...byCourse('numbers'),...byCourse('contrast'));
+    else if(r==='T1_HARMONY'||r==='T2_PLURAL_LDT'||r==='T4_NO_PLURAL_AFTER_NUMBER'||r==='T5_NUMERAL_CONFUSION'||r==='T5_NUMERAL_COMPOSE'||r==='T6_PERSON_SG'||r==='T7_EMES'||r==='T8_PERSON_PL'||r==='T8_ADJ_PRED'||r==='T9_OL'||r==='T10_QUESTION'||r==='T11_ORDINAL'){const hit=byId(r);if(hit)out.push(hit);}
    }
   }
   const seen=new Set();

@@ -406,6 +406,26 @@ assert.ok(/который по счёту|порядков/.test(JSON.stringify(
 assert.ok(/жиырмасыншы/.test(JSON.stringify(GP.lesson('2-3'))));
 ok('Path v5 2-1…2-3: doctor ending, emes slot, no gender transfer, ordinal definition');
 
+assert.ok(GP.lessons().every(l=>(l.chapters||[]).every(c=>(c.beats||[]).some(b=>b.k==='goal'))));
+assert.ok(GP.lessons().every(l=>(l.chapters||[]).every(c=>(c.beats||[]).filter(b=>b.k==='ex').length>=3)));
+const glueProd=GP.productionAsks(GP.chapter('1-2','1-2-glue'));
+assert.ok(glueProd.length>=2);
+assert.ok(GP.productionAsks(GP.chapter('1-3','1-3-qty')).length>=2);
+assert.ok(GP.productionAsks(GP.chapter('2-1','2-1-emes')).length>=2);
+ok('Path v5 every chapter has goal; productive 1-2/1-3/2-1 have typed checks');
+
+const appPath=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(/pathAskChips/.test(appPath));
+assert.ok(/allowed_lesson_ids:\[les\.id\]/.test(appPath));
+assert.ok(/адамлар/.test(appPath)&&/емес/.test(appPath));
+ok('Path AI chips depend on chapter type, not only 1-1 soft-consonant prompt');
+
+const AiR2=require('./ai-rules.js');
+assert.ok(AiR2.cardsFor({ruleIds:['рычаг_A']},null).some(c=>c.rule_id==='T1_HARMONY'));
+assert.ok(AiR2.cardsFor({ruleIds:['стык_мн']},null).some(c=>c.rule_id==='T2_PLURAL_LDT'));
+assert.ok(AiR2.cardsFor({ruleIds:['емес']},null).some(c=>c.rule_id==='T7_EMES'));
+ok('AI cardsFor maps path rule slugs to T1–T11 cards');
+
 const Canon=require('./canonical.js');
 const Gate=require('./curriculum-gate.js');
 const Diag=require('./diagnostics.js');
