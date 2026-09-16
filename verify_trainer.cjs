@@ -377,6 +377,35 @@ assert.equal(ch11ru.id,'1-1-ru');
 assert.ok(/path-ask/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 ok('Path v5 1-1-ru: қол/көл, орман/арман, sound anchors, no pronunciation scoring, chapter id kept');
 
+const ch11mix=GP.chapter('1-1','1-1-mix');
+assert.ok(/мұғалім/.test(JSON.stringify(ch11mix))&&/мұхит/.test(JSON.stringify(ch11mix))&&/заңгер/.test(JSON.stringify(ch11mix)));
+const ch11ae=GP.chapter('1-1','1-1-ae');
+assert.ok(/Не собирай кітаптар|не открываем/i.test(JSON.stringify(ch11ae)));
+assert.ok(!(ch11ae.beats||[]).some(b=>b.k==='sound'));
+assert.ok((GP.lesson('1-1').chapters||[]).every(c=>c.id&&c.beats.some(b=>b.k==='why')&&c.beats.filter(b=>b.k==='ex').length>=3&&c.beats.some(b=>b.k==='ask')));
+ok('Path v5 rest of 1-1: mixed мұғалім/мұхит/заңгер; A/E without LDT table; chapter ids kept');
+
+const l12v=GP.lesson('1-2');
+assert.ok(/кітаплар/.test(JSON.stringify(l12v))&&/адамлар/.test(JSON.stringify(l12v))&&/жердер/.test(JSON.stringify(l12v)));
+assert.ok(!(l12v.chapters||[]).some(c=>(c.beats||[]).some(b=>b.k==='sound')));
+assert.ok(GP.chapter('1-2','1-2-a').beats.some(b=>b.k==='goal'));
+assert.ok(GP.chapter('1-2','1-2-b').beats.some(b=>b.k==='goal'));
+ok('Path v5 1-2: two levers A/E then L/D/T; traps кітаплар/адамлар; no sound-anchor template');
+
+const l13v=GP.lesson('1-3');
+assert.ok(/екі кітаптар/.test(JSON.stringify(GP.chapter('1-3','1-3-qty'))));
+assert.ok(/жетпіс бес мың тоғыз жүз елу/.test(JSON.stringify(l13v)));
+assert.ok(!(l13v.chapters||[]).some(c=>(c.rule_ids||[]).includes('порядковые')));
+ok('Path v5 1-3: eki kitap trap; 75950 has мың; ordinals closed');
+
+assert.ok(/дәрігермін/.test(JSON.stringify(GP.chapter('2-1','2-1-clause'))));
+assert.ok(/емеспін/.test(JSON.stringify(GP.chapter('2-1','2-1-emes'))));
+assert.ok(/умный/.test(JSON.stringify(GP.chapter('2-2','2-2-adj'))));
+assert.ok(/студенттерсіңдер/.test(JSON.stringify(GP.lesson('2-2'))));
+assert.ok(/который по счёту|порядков/.test(JSON.stringify(GP.chapter('2-3','2-3-ord'))));
+assert.ok(/жиырмасыншы/.test(JSON.stringify(GP.lesson('2-3'))));
+ok('Path v5 2-1…2-3: doctor ending, emes slot, no gender transfer, ordinal definition');
+
 const Canon=require('./canonical.js');
 const Gate=require('./curriculum-gate.js');
 const Diag=require('./diagnostics.js');
@@ -587,9 +616,15 @@ assert.ok(ordPack.every(q=>q.kind!=='multi'));
 ok('P1.8 typed ordinal skills: cardinal→ordinal, ыншы/ншы, қырқыншы, suffix on last piece');
 
 const dash=fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8');
-assert.ok(/Сейчас по порядку/.test(dash));
-assert.ok(/не % языка|не считается/.test(dash));
-ok('P1.11 Today UX: due / lesson / homework first; no language-percent claim');
+assert.ok(/Сначала текущий урок/.test(dash));
+assert.ok(dash.includes('<h2>Память</h2>'));
+assert.ok(dash.includes('Навыки'));
+assert.ok(!/не % за сегодня/.test(dash));
+assert.ok(!/не % языка/.test(dash));
+assert.ok(/Настройки и перенос данных/.test(dash));
+assert.ok(/data-settings/.test(dash));
+assert.ok(/удержание материала после паузы|вспоминается после паузы/.test(dash));
+ok('P1.11 Today UX: due / lesson / homework first; human Memory/Skills labels; data in closed settings');
 
 assert.ok(/Произношение голосом приложение не проверяет/.test(dash));
 ok('P1.13 phonetics boundary stated; no pronunciation scoring');

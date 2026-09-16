@@ -14,6 +14,7 @@
      if(!reg.waiting)return;
      update.hidden=false;
      const panel=document.getElementById('installation-panel');if(panel)panel.open=true;
+     const data=document.getElementById('data-settings');if(data)data.open=true;
      status.textContent='Доступна новая версия. Прогресс этого окна Chrome не сотрётся. Нажми «Сохранить ответ и обновить приложение».';
      update.onclick=()=>{if(!window.dispatchEvent(new Event('qazaq-before-update',{cancelable:true}))){status.textContent='Сначала экспортируй прогресс: сохранить его в браузере не удалось.';return;}reg.waiting.postMessage({type:'ACTIVATE_UPDATE'});};
    };waiting();
