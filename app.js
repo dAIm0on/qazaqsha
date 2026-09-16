@@ -657,7 +657,7 @@
        if(!window.AiTutor||!window.AiTutor.callTutor){showLocal('rule');return;}
        const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:ch.title,stimulus:ch.title,fields:[{answers:['']}],ruleIds:ch.rule_ids||[]};
        const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:[les.id]});
-       window.AiTutor.callTutor(req).then(resp=>{
+       window.AiTutor.callTutor(req,18000).then(resp=>{
          if(resp&&resp.ok===false){showLocal('rule');return;}
          const msg=resp&&typeof resp.message_ru==='string'?resp.message_ru:'';
          if(!stub(msg)){if(out)out.textContent=msg;return;}

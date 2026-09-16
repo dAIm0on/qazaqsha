@@ -880,6 +880,10 @@ assert.ok(!hijack.req.allowed_vocab.some(w=>/кітабым|падеж/.test(w))
 ok('AI server whitelist: required fields; future/case rules cannot be injected');
 
 const tutorSrc=fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8');
+assert.ok(/user_question:req\.user_question/.test(tutorSrc));
+assert.ok(/Вопрос ученицы/.test(tutorSrc));
+ok('AI path custom question: user_question is sent to the model, not only FUTURE_RE');
+
 const wranglerSrc=fs.readFileSync(path.join(__dirname,'wrangler.toml'),'utf8');
 assert.ok(/env\.TUTOR_RATE\.limit/.test(tutorSrc));
 assert.ok(!/memLimit|buckets=new Map/.test(tutorSrc));
