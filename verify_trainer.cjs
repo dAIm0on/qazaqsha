@@ -377,6 +377,19 @@ assert.equal(ch11ru.id,'1-1-ru');
 assert.ok(/path-ask/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 ok('Path v5 1-1-ru: қол/көл, орман/арман, sound anchors, no pronunciation scoring, chapter id kept');
 
+const pathAskSrc=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(/function pathLocalText\(chapter,kind,cur\)/.test(pathAskSrc));
+assert.ok(/Это пересказ этого шага/.test(pathAskSrc));
+assert.ok(/Не разобрала этот вопрос\. Смотри текст шага выше/.test(pathAskSrc));
+assert.ok(/ruleIds:\[\]/.test(pathAskSrc));
+assert.ok(/title:'Глава: '\+ch\.title/.test(pathAskSrc));
+assert.ok(/callTutor\(req,18000\)/.test(pathAskSrc));
+assert.ok(!/Можно продолжить/.test(pathAskSrc.slice(pathAskSrc.indexOf('const stub='),pathAskSrc.indexOf('const stub=')+280)));
+const chSoft=GP.chapter('1-1','1-1-ru');
+assert.ok(chSoft.beats[0].k==='goal');
+assert.ok(chSoft.beats.some(b=>b.k==='sound'&&b.letter==='Ә'));
+ok('Path Не поняла: local text is this beat; fail line honest; dummy has no рычаг_A');
+
 const ch11mix=GP.chapter('1-1','1-1-mix');
 assert.ok(/мұғалім/.test(JSON.stringify(ch11mix))&&/мұхит/.test(JSON.stringify(ch11mix))&&/заңгер/.test(JSON.stringify(ch11mix)));
 const ch11ae=GP.chapter('1-1','1-1-ae');

@@ -562,64 +562,93 @@
    const nextBeat=()=>{gp.beat++;save();renderPath();};
    const letters=state.prefs.letters;
    const kb=letters?`<div class="letter-keyboard">${[...'әғқңөұүһі'].map(ch=>'<button type="button" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`:'';
-   function pathLocalText(chapter,kind){
+   function beatPlain(b){
+     if(!b)return '';
+     const clip=s=>String(s||'').trim();
+     if(b.k==='sound')return clip([b.letter,b.anchor,b.art,b.ex,b.warn].filter(Boolean).join('. '));
+     if(b.k==='why'||b.k==='fold')return clip((b.t?b.t+'. ':'')+(b.b||''));
+     if(b.k==='algo')return clip((b.t?b.t+'. ':'')+(b.items||[]).join('. '));
+     if(b.k==='slots'){
+       const parts=(b.parts||[]).map(p=>typeof p==='string'?p:(p&&(p.t||p.text||p.name))||'').filter(Boolean);
+       return clip((b.t?b.t+'. ':'')+parts.join('. '));
+     }
+     if(b.k==='bridge'){
+       const ru=String(b.ru||'').trim();
+       const kz=String(b.kz||'').trim();
+       const ruLine=/^в русск/i.test(ru)?ru:(ru?'В русском: '+ru:'');
+       const kzLine=/^в казах/i.test(kz)?kz:(kz?'В казахском: '+kz:'');
+       return [ruLine,kzLine,b.do||b.doit||''].filter(Boolean).join('\n');
+     }
+     if(b.k==='ex')return clip((b.from||'')+' → '+(b.to||'')+(b.ru?' ('+b.ru+')':'')+(b.why?' '+b.why:''));
+     if(b.k==='trap')return clip((b.bad||'')+' → '+(b.good||'')+(b.why?' '+b.why:''));
+     if(b.k==='goal')return clip(b.t||'');
+     return clip(b.t||b.b||'');
+   }
+   function paperAlready(s){
+     const paper=root.querySelector('.path-paper');
+     if(!paper||!s)return false;
+     const n=String(s).replace(/\s+/g,'').slice(0,80).toLowerCase();
+     if(n.length<12)return false;
+     const clone=paper.cloneNode(true);
+     const bar=clone.querySelector('.path-ai-bar');if(bar)bar.remove();
+     return String(clone.innerText||'').replace(/\s+/g,'').toLowerCase().includes(n);
+   }
+   function pathLocalText(chapter,kind,cur){
      const beats=(chapter&&chapter.beats)||[];
      const clip=s=>String(s||'').trim().slice(0,800);
-     const join=parts=>parts.map(clip).filter(Boolean).join('\n');
      const first=k=>beats.find(b=>b.k===k);
-     const kk=/[әғқңөұүһіӘҒҚҢӨҰҮҺІа-яёА-ЯЁ]/;
+     const LOOK='Смотри текст этого шага выше.';
+     const take=(list)=>{
+       for(const raw of list){
+         const t=clip(raw);if(!t)continue;
+         if(paperAlready(t))continue;
+         return t;
+       }
+       return '';
+     };
      if(kind==='simplify'){
-       const w=first('why');if(w)return clip(w.b||w.t);
-       const f=first('fold');if(f)return clip(f.b||f.t);
-       const a=first('algo');if(a)return clip((a.t?a.t+'. ':'')+(a.items||[]).slice(0,3).join('. '));
-       const g=first('goal');if(g)return clip(g.t);
-       return 'Правило уже в тексте главы выше.';
+       if(cur&&cur.k==='sound'){
+         const t=clip([cur.letter,cur.art,cur.ex,cur.warn].filter(Boolean).join('. '));
+         if(t)return t;
+       }
+       if(cur&&['why','fold','algo','slots','bridge','ex','trap'].includes(cur.k)){
+         const t=clip(beatPlain(cur));if(t)return t;
+       }
+       const fallback=[];
+       const w=first('why');if(w)fallback.push(w.b||w.t);
+       const a=first('algo');if(a)fallback.push((a.t?a.t+'. ':'')+(a.items||[]).slice(0,3).join('. '));
+       return take(fallback)||LOOK;
      }
      if(kind==='ru'){
-       const br=first('bridge');
-       if(br){
-         const ru=String(br.ru||'').trim();
-         const kz=String(br.kz||'').trim();
-         const ruLine=/^в русск/i.test(ru)?ru:(ru?'В русском: '+ru:'');
-         const kzLine=/^в казах/i.test(kz)?kz:(kz?'В казахском: '+kz:'');
-         return join([ruLine,kzLine,br.do||br.doit||'']);
-       }
-       const w=beats.find(b=>b.k==='why'&&/русск/i.test((b.b||'')+' '+(b.t||'')));
-       if(w)return clip(w.b||w.t);
-       const g=first('goal');if(g)return clip(g.t);
-       return 'Сравнение с русским уже в тексте главы выше.';
+       const cand=[];
+       if(cur&&cur.k==='bridge')cand.push(beatPlain(cur));
+       const br=first('bridge');if(br)cand.push(beatPlain(br));
+       return take(cand)||LOOK;
      }
      if(kind==='examples'){
        const lines=[];
-       for(const b of beats){
-         if(lines.length>=2)break;
-         if(b.k==='ex')lines.push(clip((b.from||'')+' → '+(b.to||'')+(b.ru?' ('+b.ru+')':'')));
+       const add=t=>{const x=clip(t);if(x&&!lines.includes(x)&&x.length>1)lines.push(x);};
+       if(cur){
+         if(cur.k==='sound'&&cur.ex)add(cur.ex);
+         if(cur.k==='ex')add(beatPlain(cur));
+         if(cur.k==='trap')add(beatPlain(cur));
        }
        for(const b of beats){
          if(lines.length>=2)break;
-         if(b.k==='trap')lines.push(clip((b.bad||'')+' → '+(b.good||'')));
+         if(b===cur||b.k==='ask')continue;
+         if(b.k==='sound'&&b.ex)add(b.ex);
+         if(b.k==='ex')add(beatPlain(b));
+         if(b.k==='trap')add(beatPlain(b));
        }
-       for(const b of beats){
-         if(lines.length>=2)break;
-         if(b.k==='sound'&&b.ex)lines.push(clip(b.ex));
-       }
-       if(lines.length<2){
-         for(const b of beats){
-           if(b.k!=='algo')continue;
-           for(const it of b.items||[]){
-             if(lines.length>=2)break;
-             if(kk.test(it)&&(it.length>2))lines.push(clip(it));
-           }
-         }
-       }
-       const clean=lines.filter(Boolean);
-       if(!clean.length)return 'Другие примеры уже в тексте главы.';
-       if(clean.length===1)return clean[0]+'\nДругие примеры уже в тексте главы.';
+       const clean=lines.filter(t=>cur&&(cur.k==='sound'||cur.k==='ex'||cur.k==='trap')?true:!paperAlready(t));
+       if(!clean.length)return LOOK;
        return clean.slice(0,2).join('\n');
      }
-     const g=first('goal');if(g)return clip(g.t);
-     const w=first('why');if(w)return clip(w.b||w.t);
-     return 'Правило уже в тексте главы выше.';
+     if(cur&&cur.k!=='goal'){
+       const t=clip(beatPlain(cur));
+       if(t)return t;
+     }
+     return LOOK;
    }
    function pathAskChips(lessonId,chapter){
      const id=chapter.id||'';
@@ -646,23 +675,32 @@
      paper.insertAdjacentHTML('beforeend',`<div class="path-ai-bar"><button type="button" class="text-button" id="path-ask">Не поняла — спросить про это правило</button><div id="path-ask-panel" class="ai-tutor-out" hidden><p class="small">Разбор только этой главы. Не ставит оценку произношению и не открывает будущие темы.</p><div class="ai-tutor-actions">${chips.map(([label,q,kind])=>`<button type="button" class="secondary-button" data-path-q="${esc(q)}" data-path-kind="${esc(kind||'simplify')}">${esc(label)}</button>`).join('')}</div><label class="input-label" for="path-ask-q">Свой вопрос</label><input id="path-ask-q" type="text" maxlength="400" autocomplete="off"><button type="button" class="text-button" id="path-ask-send">Спросить</button><div id="path-ask-out" hidden></div></div></div>`);
      const open=$('#path-ask'),panel=$('#path-ask-panel');
      if(open)open.onclick=()=>{if(panel)panel.hidden=!panel.hidden;};
-     const showLocal=kind=>{const out=$('#path-ask-out');if(!out)return;out.hidden=false;out.textContent=pathLocalText(ch,kind);};
-     const stub=s=>!s||s.length<12||/короткий разбор|Правило уже на карточке|недоступен|Проверь форму по правилу|Проверь правило текущего урока|Полный ответ не показываю|Можно продолжить/.test(s);
+     const showLocal=kind=>{
+       const out=$('#path-ask-out');if(!out)return;
+       out.hidden=false;
+       out.innerHTML='<p class="small">Это пересказ этого шага.</p><p>'+esc(pathLocalText(ch,kind,beat))+'</p>';
+     };
+     const failAsk=()=>{
+       const out=$('#path-ask-out');if(!out)return;
+       out.hidden=false;
+       out.textContent='Не разобрала этот вопрос. Смотри текст шага выше.';
+     };
+     const stub=s=>!s||s.length<12||/короткий разбор|Правило уже на карточке|недоступен|Проверь форму по правилу|Проверь правило текущего урока|Полный ответ не показываю/.test(s);
      $$('[data-path-kind]').forEach(b=>b.onclick=()=>showLocal(b.dataset.pathKind||'simplify'));
      const go=$('#path-ask-send');
      if(go)go.onclick=()=>{
        const q=($('#path-ask-q')&&$('#path-ask-q').value.trim())||'';
        if(!q){showLocal('simplify');return;}
        const out=$('#path-ask-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
-       if(!window.AiTutor||!window.AiTutor.callTutor){showLocal('rule');return;}
-       const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:ch.title,stimulus:ch.title,fields:[{answers:['']}],ruleIds:ch.rule_ids||[]};
+       if(!window.AiTutor||!window.AiTutor.callTutor){failAsk();return;}
+       const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:'Глава: '+ch.title,stimulus:'Шаг: '+beatPlain(beat).slice(0,280),fields:[{answers:['']}],ruleIds:[]};
        const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:[les.id]});
        window.AiTutor.callTutor(req,18000).then(resp=>{
-         if(resp&&resp.ok===false){showLocal('rule');return;}
+         if(resp&&resp.ok===false){failAsk();return;}
          const msg=resp&&typeof resp.message_ru==='string'?resp.message_ru:'';
          if(!stub(msg)){if(out)out.textContent=msg;return;}
-         showLocal('rule');
-       }).catch(()=>showLocal('rule'));
+         failAsk();
+       }).catch(()=>failAsk());
      };
    }
    if(beat.k==='goal'){
