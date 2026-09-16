@@ -96,19 +96,23 @@
  }
  function shouldOfferExplain(code){return code&&sameErrorCount(code)>=2;}
  function dueRemediation(){return Object.values(store.errors).filter(r=>r&&r.remediation_due).sort((a,b)=>b.count_recent-a.count_recent);}
- function localFallback(q,codes,mode){
+ function localFallback(q,codes,mode,req){
   const code=codes&&codes[0];
   const card=(R.cardsFor(q,code)||[])[0];
   const line=card?card.explanation_ru:'';
   if(mode==='hint')return C.fallback('hint',{rule_context:card?[card]:[]});
-  const expected=(q&&q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'';
-  const msg=code==='PLURAL_AFTER_NUMBER'?'После конкретного числа множественное окончание не нужно.':(Diag&&Diag.line&&codes&&codes[0]&&Diag.line(null))||line||'Проверь форму по правилу текущего урока.';
+  const expected=(req&&req.expected_answer)||(q&&q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'';
+  const wrote=(req&&req.user_answer)||'';
+  let msg=code==='PLURAL_AFTER_NUMBER'?'После конкретного числа множественное окончание не нужно.':(Diag&&Diag.line&&codes&&codes[0]&&Diag.line(null))||line||'Проверь форму по правилу текущего урока.';
+  if(mode==='explain_error'&&wrote){
+    msg=(expected?'Ты написала «'+wrote+'», нужно «'+expected+'». ':'Ты написала «'+wrote+'». ')+msg;
+  }
   const r=C.emptyResp(mode||'explain_error',true);
   r.primary_error_code=code||null;
   r.rule_ids_used=card?[card.rule_id]:[];
   r.message_ru=msg;
   r.micro_rule_ru=card?card.title_ru:null;
-  r.contrast={wrong:null,correct:mode==='hint'?null:expected||null};
+  r.contrast={wrong:wrote||null,correct:mode==='hint'?null:expected||null};
   r.next_action_ru='Введи правильную форму целиком.';
   r.needs_rule_context=false;
   r.confidence='medium';
@@ -151,22 +155,22 @@
     user_question:extra.user_question||''
   };
  }
- async function callTutor(req,timeoutMs=8000){
+ async function callTutor(req,timeoutMs=18000){
   const v=C.validateRequest(req);
   if(!v.ok)return C.fallback(req&&req.mode,'','bad_req');
-  if(typeof fetch!=='function')return localFallback(null,req.candidate_error_codes,req.mode);
+  if(typeof fetch!=='function')return localFallback(null,req.candidate_error_codes,req.mode,v.req||req);
   const ac=typeof AbortController!=='undefined'?new AbortController():null;
   const t=setTimeout(()=>{try{ac&&ac.abort();}catch{}},timeoutMs);
   try{
     const res=await fetch('/api/tutor',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(v.req),signal:ac?ac.signal:undefined});
     clearTimeout(t);
-    if(!res.ok)return localFallback(null,v.req.candidate_error_codes,v.req.mode);
+    if(!res.ok)return localFallback(null,v.req.candidate_error_codes,v.req.mode,v.req);
     const json=await res.json();
     const checked=C.validateResponse(json,v.req);
     return checked.resp;
   }catch{
     clearTimeout(t);
-    return localFallback(null,v.req.candidate_error_codes,v.req.mode);
+    return localFallback(null,v.req.candidate_error_codes,v.req.mode,v.req);
   }
  }
  const TEMPLATES={

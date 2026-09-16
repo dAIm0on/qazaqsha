@@ -428,7 +428,7 @@
      const ask=(m)=>{
        const out=$('#ai-tutor-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
        const req=window.AiTutor.buildRequest(m,q,{user_answer:answers.join(' '),is_correct:false,hint_used:hinted,codes:aiCodes});
-       window.AiTutor.callTutor(req).then(paint);
+       window.AiTutor.callTutor(req,18000).then(paint);
      };
      if($('#ai-why'))$('#ai-why').onclick=()=>ask('explain_error');
      if($('#ai-rule'))$('#ai-rule').onclick=()=>ask('explain_rule');
