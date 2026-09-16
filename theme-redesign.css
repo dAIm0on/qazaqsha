@@ -156,6 +156,11 @@ input[type=text]:focus,select:focus,textarea:focus-visible,input[type=search]:fo
 input.invalid,select.invalid{border-color:var(--error);background:var(--error-bg)}
 input.valid,select.valid{border-color:var(--success);background:var(--success-bg)}
 .letter-keyboard{display:flex;flex-wrap:wrap;gap:7px}
+.letter-keyboard button,
+input[id^="answer-"],
+.glyph-check{
+  font-family:"Golos Text","Noto Serif","Segoe UI",sans-serif;
+}
 .letter-keyboard button{
   background:var(--paper);border:1px solid var(--line);color:var(--ink);
   border-radius:var(--radius-letter);min-width:44px;min-height:44px;font-size:1.1rem

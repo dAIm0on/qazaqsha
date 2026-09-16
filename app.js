@@ -38,7 +38,7 @@
  let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null,hwSection=0,hwReturn=null,remediationNote='';
  function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}
  function focusAnswer(){const el=$('#answer-0');if(el&&!el.disabled){try{el.focus({preventScroll:false});}catch{el.focus();}}}
- function captureDraft(){const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,answers:readAnswers(q)};}
+ function captureDraft(){const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};}
  function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;}
  function elapsed(){return Math.round(elapsedMs+(timerSince===null?0:Math.max(0,performance.now()-timerSince)));}
  function morphemeRow(errors,expected,actual){
@@ -244,7 +244,7 @@
        target.focus();target.setSelectionRange(start+1,start+1);lastTextInput=target;save();
      });
    });
-   if(draft?.token===queueEpoch+':'+position){
+   if(draft?.token===queueEpoch+':'+position&&draft.exerciseId===q.id){
      if(q.kind==='multi')$$('input[name=choice]').forEach(el=>{el.checked=draft.answers.includes(el.value);});
      else q.fields.forEach((f,i)=>{$('#answer-'+i).value=String(draft.answers[i]||'');});
    }
@@ -393,7 +393,8 @@
      const paint=(resp)=>{
        const out=$('#ai-tutor-out');if(!out||!resp)return;
        out.hidden=false;
-       out.innerHTML='<p>'+esc(resp.message_ru||'')+'</p>'+(resp.micro_rule_ru?'<p class="small">'+esc(resp.micro_rule_ru)+'</p>':'')+(resp.contrast&&(resp.contrast.wrong||resp.contrast.correct)?'<p class="small">'+esc((resp.contrast.wrong||'')+(resp.contrast.wrong&&resp.contrast.correct?' → ':'')+(resp.contrast.correct||''))+'</p>':'')+(resp.next_action_ru?'<p class="small">'+esc(resp.next_action_ru)+'</p>':'');
+       const leak=resp.mode==='hint'?false:!!(resp.contrast&&resp.contrast.correct);
+       out.innerHTML='<p class="eyebrow">Разбор по правилу урока</p><p>'+esc(resp.message_ru||'Разбор по правилу урока сейчас короткий. Можно продолжить упражнение.')+'</p>'+(resp.micro_rule_ru?'<p class="small">'+esc(resp.micro_rule_ru)+'</p>':'')+(resp.contrast&&resp.contrast.wrong?'<p class="small">'+esc(resp.contrast.wrong)+'</p>':'')+(leak?'<p class="small">'+esc(resp.contrast.correct)+'</p>':'')+(resp.next_action_ru?'<p class="small">'+esc(resp.next_action_ru)+'</p>':'');
      };
      const ask=(m)=>{
        const out=$('#ai-tutor-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
@@ -554,15 +555,15 @@
    function attachPathAsk(){
      const paper=root.querySelector('.path-paper');if(!paper||paper.querySelector('#path-ask'))return;
      const chips=pathAskChips(les.id,ch);
-     paper.insertAdjacentHTML('beforeend',`<div class="path-ai-bar"><button type="button" class="text-button" id="path-ask">Не поняла — спросить про это правило</button><div id="path-ask-panel" class="ai-tutor-out" hidden><p class="small">ИИ объясняет только эту главу. Не ставит оценку произношению и не открывает будущие темы.</p><div class="ai-tutor-actions">${chips.map(([label,q])=>`<button type="button" class="secondary-button" data-path-q="${esc(q)}" data-path-mode="${/проще/i.test(q)?'simplify':'explain_rule'}">${esc(label)}</button>`).join('')}</div><label class="input-label" for="path-ask-q">Свой вопрос</label><input id="path-ask-q" type="text" maxlength="400" autocomplete="off"><button type="button" class="text-button" id="path-ask-send">Спросить</button><div id="path-ask-out" hidden></div></div></div>`);
+     paper.insertAdjacentHTML('beforeend',`<div class="path-ai-bar"><button type="button" class="text-button" id="path-ask">Не поняла — спросить про это правило</button><div id="path-ask-panel" class="ai-tutor-out" hidden><p class="small">Разбор только этой главы. Не ставит оценку произношению и не открывает будущие темы.</p><div class="ai-tutor-actions">${chips.map(([label,q])=>`<button type="button" class="secondary-button" data-path-q="${esc(q)}" data-path-mode="${/проще/i.test(q)?'simplify':'explain_rule'}">${esc(label)}</button>`).join('')}</div><label class="input-label" for="path-ask-q">Свой вопрос</label><input id="path-ask-q" type="text" maxlength="400" autocomplete="off"><button type="button" class="text-button" id="path-ask-send">Спросить</button><div id="path-ask-out" hidden></div></div></div>`);
      const open=$('#path-ask'),panel=$('#path-ask-panel');
      if(open)open.onclick=()=>{if(panel)panel.hidden=!panel.hidden;};
      const send=(q,mode)=>{
        const out=$('#path-ask-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
-       if(!window.AiTutor||!window.AiTutor.callTutor){if(out)out.textContent='Разбор сейчас недоступен. Глава работает без ИИ.';return;}
+       if(!window.AiTutor||!window.AiTutor.callTutor){if(out)out.textContent='Разбор по правилу урока сейчас короткий. Можно продолжить главу.';return;}
        const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:ch.title,stimulus:ch.title,fields:[{answers:['']}],ruleIds:ch.rule_ids||[]};
        const req=window.AiTutor.buildRequest(mode||'explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:[les.id]});
-       window.AiTutor.callTutor(req).then(resp=>{if(out)out.textContent=(resp&&resp.message_ru)||'Разбор сейчас недоступен. Можно продолжить главу.';});
+       window.AiTutor.callTutor(req).then(resp=>{if(out)out.textContent=(resp&&resp.message_ru)||'Разбор по правилу урока сейчас короткий. Можно продолжить главу.';});
      };
      $$('[data-path-q]').forEach(b=>b.onclick=()=>send(b.dataset.pathQ,b.dataset.pathMode));
      const go=$('#path-ask-send');if(go)go.onclick=()=>send(($('#path-ask-q')&&$('#path-ask-q').value.trim())||'Объясни ещё проще','simplify');
@@ -867,7 +868,7 @@
  });
  $('#pause-session').onclick=()=>showView(mode==='homework'||(mode==='remediation'&&hwReturn)?'homework':mode==='exam'?'exam':'today');
  const lettersPref=$('#pref-letters');
- if(lettersPref){lettersPref.checked=!!state.prefs.letters;lettersPref.onchange=()=>{state.prefs.letters=lettersPref.checked;save();if(view==='practice')render();};}
+ if(lettersPref){lettersPref.checked=!!state.prefs.letters;lettersPref.onchange=()=>{state.prefs.letters=lettersPref.checked;state.prefs.lettersChosen=true;save();if(view==='practice')render();};}
  renderRules();renderMaterials();
  const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','contrast','numbers','remediation','words','exam','homework','chunks'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){
@@ -897,11 +898,11 @@
    if(['today','review','vocabulary'].includes(view))dashboard.render(view);
  }
  function paintAccount(){
-   const cloud=window.QazaqCloud,toggle=$('#account-toggle'),form=$('#account-form'),userEl=$('#account-user'),out=$('#account-logout');
+   const cloud=window.QazaqCloud,toggle=$('#account-toggle'),dlg=$('#account-dialog'),userEl=$('#account-user'),out=$('#account-logout');
    if(!cloud)return;
-   if(!cloud.configured){toggle.hidden=true;form.hidden=true;userEl.hidden=true;out.hidden=true;return;}
-   if(cloud.user){toggle.hidden=true;form.hidden=true;userEl.hidden=false;userEl.textContent=cloud.user.email;out.hidden=false;}
-   else{toggle.hidden=false;userEl.hidden=true;out.hidden=true;}
+   if(!cloud.configured){if(toggle)toggle.hidden=true;if(userEl)userEl.hidden=true;if(out)out.hidden=true;return;}
+   if(cloud.user){if(toggle)toggle.hidden=true;if(userEl){userEl.hidden=false;userEl.textContent=cloud.user.email;}if(out)out.hidden=false;if(dlg&&dlg.open&&dlg.close)dlg.close();}
+   else{if(toggle)toggle.hidden=false;if(userEl)userEl.hidden=true;if(out)out.hidden=true;}
  }
  function accountError(error){
    const msg=$('#account-msg');if(!msg)return;
@@ -911,7 +912,8 @@
  (async()=>{
    const cloud=window.QazaqCloud;if(!cloud)return;
    await cloud.start();paintAccount();
-   $('#account-toggle').onclick=()=>{$('#account-form').hidden=!$('#account-form').hidden;};
+   $('#account-toggle').onclick=()=>{const d=$('#account-dialog');if(d&&d.showModal)d.showModal();};
+   const cancel=$('#account-cancel');if(cancel)cancel.onclick=()=>{const d=$('#account-dialog');if(d&&d.close)d.close();};
    $('#account-logout').onclick=async()=>{await cloud.logout();paintAccount();};
    $('#account-form').onsubmit=async e=>{
      e.preventDefault();$('#account-msg').textContent='Вхожу…';

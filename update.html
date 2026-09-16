@@ -5,32 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Обновление тренажёра без потери прогресса</title>
   <style>
-    body{font:18px/1.5 system-ui,Segoe UI,sans-serif;max-width:40rem;margin:2rem auto;padding:0 1.2rem;color:#182d48}
-    button{font:inherit;padding:.7rem 1rem;margin:.3rem .5rem .3rem 0;border-radius:8px;border:1px solid #06736f;background:#06736f;color:#fff;cursor:pointer}
-    button.secondary{background:#fff;color:#06736f}
-    .ok{background:#e3f4ef;padding:12px 14px;border-radius:8px}
-    .warn{background:#fff8e2;padding:12px 14px;border-radius:8px}
-    code{background:#f1f5f9;padding:0 .25em}
+    body{font:18px/1.5 "Golos Text",system-ui,sans-serif;max-width:40rem;margin:2rem auto;padding:0 1.2rem;color:#1E231F;background:#F4EFE7}
+    button{font:inherit;padding:.7rem 1rem;margin:.3rem .5rem .3rem 0;border-radius:8px;border:1px solid #41573F;background:#41573F;color:#fff;cursor:pointer}
+    button.secondary{background:#fff;color:#41573F}
+    .ok{background:#E5EFDF;padding:12px 14px;border-radius:8px}
+    .warn{background:#F5EACD;padding:12px 14px;border-radius:8px}
+    code{background:#EDE4D8;padding:0 .25em}
   </style>
 </head>
 <body>
-  <h1>Это тот же сайт</h1>
-  <p>Слева в Chrome часто крутится <strong>старая офлайн-копия</strong> (477 карточек). Справа — новая (587). Адрес один: <code>daim0on.github.io/qazaqsha</code>. Прогресс лежит в браузере, не на сервере, поэтому Edge его не видит.</p>
-  <p class="warn">Сначала скачай прогресс из <strong>этого</strong> окна Chrome. Потом обновляй.</p>
-  <p><button type="button" id="export">1. Скачать прогресс</button></p>
+  <h1>Обновить без потери прогресса</h1>
+  <p>Канонический адрес: <code>https://qazaqsha.pages.dev/</code>. Зеркало github.io может отставать.</p>
+  <p class="warn">Сначала скачай копию прогресса из <strong>этого</strong> окна. Потом обновляй.</p>
+  <p><button type="button" id="export">1. Скачать копию</button></p>
   <p id="export-status"></p>
-  <p><button type="button" id="refresh">2. Обновить это окно Chrome, прогресс оставить</button></p>
-  <p class="ok">Шаг 2 снимает только старые файлы сайта. Ответы в памяти Chrome не удаляются.</p>
-  <p><a href="./">Вернуться в тренажёр</a></p>
+  <p><button type="button" id="refresh">2. Обновить это окно, прогресс оставить</button></p>
+  <p class="ok">Шаг 2 снимает только старые файлы сайта. Ответы в памяти браузера не удаляются.</p>
+  <p><a href="./">3. Вернуться в тренажёр</a></p>
   <script>
     const KEY='qazaq-kris-course-v1';
     document.getElementById('export').onclick=()=>{
       const raw=localStorage.getItem(KEY);
       const status=document.getElementById('export-status');
-      if(!raw){status.textContent='В этом окне прогресса нет. Открой эту страницу из окна Chrome, где видно 71 закреплённое слово.';return;}
+      if(!raw){status.textContent='В этом окне прогресса нет. Открой эту страницу из окна, где ты уже занималась.';return;}
       const blob=new Blob([raw],{type:'application/json'});
       const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='progress.json';a.click();
-      status.textContent='Файл progress.json скачан. Его можно импортировать в Edge: Сегодня → резервная копия → импорт.';
+      status.textContent='Файл progress.json скачан. Его можно импортировать: Сегодня → Настройки и перенос данных.';
     };
     document.getElementById('refresh').onclick=async()=>{
       try{
@@ -38,8 +38,8 @@
         await Promise.all(keys.filter(k=>k.startsWith('qazaq-offline-')).map(k=>caches.delete(k)));
         const regs=await navigator.serviceWorker.getRegistrations();
         await Promise.all(regs.map(r=>r.unregister()));
-      }catch(e){}
-      location.href='./?updated='+Date.now();
+      }catch{}
+      location.reload();
     };
   </script>
 </body>

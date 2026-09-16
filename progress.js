@@ -6,7 +6,7 @@
  const obj=v=>v&&typeof v==='object'&&!Array.isArray(v);
  const safe=k=>typeof k==='string'&&k.length<=300&&!['__proto__','prototype','constructor'].includes(k);
  function dictionary(value,transform){const out=Object.create(null);if(obj(value))for(const [k,v] of Object.entries(value))if(safe(k)){const next=transform(v,k);if(next!==undefined)out[k]=next;}return out;}
- function empty(){return {schema:6,records:Object.create(null),skills:Object.create(null),errors:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:false},incidentalWeek:{key:'',added:0},homeworkAttempts:Object.create(null),grammarPath:{topicId:null,step:0,phase:'hub',queue:[],index:0,peeks:Object.create(null),fails:Object.create(null),passed:Object.create(null),blocked:false,completed:[],lessonId:null,chapterId:null,beat:0,completedChapters:Object.create(null),legacyCompleted:[]},session:null,lesson_packages:[]};}
+ function empty(){return {schema:6,records:Object.create(null),skills:Object.create(null),errors:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:false,lettersChosen:false},incidentalWeek:{key:'',added:0},homeworkAttempts:Object.create(null),grammarPath:{topicId:null,step:0,phase:'hub',queue:[],index:0,peeks:Object.create(null),fails:Object.create(null),passed:Object.create(null),blocked:false,completed:[],lessonId:null,chapterId:null,beat:0,completedChapters:Object.create(null),legacyCompleted:[]},session:null,lesson_packages:[]};}
  function migrate(raw={},now=Date.now()){
    const state=empty();state.lesson_packages=packages.merge([],raw.lesson_packages||[]);state.skills=dictionary(raw.skills,r=>obj(r)?core.migrateRecord(r,now):undefined);state.errors=Array.isArray(raw.errors)?raw.errors.filter(e=>obj(e)&&typeof e.error_type==='string'&&Number.isFinite(e.timestamp)):[];state.records=dictionary(raw.records,r=>obj(r)?core.migrateRecord(r,now):undefined);
    state.associations=dictionary(raw.associations,v=>typeof v==='string'?{text:v.slice(0,cfg.storage.maxAssociationLength),updated_at:now}:obj(v)&&typeof v.text==='string'?{text:v.text.slice(0,cfg.storage.maxAssociationLength),updated_at:Number(v.updated_at)||0}:undefined);
@@ -34,7 +34,8 @@
      state.learning.completedSteps=dictionary(raw.learning.completedSteps,n=>n===true?true:undefined);
      for(const [id,note] of Object.entries(state.learning.notes))if(!state.associations['lesson:'+id])state.associations['lesson:'+id]={text:note,updated_at:0};
    }
-   state.prefs={letters:!!(obj(raw.prefs)&&raw.prefs.letters)};
+   state.prefs={letters:!!(obj(raw.prefs)&&raw.prefs.letters),lettersChosen:!!(obj(raw.prefs)&&raw.prefs.lettersChosen)};
+   if(!state.prefs.lettersChosen&&typeof globalThis.matchMedia==='function'&&globalThis.matchMedia('(max-width:690px)').matches)state.prefs.letters=true;
    state.session=obj(raw.session)?raw.session:null;return state;
  }
  function serialize(state){return JSON.stringify({app:'qazaq-trainer',schema:6,exported_at:new Date().toISOString(),policy_version:cfg.version,scheduler_config:{implementation:cfg.algorithm,desired_retention:cfg.fsrs.desired_retention,standard_weights:true},...state});}
@@ -68,7 +69,7 @@
    }
    const eventMap=new Map([...out.events,...incoming.events].map(e=>[JSON.stringify([e.type,e.card_id,e.at,e.answers,e.correct]),e]));
    out.events=[...eventMap.values()].sort((a,b)=>a.at-b.at).slice(-cfg.storage.maxEvents);
-   out.prefs={letters:!!(incoming.prefs&&incoming.prefs.letters)||!!out.prefs.letters};
+   out.prefs={letters:!!(incoming.prefs&&incoming.prefs.letters)||!!out.prefs.letters,lettersChosen:!!(incoming.prefs&&incoming.prefs.lettersChosen)||!!out.prefs.lettersChosen};
    Object.assign(out.learning.steps,incoming.learning.steps);
    Object.assign(out.learning.notes,incoming.learning.notes);Object.assign(out.learning.completedSteps,incoming.learning.completedSteps);
    if(incoming.incidentalWeek){

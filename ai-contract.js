@@ -115,9 +115,9 @@
   r.needs_rule_context=reason==='no_context'||reason==='conflict';
   if(mode==='hint')r.message_ru='Проверь правило текущего урока и слот окончания. Полный ответ не показываю.';
   if(reason==='hint_leak')r.message_ru='Подсказка не должна содержать готовый ответ. Проверь правило, затем введи форму целиком.';
-  else if(mode==='explain_rule'||mode==='simplify')r.message_ru=(req&&req.rule_context&&req.rule_context[0]&&req.rule_context[0].explanation_ru)||'Правило уже на карточке. ИИ сейчас недоступен.';
-  else if(mode==='session_summary')r.message_ru='Разбор сессии недоступен. Локальные слабые места сохранены.';
-  else r.message_ru='Локальная проверка уже есть. ИИ-разбор сейчас недоступен — упражнение не теряется.';
+  else if(mode==='explain_rule'||mode==='simplify')r.message_ru=(req&&req.rule_context&&req.rule_context[0]&&req.rule_context[0].explanation_ru)||'Правило уже на карточке. Можно продолжить упражнение.';
+  else if(mode==='session_summary')r.message_ru='Разбор сессии сейчас короткий. Локальные слабые места сохранены.';
+  else r.message_ru='Разбор по правилу урока сейчас короткий. Можно продолжить упражнение.';
   r.confidence='low';
   return r;
  }

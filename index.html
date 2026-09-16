@@ -61,13 +61,6 @@
   <nav class="topnav" aria-label="Разделы"><button type="button" data-view="today" aria-current="page">Сегодня</button><button type="button" data-view="learn">Учить</button><button type="button" data-view="review">Повторять</button><button type="button" data-view="exam">Экзамен</button><button type="button" data-view="rules">Правила</button></nav>
   <div class="account" id="account-box">
     <button type="button" class="text-button" id="account-toggle" hidden>Войти</button>
-    <form id="account-form" hidden>
-      <input id="account-email" type="email" autocomplete="username" placeholder="почта" required>
-      <input id="account-password" type="password" autocomplete="current-password" placeholder="пароль" minlength="6" required>
-      <button type="submit" class="secondary-button" id="account-login">Войти</button>
-      <button type="button" class="secondary-button" id="account-register">Создать аккаунт</button>
-      <p id="account-msg" class="small"></p>
-    </form>
     <span id="account-user" hidden></span>
     <button type="button" class="text-button" id="account-logout" hidden>Выйти</button>
     <button type="button" class="design-settings" id="design-settings" aria-haspopup="dialog" aria-controls="settings-dialog">Сезон</button>
@@ -106,6 +99,21 @@
 </div>
 <nav class="bottom-nav" aria-label="Основная навигация"><button type="button" data-view="today">Сегодня</button><button type="button" data-view="learn">Учить</button><button type="button" data-view="review">Повторять</button><button type="button" data-view="exam">Экзамен</button><button type="button" data-view="rules">Правила</button></nav>
 <footer class="site-footer"><span lang="kk">Қазақша</span><span>Письменная практика по материалам курса · <a href="update.html">обновить без потери прогресса</a></span></footer>
+<dialog id="account-dialog" class="settings-dialog" aria-labelledby="account-title">
+  <h2 id="account-title">Вход</h2>
+  <form id="account-form">
+    <label for="account-email">Почта</label>
+    <input id="account-email" type="email" autocomplete="username" required>
+    <label for="account-password">Пароль</label>
+    <input id="account-password" type="password" autocomplete="current-password" minlength="6" required>
+    <p id="account-msg" class="small"></p>
+    <div class="ai-tutor-actions">
+      <button type="submit" class="primary-button" id="account-login">Войти</button>
+      <button type="button" class="secondary-button" id="account-register">Создать аккаунт</button>
+      <button type="button" class="text-button" id="account-cancel">Отмена</button>
+    </div>
+  </form>
+</dialog>
 <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title">
   <h2 id="settings-title">Оформление</h2>
   <p class="small">Сезон меняет бумагу и акценты, не правила курса. Зима сохраняет выбранную тему. Фотографии подключим отдельно.</p>

@@ -897,4 +897,28 @@ const fnSrc=fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'u
 assert.ok(/out\.remediation=null/.test(fnSrc));
 ok('AI-T06-hybrid: server drops model-invented remediation items; templates stay in code');
 
+const htmlSrc=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
+assert.ok(/<title>Qazaqsha — Қазақша<\/title>/.test(htmlSrc));
+assert.ok(/id="account-dialog"/.test(htmlSrc));
+assert.ok(!/тренажёр Крис/.test(htmlSrc));
+ok('COPY-3 title Qazaqsha — Қазақша; login is a dialog');
+
+assert.ok(/\['ә','ғ','қ','ң','ө','ұ','ү','һ','і'\]|әғқңөұүһі/.test(appSrc));
+assert.ok(/Golos Text/.test(theme));
+ok('FONT-1 nine kazakh letters in keyboard markup');
+
+const readme=fs.readFileSync(path.join(__dirname,'README.md'),'utf8');
+assert.ok(/qazaqsha\.pages\.dev/.test(readme));
+assert.ok(/2–3/.test(readme));
+assert.ok(!/Регистрации нет/.test(readme));
+assert.ok(!fs.readFileSync(path.join(__dirname,'CLOUD.md'),'utf8').includes('kristina.starykh'));
+const upd=fs.readFileSync(path.join(__dirname,'update.html'),'utf8');
+assert.ok(!/477/.test(upd)&&!/587/.test(upd)&&!/71 закреплённое/.test(upd));
+ok('DOC-1/2/3 pages.dev, no owner email, no stale card counts');
+
+const uiBlob=[htmlSrc,appSrc,fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8'),fs.readFileSync(path.join(__dirname,'learning.js'),'utf8')].join('\n');
+assert.ok(!/\bQwen\b/.test(uiBlob));
+assert.ok(!/нейросеть/.test(uiBlob));
+ok('AI-1 student UI does not name the model');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
