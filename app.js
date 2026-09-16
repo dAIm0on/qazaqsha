@@ -562,40 +562,101 @@
    const nextBeat=()=>{gp.beat++;save();renderPath();};
    const letters=state.prefs.letters;
    const kb=letters?`<div class="letter-keyboard">${[...'әғқңөұүһі'].map(ch=>'<button type="button" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`:'';
+   function pathLocalText(chapter,kind){
+     const beats=(chapter&&chapter.beats)||[];
+     const clip=s=>String(s||'').trim().slice(0,800);
+     const join=parts=>parts.map(clip).filter(Boolean).join('\n');
+     const first=k=>beats.find(b=>b.k===k);
+     const kk=/[әғқңөұүһіӘҒҚҢӨҰҮҺІа-яёА-ЯЁ]/;
+     if(kind==='simplify'){
+       const w=first('why');if(w)return clip(w.b||w.t);
+       const f=first('fold');if(f)return clip(f.b||f.t);
+       const a=first('algo');if(a)return clip((a.t?a.t+'. ':'')+(a.items||[]).slice(0,3).join('. '));
+       const g=first('goal');if(g)return clip(g.t);
+       return 'Правило уже в тексте главы выше.';
+     }
+     if(kind==='ru'){
+       const br=first('bridge');
+       if(br)return join(['В русском: '+(br.ru||''),'В казахском: '+(br.kz||''),br.do||br.doit||'']);
+       const w=beats.find(b=>b.k==='why'&&/русск/i.test((b.b||'')+' '+(b.t||'')));
+       if(w)return clip(w.b||w.t);
+       const g=first('goal');if(g)return clip(g.t);
+       return 'Сравнение с русским уже в тексте главы выше.';
+     }
+     if(kind==='examples'){
+       const lines=[];
+       for(const b of beats){
+         if(lines.length>=2)break;
+         if(b.k==='ex')lines.push(clip((b.from||'')+' → '+(b.to||'')+(b.ru?' ('+b.ru+')':'')));
+       }
+       for(const b of beats){
+         if(lines.length>=2)break;
+         if(b.k==='trap')lines.push(clip((b.bad||'')+' → '+(b.good||'')));
+       }
+       for(const b of beats){
+         if(lines.length>=2)break;
+         if(b.k==='sound'&&b.ex)lines.push(clip(b.ex));
+       }
+       if(lines.length<2){
+         for(const b of beats){
+           if(b.k!=='algo')continue;
+           for(const it of b.items||[]){
+             if(lines.length>=2)break;
+             if(kk.test(it)&&(it.length>2))lines.push(clip(it));
+           }
+         }
+       }
+       const clean=lines.filter(Boolean);
+       if(!clean.length)return 'Другие примеры уже в тексте главы.';
+       if(clean.length===1)return clean[0]+'\nДругие примеры уже в тексте главы.';
+       return clean.slice(0,2).join('\n');
+     }
+     const g=first('goal');if(g)return clip(g.t);
+     const w=first('why');if(w)return clip(w.b||w.t);
+     return 'Правило уже в тексте главы выше.';
+   }
    function pathAskChips(lessonId,chapter){
      const id=chapter.id||'';
-     const simplify=['Объясни ещё проще','Объясни ещё проще'];
-     const pair=(label,q)=>[label,q];
-     if(lessonId==='1-1'&&id!=='1-1-ae')return [simplify,pair('Сравни с русским','Чем это отличается от русского мягкого согласного?'),pair('Ещё 2 примера','Дай ещё 2 пары на знакомых словах.')];
-     if(id==='1-1-ae'||id==='1-2-a')return [simplify,pair('Сравни с русским','Почему твёрдое берёт А, а мягкое Е?'),pair('Ещё 2 примера','Дай ещё 2 слова курса: только гласная А или Е.')];
-     if(id==='1-2-b'||id==='1-2-traps')return [simplify,pair('Сравни с русским','Почему не *адамлар и не *жердер?'),pair('Ещё 2 примера','Дай ещё 2 основы: только стык Л, Д или Т.')];
-     if(id==='1-2-slot'||id==='1-2-glue')return [simplify,pair('Сравни с русским','Чем казахское множественное отличается от русской формы «книги»?'),pair('Ещё 2 примера','Собери ещё 2 формы двумя рычагами на словах курса.')];
-     if(id==='1-3-qty'||id==='1-3-qty2')return [simplify,pair('Сравни с русским','Почему «две книги», а по-казахски без -тар?'),pair('Ещё 2 примера','Дай ещё 2 примера без множественного.')];
-     if(lessonId==='1-3')return [simplify,pair('Сравни с русским','Как собрать число по разрядам, не списком?'),pair('Ещё 2 примера','Дай ещё 2 числа из курса.')];
-     if(id==='2-1-emes')return [simplify,pair('Сравни с русским','Куда переезжает окончание при емес?'),pair('Ещё 2 примера','Дай ещё 2 отрицания на знакомых словах.')];
-     if(id==='2-1-ba'||id==='2-2-rq'||id==='2-3-q'||id==='2-3-qstem')return [simplify,pair('Сравни с русским','На какой звук смотрит вопросительная частица?'),pair('Ещё 2 примера','Дай ещё 2 вопроса из этой сетки курса.')];
-     if(lessonId==='2-1')return [simplify,pair('Сравни с русским','Почему по-русски «Я врач» без «есть», а здесь нужна бирка?'),pair('Ещё 2 примера','Дай ещё 2 формы мен/сен/сіз на словах курса.')];
-     if(id==='2-2-hi'||id==='2-3-bye')return [simplify,pair('Сравни с русским','Почему это готовая фраза, а не новое окончание?'),pair('Ещё 2 примера','Покажи сетку по адресату ещё раз.')];
-     if(lessonId==='2-2')return [simplify,pair('Сравни с русским','Почему не переносим умный/умная/умные?'),pair('Ещё 2 примера','Дай ещё 2 формы біз/сендер/сіздер.')];
-     if(id==='2-3-ol'||id==='2-3-olar')return [simplify,pair('Сравни с русским','Почему у ол нет мын?'),pair('Ещё 2 примера','Дай ещё 2 фразы с ол/олар.')];
-     if(lessonId==='2-3')return [simplify,pair('Сравни с русским','Чем порядковое отличается от екі кітап?'),pair('Ещё 2 примера','Дай ещё 2 порядковых из курса.')];
-     return [simplify,pair('Сравни с русским','Чем это правило отличается от русского?'),pair('Ещё 2 примера','Дай ещё 2 примера на словах текущего урока.')];
+     const simplify=['Объясни ещё проще','Объясни ещё проще','simplify'];
+     const pair=(label,q,kind)=>[label,q,kind];
+     if(lessonId==='1-1'&&id!=='1-1-ae')return [simplify,pair('Сравни с русским','Чем это отличается от русского мягкого согласного?','ru'),pair('Ещё 2 примера','Дай ещё 2 пары на знакомых словах.','examples')];
+     if(id==='1-1-ae'||id==='1-2-a')return [simplify,pair('Сравни с русским','Почему твёрдое берёт А, а мягкое Е?','ru'),pair('Ещё 2 примера','Дай ещё 2 слова курса: только гласная А или Е.','examples')];
+     if(id==='1-2-b'||id==='1-2-traps')return [simplify,pair('Сравни с русским','Почему не *адамлар и не *жердер?','ru'),pair('Ещё 2 примера','Дай ещё 2 основы: только стык Л, Д или Т.','examples')];
+     if(id==='1-2-slot'||id==='1-2-glue')return [simplify,pair('Сравни с русским','Чем казахское множественное отличается от русской формы «книги»?','ru'),pair('Ещё 2 примера','Собери ещё 2 формы двумя рычагами на словах курса.','examples')];
+     if(id==='1-3-qty'||id==='1-3-qty2')return [simplify,pair('Сравни с русским','Почему «две книги», а по-казахски без -тар?','ru'),pair('Ещё 2 примера','Дай ещё 2 примера без множественного.','examples')];
+     if(lessonId==='1-3')return [simplify,pair('Сравни с русским','Как собрать число по разрядам, не списком?','ru'),pair('Ещё 2 примера','Дай ещё 2 числа из курса.','examples')];
+     if(id==='2-1-emes')return [simplify,pair('Сравни с русским','Куда переезжает окончание при емес?','ru'),pair('Ещё 2 примера','Дай ещё 2 отрицания на знакомых словах.','examples')];
+     if(id==='2-1-ba'||id==='2-2-rq'||id==='2-3-q'||id==='2-3-qstem')return [simplify,pair('Сравни с русским','На какой звук смотрит вопросительная частица?','ru'),pair('Ещё 2 примера','Дай ещё 2 вопроса из этой сетки курса.','examples')];
+     if(lessonId==='2-1')return [simplify,pair('Сравни с русским','Почему по-русски «Я врач» без «есть», а здесь нужна бирка?','ru'),pair('Ещё 2 примера','Дай ещё 2 формы мен/сен/сіз на словах курса.','examples')];
+     if(id==='2-2-hi'||id==='2-3-bye')return [simplify,pair('Сравни с русским','Почему это готовая фраза, а не новое окончание?','ru'),pair('Ещё 2 примера','Покажи сетку по адресату ещё раз.','examples')];
+     if(lessonId==='2-2')return [simplify,pair('Сравни с русским','Почему не переносим умный/умная/умные?','ru'),pair('Ещё 2 примера','Дай ещё 2 формы біз/сендер/сіздер.','examples')];
+     if(id==='2-3-ol'||id==='2-3-olar')return [simplify,pair('Сравни с русским','Почему у ол нет мын?','ru'),pair('Ещё 2 примера','Дай ещё 2 фразы с ол/олар.','examples')];
+     if(lessonId==='2-3')return [simplify,pair('Сравни с русским','Чем порядковое отличается от екі кітап?','ru'),pair('Ещё 2 примера','Дай ещё 2 порядковых из курса.','examples')];
+     return [simplify,pair('Сравни с русским','Чем это правило отличается от русского?','ru'),pair('Ещё 2 примера','Дай ещё 2 примера на словах текущего урока.','examples')];
    }
    function attachPathAsk(){
      const paper=root.querySelector('.path-paper');if(!paper||paper.querySelector('#path-ask'))return;
      const chips=pathAskChips(les.id,ch);
-     paper.insertAdjacentHTML('beforeend',`<div class="path-ai-bar"><button type="button" class="text-button" id="path-ask">Не поняла — спросить про это правило</button><div id="path-ask-panel" class="ai-tutor-out" hidden><p class="small">Разбор только этой главы. Не ставит оценку произношению и не открывает будущие темы.</p><div class="ai-tutor-actions">${chips.map(([label,q])=>`<button type="button" class="secondary-button" data-path-q="${esc(q)}" data-path-mode="${/проще/i.test(q)?'simplify':'explain_rule'}">${esc(label)}</button>`).join('')}</div><label class="input-label" for="path-ask-q">Свой вопрос</label><input id="path-ask-q" type="text" maxlength="400" autocomplete="off"><button type="button" class="text-button" id="path-ask-send">Спросить</button><div id="path-ask-out" hidden></div></div></div>`);
+     paper.insertAdjacentHTML('beforeend',`<div class="path-ai-bar"><button type="button" class="text-button" id="path-ask">Не поняла — спросить про это правило</button><div id="path-ask-panel" class="ai-tutor-out" hidden><p class="small">Разбор только этой главы. Не ставит оценку произношению и не открывает будущие темы.</p><div class="ai-tutor-actions">${chips.map(([label,q,kind])=>`<button type="button" class="secondary-button" data-path-q="${esc(q)}" data-path-kind="${esc(kind||'simplify')}">${esc(label)}</button>`).join('')}</div><label class="input-label" for="path-ask-q">Свой вопрос</label><input id="path-ask-q" type="text" maxlength="400" autocomplete="off"><button type="button" class="text-button" id="path-ask-send">Спросить</button><div id="path-ask-out" hidden></div></div></div>`);
      const open=$('#path-ask'),panel=$('#path-ask-panel');
      if(open)open.onclick=()=>{if(panel)panel.hidden=!panel.hidden;};
-     const send=(q,mode)=>{
+     const showLocal=kind=>{const out=$('#path-ask-out');if(!out)return;out.hidden=false;out.textContent=pathLocalText(ch,kind);};
+     const stub=s=>!s||s.length<12||/короткий разбор|Правило уже на карточке|недоступен/.test(s);
+     $$('[data-path-kind]').forEach(b=>b.onclick=()=>showLocal(b.dataset.pathKind||'simplify'));
+     const go=$('#path-ask-send');
+     if(go)go.onclick=()=>{
+       const q=($('#path-ask-q')&&$('#path-ask-q').value.trim())||'';
+       if(!q){showLocal('simplify');return;}
        const out=$('#path-ask-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
-       if(!window.AiTutor||!window.AiTutor.callTutor){if(out)out.textContent='Разбор по правилу урока сейчас короткий. Можно продолжить главу.';return;}
+       if(!window.AiTutor||!window.AiTutor.callTutor){showLocal('rule');return;}
        const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:ch.title,stimulus:ch.title,fields:[{answers:['']}],ruleIds:ch.rule_ids||[]};
-       const req=window.AiTutor.buildRequest(mode||'explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:[les.id]});
-       window.AiTutor.callTutor(req).then(resp=>{if(out)out.textContent=(resp&&resp.message_ru)||'Разбор по правилу урока сейчас короткий. Можно продолжить главу.';});
+       const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:[les.id]});
+       window.AiTutor.callTutor(req).then(resp=>{
+         const msg=resp&&typeof resp.message_ru==='string'?resp.message_ru:'';
+         if(!stub(msg)){if(out)out.textContent=msg;return;}
+         showLocal('rule');
+       });
      };
-     $$('[data-path-q]').forEach(b=>b.onclick=()=>send(b.dataset.pathQ,b.dataset.pathMode));
-     const go=$('#path-ask-send');if(go)go.onclick=()=>send(($('#path-ask-q')&&$('#path-ask-q').value.trim())||'Объясни ещё проще','simplify');
    }
    if(beat.k==='goal'){
      root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">ЦЕЛЬ ГЛАВЫ</p><h2>После этой главы</h2><p>${esc(beat.t)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
