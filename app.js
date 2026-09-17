@@ -690,17 +690,18 @@
          if(cur.k==='sound'&&cur.ex)add(cur.ex);
          if(cur.k==='ex')add(beatPlain(cur));
          if(cur.k==='trap')add(beatPlain(cur));
+         if(cur.k==='algo')for(const it of cur.items||[])add(it);
        }
        for(const b of beats){
-         if(lines.length>=2)break;
+         if(lines.length>=4)break;
          if(b===cur||b.k==='ask')continue;
          if(b.k==='sound'&&b.ex)add(b.ex);
          if(b.k==='ex')add(beatPlain(b));
          if(b.k==='trap')add(beatPlain(b));
+         if(b.k==='algo')for(const it of b.items||[])add(it);
        }
-       const clean=lines.filter(t=>cur&&(cur.k==='sound'||cur.k==='ex'||cur.k==='trap')?true:!paperAlready(t));
-       if(!clean.length)return LOOK;
-       return clean.slice(0,2).join('\n');
+       if(!lines.length)return LOOK;
+       return lines.slice(0,4).join('\n');
      }
      if(cur&&cur.k!=='goal'){
        const t=clip(beatPlain(cur));
@@ -748,16 +749,18 @@
      if(go)go.onclick=()=>{
        const q=($('#path-ask-q')&&$('#path-ask-q').value.trim())||'';
        if(!q){showLocal('simplify');return;}
+       if(/пример|ещё\s*2|еще\s*2|больше\s+пример/i.test(q)){showLocal('examples');return;}
        const out=$('#path-ask-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
-       if(!window.AiTutor||!window.AiTutor.callTutor){failAsk();return;}
+       if(!window.AiTutor||!window.AiTutor.callTutor){showLocal('examples');return;}
        const tRules=(window.AiRules&&window.AiRules.allowedRuleIds([les.id]))||[];
-       const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:'Глава: '+ch.title,stimulus:'Шаг: '+beatPlain(beat).slice(0,280),fields:[{answers:['']}],ruleIds:tRules};
+       const step=beatPlain(beat).replace(/падеж\w*|посессив\w*|притяжательн\w*/gi,' ').replace(/\s+/g,' ').trim().slice(0,280);
+       const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:'Глава: '+ch.title,stimulus:'Шаг: '+step,fields:[{answers:['']}],ruleIds:tRules};
        const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:[les.id]});
-       window.AiTutor.callTutor(req,18000).then(resp=>{
+       window.AiTutor.callTutor(req,25000).then(resp=>{
          const msg=resp&&typeof resp.message_ru==='string'?resp.message_ru:'';
          if(window.AiTutor.isLiveMessage(msg)){if(out)out.textContent=msg;return;}
-         failAsk();
-       }).catch(()=>failAsk());
+         showLocal('examples');
+       }).catch(()=>showLocal('examples'));
      };
    }
    if(beat.k==='goal'){

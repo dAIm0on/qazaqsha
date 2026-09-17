@@ -154,7 +154,7 @@ export async function onRequestPost(context){
     rule_context:Array.isArray(raw.rule_context)?raw.rule_context.slice(0,4):[],
     user_question:clip(raw.user_question,400),hint_used:!!raw.hint_used,lesson_id:clip(raw.lesson_id,8)
   };
-  if(FUTURE_RE.test(req.user_question+' '+req.prompt)&&req.mode!=='explain_error'){
+  if(FUTURE_RE.test(req.user_question||'')&&req.mode!=='explain_error'){
     const r=empty(req.mode,true);
     r.message_ru='Это правило тренажёр пока не вводил. Держимся уроков 1–1…2–3.';
     r.confidence='high';r.needs_rule_context=false;
