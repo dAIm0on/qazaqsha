@@ -961,6 +961,8 @@ const pack23=fs.readFileSync(path.join(__dirname,'lesson-pack-2-3.js'),'utf8');
 assert.ok(/"id": "hw23-4-kk"[\s\S]*?"әже"[\s\S]*?"апа"/.test(pack23));
 assert.ok(/"id": "hw23-5-kk"[\s\S]*?"апа"[\s\S]*?"әже"/.test(pack23));
 assert.ok(/e\.key!=='Enter'/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/result\.correct&&!reveal/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/setTimeout\(\(\)=>\{advanceTimer=null;nextQuestion\(\);\},400\)/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 ok('Pair бабушка: әже and апа both accepted; Enter checks or goes next');
 
 const Pstore=require('./progress.js');

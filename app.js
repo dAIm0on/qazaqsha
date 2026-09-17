@@ -489,8 +489,9 @@
    }
    renderStats();save();
    cancelAdvance();
-   if(result.correct&&!reveal&&!hinted){
-     advanceTimer=setTimeout(()=>{advanceTimer=null;if(checked)nextQuestion();},180);
+   if(result.correct&&!reveal){
+     $('#check-button').hidden=true;if($('#next-button'))$('#next-button').hidden=false;
+     advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
    }else{
      const next=$('#next-button');if(next)next.focus({preventScroll:true});
    }
