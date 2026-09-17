@@ -954,6 +954,9 @@ assert.ok(!/U\+0400-052F/.test(theme));
 assert.ok(/U\+04DA-04E7/.test(theme));
 ok('FONT-1 nine kazakh letters in keyboard markup');
 ok('Mobile composer: dock, visualViewport, no card clip, Kazakh unicode-range hole for fallback');
+assert.ok(!/58vw/.test(theme));
+assert.ok(/grid-template-areas:"fields" "letters" "check"/.test(theme.replace(/\s+/g,' ')));
+ok('Practice field full width; letters and Check stack under it');
 
 const Pstore=require('./progress.js');
 const blank=Pstore.empty();

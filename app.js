@@ -42,6 +42,8 @@
    const vv=window.visualViewport;
    const inset=vv?Math.max(0,window.innerHeight-vv.height-vv.offsetTop):0;
    document.documentElement.style.setProperty('--kbinset',inset+'px');
+   const tog=$('#issue-toggle');
+   if(tog)tog.hidden=inset>48&&document.body.getAttribute('data-view')==='practice';
  }
  if(window.visualViewport){
    window.visualViewport.addEventListener('resize',syncKbInset);

@@ -169,9 +169,15 @@ input[id^="answer-"],
 .tap-choices{display:flex;flex-wrap:wrap;gap:8px}
 .tap-choices .chip{min-height:44px}
 .tap-choices .chip[aria-pressed=true]{background:var(--primary);color:#FFFCF7;border-color:var(--primary)}
-.practice-composer{display:flex;align-items:flex-end;gap:8px}
-.practice-composer .fields{flex:1;min-width:0;margin:0}
-.practice-composer .primary-slot{flex:0 0 auto}
+.practice-composer{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"fields check" "letters letters";
+  gap:8px;align-items:end
+}
+.practice-composer .fields{grid-area:fields;min-width:0;margin:0;width:100%}
+.practice-composer .fields input[type=text]{width:100%;min-height:54px}
+.practice-composer .letter-keyboard{grid-area:letters;max-width:none;width:100%}
+.practice-composer .primary-slot{grid-area:check;flex:0 0 auto}
 .practice-dock .secondary-actions{margin:0 0 8px}
 #path-ask-panel,#rules-ask-panel{position:sticky;bottom:var(--kbinset,0px);z-index:8;background:var(--surface)}
 #account-dialog{max-height:100dvh;overflow:auto}
@@ -278,7 +284,9 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
   background:var(--surface);border:1px solid var(--line);color:var(--ink);
   box-shadow:0 4px 14px rgba(30,35,31,.12);font-size:.8125rem
 }
-body[data-view=practice] .issue-toggle{bottom:calc(10px + var(--kbinset,0px))}
+body[data-view=practice] .issue-toggle{
+  top:8px;right:10px;left:auto;bottom:auto;z-index:18
+}
 #issue-dialog textarea{width:100%;min-height:96px;margin:8px 0;font:inherit}
 .bottom-nav{background:var(--surface);border-top-color:var(--line);grid-template-columns:repeat(5,minmax(0,1fr))!important}
 :root{--bottom-nav-height:calc(64px + env(safe-area-inset-bottom, 0px))}
@@ -387,7 +395,13 @@ body[data-view=practice] .issue-toggle{bottom:calc(10px + var(--kbinset,0px))}
   body[data-view=path]{padding-bottom:var(--bottom-nav-height)}
   body[data-view=practice] .question-actions{bottom:auto}
   body[data-view=practice] .exercise-card{margin-bottom:0}
-  .practice-composer .letter-keyboard{max-width:min(58vw,320px)}
+  .practice-composer{
+    grid-template-columns:1fr;
+    grid-template-areas:"fields" "letters" "check";
+    align-items:stretch
+  }
+  .practice-composer .letter-keyboard{max-width:none}
+  .practice-composer .primary-slot,.practice-composer .primary-button{width:100%}
   .path-crumb{position:sticky;top:0;background:var(--paper);padding:8px 0;z-index:2}
   .lesson{grid-template-columns:38px minmax(0,1fr);padding:18px}
   .lesson .primary-button,.lesson .secondary-button{grid-column:2;justify-self:start}
