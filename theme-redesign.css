@@ -7,7 +7,7 @@
   font-weight:400 700;
   font-style:normal;
   font-display:swap;
-  unicode-range:U+0000-00FF,U+0400-052F,U+2013-2014,U+2018-201D,U+2026,U+00AB,U+00BB;
+  unicode-range:U+0000-00FF,U+0400-0405,U+0407-0455,U+0457-0491,U+0494-0499,U+049C-04A1,U+04A4-04AD,U+04B2-04B9,U+04BC-04D7,U+04DA-04E7,U+04EA-052F,U+2013-2014,U+2018-201D,U+2026,U+00AB,U+00BB;
 }
 @font-face{
   font-family:"Golos Text";
@@ -15,7 +15,7 @@
   font-weight:400 700;
   font-style:normal;
   font-display:swap;
-  unicode-range:U+0000-00FF,U+0400-052F,U+2013-2014,U+2018-201D,U+2026,U+00AB,U+00BB;
+  unicode-range:U+0000-00FF,U+0400-0405,U+0407-0455,U+0457-0491,U+0494-0499,U+049C-04A1,U+04A4-04AD,U+04B2-04B9,U+04BC-04D7,U+04DA-04E7,U+04EA-052F,U+2013-2014,U+2018-201D,U+2026,U+00AB,U+00BB;
 }
 
 :root{
@@ -159,8 +159,19 @@ input.valid,select.valid{border-color:var(--success);background:var(--success-bg
 .letter-keyboard button,
 input[id^="answer-"],
 .glyph-check{
-  font-family:"Golos Text","Noto Serif","Segoe UI",sans-serif;
+  font-family:"Segoe UI","Noto Serif","Golos Text",sans-serif;
 }
+.practice-dock{
+  position:sticky;bottom:var(--kbinset,0px);z-index:20;
+  background:var(--surface);padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -8px 18px rgba(30,35,31,.1)
+}
+.practice-composer{display:flex;align-items:flex-end;gap:8px}
+.practice-composer .fields{flex:1;min-width:0;margin:0}
+.practice-composer .primary-slot{flex:0 0 auto}
+.practice-dock .secondary-actions{margin:0 0 8px}
+#path-ask-panel,#rules-ask-panel{position:sticky;bottom:var(--kbinset,0px);z-index:8;background:var(--surface)}
+#account-dialog{max-height:100dvh;overflow:auto}
 .letter-keyboard button{
   background:var(--paper);border:1px solid var(--line);color:var(--ink);
   border-radius:var(--radius-letter);min-width:44px;min-height:44px;font-size:1.1rem
@@ -352,17 +363,19 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
   h1{font-size:2.1rem;letter-spacing:-.03em}
   .today-hero{padding:24px 20px}
   .today-tiles{grid-template-columns:1fr;gap:12px}
-  .exercise-card{margin-bottom:var(--bottom-nav-height,64px);border-radius:22px;box-shadow:none}
+  .exercise-card{margin-bottom:var(--bottom-nav-height,64px);border-radius:22px;box-shadow:none;overflow:visible}
   .stimulus{font-size:clamp(1.85rem,8vw,2.4rem)}
   .bottom-nav button[aria-current=page]{color:var(--primary)}
-  .question-actions{background:var(--surface);position:sticky;bottom:var(--bottom-nav-height,64px)}
-  .letter-keyboard{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
-  .letter-keyboard button{min-width:0;min-height:44px}
-  body[data-view=practice] .topbar{opacity:1}
+  .question-actions{background:transparent;position:static}
+  .letter-keyboard{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px}
+  .letter-keyboard button{min-width:44px;min-height:44px;flex:0 0 auto}
+  body[data-view=practice] .topbar{display:none}
   body[data-view=practice] .bottom-nav{display:none!important}
-  body[data-view=practice]{padding-bottom:var(--bottom-nav-height)}
+  body[data-view=practice]{padding-bottom:0}
   body[data-view=path]{padding-bottom:var(--bottom-nav-height)}
-  body[data-view=practice] .question-actions{bottom:0}
+  body[data-view=practice] .question-actions{bottom:auto}
+  body[data-view=practice] .exercise-card{margin-bottom:0}
+  .practice-composer .letter-keyboard{max-width:min(58vw,320px)}
   .path-crumb{position:sticky;top:0;background:var(--paper);padding:8px 0;z-index:2}
   .lesson{grid-template-columns:38px minmax(0,1fr);padding:18px}
   .lesson .primary-button,.lesson .secondary-button{grid-column:2;justify-self:start}

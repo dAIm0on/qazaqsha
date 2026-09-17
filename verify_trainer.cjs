@@ -930,7 +930,18 @@ ok('COPY-3 title Qazaqsha — Қазақша; login is a dialog');
 
 assert.ok(/\['ә','ғ','қ','ң','ө','ұ','ү','һ','і'\]|әғқңөұүһі/.test(appSrc));
 assert.ok(/Golos Text/.test(theme));
+assert.ok(/practice-dock/.test(appSrc)&&/practice-dock/.test(theme));
+assert.ok(/visualViewport/.test(appSrc));
+assert.ok(/--kbinset/.test(appSrc)&&/--kbinset/.test(theme));
+assert.ok(/interactive-widget=resizes-content/.test(htmlSrc));
+assert.ok(/lang="kk"/.test(appSrc));
+assert.ok(/pointerdown/.test(appSrc));
+assert.ok(/overflow:visible/.test(fs.readFileSync(path.join(__dirname,'styles.css'),'utf8')));
+assert.ok(!/question-actions\{position:sticky!important/.test(fs.readFileSync(path.join(__dirname,'styles.css'),'utf8')));
+assert.ok(!/U\+0400-052F/.test(theme));
+assert.ok(/U\+04DA-04E7/.test(theme));
 ok('FONT-1 nine kazakh letters in keyboard markup');
+ok('Mobile composer: dock, visualViewport, no card clip, Kazakh unicode-range hole for fallback');
 
 const readme=fs.readFileSync(path.join(__dirname,'README.md'),'utf8');
 assert.ok(/qazaqsha\.pages\.dev/.test(readme));
