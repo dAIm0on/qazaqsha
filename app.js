@@ -1041,6 +1041,56 @@
  $('#pause-session').onclick=()=>showView(mode==='homework'||(mode==='remediation'&&hwReturn)?'homework':mode==='exam'?'exam':'today');
  const lettersPref=$('#pref-letters');
  if(lettersPref){lettersPref.checked=!!state.prefs.letters;lettersPref.onchange=()=>{state.prefs.letters=lettersPref.checked;state.prefs.lettersChosen=true;save();if(view==='practice')render();};}
+ function issueContext(){
+   const q=view==='practice'?byId.get(queue[position]):null;
+   const gp=state.grammarPath||{};
+   return {
+     view,mode,topic:topic||'',courseBlock:courseBlock||'',
+     lessonId:(q&&q.lessonId)||gp.lessonId||activeLesson||hwLesson||'',
+     exerciseId:q?q.id:'',
+     title:q?String(q.title||''): (view==='path'&&gp.chapterId?String(gp.chapterId):''),
+     stimulus:q?String(q.stimulus||'').slice(0,200):'',
+     source:q?String(q.source||''):''
+   };
+ }
+ function issueLines(){
+   return (state.issueLog||[]).map(x=>{
+     const when=new Date(x.at).toLocaleString('ru-RU');
+     return when+' · '+[x.view,x.mode,x.lessonId,x.exerciseId].filter(Boolean).join(' / ')+'\n'+(x.title||'')+' '+(x.stimulus||'')+'\n'+x.note;
+   }).join('\n\n');
+ }
+ function refreshIssueContext(){
+   const el=$('#issue-context');if(!el)return;
+   const c=issueContext();
+   const bits=[c.view,c.mode&&c.mode!==c.view?c.mode:'',c.lessonId&&('урок '+c.lessonId),c.exerciseId&&('карточка '+c.exerciseId),c.title].filter(Boolean);
+   el.textContent=bits.join(' · ')||'Экран без карточки.';
+ }
+ function bindIssueBar(){
+   const dlg=$('#issue-dialog'), tog=$('#issue-toggle'), note=$('#issue-note'), status=$('#issue-status');
+   if(!dlg||!tog||!note)return;
+   const open=()=>{refreshIssueContext();status.hidden=true;note.value='';if(dlg.showModal)dlg.showModal();else dlg.setAttribute('open','');note.focus();};
+   tog.onclick=open;
+   $('#issue-close')&&($('#issue-close').onclick=()=>dlg.close?dlg.close():dlg.removeAttribute('open'));
+   $('#issue-save')&&($('#issue-save').onclick=()=>{
+     const text=note.value.trim();
+     if(!text){status.hidden=false;status.textContent='Напиши, что не так.';return;}
+     const row=Object.assign({at:Date.now(),note:text.slice(0,800)},issueContext());
+     state.issueLog=(state.issueLog||[]).concat([row]).slice(-80);
+     save();
+     status.hidden=false;status.textContent='Сохранено. Заметок: '+(state.issueLog.length)+'.';
+     note.value='';
+   });
+   $('#issue-copy')&&($('#issue-copy').onclick=()=>{
+     const blob=issueLines()||'Пока пусто.';
+     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(blob).then(()=>{status.hidden=false;status.textContent='Скопировано '+((state.issueLog||[]).length)+' заметок.';}).catch(()=>{status.hidden=false;status.textContent=blob;});
+     else {status.hidden=false;status.textContent=blob;}
+   });
+   $('#issue-download')&&($('#issue-download').onclick=()=>{
+     downloadProgress(JSON.stringify({app:'qazaq-issues',saved_at:new Date().toISOString(),items:state.issueLog||[]},null,2),'qazaq-issues.json');
+     status.hidden=false;status.textContent='Файл qazaq-issues.json — пришли его, и я прочитаю.';
+   });
+ }
+ bindIssueBar();
  renderRules();renderMaterials();
  const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','contrast','numbers','remediation','words','exam','homework','chunks'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){

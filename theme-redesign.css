@@ -268,6 +268,15 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
 .morpheme.suffix{background:var(--sage);color:var(--primary);border-color:var(--sage)}
 .morpheme.extra{background:var(--error-bg);color:var(--error);border-color:transparent}
 
+.issue-toggle{
+  position:fixed;z-index:36;left:10px;right:auto;
+  bottom:calc(10px + var(--kbinset,0px) + var(--bottom-nav-height,0px));
+  min-height:44px;padding:8px 12px;border-radius:999px;
+  background:var(--surface);border:1px solid var(--line);color:var(--ink);
+  box-shadow:0 4px 14px rgba(30,35,31,.12);font-size:.8125rem
+}
+body[data-view=practice] .issue-toggle{bottom:calc(10px + var(--kbinset,0px))}
+#issue-dialog textarea{width:100%;min-height:96px;margin:8px 0;font:inherit}
 .bottom-nav{background:var(--surface);border-top-color:var(--line);grid-template-columns:repeat(5,minmax(0,1fr))!important}
 :root{--bottom-nav-height:calc(64px + env(safe-area-inset-bottom, 0px))}
 .bottom-nav button{color:var(--muted);border-radius:12px;font-size:.6875rem;min-height:52px}

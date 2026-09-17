@@ -943,6 +943,16 @@ assert.ok(/U\+04DA-04E7/.test(theme));
 ok('FONT-1 nine kazakh letters in keyboard markup');
 ok('Mobile composer: dock, visualViewport, no card clip, Kazakh unicode-range hole for fallback');
 
+const Pstore=require('./progress.js');
+const blank=Pstore.empty();
+assert.ok(Array.isArray(blank.issueLog)&&blank.issueLog.length===0);
+const withIssue=Pstore.migrate({schema:6,records:{},issueLog:[{at:1,note:'карточка из 1-1',view:'practice',mode:'homework',lessonId:'2-1',exerciseId:'hw-x',title:'t'}]});
+assert.equal(withIssue.issueLog.length,1);
+assert.equal(withIssue.issueLog[0].note,'карточка из 1-1');
+assert.ok(/issue-toggle/.test(htmlSrc)&&/issue-note/.test(htmlSrc));
+assert.ok(/bindIssueBar/.test(appSrc)&&/issueLog/.test(appSrc));
+ok('Issue log: persist notes with screen context for later review');
+
 const readme=fs.readFileSync(path.join(__dirname,'README.md'),'utf8');
 assert.ok(/qazaqsha\.pages\.dev/.test(readme));
 assert.ok(/2–3/.test(readme));

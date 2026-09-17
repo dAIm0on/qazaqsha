@@ -100,6 +100,21 @@
   </main>
 </div>
 <nav class="bottom-nav" aria-label="Основная навигация"><button type="button" data-view="today">Сегодня</button><button type="button" data-view="learn">Учить</button><button type="button" data-view="review">Повторять</button><button type="button" data-view="exam">Экзамен</button><button type="button" data-view="rules">Правила</button></nav>
+<button type="button" id="issue-toggle" class="issue-toggle">Заметила ошибку</button>
+<dialog id="issue-dialog" class="settings-dialog" aria-labelledby="issue-title">
+  <h2 id="issue-title">Что не так на этом экране</h2>
+  <p id="issue-context" class="small"></p>
+  <label for="issue-note">Опиши своими словами</label>
+  <textarea id="issue-note" maxlength="800" rows="4" placeholder="Например: это упражнение из 1-1, а я сейчас на 2-1"></textarea>
+  <p class="small">Сохраняется в прогрессе. Если есть вход — уйдёт в облако. Можно скачать файл и прислать.</p>
+  <p id="issue-status" class="small" hidden></p>
+  <div class="ai-tutor-actions">
+    <button type="button" class="primary-button" id="issue-save">Сохранить</button>
+    <button type="button" class="secondary-button" id="issue-copy">Скопировать все</button>
+    <button type="button" class="text-button" id="issue-download">Скачать заметки</button>
+    <button type="button" class="text-button" id="issue-close">Закрыть</button>
+  </div>
+</dialog>
 <footer class="site-footer"><span lang="kk">Қазақша</span><span>Письменная практика по материалам курса · <a href="update.html">обновить без потери прогресса</a></span></footer>
 <dialog id="account-dialog" class="settings-dialog" aria-labelledby="account-title">
   <h2 id="account-title">Вход</h2>
