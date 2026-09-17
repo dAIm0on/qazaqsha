@@ -134,6 +134,34 @@
     if(out[0]===failedId&&out.length>1){out.shift();out.push(failedId);}
     return out;
   }
-  const api={normalize,evaluate,migrateRecord,updateRecord,isDue,scheduleRepeat,chooseShortSession,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY};
+  function shareVocabAlts(questions){
+    const toKk=q=>/на казахский|по-казахски|на казахском/i.test(q&&q.title||'');
+    const short=a=>{const n=normalize(a);return n&&!/[.?!]/.test(n)&&n.split(/\s+/).length<=2?n:null;};
+    const groups=new Map();
+    for(const q of questions||[]){
+      if(!q||q.kind!=='fields'||q.topic!=='vocab'||!toKk(q)||!q.fields||!q.fields[0])continue;
+      const key=normalize(q.stimulus);
+      if(!key||key.split(/\s+/).length>2)continue;
+      if(!groups.has(key))groups.set(key,[]);
+      groups.get(key).push(q);
+    }
+    for(const qs of groups.values()){
+      if(qs.length<2)continue;
+      const alts=[];
+      for(const q of qs)for(const a of q.fields[0].answers||[]){
+        const n=short(a);if(!n)continue;
+        if(!alts.some(x=>normalize(x)===n))alts.push(a);
+      }
+      const names=alts.map(normalize);
+      if(alts.length<2)continue;
+      if(names.includes('жоқ')&&names.includes('емес'))continue;
+      for(const q of qs){
+        const have=(q.fields[0].answers||[]).map(normalize);
+        for(const a of alts)if(!have.includes(normalize(a)))q.fields[0].answers.push(a);
+      }
+    }
+    return questions;
+  }
+  const api={normalize,evaluate,migrateRecord,updateRecord,isDue,scheduleRepeat,chooseShortSession,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY,shareVocabAlts};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TrainerCore=api;
 })(typeof window!=='undefined'?window:globalThis);

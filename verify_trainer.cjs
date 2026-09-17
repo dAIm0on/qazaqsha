@@ -964,6 +964,15 @@ assert.ok(/e\.key!=='Enter'/.test(fs.readFileSync(path.join(__dirname,'app.js'),
 assert.ok(/result\.correct&&!reveal/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/setTimeout\(\(\)=>\{advanceTimer=null;nextQuestion\(\);\},400\)/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 ok('Pair бабушка: әже and апа both accepted; Enter checks or goes next');
+const coreAlts=require('./core.js');
+const pairQs=[
+  {id:'a',topic:'vocab',kind:'fields',title:'Переведи на казахский',stimulus:'младшая сестра',fields:[{answers:['қарындас']}]},
+  {id:'b',topic:'vocab',kind:'fields',title:'Переведи на казахский',stimulus:'младшая сестра',fields:[{answers:['сіңлі']}]}
+];
+coreAlts.shareVocabAlts(pairQs);
+assert.ok(pairQs[0].fields[0].answers.includes('сіңлі'));
+assert.ok(pairQs[1].fields[0].answers.includes('қарындас'));
+ok('Vocab synonym answers shared on all lessons, not only 2-3');
 
 const Pstore=require('./progress.js');
 const blank=Pstore.empty();

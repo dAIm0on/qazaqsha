@@ -114,6 +114,7 @@
    const suffixes=[...new Set((q.fields||[]).flatMap(f=>f.answers).map(a=>a.toLowerCase().slice(-3)).filter(s=>['лар','лер','дар','дер','тар','тер'].includes(s)))];q.associationKeys.push(...suffixes.map(s=>'ending:'+s));
    for(const id of q.vocabIds){const w=words.find(w=>w.id===id);if(w)w.card_ids.push(q.id);}
  }
+ if(core.shareVocabAlts)core.shareVocabAlts(c.questions);
  const stable=r=>['FAMILIAR','REMEMBERED','MASTERED'].includes(r?.mastery_level);
  function known(w,state){return !!w&&['recognition','production','digit_to_word','word_to_digit'].some(type=>stable(state.skills?.[w.id+'::'+type]));}
  function missingPrerequisites(q,state){return !q.contextOnly?[]:(q.prerequisites||[]).filter(id=>!['production','digit_to_word'].some(type=>stable(state.skills?.[id+'::'+type])));}
