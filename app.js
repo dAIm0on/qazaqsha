@@ -831,17 +831,38 @@
      const input=$('#path-answer');if(input)input.focus();
      $$('#path-form [data-letter]').forEach(b=>{b.addEventListener('pointerdown',e=>e.preventDefault());b.onclick=()=>{const s=input.selectionStart||input.value.length,e=input.selectionEnd||s;input.value=input.value.slice(0,s)+b.dataset.letter+input.value.slice(e);input.focus();};});
      let pathPeek=false;
-     $('#path-rule').onclick=()=>{pathPeek=true;$('#path-fb').hidden=false;$('#path-fb').className='feedback hinted';$('#path-fb').innerHTML='<p>'+esc(beat.rule_line||beat.trap||'Собери слот, потом напиши форму целиком.')+'</p>';};
-     $('#path-idk').onclick=()=>{pathPeek=true;$('#path-form').requestSubmit();};
+     const exp=()=>String([].concat(beat.answers||[],beat.answer||[])[0]||'');
+     const formAsk=beat.type==='one_prod'||beat.type==='fade';
+     const hintLine=()=>{
+       if(beat.rule_line)return beat.rule_line;
+       if(beat.type==='know_if')return 'Ответ да или нет. Это тот же смысл, что в заголовке, или другой?';
+       if(beat.type==='know_lever')return 'Это вопрос «который по счёту», не «сколько предметов». Например екінші — второй, екі кітап — две книги.';
+       if(beat.type==='trap_choice')return beat.trap||'Напиши форму, которую курс как раз запрещает.';
+       if(formAsk)return 'Обычное число из курса + одна наклейка справа. Пример: бір → бірінші.';
+       return 'Вспомни объяснение этой главы, потом напиши короткий ответ.';
+     };
+     const showPathFb=(cls,html)=>{
+       const box=$('#path-fb');box.hidden=false;box.className='feedback '+cls;box.innerHTML=html;
+       const go=$('#path-go');if(go)go.onclick=nextBeat;
+     };
+     $('#path-rule').onclick=()=>{pathPeek=true;showPathFb('hinted','<p>'+esc(hintLine())+'</p>');};
+     $('#path-idk').onclick=()=>{
+       pathPeek=true;
+       G.recordPath(state,beat,false,true);
+       const right=exp();
+       if(input)input.value=right;
+       showPathFb('hinted','<p>Правильно: <strong>'+esc(right)+'</strong></p><p class="small">Это подсказка, не самостоятельный ответ.</p><button type="button" class="primary-button" id="path-go">Дальше</button>');
+       save();
+     };
      $('#path-form').onsubmit=e=>{
        e.preventDefault();
        if(e.isComposing||(e.nativeEvent&&e.nativeEvent.isComposing))return;
        const val=$('#path-answer').value,ok=G.evalCheck(beat,val);
        G.recordPath(state,beat,ok,pathPeek);
        if(ok){nextBeat();return;}
-       const box=$('#path-fb');box.hidden=false;box.className='feedback error';
-       const exp=[].concat(beat.answers||[beat.answer])[0];
-       box.innerHTML='<p>'+esc(G.diagnoseProd(exp,val))+'</p>'+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+'<p>Набери верную форму целиком: <strong lang="kk">'+esc(exp)+'</strong></p>';
+       const right=exp();
+       const diag=formAsk&&val.trim()?G.diagnoseProd(right,val):'Пока неверно.';
+       showPathFb('error','<p>'+esc(diag)+'</p>'+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+'<p>Правильно: <strong>'+esc(right)+'</strong></p><button type="button" class="primary-button" id="path-go">Дальше</button>');
        save();
      };
      return;

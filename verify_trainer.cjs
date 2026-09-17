@@ -962,6 +962,8 @@ assert.ok(/"id": "hw23-4-kk"[\s\S]*?"әже"[\s\S]*?"апа"/.test(pack23));
 assert.ok(/"id": "hw23-5-kk"[\s\S]*?"апа"[\s\S]*?"әже"/.test(pack23));
 assert.ok(/_qazaqEnter/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/path-form" class="practice-composer"/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/id="path-go"/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/Правильно: <strong>/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/FUTURE_RE\.test\(req\.user_question/.test(fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8')));
 assert.ok(/пример\|ещё\\s\*2/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 const ordCh=GP.chapter('2-3','2-3-ord');
