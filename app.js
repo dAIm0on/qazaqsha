@@ -845,7 +845,25 @@
        const box=$('#path-fb');box.hidden=false;box.className='feedback '+cls;box.innerHTML=html;
        const go=$('#path-go');if(go)go.onclick=nextBeat;
      };
-     $('#path-rule').onclick=()=>{pathPeek=true;showPathFb('hinted','<p>'+esc(hintLine())+'</p>');};
+     const askDummy=()=>{
+       const n=(state.grammarPath&&state.grammarPath.fails&&beat.error_key&&state.grammarPath.fails[beat.error_key])||0;
+       const tRules=(window.AiRules&&window.AiRules.allowedRuleIds([les.id]))||[];
+       const step=beatPlain(beat).replace(/падеж\w*|посессив\w*|притяжательн\w*/gi,' ').replace(/\s+/g,' ').trim().slice(0,220);
+       const again=n>=2?('Ученица уже '+n+' раз ошибалась на этом шаге. Скажи это мягко. '):'';
+       return {id:'path:'+les.id+':'+ch.id+':'+(beat.id||''),lessonId:les.id,title:beat.prompt||ch.title,stimulus:again+'Глава: '+ch.title+'. '+step,fields:[{answers:['']}],ruleIds:tRules};
+     };
+     $('#path-rule').onclick=()=>{
+       pathPeek=true;
+       const local=hintLine();
+       showPathFb('hinted','<p>Разбираю этот ответ…</p>');
+       if(!window.AiTutor||!window.AiTutor.callTutor){showPathFb('hinted','<p>'+esc(local)+'</p>');return;}
+       const req=window.AiTutor.buildRequest('hint',askDummy(),{hint_used:true,codes:[],allowed_lesson_ids:[les.id]});
+       window.AiTutor.callTutor(req,18000).then(resp=>{
+         const msg=resp&&resp.message_ru||'';
+         if(window.AiTutor.isLiveMessage(msg)&&!window.AiTutor.hintLeaks(resp,exp()))showPathFb('hinted','<p>'+esc(msg)+'</p>');
+         else showPathFb('hinted','<p>'+esc(local)+'</p>');
+       }).catch(()=>showPathFb('hinted','<p>'+esc(local)+'</p>'));
+     };
      $('#path-idk').onclick=()=>{
        pathPeek=true;
        G.recordPath(state,beat,false,true);
@@ -865,6 +883,7 @@
        showPathFb('error','<p>'+esc(diag)+'</p>'+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+'<p>Правильно: <strong>'+esc(right)+'</strong></p><button type="button" class="primary-button" id="path-go">Дальше</button>');
        save();
      };
+     attachPathAsk();
      return;
    }
    nextBeat();
