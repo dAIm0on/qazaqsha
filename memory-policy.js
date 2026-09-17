@@ -126,9 +126,21 @@
    }
    return out;
  }
- function mixRulesProbes(ids,questions,state){
+ function isLetterClassifier(q){
+   return (q&&q.fields||[]).some(f=>(f.answers||[]).some(a=>/мягк|твёрд|тверд|зависит от слова/i.test(String(a))));
+ }
+ function mixRulesProbes(ids,questions,state,scope){
+   scope=scope||{};
+   const byId=new Map((questions||[]).map(q=>[q.id,q]));
    const have=new Set(ids||[]);
-   const add=rulesProbe(questions,state).filter(id=>!have.has(id)).slice(0,2);
+   const add=rulesProbe(questions,state).filter(id=>{
+     if(have.has(id))return false;
+     const q=byId.get(id);if(!q)return false;
+     if(isLetterClassifier(q))return false;
+     if(scope.lessonId&&q.lessonId&&q.lessonId!==scope.lessonId)return false;
+     if(scope.topic&&scope.topic!=='all'&&q.topic&&q.topic!==scope.topic)return false;
+     return true;
+   }).slice(0,2);
    if(!add.length)return ids||[];
    const out=[...(ids||[])];
    out.splice(Math.min(2,out.length),0,...add);
@@ -152,6 +164,6 @@
    if((q.ruleIds||[]).includes('quantity'))return 'extra_plural';
    return 'other';
  }
- const api={PAIRS,PARTICLES,weekKey,contrastSide,breakRuns,classify,direction,isContextOnly,examReady,canMasterProduction,associationFaded,isChunk,rulesProbe,mixRulesProbes,incidentalWeek,canAddIncidental,confusionTag,isAtomicNumber,isAssembleOnlyCard,answerFlags};
+ const api={PAIRS,PARTICLES,weekKey,contrastSide,breakRuns,classify,direction,isContextOnly,examReady,canMasterProduction,associationFaded,isChunk,rulesProbe,mixRulesProbes,isLetterClassifier,incidentalWeek,canAddIncidental,confusionTag,isAtomicNumber,isAssembleOnlyCard,answerFlags};
  if(node)module.exports=api;else root.MemoryPolicy=api;
 })(typeof window!=='undefined'?window:globalThis);

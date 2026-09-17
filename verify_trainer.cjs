@@ -631,6 +631,18 @@ assert.ok(!probeMix.includes('future-case'));
 assert.ok(probeQs.filter(q=>probeMix.includes(q.id)).every(q=>q.kind==='fields'));
 ok('H3-auto mixRulesProbes injects typed introduced probe, not future lemma');
 
+const leakMix=policy.mixRulesProbes(['keep-23'],[
+  {id:'keep-23',topic:'person',lessonId:'2-3',kind:'fields',fields:[{answers:['мін']}]},
+  {id:'m1-11-1',topic:'sounds',lessonId:'1-1',kind:'fields',ruleIds:['harmony'],fields:[{answers:['Зависит от слова']},{answers:['Мягкая']}]},
+  {id:'facet-harmony-0',topic:'plural',lessonId:'1-1',kind:'fields',ruleIds:['harmony'],fields:[{answers:['а']}],stimulus:'кітап'}
+],{records:{'m1-11-1':{seen:2,recall_review_successes:1},'facet-harmony-0':{seen:2,recall_review_successes:1}}},{lessonId:'2-3',topic:'person'});
+assert.ok(leakMix.includes('keep-23'));
+assert.ok(!leakMix.includes('m1-11-1'));
+assert.ok(!leakMix.includes('facet-harmony-0'));
+assert.ok(/tap-choices/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/classifierOptions/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+ok('1-1 letter-classifier not mixed into 2-3; tap chips instead of typing Мягкая');
+
 const p23words=hw.buildPack('2-3',qs23all,{sources:{}});
 const dirs=hw.vocabDirections(p23words.homework.word_question_ids);
 assert.ok(dirs.production.length>0);

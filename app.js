@@ -164,7 +164,7 @@
    if(['smart','review','mistakes'].includes(mode)){const recent=state.events.filter(e=>e.type==='answer'&&Date.now()-e.at<cfg.session.recentWindowMs).slice(-cfg.session.minIntervening).map(e=>e.card_id);list=core.spaceRecent(window.Knowledge.choose(list,state,Infinity),recent).slice(0,cfg.session.size);}
    let ids=list.map(q=>q.id);
    if(window.MemoryPolicy)ids=window.MemoryPolicy.breakRuns(ids,questions);
-   if(window.MemoryPolicy&&window.MemoryPolicy.mixRulesProbes&&['smart','review','ordered'].includes(mode))ids=window.MemoryPolicy.mixRulesProbes(ids,questions,state);
+   if(window.MemoryPolicy&&window.MemoryPolicy.mixRulesProbes&&['smart','review','ordered'].includes(mode))ids=window.MemoryPolicy.mixRulesProbes(ids,questions,state,{lessonId:courseBlock||null,topic});
    queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);resetCounts();render();
  }
  function startLesson(id,step=learningState.steps[id]||0){
@@ -235,9 +235,20 @@
    if(!text)return '';
    return `<p class="question-note encoding-cue" id="encoding-cue">${esc(text)}</p>`;
  }
+ function classifierOptions(f){
+   const a=(f.answers||[]).join(' ').toLowerCase();
+   if(/зависит от слова/.test(a))return ['Мягкая','Твёрдая','Зависит от слова'];
+   if(/мягкое|твёрдое|твердое/.test(a))return ['Мягкое','Твёрдое'];
+   if(/мягкий|твёрдый|твердый/.test(a))return ['Мягкий','Твёрдый'];
+   return null;
+ }
  function answerMarkup(q){
    const fields=q.fields||[{label:'Ответ',kind:'text'}];
-   return `<div class="fields">${fields.map((f,i)=>`<div class="field-row"><label class="field-label" for="answer-${i}">${esc(f.label)}</label><div class="field-control"><input id="answer-${i}" name="answer-${i}" type="text" lang="kk" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${f.kind==='number-text'?'inputmode="numeric"':''} aria-describedby="correction-${i}"><span class="field-correction" id="correction-${i}"></span></div></div>`).join('')}</div>`;
+   return `<div class="fields">${fields.map((f,i)=>{
+     const taps=classifierOptions(f);
+     if(taps)return `<div class="field-row"><span class="field-label" id="label-${i}">${esc(f.label)}</span><div class="field-control tap-choices" role="group" aria-labelledby="label-${i}"><input id="answer-${i}" name="answer-${i}" type="hidden">${taps.map(v=>`<button type="button" class="chip" data-fill="answer-${i}" data-val="${esc(v)}" aria-pressed="false">${esc(v)}</button>`).join('')}</div></div>`;
+     return `<div class="field-row"><label class="field-label" for="answer-${i}">${esc(f.label)}</label><div class="field-control"><input id="answer-${i}" name="answer-${i}" type="text" lang="kk" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${f.kind==='number-text'?'inputmode="numeric"':''} aria-describedby="correction-${i}"><span class="field-correction" id="correction-${i}"></span></div></div>`;
+   }).join('')}</div>`;
  }
  function render(){
    retrying=false;
@@ -247,7 +258,7 @@
    window.NumberPractice.prepare(q,variants);confusionIndex=P.answerIndex(questions);
    const source=course.sources[q.source], streak=records[q.id]?.streak||0;
    const location=q.source.startsWith('hw')?'Слово '+q.group:`Задание ${q.group}${q.part!=='1'?' · пункт '+q.part:''}`;
-   const hasText=q.kind==='fields'&&q.fields.some(f=>f.kind!=='number-text');
+   const hasText=q.kind==='fields'&&q.fields.some(f=>f.kind!=='number-text'&&!classifierOptions(f));
    const letters=hasText&&state.prefs.letters;
    const exam=mode==='exam';
    const hw=mode==='homework';
@@ -274,10 +285,18 @@
        target.focus();target.setSelectionRange(start+1,start+1);lastTextInput=target;save();
      });
    });
+   $$('[data-fill]').forEach(b=>b.addEventListener('click',e=>{
+     e.preventDefault();
+     const inp=$('#'+b.dataset.fill);if(!inp)return;
+     inp.value=b.dataset.val;
+     b.parentElement.querySelectorAll('[data-fill="'+b.dataset.fill+'"]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
+     save();
+   }));
    if(draft?.token===queueEpoch+':'+position&&draft.exerciseId===q.id){
      if(q.kind==='multi')$$('input[name=choice]').forEach(el=>{el.checked=draft.answers.includes(el.value);});
      else q.fields.forEach((f,i)=>{$('#answer-'+i).value=String(draft.answers[i]||'');});
    }
+   $$('[data-fill]').forEach(b=>{const inp=$('#'+b.dataset.fill);if(inp&&inp.value===b.dataset.val)b.setAttribute('aria-pressed','true');});
    $('#answer-form').addEventListener('input',save);$('#answer-form').addEventListener('change',save);
    activateCard();save();
  }
