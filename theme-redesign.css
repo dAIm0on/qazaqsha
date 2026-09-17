@@ -1,4 +1,4 @@
-/* Qazaqsha — Современный Алматы (16.09.2026). Logic unchanged. Photos later. */
+/* Qazaqsha — кожа Чернила, этап 02 оболочка. Logic unchanged. */
 @import url("design-tokens.css");
 
 @font-face{
@@ -20,52 +20,37 @@
 
 :root{
   color-scheme:light;
-  --paper:#F4EFE7; --surface:#FFFCF7; --surface-alt:#EDE4D8; --sage:#E2E8DB;
-  --ink:#1E231F; --body:#3B3A36; --muted:#625F57; --line:#D9D1C4;
-  --primary:#41573F; --primary-hover:#334832; --accent:#9F4E31;
-  --success:#315A38; --success-bg:#E5EFDF; --error:#8D3F32; --error-bg:#F7E8E1;
-  --warning:#77550F; --warning-bg:#F5EACD; --focus:#1C655F;
-  --input-line:#8A8377;
-  --display:"Noto Serif",Georgia,serif;
-  --sans:"Golos Text","Segoe UI",sans-serif;
-  --radius-lg:28px; --radius:20px; --radius-control:16px; --radius-letter:10px;
-  --shadow:0 10px 36px rgba(48,41,30,.03);
-  --motion-fast:140ms; --motion-base:220ms; --ease:cubic-bezier(.2,.7,.2,1);
-
+  --input-line:#16141244;
   --qs-bg-top:var(--paper); --qs-bg:var(--paper); --qs-bg-bottom:var(--paper);
   --qs-surface:var(--surface); --qs-surface-raised:var(--surface); --qs-surface-muted:var(--surface-alt);
   --qs-ink:var(--ink); --qs-ink-soft:var(--body); --qs-muted:var(--muted); --qs-muted-2:var(--muted);
-  --qs-green:var(--primary); --qs-green-hover:var(--primary-hover); --qs-green-soft:var(--sage);
-  --qs-lime:var(--success); --qs-lime-soft:var(--success-bg);
-  --qs-terracotta:var(--accent); --qs-terracotta-soft:var(--error-bg);
-  --qs-violet:var(--primary); --qs-violet-soft:var(--sage);
-  --qs-error:var(--error); --qs-error-soft:var(--error-bg);
-  --qs-warning:var(--warning); --qs-warning-soft:var(--warning-bg);
+  --qs-green:var(--ok); --qs-green-hover:var(--ok); --qs-green-soft:var(--lilac);
+  --qs-lime:var(--ok); --qs-lime-soft:var(--success-bg);
+  --qs-terracotta:var(--sticker); --qs-terracotta-soft:var(--error-bg);
+  --qs-violet:var(--lilac); --qs-violet-soft:var(--lilac);
+  --qs-error:var(--sticker); --qs-error-soft:var(--error-bg);
+  --qs-warning:var(--warning); --qs-warning-soft:var(--oil);
   --qs-line:var(--line); --qs-line-strong:var(--input-line);
   --qs-shadow-1:var(--shadow); --qs-shadow-2:var(--shadow);
-  --qs-r-sm:10px; --qs-r-md:var(--radius-control); --qs-r-lg:var(--radius); --qs-r-xl:var(--radius-lg);
+  --qs-r-sm:8px; --qs-r-md:var(--radius-control); --qs-r-lg:var(--radius); --qs-r-xl:var(--radius-lg);
   --qs-font-ui:var(--sans); --qs-font-display:var(--display);
   --qs-text-base:16px; --qs-line-base:1.55;
   --qs-motion-fast:var(--motion-fast); --qs-motion-normal:var(--motion-base); --qs-ease:var(--ease);
   --qs-page-bg:var(--paper);
-
-  --navy:var(--primary); --teal:var(--primary); --teal-soft:var(--sage); --gold:var(--accent);
+  --navy:var(--ink); --teal:var(--ink); --teal-soft:var(--lilac); --gold:var(--oil);
   --bg:var(--paper); --white:var(--surface);
   font-family:var(--sans);
   font-size:16px;
   line-height:1.55;
   font-synthesis:none;
 }
-:root[data-season="summer"]{
-  --paper:#F5F1EA; --surface-alt:#E7EDE9; --sage:#DCE8E3;
-  --primary:#416154; --primary-hover:#304D42; --accent:#355E7C;
-}
-:root[data-season="spring"]{
-  --paper:#F7F3EE; --surface-alt:#EDE1DA; --sage:#E2EBDF;
-  --primary:#456343; --primary-hover:#334D31; --accent:#92583F;
-}
 
-html,body{background:var(--paper);color:var(--ink);min-height:100%}
+html,body{
+  color:var(--ink);min-height:100%;
+  background-color:var(--paper);
+  background-image:radial-gradient(circle at 1px 1px,rgba(22,20,18,.10) 1px,transparent 1px);
+  background-size:var(--dot,18px) var(--dot,18px);
+}
 body{margin:0}
 a{color:var(--accent);text-underline-offset:3px}
 :focus-visible,button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{
@@ -78,10 +63,13 @@ h3{font-family:var(--sans);font-weight:550;font-size:1.125rem;letter-spacing:-.0
 .eyebrow{color:var(--muted);letter-spacing:.14em;font-size:.6875rem;font-weight:600}
 
 /* Shell */
+.topbar,.topnav,.bottom-nav{
+  backdrop-filter:none;-webkit-backdrop-filter:none
+}
 .topbar{
-  background:transparent;color:var(--ink);
-  min-height:72px;padding:16px max(24px,calc((100vw - 1440px)/2 + 48px));
-  border-bottom:1px solid var(--line);gap:24px
+  background:var(--paper);color:var(--ink);
+  min-height:56px;padding:12px max(16px,calc((100vw - 1440px)/2 + 48px));
+  border-bottom:1px solid var(--line);gap:16px
 }
 .brand{color:var(--ink);font-family:var(--display);font-weight:500;letter-spacing:-.04em;font-size:1.7rem;flex-direction:column;align-items:flex-start;gap:4px}
 .brand-mark{
@@ -156,6 +144,9 @@ input[type=text]:focus,select:focus,textarea:focus-visible,input[type=search]:fo
 input.invalid,select.invalid{border-color:var(--error);background:var(--error-bg)}
 input.valid,select.valid{border-color:var(--success);background:var(--success-bg)}
 .letter-keyboard{display:flex;flex-wrap:wrap;gap:7px}
+.letter-keyboard button{
+  min-width:44px;min-height:44px;border-radius:var(--radius-letter,8px)
+}
 .letter-keyboard button,
 input[id^="answer-"],
 .glyph-check{
@@ -290,10 +281,22 @@ body[data-view=practice] .issue-toggle{
   top:8px;right:10px;left:auto;bottom:auto;z-index:18
 }
 #issue-dialog textarea{width:100%;min-height:96px;margin:8px 0;font:inherit}
-.bottom-nav{background:var(--surface);border-top-color:var(--line);grid-template-columns:repeat(5,minmax(0,1fr))!important}
+.bottom-nav{
+  background:var(--surface);border-top:1px solid var(--line);
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  padding-bottom:env(safe-area-inset-bottom,0px)
+}
 :root{--bottom-nav-height:calc(64px + env(safe-area-inset-bottom, 0px))}
-.bottom-nav button{color:var(--muted);border-radius:12px;font-size:.6875rem;min-height:52px}
-.bottom-nav button[aria-current=page]{color:var(--primary);background:var(--sage);box-shadow:none}
+.bottom-nav button{
+  position:relative;color:var(--muted);border-radius:8px;
+  font-size:.625rem;line-height:1.15;min-height:52px;min-width:0;
+  padding:6px 2px;white-space:normal;overflow:visible
+}
+.bottom-nav button[aria-current=page]{color:var(--ink);background:transparent;box-shadow:none;font-weight:700}
+.bottom-nav button[aria-current=page]::after{
+  content:"";position:absolute;left:50%;bottom:6px;width:28px;height:3px;
+  margin-left:-14px;border-radius:999px;background:var(--spot,#FF5A1F)
+}
 
 .path-crumb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 12px;font-size:.875rem;color:var(--muted)}
 .path-crumb strong{color:var(--ink)}
@@ -354,9 +357,9 @@ body[data-view=practice] .issue-toggle{
 .season-swatches{display:flex;gap:9px;margin:8px 0 0}
 .season-swatches button{width:44px;height:44px;border-radius:50%;border:2px solid transparent;padding:0}
 .season-swatches button[aria-pressed=true]{border-color:var(--ink)}
-.season-swatches .autumn{background:#41573F}
-.season-swatches .summer{background:#416154}
-.season-swatches .spring{background:#456343}
+.season-swatches .autumn{background:#161412}
+.season-swatches .summer{background:#DDD0F6}
+.season-swatches .spring{background:#F3E18A}
 .season-captions{display:flex;gap:9px;margin:6px 0 0;font-size:.75rem;color:var(--muted)}
 .season-captions span{width:44px;text-align:center}
 .glyph-check{font-size:1.15rem;letter-spacing:.04em;overflow-wrap:anywhere;margin:12px 0 0}
@@ -377,24 +380,31 @@ body[data-view=practice] .issue-toggle{
   .today-tiles{grid-template-columns:1fr 1fr}
 }
 @media(max-width:899px){
-  .workspace{grid-template-columns:1fr;padding:28px 24px 100px}
+  .workspace{grid-template-columns:1fr;padding:16px 16px 100px}
   .sidebar{display:none}
 }
 @media(max-width:690px){
-  .topbar{padding:12px 20px;min-height:64px}
+  .topbar{padding:8px 16px;min-height:56px}
   h1{font-size:2.1rem;letter-spacing:-.03em}
   .today-hero{padding:24px 20px}
   .today-tiles{grid-template-columns:1fr;gap:12px}
   .exercise-card{margin-bottom:var(--bottom-nav-height,64px);border-radius:22px;box-shadow:none;overflow:visible}
   .stimulus{font-size:clamp(1.85rem,8vw,2.4rem)}
-  .bottom-nav button[aria-current=page]{color:var(--primary)}
+  .bottom-nav button[aria-current=page]{color:var(--ink)}
   .question-actions{background:transparent;position:static}
   .letter-keyboard{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px}
   .letter-keyboard button{min-width:44px;min-height:44px;flex:0 0 auto}
   body[data-view=practice] .topbar{display:none}
   body[data-view=practice] .bottom-nav{display:none!important}
   body[data-view=practice]{padding-bottom:0}
-  body[data-view=path]{padding-bottom:var(--bottom-nav-height)}
+  body[data-view=path],
+  body[data-view=today],
+  body[data-view=learn],
+  body[data-view=review],
+  body[data-view=exam],
+  body[data-view=rules],
+  body[data-view=homework],
+  body[data-view=vocabulary]{padding-bottom:var(--bottom-nav-height)}
   body[data-view=practice] .question-actions{bottom:auto}
   body[data-view=practice] .exercise-card{margin-bottom:0}
   .composer-row{align-items:center}
@@ -417,6 +427,7 @@ body[data-view=practice] .issue-toggle{
   h1{font-size:1.95rem}
   .today-hero{padding:20px 16px}
   .workspace{padding-inline:16px}
+  .bottom-nav button{font-size:.5625rem;padding:6px 0}
 }
 
 @media print{
