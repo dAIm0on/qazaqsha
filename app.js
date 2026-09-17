@@ -249,7 +249,7 @@
    return `<div class="fields">${fields.map((f,i)=>{
      const taps=classifierOptions(f);
      if(taps)return `<div class="field-row"><span class="field-label" id="label-${i}">${esc(f.label)}</span><div class="field-control tap-choices" role="group" aria-labelledby="label-${i}"><input id="answer-${i}" name="answer-${i}" type="hidden">${taps.map(v=>`<button type="button" class="chip" data-fill="answer-${i}" data-val="${esc(v)}" aria-pressed="false">${esc(v)}</button>`).join('')}</div></div>`;
-     return `<div class="field-row"><label class="field-label" for="answer-${i}">${esc(f.label)}</label><div class="field-control"><input id="answer-${i}" name="answer-${i}" type="text" lang="kk" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${f.kind==='number-text'?'inputmode="numeric"':''} aria-describedby="correction-${i}"><span class="field-correction" id="correction-${i}"></span></div></div>`;
+     return `<div class="field-row"><label class="field-label" for="answer-${i}">${esc(f.label)}</label><div class="field-control"><input id="answer-${i}" name="answer-${i}" type="text" lang="kk" enterkeyhint="enter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${f.kind==='number-text'?'inputmode="numeric"':''} aria-describedby="correction-${i}"><span class="field-correction" id="correction-${i}"></span></div></div>`;
    }).join('')}</div>`;
  }
  function render(){
@@ -272,8 +272,11 @@
    const goCard=()=>{if(checked)nextQuestion();else checkAnswer(q);};
    if(window._qazaqEnter)document.removeEventListener('keydown',window._qazaqEnter);
    window._qazaqEnter=e=>{
-     if(e.key!=='Enter'||e.repeat||e.isComposing)return;
-     if(e.target&&e.target.closest&&e.target.closest('textarea,dialog,#issue-dialog'))return;
+     if(e.key!=='Enter'&&e.key!=='NumpadEnter')return;
+     if(e.repeat||e.isComposing)return;
+     if(document.body.getAttribute('data-view')!=='practice')return;
+     if(!document.getElementById('answer-form'))return;
+     if(e.target&&e.target.closest&&e.target.closest('textarea,dialog,#issue-dialog,#path-form'))return;
      e.preventDefault();
      goCard();
    };
@@ -813,9 +816,9 @@
      root.innerHTML=`<div class="panel path-paper">${head}<p class="phase-label">${beat.type==='one_prod'?'Самостоятельно':beat.type==='trap_choice'?'Ловушка':'Проверь понимание'}</p>
        <h2>${esc(beat.prompt)}</h2>
        ${beat.stem?'<p class="stimulus" lang="kk">'+esc(beat.stem)+'</p>':''}
-       <form id="path-form"><input id="path-answer" type="text" lang="kk" enterkeyhint="done" autocomplete="off" spellcheck="false">${kb}
+       <form id="path-form" class="practice-composer"><div class="composer-row"><input id="path-answer" type="text" lang="kk" enterkeyhint="enter" autocomplete="off" spellcheck="false"><button type="submit" class="primary-button" id="path-check">Проверить</button></div>${kb}
          <div id="path-fb" class="feedback" hidden></div>
-         <div class="lesson-actions"><button type="submit" class="primary-button">Проверить</button>
+         <div class="lesson-actions">
            <button type="button" class="secondary-button" id="path-rule">Подсказка</button>
            <button type="button" class="text-button" id="path-idk">Не знаю</button></div></form></div>`;
      bindCrumb();
@@ -824,17 +827,15 @@
      let pathPeek=false;
      $('#path-rule').onclick=()=>{pathPeek=true;$('#path-fb').hidden=false;$('#path-fb').className='feedback hinted';$('#path-fb').innerHTML='<p>'+esc(beat.rule_line||beat.trap||'Собери слот, потом напиши форму целиком.')+'</p>';};
      $('#path-idk').onclick=()=>{pathPeek=true;$('#path-form').requestSubmit();};
-     $('#path-form').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.isComposing||e.keyCode===229))e.preventDefault();});
      $('#path-form').onsubmit=e=>{
        e.preventDefault();
        if(e.isComposing||(e.nativeEvent&&e.nativeEvent.isComposing))return;
        const val=$('#path-answer').value,ok=G.evalCheck(beat,val);
        G.recordPath(state,beat,ok,pathPeek);
-       if(ok&&!pathPeek){nextBeat();return;}
+       if(ok){nextBeat();return;}
        const box=$('#path-fb');box.hidden=false;box.className='feedback error';
        const exp=[].concat(beat.answers||[beat.answer])[0];
        box.innerHTML='<p>'+esc(G.diagnoseProd(exp,val))+'</p>'+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+'<p>Набери верную форму целиком: <strong lang="kk">'+esc(exp)+'</strong></p>';
-       $('#path-form').onsubmit=ev=>{ev.preventDefault();if(!G.evalCheck(beat,$('#path-answer').value))return;nextBeat();};
        save();
      };
      return;

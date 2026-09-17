@@ -172,7 +172,9 @@ input[id^="answer-"],
 .practice-composer{display:flex;flex-direction:column;gap:8px}
 .composer-row{display:flex;flex-direction:row;align-items:center;gap:8px;width:100%}
 .composer-row .fields{flex:1;min-width:0;margin:0}
-.composer-row .field-row{display:flex;flex-direction:row;align-items:center;gap:8px;margin:0}
+.composer-row .field-row{display:flex;flex-direction:row;align-items:center;gap:8px;margin:0;grid-template-columns:minmax(0,1fr)}
+#path-form .composer-row input[type=text]{flex:1;min-width:0;min-height:54px}
+#path-form .composer-row .primary-button{flex:0 0 auto;min-height:54px;min-width:7.5rem}
 .composer-row .field-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 .composer-row .field-control{flex:1;min-width:0}
 .composer-row .fields input[type=text]{width:100%;min-height:54px}
