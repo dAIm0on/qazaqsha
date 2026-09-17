@@ -966,6 +966,8 @@ assert.ok(/FUTURE_RE\.test\(req\.user_question/.test(fs.readFileSync(path.join(_
 assert.ok(/пример\|ещё\\s\*2/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 const ordCh=GP.chapter('2-3','2-3-ord');
 assert.ok(ordCh.beats.filter(b=>b.k==='ex').length>=3);
+assert.ok(/екі кітап/.test(ordCh.beats.find(b=>b.k==='why').b));
+assert.ok(ordCh.beats.find(b=>b.k==='ask'&&b.id==='23w2').answers.includes('бірінші'));
 assert.ok(!/keyCode===229/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/result\.correct&&!reveal/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/setTimeout\(\(\)=>\{advanceTimer=null;nextQuestion\(\);\},400\)/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));

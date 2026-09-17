@@ -653,7 +653,7 @@
    }
    function pathLocalText(chapter,kind,cur){
      const beats=(chapter&&chapter.beats)||[];
-     const clip=s=>String(s||'').trim().slice(0,800);
+     const clip=s=>String(s||'').trim().slice(0,1600);
      const first=k=>beats.find(b=>b.k===k);
      const LOOK='Смотри текст этого шага выше.';
      const take=(list)=>{
@@ -673,8 +673,11 @@
          const t=clip(beatPlain(cur));if(t)return t;
        }
        const fallback=[];
-       const w=first('why');if(w)fallback.push(w.b||w.t);
-       const a=first('algo');if(a)fallback.push((a.t?a.t+'. ':'')+(a.items||[]).slice(0,3).join('. '));
+       const w=first('why');if(w)fallback.push((w.t?w.t+'. ':'')+(w.b||''));
+       const br=first('bridge');if(br)fallback.push(beatPlain(br));
+       const a=first('algo');if(a)fallback.push((a.t?a.t+'. ':'')+(a.items||[]).join(' '));
+       const packed=[w&&((w.t?w.t+'. ':'')+(w.b||'')),a&&(a.items||[]).slice(0,4).join(' ')].filter(Boolean).join('\n\n');
+       if(packed)fallback.unshift(packed);
        return take(fallback)||LOOK;
      }
      if(kind==='ru'){
