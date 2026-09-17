@@ -70,11 +70,18 @@ notes = {
     "әже": "В листе ДЗ пара әже/апа — бабушка.",
     "апа": "В листе ДЗ пара әже/апа — бабушка; в речи апа ещё «тётя».",
 }
+KZ_ALTS = {
+    "бабушка": ["әже", "апа"],
+    "тётя": ["тәте", "апа"],
+    "тетя": ["тәте", "апа"],
+}
 for i, (kk, ru) in enumerate(hw, 1):
     words.append({"kazakh": kk, "translation": ru})
     note = notes.get(kk)
     expl = f"{kk} — {ru[0]}." + (f" {note}" if note else "")
-    qs.append(card(f"hw23-{i}-kk", "hw23", "words", f"{i}-kk", "vocab", "Переведи на казахский", ru[0], [kk], expl, hint=kk, note=note, ruleIds=["person-vocab"]))
+    alts = KZ_ALTS.get(ru[0], [kk])
+    kk_answers = [kk] + [x for x in alts if x != kk]
+    qs.append(card(f"hw23-{i}-kk", "hw23", "words", f"{i}-kk", "vocab", "Переведи на казахский", ru[0], kk_answers, expl, hint=kk, note=note, ruleIds=["person-vocab"]))
     qs.append(card(f"hw23-{i}-ru", "hw23", "words", f"{i}-ru", "vocab", "Переведи на русский", kk, ru, expl, hint=ru[0], note=note, ruleIds=["person-vocab"]))
 
 PERSONS = ["Мен", "Біз", "Сен", "Сендер", "Сіз", "Сіздер", "Ол"]

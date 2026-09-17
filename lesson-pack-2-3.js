@@ -416,7 +416,8 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           "label": "Ответ",
           "kind": "text",
           "answers": [
-            "әже"
+            "әже",
+            "апа"
           ]
         }
       ],
@@ -468,7 +469,8 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           "label": "Ответ",
           "kind": "text",
           "answers": [
-            "апа"
+            "апа",
+            "әже"
           ]
         }
       ],
@@ -572,7 +574,8 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           "label": "Ответ",
           "kind": "text",
           "answers": [
-            "тәте"
+            "тәте",
+            "апа"
           ]
         }
       ],
