@@ -238,7 +238,9 @@ input[id^="answer-"],
 .today-hero h1{margin:0 0 12px;max-width:18ch}
 .today-hero p{color:var(--body);max-width:36rem}
 .today-actions{gap:16px;grid-template-columns:1fr}
-.today-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0 0 24px}
+.today-tiles{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 0 24px}
+.today-tiles .today-option:nth-child(1){background:var(--oil)}
+.today-tiles .today-option:nth-child(2){background:var(--lilac)}
 .today-actions button,.today-tiles button{
   border-radius:var(--radius);border:1px solid var(--line);min-height:88px;text-align:left;
   display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:center;padding:20px 22px
@@ -395,7 +397,7 @@ body[data-view=practice] .issue-toggle{
   .topbar{padding:12px 20px;min-height:64px}
   h1{font-size:2.1rem;letter-spacing:-.03em}
   .today-hero{padding:24px 20px}
-  .today-tiles{grid-template-columns:1fr;gap:12px}
+  .today-tiles{grid-template-columns:1fr 1fr;gap:12px}
   .exercise-card{margin-bottom:var(--bottom-nav-height,64px);border-radius:22px;box-shadow:none;overflow:visible}
   .stimulus{font-size:clamp(1.85rem,8vw,2.4rem)}
   .bottom-nav button[aria-current=page]{color:var(--primary)}
