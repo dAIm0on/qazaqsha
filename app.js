@@ -258,7 +258,8 @@
    const q=byId.get(queue[position]);
    if(!q){renderEmpty();return;}
    window.NumberPractice.prepare(q,variants);confusionIndex=P.answerIndex(questions);
-   const source=course.sources[q.source], streak=records[q.id]?.streak||0;
+   if(course.sources&&!course.sources['ai-remed'])course.sources['ai-remed']={title:'Разбор навыка',url:'#',additional:true};
+   const source=course.sources[q.source]||course.sources['ai-remed']||{title:'Практика',url:'#',additional:true}, streak=records[q.id]?.streak||0;
    const location=q.source.startsWith('hw')?'Слово '+q.group:`Задание ${q.group}${q.part!=='1'?' · пункт '+q.part:''}`;
    const hasText=q.kind==='fields'&&q.fields.some(f=>f.kind!=='number-text'&&!classifierOptions(f));
    const letters=hasText&&state.prefs.letters;
@@ -267,15 +268,17 @@
    const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
    const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
    const letterBar=letters?`<div class="letter-keyboard" lang="kk" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div>`:'';
-   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${source.additional?esc(source.title):`<a href="${source.url}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`}<br>${esc(location)}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(q.title)}</h2>${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div><div class="practice-composer">${answerMarkup(q)}${letterBar}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="next-button" hidden>Дальше →</button></div></div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
-   $('#answer-form').addEventListener('keydown',e=>{
-     if(e.key!=='Enter')return;
-     if(e.isComposing||e.keyCode===229){e.preventDefault();return;}
+   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${source.additional?esc(source.title):`<a href="${source.url}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`}<br>${esc(location)}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(q.title)}</h2>${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div>${letterBar}</div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
+   const goCard=()=>{if(checked)nextQuestion();else checkAnswer(q);};
+   if(window._qazaqEnter)document.removeEventListener('keydown',window._qazaqEnter);
+   window._qazaqEnter=e=>{
+     if(e.key!=='Enter'||e.repeat||e.isComposing)return;
+     if(e.target&&e.target.closest&&e.target.closest('textarea,dialog,#issue-dialog'))return;
      e.preventDefault();
-     if(checked)nextQuestion();
-     else checkAnswer(q);
-   });
-   $('#answer-form').addEventListener('submit',e=>{e.preventDefault();if(e.isComposing||(e.nativeEvent&&e.nativeEvent.isComposing))return;if(checked)nextQuestion();else checkAnswer(q);});
+     goCard();
+   };
+   document.addEventListener('keydown',window._qazaqEnter);
+   $('#answer-form').addEventListener('submit',e=>{e.preventDefault();if(e.isComposing||(e.nativeEvent&&e.nativeEvent.isComposing))return;goCard();});
    if($('#rule-button'))$('#rule-button').onclick=()=>showRule(q);
    $('#hint-button').onclick=()=>showHint(q);
    $('#reveal-button').onclick=()=>mode==='exam'?checkAnswer(q,true):peekAnswer(q);
@@ -487,13 +490,13 @@
      const extra=window.AiTutor.takeRemediation(byId);
      if(extra.length)window.AiTutor.spliceRemediation(queue,position,extra.map(x=>x.id));
    }
-   renderStats();save();
+   try{renderStats();save();}catch(_){}
    cancelAdvance();
    if(result.correct&&!reveal){
-     $('#check-button').hidden=true;if($('#next-button'))$('#next-button').hidden=false;
+     const next=$('#next-button'),check=$('#check-button');
+     if(check)check.hidden=true;
+     if(next){next.hidden=false;try{next.focus({preventScroll:true});}catch{}}
      advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
-   }else{
-     const next=$('#next-button');if(next)next.focus({preventScroll:true});
    }
  }
  function nextQuestion(){cancelAdvance();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}

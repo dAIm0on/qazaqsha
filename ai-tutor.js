@@ -193,7 +193,8 @@
   ],
   NUMERAL_CONFUSION_6_60:[{ru:'6',kk:'алты'},{ru:'60',kk:'алпыс'},{ru:'6',kk:'алты'}],
   NUMERAL_CONFUSION_7_70:[{ru:'7',kk:'жеті'},{ru:'70',kk:'жетпіс'},{ru:'7',kk:'жеті'}],
-  PLURAL_INITIAL_LDT:[{ru:'люди (мн.)',kk:'адамдар',w:'адам'},{ru:'книги (мн.)',kk:'кітаптар',w:'кітап'},{ru:'места (мн.)',kk:'жерлер',w:'жер'}]
+  PLURAL_INITIAL_LDT:[{ru:'люди (мн.)',kk:'адамдар',w:'адам'},{ru:'книги (мн.)',kk:'кітаптар',w:'кітап'},{ru:'места (мн.)',kk:'жерлер',w:'жер'}],
+  VOCAB_RECALL:[{ru:'человек',kk:'адам',w:'адам'},{ru:'книга',kk:'кітап',w:'кітап'},{ru:'друг',kk:'дос',w:'дос'}]
  };
  function templateQuestions(code,now=Date.now()){
   const rows=TEMPLATES[code]||TEMPLATES.PLURAL_AFTER_NUMBER;
@@ -203,11 +204,11 @@
    if(used.some(w=>w&&!vocab.has(String(w).toLowerCase())&&!/^\d+$/.test(w)))return null;
    return {
     id:'ai-remed:'+code+':'+now+':'+(i+1),
-    source:'ai-remed',topic:code.indexOf('NUMERAL')===0?'numbers':'plural',kind:'fields',
+    source:'ai-remed',topic:code.indexOf('NUMERAL')===0?'numbers':code==='VOCAB_RECALL'?'vocab':'plural',kind:'fields',
     title:'Скажи по-казахски',stimulus:row.ru,
     fields:[{label:'Ответ',kind:'text',answers:[kk]}],
     explanation:'Временная проверка навыка. Не входит в банк 220 ID.',
-    ruleIds:code==='PLURAL_AFTER_NUMBER'?['quantity']:['plural'],
+    ruleIds:code==='PLURAL_AFTER_NUMBER'?['quantity']:code==='VOCAB_RECALL'?[]:['plural'],
     contextOnly:false
    };
   }).filter(Boolean);
