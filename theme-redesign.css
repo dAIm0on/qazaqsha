@@ -1,4 +1,4 @@
-/* Qazaqsha — Современный Алматы (16.09.2026). Logic unchanged. Photos later. */
+/* Qazaqsha — кожа Чернила. Logic unchanged. */
 @import url("design-tokens.css");
 
 @font-face{
@@ -7,7 +7,7 @@
   font-weight:400 700;
   font-style:normal;
   font-display:swap;
-  unicode-range:U+0000-00FF,U+0400-0405,U+0407-0455,U+0457-0491,U+0494-0499,U+049C-04A1,U+04A4-04AD,U+04B2-04B9,U+04BC-04D7,U+04DA-04E7,U+04EA-052F,U+2013-2014,U+2018-201D,U+2026,U+00AB,U+00BB;
+  unicode-range:U+0000-00FF,U+0400-052F,U+1C80-1C8F,U+2013-2014,U+2018-201D,U+2026,U+00AB,U+00BB;
 }
 @font-face{
   font-family:"Golos Text";
@@ -15,32 +15,22 @@
   font-weight:400 700;
   font-style:normal;
   font-display:swap;
-  unicode-range:U+0000-00FF,U+0400-0405,U+0407-0455,U+0457-0491,U+0494-0499,U+049C-04A1,U+04A4-04AD,U+04B2-04B9,U+04BC-04D7,U+04DA-04E7,U+04EA-052F,U+2013-2014,U+2018-201D,U+2026,U+00AB,U+00BB;
+  unicode-range:U+0000-00FF,U+0400-052F,U+1C80-1C8F,U+2013-2014,U+2018-201D,U+2026,U+00AB,U+00BB;
 }
 
 :root{
   color-scheme:light;
-  --paper:#F4EFE7; --surface:#FFFCF7; --surface-alt:#EDE4D8; --sage:#E2E8DB;
-  --ink:#1E231F; --body:#3B3A36; --muted:#625F57; --line:#D9D1C4;
-  --primary:#41573F; --primary-hover:#334832; --accent:#9F4E31;
-  --success:#315A38; --success-bg:#E5EFDF; --error:#8D3F32; --error-bg:#F7E8E1;
-  --warning:#77550F; --warning-bg:#F5EACD; --focus:#1C655F;
   --input-line:#8A8377;
-  --display:"Noto Serif",Georgia,serif;
-  --sans:"Golos Text","Segoe UI",sans-serif;
-  --radius-lg:28px; --radius:20px; --radius-control:16px; --radius-letter:10px;
-  --shadow:0 10px 36px rgba(48,41,30,.03);
-  --motion-fast:140ms; --motion-base:220ms; --ease:cubic-bezier(.2,.7,.2,1);
-
+  --radius-letter:10px;
   --qs-bg-top:var(--paper); --qs-bg:var(--paper); --qs-bg-bottom:var(--paper);
   --qs-surface:var(--surface); --qs-surface-raised:var(--surface); --qs-surface-muted:var(--surface-alt);
   --qs-ink:var(--ink); --qs-ink-soft:var(--body); --qs-muted:var(--muted); --qs-muted-2:var(--muted);
-  --qs-green:var(--primary); --qs-green-hover:var(--primary-hover); --qs-green-soft:var(--sage);
+  --qs-green:var(--primary); --qs-green-hover:var(--primary-hover); --qs-green-soft:var(--lilac);
   --qs-lime:var(--success); --qs-lime-soft:var(--success-bg);
-  --qs-terracotta:var(--accent); --qs-terracotta-soft:var(--error-bg);
-  --qs-violet:var(--primary); --qs-violet-soft:var(--sage);
-  --qs-error:var(--error); --qs-error-soft:var(--error-bg);
-  --qs-warning:var(--warning); --qs-warning-soft:var(--warning-bg);
+  --qs-terracotta:var(--sticker); --qs-terracotta-soft:var(--error-bg);
+  --qs-violet:var(--lilac); --qs-violet-soft:var(--lilac);
+  --qs-error:var(--sticker); --qs-error-soft:var(--error-bg);
+  --qs-warning:var(--warning); --qs-warning-soft:var(--oil);
   --qs-line:var(--line); --qs-line-strong:var(--input-line);
   --qs-shadow-1:var(--shadow); --qs-shadow-2:var(--shadow);
   --qs-r-sm:10px; --qs-r-md:var(--radius-control); --qs-r-lg:var(--radius); --qs-r-xl:var(--radius-lg);
@@ -48,24 +38,20 @@
   --qs-text-base:16px; --qs-line-base:1.55;
   --qs-motion-fast:var(--motion-fast); --qs-motion-normal:var(--motion-base); --qs-ease:var(--ease);
   --qs-page-bg:var(--paper);
-
-  --navy:var(--primary); --teal:var(--primary); --teal-soft:var(--sage); --gold:var(--accent);
+  --navy:var(--primary); --teal:var(--primary); --teal-soft:var(--lilac); --gold:var(--oil);
   --bg:var(--paper); --white:var(--surface);
   font-family:var(--sans);
   font-size:16px;
   line-height:1.55;
   font-synthesis:none;
 }
-:root[data-season="summer"]{
-  --paper:#F5F1EA; --surface-alt:#E7EDE9; --sage:#DCE8E3;
-  --primary:#416154; --primary-hover:#304D42; --accent:#355E7C;
-}
-:root[data-season="spring"]{
-  --paper:#F7F3EE; --surface-alt:#EDE1DA; --sage:#E2EBDF;
-  --primary:#456343; --primary-hover:#334D31; --accent:#92583F;
-}
 
-html,body{background:var(--paper);color:var(--ink);min-height:100%}
+html,body{
+  color:var(--ink);min-height:100%;
+  background-color:var(--paper);
+  background-image:radial-gradient(circle,color-mix(in srgb,var(--ink) 14%,transparent) 1.1px,transparent 1.2px);
+  background-size:var(--dot,18px) var(--dot,18px);
+}
 body{margin:0}
 a{color:var(--accent);text-underline-offset:3px}
 :focus-visible,button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{
@@ -141,7 +127,7 @@ body[data-view=practice] #source-filter{opacity:.72}
 .exercise-card .source-label,.exercise-card .source-label a,.exercise-card .mastery-label,.exercise-card .keyboard-label{color:var(--muted)}
 .phase-label{color:var(--muted)!important;letter-spacing:.12em;font-size:.6875rem}
 .stimulus{
-  font-family:var(--sans);font-weight:500;color:var(--ink);
+  font-family:var(--display);font-weight:400;color:var(--ink);
   font-size:clamp(2rem,4vw,2.85rem);line-height:1.22;letter-spacing:-.03em
 }
 .translation{color:var(--muted);font-weight:400;font-size:1rem}
@@ -156,10 +142,13 @@ input[type=text]:focus,select:focus,textarea:focus-visible,input[type=search]:fo
 input.invalid,select.invalid{border-color:var(--error);background:var(--error-bg)}
 input.valid,select.valid{border-color:var(--success);background:var(--success-bg)}
 .letter-keyboard{display:flex;flex-wrap:wrap;gap:7px}
-.letter-keyboard button,
+.letter-keyboard button{
+  min-width:44px;min-height:44px;
+  font-family:"Noto Serif","Segoe UI","Golos Text",sans-serif;
+}
 input[id^="answer-"],
 .glyph-check{
-  font-family:"Segoe UI","Noto Serif","Golos Text",sans-serif;
+  font-family:"Noto Serif","Segoe UI","Golos Text",sans-serif;
 }
 .practice-dock{
   position:sticky;bottom:var(--kbinset,0px);z-index:20;
@@ -203,7 +192,14 @@ input[id^="answer-"],
 }
 .exercise-card .secondary-button,.exercise-card .text-button{color:var(--muted)}
 .feedback{background:var(--success-bg);border:1px solid color-mix(in srgb,var(--success) 28%,var(--line));color:var(--success);border-radius:var(--radius-control)}
-.feedback.error{background:var(--error-bg);border-color:color-mix(in srgb,var(--error) 30%,var(--line));color:var(--error)}
+.feedback.error{background:var(--error-bg);border-color:var(--sticker);color:var(--sticker)}
+.error-sticker{
+  display:inline-block;background:var(--sticker);color:#fff;
+  font-family:var(--sans);font-weight:700;font-size:.75rem;
+  letter-spacing:.03em;padding:6px 10px;border-radius:8px;margin:0 0 10px;
+  transform:rotate(-2deg)
+}
+.feedback:not(.error) .error-sticker{display:none}
 .feedback.hinted{background:var(--warning-bg);border-color:color-mix(in srgb,var(--warning) 28%,var(--line));color:var(--warning)}
 .feedback h3{font-family:var(--sans);color:inherit}
 .feedback h3::before{content:"✓ ";color:var(--success);font-weight:700}
@@ -224,9 +220,21 @@ input[id^="answer-"],
 .panel h2,.compact-panel h2,.micro-lesson h2,.panel p,.course-jump p{color:var(--ink)}
 .panel .small,.compact-panel .small{color:var(--muted)}
 .today-hero{
-  background:var(--surface-alt);border-radius:var(--radius-lg);padding:32px 28px;
-  margin:0 0 24px;border:1px solid transparent
+  background:transparent;border-radius:var(--radius-lg);padding:8px 0 16px;
+  margin:0;border:0
 }
+.today-path-quiet{display:inline-block;margin:8px 0 0;color:var(--muted);background:transparent;border:0;text-decoration:underline;text-underline-offset:3px;min-height:44px}
+.today-collage{
+  height:132px;margin:0 0 20px;border-radius:var(--radius-lg);
+  background:
+    linear-gradient(120deg,var(--lilac) 0 46%,transparent 46%),
+    linear-gradient(300deg,var(--oil) 0 40%,var(--paper) 40%);
+  background-color:var(--paper);
+}
+.today-lessons{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 24px
+}
+.today-lessons .secondary-button{width:100%;min-height:48px;text-align:center}
 .today-hero h1{margin:0 0 12px;max-width:18ch}
 .today-hero p{color:var(--body);max-width:36rem}
 .today-actions{gap:16px;grid-template-columns:1fr}
@@ -238,7 +246,7 @@ input[id^="answer-"],
 .today-tiles span,.today-actions .today-option span{font-size:1.05rem;font-weight:550;grid-column:1;grid-row:1}
 .today-tiles strong,.today-actions .today-option strong{grid-column:2;grid-row:1/3;font-size:1.75rem;line-height:1}
 .today-tiles small,.today-actions .today-option small{grid-column:1;grid-row:2;max-width:18rem}
-.today-main{background:var(--primary)!important;color:#FFFCF7!important;min-height:56px!important;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.today-main{background:#111111!important;color:#FFFCF7!important;min-height:56px!important;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;border-color:#111111!important}
 .today-main:disabled{background:var(--surface-alt)!important;color:var(--muted)!important;border-color:var(--line)!important}
 .today-option{background:var(--surface);color:var(--ink);border-color:var(--line)!important}
 .today-option strong{font-family:var(--display);font-weight:400;font-size:2rem;color:var(--ink)}
@@ -290,6 +298,9 @@ body[data-view=practice] .issue-toggle{
   top:8px;right:10px;left:auto;bottom:auto;z-index:18
 }
 #issue-dialog textarea{width:100%;min-height:96px;margin:8px 0;font:inherit}
+.bottom-nav,.topbar,.topnav{
+  backdrop-filter:none;-webkit-backdrop-filter:none
+}
 .bottom-nav{background:var(--surface);border-top-color:var(--line);grid-template-columns:repeat(5,minmax(0,1fr))!important}
 :root{--bottom-nav-height:calc(64px + env(safe-area-inset-bottom, 0px))}
 .bottom-nav button{color:var(--muted);border-radius:12px;font-size:.6875rem;min-height:52px}
@@ -354,9 +365,9 @@ body[data-view=practice] .issue-toggle{
 .season-swatches{display:flex;gap:9px;margin:8px 0 0}
 .season-swatches button{width:44px;height:44px;border-radius:50%;border:2px solid transparent;padding:0}
 .season-swatches button[aria-pressed=true]{border-color:var(--ink)}
-.season-swatches .autumn{background:#41573F}
-.season-swatches .summer{background:#416154}
-.season-swatches .spring{background:#456343}
+.season-swatches .autumn{background:#111111}
+.season-swatches .summer{background:#DDD0F6}
+.season-swatches .spring{background:#F3E18A}
 .season-captions{display:flex;gap:9px;margin:6px 0 0;font-size:.75rem;color:var(--muted)}
 .season-captions span{width:44px;text-align:center}
 .glyph-check{font-size:1.15rem;letter-spacing:.04em;overflow-wrap:anywhere;margin:12px 0 0}
