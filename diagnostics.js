@@ -103,9 +103,21 @@
    return 'Для '+pron+' нужна притяжательная наклейка справа: '+base+' → '+E+'.';
   }
   if(error_type==='poss_assim_voice'&&E){
-   const raw=core.normalize(q&&q.stimulus||'');
-   const from=/кітап/.test(raw)?'П':/жүрек/.test(raw)?'К':/саусақ|қонақ/.test(raw)?'Қ':'П/К/Қ';
-   const to=from==='П'?'Б':from==='К'?'Г':from==='Қ'?'Ғ':'звонкую пару';
+   const en=core.normalize(E),an=core.normalize(A),pairs={'п':'б','к':'г','қ':'ғ'};
+   let from='',to='';
+   const n=Math.min(en.length,an.length);
+   for(let i=0;i<n;i++){
+    if(en[i]===an[i])continue;
+    for(const [f,t] of Object.entries(pairs)){
+     if(an[i]===f&&en[i]===t){from=f.toUpperCase();to=t.toUpperCase();break;}
+    }
+    if(from)break;
+   }
+   if(!from){
+    const raw=core.normalize(q&&q.stimulus||'');
+    from=/кітап|мектеп/.test(raw)?'П':/жүрек/.test(raw)?'К':/саусақ|қонақ/.test(raw)?'Қ':'П/К/Қ';
+    to=from==='П'?'Б':from==='К'?'Г':from==='Қ'?'Ғ':'звонкую пару';
+   }
    return 'Перед гласной притяжательного окончания '+from+' озвончается в '+to+': нужно '+E+'.';
   }
   return {

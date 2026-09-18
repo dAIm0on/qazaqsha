@@ -1217,6 +1217,10 @@ assert.ok(!/сіздің|біздің|олардың/u.test(JSON.stringify(Lesso
 assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 ok('Phase 3 Session C: closed оның-only T20/T21 pack, сіздің and later persons still locked');
 
+assert.match(Diag.line('poss_assim_voice','Оның мектебі','Оның мектепі',Lesson31A.byId('p3-31-c-g2-mektep')),/П.*Б.*мектебі/i);
+assert.match(Diag.line('poss_assim_voice','Менің кітабым','Менің кітапым',Lesson31A.byId('p3-31-a-g6-kitapym')),/П.*Б.*кітабым/i);
+ok('Phase 3 possessive assimilation feedback derives the actual voicing pair, not a word whitelist');
+
 const PhraseBanks=require('./phrase-banks.js');
 const PhraseDrill=require('./phrase-drill.js');
 assert.equal(PhraseBanks.forLesson('1-2').length,11);
