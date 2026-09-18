@@ -110,7 +110,13 @@
  }
  function pauseTimer(){elapsedMs=elapsed();timerSince=null;if(examRaf){cancelAnimationFrame(examRaf);examRaf=null;}cancelAdvance();}
  function startTimer(){if(!introOpen&&view==='practice'&&!checked&&!document.hidden&&timerSince===null&&byId.has(queue[position]))timerSince=performance.now();}
- function eligible(value){const q=typeof value==='string'?byId.get(value):value;return !!q&&catalog.eligible(q,state)&&(!q.promotedWord||state.vocabulary[q.promotedWord]?.target_or_context==='target');}
+ function eligible(value){
+  const q=typeof value==='string'?byId.get(value):value;
+  if(!q)return false;
+  if(q.source==='p2b'&&!records[q.id]?.seen&&mode!=='course')return false;
+  if(q.source==='phrase'&&!records[q.id]?.seen&&mode!=='phrase'&&mode!=='course')return false;
+  return catalog.eligible(q,state)&&(!q.promotedWord||state.vocabulary[q.promotedWord]?.target_or_context==='target');
+ }
  function activateCard(){
    if(introOpen||view!=='practice'||checked||document.hidden)return;
    const q=byId.get(queue[position]);if(!q)return;
@@ -174,10 +180,17 @@
    return list;
  }
  function startCourse(block){
-   courseBlock=block;vocabRole=null;sourceFilter=null;activeLesson=null;activeStep=null;if(view!=='practice'&&view!=='exam')topic='all';mode=mode==='exam'?'exam':'ordered';
+   courseBlock=block;vocabRole=null;sourceFilter=null;activeLesson=null;activeStep=null;if(view!=='practice'&&view!=='exam')topic='all';
    const first=window.LEARNING.lessons.find(l=>l.courseLesson===block);
    if(first)learningState.lessonId=first.id;
-   startQueue({all:true});showView('practice');
+   const lessonCards=window.Phase2BPractice?.lessonSession?.(block)||[];
+   if(lessonCards.length&&mode!=='exam'){
+     mode='course';
+     queue=lessonCards.map(q=>q.id).filter(id=>byId.has(id));
+     practiceIds=[...queue];stepEvidence={};queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);resetCounts();
+     render();showView('practice');return;
+   }
+   mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');
  }
  function shuffled(items){
    const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
@@ -254,7 +267,7 @@
    }
    const scope=subset(), tried=scope.filter(q=>records[q.id]?.attempts>0).length;
    const sp=$('#session-position');
-   if(sp)sp.textContent=['smart','lesson','review','contrast'].includes(mode)?`Шаг ${Math.min(position+1,queue.length)} из ${queue.length}`:`Встречалось ${tried} из ${scope.length}`;
+   if(sp)sp.textContent=['smart','lesson','course','review','contrast'].includes(mode)?`Шаг ${Math.min(position+1,queue.length)} из ${queue.length}`:`Встречалось ${tried} из ${scope.length}`;
    const ss=$('#session-score');
    if(ss)ss.textContent=sessionAttempts?`Без подсказки: ${sessionCorrect} / ${sessionAttempts}`:'';
    const pt=$('#practice-title');
