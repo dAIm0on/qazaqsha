@@ -1020,4 +1020,30 @@ assert.ok(/repeat\(5,/.test(theme));
 assert.ok(/id="homework-title">Домашка/.test(htmlSrc));
 ok('COPY-2/NAV-1 exam start or empty; 5-col nav; homework title');
 
+
+const P2BG1=require('./phase2b-practice.js');
+const G1Diag=require('./diagnostics.js');
+const g1All=P2BG1.allG1();
+assert.ok(g1All.length>=15);
+assert.ok(g1All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G1'&&q.phase2b.cell));
+assert.equal(new Set(g1All.map(q=>q.id)).size,g1All.length);
+assert.ok(g1All.every(q=>/^p2b-/.test(q.id)));
+assert.equal(P2BG1.cardsFor('1-3').length,0);
+assert.ok(P2BG1.cardsFor('1-1').length>0&&P2BG1.cardsFor('1-2').length>0&&P2BG1.cardsFor('2-1').length>0&&P2BG1.cardsFor('2-2').length>0&&P2BG1.cardsFor('2-3').length>0);
+assert.ok(P2BG1.checkCell('p2b-12-g1-kitap','кітаптар').result.correct);
+const g1PluralBad=P2BG1.checkCell('p2b-12-g1-kitap','кітаплар');
+assert.ok(!g1PluralBad.result.correct&&g1PluralBad.errors.some(e=>e.error_type==='plural_initial_consonant'));
+assert.ok(P2BG1.checkCell('p2b-21-g1-dos','доспын').result.correct);
+const g1DosBad=P2BG1.checkCell('p2b-21-g1-dos','досмын');
+assert.ok(g1DosBad.errors.some(e=>e.error_type==='person_sg_form'));
+const g1BizBad=P2BG1.checkCell('p2b-22-g1-adam','адаммыз');
+assert.ok(g1BizBad.errors.some(e=>e.error_type==='person_pl_form'));
+const g1OlBad=P2BG1.checkCell('p2b-23-g1-mugalim','мұғаліммін');
+assert.ok(g1OlBad.errors.some(e=>e.error_type==='ol_suffix'));
+assert.ok(/phase2b-practice\.js/.test(htmlSrc));
+assert.ok(!/бирк|наклейк/i.test(fs.readFileSync(path.join(__dirname,'diagnostics.js'),'utf8')));
+assert.ok(/последний релевантный слог/.test(G1Diag.line('harmony_edge')));
+ok('Phase 2B G1: one-cell registry, local checking, precise diagnostics, 1-3 correctly has no G1');
+
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
