@@ -8,10 +8,14 @@
   '1-3':['plural_after_num','numerals','phone'],
   '2-1':['person_sg','emes','question_ba_be'],
   '2-2':['person_pl','adjective_predicate','greetings','question_after_r'],
-  '2-3':['ordinal','question_full','third_person','farewell']
+  '2-3':['ordinal','question_full','third_person','farewell'],
+  '3-1':['possessive','existence']
  };
  const FUTURE=['case','possessive','labial','degrees','existence','imperative_paradigm'];
  const FUTURE_RE=/падеж|посессив|притяжательн|губн(ая|ой) гармо|степен(и|ей) сравнен|менің \S+ым|кітабым|бар ма\?|labial|comparative/i;
+ const ALWAYS_FUTURE_RE=/падеж|губн(ая|ой) гармо|степен(и|ей) сравнен|labial|comparative/i;
+ const POSS_FUTURE_RE=/посессив|притяжательн|менің \S+ым|кітабым/i;
+ const EXIST_FUTURE_RE=/бар ма\?/i;
  function lessonRank(id){
   const m=String(id||'').match(/^(\d)-(\d)$/);
   return m?Number(m[1])*10+Number(m[2]):0;
@@ -63,8 +67,15 @@
  function isDegreeDrill(q){
   return /степен(и|ей) сравнен|comparative|ең \S+рақ/i.test(blob(q));
  }
- function futureHits(questions){
-  return (questions||[]).filter(q=>isPossessiveProduction(q)||isExistenceGrammar(q)||isCaseDrill(q)||isLabialRule(q)||isDegreeDrill(q)||FUTURE_RE.test(blob(q))&&!isVocabOnly(q)&&q.topic!=='rules');
+ function futureHits(questions,catalog){
+  const possBlocked=!allows('possessive',catalog),existBlocked=!allows('existence',catalog);
+  return (questions||[]).filter(q=>{
+   const b=blob(q),learnerGrammar=!isVocabOnly(q)&&q.topic!=='rules';
+   if(isCaseDrill(q)||isLabialRule(q)||isDegreeDrill(q)||ALWAYS_FUTURE_RE.test(b)&&learnerGrammar)return true;
+   if(possBlocked&&(isPossessiveProduction(q)||POSS_FUTURE_RE.test(b)&&learnerGrammar))return true;
+   if(existBlocked&&(isExistenceGrammar(q)||EXIST_FUTURE_RE.test(b)&&learnerGrammar))return true;
+   return false;
+  });
  }
  function questionParticleScope(q){
   const les=q&&(q.lessonId||q.lesson_id)||'';
@@ -75,9 +86,9 @@
  }
  function examEligible(q,catalog){
   if(!q||q.contextOnly||q.source==='phrase'||q.kind==='phrase'||q.practiceOnly)return false;
-  if(futureHits([q]).length)return false;
+  if(futureHits([q],catalog).length)return false;
   const skill=(q.ruleIds||[])[0];
-  if(skill==='case'||skill==='possessive'||skill==='labial'||skill==='degrees')return false;
+  if(['case','possessive','labial','degrees','existence'].includes(skill)&&!allows(skill,catalog))return false;
   return true;
  }
  const api={INTRODUCED,FUTURE,lessonRank,installedLessons,currentMax,introducedAt,allows,isPossessiveProduction,isExistenceGrammar,isCaseDrill,isLabialRule,isDegreeDrill,futureHits,questionParticleScope,isVocabOnly,examEligible};

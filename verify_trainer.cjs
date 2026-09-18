@@ -1327,6 +1327,22 @@ assert.ok(HW31.validate().ok);
 assert.ok(!fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson31-homework.js'));
 ok('Phase 3 closed Homework 3-1 uses canonical T20-T23, real lesson words, and unlocks 4 phrases only after Session G');
 
+const Gate31=require('./curriculum-gate.js');
+const cat23={lessons:['1-1','1-2','1-3','2-1','2-2','2-3'].map(id=>({id,active:true}))};
+const cat31={lessons:[...cat23.lessons,{id:'3-1',active:true}]};
+assert.equal(Gate31.allows('possessive',cat23),false);
+assert.equal(Gate31.allows('existence',cat23),false);
+assert.equal(Gate31.allows('possessive',cat31),true);
+assert.equal(Gate31.allows('existence',cat31),true);
+assert.equal(Gate31.allows('case',cat31),false);
+assert.equal(Gate31.allows('labial',cat31),false);
+assert.equal(Gate31.allows('degrees',cat31),false);
+const gate31Cards=[...Lesson31A.sessionA(),...Lesson31A.sessionE(),...Lesson31A.sessionF()];
+assert.ok(Gate31.futureHits(gate31Cards,cat23).length>0);
+assert.equal(Gate31.futureHits(gate31Cards,cat31).length,0);
+assert.equal(Gate31.examEligible(Lesson31A.sessionA()[0],cat31),false);
+ok('Phase 3 curriculum gate can unlock possessive/existence at 3-1 while later grammar stays closed');
+
 const Pack31Source=fs.readFileSync(path.join(__dirname,'lesson-pack-3-1.js'),'utf8');
 assert.ok(/lesson_id["']?:\s*["']3-1["']/.test(Pack31Source));
 assert.ok(/hw31-01-ru/.test(Pack31Source)&&/hw31-18-kk/.test(Pack31Source));
