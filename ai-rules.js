@@ -1,4 +1,4 @@
-/* Grounded rule cards from current course 1-1…2-3 only. */
+/* Grounded rule cards from current open course 1-1…3-1. */
 (function(root){
  'use strict';
  const hw=typeof module!=='undefined'&&module.exports?require('./homework.js'):root.Homework;
@@ -14,7 +14,11 @@
   {rule_id:'T8_ADJ_PRED',lesson_id:'2-2',course_rule:'person-pl',title_ru:'Прилагательное-сказуемое',explanation_ru:'В рамках 2-2 прилагательное может быть сказуемым с личным окончанием по уже введённым лицам.',examples_correct:['Олар байлар'],examples_wrong:[],error_codes:['PREDICATIVE_ADJECTIVE']},
   {rule_id:'T9_OL',lesson_id:'2-3',course_rule:'ol',title_ru:'Ол / олар без личной бирки',explanation_ru:'Ол и олар бирки мын/сың/сыз не берут. Ол мұғалім, не *ол мұғаліммін.',examples_correct:['Ол мұғалім'],examples_wrong:['ол мұғаліммін'],error_codes:['OL_OLAR']},
   {rule_id:'T10_QUESTION',lesson_id:'2-3',course_rule:'question',title_ru:'Вопросительная частица',explanation_ru:'Частица смотрит на последнюю букву последнего слова. Глухие → па/пе. М Н Ң Ж З → ба/бе. Иначе ма/ме. Гласная по гармонии.',examples_correct:['Ол қонақ па?'],examples_wrong:[],error_codes:['QUESTION_PARTICLE','QUESTION_PARTICLE_HARMONY','QUESTION_PARTICLE_PHONOLOGY']},
-  {rule_id:'T11_ORDINAL',lesson_id:'2-3',course_rule:'ordinal',title_ru:'Порядковое число',explanation_ru:'Сначала обычное число. Наклейка только на последнее слово. На согласную ыншы/інші, на гласную ншы/нші. Жиырмасыншы, не жиырманшы.',examples_correct:['жиырмасыншы','он екінші'],examples_wrong:['жиырманшы'],error_codes:['ORDINAL_SUFFIX']}
+  {rule_id:'T11_ORDINAL',lesson_id:'2-3',course_rule:'ordinal',title_ru:'Порядковое число',explanation_ru:'Сначала обычное число. Наклейка только на последнее слово. На согласную ыншы/інші, на гласную ншы/нші. Жиырмасыншы, не жиырманшы.',examples_correct:['жиырмасыншы','он екінші'],examples_wrong:['жиырманшы'],error_codes:['ORDINAL_SUFFIX']},
+  {rule_id:'T20_POSS',lesson_id:'3-1',course_rule:'possessive',title_ru:'Притяжательная форма',explanation_ru:'Если слева менің, сенің, сіздің или оның, предмет справа получает притяжательное окончание. Менің әкем, сенің досың, оның қаласы.',examples_correct:['менің әкем','сенің досың','оның қаласы'],examples_wrong:['менің әке'],error_codes:['POSS_PRONOUN','POSS_PERSON_SUFFIX','POSS_HARMONY','POSS_VOWEL_BUFFER','POSS_ADJ_POSITION','POSS_OWNER_FORM']},
+  {rule_id:'T21_POSS_ASSIM',lesson_id:'3-1',course_rule:'poss-assim',title_ru:'Озвончение П / К / Қ',explanation_ru:'Перед гласным притяжательным окончанием конечные п, к, қ озвончаются: п→б, к→г, қ→ғ. кітап + ым → кітабым.',examples_correct:['кітабым','жүрегім','қонағым'],examples_wrong:['кітапым','жүрекім'],error_codes:['POSS_ASSIM_VOICE']},
+  {rule_id:'T22_BAR_ZHOK',lesson_id:'3-1',course_rule:'bar-zhok',title_ru:'Бар / жоқ: наличие и отсутствие',explanation_ru:'Бар = есть/имеется. Жоқ = нет/отсутствует. Емес = не является и не заменяет жоқ в конструкции «у меня нет».',examples_correct:['менің көлігім бар','менің көлігім жоқ'],examples_wrong:['менің көлігім емес'],error_codes:['BAR_ZHOK']},
+  {rule_id:'T23_POSS_PL',lesson_id:'3-1',course_rule:'poss-plural',title_ru:'Множественное перед притяжательным',explanation_ru:'Сначала множественное, потом притяжательное: кітап + тар + ым → кітаптарым. Не *кітабымдар.',examples_correct:['кітаптарым','мысықтарым'],examples_wrong:['кітабымдар'],error_codes:['POSS_PLURAL_ORDER']}
  ];
  function byId(id){return CARDS.find(c=>c.rule_id===id)||null;}
  function byCourse(rule){return CARDS.filter(c=>c.course_rule===rule);}
@@ -35,7 +39,7 @@
     else if(r==='question'||r==='вопрос'||r==='ba_me')out.push(...byCourse('question'));
     else if(r==='contrast')out.push(...byCourse('contrast'));
     else if(r==='numbers'||r==='разряды')out.push(...byCourse('numbers'),...byCourse('contrast'));
-    else if(r==='T1_HARMONY'||r==='T2_PLURAL_LDT'||r==='T4_NO_PLURAL_AFTER_NUMBER'||r==='T5_NUMERAL_CONFUSION'||r==='T5_NUMERAL_COMPOSE'||r==='T6_PERSON_SG'||r==='T7_EMES'||r==='T8_PERSON_PL'||r==='T8_ADJ_PRED'||r==='T9_OL'||r==='T10_QUESTION'||r==='T11_ORDINAL'){const hit=byId(r);if(hit)out.push(hit);}
+    else if(r==='T1_HARMONY'||r==='T2_PLURAL_LDT'||r==='T4_NO_PLURAL_AFTER_NUMBER'||r==='T5_NUMERAL_CONFUSION'||r==='T5_NUMERAL_COMPOSE'||r==='T6_PERSON_SG'||r==='T7_EMES'||r==='T8_PERSON_PL'||r==='T8_ADJ_PRED'||r==='T9_OL'||r==='T10_QUESTION'||r==='T11_ORDINAL'||r==='T20_POSS'||r==='T21_POSS_ASSIM'||r==='T22_BAR_ZHOK'||r==='T23_POSS_PL'){const hit=byId(r);if(hit)out.push(hit);}
    }
   }
   const seen=new Set();
@@ -43,13 +47,13 @@
  }
  function allowedVocab(lessonIds){
   const src=hw&&hw.WORD_LEMMAS||{};
-  const ids=lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3'];
+  const ids=lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3','3-1'];
   const out=[];
   for(const id of ids)for(const w of src[id]||[])if(!out.includes(w))out.push(w);
   return out;
  }
  function allowedRuleIds(lessonIds){
-  const max=new Set(lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3']);
+  const max=new Set(lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3','3-1']);
   return CARDS.filter(c=>max.has(c.lesson_id)).map(c=>c.rule_id);
  }
  function toRuleContext(card){

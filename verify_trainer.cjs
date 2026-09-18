@@ -1180,7 +1180,7 @@ assert.ok(a31Assim.errors.some(e=>e.error_type==='poss_assim_voice'));
 assert.match(Diag.line('poss_suffix_missing','Менің әкем','Менің әке',Lesson31A.byId('p3-31-a-g6-ake')),/притяжательная наклейка/i);
 assert.match(Diag.line('poss_assim_voice','Менің кітабым','Менің кітапым',Lesson31A.byId('p3-31-a-g6-kitapym')),/П.*Б.*кітабым/i);
 assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
-assert.ok(!fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson31-pack.js'));
+assert.ok(fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson31-pack.js'));
 assert.ok(!fs.readFileSync(path.join(__dirname,'learning.js'),'utf8').includes("'3-1'"));
 ok('Phase 3 Session A: closed menің-only T20/T21 pack, 3-1 still not opened');
 
@@ -1324,7 +1324,7 @@ assert.ok(!JSON.stringify(hw31Open.target_vocabulary).includes('T20_POSS'));
 assert.equal(hw31Open.external_test_url,'https://batylbol.kz/test/PrityazhEdChislo.html');
 assert.ok(hw31Open.items.every(q=>q&&q.lessonId==='3-1'));
 assert.ok(HW31.validate().ok);
-assert.ok(!fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson31-homework.js'));
+assert.ok(fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson31-homework.js'));
 ok('Phase 3 closed Homework 3-1 uses canonical T20-T23, real lesson words, and unlocks 4 phrases only after Session G');
 
 const Gate31=require('./curriculum-gate.js');
@@ -1365,6 +1365,40 @@ assert.ok(/Lesson31Pack\?\.install\?\.\(course,window\.CURRICULUM\)/.test(app31S
 assert.ok(/block==='3-1'\?\(window\.Lesson31Pack\?\.lessonSession/.test(app31Src));
 ok('Phase 3 dormant Practice/Phrase integration installs nothing while closed and all 46 items when 3-1 gate opens');
 
+const openAdapter=require('./explain-bank-adapter.js');
+assert.deepEqual(openAdapter.OPEN,['1-1','1-2','1-3','2-1','2-2','2-3','3-1']);
+assert.deepEqual(openAdapter.courseById('3-1').rules,['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']);
+assert.equal(openAdapter.CHAPTER_RULE['3-1-poss'],'T20_POSS');
+assert.equal(openAdapter.CHAPTER_RULE['3-1-assim'],'T21_POSS_ASSIM');
+assert.equal(openAdapter.CHAPTER_RULE['3-1-bar'],'T22_BAR_ZHOK');
+assert.equal(openAdapter.CHAPTER_RULE['3-1-plural'],'T23_POSS_PL');
+const openIndex=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
+assert.ok(openIndex.indexOf('lesson31-pack.js')<openIndex.indexOf('phrase-drill.js'));
+assert.ok(openIndex.indexOf('lesson-pack-3-1.js')<openIndex.indexOf('curriculum.js'));
+assert.ok(openIndex.includes('lesson31-homework.js'));
+const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
+assert.ok(/phase3-31/.test(openSw)&&/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
+const AIC31=require('./ai-contract.js');
+assert.ok(AIC31.ALLOWED_LESSONS.includes('3-1'));
+assert.ok(['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL'].every(r=>AIC31.resolveCurriculum('3-1').allowed_rule_ids.includes(r)));
+assert.ok(!AIC31.resolveCurriculum('2-3').allowed_rule_ids.includes('T20_POSS'));
+assert.equal(AIC31.looksFuture('объясни притяжательное окончание','2-3'),true);
+assert.equal(AIC31.looksFuture('объясни притяжательное окончание','3-1'),false);
+assert.equal(AIC31.looksFuture('объясни падеж','3-1'),true);
+const AIR31=require('./ai-rules.js');
+assert.ok(['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL'].every(r=>AIR31.byId(r)));
+const AIT31=require('./ai-tutor.js');
+assert.equal(AIT31.mapDiag('poss_assim_voice','кітабым','кітапым'),'POSS_ASSIM_VOICE');
+assert.equal(AIT31.mapDiag('poss_plural_order','кітаптарым','кітабымдар'),'POSS_PLURAL_ORDER');
+assert.equal(AIT31.mapDiag('bar_zhok_not_emes','көлігім жоқ','көлігім емес'),'BAR_ZHOK');
+const HWLive31=require('./homework.js');
+const hwLiveLocked=HWLive31.buildPack('3-1',Lesson31A.all(),{sources:{m31:{title:'Методичка 3-1',url:'#'}}},{sessionGUnlocked:false});
+assert.equal(hwLiveLocked.homework.exercise_ids.length,6);
+const hwLiveOpen=HWLive31.buildPack('3-1',Lesson31A.all(),{sources:{m31:{title:'Методичка 3-1',url:'#'}}},{sessionGUnlocked:true});
+assert.equal(hwLiveOpen.homework.exercise_ids.length,10);
+assert.equal(hwLiveOpen.homework.external_test_url,'https://batylbol.kz/test/PrityazhEdChislo.html');
+ok('Phase 3 opening: Learn/Path/Practice/Homework/PWA/AI expose only lesson 3-1 canonical scope');
+
 const Pack31Source=fs.readFileSync(path.join(__dirname,'lesson-pack-3-1.js'),'utf8');
 assert.ok(/lesson_id["']?:\s*["']3-1["']/.test(Pack31Source));
 assert.ok(/hw31-01-ru/.test(Pack31Source)&&/hw31-18-kk/.test(Pack31Source));
@@ -1375,7 +1409,7 @@ assert.ok(path31);
 assert.deepEqual(path31.chapters.map(c=>c.rule_ids[0]),['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']);
 assert.deepEqual(path31.chapters.map(c=>c.id),['3-1-poss','3-1-assim','3-1-bar','3-1-plural']);
 assert.ok(!/рычаг|бирка|алломорф|слот/i.test(JSON.stringify(path31)));
-assert.ok(!fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson-pack-3-1.js'));
+assert.ok(fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson-pack-3-1.js'));
 ok('Phase 3 curriculum pack and Path 3-1 are prepared but still not live-loaded');
 
 const PhraseBanks=require('./phrase-banks.js');

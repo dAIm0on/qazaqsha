@@ -27,6 +27,11 @@
   if(type==='letter_confusion')return 'KAZAKH_SPELLING';
   if(type==='number_order')return 'NUMERAL_COMPOSITION';
   if(type==='question_class')return 'QUESTION_PARTICLE';
+  if(type==='poss_suffix_missing'||type==='poss_phrase')return 'POSS_PERSON_SUFFIX';
+  if(type==='poss_assim_voice')return 'POSS_ASSIM_VOICE';
+  if(type==='poss_plural_order')return 'POSS_PLURAL_ORDER';
+  if(type==='poss_owner_form')return 'POSS_PRONOUN';
+  if(type==='bar_zhok_choice'||type==='bar_zhok_not_emes')return 'BAR_ZHOK';
   if(type==='number_confusion'){
    const b=(expected||'')+' '+(actual||'');
    if(/алты|алпыс/.test(b))return 'NUMERAL_CONFUSION_6_60';
@@ -193,7 +198,7 @@
    return localFallback(null,req&&req.candidate_error_codes,req&&req.mode,req);
   }
   if(v.req.surface==='exam')return C.examBlocked(v.req.mode);
-  if(v.req.mode!=='explain_error'&&C.looksFuture(v.req.user_question))return C.futureBlocked(v.req.mode);
+  if(v.req.mode!=='explain_error'&&C.looksFuture(v.req.user_question,v.req.lesson_id))return C.futureBlocked(v.req.mode);
   if(typeof fetch!=='function')return localFallback(null,v.req.candidate_error_codes,v.req.mode,v.req);
   const own=(!opts.signal&&typeof AbortController!=='undefined')?new AbortController():null;
   const signal=opts.signal||(own&&own.signal);
@@ -292,6 +297,7 @@
     NUMERAL_CONFUSION_8_80:'8 и 80',NUMERAL_CONFUSION_9_90:'9 и 90',
     PLURAL_INITIAL_LDT:'Множественное Л/Д/Т',PLURAL_HARMONY_AE:'Множественное А/Е',
     EMES_SUFFIX_POSITION:'Емес: место окончания',ORDINAL_SUFFIX:'Порядковое',
+    POSS_PERSON_SUFFIX:'Притяжательное окончание',POSS_ASSIM_VOICE:'Притяжательное П/К/Қ',POSS_PLURAL_ORDER:'Порядок множественного и притяжательного',POSS_PRONOUN:'Форма владельца',BAR_ZHOK:'Бар / жоқ',
     VOCAB_RECALL:'Слово'
   }[code]||code;
  }

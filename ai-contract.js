@@ -7,11 +7,13 @@
  const FALLBACK=FALLBACK_MODEL;
  const MODES=['explain_error','hint','explain_rule','simplify','ask_tutor','session_summary','remediation'];
  const SURFACES=['practice','path','rules','homework','review','exam','learn'];
- const ERROR_CODES=['HARMONY_FRONT_BACK','HARMONY_AMBIGUOUS_I_U_YU','PLURAL_HARMONY_AE','PLURAL_INITIAL_LDT','PLURAL_FORM_COMBINED','PLURAL_AFTER_NUMBER','QUANTIFIER_NO_PLURAL','NUMERAL_LEXEME','NUMERAL_CONFUSION_6_60','NUMERAL_CONFUSION_7_70','NUMERAL_CONFUSION_8_80','NUMERAL_CONFUSION_9_90','NUMERAL_COMPOSITION','NUMERAL_HUNDREDS_THOUSANDS','PERSON_MEN_ENDING','PERSON_SEN_ENDING','PERSON_SIZ_ENDING','EMES_SUFFIX_POSITION','PREDICATIVE_ADJECTIVE','PERSON_BIZ_ENDING','PERSON_SENDER_ENDING','PERSON_SIZDER_ENDING','NO_EXTRA_PLURAL_WITH_PERSON','OL_OLAR','QUESTION_PARTICLE','QUESTION_PARTICLE_HARMONY','QUESTION_PARTICLE_PHONOLOGY','ORDINAL_SUFFIX','KAZAKH_SPELLING','WORD_ORDER_CURRENT','VOCAB_RECALL','MULTI_ERROR','UNKNOWN'];
- const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3'];
- const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL']};
- const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам']};
+ const ERROR_CODES=['HARMONY_FRONT_BACK','HARMONY_AMBIGUOUS_I_U_YU','PLURAL_HARMONY_AE','PLURAL_INITIAL_LDT','PLURAL_FORM_COMBINED','PLURAL_AFTER_NUMBER','QUANTIFIER_NO_PLURAL','NUMERAL_LEXEME','NUMERAL_CONFUSION_6_60','NUMERAL_CONFUSION_7_70','NUMERAL_CONFUSION_8_80','NUMERAL_CONFUSION_9_90','NUMERAL_COMPOSITION','NUMERAL_HUNDREDS_THOUSANDS','PERSON_MEN_ENDING','PERSON_SEN_ENDING','PERSON_SIZ_ENDING','EMES_SUFFIX_POSITION','PREDICATIVE_ADJECTIVE','PERSON_BIZ_ENDING','PERSON_SENDER_ENDING','PERSON_SIZDER_ENDING','NO_EXTRA_PLURAL_WITH_PERSON','OL_OLAR','QUESTION_PARTICLE','QUESTION_PARTICLE_HARMONY','QUESTION_PARTICLE_PHONOLOGY','ORDINAL_SUFFIX','KAZAKH_SPELLING','WORD_ORDER_CURRENT','VOCAB_RECALL','POSS_PRONOUN','POSS_PERSON_SUFFIX','POSS_HARMONY','POSS_VOWEL_BUFFER','POSS_ASSIM_VOICE','POSS_PLURAL_ORDER','POSS_ADJ_POSITION','POSS_OWNER_FORM','BAR_ZHOK','MULTI_ERROR','UNKNOWN'];
+ const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1'];
+ const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'] ,'3-1':['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']};
+ const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам'] ,'3-1':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','жүрек','сақал','мысық','таз','тақырбас','қатты','саусақ','кім','не','қандай','қай','нешінші','бұл']};
  const FUTURE_RE=/падеж|посессив|притяжательн|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|бар ма\?|кітабым/i;
+const ALWAYS_FUTURE_RE=/падеж|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|labial|comparative/i;
+const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|кітабым/i;
  const MAX_IN=12000,MAX_MSG=450,MAX_OUT_TOKENS=250,ASK_OUT_TOKENS=400;
  const CLIENT_TIMEOUT_MS=25000,PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000;
  const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,session_summary:800,remediation:450};
@@ -178,7 +180,7 @@
  function localExplain(req){
   const mode=(req&&req.mode)||'explain_error';
   if((req&&req.surface)==='exam')return examBlocked(mode);
-  if(mode!=='explain_error'&&looksFuture(req&&req.user_question))return futureBlocked(mode);
+  if(mode!=='explain_error'&&looksFuture(req&&req.user_question,req&&req.lesson_id))return futureBlocked(mode);
   const ctx=(req&&req.rule_context&&req.rule_context[0])||{};
   const medium=ctx.medium||ctx.explanation_ru||'';
   const ru=ctx.ru_refresh||'';
@@ -233,7 +235,7 @@
    leak.message_ru='Подсказка не должна содержать готовый ответ. Проверь правило, затем введи форму целиком.';
    return leak;
   }
-  if(looksFuture(r.message_ru))return null;
+  if(looksFuture(r.message_ru,req&&req.lesson_id))return null;
   if(!isUsableText(r.message_ru))return null;
   return r;
  }
@@ -316,7 +318,7 @@
   r.meta={request_id:null,source:'local'};
   return r;
  }
- function looksFuture(text){return FUTURE_RE.test(String(text||''));}
+ function looksFuture(text,lessonId){const v=String(text||'');return ALWAYS_FUTURE_RE.test(v)||(lessonId!=='3-1'&&POSS_FUTURE_RE.test(v));}
  function outTokens(mode){return mode==='ask_tutor'?ASK_OUT_TOKENS:MAX_OUT_TOKENS;}
  const api={PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,FALLBACK,MODES,SURFACES,ERROR_CODES,ALLOWED_LESSONS,RULE_BY_LESSON,VOCAB_BY_LESSON,FUTURE_RE,MAX_OUT_TOKENS,ASK_OUT_TOKENS,CLIENT_TIMEOUT_MS,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,SYSTEM,validateRequest,validateResponse,extractJson,normalizeModelText,isUsableText,emptyResp,fallback,localExplain,assembleResponse,examBlocked,futureBlocked,missingLesson,looksFuture,clip,normKey,resolveCurriculum,lessonsThrough,containsExpected,clipTail,clipRuleContext,maxMessage,outTokens,leverLine};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.AiContract=api;

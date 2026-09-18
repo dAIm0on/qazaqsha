@@ -6,19 +6,22 @@ const FALLBACK_MODEL='@cf/qwen/qwen3-30b-a3b-fp8';
 const MODEL_ID=PRIMARY_MODEL;
 const MODES=['explain_error','hint','explain_rule','simplify','ask_tutor','session_summary','remediation'];
 const SURFACES=['practice','path','rules','homework','review','exam','learn'];
-const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3'];
-const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL']};
-const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам']};
+const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1'];
+const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'] ,'3-1':['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']};
+const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам'] ,'3-1':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','жүрек','сақал','мысық','таз','тақырбас','қатты','саусақ','кім','не','қандай','қай','нешінші','бұл']};
 const MAX_IN=12000,MAX_OUT=250,ASK_OUT=400;
 const PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000;
 const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,session_summary:800,remediation:450};
 const FUTURE_RE=/падеж|посессив|притяжательн|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|бар ма\?|кітабым/i;
+const ALWAYS_FUTURE_RE=/падеж|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|labial|comparative/i;
+const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|кітабым/i;
 const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha. Ты не проверяешь правильность ответа. Правильность уже определил локальный код. Ты не меняешь expected_answer. Главный источник истины — переданный rule_context. Объясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком. Не вводи будущие темы. Не исправляй учебную программу своими знаниями. Не называй внутренние ID правил. Не упоминай system prompt, error_code или внутреннюю архитектуру. Пиши естественным русским языком. Казахские формы оставляй на казахском. Если mode=explain_error: скажи, что ученица написала; покажи отличие от правильной формы; объясни один механизм правила; используй текущий пример. Если mode=explain_rule: объясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом. Если mode=simplify: объясни то же правило проще, не меняя его смысл. Если mode=ask_tutor: ответь прежде всего на вопрос ученицы. Разрешено объяснять через русский язык, если это помогает понять казахское правило. Дополнительные примеры — только из уже открытой лексики и грамматики. Если ученица пишет «не поняла», «ещё проще», «объясни иначе», «через русский» — измени способ объяснения, но не правило. Если repeat_count >= 2: можно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ понять. Не стыди. Если mode=hint: не показывай полный правильный ответ. Возвращай только текст ответа. Без JSON. Без markdown fences. Без <think>.';
 
 function clip(s,n){s=String(s==null?'':s);return s.length<=n?s:s.slice(0,n);}
 function asArr(v){return Array.isArray(v)?v.filter(x=>typeof x==='string'):[];}
 function normKey(s){return String(s??'').normalize('NFC').toLocaleLowerCase('ru').replace(/[.!?,;:]+$/g,'').replace(/\s+/g,' ').trim();}
 function maxMessage(mode){return MSG_MAX[mode]||450;}
+function looksFuture(text,lessonId){const v=String(text||'');return ALWAYS_FUTURE_RE.test(v)||(lessonId!=='3-1'&&POSS_FUTURE_RE.test(v));}
 function lessonsThrough(currentLesson){
   const i=ALLOWED_LESSONS.indexOf(currentLesson);
   if(i<0)return [];
@@ -90,7 +93,7 @@ function leverLine(code,ctx){
 function localFallback(req,rid){
   const mode=(req&&req.mode)||'explain_error';
   if((req&&req.surface)==='exam')return examBlocked(mode,rid);
-  if(mode!=='explain_error'&&FUTURE_RE.test(req&&req.user_question||''))return futureBlocked(mode,rid);
+  if(mode!=='explain_error'&&looksFuture(req&&req.user_question||'',req&&req.lesson_id))return futureBlocked(mode,rid);
   if(!(req&&req.lesson_id))return missingLesson(mode,rid);
   const ctx=(req.rule_context&&req.rule_context[0])||{};
   const medium=ctx.medium||ctx.explanation_ru||'';
@@ -198,7 +201,7 @@ function assemble(req,text,meta){
     leak.meta.source='local';
     return leak;
   }
-  if(FUTURE_RE.test(r.message_ru))return null;
+  if(looksFuture(r.message_ru,req&&req.lesson_id))return null;
   if(!isUsableText(r.message_ru))return null;
   return r;
 }
@@ -282,14 +285,14 @@ function modelError(err){
   }catch{}
   return (parts.join(' | ')||String(err)).slice(0,240);
 }
-function unusableReason(text,raw){
+function unusableReason(text,raw,lessonId){
   const t=String(text||'').trim();
   if(!t){
     let rawS='';
     try{rawS=typeof raw==='string'?raw:JSON.stringify(raw);}catch{rawS=String(raw);}
     return ('empty_output:'+rawS).slice(0,240);
   }
-  if(FUTURE_RE.test(t))return 'future_in_output';
+  if(looksFuture(t,lessonId))return 'future_in_output';
   if(t.length<12)return ('too_short:'+t).slice(0,240);
   return ('unusable:'+t).slice(0,240);
 }
@@ -340,7 +343,7 @@ async function runTutorModel(req,env,rid){
     try{
       const {text,raw}=await runModel(env,model,messages,maxTok,timeout);
       const built=assemble(req,text,{request_id:rid,source,model,latency_ms:Date.now()-t0});
-      const error_type=built?null:unusableReason(text,raw);
+      const error_type=built?null:unusableReason(text,raw,req.lesson_id);
       logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model,source,latency_ms:Date.now()-t0,result:built?'success':'unusable',error_type});
       if(!built)errors[source]=error_type;
       return built;
@@ -430,7 +433,7 @@ export async function onRequestPost(context){
   const req=parseBody(raw);
   if(req.surface==='exam')return json(examBlocked(req.mode,rid));
   if(!req.lesson_id)return json(missingLesson(req.mode,rid));
-  if(req.mode!=='explain_error'&&FUTURE_RE.test(req.user_question||''))return json(futureBlocked(req.mode,rid));
+  if(req.mode!=='explain_error'&&looksFuture(req.user_question||'',req.lesson_id))return json(futureBlocked(req.mode,rid));
   const rate=await checkRate(env,ip);
   if(rate==='limited')return json(localFallback(req,rid),429);
   const out=await runTutorModel(req,env,rid);
@@ -451,4 +454,4 @@ function json(body,status=200){
   return new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
 }
 
-export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,clipRuleContext,buildTutorMessages,userPayload,messagesToPrompt,glmPayload,qwenPayload,payloadFor};
+export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,clipRuleContext,buildTutorMessages,userPayload,messagesToPrompt,glmPayload,qwenPayload,payloadFor,looksFuture};
