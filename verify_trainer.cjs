@@ -1327,6 +1327,19 @@ assert.ok(HW31.validate().ok);
 assert.ok(!fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson31-homework.js'));
 ok('Phase 3 closed Homework 3-1 uses canonical T20-T23, real lesson words, and unlocks 4 phrases only after Session G');
 
+const Pack31Source=fs.readFileSync(path.join(__dirname,'lesson-pack-3-1.js'),'utf8');
+assert.ok(/lesson_id["']?:\s*["']3-1["']/.test(Pack31Source));
+assert.ok(/hw31-01-ru/.test(Pack31Source)&&/hw31-18-kk/.test(Pack31Source));
+assert.ok(/T20_POSS/.test(Pack31Source)&&/T21_POSS_ASSIM/.test(Pack31Source)&&/T22_BAR_ZHOK/.test(Pack31Source)&&/T23_POSS_PL/.test(Pack31Source));
+const GC31=require('./grammar-chapters.js');
+const path31=GC31.LESSONS.find(l=>l.id==='3-1');
+assert.ok(path31);
+assert.deepEqual(path31.chapters.map(c=>c.rule_ids[0]),['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']);
+assert.deepEqual(path31.chapters.map(c=>c.id),['3-1-poss','3-1-assim','3-1-bar','3-1-plural']);
+assert.ok(!/рычаг|бирка|алломорф|слот/i.test(JSON.stringify(path31)));
+assert.ok(!fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson-pack-3-1.js'));
+ok('Phase 3 curriculum pack and Path 3-1 are prepared but still not live-loaded');
+
 const PhraseBanks=require('./phrase-banks.js');
 const PhraseDrill=require('./phrase-drill.js');
 assert.equal(PhraseBanks.forLesson('1-2').length,11);
