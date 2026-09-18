@@ -202,7 +202,6 @@ body.keyboard-open[data-view=practice] .stimulus{font-size:1.45rem;margin:4px 0 
 .composer-row .primary-slot{flex:0 0 auto;display:flex;align-items:center}
 .practice-composer .letter-keyboard{width:100%;max-width:none}
 .practice-dock .secondary-actions{margin:0 0 8px}
-#path-ask-panel{position:sticky;bottom:var(--kbinset,0px);z-index:8;background:var(--surface)}
 #rules-ask-panel{position:static;background:var(--surface)}
 #rules-ask-q{width:100%;min-height:54px;margin:8px 0;font-size:max(16px,1rem)}
 html.keyboard-open body[data-view=rules] #rules-ask-panel,

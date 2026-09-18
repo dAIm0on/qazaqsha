@@ -14,6 +14,8 @@ function ok(name){passed.push(name);console.log('OK',name);}
 const appSrc=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 const learnSrc=fs.readFileSync(path.join(__dirname,'learning.js'),'utf8');
 const html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
+const tutorSrc=fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8');
+const themeSrc=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
 
 const need=['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE','PHONE_GROUPS','T12_GLUE','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'];
 for(const id of need)assert.ok(Bank.byId(id)&&Bank.byId(id).medium,id);
@@ -51,8 +53,15 @@ assert.ok(/surface:'path'/.test(appSrc));
 assert.ok(/surface:'learn'/.test(learnSrc));
 ok('pet context updates with lesson/chapter');
 
+assert.ok(!/function attachPathAsk|function pathAskChips|id=["'\`]path-ask["'\`]|path-ask-panel|data-path-kind/.test(appSrc));
+assert.ok(/function contextPrompts/.test(tutorSrc));
+assert.ok(/две книги/.test(tutorSrc)&&/кто есть/.test(tutorSrc));
+assert.ok(!/рычаг|бирк|алломорф|слот/i.test(tutorSrc));
+assert.ok(!/#path-ask-panel/.test(themeSrc));
+ok('single TutorUI replaces legacy path-ask and keeps contextual prompts');
+
 assert.ok(/syncView\('exam'|syncView\(next==='practice'&&mode==='exam'\?'exam'/.test(appSrc)||/syncView/.test(appSrc));
-assert.ok(/view==='exam'/.test(fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8')));
+assert.ok(/view==='exam'/.test(tutorSrc));
 ok('no tutor in exam (launcher hidden)');
 
 const ctx=UI.context('T2_PLURAL_LDT');

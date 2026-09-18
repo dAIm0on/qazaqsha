@@ -733,137 +733,6 @@
      if(b.k==='goal')return clip(b.t||'');
      return clip(b.t||b.b||'');
    }
-   function paperAlready(s){
-     const paper=root.querySelector('.path-paper');
-     if(!paper||!s)return false;
-     const n=String(s).replace(/\s+/g,'').slice(0,80).toLowerCase();
-     if(n.length<12)return false;
-     const clone=paper.cloneNode(true);
-     const bar=clone.querySelector('.path-ai-bar');if(bar)bar.remove();
-     return String(clone.innerText||'').replace(/\s+/g,'').toLowerCase().includes(n);
-   }
-   function pathLocalText(chapter,kind,cur){
-     const beats=(chapter&&chapter.beats)||[];
-     const clip=s=>String(s||'').trim().slice(0,1600);
-     const first=k=>beats.find(b=>b.k===k);
-     const LOOK='Смотри текст этого шага выше.';
-     const take=(list)=>{
-       for(const raw of list){
-         const t=clip(raw);if(!t)continue;
-         if(paperAlready(t))continue;
-         return t;
-       }
-       return '';
-     };
-     if(kind==='simplify'){
-       if(cur&&cur.k==='sound'){
-         const t=clip([cur.letter,cur.art,cur.ex,cur.warn].filter(Boolean).join('. '));
-         if(t)return t;
-       }
-       if(cur&&['why','fold','algo','slots','bridge','ex','trap'].includes(cur.k)){
-         const t=clip(beatPlain(cur));if(t)return t;
-       }
-       const fallback=[];
-       const w=first('why');if(w)fallback.push((w.t?w.t+'. ':'')+(w.b||''));
-       const br=first('bridge');if(br)fallback.push(beatPlain(br));
-       const a=first('algo');if(a)fallback.push((a.t?a.t+'. ':'')+(a.items||[]).join(' '));
-       const packed=[w&&((w.t?w.t+'. ':'')+(w.b||'')),a&&(a.items||[]).slice(0,4).join(' ')].filter(Boolean).join('\n\n');
-       if(packed)fallback.unshift(packed);
-       return take(fallback)||LOOK;
-     }
-     if(kind==='ru'){
-       const cand=[];
-       if(cur&&cur.k==='bridge')cand.push(beatPlain(cur));
-       const br=first('bridge');if(br)cand.push(beatPlain(br));
-       return take(cand)||LOOK;
-     }
-     if(kind==='examples'){
-       const lines=[];
-       const add=t=>{const x=clip(t);if(x&&!lines.includes(x)&&x.length>1)lines.push(x);};
-       if(cur){
-         if(cur.k==='sound'&&cur.ex)add(cur.ex);
-         if(cur.k==='ex')add(beatPlain(cur));
-         if(cur.k==='trap')add(beatPlain(cur));
-         if(cur.k==='algo')for(const it of cur.items||[])add(it);
-       }
-       for(const b of beats){
-         if(lines.length>=4)break;
-         if(b===cur||b.k==='ask')continue;
-         if(b.k==='sound'&&b.ex)add(b.ex);
-         if(b.k==='ex')add(beatPlain(b));
-         if(b.k==='trap')add(beatPlain(b));
-         if(b.k==='algo')for(const it of b.items||[])add(it);
-       }
-       if(!lines.length)return LOOK;
-       return lines.slice(0,4).join('\n');
-     }
-     if(cur&&cur.k!=='goal'){
-       const t=clip(beatPlain(cur));
-       if(t)return t;
-     }
-     return LOOK;
-   }
-   function pathAskChips(lessonId,chapter){
-     const id=chapter.id||'';
-     const simplify=['Объясни ещё проще','Объясни ещё проще','simplify'];
-     const pair=(label,q,kind)=>[label,q,kind];
-     if(lessonId==='1-1'&&id!=='1-1-ae')return [simplify,pair('Сравни с русским','Чем это отличается от русского мягкого согласного?','ru'),pair('Ещё 2 примера','Дай ещё 2 пары на знакомых словах.','examples')];
-     if(id==='1-1-ae'||id==='1-2-a')return [simplify,pair('Сравни с русским','Почему твёрдое берёт А, а мягкое Е?','ru'),pair('Ещё 2 примера','Дай ещё 2 слова курса: только гласная А или Е.','examples')];
-     if(id==='1-2-b'||id==='1-2-traps')return [simplify,pair('Сравни с русским','Почему не *адамлар и не *жердер?','ru'),pair('Ещё 2 примера','Дай ещё 2 основы: только стык Л, Д или Т.','examples')];
-     if(id==='1-2-slot'||id==='1-2-glue')return [simplify,pair('Сравни с русским','Чем казахское множественное отличается от русской формы «книги»?','ru'),pair('Ещё 2 примера','Собери ещё 2 формы двумя рычагами на словах курса.','examples')];
-     if(id==='1-3-qty'||id==='1-3-qty2')return [simplify,pair('Сравни с русским','Почему «две книги», а по-казахски без -тар?','ru'),pair('Ещё 2 примера','Дай ещё 2 примера без множественного.','examples')];
-     if(lessonId==='1-3')return [simplify,pair('Сравни с русским','Как собрать число по разрядам, не списком?','ru'),pair('Ещё 2 примера','Дай ещё 2 числа из курса.','examples')];
-     if(id==='2-1-emes')return [simplify,pair('Сравни с русским','Куда переезжает окончание при емес?','ru'),pair('Ещё 2 примера','Дай ещё 2 отрицания на знакомых словах.','examples')];
-     if(id==='2-1-ba'||id==='2-2-rq'||id==='2-3-q'||id==='2-3-qstem')return [simplify,pair('Сравни с русским','На какой звук смотрит вопросительная частица?','ru'),pair('Ещё 2 примера','Дай ещё 2 вопроса из этой сетки курса.','examples')];
-     if(lessonId==='2-1')return [simplify,pair('Сравни с русским','Почему по-русски «Я врач» без «есть», а здесь нужна бирка?','ru'),pair('Ещё 2 примера','Дай ещё 2 формы мен/сен/сіз на словах курса.','examples')];
-     if(id==='2-2-hi'||id==='2-3-bye')return [simplify,pair('Сравни с русским','Почему это готовая фраза, а не новое окончание?','ru'),pair('Ещё 2 примера','Покажи сетку по адресату ещё раз.','examples')];
-     if(lessonId==='2-2')return [simplify,pair('Сравни с русским','Почему не переносим умный/умная/умные?','ru'),pair('Ещё 2 примера','Дай ещё 2 формы біз/сендер/сіздер.','examples')];
-     if(id==='2-3-ol'||id==='2-3-olar')return [simplify,pair('Сравни с русским','Почему у ол нет мын?','ru'),pair('Ещё 2 примера','Дай ещё 2 фразы с ол/олар.','examples')];
-     if(lessonId==='2-3')return [simplify,pair('Сравни с русским','Чем порядковое отличается от екі кітап?','ru'),pair('Ещё 2 примера','Дай ещё 2 порядковых из курса.','examples')];
-     return [simplify,pair('Сравни с русским','Чем это правило отличается от русского?','ru'),pair('Ещё 2 примера','Дай ещё 2 примера на словах текущего урока.','examples')];
-   }
-   function attachPathAsk(){
-     const paper=root.querySelector('.path-paper');if(!paper||paper.querySelector('#path-ask'))return;
-     const chips=pathAskChips(les.id,ch);
-     paper.insertAdjacentHTML('beforeend',`<div class="path-ai-bar"><button type="button" class="text-button" id="path-ask">Не поняла — спросить про это правило</button><div id="path-ask-panel" class="ai-tutor-out" hidden><p class="small">Разбор только этой главы. Не ставит оценку произношению и не открывает будущие темы.</p><div class="ai-tutor-actions">${chips.map(([label,q,kind])=>`<button type="button" class="secondary-button" data-path-q="${esc(q)}" data-path-kind="${esc(kind||'simplify')}">${esc(label)}</button>`).join('')}</div><label class="input-label" for="path-ask-q">Свой вопрос</label><input id="path-ask-q" type="text" maxlength="400" autocomplete="off"><button type="button" class="text-button" id="path-ask-send">Спросить</button><div id="path-ask-out" hidden></div></div></div>`);
-     const open=$('#path-ask'),panel=$('#path-ask-panel');
-     if(open)open.onclick=()=>{if(panel)panel.hidden=!panel.hidden;};
-     const showLocal=kind=>{
-       const out=$('#path-ask-out');if(!out)return;
-       out.hidden=false;
-       out.innerHTML='<p class="small">Это пересказ этого шага.</p><p>'+esc(pathLocalText(ch,kind,beat))+'</p>';
-     };
-     const failAsk=()=>{
-       const out=$('#path-ask-out');if(!out)return;
-       out.hidden=false;
-       out.textContent='Не разобрала этот вопрос. Смотри текст шага выше.';
-     };
-     let pathTail=[];
-     $$('[data-path-kind]').forEach(b=>b.onclick=()=>showLocal(b.dataset.pathKind||'simplify'));
-     const go=$('#path-ask-send');
-     if(go)go.onclick=()=>{
-       const q=($('#path-ask-q')&&$('#path-ask-q').value.trim())||'';
-       if(!q){showLocal('simplify');return;}
-       if(/пример|ещё\s*2|еще\s*2|больше\s+пример/i.test(q)){showLocal('examples');return;}
-       const out=$('#path-ask-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
-       go.disabled=true;
-       if(!window.AiTutor||!window.AiTutor.callTutor){showLocal('examples');go.disabled=false;return;}
-       const tRules=(window.AiRules&&window.AiRules.allowedRuleIds([les.id]))||[];
-       const step=beatPlain(beat).replace(/падеж\w*|посессив\w*|притяжательн\w*/gi,' ').replace(/\s+/g,' ').trim().slice(0,280);
-       const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:'Глава: '+ch.title,stimulus:'Шаг: '+step,fields:[{answers:['']}],ruleIds:tRules};
-       pathTail.push({role:'user',content:q});
-       pathTail=pathTail.slice(-4);
-       const token=++tutorToken;
-       const ac=typeof AbortController!=='undefined'?new AbortController():null;
-       tutorAbort=ac;
-       window.AiTutor.askTutor(dummy,q,{surface:'path',lesson_id:les.id,conversation_tail:pathTail,signal:ac&&ac.signal}).then(resp=>{
-         if(token!==tutorToken)return;
-         const msg=resp&&typeof resp.message_ru==='string'?resp.message_ru.trim():'';
-         if(msg){if(out)out.textContent=msg;pathTail.push({role:'assistant',content:msg});pathTail=pathTail.slice(-4);return;}
-         showLocal('examples');
-       }).catch(()=>{if(token===tutorToken)showLocal('examples');}).finally(()=>{go.disabled=false;});
-     };
-   }
    const bankCard=Bank&&Bank.cardForChapter(ch);
    const canonKey=les.id+':'+ch.id;
    if(bankCard&&isCanonBeat(beat.k)){
@@ -885,22 +754,22 @@
        ${ex?'<section class="path-block"><h3>Примеры</h3><ul class="path-ex">'+ex+'</ul></section>':''}
        ${traps?'<section class="path-block"><h3>Не перепутай</h3><ul class="path-traps">'+traps+'</ul></section>':''}
        <button type="button" class="primary-button" id="path-next">${cta}</button></div>`;
-     bindCrumb();bindTutor(les,ch);attachPathAsk();
+     bindCrumb();bindTutor(les,ch);
      $('#path-next').onclick=()=>{while(beats[gp.beat]&&isCanonBeat(beats[gp.beat].k))gp.beat++;save();renderPath();};
      return;
    }
    bindTutor(les,ch);
    if(beat.k==='goal'){
      root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">ЦЕЛЬ ГЛАВЫ</p><h2>После этой главы</h2><p>${esc(beat.t)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='sound'){
      root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">КАК ПРИМЕРНО ПОЧУВСТВОВАТЬ</p><h2 lang="kk">${esc(beat.letter)}</h2><p><strong>Русский якорь:</strong> ${esc(beat.anchor)}</p><p>${esc(beat.art)}</p><p lang="kk">${esc(beat.ex)}</p><p class="small">${esc(beat.warn)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='why'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>${esc(beat.t)}</h2><p>${esc(beat.b)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='bridge'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Сравни с русским</h2>
@@ -908,18 +777,18 @@
        <p><strong>В казахском иначе…</strong> ${esc(beat.kz)}</p>
        <p><strong>Поэтому делай…</strong> ${esc(beat.do)}</p>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='slots'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Из чего это собирается</h2><p>${esc(beat.t)}</p>
        <div class="path-slots">${(beat.parts||[]).map(p=>'<span class="path-slot">'+esc(p.l)+'</span>').join('<span class="path-plus">+</span>')}</div>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='algo'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>${esc(beat.t)}</h2><ol class="learning-steps">${(beat.items||[]).map(i=>'<li>'+esc(i)+'</li>').join('')}</ol>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='ex'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Разобранный пример</h2>
@@ -927,7 +796,7 @@
        <p>${esc(beat.ru)}</p>
        <p>Слот: <strong lang="kk">${esc(beat.slot)}</strong>. ${esc(beat.why)}</p>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='trap'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Не перепутай</h2>
@@ -935,12 +804,12 @@
        <p>Нужно: <strong lang="kk">${esc(beat.good)}</strong></p>
        <p>${esc(beat.why)}</p>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='fold'){
      root.innerHTML=`<div class="panel path-paper">${head}<details open><summary>${esc(beat.t)}</summary><p>${esc(beat.b)}</p></details>
        <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
+     bindCrumb();$('#path-next').onclick=nextBeat;return;
    }
    if(beat.k==='ask'){
      root.innerHTML=`<div class="panel path-paper">${head}<p class="phase-label">${beat.type==='one_prod'?'Самостоятельно':beat.type==='trap_choice'?'Ловушка':'Проверь понимание'}</p>
@@ -1002,7 +871,7 @@
        const askT=$('#path-ask-tutor');if(askT)askT.onclick=()=>{if(window.TutorUI)window.TutorUI.open();};
        save();
      };
-     attachPathAsk();
+     
      return;
    }
    nextBeat();

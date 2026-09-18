@@ -11,6 +11,30 @@
  function bank(){return root.ExplainBankUI;}
  function card(){return bank()&&bank().get(ctx.rule_id);}
  function course(){return bank()&&bank().courseById(ctx.lesson_id);}
+ function contextPrompts(){
+  const id=ctx.chapter_id||'';
+  const base={
+   simplify:'Объясни правило этой главы проще, короткими шагами.',
+   ru:'Чем это правило отличается от русского?',
+   ex:'Дай ещё 2 примера на словах текущего урока.',
+   why:'Почему именно так работает правило этой главы? Объясни механизм, а не только готовый ответ.'
+  };
+  const withQ=(ru,ex)=>Object.assign({},base,{ru,ex});
+  if(ctx.lesson_id==='1-1'&&id!=='1-1-ae')return withQ('Чем это отличается от русского мягкого согласного?','Дай ещё 2 пары на знакомых словах.');
+  if(id==='1-1-ae'||id==='1-2-a')return withQ('Почему твёрдое берёт А, а мягкое Е?','Дай ещё 2 слова курса: покажи только выбор А или Е.');
+  if(id==='1-2-b'||id==='1-2-traps')return withQ('Почему не *адамлар и не *жердер?','Дай ещё 2 основы и покажи выбор Л, Д или Т.');
+  if(id==='1-2-slot'||id==='1-2-glue')return withQ('Чем казахское множественное отличается от русской формы «книги»?','Собери ещё 2 формы: сначала А или Е, потом Л, Д или Т.');
+  if(id==='1-3-qty'||id==='1-3-qty2')return withQ('Почему по-русски «две книги», а по-казахски после числа нет окончания множественного?','Дай ещё 2 примера: число + существительное без окончания множественного.');
+  if(ctx.lesson_id==='1-3')return withQ('Как составное число собирается по разрядам?','Дай ещё 2 числа из курса.');
+  if(id==='2-1-emes')return withQ('Чем отличается русское «не врач» от конструкции с емес и куда ставится окончание лица?','Дай ещё 2 отрицания на знакомых словах.');
+  if(id==='2-1-ba'||id==='2-2-rq'||id==='2-3-q'||id==='2-3-qstem')return withQ('Чем казахская вопросительная частица отличается от русского вопроса и на какой звук она смотрит?','Дай ещё 2 вопроса из этой главы.');
+  if(ctx.lesson_id==='2-1')return withQ('Почему по-русски «Я врач» без «есть», а по-казахски нужен кусок «кто есть» справа?','Дай ещё 2 формы мен/сен/сіз на словах курса.');
+  if(id==='2-2-hi'||id==='2-3-bye')return withQ('Почему это готовая фраза, а не новое окончание?','Покажи ещё 2 примера с разными адресатами.');
+  if(ctx.lesson_id==='2-2')return withQ('Почему русские формы «умный / умная / умные» нельзя переносить сюда буквально?','Дай ещё 2 формы біз/сендер/сіздер.');
+  if(id==='2-3-ol'||id==='2-3-olar')return withQ('Почему у ол нет окончания «кто есть»?','Дай ещё 2 фразы с ол/олар.');
+  if(ctx.lesson_id==='2-3')return withQ('Чем порядковое число отличается от сочетания вроде екі кітап?','Дай ещё 2 порядковых числа из курса.');
+  return base;
+ }
  function setContext(next){
   next=next||{};
   const prev=ctx.lesson_id+':'+ctx.chapter_id+':'+ctx.rule_id;
@@ -80,8 +104,8 @@
  }
  function paintCtx(){
   const el=$('#tutor-sheet-ctx');if(!el)return;
-  const c=course();
-  el.textContent='Урок '+(c?c.label:ctx.lesson_id)+(c?' · '+c.name:'');
+  const c=course(),r=card();
+  el.textContent='Урок '+(c?c.label:ctx.lesson_id)+(c?' · '+c.name:'')+(r&&r.title?' · '+r.title:'');
  }
  function showOut(html,local){
   const out=$('#tutor-out');if(!out)return;
@@ -136,14 +160,14 @@
   else showOut('<p>'+esc(c.short||c.medium)+'</p>',true);
  }
  function quick(act){
-  const c=card();
+  const c=card(),p=contextPrompts();
   if(act==='ru'){
    if(c&&c.ru_refresh){
     showOut('<p>'+esc(c.ru_refresh).replace(/\n/g,'</p><p>')+'</p><p><button type="button" class="text-button" id="tutor-ru-more">Спросить подробнее</button></p>',true);
-    const more=$('#tutor-ru-more');if(more)more.onclick=()=>callAI('ask_tutor','Объясни через русский подробнее.');
+    const more=$('#tutor-ru-more');if(more)more.onclick=()=>callAI('ask_tutor',p.ru);
     return;
    }
-   callAI('ask_tutor','Сравни с русским.');return;
+   callAI('ask_tutor',p.ru);return;
   }
   if(act==='ex'){
    const ex=(c&&c.examples)||[];
@@ -152,10 +176,10 @@
     exampleIndex++;
     return;
    }
-   callAI('ask_tutor','Дай ещё пример на словах этого урока.');return;
+   callAI('ask_tutor',p.ex);return;
   }
-  if(act==='simplify'){callAI('simplify','Объясни проще.');return;}
-  if(act==='why'){callAI('ask_tutor','Почему именно так?');return;}
+  if(act==='simplify'){callAI('simplify',p.simplify);return;}
+  if(act==='why'){callAI('ask_tutor',p.why);return;}
  }
  function askFree(){
   const q=($('#tutor-q')&&$('#tutor-q').value.trim())||'';
