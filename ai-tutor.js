@@ -96,27 +96,43 @@
  }
  function shouldOfferExplain(code){return code&&sameErrorCount(code)>=2;}
  function dueRemediation(){return Object.values(store.errors).filter(r=>r&&r.remediation_due).sort((a,b)=>b.count_recent-a.count_recent);}
+ function explainBankGet(ruleId){
+  try{
+   const Bank=node?(function(){try{return require('./explain-bank.js');}catch{return null;}}()):root.ExplainBank;
+   if(!Bank||!ruleId)return null;
+   if(typeof Bank.get==='function')return Bank.get(ruleId);
+   return Bank[ruleId]||null;
+  }catch{return null;}
+ }
+ function toContext(card){
+  if(!card)return null;
+  const bank=explainBankGet(card.rule_id);
+  const src=bank||card;
+  if(R.toRuleContext)return R.toRuleContext(src);
+  return {
+   rule_id:src.rule_id,title_ru:src.title_ru,
+   ru_refresh:src.ru_refresh||'',short:src.short||src.title_ru,
+   medium:src.medium||src.explanation_ru,
+   explanation_ru:src.explanation_ru||src.medium,
+   examples_correct:src.examples_correct||[],examples_wrong:src.examples_wrong||[],
+   traps:src.traps||[]
+  };
+ }
  function localFallback(q,codes,mode,req){
+  const lesson=(req&&req.lesson_id)||(q&&q.lessonId)||'';
   const code=codes&&codes[0];
   const card=(R.cardsFor(q,code)||[])[0];
-  const line=card?card.explanation_ru:'';
-  if(mode==='hint')return C.fallback('hint',{rule_context:card?[card]:[]});
-  const expected=(req&&req.expected_answer)||(q&&q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'';
-  const wrote=(req&&req.user_answer)||'';
-  let msg=code==='PLURAL_AFTER_NUMBER'?'После конкретного числа множественное окончание не нужно.':(Diag&&Diag.line&&codes&&codes[0]&&Diag.line(null))||line||'Проверь форму по правилу текущего урока.';
-  if(mode==='explain_error'&&wrote){
-    msg=(expected?'Ты написала «'+wrote+'», нужно «'+expected+'». ':'Ты написала «'+wrote+'». ')+msg;
-  }
-  const r=C.emptyResp(mode||'explain_error',true);
-  r.primary_error_code=code||null;
-  r.rule_ids_used=card?[card.rule_id]:[];
-  r.message_ru=msg;
-  r.micro_rule_ru=card?card.title_ru:null;
-  r.contrast={wrong:wrote||null,correct:mode==='hint'?null:expected||null};
-  r.next_action_ru='Введи правильную форму целиком.';
-  r.needs_rule_context=false;
-  r.confidence='medium';
-  return r;
+  const ctx=toContext(card);
+  return C.localExplain({
+   mode:mode||'explain_error',
+   surface:(req&&req.surface)||'practice',
+   lesson_id:lesson,
+   user_answer:(req&&req.user_answer)||'',
+   expected_answer:(req&&req.expected_answer)||(q&&q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'',
+   candidate_error_codes:codes||[],
+   rule_context:ctx?[ctx]:[],
+   user_question:(req&&req.user_question)||''
+  });
  }
  function canonicalExpected(q,extra){
   extra=extra||{};
@@ -131,28 +147,34 @@
  }
  function buildRequest(mode,q,extra){
   extra=extra||{};
-  const lessons=C.ALLOWED_LESSONS;
+  const lesson=C.ALLOWED_LESSONS.includes(q&&q.lessonId)?q.lessonId:(C.ALLOWED_LESSONS.includes(extra.lesson_id)?extra.lesson_id:'');
+  const lessons=lesson?C.lessonsThrough(lesson):[];
   const expected=canonicalExpected(q,extra);
   const codes=extra.codes||[];
   const cards=R.cardsFor(q,codes[0]).slice(0,2);
   const summary={};
   for(const [k,v] of Object.entries(store.errors))if(v&&v.count_recent)summary[k]=v.count_recent;
+  const ctx=cards.map(toContext).filter(Boolean);
   return {
-    mode,locale:'ru',lesson_id:q&&q.lessonId||extra.lesson_id||'',
+    mode,locale:'ru',
+    surface:C.SURFACES.includes(extra.surface)?extra.surface:'practice',
+    lesson_id:lesson,
     exercise_id:q&&q.id||'',
     prompt:(q&&(q.title||'')+' '+(q.stimulus||'')).trim(),
     user_answer:extra.user_answer||'',
-    expected_answer:expected,
+    expected_answer:mode==='hint'?'':expected,
     is_correct:!!extra.is_correct,
     hint_used:!!extra.hint_used,
+    repeat_count:extra.repeat_count!=null?extra.repeat_count:(codes[0]?sameErrorCount(codes[0]):0),
     rule_ids:cards.map(c=>c.rule_id),
-    allowed_rule_ids:R.allowedRuleIds(extra.allowed_lesson_ids||lessons),
-    allowed_vocab:R.allowedVocab(extra.allowed_lesson_ids||lessons),
-    allowed_lesson_ids:extra.allowed_lesson_ids&&extra.allowed_lesson_ids.length?extra.allowed_lesson_ids:lessons,
+    allowed_rule_ids:R.allowedRuleIds(lessons),
+    allowed_vocab:R.allowedVocab(lessons),
+    allowed_lesson_ids:lessons,
     candidate_error_codes:codes.filter(c=>C.ERROR_CODES.includes(c)).slice(0,8),
     recent_error_summary:summary,
-    rule_context:cards.map(c=>({rule_id:c.rule_id,title_ru:c.title_ru,explanation_ru:c.explanation_ru,examples_correct:c.examples_correct,examples_wrong:c.examples_wrong})),
-    user_question:extra.user_question||''
+    rule_context:ctx,
+    user_question:extra.user_question||'',
+    conversation_tail:C.clipTail(extra.conversation_tail)
   };
  }
  function isLiveMessage(s){
@@ -160,30 +182,61 @@
   if(s.length<12)return false;
   return !/короткий разбор|разбор по правилу урока сейчас короткий|Правило уже на карточке|недоступен|Проверь форму по правилу|Проверь правило текущего урока|Полный ответ не показываю|Не разобрала этот вопрос|Разбор сессии сейчас короткий/i.test(s);
  }
- async function callTutor(req,timeoutMs=18000){
-  const v=C.validateRequest(req);
-  if(!v.ok)return C.fallback(req&&req.mode,'','bad_req');
-  if(typeof fetch!=='function')return localFallback(null,req.candidate_error_codes,req.mode,v.req||req);
-  const ac=typeof AbortController!=='undefined'?new AbortController():null;
-  const t=setTimeout(()=>{try{ac&&ac.abort();}catch{}},timeoutMs);
+ async function callTutor(req,timeoutMs,opts){
+  opts=opts||{};
+  if(timeoutMs==null)timeoutMs=C.CLIENT_TIMEOUT_MS||25000;
+  if(req&&req.surface==='exam')return C.examBlocked(req.mode);
+  const v=C.validateRequest(req||{});
+  if(!v.ok){
+   if(v.error==='missing_lesson')return C.missingLesson(req&&req.mode);
+   if((req&&req.surface)==='exam')return C.examBlocked(req&&req.mode);
+   return localFallback(null,req&&req.candidate_error_codes,req&&req.mode,req);
+  }
+  if(v.req.surface==='exam')return C.examBlocked(v.req.mode);
+  if(v.req.mode!=='explain_error'&&C.looksFuture(v.req.user_question))return C.futureBlocked(v.req.mode);
+  if(typeof fetch!=='function')return localFallback(null,v.req.candidate_error_codes,v.req.mode,v.req);
+  const own=(!opts.signal&&typeof AbortController!=='undefined')?new AbortController():null;
+  const signal=opts.signal||(own&&own.signal);
+  const t=setTimeout(()=>{try{own&&own.abort();}catch{}},timeoutMs);
   try{
-    const res=await fetch('/api/tutor',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(v.req),signal:ac?ac.signal:undefined});
+    const body=Object.assign({},v.req);
+    if(body.mode==='hint')body.expected_answer='';
+    const res=await fetch('/api/tutor',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal});
     clearTimeout(t);
-    if(!res.ok)return localFallback(null,v.req.candidate_error_codes,v.req.mode,v.req);
-    const json=await res.json();
-    const checked=C.validateResponse(json,v.req);
-    const resp=checked.resp;
-    const live=typeof json.message_ru==='string'?json.message_ru.trim():'';
-    if(isLiveMessage(live)){
-      if(v.req.mode==='hint'&&hintLeaks({message_ru:live,micro_rule_ru:json.micro_rule_ru,next_action_ru:json.next_action_ru,contrast:json.contrast},v.req.expected_answer))return resp;
-      resp.message_ru=live.slice(0,450);
+    let json=null;
+    try{json=await res.json();}catch{json=null;}
+    if(json&&typeof json.message_ru==='string'&&json.message_ru.trim()){
+      const checked=C.validateResponse(json,v.req);
+      const resp=checked.resp;
+      resp.message_ru=json.message_ru.trim().slice(0,C.maxMessage(v.req.mode));
+      if(json.meta)resp.meta=json.meta;
+      if(v.req.mode==='hint'&&hintLeaks(resp,req&&req.expected_answer))return localFallback(null,v.req.candidate_error_codes,'hint',v.req);
       return resp;
     }
-    return resp;
-  }catch{
+    return localFallback(null,v.req.candidate_error_codes,v.req.mode,v.req);
+  }catch(err){
     clearTimeout(t);
+    if(err&&(err.name==='AbortError'||err.message==='The user aborted a request.')){
+      const r=C.emptyResp(v.req.mode,false);r.aborted=true;r.meta={request_id:null,source:'local'};return r;
+    }
     return localFallback(null,v.req.candidate_error_codes,v.req.mode,v.req);
   }
+ }
+ function askTutor(context,question,extra){
+  extra=extra||{};
+  const q=context&&context.q?context.q:context;
+  const req=buildRequest('ask_tutor',q,{
+   user_answer:extra.user_answer||'',
+   is_correct:!!extra.is_correct,
+   hint_used:!!extra.hint_used,
+   codes:extra.codes||[],
+   surface:extra.surface||(context&&context.surface)||'practice',
+   lesson_id:extra.lesson_id||(q&&q.lessonId)||(context&&context.lesson_id)||'',
+   user_question:question||'',
+   conversation_tail:extra.conversation_tail||(context&&context.conversation_tail)||[],
+   repeat_count:extra.repeat_count
+  });
+  return callTutor(req,C.CLIENT_TIMEOUT_MS||25000,extra);
  }
  const TEMPLATES={
   PLURAL_AFTER_NUMBER:[
@@ -245,6 +298,6 @@
  function hintLeaks(resp,expected){
   return C.containsExpected(resp,expected);
  }
- const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,localFallback,isLiveMessage,buildRequest,callTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset};
+ const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,localFallback,isLiveMessage,buildRequest,callTutor,askTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset};
  if(node)module.exports=api;else root.AiTutor=api;
 })(typeof window!=='undefined'?window:globalThis);

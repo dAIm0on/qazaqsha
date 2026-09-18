@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-  <meta name="theme-color" content="#41573F">
+  <meta name="theme-color" content="#F6F1E8">
   <meta name="description" content="Личный тренажёр казахского языка по урокам 1–1…2–3: письменная практика, правила и память.">
   <title>Qazaqsha — Қазақша</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -41,6 +41,9 @@
   <script defer src="ai-contract.js"></script>
   <script defer src="ai-rules.js"></script>
   <script defer src="ai-tutor.js"></script>
+  <script defer src="explain-bank.js"></script>
+  <script defer src="explain-bank-adapter.js"></script>
+  <script defer src="tutor-ui.js"></script>
   <script defer src="grammar-paths.js"></script>
   <script defer src="grammar-chapters.js"></script>
   <script defer src="grammar-path.js"></script>
@@ -69,28 +72,37 @@
   </div>
 </header>
 <div class="workspace">
-  <aside class="sidebar">
-    <p class="eyebrow">ТВОЙ МАРШРУТ</p>
-    <nav id="lesson-nav" aria-label="Темы упражнений"></nav>
-    <div class="mastery-panel"><div class="mastery-line"><span>Помню после паузы</span><strong id="mastery-count">0</strong></div><progress id="mastery-progress" value="0" max="220" aria-label="Самостоятельное воспроизведение после паузы"></progress><p>Ответ всегда вписывается вручную, без выбора из списка.</p></div>
-
-
-  </aside>
   <main id="main" tabindex="-1">
     <section id="today-view" aria-labelledby="today-title"><div class="section-heading"><h1 id="today-title">Сегодня</h1></div><div id="today-content"></div><details class="panel" id="installation-panel"><summary>На телефон и без интернета</summary><p id="offline-status" role="status">Проверяю возможность сохранить приложение…</p><button id="install-app" type="button" class="secondary-button" hidden>Установить на телефон</button><button id="update-app" type="button" class="secondary-button" hidden>Сохранить ответ и обновить приложение</button><p>Android: открой сайт в браузере и выбери «Установить приложение» или «Добавить на главный экран». iPhone: открой сайт в Safari → «Поделиться» → «На экран Домой».</p><p class="small">Сначала открой тренажёр с интернетом и дождись сообщения о сохранении материалов. Прогресс зависит от браузера: перед переходом в установленное приложение скачай progress.json и при необходимости импортируй его. Очистка данных браузера удаляет и офлайн-копию, и прогресс.</p></details></section>
     <section id="review-view" hidden aria-labelledby="review-title"><div class="section-heading"><h1 id="review-title">Повторять</h1></div><div id="review-content"></div></section>
     <section id="vocabulary-view" hidden aria-labelledby="vocabulary-title"><div class="section-heading"><h1 id="vocabulary-title">Мой словарь</h1><button type="button" class="text-button" data-view="today">К сегодняшнему плану</button></div><div id="vocabulary-content"></div></section>
     <section id="learn-view" hidden aria-labelledby="learn-title"><div class="section-heading"><h1 id="learn-title">Учить</h1></div><div id="learn-content"></div></section>
     <section hidden id="practice-view" aria-labelledby="practice-title">
-      <div class="section-heading"><div><p class="eyebrow">ПИСЬМЕННО</p><h1 id="practice-title">Практика</h1></div><span class="course-badge">Спокойный ввод</span></div>
-      <div class="modebar" aria-label="Порядок тренировки"><button type="button" data-mode="smart" aria-pressed="false">6 карточек</button><button type="button" data-mode="review" aria-pressed="false">Пора повторить <span id="due-count">0</span></button><button type="button" data-mode="ordered" aria-pressed="true">По материалам</button><button type="button" data-mode="shuffle" aria-pressed="false">Вперемешку</button><button type="button" data-mode="mistakes" aria-pressed="false">Мои ошибки <span id="mistake-count">0</span></button></div>
-      <div id="jump-bar" class="jump-bar"></div>
-      <div id="source-filter" hidden></div>
-      <label class="pref-check glyph-check"><input type="checkbox" id="pref-letters"> Казахские буквы Ә Ғ Қ Ң Ө Ұ Ү Һ І на экране</label>
-      <div class="session-line"><span id="session-position"></span><span id="session-score"></span></div>
+      <div class="practice-head">
+        <button type="button" id="pause-session" class="text-button practice-back">←</button>
+        <div class="practice-head-copy">
+          <p class="practice-filter-summary" id="practice-filter-summary"></p>
+          <h1 id="practice-title">Практика</h1>
+        </div>
+        <button type="button" class="secondary-button" id="practice-filter-open">Фильтр</button>
+      </div>
+      <div class="session-line"><span id="session-position"></span><span id="session-score" hidden></span></div>
       <div id="exam-bar" class="exam-bar" hidden><div id="exam-bar-fill"></div></div>
-      <article id="exercise" class="exercise-card"></article>
-      <button type="button" id="pause-session" class="text-button">Сделать паузу · Сегодня</button><p class="practice-note">Сначала слепая попытка. «Не знаю» показывает форму — её всё равно нужно набрать. Верно без подсказки сразу идёт дальше; ошибка остаётся на экране.</p>
+      <article id="exercise" class="exercise-card answer-zone"></article>
+      <p class="practice-note">Сначала слепая попытка. «Не знаю» показывает форму — её всё равно нужно набрать. Верно без подсказки сразу идёт дальше; ошибка остаётся на экране.</p>
+      <dialog id="practice-filter" class="practice-filter" aria-labelledby="practice-filter-title">
+        <h2 id="practice-filter-title">Фильтр</h2>
+        <div id="jump-bar" class="jump-bar"></div>
+        <div id="source-filter" hidden></div>
+        <div class="jump-row practice-filter-modes"><span>Порядок</span>
+          <button type="button" class="chip" data-mode="smart">Короткий подход</button>
+          <button type="button" class="chip" data-mode="ordered" aria-pressed="true">По материалам</button>
+          <button type="button" class="chip" data-mode="shuffle">Вперемешку</button>
+          <button type="button" class="chip" data-mode="review">Пора повторить</button>
+          <button type="button" class="chip" data-mode="mistakes">Мои ошибки</button>
+        </div>
+        <button type="button" class="secondary-button" id="practice-filter-close">Закрыть</button>
+      </dialog>
     </section>
     <section id="homework-view" hidden aria-labelledby="homework-title"><div class="section-heading"><div><h1 id="homework-title">Домашка</h1></div><button type="button" class="text-button" data-view="today">К сегодня</button></div><div id="homework-content"></div></section>
     <section id="path-view" hidden aria-labelledby="path-title"><div class="section-heading"><div><p class="eyebrow">РАЗБИРАЕМ ТО, ЧТО УЖЕ БЫЛО НА ЗАНЯТИЯХ</p><h1 id="path-title">Уроки и правила</h1></div><button type="button" class="text-button" data-view="today">К сегодня</button></div><div id="path-content"></div></section>
@@ -116,15 +128,16 @@
   </div>
 </dialog>
 <footer class="site-footer"><span lang="kk">Қазақша</span><span>Письменная практика по материалам курса · <a href="update.html">обновить без потери прогресса</a></span></footer>
-<dialog id="account-dialog" class="settings-dialog" aria-labelledby="account-title">
+<dialog id="account-dialog" class="settings-dialog account-dialog" aria-labelledby="account-title">
   <h2 id="account-title">Вход</h2>
+  <p class="small">Синхронизация прогресса. Форма не разворачивается в шапке.</p>
   <form id="account-form">
     <label for="account-email">Почта</label>
-    <input id="account-email" type="email" autocomplete="username" required>
+    <input id="account-email" type="email" autocomplete="username" enterkeyhint="next" required>
     <label for="account-password">Пароль</label>
-    <input id="account-password" type="password" autocomplete="current-password" minlength="6" required>
+    <input id="account-password" type="password" autocomplete="current-password" enterkeyhint="done" minlength="6" required>
     <p id="account-msg" class="small"></p>
-    <div class="ai-tutor-actions">
+    <div class="account-actions ai-tutor-actions">
       <button type="submit" class="primary-button" id="account-login">Войти</button>
       <button type="button" class="secondary-button" id="account-register">Создать аккаунт</button>
       <button type="button" class="text-button" id="account-cancel">Отмена</button>
@@ -148,6 +161,7 @@
     </select>
   </label>
   <label><input type="checkbox" id="motion-off"> Меньше движения</label>
+  <label class="pref-check glyph-check"><input type="checkbox" id="pref-letters"> Казахские буквы Ә Ғ Қ Ң Ө Ұ Ү Һ І на экране</label>
   <p class="glyph-check" lang="kk">Ә ә Ғ ғ Қ қ Ң ң Ө ө Ұ ұ Ү ү Һ һ І і</p>
   <button type="button" class="secondary-button" id="settings-close">Закрыть</button>
 </dialog>
