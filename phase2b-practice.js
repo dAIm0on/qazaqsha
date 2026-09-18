@@ -13,7 +13,7 @@
   return {
    id,source:'p2b',group:'G1',part:String(order),lessonId:lesson,topic,kind:'fields',
    title,stimulus,fields:[field(answers,label)],explanation,
-   ruleIds:[rule],
+   ruleIds:Array.isArray(rule)?rule:[rule],
    phase2b:{genre:'G1',cell:true,lesson_order:order,error_type:error_type||''}
   };
  }
@@ -58,14 +58,6 @@
    phase2b:{genre:'G6',rewrite:true,lesson_order:order,error_type:error_type||''}
   };
  }
- function phrase({id,lesson,stimulus,answers,rule,error_type,explanation,label='Фраза по-казахски'}){
-  return {
-   id,source:'p2b',group:'PHRASE',part:'1',lessonId:lesson,topic:'phrase',kind:'phrase',
-   title:'Phrase Drill',stimulus,fields:[field(answers,label)],explanation,
-   ruleIds:Array.isArray(rule)?rule:[rule],vocabIds:[],
-   phase2b:{genre:'PHRASE',phrase:true,lesson_order:90,error_type:error_type||''}
-  };
- }
  const G1={
   '1-1':[
    cell({id:'p2b-11-g1-class-ae',lesson:'1-1',order:1,topic:'sounds',title:'Одна клетка: какой ряд?',stimulus:'Ә',answers:['мягкий'],rule:'T1_HARMONY',error_type:'harmony_class',explanation:'Ә относится к мягкому ряду.'}),
@@ -90,7 +82,8 @@
    cell({id:'p2b-22-g1-dos',lesson:'2-2',order:1,topic:'person',title:'Одна клетка: біз + основа',stimulus:'Біз + дос',answers:['доспыз'],rule:'T8_PERSON_PL',error_type:'person_pl_form',explanation:'После С форма для біз начинается с П: доспыз.'}),
    cell({id:'p2b-22-g1-adam',lesson:'2-2',order:1,topic:'person',title:'Одна клетка: біз + основа',stimulus:'Біз + адам',answers:['адамбыз'],rule:'T8_PERSON_PL',error_type:'person_pl_form',explanation:'После М форма для біз начинается с Б: адамбыз.'}),
    cell({id:'p2b-22-g1-student',lesson:'2-2',order:1,topic:'person',title:'Одна клетка: біз + основа',stimulus:'Біз + студент',answers:['студентпіз'],rule:'T8_PERSON_PL',error_type:'person_pl_form',explanation:'Біз + студент → студентпіз.'}),
-   cell({id:'p2b-22-g1-sender-student',lesson:'2-2',order:2,topic:'person',title:'Одна клетка: сендер + основа',stimulus:'Сендер + студент',answers:['студентсіңдер'],rule:'T8_PERSON_PL',error_type:'person_pl_form',explanation:'Сендер + студент → студентсіңдер. Отдельное -тар на студент не нужно.'})
+   cell({id:'p2b-22-g1-sender-student',lesson:'2-2',order:2,topic:'person',title:'Одна клетка: сендер + основа',stimulus:'Сендер + студент',answers:['студентсіңдер'],rule:'T8_PERSON_PL',error_type:'person_pl_form',explanation:'Сендер + студент → студентсіңдер. Отдельное -тар на студент не нужно.'}),
+   cell({id:'p2b-22-g1-adj-aqyldy',lesson:'2-2',order:5,topic:'person',title:'Признак как сказуемое',stimulus:'Біз + ақылды',answers:['ақылдымыз'],rule:['T8_PERSON_PL','T8_ADJ_PRED'],error_type:'person_pl_form',explanation:'Ақылды — сказуемое-признак. Біз + ақылды → ақылдымыз.'})
   ],
   '2-3':[
    cell({id:'p2b-23-g1-qonaq',lesson:'2-3',order:1,topic:'person',title:'Одна клетка: ол + основа',stimulus:'Ол + қонақ',answers:['қонақ'],rule:'T9_OL',error_type:'ol_suffix',explanation:'После ол личного окончания нет: ол қонақ.'}),
@@ -114,7 +107,8 @@
   '2-3':[
    suffix({id:'p2b-23-g2-qonaq',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Ол қонақ + ___ ?',answers:['па'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Қонақ заканчивается на Қ, поэтому вопросительная частица начинается с П: па.'}),
    suffix({id:'p2b-23-g2-adam',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Ол адам + ___ ?',answers:['ба'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Адам заканчивается на М, поэтому здесь ба.'}),
-   suffix({id:'p2b-23-g2-aqyldy',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Олар ақылды + ___ ?',answers:['ма'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Последнее слово оканчивается гласной; ряд твёрдый, поэтому ма.'})
+   suffix({id:'p2b-23-g2-aqyldy',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Олар ақылды + ___ ?',answers:['ма'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Последнее слово оканчивается гласной; ряд твёрдый, поэтому ма.'}),
+   suffix({id:'p2b-23-g2-ordinal20',lesson:'2-3',order:4,topic:'numbers',title:'Сделай порядковое число',stimulus:'жиырма → ___',answers:['жиырмасыншы'],rule:'T11_ORDINAL',error_type:'ordinal_20',explanation:'20-й — жиырмасыншы. Это закреплённая форма курса.',label:'Порядковая форма'})
   ]
  };
  const G3={
@@ -128,6 +122,7 @@
   '1-3':[
    produce({id:'p2b-13-g3-n17',lesson:'1-3',order:1,topic:'numbers',title:'Запиши число по-казахски',stimulus:'17',answers:['он жеті'],rule:'T5_NUMERAL_COMPOSE',explanation:'17 = 10 + 7 → он жеті.'}),
    produce({id:'p2b-13-g3-n32',lesson:'1-3',order:1,topic:'numbers',title:'Запиши число по-казахски',stimulus:'32',answers:['отыз екі'],rule:'T5_NUMERAL_COMPOSE',explanation:'32 = 30 + 2 → отыз екі.'}),
+   {id:'p2b-13-g3-phone',source:'p2b',group:'G3',part:'3',lessonId:'1-3',topic:'numbers',kind:'fields',title:'Запиши четыре группы словами',stimulus:'+7 711 388 00 11',fields:[field(['жеті жүз он бір'],'Группа 1'),field(['үш жүз сексен сегіз'],'Группа 2'),field(['нөл нөл'],'Группа 3'),field(['он бір'],'Группа 4')],explanation:'+7 — код страны. Проверяем четыре группы после него; ведущие нули сохраняются.',ruleIds:['PHONE_GROUPS'],phase2b:{genre:'G3',production:true,lesson_order:3,error_type:''}},
    produce({id:'p2b-13-g3-two-books',lesson:'1-3',order:4,topic:'plural',stimulus:'две книги',answers:['екі кітап'],rule:'T4_NO_PLURAL_AFTER_NUMBER',error_type:'plural_after_numeral',explanation:'Количество уже выражено словом екі, поэтому кітап остаётся без множественного окончания.'}),
    produce({id:'p2b-13-g3-five-books',lesson:'1-3',order:4,topic:'plural',stimulus:'пять книг',answers:['бес кітап'],rule:'T4_NO_PLURAL_AFTER_NUMBER',error_type:'plural_after_numeral',explanation:'После бес существительное остаётся без множественного окончания: бес кітап.'})
   ],
@@ -203,38 +198,9 @@
    rewrite({id:'p2b-23-g6-missing-question',lesson:'2-3',order:5,topic:'person',stimulus:'Ол қонақ?',answers:['Ол қонақ па?','Ол қонақ па'],rule:'T10_QUESTION',error_type:'question_particle_missing',explanation:'Для закрытого вопроса здесь нужна отдельная частица: Ол қонақ па?'})
   ]
  };
- const PHRASE={
-  '1-1':[],
-  '1-2':[],
-  '1-3':[
-   phrase({id:'p2b-13-ph-1',lesson:'1-3',stimulus:'Два слова',answers:['екі сөз'],rule:'T4_NO_PLURAL_AFTER_NUMBER',error_type:'plural_after_numeral',explanation:'После числа существительное остаётся без множественного окончания: екі сөз.'}),
-   phrase({id:'p2b-13-ph-2',lesson:'1-3',stimulus:'Одна девушка',answers:['бір қыз'],rule:'T4_NO_PLURAL_AFTER_NUMBER',error_type:'plural_after_numeral',explanation:'Бір қыз — одна девушка.'}),
-   phrase({id:'p2b-13-ph-3',lesson:'1-3',stimulus:'Три сына',answers:['үш ұл'],rule:'T4_NO_PLURAL_AFTER_NUMBER',error_type:'plural_after_numeral',explanation:'Үш ұл — три сына; отдельное множественное окончание не нужно.'}),
-   phrase({id:'p2b-13-ph-4',lesson:'1-3',stimulus:'Пять книг',answers:['бес кітап'],rule:'T4_NO_PLURAL_AFTER_NUMBER',error_type:'plural_after_numeral',explanation:'Бес кітап — пять книг.'})
-  ],
-  '2-1':[
-   phrase({id:'p2b-21-ph-1',lesson:'2-1',stimulus:'Я учёный.',answers:['Мен ғалыммын.','Мен ғалыммын','Ғалыммын.','Ғалыммын'],rule:'T6_PERSON_SG',error_type:'person_sg_form',explanation:'Мен + ғалым → Мен ғалыммын.'}),
-   phrase({id:'p2b-21-ph-2',lesson:'2-1',stimulus:'Ты учитель.',answers:['Сен мұғалімсің.','Сен мұғалімсің'],rule:'T6_PERSON_SG',error_type:'person_sg_form',explanation:'Сен + мұғалім → Сен мұғалімсің.'}),
-   phrase({id:'p2b-21-ph-3',lesson:'2-1',stimulus:'Вы врач.',answers:['Сіз дәрігерсіз.','Сіз дәрігерсіз'],rule:'T6_PERSON_SG',error_type:'person_sg_form',explanation:'Сіз + дәрігер → Сіз дәрігерсіз.'}),
-   phrase({id:'p2b-21-ph-4',lesson:'2-1',stimulus:'Я не девушка.',answers:['Мен қыз емеспін.','Мен қыз емеспін','Қыз емеспін.','Қыз емеспін'],rule:'T7_EMES',error_type:'emes_position',explanation:'Отрицание: қыз + емес; личное окончание стоит на емес.'})
-  ],
-  '2-2':[
-   phrase({id:'p2b-22-ph-1',lesson:'2-2',stimulus:'Мы поэты.',answers:['Біз ақынбыз.','Біз ақынбыз'],rule:'T8_PERSON_PL',error_type:'person_pl_form',explanation:'Біз + ақын → Біз ақынбыз.'}),
-   phrase({id:'p2b-22-ph-2',lesson:'2-2',stimulus:'Вы (сендер) водители.',answers:['Сендер жүргізушісіңдер.','Сендер жүргізушісіңдер'],rule:'T8_PERSON_PL',error_type:'person_pl_form',explanation:'Сендер жүргізушісіңдер.'}),
-   phrase({id:'p2b-22-ph-3',lesson:'2-2',stimulus:'Мы не скупые.',answers:['Біз сараң емеспіз.','Біз сараң емеспіз'],rule:['T8_PERSON_PL','T7_EMES'],error_type:'emes_position',explanation:'Біз сараң емеспіз: личное окончание стоит на емес.'}),
-   phrase({id:'p2b-22-ph-4',lesson:'2-2',stimulus:'Вы (сіздер) умные.',answers:['Сіздер ақылдысыздар.','Сіздер ақылдысыздар'],rule:['T8_PERSON_PL','T8_ADJ_PRED'],error_type:'person_pl_form',explanation:'Сіздер ақылдысыздар.'})
-  ],
-  '2-3':[
-   phrase({id:'p2b-23-ph-1',lesson:'2-3',stimulus:'Он гость?',answers:['Ол қонақ па?','Ол қонақ па'],rule:['T9_OL','T10_QUESTION'],error_type:'question_class',explanation:'Ол қонақ па? У ол нет личного окончания; после Қ выбираем па.'}),
-   phrase({id:'p2b-23-ph-2',lesson:'2-3',stimulus:'Он не специалист?',answers:['Ол маман емес пе?','Ол маман емес пе'],rule:['T9_OL','T10_QUESTION'],error_type:'question_class',explanation:'Ол маман емес пе? Частица выбирается по слову емес: пе.'}),
-   phrase({id:'p2b-23-ph-3',lesson:'2-3',stimulus:'Он сосед.',answers:['Ол көрші.','Ол көрші'],rule:'T9_OL',error_type:'ol_suffix',explanation:'Ол көрші: личного окончания после ол нет.'}),
-   phrase({id:'p2b-23-ph-4',lesson:'2-3',stimulus:'двенадцатый',answers:['он екінші'],rule:'T11_ORDINAL',error_type:'',explanation:'12-й: он екінші; порядковым становится последний компонент.'})
-  ]
- };
-
  function clone(q){return JSON.parse(JSON.stringify(q));}
  function cardsFor(lessonId,genre='G1'){
-  const bank=genre==='G1'?G1:genre==='G2'?G2:genre==='G3'?G3:genre==='G4'?G4:genre==='G5'?G5:genre==='G6'?G6:genre==='PHRASE'?PHRASE:null;
+  const bank=genre==='G1'?G1:genre==='G2'?G2:genre==='G3'?G3:genre==='G4'?G4:genre==='G5'?G5:genre==='G6'?G6:null;
   return bank?(bank[lessonId]||[]).map(clone):[];
  }
  function allG1(){return Object.keys(G1).flatMap(id=>cardsFor(id,'G1'));}
@@ -243,9 +209,7 @@
  function allG4(){return Object.keys(G4).flatMap(id=>cardsFor(id,'G4'));}
  function allG5(){return Object.keys(G5).flatMap(id=>cardsFor(id,'G5'));}
  function allG6(){return Object.keys(G6).flatMap(id=>cardsFor(id,'G6'));}
- function allPhrases(){return Object.keys(PHRASE).flatMap(id=>cardsFor(id,'PHRASE'));}
- function phrasesFor(lessonId){return cardsFor(lessonId,'PHRASE');}
- function all(){return [...allG1(),...allG2(),...allG3(),...allG4(),...allG5(),...allG6(),...allPhrases()];}
+ function all(){return [...allG1(),...allG2(),...allG3(),...allG4(),...allG5(),...allG6()];}
  function byId(id){return all().find(q=>q.id===id)||null;}
  function checkCell(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
@@ -254,6 +218,16 @@
   const result=core.evaluate(q,answers);
   const errors=result.correct||!diagnostics||!diagnostics.diagnose?[]:diagnostics.diagnose(q,answers,result,Date.now());
   return {question:q,result,errors};
+ }
+ function lessonSession(lessonId){
+  const priority={G1:1,G2:2,G3:3,G4:4,G5:5,G6:6};
+  return ['G1','G2','G3','G4','G5','G6']
+   .flatMap(g=>cardsFor(lessonId,g))
+   .sort((a,b)=>{
+    const ao=Number(a.phase2b&&a.phase2b.lesson_order||99),bo=Number(b.phase2b&&b.phase2b.lesson_order||99);
+    if(ao!==bo)return ao-bo;
+    return (priority[a.phase2b&&a.phase2b.genre]||99)-(priority[b.phase2b&&b.phase2b.genre]||99);
+   });
  }
  function install(course){
   if(!course||!Array.isArray(course.questions))return [];
@@ -264,7 +238,7 @@
   }
   return added;
  }
- const api={G1,G2,G3,G4,G5,G6,PHRASE,cardsFor,allG1,allG2,allG3,allG4,allG5,allG6,allPhrases,phrasesFor,all,byId,checkCell,checkTask:checkCell,install};
+ const api={G1,G2,G3,G4,G5,G6,cardsFor,allG1,allG2,allG3,allG4,allG5,allG6,all,byId,checkCell,checkTask:checkCell,install,lessonSession};
  if(node)module.exports=api;
  else{
   root.Phase2BPractice=api;
