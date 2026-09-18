@@ -265,5 +265,9 @@
   return added;
  }
  const api={G1,G2,G3,G4,G5,G6,PHRASE,cardsFor,allG1,allG2,allG3,allG4,allG5,allG6,allPhrases,phrasesFor,all,byId,checkCell,checkTask:checkCell,install};
- if(node)module.exports=api;else root.Phase2BPractice=api;
+ if(node)module.exports=api;
+ else{
+  root.Phase2BPractice=api;
+  if(root.COURSE)install(root.COURSE);
+ }
 })(typeof window!=='undefined'?window:globalThis);

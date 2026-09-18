@@ -1168,7 +1168,16 @@ const knowledgeSrc=fs.readFileSync(path.join(__dirname,'knowledge.js'),'utf8');
 assert.ok(/else bind\('exercise:'\+q\.id,q\.kind==='multi'\?'visual_recognition':'application',null\)/.test(knowledgeSrc));
 assert.ok(/q\.kind==='phrase'/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(!P2BG1.phrasesFor('2-1').some(q=>(q.ruleIds||[]).includes('T10_QUESTION')));
-ok('Phase 2B Phrase Drill: current-course phrases only, separate exercise skill, no word production binding');
+const phase2bSrc=fs.readFileSync(path.join(__dirname,'phase2b-practice.js'),'utf8');
+const curriculumSrc=fs.readFileSync(path.join(__dirname,'curriculum.js'),'utf8');
+assert.ok(/if\(root\.COURSE\)install\(root\.COURSE\)/.test(phase2bSrc));
+assert.ok(/q\.phase2b&&q\.phase2b\.phrase\?\[\]:words\.filter/.test(curriculumSrc));
+const livePhase2B={questions:[]};
+assert.equal(P2BG1.install(livePhase2B).length,P2BG1.all().length);
+assert.equal(P2BG1.install(livePhase2B).length,0);
+assert.ok(livePhase2B.questions.some(q=>q.phase2b&&q.phase2b.phrase));
+assert.ok(!livePhase2B.questions.some(q=>q.lessonId==='3-1'));
+ok('Phase 2B Phrase Drill: current-course phrases install into live Practice, stay separate from word production');
 
 
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
