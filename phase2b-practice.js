@@ -25,6 +25,14 @@
    phase2b:{genre:'G2',suffix:true,lesson_order:order,error_type:error_type||''}
   };
  }
+ function produce({id,lesson,order,topic,title='Переведи на казахский',stimulus,answers,rule,error_type,explanation,label='Ответ на казахском'}){
+  return {
+   id,source:'p2b',group:'G3',part:String(order),lessonId:lesson,topic,kind:'fields',
+   title,stimulus,fields:[field(answers,label)],explanation,
+   ruleIds:Array.isArray(rule)?rule:[rule],
+   phase2b:{genre:'G3',production:true,lesson_order:order,error_type:error_type||''}
+  };
+ }
  const G1={
   '1-1':[
    cell({id:'p2b-11-g1-class-ae',lesson:'1-1',order:1,topic:'sounds',title:'Одна клетка: какой ряд?',stimulus:'Ә',answers:['мягкий'],rule:'T1_HARMONY',error_type:'harmony_class',explanation:'Ә относится к мягкому ряду.'}),
@@ -76,15 +84,44 @@
    suffix({id:'p2b-23-g2-aqyldy',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Олар ақылды + ___ ?',answers:['ма'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Последнее слово оканчивается гласной; ряд твёрдый, поэтому ма.'})
   ]
  };
+ const G3={
+  '1-1':[],
+  '1-2':[
+   produce({id:'p2b-12-g3-books',lesson:'1-2',order:2,topic:'plural',stimulus:'книги',answers:['кітаптар'],rule:'T2_PLURAL_LDT',error_type:'plural_form',explanation:'Кітап во множественном числе: кітаптар.'}),
+   produce({id:'p2b-12-g3-people',lesson:'1-2',order:2,topic:'plural',stimulus:'люди',answers:['адамдар'],rule:'T2_PLURAL_LDT',error_type:'plural_form',explanation:'Адам во множественном числе: адамдар.'}),
+   produce({id:'p2b-12-g3-lands',lesson:'1-2',order:2,topic:'plural',stimulus:'земли',answers:['жерлер'],rule:'T2_PLURAL_LDT',error_type:'plural_form',explanation:'Жер во множественном числе: жерлер.'}),
+   produce({id:'p2b-12-g3-girls',lesson:'1-2',order:2,topic:'plural',stimulus:'девушки',answers:['қыздар'],rule:'T2_PLURAL_LDT',error_type:'plural_form',explanation:'Қыз во множественном числе: қыздар.'})
+  ],
+  '1-3':[
+   produce({id:'p2b-13-g3-n17',lesson:'1-3',order:1,topic:'numbers',title:'Запиши число по-казахски',stimulus:'17',answers:['он жеті'],rule:'T5_NUMERAL_COMPOSE',explanation:'17 = 10 + 7 → он жеті.'}),
+   produce({id:'p2b-13-g3-n32',lesson:'1-3',order:1,topic:'numbers',title:'Запиши число по-казахски',stimulus:'32',answers:['отыз екі'],rule:'T5_NUMERAL_COMPOSE',explanation:'32 = 30 + 2 → отыз екі.'}),
+   produce({id:'p2b-13-g3-two-books',lesson:'1-3',order:4,topic:'plural',stimulus:'две книги',answers:['екі кітап'],rule:'T4_NO_PLURAL_AFTER_NUMBER',error_type:'plural_after_numeral',explanation:'Количество уже выражено словом екі, поэтому кітап остаётся без множественного окончания.'}),
+   produce({id:'p2b-13-g3-five-books',lesson:'1-3',order:4,topic:'plural',stimulus:'пять книг',answers:['бес кітап'],rule:'T4_NO_PLURAL_AFTER_NUMBER',error_type:'plural_after_numeral',explanation:'После бес существительное остаётся без множественного окончания: бес кітап.'})
+  ],
+  '2-1':[
+   produce({id:'p2b-21-g3-scientist',lesson:'2-1',order:5,topic:'person',stimulus:'Я учёный.',answers:['Мен ғалыммын.','Мен ғалыммын','Ғалыммын.','Ғалыммын'],rule:'T6_PERSON_SG',error_type:'person_sg_form',explanation:'Мен + ғалым → Мен ғалыммын.'}),
+   produce({id:'p2b-21-g3-not-doctor',lesson:'2-1',order:5,topic:'person',stimulus:'Ты не врач.',answers:['Сен дәрігер емессің.','Сен дәрігер емессің'],rule:'T7_EMES',error_type:'emes_position',explanation:'Отрицание: дәрігер + емес; личное окончание стоит на емес → емессің.'}),
+   produce({id:'p2b-21-g3-polite-teacher-q',lesson:'2-1',order:5,topic:'person',stimulus:'Вы учитель?',answers:['Сіз мұғалімсіз бе?','Сіз мұғалімсіз бе'],rule:['T6_PERSON_SG','T10_QUESTION'],error_type:'question_class',explanation:'Сіз мұғалімсіз бе? Вопросительная частица стоит отдельно в конце.'})
+  ],
+  '2-2':[
+   produce({id:'p2b-22-g3-we-friends',lesson:'2-2',order:4,topic:'person',stimulus:'Мы друзья.',answers:['Біз доспыз.','Біз доспыз'],rule:'T8_PERSON_PL',error_type:'person_pl_form',explanation:'Біз + дос → Біз доспыз.'}),
+   produce({id:'p2b-22-g3-you-bosses',lesson:'2-2',order:4,topic:'person',stimulus:'Вы (сендер) начальники.',answers:['Сендер бастықсыңдар.','Сендер бастықсыңдар'],rule:'T8_PERSON_PL',error_type:'person_pl_form',explanation:'Сендер уже показывает множественность; сказуемое: бастықсыңдар.'})
+  ],
+  '2-3':[
+   produce({id:'p2b-23-g3-he-guest-q',lesson:'2-3',order:3,topic:'person',stimulus:'Он гость?',answers:['Ол қонақ па?','Ол қонақ па'],rule:['T9_OL','T10_QUESTION'],error_type:'question_class',explanation:'После ол личного окончания нет; после қ в қонақ выбираем па.'}),
+   produce({id:'p2b-23-g3-he-not-teacher-q',lesson:'2-3',order:3,topic:'person',stimulus:'Он не учитель?',answers:['Ол мұғалім емес пе?','Ол мұғалім емес пе'],rule:['T9_OL','T10_QUESTION'],error_type:'question_class',explanation:'Ол мұғалім емес пе? Частицу выбираем по последнему слову емес: пе.'})
+  ]
+ };
 
  function clone(q){return JSON.parse(JSON.stringify(q));}
  function cardsFor(lessonId,genre='G1'){
-  const bank=genre==='G1'?G1:genre==='G2'?G2:null;
+  const bank=genre==='G1'?G1:genre==='G2'?G2:genre==='G3'?G3:null;
   return bank?(bank[lessonId]||[]).map(clone):[];
  }
  function allG1(){return Object.keys(G1).flatMap(id=>cardsFor(id,'G1'));}
  function allG2(){return Object.keys(G2).flatMap(id=>cardsFor(id,'G2'));}
- function all(){return [...allG1(),...allG2()];}
+ function allG3(){return Object.keys(G3).flatMap(id=>cardsFor(id,'G3'));}
+ function all(){return [...allG1(),...allG2(),...allG3()];}
  function byId(id){return all().find(q=>q.id===id)||null;}
  function checkCell(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
@@ -103,6 +140,6 @@
   }
   return added;
  }
- const api={G1,G2,cardsFor,allG1,allG2,all,byId,checkCell,checkTask:checkCell,install};
+ const api={G1,G2,G3,cardsFor,allG1,allG2,allG3,all,byId,checkCell,checkTask:checkCell,install};
  if(node)module.exports=api;else root.Phase2BPractice=api;
 })(typeof window!=='undefined'?window:globalThis);

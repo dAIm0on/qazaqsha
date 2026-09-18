@@ -1066,4 +1066,23 @@ assert.equal(new Set([...g1All,...g2All].map(q=>q.id)).size,g1All.length+g2All.l
 ok('Phase 2B G2: suffix completion registry and local piece diagnostics');
 
 
+
+const g3All=P2BG1.allG3();
+assert.ok(g3All.length>=12);
+assert.ok(g3All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G3'&&q.phase2b.production));
+assert.equal(P2BG1.cardsFor('1-1','G3').length,0);
+assert.ok(P2BG1.checkTask('p2b-12-g3-books','кітаптар').result.correct);
+assert.ok(P2BG1.checkTask('p2b-13-g3-n17','он жеті').result.correct);
+const g3NumBad=P2BG1.checkTask('p2b-13-g3-n17','жеті он');
+assert.ok(g3NumBad.errors.some(e=>e.error_type==='number_order'));
+assert.ok(P2BG1.checkTask('p2b-13-g3-two-books','екі кітап').result.correct);
+const g3QtyBad=P2BG1.checkTask('p2b-13-g3-two-books','екі кітаптар');
+assert.ok(g3QtyBad.errors.some(e=>e.error_type==='plural_after_numeral'));
+assert.ok(P2BG1.checkTask('p2b-21-g3-scientist','Мен ғалыммын').result.correct);
+assert.ok(P2BG1.checkTask('p2b-22-g3-we-friends','Біз доспыз').result.correct);
+assert.ok(P2BG1.checkTask('p2b-23-g3-he-guest-q','Ол қонақ па').result.correct);
+assert.equal(new Set(P2BG1.all().map(q=>q.id)).size,P2BG1.all().length);
+ok('Phase 2B G3: directed production uses only open lesson grammar and local checking');
+
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
