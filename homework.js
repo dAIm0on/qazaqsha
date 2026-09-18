@@ -4,6 +4,9 @@
  const node=typeof module!=='undefined'&&module.exports;
  const schema=node?require('./package-schema.js'):root.LessonPackageSchema;
  const core=node?require('./core.js'):root.TrainerCore;
+ const phase2b=node?require('./phase2b-practice.js'):root.Phase2BPractice;
+ const explainNode=node?require('./explain-bank.js'):null;
+ function explainBank(){return explainNode||root.ExplainBank||null;}
  const DAY=86400000;
  const RULES={
    harmony:'Для окончания смотри последний слог, не первое впечатление от слова.\nЗадний ряд А О Ұ Ы → в окончании гласная А.\nПередний ряд Ә Ө Ү І Е → в окончании гласная Е.\nПары курса: Ә—А, Ө—О, І—Ы, Ү—Ұ, К—Қ, Г—Ғ.\nИ и У сами по себе ряд не задают: смотри слово целиком.',
@@ -57,18 +60,30 @@
    if(q.topic==='person'||ids.includes('person-sg'))return 'person';
    return '';
  }
- function ruleText(q,ruleId){
-   const id=ruleId||inferRule(q);
-   if(!id||!RULES[id])return '';
-   let text=RULES[id];
-   const answers=((q&&q.fields)||[]).flatMap(f=>f.answers||[]).concat(q&&q.stimulus?[q.stimulus]:[]).map(a=>String(a).trim()).filter(a=>a.length>2);
-   for(const a of answers){
-     const re=new RegExp('[^\\n]*'+a.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'[^\\n]*\\n?','iu');
-     if(re.test(text))text=text.replace(re,'');
-   }
-   return text.replace(/\n{3,}/g,'\n\n').trim();
+ function canonicalRuleId(q){
+   if(!q||!q.phase2b)return '';
+   const bank=explainBank(),ids=q.ruleIds||[];
+   const type=String(q.phase2b.error_type||'');
+   const preferred=/question/.test(type)?'T10_QUESTION':/emes/.test(type)?'T7_EMES':/plural_after_numeral/.test(type)?'T4_NO_PLURAL_AFTER_NUMBER':'';
+   if(preferred&&ids.includes(preferred)&&bank&&bank.byId&&bank.byId(preferred))return preferred;
+   return ids.find(id=>bank&&bank.byId&&bank.byId(id))||'';
  }
- function ruleId(q){const id=inferRule(q);return RULES[id]?id:'';}
+ function cleanRuleText(text,q){
+   const answers=((q&&q.fields)||[]).flatMap(f=>f.answers||[]).concat(q&&q.stimulus?[q.stimulus]:[]).map(a=>String(a).trim()).filter(a=>a.length>2);
+   return String(text||'').split('\n').filter(line=>!answers.some(a=>line.includes(a))).join('\n').replace(/\n{3,}/g,'\n\n').trim();
+ }
+ function ruleText(q,ruleId){
+   const id=ruleId||canonicalRuleId(q)||inferRule(q);
+   const bank=explainBank(),card=bank&&bank.byId&&bank.byId(id);
+   if(card)return cleanRuleText(card.medium||card.short||card.ru_refresh||'',q);
+   if(!id||!RULES[id])return '';
+   return cleanRuleText(RULES[id],q);
+ }
+ function ruleId(q){
+   const canonical=canonicalRuleId(q);
+   if(canonical)return canonical;
+   const id=inferRule(q);return RULES[id]?id:'';
+ }
  function missingRules(questions){
    const miss=new Set();
    for(const q of questions||[]){
@@ -100,7 +115,11 @@
  }
  function buildPack(lessonId,questions,course){
    const exSource={ '1-1':'e1','1-2':'e2','1-3':'e3','2-1':'e21','2-2':'e22','2-3':'e23' }[lessonId];
-   const exercises=bySource(questions,exSource);
+   const original=bySource(questions,exSource);
+   const qById=new Map((questions||[]).map(q=>[q.id,q]));
+   const phaseIds=phase2b&&phase2b.homeworkIdsFor?phase2b.homeworkIdsFor(lessonId):[];
+   const phaseExercises=phaseIds.map(id=>qById.get(id)).filter(Boolean);
+   const exercises=[...original,...phaseExercises];
    const words=wordsForLesson(questions,lessonId);
    const all=[...exercises,...words];
    const rule_map=Object.create(null);

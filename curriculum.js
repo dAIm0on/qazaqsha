@@ -104,7 +104,7 @@
  for(const q of c.questions){
    q.lessonId=q.lessonId||(q.source==='m1'||q.source==='e1'||q.source==='hw1'||q.topic==='sounds'||q.topic==='vocab'?'1-1':'1-2');
    const text=[q.stimulus,...(q.fields||[]).flatMap(f=>f.answers),...(q.correct||[])].join(' '),parts=new Set(tokens(text));
-   q.vocabIds=words.filter(w=>w.aliases.some(a=>a.includes(' ')?core.normalize(text).includes(a):parts.has(a))).map(w=>w.id);
+   q.vocabIds=q.phase2b&&q.phase2b.phrase?[]:words.filter(w=>w.aliases.some(a=>a.includes(' ')?core.normalize(text).includes(a):parts.has(a))).map(w=>w.id);
    if(q.source==='hw2'){const w=words[c.vocabulary.length+Number(q.group)-1];if(w&&!q.vocabIds.includes(w.id))q.vocabIds.push(w.id);}
    q.ruleIds=q.ruleIds|| (q.topic==='sounds'?['harmony']:q.topic==='numbers'?['numbers']:q.topic==='plural'?['plural-l','plural-d','plural-t']:[]);
    if(q.id.includes('quantity'))q.ruleIds=['quantity'];

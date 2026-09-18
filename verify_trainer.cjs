@@ -1020,4 +1020,242 @@ assert.ok(/repeat\(5,/.test(theme));
 assert.ok(/id="homework-title">Домашка/.test(htmlSrc));
 ok('COPY-2/NAV-1 exam start or empty; 5-col nav; homework title');
 
+
+const P2BG1=require('./phase2b-practice.js');
+const G1Diag=require('./diagnostics.js');
+const g1All=P2BG1.allG1();
+assert.ok(g1All.length>=15);
+assert.ok(g1All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G1'&&q.phase2b.cell));
+assert.equal(new Set(g1All.map(q=>q.id)).size,g1All.length);
+assert.ok(g1All.every(q=>/^p2b-/.test(q.id)));
+assert.equal(P2BG1.cardsFor('1-3').length,0);
+assert.ok(P2BG1.cardsFor('1-1').length>0&&P2BG1.cardsFor('1-2').length>0&&P2BG1.cardsFor('2-1').length>0&&P2BG1.cardsFor('2-2').length>0&&P2BG1.cardsFor('2-3').length>0);
+assert.ok(P2BG1.checkCell('p2b-12-g1-kitap','кітаптар').result.correct);
+const g1PluralBad=P2BG1.checkCell('p2b-12-g1-kitap','кітаплар');
+assert.ok(!g1PluralBad.result.correct&&g1PluralBad.errors.some(e=>e.error_type==='plural_initial_consonant'));
+assert.ok(P2BG1.checkCell('p2b-21-g1-dos','доспын').result.correct);
+const g1DosBad=P2BG1.checkCell('p2b-21-g1-dos','досмын');
+assert.ok(g1DosBad.errors.some(e=>e.error_type==='person_sg_form'));
+const g1BizBad=P2BG1.checkCell('p2b-22-g1-adam','адаммыз');
+assert.ok(g1BizBad.errors.some(e=>e.error_type==='person_pl_form'));
+const g1OlBad=P2BG1.checkCell('p2b-23-g1-mugalim','мұғаліммін');
+assert.ok(g1OlBad.errors.some(e=>e.error_type==='ol_suffix'));
+assert.ok(/phase2b-practice\.js/.test(htmlSrc));
+assert.ok(!/бирк|наклейк/i.test(fs.readFileSync(path.join(__dirname,'diagnostics.js'),'utf8')));
+assert.ok(/последний релевантный слог/.test(G1Diag.line('harmony_edge')));
+ok('Phase 2B G1: one-cell registry, local checking, precise diagnostics, 1-3 correctly has no G1');
+
+
+
+const g2All=P2BG1.allG2();
+assert.ok(g2All.length>=8);
+assert.ok(g2All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G2'&&q.phase2b.suffix));
+assert.equal(P2BG1.cardsFor('1-1','G2').length,0);
+assert.equal(P2BG1.cardsFor('1-3','G2').length,0);
+assert.equal(P2BG1.cardsFor('2-2','G2').length,0);
+assert.ok(P2BG1.checkTask('p2b-12-g2-kitap','тар').result.correct);
+const g2KitapBad=P2BG1.checkTask('p2b-12-g2-kitap','лар');
+assert.ok(g2KitapBad.errors.some(e=>e.error_type==='plural_initial_consonant'));
+assert.ok(P2BG1.checkTask('p2b-21-g2-dos','пын').result.correct);
+const g2DosBad=P2BG1.checkTask('p2b-21-g2-dos','мын');
+assert.ok(g2DosBad.errors.some(e=>e.error_type==='person_sg_piece'));
+assert.ok(P2BG1.checkTask('p2b-23-g2-qonaq','па').result.correct);
+const g2QBad=P2BG1.checkTask('p2b-23-g2-qonaq','ба');
+assert.ok(g2QBad.errors.some(e=>e.error_type==='question_class'));
+assert.equal(new Set([...g1All,...g2All].map(q=>q.id)).size,g1All.length+g2All.length);
+ok('Phase 2B G2: suffix completion registry and local piece diagnostics');
+
+
+
+const g3All=P2BG1.allG3();
+assert.ok(g3All.length>=12);
+assert.ok(g3All.every(q=>q.kind==='fields'&&q.fields.length>=1&&q.phase2b&&q.phase2b.genre==='G3'&&q.phase2b.production));
+assert.equal(P2BG1.cardsFor('1-1','G3').length,0);
+assert.ok(P2BG1.checkTask('p2b-12-g3-books','кітаптар').result.correct);
+assert.ok(P2BG1.checkTask('p2b-13-g3-n17','он жеті').result.correct);
+const g3NumBad=P2BG1.checkTask('p2b-13-g3-n17','жеті он');
+assert.ok(g3NumBad.errors.some(e=>e.error_type==='number_order'));
+assert.ok(P2BG1.checkTask('p2b-13-g3-two-books','екі кітап').result.correct);
+const g3QtyBad=P2BG1.checkTask('p2b-13-g3-two-books','екі кітаптар');
+assert.ok(g3QtyBad.errors.some(e=>e.error_type==='plural_after_numeral'));
+assert.ok(P2BG1.checkTask('p2b-21-g3-scientist','Мен ғалыммын').result.correct);
+assert.ok(P2BG1.checkTask('p2b-22-g3-we-friends','Біз доспыз').result.correct);
+assert.ok(P2BG1.checkTask('p2b-23-g3-he-guest-q','Ол қонақ па').result.correct);
+assert.equal(new Set(P2BG1.all().map(q=>q.id)).size,P2BG1.all().length);
+ok('Phase 2B G3: directed production uses only open lesson grammar and local checking');
+
+
+
+const g4All=P2BG1.allG4();
+assert.equal(g4All.length,6);
+assert.ok(g4All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G4'&&q.phase2b.recognition));
+assert.equal(P2BG1.cardsFor('2-1','G4').length,0);
+assert.equal(P2BG1.cardsFor('2-2','G4').length,0);
+assert.equal(P2BG1.cardsFor('2-3','G4').length,0);
+assert.ok(P2BG1.checkTask('p2b-12-g4-girls','девушки').result.correct);
+assert.ok(P2BG1.checkTask('p2b-12-g4-girls','девочки').result.correct);
+const g4LandBad=P2BG1.checkTask('p2b-12-g4-lands','земля');
+assert.ok(g4LandBad.errors.some(e=>e.error_type==='translation_variant'));
+assert.ok(P2BG1.checkTask('p2b-13-g4-45','45').result.correct);
+const g4NumBad=P2BG1.checkTask('p2b-13-g4-45','54');
+assert.ok(g4NumBad.errors.some(e=>e.error_type==='number_confusion'));
+ok('Phase 2B G4: KK→RU/number recognition uses explicit accepted variants');
+
+
+
+const g5All=P2BG1.allG5();
+assert.equal(g5All.length,4);
+assert.ok(g5All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G5'&&q.phase2b.transform));
+assert.equal(P2BG1.cardsFor('1-1','G5').length,0);
+assert.equal(P2BG1.cardsFor('1-2','G5').length,0);
+assert.equal(P2BG1.cardsFor('1-3','G5').length,0);
+assert.equal(P2BG1.cardsFor('2-3','G5').length,0);
+assert.ok(P2BG1.checkTask('p2b-21-g5-neg-qyz','Қыз емеспін').result.correct);
+const g5NegBad=P2BG1.checkTask('p2b-21-g5-neg-qyz','Қыз емесбін');
+assert.ok(g5NegBad.errors.some(e=>e.error_type==='emes_position'));
+assert.ok(P2BG1.checkTask('p2b-21-g5-question-doctor','Мен дәрігермін бе').result.correct);
+const g5QBad=P2BG1.checkTask('p2b-21-g5-question-doctor','Мен дәрігермін ба');
+assert.ok(g5QBad.errors.some(e=>e.error_type==='question_class'));
+assert.ok(P2BG1.checkTask('p2b-22-g5-neg-reader','Оқырман емессіңдер').result.correct);
+ok('Phase 2B G5: local transformations only where curriculum defines them');
+
+
+
+const g6All=P2BG1.allG6();
+assert.ok(g6All.length>=14);
+assert.ok(g6All.every(q=>q.kind==='fields'&&q.phase2b&&q.phase2b.genre==='G6'&&q.phase2b.rewrite));
+assert.ok(P2BG1.checkTask('p2b-11-g6-kitap-edge',['тап','твёрдый']).result.correct);
+assert.ok(P2BG1.checkTask('p2b-12-g6-kitaplar','кітаптар').result.correct);
+const g6Kitap=P2BG1.checkTask('p2b-12-g6-kitaplar','кітаплар');
+assert.ok(g6Kitap.errors.some(e=>e.error_type==='plural_initial_consonant'));
+assert.ok(P2BG1.checkTask('p2b-13-g6-eki-kitaptar','екі кітап').result.correct);
+const g6Qty=P2BG1.checkTask('p2b-13-g6-eki-kitaptar','екі кітаптар');
+assert.ok(g6Qty.errors.some(e=>e.error_type==='plural_after_numeral'));
+const g6Dos=P2BG1.checkTask('p2b-21-g6-dosmyn','досмын');
+assert.ok(g6Dos.errors.some(e=>e.error_type==='person_sg_initial'));
+const g6Missing=P2BG1.checkTask('p2b-21-g6-missing-person','Мен дәрігер');
+assert.ok(g6Missing.errors.some(e=>e.error_type==='person_marker_missing'));
+const g6Biz=P2BG1.checkTask('p2b-22-g6-adammiz','Біз адаммыз');
+assert.ok(g6Biz.errors.some(e=>e.error_type==='person_biz_initial'));
+const g6PluralPred=P2BG1.checkTask('p2b-22-g6-dostar','Сендер достарсыңдар');
+assert.ok(g6PluralPred.errors.some(e=>e.error_type==='plural_on_predicate'));
+const g6Ol=P2BG1.checkTask('p2b-23-g6-ol-mugalimmin','Ол мұғаліммін');
+assert.ok(g6Ol.errors.some(e=>e.error_type==='ol_suffix'));
+const g6Ba=P2BG1.checkTask('p2b-23-g6-konak-ba','Ол қонақ ба');
+assert.ok(g6Ba.errors.some(e=>e.error_type==='question_class'));
+const g6MissingQ=P2BG1.checkTask('p2b-23-g6-missing-question','Ол қонақ');
+assert.ok(g6MissingQ.errors.some(e=>e.error_type==='question_particle_missing'));
+assert.ok(/После П множественное начинается с Т/.test(P2BG1.byId('p2b-12-g6-kitaplar').explanation));
+assert.ok(/После числа екі/.test(P2BG1.byId('p2b-13-g6-eki-kitaptar').explanation));
+assert.ok(/После С/.test(P2BG1.byId('p2b-21-g6-dosmyn').explanation));
+ok('Phase 2B G6: rewrite errors name the exact wrong piece and mechanism');
+
+const p2b12Session=P2BG1.lessonSession('1-2');
+assert.ok(p2b12Session.length>0);
+assert.equal(p2b12Session[0].phase2b.genre,'G2');
+assert.ok(p2b12Session.findIndex(q=>q.phase2b.genre==='G3')<p2b12Session.findIndex(q=>q.phase2b.genre==='G4'));
+assert.ok(P2BG1.byId('p2b-22-g1-adj-aqyldy').ruleIds.includes('T8_ADJ_PRED'));
+assert.ok(!JSON.stringify(P2BG1.byId('p2b-22-g1-adj-aqyldy')).includes('сенің'));
+assert.ok(P2BG1.checkTask('p2b-23-g2-ordinal20','жиырмасыншы').result.correct);
+assert.ok(P2BG1.checkTask('p2b-13-g3-phone',['жеті жүз он бір','үш жүз сексен сегіз','нөл нөл','он бір']).result.correct);
+assert.ok(!P2BG1.cardsFor('2-1','G3').some(q=>(q.ruleIds||[]).includes('T10_QUESTION')));
+ok('Phase 2B lesson flow: ordered G1-G6, safe 2-2 adjective, 1-3 phone, 2-3 ordinal, no early T10');
+
+
+
+
+const PhraseBanks=require('./phrase-banks.js');
+const PhraseDrill=require('./phrase-drill.js');
+assert.equal(PhraseBanks.forLesson('1-2').length,11);
+assert.equal(PhraseBanks.forLesson('1-3').length,12);
+assert.equal(PhraseBanks.forLesson('1-1').length,0);
+assert.equal(PhraseBanks.forLesson('2-1').length,0);
+assert.equal(PhraseDrill.forLesson('1-2').length,22);
+assert.equal(PhraseDrill.forLesson('1-3').length,24);
+assert.equal(PhraseDrill.forLesson('3-1').length,0);
+const phraseAll=PhraseDrill.allQuestions();
+assert.ok(phraseAll.every(q=>/^phrase:(1-2|1-3):(ru-kk|kk-ru):\d{2}$/.test(q.id)));
+assert.ok(phraseAll.every(q=>q.kind==='phrase'&&q.source==='phrase'&&q.fields.length===1&&q.phase2b&&q.phase2b.phrase));
+assert.ok(phraseAll.every(q=>Array.isArray(q.vocabIds)&&q.vocabIds.length===0));
+assert.ok(phraseAll.every(q=>!q.allowed_lesson_ids.includes('3-1')));
+const deterministic=()=>0.37;
+const s12=PhraseDrill.session('1-2',{count:16,random:deterministic});
+assert.equal(s12.length,11);
+assert.equal(new Set(s12.map(q=>q.pair_key)).size,s12.length);
+assert.ok(Math.abs(s12.filter(q=>q.dir==='ru-kk').length-s12.filter(q=>q.dir==='kk-ru').length)<=1);
+const s13=PhraseDrill.session('1-3',{count:12,random:deterministic});
+assert.equal(s13.length,12);
+assert.equal(new Set(s13.map(q=>q.pair_key)).size,s13.length);
+assert.ok(Math.abs(s13.filter(q=>q.dir==='ru-kk').length-s13.filter(q=>q.dir==='kk-ru').length)<=1);
+assert.ok(s13.filter(q=>q.root_lesson!=='1-3').length/s13.length>=0.70);
+const weakProfile={PLURAL_AFTER_NUMBER:3,QUANTIFIER_NO_PLURAL:2};
+const s13Weak=PhraseDrill.session('1-3',{count:12,random:deterministic,error_profile:weakProfile});
+const targeted=s13Weak.filter(q=>q.phase2b&&q.phase2b.weakness_targeted);
+assert.ok(targeted.length>=2&&targeted.length<=4);
+assert.ok(targeted.every(q=>q.errorTargets.some(code=>weakProfile[code])));
+assert.ok(s13Weak.filter(q=>q.root_lesson!=='1-3').length/s13Weak.length>=0.70);
+assert.ok(core.evaluate(PhraseDrill.forLesson('1-3').find(q=>q.id==='phrase:1-3:ru-kk:01'),['бес кітап']).correct);
+assert.ok(!core.evaluate(PhraseDrill.forLesson('1-3').find(q=>q.id==='phrase:1-3:ru-kk:01'),['бес кітаптар']).correct);
+const livePhrase={questions:[],sources:{}};
+const phraseInstalled=PhraseDrill.install(livePhrase);
+assert.equal(phraseInstalled.length,PhraseDrill.allQuestions().length);
+assert.equal(PhraseDrill.install(livePhrase).length,0);
+assert.ok(livePhrase.questions.every(q=>q.source==='phrase'&&q.vocabIds.length===0));
+const htmlPhase2B=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
+const swPhase2B=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
+const appPhase2B=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(/phrase-banks\.js/.test(htmlPhase2B)&&/phrase-drill\.js/.test(htmlPhase2B));
+assert.ok(/phase2b-practice\.js/.test(swPhase2B)&&/phrase-banks\.js/.test(swPhase2B)&&/phrase-drill\.js/.test(swPhase2B));
+assert.ok(/PhraseDrill\.session/.test(appPhase2B));
+assert.ok(/\['phrase','Фразы','07'\]/.test(appPhase2B));
+assert.ok(/q\.phase2b&&q\.phase2b\.phrase\?\[\]:words\.filter/.test(fs.readFileSync(path.join(__dirname,'curriculum.js'),'utf8')));
+ok('Phase 2B P1a Phrase Drill: 1-2/1-3 only, no mirrors, balanced directions, >=70% earlier roots, no word-FSRS binding');
+
+assert.deepEqual(P2BG1.homeworkIdsFor('1-1'),['p2b-11-g1-edge-kitap','p2b-11-g6-kitap-edge']);
+for(const id of ['1-2','1-3','2-1','2-2','2-3'])assert.equal(P2BG1.homeworkIdsFor(id).length,3);
+const phaseHwQuestions=P2BG1.all();
+const phaseHw12=hw.buildPack('1-2',phaseHwQuestions,{sources:{}});
+assert.ok(phaseHw12.homework.exercise_ids.includes('p2b-12-g2-kitap'));
+assert.ok(phaseHw12.homework.exercise_ids.includes('p2b-12-g6-kitaplar'));
+assert.equal(phaseHw12.homework.rule_map['p2b-12-g6-kitaplar'],'T2_PLURAL_LDT');
+assert.ok(hw.ruleText(P2BG1.byId('p2b-12-g6-kitaplar')).length>20);
+const phaseHw13=hw.buildPack('1-3',phaseHwQuestions,{sources:{}});
+assert.equal(phaseHw13.homework.rule_map['p2b-13-g6-eki-kitaptar'],'T4_NO_PLURAL_AFTER_NUMBER');
+const phaseHw22=hw.buildPack('2-2',phaseHwQuestions,{sources:{}});
+assert.equal(phaseHw22.homework.rule_map['p2b-22-g5-neg-reader'],'T7_EMES');
+const phaseHw23=hw.buildPack('2-3',phaseHwQuestions,{sources:{}});
+assert.equal(phaseHw23.homework.rule_map['p2b-23-g3-he-guest-q'],'T10_QUESTION');
+assert.ok(!phaseHwQuestions.some(q=>q.lessonId==='3-1'));
+ok('Phase 2B Homework: compact G1-G6 set reuses canonical rule IDs and ExplainBank');
+
+const flowSrc=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(/mode==='course'&&courseBlock/.test(flowSrc));
+assert.ok(/id="course-to-homework"/.test(flowSrc));
+assert.ok(/data-hw-review/.test(flowSrc));
+assert.ok(/mode==='course'&&courseBlock===block&&queue\.length>0&&position<queue\.length/.test(flowSrc));
+assert.ok(/'course','phrase'/.test(flowSrc));
+assert.ok(/hwLesson,hwPart,hwSection/.test(flowSrc));
+assert.ok(/\['practice','homework','learn','path','review'\]/.test(flowSrc));
+ok('Phase 2B flow: Learn → Path → Practice → Homework → Review is explicit and resumable');
+
+assert.match(G1Diag.line('plural_initial_consonant','кітаптар','кітаплар',P2BG1.byId('p2b-12-g6-kitaplar')),/Ты выбрала -лар\. После П множественное начинается с Т, поэтому кітаптар/);
+assert.match(G1Diag.line('plural_after_numeral','екі кітап','екі кітаптар',P2BG1.byId('p2b-13-g6-eki-kitaptar')),/После числа екі.*екі кітап, не екі кітаптар/);
+assert.match(G1Diag.line('person_sg_form','доспын','досмын',P2BG1.byId('p2b-21-g6-dosmyn')),/Ты выбрала -мын\. После С.*П.*доспын/);
+assert.match(G1Diag.line('person_marker_missing','Мен дәрігермін','Мен дәрігер',P2BG1.byId('p2b-21-g6-missing-person')),/Не хватает личного окончания.*мін.*Мен дәрігермін/);
+assert.match(G1Diag.line('question_class','Ол қонақ па','Ол қонақ ба',P2BG1.byId('p2b-23-g6-konak-ba')),/Ты выбрала ба\. После Қ.*П.*па, не ба/);
+assert.match(G1Diag.line('question_particle_missing','Ол қонақ па','Ол қонақ',P2BG1.byId('p2b-23-g6-missing-question')),/Не хватает отдельной вопросительной частицы.*Ол қонақ па/);
+assert.ok(/line\(e\.error_type,e\.expected_answer,e\.actual_answer,q\)/.test(flowSrc));
+ok('Phase 2B diagnostics: learner feedback names the wrong piece, mechanism, and corrected form');
+
+const PhraseDrillGuard=require('./phrase-drill.js');
+const phraseExamProbe=PhraseDrillGuard.forLesson('1-2')[0];
+assert.ok(phraseExamProbe&&phraseExamProbe.source==='phrase'&&phraseExamProbe.kind==='phrase');
+assert.equal(Gate.examEligible(phraseExamProbe),false);
+ok('Phase 2B Phrase guard: practice-only phrase items never enter Exam');
+
+
+const appPhraseProfile=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok((appPhraseProfile.match(/PhraseDrill\.session\([^;]+error_profile:\(window\.AiTutor\?\.topWeak\?\.\(4\)\|\|\[\]\)/g)||[]).length>=2);
+ok('Phase 2B P1b: live Phrase sessions use existing AiTutor weakness profile without a second store');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
