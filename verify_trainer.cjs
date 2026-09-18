@@ -1228,6 +1228,16 @@ assert.equal(phaseHw23.homework.rule_map['p2b-23-g3-he-guest-q'],'T10_QUESTION')
 assert.ok(!phaseHwQuestions.some(q=>q.lessonId==='3-1'));
 ok('Phase 2B Homework: compact G1-G6 set reuses canonical rule IDs and ExplainBank');
 
+const flowSrc=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(/mode==='course'&&courseBlock/.test(flowSrc));
+assert.ok(/id="course-to-homework"/.test(flowSrc));
+assert.ok(/data-hw-review/.test(flowSrc));
+assert.ok(/mode==='course'&&courseBlock===block&&queue\.length>0&&position<queue\.length/.test(flowSrc));
+assert.ok(/'course','phrase'/.test(flowSrc));
+assert.ok(/hwLesson,hwPart,hwSection/.test(flowSrc));
+assert.ok(/\['practice','homework','learn','path','review'\]/.test(flowSrc));
+ok('Phase 2B flow: Learn → Path → Practice → Homework → Review is explicit and resumable');
+
 const PhraseDrillGuard=require('./phrase-drill.js');
 const phraseExamProbe=PhraseDrillGuard.forLesson('1-2')[0];
 assert.ok(phraseExamProbe&&phraseExamProbe.source==='phrase'&&phraseExamProbe.kind==='phrase');
