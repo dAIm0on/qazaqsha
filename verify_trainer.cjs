@@ -374,20 +374,18 @@ assert.ok(ch11ru.beats.some(b=>b.k==='sound'&&b.letter==='Ө'&&/не русск�
 assert.ok(!/произнес(ено|ла) правильно/i.test(blob11));
 assert.ok(!/падеж|посессив|губн(ая|ой) гармо/i.test(blob11));
 assert.equal(ch11ru.id,'1-1-ru');
-assert.ok(/path-ask/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
-ok('Path v5 1-1-ru: қол/көл, орман/арман, sound anchors, no pronunciation scoring, chapter id kept');
+const pathAppSrc=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+const pathTutorSrc=fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8');
+assert.ok(!/function attachPathAsk|function pathAskChips|id=["'\`]path-ask["'\`]|path-ask-panel|data-path-kind/.test(pathAppSrc));
+assert.ok(/id=["'\`]path-ask-tutor["'\`]/.test(pathAppSrc));
+ok('Path v5 1-1-ru: қол/көл, орман/арман, sound anchors, single TutorUI, chapter id kept');
 
-const pathAskSrc=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
-assert.ok(/function pathLocalText\(chapter,kind,cur\)/.test(pathAskSrc));
-assert.ok(/Это пересказ этого шага/.test(pathAskSrc));
-assert.ok(/Не разобрала этот вопрос\. Смотри текст шага выше/.test(pathAskSrc));
-assert.ok(/allowedRuleIds\(\[les\.id\]\)/.test(pathAskSrc));
-assert.ok(!/resp&&resp\.ok===false\)\{failAsk/.test(pathAskSrc));
-assert.ok(/title:'Глава: '\+ch\.title/.test(pathAskSrc));
-assert.ok(/callTutor\(req,25000/.test(pathAskSrc));
-assert.ok(/askTutor\(dummy,q/.test(pathAskSrc));
-assert.ok(!/isLiveMessage\(msg\)/.test(pathAskSrc));
-assert.ok(/rules-ask-send/.test(pathAskSrc));
+assert.ok(/function contextPrompts/.test(pathTutorSrc));
+assert.ok(/conversation_tail:tail\.slice\(\)/.test(pathTutorSrc));
+assert.ok(/callTutor\(req,25000/.test(pathTutorSrc));
+assert.ok(/две книги/.test(pathTutorSrc)&&/кто есть/.test(pathTutorSrc));
+assert.ok(!/рычаг|бирк|алломорф|слот/i.test(pathTutorSrc));
+assert.ok(/rules-ask-send/.test(pathAppSrc));
 const Tutor=require('./ai-tutor.js');
 assert.ok(Tutor.isLiveMessage('В қол последний слог ол — твёрдый ряд, в көл — өл.'));
 assert.ok(!Tutor.isLiveMessage('Разбор по правилу урока сейчас короткий. Можно продолжить упражнение.'));
@@ -395,7 +393,7 @@ assert.ok(!Tutor.isLiveMessage('Правило уже на карточке. М�
 const chSoft=GP.chapter('1-1','1-1-ru');
 assert.ok(chSoft.beats[0].k==='goal');
 assert.ok(chSoft.beats.some(b=>b.k==='sound'&&b.letter==='Ә'));
-ok('Path Не поняла: local text is this beat; fail line honest; dummy has no рычаг_A');
+ok('Path TutorUI: chapter context preserved; legacy duplicate help removed');
 
 const ch11mix=GP.chapter('1-1','1-1-mix');
 assert.ok(/мұғалім/.test(JSON.stringify(ch11mix))&&/мұхит/.test(JSON.stringify(ch11mix))&&/заңгер/.test(JSON.stringify(ch11mix)));
@@ -435,10 +433,12 @@ assert.ok(GP.productionAsks(GP.chapter('2-1','2-1-emes')).length>=2);
 ok('Path v5 every chapter has goal; productive 1-2/1-3/2-1 have typed checks');
 
 const appPath=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
-assert.ok(/pathAskChips/.test(appPath));
-assert.ok(/lesson_id:les\.id/.test(appPath));
-assert.ok(/адамлар/.test(appPath)&&/емес/.test(appPath));
-ok('Path AI chips depend on chapter type, not only 1-1 soft-consonant prompt');
+const tutorPath=fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8');
+assert.ok(!/pathAskChips|attachPathAsk|path-ask-panel/.test(appPath));
+assert.ok(/contextPrompts/.test(tutorPath));
+assert.ok(/адамлар/.test(tutorPath)&&/емес/.test(tutorPath)&&/екі кітап/.test(tutorPath));
+assert.ok(/chapter_id/.test(tutorPath)&&/lesson_id:ctx\.lesson_id/.test(tutorPath));
+ok('Path TutorUI prompts depend on lesson/chapter with one help surface');
 
 const AiR2=require('./ai-rules.js');
 assert.ok(AiR2.cardsFor({ruleIds:['рычаг_A']},null).some(c=>c.rule_id==='T1_HARMONY'));
