@@ -190,7 +190,7 @@
      const phraseCut=block==='1-2'?2:block==='1-3'?3:null;
      if(phraseCut!=null&&window.PhraseDrill){
        const seenIds=Object.keys(records).filter(id=>records[id]&&records[id].seen);
-       const phrases=window.PhraseDrill.session(block,{count:block==='1-2'?16:12,seen_ids:seenIds});
+       const phrases=window.PhraseDrill.session(block,{count:block==='1-2'?16:12,seen_ids:seenIds,error_profile:(window.AiTutor?.topWeak?.(4)||[])});
        const before=ordered.filter(q=>Number(q.phase2b&&q.phase2b.lesson_order||99)<=phraseCut);
        const after=ordered.filter(q=>Number(q.phase2b&&q.phase2b.lesson_order||99)>phraseCut);
        ordered=[...before,...phrases,...after];
@@ -210,7 +210,7 @@
    if(topic==='phrase'&&courseBlock&&window.PhraseDrill&&mode!=='exam'){
      mode='phrase';
      const seenIds=Object.keys(records).filter(id=>records[id]&&records[id].seen);
-     const list=window.PhraseDrill.session(courseBlock,{count:courseBlock==='1-2'?16:12,seen_ids:seenIds});
+     const list=window.PhraseDrill.session(courseBlock,{count:courseBlock==='1-2'?16:12,seen_ids:seenIds,error_profile:(window.AiTutor?.topWeak?.(4)||[])});
      queue=list.map(q=>q.id).filter(id=>byId.has(id));practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);resetCounts();render();return;
    }
    let list=subset();
