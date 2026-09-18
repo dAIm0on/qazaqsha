@@ -54,16 +54,16 @@
   const isWeak=p=>(p.error_targets||[]).some(x=>weak.has(x))||weak.has(p.error_type);
   const unseenFirst=list=>list.slice().sort((a,b)=>Number(bothUnseen(b))-Number(bothUnseen(a)));
   function bothUnseen(p){return !seen.has(variant(p,'ru-kk').id)&&!seen.has(variant(p,'kk-ru').id);}
-  const picked=[];
+  const picked=[],targetedPairs=new Set();
   const weakEarly=unseenFirst(pairs.filter(p=>isWeak(p)&&p.root_lesson!==lessonId));
   const weakCurrent=unseenFirst(pairs.filter(p=>isWeak(p)&&p.root_lesson===lessonId));
   const weakCap=Math.min(4,count);
-  for(const p of weakEarly){if(picked.length>=weakCap)break;picked.push(p);}
+  for(const p of weakEarly){if(picked.length>=weakCap)break;picked.push(p);targetedPairs.add(p.pair_key);}
   const currentWeakCap=Math.max(0,count-minEarlier);
   let currentWeak=0;
   for(const p of weakCurrent){
    if(picked.length>=weakCap||currentWeak>=currentWeakCap)break;
-   if(!picked.some(x=>x.pair_key===p.pair_key)){picked.push(p);currentWeak++;}
+   if(!picked.some(x=>x.pair_key===p.pair_key)){picked.push(p);targetedPairs.add(p.pair_key);currentWeak++;}
   }
   const earlier=unseenFirst(pairs.filter(p=>p.root_lesson!==lessonId));
   while(picked.filter(p=>p.root_lesson!==lessonId).length<Math.min(minEarlier,count)){
@@ -81,7 +81,7 @@
     if((altRu&&ruUsed<ruTarget)||(!altRu&&kkUsed<selected.length-ruTarget))dir=alt.dir;
    }
    if(dir==='ru-kk')ruUsed++;else kkUsed++;
-   return variant(p,dir);
+   const q=variant(p,dir);q.phase2b.weakness_targeted=targetedPairs.has(p.pair_key);return q;
   });
  }
  function install(course){
