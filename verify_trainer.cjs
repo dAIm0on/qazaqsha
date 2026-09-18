@@ -1232,9 +1232,9 @@ assert.ok(Lesson31A.check('p3-31-d-g2-kolik','көлігіңіз').result.correc
 const d31Missing=Lesson31A.check('p3-31-d-g2-ata','ата');
 assert.ok(d31Missing.errors.some(e=>e.error_type==='poss_suffix_missing'));
 assert.match(Diag.line('poss_suffix_missing','Сіздің атаңыз','Сіздің ата',Lesson31A.byId('p3-31-d-g2-ata')),/Для сіздің нужна притяжательная наклейка/i);
-const d31Assim=Lesson31A.check('p3-31-d-g2-kolik','көлікiңіз');
+const d31Assim=Lesson31A.check('p3-31-d-g2-kolik','көлікіңіз');
 assert.ok(d31Assim.errors.some(e=>e.error_type==='poss_assim_voice'));
-assert.match(Diag.line('poss_assim_voice','Сіздің көлігіңіз','Сіздің көлікiңіз',Lesson31A.byId('p3-31-d-g2-kolik')),/К.*Г.*көлігіңіз/i);
+assert.match(Diag.line('poss_assim_voice','Сіздің көлігіңіз','Сіздің көлікіңіз',Lesson31A.byId('p3-31-d-g2-kolik')),/К.*Г.*көлігіңіз/i);
 assert.ok(!/біздің|олардың/u.test(JSON.stringify(Lesson31A.all())));
 assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 ok('Phase 3 Session D: structured сіздің T20/T21 only, free Phrase Drill and later persons still locked');
