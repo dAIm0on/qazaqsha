@@ -49,6 +49,15 @@
    phase2b:{genre:'G5',transform:true,lesson_order:order,error_type:error_type||''}
   };
  }
+ function rewrite({id,lesson,order,topic,stimulus,answers,fields,rule,error_type,explanation,label='Исправленная форма'}){
+  return {
+   id,source:'p2b',group:'G6',part:String(order),lessonId:lesson,topic,kind:'fields',
+   title:'Найди ошибку и перепиши',stimulus,
+   fields:fields?fields.map(x=>field(x.answers,x.label||'Ответ',x.kind||'text')):[field(answers,label)],
+   explanation,ruleIds:Array.isArray(rule)?rule:[rule],
+   phase2b:{genre:'G6',rewrite:true,lesson_order:order,error_type:error_type||''}
+  };
+ }
  const G1={
   '1-1':[
    cell({id:'p2b-11-g1-class-ae',lesson:'1-1',order:1,topic:'sounds',title:'Одна клетка: какой ряд?',stimulus:'Ә',answers:['мягкий'],rule:'T1_HARMONY',error_type:'harmony_class',explanation:'Ә относится к мягкому ряду.'}),
@@ -158,10 +167,38 @@
   ],
   '2-3':[]
  };
+ const G6={
+  '1-1':[
+   rewrite({id:'p2b-11-g6-kitap-edge',lesson:'1-1',order:5,topic:'sounds',stimulus:'«кітап — мягкое, потому что кі»',fields:[{label:'Какой слог решает?',answers:['тап']},{label:'Какой ряд?',answers:['твёрдый','твердый']}],rule:'T1_HARMONY',error_type:'harmony_wrong_edge',explanation:'Ошибка в выборе края: ты посмотрела на начало. Для окончания решает тап, поэтому ряд твёрдый.'})
+  ],
+  '1-2':[
+   rewrite({id:'p2b-12-g6-kitaplar',lesson:'1-2',order:5,topic:'plural',stimulus:'кітаплар',answers:['кітаптар'],rule:'T2_PLURAL_LDT',error_type:'plural_form',explanation:'Ты выбрала -лар. После П множественное начинается с Т, поэтому кітаптар.'}),
+   rewrite({id:'p2b-12-g6-adamlar',lesson:'1-2',order:5,topic:'plural',stimulus:'адамлар',answers:['адамдар'],rule:'T2_PLURAL_LDT',error_type:'plural_form',explanation:'После М множественное начинается с Д: адамдар.'}),
+   rewrite({id:'p2b-12-g6-zherder',lesson:'1-2',order:5,topic:'plural',stimulus:'жердер',answers:['жерлер'],rule:'T2_PLURAL_LDT',error_type:'plural_form',explanation:'После Р множественное начинается с Л; мягкий ряд даёт Е: жерлер.'})
+  ],
+  '1-3':[
+   rewrite({id:'p2b-13-g6-kop-adamdar',lesson:'1-3',order:5,topic:'plural',stimulus:'көп адамдар',answers:['көп адам'],rule:'T4_NO_PLURAL_AFTER_NUMBER',error_type:'plural_after_numeral',explanation:'После көп отдельное множественное окончание не нужно: көп адам.'}),
+   rewrite({id:'p2b-13-g6-eki-kitaptar',lesson:'1-3',order:5,topic:'plural',stimulus:'екі кітаптар',answers:['екі кітап'],rule:'T4_NO_PLURAL_AFTER_NUMBER',error_type:'plural_after_numeral',explanation:'После числа екі множественное окончание не ставится: екі кітап.'})
+  ],
+  '2-1':[
+   rewrite({id:'p2b-21-g6-dosmyn',lesson:'2-1',order:6,topic:'person',stimulus:'досмын',answers:['доспын'],rule:'T6_PERSON_SG',error_type:'person_sg_initial',explanation:'Ты выбрала М. После С форма для мен начинается с П: доспын.'}),
+   rewrite({id:'p2b-21-g6-missing-person',lesson:'2-1',order:6,topic:'person',stimulus:'Мен дәрігер',answers:['Мен дәрігермін','Мен дәрігермін.'],rule:'T6_PERSON_SG',error_type:'person_marker_missing',explanation:'В этой фразе не хватает личного окончания: Мен дәрігермін.'}),
+   rewrite({id:'p2b-21-g6-emesbin',lesson:'2-1',order:6,topic:'person',stimulus:'қыз емесбін',answers:['қыз емеспін'],rule:'T7_EMES',error_type:'person_sg_initial',explanation:'Смотри на край емес: он заканчивается на С, поэтому ПІН → қыз емеспін.'})
+  ],
+  '2-2':[
+   rewrite({id:'p2b-22-g6-adammiz',lesson:'2-2',order:6,topic:'person',stimulus:'Біз адаммыз',answers:['Біз адамбыз','Біз адамбыз.'],rule:'T8_PERSON_PL',error_type:'person_biz_initial',explanation:'После М в форме біз начало Б: адамбыз.'}),
+   rewrite({id:'p2b-22-g6-dostar',lesson:'2-2',order:6,topic:'person',stimulus:'Сендер достарсыңдар',answers:['Сендер доссыңдар','Сендер доссыңдар.'],rule:'T8_PERSON_PL',error_type:'plural_on_predicate',explanation:'Лишнее -тар: сендер уже показывает, что людей несколько. Нужно: Сендер доссыңдар.'})
+  ],
+  '2-3':[
+   rewrite({id:'p2b-23-g6-ol-mugalimmin',lesson:'2-3',order:5,topic:'person',stimulus:'Ол мұғаліммін',answers:['Ол мұғалім','Ол мұғалім.'],rule:'T9_OL',error_type:'ol_suffix',explanation:'Лишнее -мін: у ол личного окончания нет. Нужно: Ол мұғалім.'}),
+   rewrite({id:'p2b-23-g6-konak-ba',lesson:'2-3',order:5,topic:'person',stimulus:'Ол қонақ ба?',answers:['Ол қонақ па?','Ол қонақ па'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Қонақ заканчивается на Қ, поэтому вопросительная частица начинается с П: қонақ па?'}),
+   rewrite({id:'p2b-23-g6-missing-question',lesson:'2-3',order:5,topic:'person',stimulus:'Ол қонақ?',answers:['Ол қонақ па?','Ол қонақ па'],rule:'T10_QUESTION',error_type:'question_particle_missing',explanation:'Для закрытого вопроса здесь нужна отдельная частица: Ол қонақ па?'})
+  ]
+ };
 
  function clone(q){return JSON.parse(JSON.stringify(q));}
  function cardsFor(lessonId,genre='G1'){
-  const bank=genre==='G1'?G1:genre==='G2'?G2:genre==='G3'?G3:genre==='G4'?G4:genre==='G5'?G5:null;
+  const bank=genre==='G1'?G1:genre==='G2'?G2:genre==='G3'?G3:genre==='G4'?G4:genre==='G5'?G5:genre==='G6'?G6:null;
   return bank?(bank[lessonId]||[]).map(clone):[];
  }
  function allG1(){return Object.keys(G1).flatMap(id=>cardsFor(id,'G1'));}
@@ -169,12 +206,13 @@
  function allG3(){return Object.keys(G3).flatMap(id=>cardsFor(id,'G3'));}
  function allG4(){return Object.keys(G4).flatMap(id=>cardsFor(id,'G4'));}
  function allG5(){return Object.keys(G5).flatMap(id=>cardsFor(id,'G5'));}
- function all(){return [...allG1(),...allG2(),...allG3(),...allG4(),...allG5()];}
+ function allG6(){return Object.keys(G6).flatMap(id=>cardsFor(id,'G6'));}
+ function all(){return [...allG1(),...allG2(),...allG3(),...allG4(),...allG5(),...allG6()];}
  function byId(id){return all().find(q=>q.id===id)||null;}
  function checkCell(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
   if(!q||!core||!core.evaluate)throw new Error('Phase 2B card/core unavailable');
-  const answers=[String(answer??'')];
+  const answers=Array.isArray(answer)?answer.map(x=>String(x??'')):[String(answer??'')];
   const result=core.evaluate(q,answers);
   const errors=result.correct||!diagnostics||!diagnostics.diagnose?[]:diagnostics.diagnose(q,answers,result,Date.now());
   return {question:q,result,errors};
@@ -188,6 +226,6 @@
   }
   return added;
  }
- const api={G1,G2,G3,G4,G5,cardsFor,allG1,allG2,allG3,allG4,allG5,all,byId,checkCell,checkTask:checkCell,install};
+ const api={G1,G2,G3,G4,G5,G6,cardsFor,allG1,allG2,allG3,allG4,allG5,allG6,all,byId,checkCell,checkTask:checkCell,install};
  if(node)module.exports=api;else root.Phase2BPractice=api;
 })(typeof window!=='undefined'?window:globalThis);

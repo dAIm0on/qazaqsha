@@ -1120,4 +1120,35 @@ assert.ok(P2BG1.checkTask('p2b-22-g5-neg-reader','Оқырман емессің�
 ok('Phase 2B G5: local transformations only where curriculum defines them');
 
 
+
+const g6All=P2BG1.allG6();
+assert.ok(g6All.length>=14);
+assert.ok(g6All.every(q=>q.kind==='fields'&&q.phase2b&&q.phase2b.genre==='G6'&&q.phase2b.rewrite));
+assert.ok(P2BG1.checkTask('p2b-11-g6-kitap-edge',['тап','твёрдый']).result.correct);
+assert.ok(P2BG1.checkTask('p2b-12-g6-kitaplar','кітаптар').result.correct);
+const g6Kitap=P2BG1.checkTask('p2b-12-g6-kitaplar','кітаплар');
+assert.ok(g6Kitap.errors.some(e=>e.error_type==='plural_initial_consonant'));
+assert.ok(P2BG1.checkTask('p2b-13-g6-eki-kitaptar','екі кітап').result.correct);
+const g6Qty=P2BG1.checkTask('p2b-13-g6-eki-kitaptar','екі кітаптар');
+assert.ok(g6Qty.errors.some(e=>e.error_type==='plural_after_numeral'));
+const g6Dos=P2BG1.checkTask('p2b-21-g6-dosmyn','досмын');
+assert.ok(g6Dos.errors.some(e=>e.error_type==='person_sg_initial'));
+const g6Missing=P2BG1.checkTask('p2b-21-g6-missing-person','Мен дәрігер');
+assert.ok(g6Missing.errors.some(e=>e.error_type==='person_marker_missing'));
+const g6Biz=P2BG1.checkTask('p2b-22-g6-adammiz','Біз адаммыз');
+assert.ok(g6Biz.errors.some(e=>e.error_type==='person_biz_initial'));
+const g6PluralPred=P2BG1.checkTask('p2b-22-g6-dostar','Сендер достарсыңдар');
+assert.ok(g6PluralPred.errors.some(e=>e.error_type==='plural_on_predicate'));
+const g6Ol=P2BG1.checkTask('p2b-23-g6-ol-mugalimmin','Ол мұғаліммін');
+assert.ok(g6Ol.errors.some(e=>e.error_type==='ol_suffix'));
+const g6Ba=P2BG1.checkTask('p2b-23-g6-konak-ba','Ол қонақ ба');
+assert.ok(g6Ba.errors.some(e=>e.error_type==='question_class'));
+const g6MissingQ=P2BG1.checkTask('p2b-23-g6-missing-question','Ол қонақ');
+assert.ok(g6MissingQ.errors.some(e=>e.error_type==='question_particle_missing'));
+assert.ok(/После П множественное начинается с Т/.test(P2BG1.byId('p2b-12-g6-kitaplar').explanation));
+assert.ok(/После числа екі/.test(P2BG1.byId('p2b-13-g6-eki-kitaptar').explanation));
+assert.ok(/После С/.test(P2BG1.byId('p2b-21-g6-dosmyn').explanation));
+ok('Phase 2B G6: rewrite errors name the exact wrong piece and mechanism');
+
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
