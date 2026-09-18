@@ -215,19 +215,24 @@ function clipTail(tail){
   }
   return out;
 }
-function clipRuleContext(arr){
-  return (Array.isArray(arr)?arr:[]).slice(0,4).map(c=>{
-    if(!c||typeof c!=='object')return {rule_id:'',title_ru:'',medium:'',ru_refresh:''};
+function clipRuleContext(arr,allowRules){
+  const allow=allowRules instanceof Set?allowRules:new Set(allowRules||[]);
+  const out=[];
+  for(const c of (Array.isArray(arr)?arr:[]).slice(0,4)){
+    if(!c||typeof c!=='object')continue;
+    const id=clip(c.rule_id,40).trim();
+    if(!id||!allow.has(id))continue;
     const medium=clip(c.medium||c.explanation_ru,700);
-    return {
-      rule_id:clip(c.rule_id,40),title_ru:clip(c.title_ru,120),
+    out.push({
+      rule_id:id,title_ru:clip(c.title_ru,120),
       ru_refresh:clip(c.ru_refresh,400),short:clip(c.short||c.title_ru,160),
       medium,explanation_ru:clip(c.explanation_ru||c.medium,700),
       examples_correct:asArr(c.examples_correct).slice(0,4),
       examples_wrong:asArr(c.examples_wrong).slice(0,4),
       traps:asArr(c.traps).slice(0,4)
-    };
-  });
+    });
+  }
+  return out;
 }
 function userPayload(req){
   const ctx=(req.rule_context||[]).map(c=>({
@@ -264,11 +269,16 @@ async function runModel(env,model,messages,maxTokens,timeoutMs){
   ]);
   return normalizeModelText(out);
 }
+function buildTutorMessages(req){
+  const messages=[{role:'system',content:SYSTEM}];
+  for(const m of req.conversation_tail||[])messages.push({role:m.role,content:m.content});
+  messages.push({role:'user',content:userPayload(req)});
+  return messages;
+}
 async function runTutorModel(req,env,rid){
   const started=Date.now();
   const maxTok=req.mode==='ask_tutor'?ASK_OUT:MAX_OUT;
-  const messages=[{role:'system',content:SYSTEM},{role:'user',content:userPayload(req)}];
-  for(const m of req.conversation_tail||[])messages.push({role:m.role,content:m.content});
+  const messages=buildTutorMessages(req);
   const tryOne=async(model,timeout,source)=>{
     const t0=Date.now();
     try{
@@ -335,7 +345,7 @@ function parseBody(raw){
     allowed_lesson_ids:resolved.allowed_lesson_ids,
     candidate_error_codes:asArr(raw&&raw.candidate_error_codes).slice(0,8),
     recent_error_summary:raw&&raw.recent_error_summary&&typeof raw.recent_error_summary==='object'?raw.recent_error_summary:{},
-    rule_context:clipRuleContext(raw&&raw.rule_context),
+    rule_context:clipRuleContext(raw&&raw.rule_context,allowRules),
     user_question:clip(raw&&raw.user_question,400),
     conversation_tail:clipTail(raw&&raw.conversation_tail)
   };
@@ -377,4 +387,4 @@ function json(body,status=200){
   return new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
 }
 
-export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble};
+export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,clipRuleContext,buildTutorMessages,userPayload};

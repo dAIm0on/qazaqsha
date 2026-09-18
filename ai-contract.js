@@ -62,12 +62,16 @@
   }
   return out;
  }
- function clipRuleContext(arr){
-  return (Array.isArray(arr)?arr:[]).slice(0,4).map(c=>{
-   if(!c||typeof c!=='object')return {rule_id:'',title_ru:'',ru_refresh:'',short:'',medium:'',explanation_ru:'',examples_correct:[],examples_wrong:[],traps:[]};
+ function clipRuleContext(arr,allowRules){
+  const allow=allowRules instanceof Set?allowRules:new Set(allowRules||[]);
+  const out=[];
+  for(const c of (Array.isArray(arr)?arr:[]).slice(0,4)){
+   if(!c||typeof c!=='object')continue;
+   const id=clip(c.rule_id,40).trim();
+   if(!id||(allow.size&&!allow.has(id)))continue;
    const medium=clip(c.medium||c.explanation_ru,700);
-   return {
-    rule_id:clip(c.rule_id,40),
+   out.push({
+    rule_id:id,
     title_ru:clip(c.title_ru,120),
     ru_refresh:clip(c.ru_refresh,400),
     short:clip(c.short||c.title_ru,160),
@@ -76,8 +80,9 @@
     examples_correct:asArr(c.examples_correct).slice(0,4),
     examples_wrong:asArr(c.examples_wrong).slice(0,4),
     traps:asArr(c.traps).slice(0,4)
-   };
-  });
+   });
+  }
+  return out;
  }
  function extractJson(text){
   let t=String(text||'').replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
@@ -264,7 +269,7 @@
     allowed_lesson_ids:resolved.allowed_lesson_ids,
     candidate_error_codes:asArr(raw.candidate_error_codes).filter(c=>ERROR_CODES.includes(c)).slice(0,8),
     recent_error_summary:raw.recent_error_summary&&typeof raw.recent_error_summary==='object'?raw.recent_error_summary:{},
-    rule_context:clipRuleContext(raw.rule_context),
+    rule_context:clipRuleContext(raw.rule_context,allowRules),
     user_question:clip(raw.user_question,400),
     conversation_tail:clipTail(raw.conversation_tail)
   }};

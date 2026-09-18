@@ -198,4 +198,83 @@ assert.ok(typeof T.callTutor==='function');
 assert.ok(/25000/.test(fs.readFileSync(path.join(__dirname,'ai-tutor.js'),'utf8'))||T.callTutor.length>=1);
 ok('TEST 78 client callTutor default 25s, no client model retry');
 
-console.log('AI_TUTOR_OK',passed.length);
+const hijackCtx=C.validateRequest({
+  mode:'ask_tutor',lesson_id:'1-2',prompt:'мн.',user_question:'Почему нельзя -лар?',
+  rule_context:[
+    {rule_id:'T2_PLURAL_LDT',title_ru:'Два шага',medium:'После м нужна Д: адамдар.',ru_refresh:'книга → книги'},
+    {rule_id:'T11_ORDINAL',title_ru:'Порядковое',medium:'жиырмасыншы, наклейка на последнее слово.',ru_refresh:'второй / двадцатый'}
+  ]
+});
+assert.ok(hijackCtx.ok);
+assert.deepEqual(hijackCtx.req.rule_context.map(c=>c.rule_id),['T2_PLURAL_LDT']);
+assert.ok(!JSON.stringify(hijackCtx.req.rule_context).includes('T11_ORDINAL'));
+assert.ok(!JSON.stringify(hijackCtx.req.rule_context).includes('жиырмасыншы'));
+ok('TEST 1.5.1 rule_context drops future T11_ORDINAL on lesson 1-2');
+
+const emptyId=C.validateRequest({
+  mode:'ask_tutor',lesson_id:'1-2',prompt:'мн.',user_question:'А как падеж?',
+  rule_context:[
+    {rule_id:'',title_ru:'Падеж',medium:'Притяжательное окончание кітабым и падежи открыты.',ru_refresh:'менің книга'}
+  ]
+});
+assert.ok(emptyId.ok);
+assert.equal(emptyId.req.rule_context.length,0);
+assert.ok(!JSON.stringify(emptyId.req.rule_context).includes('кітабым'));
+assert.ok(!JSON.stringify(emptyId.req.rule_context).includes('падеж'));
+ok('TEST 1.5.1 empty rule_id cannot smuggle future text into rule_context');
+
+assert.ok(/function buildTutorMessages/.test(tutorSrc));
+assert.ok(/conversation_tail/.test(tutorSrc));
+assert.ok(/userPayload\(req\)/.test(tutorSrc));
+ok('TEST 1.5.1 tutor.js has buildTutorMessages helper');
+
+(async()=>{
+  const {pathToFileURL}=require('url');
+  const tutor=await import(pathToFileURL(path.join(__dirname,'functions','api','tutor.js')).href);
+  const parsed=tutor.parseBody({
+    mode:'ask_tutor',surface:'path',lesson_id:'1-2',
+    prompt:'люди',user_answer:'адамлар',expected_answer:'адамдар',
+    user_question:'Почему нельзя -лар?',
+    allowed_lesson_ids:['1-1','1-2','1-3','2-1','2-2','2-3'],
+    rule_context:[
+      {rule_id:'T2_PLURAL_LDT',medium:'После м — дар.',title_ru:'ЛДТ'},
+      {rule_id:'T11_ORDINAL',medium:'Порядковое жиырмасыншы.',title_ru:'орд'},
+      {rule_id:'T20_POSS',medium:'менің әкем',title_ru:'посессив'},
+      {rule_id:'',medium:'падеж кітабым открыт',title_ru:'future'}
+    ]
+  });
+  assert.deepEqual(parsed.allowed_lesson_ids,['1-1','1-2']);
+  assert.deepEqual(parsed.rule_context.map(c=>c.rule_id),['T2_PLURAL_LDT']);
+  const payload=tutor.userPayload(parsed);
+  assert.ok(/После м/.test(payload));
+  assert.ok(!/жиырмасыншы/.test(payload));
+  assert.ok(!/менің/.test(payload));
+  assert.ok(!/кітабым/.test(payload));
+  assert.ok(!/T11_ORDINAL/.test(payload));
+  ok('TEST 1.5.1 server parse/model payload keeps only 1-1…1-2 context');
+
+  const msgs=tutor.buildTutorMessages({
+    mode:'ask_tutor',surface:'path',lesson_id:'1-2',
+    user_question:'Теперь объясни через русский',
+    rule_context:[{rule_id:'T2_PLURAL_LDT',title_ru:'ЛДТ',medium:'дар'}],
+    conversation_tail:[
+      {role:'user',content:'Почему адамдар?'},
+      {role:'assistant',content:'После м окончание с д: адамдар.'},
+      {role:'user',content:'Я всё равно не поняла'}
+    ]
+  });
+  assert.equal(msgs[0].role,'system');
+  assert.equal(msgs[1].role,'user');
+  assert.equal(msgs[1].content,'Почему адамдар?');
+  assert.equal(msgs[2].role,'assistant');
+  assert.equal(msgs[3].role,'user');
+  assert.equal(msgs[3].content,'Я всё равно не поняла');
+  const last=msgs[msgs.length-1];
+  assert.equal(last.role,'user');
+  assert.ok(/Теперь объясни через русский/.test(last.content));
+  const lastUser=msgs.filter(m=>m.role==='user').pop();
+  assert.ok(/Теперь объясни через русский/.test(lastUser.content));
+  assert.ok(!/Теперь объясни через русский/.test(msgs.slice(1,-1).map(m=>m.content).join('\n')));
+  ok('TEST 1.5.1 conversation_tail then current userPayload last');
+  console.log('AI_TUTOR_OK',passed.length);
+})().catch(err=>{console.error(err);process.exit(1);});
