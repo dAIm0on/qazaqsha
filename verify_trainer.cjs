@@ -1218,4 +1218,9 @@ assert.ok(phraseExamProbe&&phraseExamProbe.source==='phrase'&&phraseExamProbe.ki
 assert.equal(Gate.examEligible(phraseExamProbe),false);
 ok('Phase 2B Phrase guard: practice-only phrase items never enter Exam');
 
+
+const appPhraseProfile=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok((appPhraseProfile.match(/PhraseDrill\.session\([^;]+error_profile:\(window\.AiTutor\?\.topWeak\?\.\(4\)\|\|\[\]\)/g)||[]).length>=2);
+ok('Phase 2B P1b: live Phrase sessions use existing AiTutor weakness profile without a second store');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
