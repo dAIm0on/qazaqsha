@@ -1102,4 +1102,22 @@ assert.ok(g4NumBad.errors.some(e=>e.error_type==='number_confusion'));
 ok('Phase 2B G4: KK→RU/number recognition uses explicit accepted variants');
 
 
+
+const g5All=P2BG1.allG5();
+assert.equal(g5All.length,4);
+assert.ok(g5All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G5'&&q.phase2b.transform));
+assert.equal(P2BG1.cardsFor('1-1','G5').length,0);
+assert.equal(P2BG1.cardsFor('1-2','G5').length,0);
+assert.equal(P2BG1.cardsFor('1-3','G5').length,0);
+assert.equal(P2BG1.cardsFor('2-3','G5').length,0);
+assert.ok(P2BG1.checkTask('p2b-21-g5-neg-qyz','Қыз емеспін').result.correct);
+const g5NegBad=P2BG1.checkTask('p2b-21-g5-neg-qyz','Қыз емесбін');
+assert.ok(g5NegBad.errors.some(e=>e.error_type==='emes_position'));
+assert.ok(P2BG1.checkTask('p2b-21-g5-question-doctor','Мен дәрігермін бе').result.correct);
+const g5QBad=P2BG1.checkTask('p2b-21-g5-question-doctor','Мен дәрігермін ба');
+assert.ok(g5QBad.errors.some(e=>e.error_type==='question_class'));
+assert.ok(P2BG1.checkTask('p2b-22-g5-neg-reader','Оқырман емессіңдер').result.correct);
+ok('Phase 2B G5: local transformations only where curriculum defines them');
+
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

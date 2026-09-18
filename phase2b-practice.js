@@ -41,6 +41,14 @@
    phase2b:{genre:'G4',recognition:true,lesson_order:order,error_type:error_type||''}
   };
  }
+ function transform({id,lesson,order,topic,title,stimulus,answers,rule,error_type,explanation,label='Новая форма'}){
+  return {
+   id,source:'p2b',group:'G5',part:String(order),lessonId:lesson,topic,kind:'fields',
+   title,stimulus,fields:[field(answers,label)],explanation,
+   ruleIds:Array.isArray(rule)?rule:[rule],
+   phase2b:{genre:'G5',transform:true,lesson_order:order,error_type:error_type||''}
+  };
+ }
  const G1={
   '1-1':[
    cell({id:'p2b-11-g1-class-ae',lesson:'1-1',order:1,topic:'sounds',title:'Одна клетка: какой ряд?',stimulus:'Ә',answers:['мягкий'],rule:'T1_HARMONY',error_type:'harmony_class',explanation:'Ә относится к мягкому ряду.'}),
@@ -136,17 +144,32 @@
   '2-2':[],
   '2-3':[]
  };
+ const G5={
+  '1-1':[],
+  '1-2':[],
+  '1-3':[],
+  '2-1':[
+   transform({id:'p2b-21-g5-neg-qyz',lesson:'2-1',order:3,topic:'person',title:'Сделай отрицание',stimulus:'Қызбын.',answers:['Қыз емеспін.','Қыз емеспін'],rule:'T7_EMES',error_type:'emes_position',explanation:'Отрицание строится через емес; личное окончание стоит на емес: қыз емеспін.'}),
+   transform({id:'p2b-21-g5-question-doctor',lesson:'2-1',order:4,topic:'person',title:'Сделай вопрос',stimulus:'Мен дәрігермін.',answers:['Мен дәрігермін бе?','Мен дәрігермін бе'],rule:'T6_PERSON_SG',error_type:'question_class',explanation:'Вопросительная частица стоит отдельным словом в конце: Мен дәрігермін бе?'})
+  ],
+  '2-2':[
+   transform({id:'p2b-22-g5-neg-reader',lesson:'2-2',order:3,topic:'person',title:'Сделай отрицание',stimulus:'Оқырмансыңдар.',answers:['Оқырман емессіңдер.','Оқырман емессіңдер'],rule:['T8_PERSON_PL','T7_EMES'],error_type:'emes_position',explanation:'При отрицании личное окончание стоит на емес: оқырман емессіңдер.'}),
+   transform({id:'p2b-22-g5-neg-students',lesson:'2-2',order:3,topic:'person',title:'Сделай отрицание',stimulus:'Біз студентпіз.',answers:['Біз студент емеспіз.','Біз студент емеспіз'],rule:['T8_PERSON_PL','T7_EMES'],error_type:'emes_position',explanation:'Біз студент емеспіз: показатель лица стоит на емес.'})
+  ],
+  '2-3':[]
+ };
 
  function clone(q){return JSON.parse(JSON.stringify(q));}
  function cardsFor(lessonId,genre='G1'){
-  const bank=genre==='G1'?G1:genre==='G2'?G2:genre==='G3'?G3:genre==='G4'?G4:null;
+  const bank=genre==='G1'?G1:genre==='G2'?G2:genre==='G3'?G3:genre==='G4'?G4:genre==='G5'?G5:null;
   return bank?(bank[lessonId]||[]).map(clone):[];
  }
  function allG1(){return Object.keys(G1).flatMap(id=>cardsFor(id,'G1'));}
  function allG2(){return Object.keys(G2).flatMap(id=>cardsFor(id,'G2'));}
  function allG3(){return Object.keys(G3).flatMap(id=>cardsFor(id,'G3'));}
  function allG4(){return Object.keys(G4).flatMap(id=>cardsFor(id,'G4'));}
- function all(){return [...allG1(),...allG2(),...allG3(),...allG4()];}
+ function allG5(){return Object.keys(G5).flatMap(id=>cardsFor(id,'G5'));}
+ function all(){return [...allG1(),...allG2(),...allG3(),...allG4(),...allG5()];}
  function byId(id){return all().find(q=>q.id===id)||null;}
  function checkCell(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
@@ -165,6 +188,6 @@
   }
   return added;
  }
- const api={G1,G2,G3,G4,cardsFor,allG1,allG2,allG3,allG4,all,byId,checkCell,checkTask:checkCell,install};
+ const api={G1,G2,G3,G4,G5,cardsFor,allG1,allG2,allG3,allG4,allG5,all,byId,checkCell,checkTask:checkCell,install};
  if(node)module.exports=api;else root.Phase2BPractice=api;
 })(typeof window!=='undefined'?window:globalThis);
