@@ -1305,6 +1305,28 @@ assert.match(Diag.line('poss_owner_form','Оның қаласы','Оның қа�
 assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 ok('Phase 3 mandatory G6 remediation pack is complete while 3-1 remains closed');
 
+const HW31=require('./lesson31-homework.js');
+const hw31Locked=HW31.build();
+const hw31Open=HW31.build({sessionGUnlocked:true});
+assert.equal(hw31Locked.lesson_id,'3-1');
+assert.equal(hw31Locked.exercise_ids.length,6);
+assert.equal(hw31Locked.phrase_ids.length,0);
+assert.equal(hw31Open.phrase_ids.length,4);
+assert.equal(hw31Open.item_ids.length,10);
+assert.equal(hw31Open.rule_map['p3-31-a-g2-kitap'],'T21_POSS_ASSIM');
+assert.equal(hw31Open.rule_map['p3-31-e-g6-emes'],'T22_BAR_ZHOK');
+assert.equal(hw31Open.rule_map['p3-31-f-g6-kitabymdar'],'T23_POSS_PL');
+assert.deepEqual(hw31Open.rule_ids,['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']);
+assert.equal(hw31Open.target_vocabulary.length,12);
+assert.ok(hw31Open.target_vocabulary.some(w=>w.id==='word:біздің'&&w.target));
+assert.ok(hw31Open.target_vocabulary.some(w=>w.id==='word:олардың'&&w.target));
+assert.ok(!JSON.stringify(hw31Open.target_vocabulary).includes('T20_POSS'));
+assert.equal(hw31Open.external_test_url,'https://batylbol.kz/test/PrityazhEdChislo.html');
+assert.ok(hw31Open.items.every(q=>q&&q.lessonId==='3-1'));
+assert.ok(HW31.validate().ok);
+assert.ok(!fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson31-homework.js'));
+ok('Phase 3 closed Homework 3-1 uses canonical T20-T23, real lesson words, and unlocks 4 phrases only after Session G');
+
 const PhraseBanks=require('./phrase-banks.js');
 const PhraseDrill=require('./phrase-drill.js');
 assert.equal(PhraseBanks.forLesson('1-2').length,11);
