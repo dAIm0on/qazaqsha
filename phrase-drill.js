@@ -51,11 +51,26 @@
   const count=Math.min(requested,pairs.length); // 1-2 safely caps at 11 unique semantic pairs.
   pairs=shuffled(pairs,random).sort((a,b)=>pairScore(b,weak,seen)-pairScore(a,weak,seen));
   const minEarlier=Math.ceil(count*.70);
-  const earlier=pairs.filter(p=>p.root_lesson!==lessonId);
+  const isWeak=p=>(p.error_targets||[]).some(x=>weak.has(x))||weak.has(p.error_type);
+  const unseenFirst=list=>list.slice().sort((a,b)=>Number(bothUnseen(b))-Number(bothUnseen(a)));
+  function bothUnseen(p){return !seen.has(variant(p,'ru-kk').id)&&!seen.has(variant(p,'kk-ru').id);}
   const picked=[];
-  for(const p of earlier){if(picked.length>=Math.min(minEarlier,count))break;picked.push(p);}
-  for(const p of pairs){if(picked.length>=count)break;if(!picked.some(x=>x.pair_key===p.pair_key))picked.push(p);}
-  const selected=shuffled(picked,random);
+  const weakEarly=unseenFirst(pairs.filter(p=>isWeak(p)&&p.root_lesson!==lessonId));
+  const weakCurrent=unseenFirst(pairs.filter(p=>isWeak(p)&&p.root_lesson===lessonId));
+  const weakCap=Math.min(4,count);
+  for(const p of weakEarly){if(picked.length>=weakCap)break;picked.push(p);}
+  const currentWeakCap=Math.max(0,count-minEarlier);
+  let currentWeak=0;
+  for(const p of weakCurrent){
+   if(picked.length>=weakCap||currentWeak>=currentWeakCap)break;
+   if(!picked.some(x=>x.pair_key===p.pair_key)){picked.push(p);currentWeak++;}
+  }
+  const earlier=unseenFirst(pairs.filter(p=>p.root_lesson!==lessonId));
+  while(picked.filter(p=>p.root_lesson!==lessonId).length<Math.min(minEarlier,count)){
+   const p=earlier.find(x=>!picked.some(y=>y.pair_key===x.pair_key));if(!p)break;picked.push(p);
+  }
+  for(const p of unseenFirst(pairs)){if(picked.length>=count)break;if(!picked.some(x=>x.pair_key===p.pair_key))picked.push(p);}
+  const selected=shuffled(picked.slice(0,count),random);
   const ruTarget=Math.ceil(selected.length/2);
   let ruUsed=0,kkUsed=0;
   return selected.map((p,i)=>{
