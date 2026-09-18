@@ -1085,4 +1085,21 @@ assert.equal(new Set(P2BG1.all().map(q=>q.id)).size,P2BG1.all().length);
 ok('Phase 2B G3: directed production uses only open lesson grammar and local checking');
 
 
+
+const g4All=P2BG1.allG4();
+assert.equal(g4All.length,6);
+assert.ok(g4All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G4'&&q.phase2b.recognition));
+assert.equal(P2BG1.cardsFor('2-1','G4').length,0);
+assert.equal(P2BG1.cardsFor('2-2','G4').length,0);
+assert.equal(P2BG1.cardsFor('2-3','G4').length,0);
+assert.ok(P2BG1.checkTask('p2b-12-g4-girls','девушки').result.correct);
+assert.ok(P2BG1.checkTask('p2b-12-g4-girls','девочки').result.correct);
+const g4LandBad=P2BG1.checkTask('p2b-12-g4-lands','земля');
+assert.ok(g4LandBad.errors.some(e=>e.error_type==='translation_variant'));
+assert.ok(P2BG1.checkTask('p2b-13-g4-45','45').result.correct);
+const g4NumBad=P2BG1.checkTask('p2b-13-g4-45','54');
+assert.ok(g4NumBad.errors.some(e=>e.error_type==='number_confusion'));
+ok('Phase 2B G4: KK→RU/number recognition uses explicit accepted variants');
+
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

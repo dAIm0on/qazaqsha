@@ -33,6 +33,14 @@
    phase2b:{genre:'G3',production:true,lesson_order:order,error_type:error_type||''}
   };
  }
+ function recognize({id,lesson,order,topic,title='Переведи на русский',stimulus,answers,rule,error_type='translation_variant',explanation,label='Ответ',kind='text'}){
+  return {
+   id,source:'p2b',group:'G4',part:String(order),lessonId:lesson,topic,kind:'fields',
+   title,stimulus,fields:[field(answers,label,kind)],explanation,
+   ruleIds:Array.isArray(rule)?rule:[rule],
+   phase2b:{genre:'G4',recognition:true,lesson_order:order,error_type:error_type||''}
+  };
+ }
  const G1={
   '1-1':[
    cell({id:'p2b-11-g1-class-ae',lesson:'1-1',order:1,topic:'sounds',title:'Одна клетка: какой ряд?',stimulus:'Ә',answers:['мягкий'],rule:'T1_HARMONY',error_type:'harmony_class',explanation:'Ә относится к мягкому ряду.'}),
@@ -112,16 +120,33 @@
    produce({id:'p2b-23-g3-he-not-teacher-q',lesson:'2-3',order:3,topic:'person',stimulus:'Он не учитель?',answers:['Ол мұғалім емес пе?','Ол мұғалім емес пе'],rule:['T9_OL','T10_QUESTION'],error_type:'question_class',explanation:'Ол мұғалім емес пе? Частицу выбираем по последнему слову емес: пе.'})
   ]
  };
+ const G4={
+  '1-1':[],
+  '1-2':[
+   recognize({id:'p2b-12-g4-books',lesson:'1-2',order:3,topic:'plural',stimulus:'кітаптар',answers:['книги'],rule:'T2_PLURAL_LDT',explanation:'Кітаптар — книги.'}),
+   recognize({id:'p2b-12-g4-people',lesson:'1-2',order:3,topic:'plural',stimulus:'адамдар',answers:['люди'],rule:'T2_PLURAL_LDT',explanation:'Адамдар — люди.'}),
+   recognize({id:'p2b-12-g4-lands',lesson:'1-2',order:3,topic:'plural',stimulus:'жерлер',answers:['земли'],rule:'T2_PLURAL_LDT',explanation:'Жерлер — земли.'}),
+   recognize({id:'p2b-12-g4-girls',lesson:'1-2',order:3,topic:'plural',stimulus:'қыздар',answers:['девушки','девочки'],rule:'T2_PLURAL_LDT',explanation:'Қыздар — девушки / девочки в зависимости от контекста.'})
+  ],
+  '1-3':[
+   recognize({id:'p2b-13-g4-45',lesson:'1-3',order:2,topic:'numbers',title:'Запиши число цифрами',stimulus:'қырық бес',answers:['45'],rule:'T5_NUMERAL_COMPOSE',error_type:'',explanation:'Қырық = 40, бес = 5 → 45.',label:'Число',kind:'number-text'}),
+   recognize({id:'p2b-13-g4-17',lesson:'1-3',order:2,topic:'numbers',title:'Запиши число цифрами',stimulus:'он жеті',answers:['17'],rule:'T5_NUMERAL_COMPOSE',error_type:'',explanation:'Он = 10, жеті = 7 → 17.',label:'Число',kind:'number-text'})
+  ],
+  '2-1':[],
+  '2-2':[],
+  '2-3':[]
+ };
 
  function clone(q){return JSON.parse(JSON.stringify(q));}
  function cardsFor(lessonId,genre='G1'){
-  const bank=genre==='G1'?G1:genre==='G2'?G2:genre==='G3'?G3:null;
+  const bank=genre==='G1'?G1:genre==='G2'?G2:genre==='G3'?G3:genre==='G4'?G4:null;
   return bank?(bank[lessonId]||[]).map(clone):[];
  }
  function allG1(){return Object.keys(G1).flatMap(id=>cardsFor(id,'G1'));}
  function allG2(){return Object.keys(G2).flatMap(id=>cardsFor(id,'G2'));}
  function allG3(){return Object.keys(G3).flatMap(id=>cardsFor(id,'G3'));}
- function all(){return [...allG1(),...allG2(),...allG3()];}
+ function allG4(){return Object.keys(G4).flatMap(id=>cardsFor(id,'G4'));}
+ function all(){return [...allG1(),...allG2(),...allG3(),...allG4()];}
  function byId(id){return all().find(q=>q.id===id)||null;}
  function checkCell(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
@@ -140,6 +165,6 @@
   }
   return added;
  }
- const api={G1,G2,G3,cardsFor,allG1,allG2,allG3,all,byId,checkCell,checkTask:checkCell,install};
+ const api={G1,G2,G3,G4,cardsFor,allG1,allG2,allG3,allG4,all,byId,checkCell,checkTask:checkCell,install};
  if(node)module.exports=api;else root.Phase2BPractice=api;
 })(typeof window!=='undefined'?window:globalThis);
