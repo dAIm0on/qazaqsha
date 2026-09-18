@@ -1046,4 +1046,24 @@ assert.ok(/последний релевантный слог/.test(G1Diag.line(
 ok('Phase 2B G1: one-cell registry, local checking, precise diagnostics, 1-3 correctly has no G1');
 
 
+
+const g2All=P2BG1.allG2();
+assert.ok(g2All.length>=8);
+assert.ok(g2All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G2'&&q.phase2b.suffix));
+assert.equal(P2BG1.cardsFor('1-1','G2').length,0);
+assert.equal(P2BG1.cardsFor('1-3','G2').length,0);
+assert.equal(P2BG1.cardsFor('2-2','G2').length,0);
+assert.ok(P2BG1.checkTask('p2b-12-g2-kitap','тар').result.correct);
+const g2KitapBad=P2BG1.checkTask('p2b-12-g2-kitap','лар');
+assert.ok(g2KitapBad.errors.some(e=>e.error_type==='plural_initial_consonant'));
+assert.ok(P2BG1.checkTask('p2b-21-g2-dos','пын').result.correct);
+const g2DosBad=P2BG1.checkTask('p2b-21-g2-dos','мын');
+assert.ok(g2DosBad.errors.some(e=>e.error_type==='person_sg_piece'));
+assert.ok(P2BG1.checkTask('p2b-23-g2-qonaq','па').result.correct);
+const g2QBad=P2BG1.checkTask('p2b-23-g2-qonaq','ба');
+assert.ok(g2QBad.errors.some(e=>e.error_type==='question_class'));
+assert.equal(new Set([...g1All,...g2All].map(q=>q.id)).size,g1All.length+g2All.length);
+ok('Phase 2B G2: suffix completion registry and local piece diagnostics');
+
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

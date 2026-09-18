@@ -1,4 +1,4 @@
-/* Phase 2B G1: one table cell at a time.
+/* Phase 2B practice registry: G1 one-cell + G2 suffix completion.
    Registry only: lesson flow sequencing is wired after G1-G6 are complete. */
 (function(root){
  'use strict';
@@ -15,6 +15,14 @@
    title,stimulus,fields:[field(answers,label)],explanation,
    ruleIds:[rule],
    phase2b:{genre:'G1',cell:true,lesson_order:order,error_type:error_type||''}
+  };
+ }
+ function suffix({id,lesson,order,topic,title,stimulus,answers,rule,error_type,explanation,label='Кусок справа'}){
+  return {
+   id,source:'p2b',group:'G2',part:String(order),lessonId:lesson,topic,kind:'fields',
+   title,stimulus,fields:[field(answers,label)],explanation,
+   ruleIds:[rule],
+   phase2b:{genre:'G2',suffix:true,lesson_order:order,error_type:error_type||''}
   };
  }
  const G1={
@@ -49,17 +57,38 @@
    cell({id:'p2b-23-g1-korshi',lesson:'2-3',order:1,topic:'person',title:'Одна клетка: ол + основа',stimulus:'Ол + көрші',answers:['көрші'],rule:'T9_OL',error_type:'ol_suffix',explanation:'После ол личного окончания нет: ол көрші.'})
   ]
  };
+ const G2={
+  '1-1':[],
+  '1-2':[
+   suffix({id:'p2b-12-g2-kitap',lesson:'1-2',order:1,topic:'plural',title:'Дополни окончание',stimulus:'кітап + ___',answers:['тар'],rule:'T2_PLURAL_LDT',error_type:'plural_form',explanation:'После П множественное начинается с Т; последний слог твёрдый, поэтому тар.'}),
+   suffix({id:'p2b-12-g2-adam',lesson:'1-2',order:1,topic:'plural',title:'Дополни окончание',stimulus:'адам + ___',answers:['дар'],rule:'T2_PLURAL_LDT',error_type:'plural_form',explanation:'После М множественное начинается с Д; ряд твёрдый, поэтому дар.'}),
+   suffix({id:'p2b-12-g2-zher',lesson:'1-2',order:1,topic:'plural',title:'Дополни окончание',stimulus:'жер + ___',answers:['лер'],rule:'T2_PLURAL_LDT',error_type:'plural_form',explanation:'После Р начало Л; ряд мягкий, поэтому лер.'})
+  ],
+  '1-3':[],
+  '2-1':[
+   suffix({id:'p2b-21-g2-dos',lesson:'2-1',order:2,topic:'person',title:'Дополни личное окончание',stimulus:'Мен + дос + ___',answers:['пын'],rule:'T6_PERSON_SG',error_type:'person_sg_piece',explanation:'После С форма для мен начинается с П: дос + пын = доспын.'}),
+   suffix({id:'p2b-21-g2-adam',lesson:'2-1',order:2,topic:'person',title:'Дополни личное окончание',stimulus:'Мен + адам + ___',answers:['мын'],rule:'T6_PERSON_SG',error_type:'person_sg_piece',explanation:'После М в этой форме: адам + мын = адаммын.'})
+  ],
+  '2-2':[],
+  '2-3':[
+   suffix({id:'p2b-23-g2-qonaq',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Ол қонақ + ___ ?',answers:['па'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Қонақ заканчивается на Қ, поэтому вопросительная частица начинается с П: па.'}),
+   suffix({id:'p2b-23-g2-adam',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Ол адам + ___ ?',answers:['ба'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Адам заканчивается на М, поэтому здесь ба.'}),
+   suffix({id:'p2b-23-g2-aqyldy',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Олар ақылды + ___ ?',answers:['ма'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Последнее слово оканчивается гласной; ряд твёрдый, поэтому ма.'})
+  ]
+ };
 
  function clone(q){return JSON.parse(JSON.stringify(q));}
  function cardsFor(lessonId,genre='G1'){
-  if(genre!=='G1')return [];
-  return (G1[lessonId]||[]).map(clone);
+  const bank=genre==='G1'?G1:genre==='G2'?G2:null;
+  return bank?(bank[lessonId]||[]).map(clone):[];
  }
- function allG1(){return Object.keys(G1).flatMap(id=>cardsFor(id));}
- function byId(id){return allG1().find(q=>q.id===id)||null;}
+ function allG1(){return Object.keys(G1).flatMap(id=>cardsFor(id,'G1'));}
+ function allG2(){return Object.keys(G2).flatMap(id=>cardsFor(id,'G2'));}
+ function all(){return [...allG1(),...allG2()];}
+ function byId(id){return all().find(q=>q.id===id)||null;}
  function checkCell(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
-  if(!q||!core||!core.evaluate)throw new Error('G1 card/core unavailable');
+  if(!q||!core||!core.evaluate)throw new Error('Phase 2B card/core unavailable');
   const answers=[String(answer??'')];
   const result=core.evaluate(q,answers);
   const errors=result.correct||!diagnostics||!diagnostics.diagnose?[]:diagnostics.diagnose(q,answers,result,Date.now());
@@ -68,12 +97,12 @@
  function install(course){
   if(!course||!Array.isArray(course.questions))return [];
   const known=new Set(course.questions.map(q=>q.id)),added=[];
-  for(const q of allG1()){
+  for(const q of all()){
    if(known.has(q.id))continue;
    course.questions.push(clone(q));known.add(q.id);added.push(q.id);
   }
   return added;
  }
- const api={G1,cardsFor,allG1,byId,checkCell,install};
+ const api={G1,G2,cardsFor,allG1,allG2,all,byId,checkCell,checkTask:checkCell,install};
  if(node)module.exports=api;else root.Phase2BPractice=api;
 })(typeof window!=='undefined'?window:globalThis);

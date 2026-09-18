@@ -1,8 +1,8 @@
 (function(root){
  'use strict';
  const core=typeof module!=='undefined'&&module.exports?require('./core.js'):root.TrainerCore;
- const labels={plural_initial_consonant:'Множественное: Л/Д/Т',vowel_harmony:'Множественное: гармония А/Е',plural_after_numeral:'Множественное после числа',plural_form:'Множественное: два шага',number_order:'Порядок разрядов',number_confusion:'Перепутано число',letter_confusion:'Различие букв',lexical_retrieval:'Вспоминание слова',harmony_class:'Твёрдый / мягкий ряд',harmony_pair:'Парные гласные',harmony_edge:'Последний релевантный слог',person_sg_form:'Личное окончание: мен',person_pl_form:'Личное окончание: множественные лица',emes_position:'Емес: куда ставится личное окончание',person_sen_siz:'Сен / сіз',ordinal_20:'Порядковое: 20-е',ol_suffix:'Ол без личного окончания',question_class:'Вопросительная частица',unclassified:'Нужно сверить весь ответ'};
- const SKILL={plural_initial_consonant:'rule:plural::ldt',vowel_harmony:'rule:plural::harmony',plural_after_numeral:'rule:plural_after_num',plural_form:'rule:plural',harmony_class:'rule:harmony',harmony_pair:'rule:harmony',harmony_edge:'rule:harmony',person_sg_form:'rule:person::sg',person_pl_form:'rule:person::pl',number_order:'rule:numeral::assemble',number_confusion:'rule:numeral::atom',emes_position:'rule:emes::position',person_sen_siz:'rule:person::sen_siz',ordinal_20:'rule:ordinal::exception_20',ol_suffix:'rule:third_person::no_personal_suffix',question_class:'rule:question::consonant_class'};
+ const labels={plural_initial_consonant:'Множественное: Л/Д/Т',vowel_harmony:'Множественное: гармония А/Е',plural_after_numeral:'Множественное после числа',plural_form:'Множественное: два шага',number_order:'Порядок разрядов',number_confusion:'Перепутано число',letter_confusion:'Различие букв',lexical_retrieval:'Вспоминание слова',harmony_class:'Твёрдый / мягкий ряд',harmony_pair:'Парные гласные',harmony_edge:'Последний релевантный слог',person_sg_form:'Личное окончание: мен',person_sg_piece:'Кусок личного окончания: мен',person_pl_form:'Личное окончание: множественные лица',emes_position:'Емес: куда ставится личное окончание',person_sen_siz:'Сен / сіз',ordinal_20:'Порядковое: 20-е',ol_suffix:'Ол без личного окончания',question_class:'Вопросительная частица',unclassified:'Нужно сверить весь ответ'};
+ const SKILL={plural_initial_consonant:'rule:plural::ldt',vowel_harmony:'rule:plural::harmony',plural_after_numeral:'rule:plural_after_num',plural_form:'rule:plural',harmony_class:'rule:harmony',harmony_pair:'rule:harmony',harmony_edge:'rule:harmony',person_sg_form:'rule:person::sg',person_sg_piece:'rule:person::sg',person_pl_form:'rule:person::pl',number_order:'rule:numeral::assemble',number_confusion:'rule:numeral::atom',emes_position:'rule:emes::position',person_sen_siz:'rule:person::sen_siz',ordinal_20:'rule:ordinal::exception_20',ol_suffix:'rule:third_person::no_personal_suffix',question_class:'rule:question::consonant_class'};
  function classify(expected,actual,q={},field={}){
    const e=core.normalize(expected,field.kind),a=core.normalize(actual,field.kind);if(e===a)return [];
    const out=[],suffix=/[лдт][ае]р$/u;
@@ -20,7 +20,7 @@
    if(/жиырмасыншы/.test(e)&&/жиырманшы/.test(a))out.push('ordinal_20');
    if(/^ол /.test(e)&&/мін$|мын$|сың$|сіз$/.test(a))out.push('ol_suffix');
    if(/сен|сіз/.test(e)&&((/сыз|сіз/.test(e)&&/сың|сің/.test(a))||(/сың|сің/.test(e)&&/сыз|сіз/.test(a))))out.push('person_sen_siz');
-   if(!out.length&&q.phase2b&&q.phase2b.genre==='G1'&&q.phase2b.error_type)out.push(q.phase2b.error_type);
+   if(!out.length&&q.phase2b&&q.phase2b.error_type)out.push(q.phase2b.error_type);
    if(!out.length&&q.topic==='numbers'){
      if(/алты/.test(e)&&/алпыс/.test(a)||/алпыс/.test(e)&&/алты/.test(a))out.push('number_confusion');
      else out.push(e.split(' ').sort().join(' ')===a.split(' ').sort().join(' ')?'number_order':'number_confusion');
@@ -49,6 +49,7 @@
     harmony_pair:'Неверно выбрана парная гласная другого ряда.',
     harmony_edge:'Для окончания смотри на последний релевантный слог справа.',
     person_sg_form:'Проверь личное окончание по лицу и последнему звуку основы.',
+    person_sg_piece:'Проверь первый звук личного окончания по последнему звуку основы.',
     person_pl_form:'Проверь личное окончание множественного лица по последнему звуку основы.',
     emes_position:'Личное окончание должно стоять на емес.',
     person_sen_siz:'Перепутаны сен и сіз.',
