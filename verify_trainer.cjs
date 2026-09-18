@@ -1205,4 +1205,11 @@ assert.ok(/\['phrase','Фразы','07'\]/.test(appPhase2B));
 assert.ok(/q\.phase2b&&q\.phase2b\.phrase\?\[\]:words\.filter/.test(fs.readFileSync(path.join(__dirname,'curriculum.js'),'utf8')));
 ok('Phase 2B P1a Phrase Drill: 1-2/1-3 only, no mirrors, balanced directions, >=70% earlier roots, no word-FSRS binding');
 
+
+const PhraseDrillGuard=require('./phrase-drill.js');
+const phraseExamProbe=PhraseDrillGuard.forLesson('1-2')[0];
+assert.ok(phraseExamProbe&&phraseExamProbe.source==='phrase'&&phraseExamProbe.kind==='phrase');
+assert.equal(Gate.examEligible(phraseExamProbe),false);
+ok('Phase 2B Phrase guard: practice-only phrase items never enter Exam');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
