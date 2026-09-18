@@ -1,8 +1,8 @@
 (function(root){
  'use strict';
  const core=typeof module!=='undefined'&&module.exports?require('./core.js'):root.TrainerCore;
- const labels={plural_initial_consonant:'Множественное: Л/Д/Т',vowel_harmony:'Множественное: гармония А/Е',plural_after_numeral:'Множественное после числа',plural_form:'Множественное: два шага',number_order:'Порядок разрядов',number_confusion:'Перепутано число',letter_confusion:'Различие букв',lexical_retrieval:'Вспоминание слова',translation_variant:'Перевод формы',harmony_wrong_edge:'Неверно выбран край слова',person_sg_initial:'Личное окончание: начало после основы',person_marker_missing:'Не хватает личного окончания',person_biz_initial:'Біз: начало личного окончания',plural_on_predicate:'Лишнее множественное на сказуемом',question_particle_missing:'Не хватает вопросительной частицы',harmony_class:'Твёрдый / мягкий ряд',harmony_pair:'Парные гласные',harmony_edge:'Последний релевантный слог',person_sg_form:'Личное окончание: мен',person_sg_piece:'Кусок личного окончания: мен',person_pl_form:'Личное окончание: множественные лица',emes_position:'Емес: куда ставится личное окончание',person_sen_siz:'Сен / сіз',ordinal_20:'Порядковое: 20-е',ol_suffix:'Ол без личного окончания',question_class:'Вопросительная частица',unclassified:'Нужно сверить весь ответ'};
- const SKILL={plural_initial_consonant:'rule:plural::ldt',vowel_harmony:'rule:plural::harmony',plural_after_numeral:'rule:plural_after_num',plural_form:'rule:plural',translation_variant:'rule:translation::recognition',harmony_wrong_edge:'rule:harmony',person_sg_initial:'rule:person::sg',person_marker_missing:'rule:person::sg',person_biz_initial:'rule:person::pl',plural_on_predicate:'rule:person::pl',question_particle_missing:'rule:question::particle',harmony_class:'rule:harmony',harmony_pair:'rule:harmony',harmony_edge:'rule:harmony',person_sg_form:'rule:person::sg',person_sg_piece:'rule:person::sg',person_pl_form:'rule:person::pl',number_order:'rule:numeral::assemble',number_confusion:'rule:numeral::atom',emes_position:'rule:emes::position',person_sen_siz:'rule:person::sen_siz',ordinal_20:'rule:ordinal::exception_20',ol_suffix:'rule:third_person::no_personal_suffix',question_class:'rule:question::consonant_class'};
+ const labels={plural_initial_consonant:'Множественное: Л/Д/Т',vowel_harmony:'Множественное: гармония А/Е',plural_after_numeral:'Множественное после числа',plural_form:'Множественное: два шага',number_order:'Порядок разрядов',number_confusion:'Перепутано число',letter_confusion:'Различие букв',lexical_retrieval:'Вспоминание слова',translation_variant:'Перевод формы',harmony_wrong_edge:'Неверно выбран край слова',person_sg_initial:'Личное окончание: начало после основы',person_marker_missing:'Не хватает личного окончания',person_biz_initial:'Біз: начало личного окончания',plural_on_predicate:'Лишнее множественное на сказуемом',question_particle_missing:'Не хватает вопросительной частицы',harmony_class:'Твёрдый / мягкий ряд',harmony_pair:'Парные гласные',harmony_edge:'Последний релевантный слог',person_sg_form:'Личное окончание: мен',person_sg_piece:'Кусок личного окончания: мен',person_pl_form:'Личное окончание: множественные лица',emes_position:'Емес: куда ставится личное окончание',person_sen_siz:'Сен / сіз',ordinal_20:'Порядковое: 20-е',ol_suffix:'Ол без личного окончания',question_class:'Вопросительная частица',poss_suffix_missing:'Притяжательное: не хватает наклейки',poss_assim_voice:'Притяжательное: озвончение П/К/Қ',unclassified:'Нужно сверить весь ответ'};
+ const SKILL={plural_initial_consonant:'rule:plural::ldt',vowel_harmony:'rule:plural::harmony',plural_after_numeral:'rule:plural_after_num',plural_form:'rule:plural',translation_variant:'rule:translation::recognition',harmony_wrong_edge:'rule:harmony',person_sg_initial:'rule:person::sg',person_marker_missing:'rule:person::sg',person_biz_initial:'rule:person::pl',plural_on_predicate:'rule:person::pl',question_particle_missing:'rule:question::particle',harmony_class:'rule:harmony',harmony_pair:'rule:harmony',harmony_edge:'rule:harmony',person_sg_form:'rule:person::sg',person_sg_piece:'rule:person::sg',person_pl_form:'rule:person::pl',number_order:'rule:numeral::assemble',number_confusion:'rule:numeral::atom',emes_position:'rule:emes::position',person_sen_siz:'rule:person::sen_siz',ordinal_20:'rule:ordinal::exception_20',ol_suffix:'rule:third_person::no_personal_suffix',question_class:'rule:question::consonant_class',poss_suffix_missing:'rule:poss::suffix',poss_assim_voice:'rule:poss::assim_voice'};
  function classify(expected,actual,q={},field={}){
    const e=core.normalize(expected,field.kind),a=core.normalize(actual,field.kind);if(e===a)return [];
    const out=[],suffix=/[лдт][ае]р$/u;
@@ -21,6 +21,7 @@
    if(/^ол /.test(e)&&/мін$|мын$|сың$|сіз$/.test(a))out.push('ol_suffix');
    if(/сен|сіз/.test(e)&&((/сыз|сіз/.test(e)&&/сың|сің/.test(a))||(/сың|сің/.test(e)&&/сыз|сіз/.test(a))))out.push('person_sen_siz');
    if(!out.length&&q.phase2b&&q.phase2b.error_type)out.push(q.phase2b.error_type);
+   if(!out.length&&q.phase3&&q.phase3.error_type)out.push(q.phase3.error_type);
    if(!out.length&&q.topic==='numbers'){
      if(/алты/.test(e)&&/алпыс/.test(a)||/алпыс/.test(e)&&/алты/.test(a))out.push('number_confusion');
      else out.push(e.split(' ').sort().join(' ')===a.split(' ').sort().join(' ')?'number_order':'number_confusion');
@@ -96,6 +97,16 @@
     if(ep&&ap&&last)return 'Ты выбрала '+ap+'. После '+last+' вопросительная частица начинается с '+ep[0].toUpperCase()+': '+ep+', не '+ap+'.';
   }
   if(error_type==='question_particle_missing'&&E)return 'Не хватает отдельной вопросительной частицы: нужно '+E+'.';
+  if(error_type==='poss_suffix_missing'&&E){
+   const raw=core.normalize(q&&q.stimulus||''),base=(raw.match(/(?:менің\s*\+?\s*|менің\s+)([а-яәіңғүұқөһ]+)/u)||[])[1]||'основы';
+   return 'Для менің нужна притяжательная наклейка справа: '+base+' → '+E+'.';
+  }
+  if(error_type==='poss_assim_voice'&&E){
+   const raw=core.normalize(q&&q.stimulus||'');
+   const from=/кітап/.test(raw)?'П':/жүрек/.test(raw)?'К':/саусақ|қонақ/.test(raw)?'Қ':'П/К/Қ';
+   const to=from==='П'?'Б':from==='К'?'Г':from==='Қ'?'Ғ':'звонкую пару';
+   return 'Перед гласной притяжательного окончания '+from+' озвончается в '+to+': нужно '+E+'.';
+  }
   return {
     vowel_harmony:'Гармония: гласная окончания неверна.',
     plural_initial_consonant:'Стык Л/Д/Т выбран неверно.',
@@ -119,6 +130,8 @@
     ordinal_20:'Правильно: жиырмасыншы, не жиырманшы.',
     ol_suffix:'У ол/олар личного окончания нет.',
     question_class:'Неверная семья частицы па/ба/ма.',
+    poss_suffix_missing:'Не хватает притяжательной наклейки справа.',
+    poss_assim_voice:'Перед гласной притяжательного окончания нужно озвончение П/К/Қ.',
     number_confusion:'Перепутаны похожие числа.'
   }[error_type]||'';
  }

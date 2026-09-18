@@ -1164,6 +1164,26 @@ ok('Phase 2B lesson flow: ordered G1-G6, safe 2-2 adjective, 1-3 phone, 2-3 ordi
 
 
 
+const Lesson31A=require('./lesson31-pack.js');
+const a31=Lesson31A.sessionA();
+assert.equal(a31.length,6);
+assert.ok(a31.every(q=>q.lessonId==='3-1'&&q.phase3&&q.phase3.session==='A'&&q.practiceOnly));
+assert.ok(a31.every(q=>(q.ruleIds||[]).every(r=>['T20_POSS','T21_POSS_ASSIM'].includes(r))));
+assert.ok(!/сенің|оның|сіздің|біздің|олардың/u.test(JSON.stringify(a31)));
+assert.ok(Lesson31A.check('p3-31-a-g1-ake','әкем').result.correct);
+assert.ok(Lesson31A.check('p3-31-a-g2-kitap','кітабым').result.correct);
+assert.ok(Lesson31A.check('p3-31-a-g2-qala','қалам').result.correct);
+const a31Missing=Lesson31A.check('p3-31-a-g6-ake','Менің әке');
+assert.ok(a31Missing.errors.some(e=>e.error_type==='poss_suffix_missing'));
+const a31Assim=Lesson31A.check('p3-31-a-g6-kitapym','Менің кітапым');
+assert.ok(a31Assim.errors.some(e=>e.error_type==='poss_assim_voice'));
+assert.match(Diag.line('poss_suffix_missing','Менің әкем','Менің әке',Lesson31A.byId('p3-31-a-g6-ake')),/притяжательная наклейка/i);
+assert.match(Diag.line('poss_assim_voice','Менің кітабым','Менің кітапым',Lesson31A.byId('p3-31-a-g6-kitapym')),/П.*Б.*кітабым/i);
+assert.equal(PhraseDrill.forLesson('3-1').length,0);
+assert.ok(!fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson31-pack.js'));
+assert.ok(!fs.readFileSync(path.join(__dirname,'learning.js'),'utf8').includes("'3-1'"));
+ok('Phase 3 Session A: closed menің-only T20/T21 pack, 3-1 still not opened');
+
 const PhraseBanks=require('./phrase-banks.js');
 const PhraseDrill=require('./phrase-drill.js');
 assert.equal(PhraseBanks.forLesson('1-2').length,11);
