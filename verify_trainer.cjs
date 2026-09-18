@@ -1290,6 +1290,21 @@ assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 assert.ok(!fs.readFileSync(path.join(__dirname,'phrase-banks.js'),'utf8').includes("'3-1':"));
 ok('Phase 3 Session G: closed two-way 3-1 phrase bank validated without exposing live Phrase Drill');
 
+const x31=Lesson31A.errorPack();
+assert.equal(x31.length,3);
+assert.ok(x31.every(q=>q.lessonId==='3-1'&&q.phase3&&q.phase3.session==='G6'&&q.practiceOnly));
+const xHeart=Lesson31A.check('p3-31-x-g6-zhurekim','Менің жүрекім');
+assert.ok(xHeart.errors.some(e=>e.error_type==='poss_assim_voice'));
+assert.match(Diag.line('poss_assim_voice','Менің жүрегім','Менің жүрекім',Lesson31A.byId('p3-31-x-g6-zhurekim')),/К.*Г.*жүрегім/u);
+const xFinger=Lesson31A.check('p3-31-x-g6-sausakym','Менің саусақым');
+assert.ok(xFinger.errors.some(e=>e.error_type==='poss_assim_voice'));
+assert.match(Diag.line('poss_assim_voice','Менің саусағым','Менің саусақым',Lesson31A.byId('p3-31-x-g6-sausakym')),/Қ.*Ғ.*саусағым/u);
+const xOwner=Lesson31A.check('p3-31-x-g6-onyn-qalam','Оның қалам');
+assert.ok(xOwner.errors.some(e=>e.error_type==='poss_owner_form'));
+assert.match(Diag.line('poss_owner_form','Оның қаласы','Оның қалам',Lesson31A.byId('p3-31-x-g6-onyn-qalam')),/оның.*третьего лица.*қала → қаласы.*-м.*менің/u);
+assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
+ok('Phase 3 mandatory G6 remediation pack is complete while 3-1 remains closed');
+
 const PhraseBanks=require('./phrase-banks.js');
 const PhraseDrill=require('./phrase-drill.js');
 assert.equal(PhraseBanks.forLesson('1-2').length,11);

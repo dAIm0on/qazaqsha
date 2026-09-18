@@ -176,6 +176,23 @@
   field({id:'p3-31-g-g3-cat-bald',order:17,session:'G',kind:'phrase',title:'RU → KK',stimulus:'мой кот лысый',answers:['менің мысығым таз'],rule:'T20_POSS',error_type:'poss_phrase',explanation:'мой кот лысый → менің мысығым таз.'}),
   field({id:'p3-31-g-g3-cats-bald',order:18,session:'G',kind:'phrase',title:'RU → KK',stimulus:'мои котики лысые',answers:['менің мысықтарым таз'],rule:['T20_POSS','T23_POSS_PL'],error_type:'poss_phrase',explanation:'мои котики лысые → менің мысықтарым таз.'})
  ];
+ const ERROR_PACK=[
+  field({
+   id:'p3-31-x-g6-zhurekim',order:1,session:'G6',title:'Исправь озвончение',stimulus:'Менің жүрекім',
+   answers:['Менің жүрегім','жүрегім'],rule:['T20_POSS','T21_POSS_ASSIM'],error_type:'poss_assim_voice',
+   explanation:'жүрек + ім → жүрегім: перед гласной притяжательного окончания к озвончается в г.'
+  }),
+  field({
+   id:'p3-31-x-g6-sausakym',order:2,session:'G6',title:'Исправь озвончение',stimulus:'Менің саусақым',
+   answers:['Менің саусағым','саусағым'],rule:['T20_POSS','T21_POSS_ASSIM'],error_type:'poss_assim_voice',
+   explanation:'саусақ + ым → саусағым: перед гласной притяжательного окончания қ озвончается в ғ.'
+  }),
+  field({
+   id:'p3-31-x-g6-onyn-qalam',order:3,session:'G6',title:'Исправь форму владельца',stimulus:'Оның + қала → Оның қалам',
+   answers:['Оның қаласы','қаласы'],rule:'T20_POSS',error_type:'poss_owner_form',
+   explanation:'Для оның нужна форма третьего лица: қала → қаласы. -м относится к менің.'
+  })
+ ];
 
  function sessionA(){return SESSION_A.map(clone);}
  function sessionB(){return SESSION_B.map(clone);}
@@ -184,8 +201,9 @@
  function sessionE(){return SESSION_E.map(clone);}
  function sessionF(){return SESSION_F.map(clone);}
  function sessionG(){return SESSION_G.map(clone);}
- function all(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD(),...sessionE(),...sessionF(),...sessionG()];}
- function byId(id){const q=[...SESSION_A,...SESSION_B,...SESSION_C,...SESSION_D,...SESSION_E,...SESSION_F,...SESSION_G].find(x=>x.id===id);return q?clone(q):null;}
+ function errorPack(){return ERROR_PACK.map(clone);}
+ function all(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD(),...sessionE(),...sessionF(),...sessionG(),...errorPack()];}
+ function byId(id){const q=[...SESSION_A,...SESSION_B,...SESSION_C,...SESSION_D,...SESSION_E,...SESSION_F,...SESSION_G,...ERROR_PACK].find(x=>x.id===id);return q?clone(q):null;}
  function check(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
   if(!q||!core||!core.evaluate)throw new Error('Lesson 3-1 closed pack unavailable');
@@ -196,6 +214,6 @@
  }
  function isClosed(){return true;}
 
- const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,SESSION_E,SESSION_F,SESSION_G,sessionA,sessionB,sessionC,sessionD,sessionE,sessionF,sessionG,all,byId,check,isClosed};
+ const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,SESSION_E,SESSION_F,SESSION_G,ERROR_PACK,sessionA,sessionB,sessionC,sessionD,sessionE,sessionF,sessionG,errorPack,all,byId,check,isClosed};
  if(node)module.exports=api;else root.Lesson31Pack=api;
 })(typeof window!=='undefined'?window:globalThis);
