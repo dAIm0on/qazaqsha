@@ -314,7 +314,7 @@
    if(course.sources&&!course.sources['ai-remed'])course.sources['ai-remed']={title:'Разбор навыка',url:'#',additional:true};
    const source=course.sources[q.source]||course.sources['ai-remed']||{title:'Практика',url:'#',additional:true}, streak=records[q.id]?.streak||0;
    const location=q.source.startsWith('hw')?'Слово '+q.group:`Задание ${q.group}${q.part!=='1'?' · пункт '+q.part:''}`;
-   const hasText=q.kind==='fields'&&q.fields.some(f=>f.kind!=='number-text'&&!classifierOptions(f));
+   const hasText=(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='number-text'&&!classifierOptions(f));
    const letters=hasText&&state.prefs.letters;
    const exam=mode==='exam';
    const hw=mode==='homework';
@@ -391,7 +391,7 @@
    (q.fields||[]).forEach((_,i)=>{const el=$('#answer-'+i);if(el)el.value='';});
    if($('#reveal-button'))$('#reveal-button').disabled=true;
    if($('#hint-button'))$('#hint-button').disabled=true;
-   if(!$('.letter-keyboard')&&q.kind==='fields'&&q.fields.some(f=>f.kind!=='number-text')){
+   if(!$('.letter-keyboard')&&(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='number-text')){
      const keys=document.createElement('div');keys.className='letter-keyboard';keys.lang='kk';keys.innerHTML=[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}">${c}</button>`).join('');
      const slot=$('.practice-composer .primary-slot');
      if(slot)slot.before(keys);else box.after(keys);
@@ -425,12 +425,12 @@
    const answers=readAnswers(q), warning=$('#validation');
    if(!reveal){
      const missing=q.kind==='multi'?answers.length===0:answers.some(a=>!a.trim());
-     if(missing){warning.textContent=q.kind==='multi'?'Выбери хотя бы один вариант.':'Заполни все поля — проверим разбор целиком.';warning.hidden=false;if(q.kind==='fields')$('#answer-'+answers.findIndex(a=>!a.trim())).focus();return;}
+     if(missing){warning.textContent=q.kind==='multi'?'Выбери хотя бы один вариант.':'Заполни все поля — проверим разбор целиком.';warning.hidden=false;if(q.kind!=='multi')$('#answer-'+answers.findIndex(a=>!a.trim())).focus();return;}
    }
    warning.hidden=true;
    const result=reveal?{correct:false,parts:q.kind==='multi'?q.options.map(()=>false):q.fields.map(()=>false)}:core.evaluate(q,answers);
    checked=true;if(reveal){hintEvent(q,'reveal');hinted=true;}
-   pauseTimer();const now=Date.now(),recall=q.kind==='fields'&&q.fields.some(f=>f.kind!=='select');
+   pauseTimer();const now=Date.now(),recall=(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='select');
    const F=window.FSRS;
    let rating;
    if(!result.correct||hinted||examTimedOut)rating=F.Rating.Again;

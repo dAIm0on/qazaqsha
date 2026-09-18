@@ -1151,4 +1151,24 @@ assert.ok(/После С/.test(P2BG1.byId('p2b-21-g6-dosmyn').explanation));
 ok('Phase 2B G6: rewrite errors name the exact wrong piece and mechanism');
 
 
+
+const phraseAll=P2BG1.allPhrases();
+assert.equal(P2BG1.phrasesFor('1-1').length,0);
+assert.equal(P2BG1.phrasesFor('1-2').length,0);
+assert.equal(P2BG1.phrasesFor('1-3').length,4);
+assert.equal(P2BG1.phrasesFor('2-1').length,4);
+assert.equal(P2BG1.phrasesFor('2-2').length,4);
+assert.equal(P2BG1.phrasesFor('2-3').length,4);
+assert.ok(phraseAll.every(q=>q.kind==='phrase'&&q.fields.length===1&&q.phase2b&&q.phase2b.phrase&&Array.isArray(q.vocabIds)&&q.vocabIds.length===0));
+assert.ok(P2BG1.checkTask('p2b-13-ph-1','екі сөз').result.correct);
+assert.ok(P2BG1.checkTask('p2b-21-ph-1','Мен ғалыммын').result.correct);
+assert.ok(P2BG1.checkTask('p2b-22-ph-3','Біз сараң емеспіз').result.correct);
+assert.ok(P2BG1.checkTask('p2b-23-ph-1','Ол қонақ па').result.correct);
+const knowledgeSrc=fs.readFileSync(path.join(__dirname,'knowledge.js'),'utf8');
+assert.ok(/else bind\('exercise:'\+q\.id,q\.kind==='multi'\?'visual_recognition':'application',null\)/.test(knowledgeSrc));
+assert.ok(/q\.kind==='phrase'/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(!P2BG1.phrasesFor('2-1').some(q=>(q.ruleIds||[]).includes('T10_QUESTION')));
+ok('Phase 2B Phrase Drill: current-course phrases only, separate exercise skill, no word production binding');
+
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
