@@ -549,7 +549,7 @@
      return rest.length?rest.join(', '):'';
    }).filter(Boolean).join('; ');
    const timeLine=mode==='exam'?(examTimedOut?'Время вышло.':'Короткий лимит на карточку'+(elapsedMs>cfg.session.examHardMs&&result.correct?' · медленно.':' · зачёт.')):'';
-   const local=errors.map(e=>window.ErrorDiagnostics.line&&window.ErrorDiagnostics.line(e.error_type)||window.ErrorDiagnostics.labels[e.error_type]).filter(Boolean);
+   const local=errors.map(e=>window.ErrorDiagnostics.line&&window.ErrorDiagnostics.line(e.error_type,e.expected_answer,e.actual_answer,q)||window.ErrorDiagnostics.labels[e.error_type]).filter(Boolean);
    const aiCodes=window.AiTutor&&mode!=='exam'?window.AiTutor.noteAnswer(q,answers,result,hinted,errors,now):[];
    const aiRepeat=window.AiTutor&&aiCodes[0]&&window.AiTutor.shouldOfferExplain(aiCodes[0]);
    const morph=!result.correct?morphemeRow(errors,answerLine,answers.join(' ')):'';

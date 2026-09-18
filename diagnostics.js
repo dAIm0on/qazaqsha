@@ -39,7 +39,63 @@
   if(error_type==='lexical_retrieval'&&q&&q.vocabIds&&q.vocabIds[0])return q.vocabIds[0]+'::production';
   return SKILL[error_type]||('card:'+(q&&q.id||''));
  }
- function line(error_type){
+ function display(v){return String(v??'').trim().replace(/[?.!]+$/u,'');}
+ function pluralForm(v){
+  const x=core.normalize(v),m=x.match(/^(.*?)([лдт][ае]р)$/u);
+  return m?{stem:m[1],suffix:m[2]}:null;
+ }
+ function baseFrom(q,fallback){
+  const raw=String(q&&q.stimulus||'').split(/[+→·]/u)[0].trim();
+  const words=core.normalize(raw).split(/\s+/u).filter(Boolean);
+  return words.length?words[words.length-1]:String(fallback||'');
+ }
+ function lastLetter(v){const a=[...String(v||'')];return (a[a.length-1]||'').toUpperCase();}
+ function commonPrefix(a,b){
+  const x=core.normalize(a),y=core.normalize(b);let i=0;
+  while(i<x.length&&i<y.length&&x[i]===y[i])i++;
+  return x.slice(0,i).trim();
+ }
+ function questionPart(v){
+  const x=core.normalize(v),m=x.match(/(?:^|\s)(ма|ме|ба|бе|па|пе)$/u);
+  return m?m[1]:'';
+ }
+ function line(error_type,expected,actual,q){
+  const E=display(expected),A=display(actual);
+  if(error_type==='plural_initial_consonant'){
+    const ep=pluralForm(E),ap=pluralForm(A);
+    if(ep&&ap&&ep.suffix!==ap.suffix){
+      const base=ep.stem||baseFrom(q,ep.stem),last=lastLetter(base),need=ep.suffix[0].toUpperCase();
+      if(last)return 'Ты выбрала -'+ap.suffix+'. После '+last+' множественное начинается с '+need+', поэтому '+E+'.';
+    }
+  }
+  if(error_type==='plural_after_numeral'&&E&&A){
+    const n=(core.normalize(E).split(/\s+/u)[0]||core.normalize(q&&q.stimulus||'').split(/\s+/u)[0]||'числа');
+    return 'После числа '+n+' множественное окончание не ставится: '+E+', не '+A+'.';
+  }
+  if(error_type==='person_sg_form'||error_type==='person_sg_piece'){
+    const p=commonPrefix(E,A)||baseFrom(q,''),last=lastLetter(p||baseFrom(q,''));
+    const eNorm=core.normalize(E),aNorm=core.normalize(A);
+    const need=p&&eNorm.startsWith(p)?eNorm.slice(p.length):eNorm;
+    const used=p&&aNorm.startsWith(p)?aNorm.slice(p.length):aNorm;
+    if(last&&need&&used&&need!==used)return 'Ты выбрала -'+used+'. После '+last+' личное окончание для мен начинается с '+need[0].toUpperCase()+': '+E+'.';
+  }
+  if(error_type==='person_marker_missing'&&E){
+    const en=core.normalize(E),an=core.normalize(A);
+    const suffix=an&&en.startsWith(an)?en.slice(an.length):'';
+    return 'Не хватает личного окончания'+(suffix?' «-'+suffix+'»':'')+': нужно '+E+'.';
+  }
+  if(error_type==='person_biz_initial'&&E&&A){
+    const p=commonPrefix(E,A)||baseFrom(q,''),last=lastLetter(p||baseFrom(q,''));
+    if(last)return 'После '+last+' форма біз начинается с правильного согласного: '+E+', не '+A+'.';
+  }
+  if(error_type==='emes_position'&&E&&A)return 'Личное окончание должно стоять на емес: '+E+', не '+A+'.';
+  if(error_type==='ol_suffix'&&E&&A)return 'У ол/олар личного окончания нет: '+E+', не '+A+'.';
+  if(error_type==='question_class'&&E&&A){
+    const ep=questionPart(E),ap=questionPart(A);
+    const base=baseFrom(q,core.normalize(E).replace(/\s+(ма|ме|ба|бе|па|пе)$/u,'').split(/\s+/u).pop()),last=lastLetter(base);
+    if(ep&&ap&&last)return 'Ты выбрала '+ap+'. После '+last+' вопросительная частица начинается с '+ep[0].toUpperCase()+': '+ep+', не '+ap+'.';
+  }
+  if(error_type==='question_particle_missing'&&E)return 'Не хватает отдельной вопросительной частицы: нужно '+E+'.';
   return {
     vowel_harmony:'Гармония: гласная окончания неверна.',
     plural_initial_consonant:'Стык Л/Д/Т выбран неверно.',

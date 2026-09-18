@@ -1238,6 +1238,15 @@ assert.ok(/hwLesson,hwPart,hwSection/.test(flowSrc));
 assert.ok(/\['practice','homework','learn','path','review'\]/.test(flowSrc));
 ok('Phase 2B flow: Learn → Path → Practice → Homework → Review is explicit and resumable');
 
+assert.match(G1Diag.line('plural_initial_consonant','кітаптар','кітаплар',P2BG1.byId('p2b-12-g6-kitaplar')),/Ты выбрала -лар\. После П множественное начинается с Т, поэтому кітаптар/);
+assert.match(G1Diag.line('plural_after_numeral','екі кітап','екі кітаптар',P2BG1.byId('p2b-13-g6-eki-kitaptar')),/После числа екі.*екі кітап, не екі кітаптар/);
+assert.match(G1Diag.line('person_sg_form','доспын','досмын',P2BG1.byId('p2b-21-g6-dosmyn')),/Ты выбрала -мын\. После С.*П.*доспын/);
+assert.match(G1Diag.line('person_marker_missing','Мен дәрігермін','Мен дәрігер',P2BG1.byId('p2b-21-g6-missing-person')),/Не хватает личного окончания.*мін.*Мен дәрігермін/);
+assert.match(G1Diag.line('question_class','Ол қонақ па','Ол қонақ ба',P2BG1.byId('p2b-23-g6-konak-ba')),/Ты выбрала ба\. После Қ.*П.*па, не ба/);
+assert.match(G1Diag.line('question_particle_missing','Ол қонақ па','Ол қонақ',P2BG1.byId('p2b-23-g6-missing-question')),/Не хватает отдельной вопросительной частицы.*Ол қонақ па/);
+assert.ok(/line\(e\.error_type,e\.expected_answer,e\.actual_answer,q\)/.test(flowSrc));
+ok('Phase 2B diagnostics: learner feedback names the wrong piece, mechanism, and corrected form');
+
 const PhraseDrillGuard=require('./phrase-drill.js');
 const phraseExamProbe=PhraseDrillGuard.forLesson('1-2')[0];
 assert.ok(phraseExamProbe&&phraseExamProbe.source==='phrase'&&phraseExamProbe.kind==='phrase');
