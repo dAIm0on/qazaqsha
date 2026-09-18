@@ -228,6 +228,14 @@ assert.ok(/conversation_tail/.test(tutorSrc));
 assert.ok(/userPayload\(req\)/.test(tutorSrc));
 ok('TEST 1.5.1 tutor.js has buildTutorMessages helper');
 
+assert.ok(/function glmPayload/.test(tutorSrc));
+assert.ok(/function qwenPayload/.test(tutorSrc));
+assert.ok(/function messagesToPrompt/.test(tutorSrc));
+assert.ok(/max_completion_tokens/.test(tutorSrc));
+assert.ok(!/enable_thinking/.test(tutorSrc));
+assert.ok(!/env\.AI\.run\(model,\{messages,max_tokens:maxTokens,enable_thinking:false\}\)/.test(tutorSrc));
+ok('TEST 1.5.2 tutor.js splits GLM/Qwen payloads, no enable_thinking');
+
 (async()=>{
   const {pathToFileURL}=require('url');
   const tutor=await import(pathToFileURL(path.join(__dirname,'functions','api','tutor.js')).href);
@@ -276,5 +284,41 @@ ok('TEST 1.5.1 tutor.js has buildTutorMessages helper');
   assert.ok(/Теперь объясни через русский/.test(lastUser.content));
   assert.ok(!/Теперь объясни через русский/.test(msgs.slice(1,-1).map(m=>m.content).join('\n')));
   ok('TEST 1.5.1 conversation_tail then current userPayload last');
+
+  const glm=tutor.glmPayload(msgs,250);
+  assert.ok(Array.isArray(glm.messages));
+  assert.equal(glm.messages,msgs);
+  assert.equal(glm.max_completion_tokens,250);
+  assert.ok(!Object.prototype.hasOwnProperty.call(glm,'enable_thinking'));
+  assert.ok(!Object.prototype.hasOwnProperty.call(glm,'prompt'));
+  assert.ok(!Object.prototype.hasOwnProperty.call(glm,'max_tokens'));
+  ok('TEST 1.5.2 GLM payload has messages, no enable_thinking');
+
+  const qwen=tutor.qwenPayload(msgs,250);
+  assert.equal(typeof qwen.prompt,'string');
+  assert.equal(qwen.max_tokens,250);
+  assert.ok(!Object.prototype.hasOwnProperty.call(qwen,'messages'));
+  assert.ok(!Object.prototype.hasOwnProperty.call(qwen,'enable_thinking'));
+  assert.ok(!Object.prototype.hasOwnProperty.call(qwen,'max_completion_tokens'));
+  const prompt=qwen.prompt;
+  const tailPos=prompt.indexOf('Почему адамдар?');
+  const qPos=prompt.lastIndexOf('Теперь объясни через русский');
+  assert.ok(tailPos>=0,'qwen prompt includes conversation tail');
+  assert.ok(qPos>=0,'qwen prompt includes current question');
+  assert.ok(qPos>tailPos,'current question comes after conversation tail');
+  const lastBlock=prompt.slice(prompt.lastIndexOf('Ученица:'));
+  assert.ok(/Теперь объясни через русский/.test(lastBlock));
+  ok('TEST 1.5.2 Qwen payload is prompt-only; current question after tail');
+
+  const glmRouted=tutor.payloadFor(tutor.PRIMARY_MODEL,msgs,400);
+  const qwenRouted=tutor.payloadFor(tutor.FALLBACK_MODEL,msgs,400);
+  assert.ok(glmRouted.messages&&glmRouted.max_completion_tokens===400);
+  assert.ok(typeof qwenRouted.prompt==='string'&&qwenRouted.max_tokens===400);
+  ok('TEST 1.5.2 payloadFor routes GLM vs Qwen');
+
+  assert.equal(tutor.normalizeModelText({choices:[{message:{content:'GLM choices content: бес кітап без -тар.'}}]}),'GLM choices content: бес кітап без -тар.');
+  assert.equal(tutor.normalizeModelText({choices:[{message:{content:null,reasoning_content:'GLM reasoning: бес кітап без множественного.'}}]}),'GLM reasoning: бес кітап без множественного.');
+  assert.equal(tutor.normalizeModelText({response:'Qwen response: 6 — алты, 60 — алпыс.'}),'Qwen response: 6 — алты, 60 — алпыс.');
+  ok('TEST 1.5.2 normalizeModelText reads GLM choices and Qwen response');
   console.log('AI_TUTOR_OK',passed.length);
 })().catch(err=>{console.error(err);process.exit(1);});

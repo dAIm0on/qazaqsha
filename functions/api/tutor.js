@@ -150,6 +150,8 @@ function normalizeModelText(out){
     if(msg){
       if(typeof msg.content==='string')t=msg.content;
       else if(Array.isArray(msg.content))t=msg.content.map(p=>typeof p==='string'?p:(p&&(p.text||p.content))||'').join('');
+      if(!t&&typeof msg.reasoning_content==='string')t=msg.reasoning_content;
+      if(!t&&typeof msg.reasoning==='string')t=msg.reasoning;
     }
     if(!t&&typeof out.text==='string')t=out.text;
     if(!t&&out.result&&typeof out.result.response==='string')t=out.result.response;
@@ -261,13 +263,66 @@ function userPayload(req){
 function logTutor(row){
   try{console.log(JSON.stringify(row));}catch{}
 }
+function modelError(err){
+  if(err==null)return 'unknown';
+  if(typeof err==='string')return err.slice(0,240);
+  const parts=[];
+  if(err.message)parts.push(String(err.message));
+  if(err.code!=null)parts.push('code='+err.code);
+  if(err.name&&err.name!=='Error')parts.push(err.name);
+  const cause=err.cause;
+  if(cause&&cause!==err){
+    if(typeof cause==='string')parts.push(cause);
+    else if(cause.message)parts.push(String(cause.message));
+    if(cause.code!=null)parts.push('cause_code='+cause.code);
+  }
+  try{
+    const s=JSON.stringify(err);
+    if(s&&s!=='{}'&&!parts.join(' ').includes(s.slice(0,40)))parts.push(s.slice(0,180));
+  }catch{}
+  return (parts.join(' | ')||String(err)).slice(0,240);
+}
+function unusableReason(text,raw){
+  const t=String(text||'').trim();
+  if(!t){
+    let rawS='';
+    try{rawS=typeof raw==='string'?raw:JSON.stringify(raw);}catch{rawS=String(raw);}
+    return ('empty_output:'+rawS).slice(0,240);
+  }
+  if(FUTURE_RE.test(t))return 'future_in_output';
+  if(t.length<12)return ('too_short:'+t).slice(0,240);
+  return ('unusable:'+t).slice(0,240);
+}
+function messagesToPrompt(messages){
+  const lines=[];
+  for(const m of messages||[]){
+    const role=m&&m.role||'user';
+    const content=String(m&&m.content||'').trim();
+    if(!content)continue;
+    if(role==='system')lines.push('Инструкция:\n'+content);
+    else if(role==='assistant')lines.push('Тьютор:\n'+content);
+    else lines.push('Ученица:\n'+content);
+  }
+  return lines.join('\n\n');
+}
+function glmPayload(messages,maxTokens){
+  return {messages,max_completion_tokens:maxTokens};
+}
+function qwenPayload(messages,maxTokens){
+  return {prompt:messagesToPrompt(messages),max_tokens:maxTokens};
+}
+function payloadFor(model,messages,maxTokens){
+  if(model===PRIMARY_MODEL)return glmPayload(messages,maxTokens);
+  return qwenPayload(messages,maxTokens);
+}
 async function runModel(env,model,messages,maxTokens,timeoutMs){
-  const run=env.AI.run(model,{messages,max_tokens:maxTokens,enable_thinking:false});
+  const payload=payloadFor(model,messages,maxTokens);
+  const run=env.AI.run(model,payload);
   const out=await Promise.race([
     run,
     new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),timeoutMs))
   ]);
-  return normalizeModelText(out);
+  return {text:normalizeModelText(out),raw:out};
 }
 function buildTutorMessages(req){
   const messages=[{role:'system',content:SYSTEM}];
@@ -279,15 +334,20 @@ async function runTutorModel(req,env,rid){
   const started=Date.now();
   const maxTok=req.mode==='ask_tutor'?ASK_OUT:MAX_OUT;
   const messages=buildTutorMessages(req);
+  const errors={primary:null,fallback:null};
   const tryOne=async(model,timeout,source)=>{
     const t0=Date.now();
     try{
-      const text=await runModel(env,model,messages,maxTok,timeout);
+      const {text,raw}=await runModel(env,model,messages,maxTok,timeout);
       const built=assemble(req,text,{request_id:rid,source,model,latency_ms:Date.now()-t0});
-      logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model,source,latency_ms:Date.now()-t0,result:built?'success':'unusable',error_type:built?null:'unusable'});
+      const error_type=built?null:unusableReason(text,raw);
+      logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model,source,latency_ms:Date.now()-t0,result:built?'success':'unusable',error_type});
+      if(!built)errors[source]=error_type;
       return built;
     }catch(err){
-      logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model,source,latency_ms:Date.now()-t0,result:'error',error_type:String(err&&err.message||err).slice(0,80)});
+      const error_type=modelError(err);
+      errors[source]=error_type;
+      logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model,source,latency_ms:Date.now()-t0,result:'error',error_type});
       return null;
     }
   };
@@ -296,10 +356,14 @@ async function runTutorModel(req,env,rid){
     if(primary)return primary;
     const fallback=await tryOne(FALLBACK_MODEL,FALLBACK_TIMEOUT_MS,'fallback');
     if(fallback)return fallback;
+  }else{
+    errors.primary='no_ai_binding';
   }
   const local=localFallback(req,rid);
   local.meta.latency_ms=Date.now()-started;
-  logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model:null,source:'local',latency_ms:local.meta.latency_ms,result:'local',error_type:'model_unavailable'});
+  local.meta.primary_error=errors.primary;
+  local.meta.fallback_error=errors.fallback;
+  logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model:null,source:'local',latency_ms:local.meta.latency_ms,result:'local',error_type:'model_unavailable',primary_error:errors.primary,fallback_error:errors.fallback});
   return local;
 }
 function clientOk(request){
@@ -387,4 +451,4 @@ function json(body,status=200){
   return new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
 }
 
-export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,clipRuleContext,buildTutorMessages,userPayload};
+export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,clipRuleContext,buildTutorMessages,userPayload,messagesToPrompt,glmPayload,qwenPayload,payloadFor};
