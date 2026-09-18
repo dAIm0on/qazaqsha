@@ -13,7 +13,7 @@
  }
  for(const q of questions)coerceTyped(q);
  const byId=new Map(questions.map(q=>[q.id,q]));
- const topics=[['all','Все задания','∞'],['sounds','Звуки и слоги','01'],['plural','Множественное число','02'],['vocab','Слова','03'],['numbers','Числа и количество','04'],['person','Личные окончания','05'],['rules','Только правила','06']];
+ const topics=[['all','Все задания','∞'],['sounds','Звуки и слоги','01'],['plural','Множественное число','02'],['vocab','Слова','03'],['numbers','Числа и количество','04'],['person','Личные окончания','05'],['rules','Только правила','06'],['phrase','Фразы','07']];
  const KEY='qazaq-kris-course-v1', BACKUP=KEY+'-before-import', MIGRATION=KEY+'-before-schema-5';
  const cfg=window.TRAINER_CONFIG, P=window.ProgressStore, catalog=window.CURRICULUM;
  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -186,7 +186,16 @@
    const lessonCards=window.Phase2BPractice?.lessonSession?.(block)||[];
    if(lessonCards.length&&mode!=='exam'){
      mode='course';
-     queue=lessonCards.map(q=>q.id).filter(id=>byId.has(id));
+     let ordered=lessonCards.slice();
+     const phraseCut=block==='1-2'?2:block==='1-3'?3:null;
+     if(phraseCut!=null&&window.PhraseDrill){
+       const seenIds=Object.keys(records).filter(id=>records[id]&&records[id].seen);
+       const phrases=window.PhraseDrill.session(block,{count:block==='1-2'?16:12,seen_ids:seenIds});
+       const before=ordered.filter(q=>Number(q.phase2b&&q.phase2b.lesson_order||99)<=phraseCut);
+       const after=ordered.filter(q=>Number(q.phase2b&&q.phase2b.lesson_order||99)>phraseCut);
+       ordered=[...before,...phrases,...after];
+     }
+     queue=ordered.map(q=>q.id).filter(id=>byId.has(id));
      practiceIds=[...queue];stepEvidence={};queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);resetCounts();
      render();showView('practice');return;
    }
@@ -197,7 +206,14 @@
  }
  function examReady(r){return window.MemoryPolicy?window.MemoryPolicy.examReady(r):!!r&&(r.recall_review_successes||0)>=2;}
  function startQueue({all=false}={}){
-   activeLesson=null;activeStep=null;stepEvidence={};let list=subset();
+   activeLesson=null;activeStep=null;stepEvidence={};
+   if(topic==='phrase'&&courseBlock&&window.PhraseDrill&&mode!=='exam'){
+     mode='phrase';
+     const seenIds=Object.keys(records).filter(id=>records[id]&&records[id].seen);
+     const list=window.PhraseDrill.session(courseBlock,{count:courseBlock==='1-2'?16:12,seen_ids:seenIds});
+     queue=list.map(q=>q.id).filter(id=>byId.has(id));practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);resetCounts();render();return;
+   }
+   let list=subset();
    if(!vocabRole)list=list.filter(q=>q.wordRole!=='used');
    if(mode==='smart'){list=shuffled(list).sort((a,b)=>Number(window.Knowledge.bindings(b).some(x=>x.skill_type==='production'))-Number(window.Knowledge.bindings(a).some(x=>x.skill_type==='production')));list=core.chooseShortSession(list,records,Date.now(),questions.length);}
    else if(mode==='review')list=list.filter(q=>core.isDue(records[q.id])).sort((a,b)=>records[a.id].dueAt-records[b.id].dueAt);
