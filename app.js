@@ -1,7 +1,10 @@
 /* All answers are checked locally against the reviewed course key. */
 (function(){
  'use strict';
- const course=window.COURSE, core=window.TrainerCore, questions=course.questions;
+ const course=window.COURSE, core=window.TrainerCore;
+ try{window.Lesson31Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{window.PhraseDrill?.install?.(course,window.CURRICULUM);}catch{}
+ const questions=course.questions;
  function coerceTyped(q){
    if(q.kind==='multi'){
      q.kind='fields';
@@ -115,6 +118,7 @@
   if(!q)return false;
   if(q.source==='p2b'&&!records[q.id]?.seen&&mode!=='course')return false;
   if(q.source==='phrase'&&!records[q.id]?.seen&&mode!=='phrase'&&mode!=='course')return false;
+  if(q.source==='phase3-31'&&!records[q.id]?.seen&&mode!=='course'&&mode!=='phrase')return false;
   return catalog.eligible(q,state)&&(!q.promotedWord||state.vocabulary[q.promotedWord]?.target_or_context==='target');
  }
  function activateCard(){
@@ -185,7 +189,7 @@
    if(resumeCourse){render();showView('practice');return;}
    const first=window.LEARNING.lessons.find(l=>l.courseLesson===block);
    if(first)learningState.lessonId=first.id;
-   const lessonCards=window.Phase2BPractice?.lessonSession?.(block)||[];
+   const lessonCards=block==='3-1'?(window.Lesson31Pack?.lessonSession?.()||[]):(window.Phase2BPractice?.lessonSession?.(block)||[]);
    if(lessonCards.length&&mode!=='exam'){
      mode='course';
      let ordered=lessonCards.slice();

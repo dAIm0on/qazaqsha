@@ -1343,6 +1343,27 @@ assert.equal(Gate31.futureHits(gate31Cards,cat31).length,0);
 assert.equal(Gate31.examEligible(Lesson31A.sessionA()[0],cat31),false);
 ok('Phase 3 curriculum gate can unlock possessive/existence at 3-1 while later grammar stays closed');
 
+const closedCourse={questions:[],sources:{}};
+assert.equal(Lesson31A.install(closedCourse,cat23).length,0);
+assert.equal(require('./phrase-drill.js').forLesson('3-1',cat23).length,0);
+const openCourse={questions:[],sources:{}};
+assert.equal(Lesson31A.grammarQuestions().length,28);
+assert.equal(Lesson31A.lessonSession().length,46);
+assert.equal(Lesson31A.install(openCourse,cat31).length,28);
+const PD31=require('./phrase-drill.js');
+assert.equal(PD31.forLesson('3-1',cat31).length,18);
+assert.equal(PD31.install(openCourse,cat31).length,18);
+assert.equal(openCourse.questions.length,46);
+const s31=PD31.session('3-1',{catalog:cat31,count:12,random:()=>0.37,seen_ids:[]});
+assert.equal(s31.length,12);
+assert.equal(s31.filter(q=>q.title==='RU → KK').length,6);
+assert.equal(s31.filter(q=>q.title==='KK → RU').length,6);
+assert.ok(!/сіздің|біздің|олардың/u.test(JSON.stringify(s31)));
+const app31Src=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(/Lesson31Pack\?\.install\?\.\(course,window\.CURRICULUM\)/.test(app31Src));
+assert.ok(/block==='3-1'\?\(window\.Lesson31Pack\?\.lessonSession/.test(app31Src));
+ok('Phase 3 dormant Practice/Phrase integration installs nothing while closed and all 46 items when 3-1 gate opens');
+
 const Pack31Source=fs.readFileSync(path.join(__dirname,'lesson-pack-3-1.js'),'utf8');
 assert.ok(/lesson_id["']?:\s*["']3-1["']/.test(Pack31Source));
 assert.ok(/hw31-01-ru/.test(Pack31Source)&&/hw31-18-kk/.test(Pack31Source));

@@ -4,6 +4,7 @@
  const node=typeof module!=='undefined'&&module.exports;
  const core=node?require('./core.js'):root.TrainerCore;
  const diagnostics=node?require('./diagnostics.js'):root.ErrorDiagnostics;
+ const gate=node?require('./curriculum-gate.js'):root.CurriculumGate;
 
  function clone(x){return JSON.parse(JSON.stringify(x));}
  function field({id,order,title,stimulus,answers,rule,error_type,explanation,kind='fields',session='A'}){
@@ -202,8 +203,18 @@
  function sessionF(){return SESSION_F.map(clone);}
  function sessionG(){return SESSION_G.map(clone);}
  function errorPack(){return ERROR_PACK.map(clone);}
- function all(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD(),...sessionE(),...sessionF(),...sessionG(),...errorPack()];}
+ function lessonSession(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD(),...sessionE(),...sessionF(),...errorPack(),...sessionG()];}
+ function grammarQuestions(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD(),...sessionE(),...sessionF(),...errorPack()];}
+ function all(){return [...lessonSession()];}
  function byId(id){const q=[...SESSION_A,...SESSION_B,...SESSION_C,...SESSION_D,...SESSION_E,...SESSION_F,...SESSION_G,...ERROR_PACK].find(x=>x.id===id);return q?clone(q):null;}
+ function install(course,catalog){
+  if(!course||!Array.isArray(course.questions)||!gate||!gate.allows||!gate.allows('possessive',catalog))return [];
+  course.sources=course.sources||{};
+  if(!course.sources['phase3-31'])course.sources['phase3-31']={title:'Урок 3-1 · притяжательные формы',url:'#',additional:true};
+  const known=new Set(course.questions.map(q=>q.id)),added=[];
+  for(const q of grammarQuestions()){if(known.has(q.id))continue;course.questions.push(clone(q));known.add(q.id);added.push(q.id);}
+  return added;
+ }
  function check(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
   if(!q||!core||!core.evaluate)throw new Error('Lesson 3-1 closed pack unavailable');
@@ -214,6 +225,6 @@
  }
  function isClosed(){return true;}
 
- const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,SESSION_E,SESSION_F,SESSION_G,ERROR_PACK,sessionA,sessionB,sessionC,sessionD,sessionE,sessionF,sessionG,errorPack,all,byId,check,isClosed};
+ const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,SESSION_E,SESSION_F,SESSION_G,ERROR_PACK,sessionA,sessionB,sessionC,sessionD,sessionE,sessionF,sessionG,errorPack,lessonSession,grammarQuestions,all,byId,check,isClosed,install};
  if(node)module.exports=api;else root.Lesson31Pack=api;
 })(typeof window!=='undefined'?window:globalThis);
