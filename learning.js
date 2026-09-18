@@ -1,54 +1,76 @@
 (function(){
 'use strict';
-const data=window.LEARNING,core=window.TrainerCore;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=s=>document.querySelector(s);
 function create(api){
- function render(){
-  const state=api.state,lesson=data.lessons.find(l=>l.id===state.lessonId)||data.lessons[0];state.lessonId=lesson.id;
-  const i=Math.min(lesson.chunks.length-1,Math.max(0,state.steps[lesson.id]||0)),step=lesson.chunks[i];
-  const complete=!!state.completedSteps[lesson.id+':'+i];
-  $('#learn-content').innerHTML='<p class="learn-lead">Текущий шаг — первый. Остальные уроки 1–1…2–3 ниже.</p>'+
-   '<article class="panel micro-lesson learn-current"><div class="lesson-top"><p class="eyebrow">УРОК '+lesson.courseLesson+' · ШАГ '+(i+1)+' / '+lesson.chunks.length+'</p><span class="small">'+(complete?'Проверка пройдена':'Одна идея → проверка')+'</span></div><h2>'+esc(step.title)+'</h2><p class="lesson-intro">'+esc(step.explanation)+'</p>'+
-   (step.items.length?'<div class="study-heading"><h3>Примеры</h3><button type="button" class="secondary-button" id="toggle-study" aria-expanded="false" aria-controls="study-grid">Показать ответы</button></div><div class="study-grid" id="study-grid">'+step.items.map((item,n)=>'<div class="study-card"><p class="study-front">'+esc(item.front)+'</p><div class="study-answer" id="study-answer-'+n+'" hidden><p class="study-back" lang="kk">'+esc(item.back)+'</p><p class="small">'+esc(item.cue)+'</p></div><button type="button" class="text-button individual-answer" data-answer="'+n+'" aria-controls="study-answer-'+n+'" aria-expanded="false">Проверить себя</button></div>').join('')+'</div>':'')+
-   '<div class="lesson-actions"><button type="button" class="primary-button" id="start-lesson">Понятно — проверить</button><button type="button" class="secondary-button" id="start-lesson-bank">Практика урока ('+step.questionIds.length+') — другой объём</button></div>'+
-   '<details class="personal-cue"><summary>Ассоциация к этой идее</summary><label for="personal-cue">Мой образ или подсказка</label><textarea id="personal-cue" rows="2" maxlength="1200">'+esc(api.association(step.associationKey)||state.notes[lesson.id]||'')+'</textarea><p class="small">Во время проверки показывается только по запросу и считается подсказкой.</p></details>'+
-   (lesson.note?'<details><summary>Важное уточнение</summary><p>'+esc(lesson.note)+'</p></details>':'')+
-   '</article><div class="lesson-pagination"><button type="button" class="secondary-button" id="previous-step" '+(i===0?'disabled':'')+'>← Назад</button><button type="button" class="secondary-button" id="next-step">'+(i<lesson.chunks.length-1?'Следующая идея →':'Следующий урок →')+'</button></div>'+
-   (api.courseJumpMarkup?api.courseJumpMarkup('learn-course-jump'):'')+
-   '<details class="panel compact-panel learn-more-steps"><summary>Другие шаги этого курса</summary><div class="lesson-selector"><label for="micro-lesson">Маленький урок</label><select id="micro-lesson">'+
-   [['numbers','Числа'],['vocab','Слова'],['sounds','Сингармонизм'],['plural','Грамматика'],['person','Личные окончания'],['rules','Правила']].map(([id,title])=>'<optgroup label="'+title+'">'+data.lessons.filter(l=>l.topic===id).map(l=>'<option value="'+l.id+'" '+(l.id===lesson.id?'selected':'')+'>'+esc(l.title)+'</option>').join('')+'</optgroup>').join('')+'</select></div></details>'+
-   (lesson.tool?toolMarkup(lesson.tool):'')+
-   '<details class="panel method-note"><summary>Уровни и повторения</summary><p>Новое → изучается → знакомо → помню после паузы → устойчиво вспоминаю. Выбор из вариантов не равен самостоятельному воспроизведению. Высокие уровни требуют правильных ответов после пауз.</p><p>Дата повторения автоматически рассчитывается по истории ответов. Медленный правильный ответ не штрафуется. Своя ассоциация считается подсказкой.</p><p>Если для повторения ошибки нет трёх других карточек, она переносится в следующий подход.</p><div class="link-list"><a href="https://journals.sagepub.com/doi/10.1111/j.1467-9280.2006.01693.x" target="_blank" rel="noopener noreferrer">Проверка по памяти: исследование</a><a href="https://pubmed.ncbi.nlm.nih.gov/19076480/" target="_blank" rel="noopener noreferrer">Интервалы: исследование</a></div></details>';
-  if(api.bindCourseJump)api.bindCourseJump($('#learn-course-jump'));
-  $('#micro-lesson').onchange=e=>selectLesson(e.target.value);
-  $('#start-lesson').onclick=()=>api.startLesson(lesson.id,i);
-  if($('#start-lesson-bank'))$('#start-lesson-bank').onclick=()=>api.startLesson(lesson.id,i);
-  $('#previous-step').onclick=()=>{state.steps[lesson.id]=i-1;api.save();render();};
-  $('#next-step').onclick=()=>{if(i<lesson.chunks.length-1){state.steps[lesson.id]=i+1;api.save();render();}else{const next=data.lessons[data.lessons.indexOf(lesson)+1];if(next)selectLesson(next.id);else api.today();}};
-  $('#personal-cue').oninput=e=>api.setAssociation(step.associationKey,e.target.value);
-  function show(b,visible){$('#study-answer-'+b.dataset.answer).hidden=!visible;b.textContent=visible?'Скрыть':'Проверить себя';b.setAttribute('aria-expanded',String(visible));}
-  function sync(){const visible=[...document.querySelectorAll('.study-answer')].some(e=>!e.hidden);$('#toggle-study').textContent=visible?'Скрыть ответы':'Показать ответы';$('#toggle-study').setAttribute('aria-expanded',String(visible));}
-  document.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>{show(b,$('#study-answer-'+b.dataset.answer).hidden);sync();});
-  if($('#toggle-study'))$('#toggle-study').onclick=()=>{const visible=$('#toggle-study').getAttribute('aria-expanded')!=='true';document.querySelectorAll('[data-answer]').forEach(b=>show(b,visible));sync();};
-  bindTool(lesson.tool);
+ function progressOf(lessonId){
+  const G=window.GrammarPath;
+  const les=G&&G.lesson(lessonId);
+  const gp=api.grammarPath?api.grammarPath():{};
+  const n=les&&les.chapters?les.chapters.length:0;
+  const done=n?(les.chapters.filter(c=>gp.completedChapters&&gp.completedChapters[lessonId+':'+c.id]).length):0;
+  return {n,done,started:done>0||(gp.lessonId===lessonId&&gp.chapterId),all:n>0&&done>=n};
  }
- function selectLesson(id){api.state.lessonId=id;api.save();render();$('#learn-view').scrollIntoView({block:'start'});}
+ function currentId(){
+  const Bank=window.ExplainBankUI;
+  const list=Bank?Bank.COURSE:[];
+  const gp=api.grammarPath?api.grammarPath():{};
+  if(gp.lessonId&&list.some(c=>c.id===gp.lessonId))return gp.lessonId;
+  for(const c of list){
+   const p=progressOf(c.id);
+   if(!p.all)return c.id;
+  }
+  return list[0]&&list[0].id||'1-1';
+ }
+ function render(){
+  const Bank=window.ExplainBankUI;
+  const list=Bank?Bank.COURSE:[];
+  const id=currentId();
+  const cur=list.find(c=>c.id===id)||list[0];
+  const G=window.GrammarPath;
+  const les=G&&G.lesson(id);
+  const p=progressOf(id);
+  const chIndex=les&&les.chapters&&p.done<les.chapters.length?p.done:0;
+  const ch=les&&les.chapters?les.chapters[Math.min(chIndex,les.chapters.length-1)]:null;
+  const chTitle=ch&&Bank?Bank.chapterTitle(ch):(ch&&ch.title)||'';
+  const cta=p.all?'Повторить урок':(p.started?'Продолжить урок':'Начать урок');
+  const prog=p.n?('Глава '+(Math.min(p.done+1,p.n))+' из '+p.n):'';
+  $('#learn-content').innerHTML=
+   '<article class="panel learn-now">'+
+    '<p class="eyebrow">ТЕКУЩИЙ УРОК</p>'+
+    '<h2>Урок '+(cur?esc(cur.label):esc(id))+'</h2>'+
+    '<p class="learn-now-name">'+(cur?esc(cur.name):'')+'</p>'+
+    (prog?'<p class="small">'+esc(prog)+(chTitle?(' · '+esc(chTitle)):'')+'</p>':'')+
+    '<div class="lesson-actions"><button type="button" class="primary-button" id="learn-continue">'+esc(cta)+'</button></div>'+
+   '</article>'+
+   '<div class="panel learn-course"><h2>Все уроки</h2><div class="learn-lessons">'+
+    list.map(c=>{
+     const pr=progressOf(c.id);
+     const mark=pr.all?'Разобран':(pr.started?'В процессе':'Не начат');
+     return '<button type="button" class="lesson" data-learn-les="'+esc(c.id)+'" '+(c.id===id?'aria-current="true"':'')+'>'+
+      '<span class="number">'+esc(c.label)+'</span><div><h3>'+esc(c.name)+'</h3><p>'+(pr.n?(pr.done+' из '+pr.n+' глав'):'')+'</p></div>'+
+      '<span class="small">'+esc(mark)+'</span></button>';
+    }).join('')+
+   '</div></div>'+
+   '<div class="panel compact-panel learn-secondary"><p class="small">Дополнительно</p>'+
+    '<div class="review-actions">'+
+     '<button type="button" class="secondary-button" id="learn-practice">Практика этого урока</button>'+
+     '<button type="button" class="text-button" id="learn-homework">Домашка</button>'+
+    '</div></div>';
+  const go=$('#learn-continue');
+  if(go)go.onclick=()=>api.openPath?api.openPath(id):api.startCourse(id);
+  document.querySelectorAll('[data-learn-les]').forEach(b=>b.onclick=()=>{
+   if(api.openPath)api.openPath(b.dataset.learnLes);
+  });
+  const pr=$('#learn-practice');if(pr)pr.onclick=()=>api.startCourse(id);
+  const hw=$('#learn-homework');if(hw)hw.onclick=()=>{if(api.openHomework)api.openHomework(id);else api.today();};
+  if(window.TutorUI){
+   window.TutorUI.setContext({surface:'learn',lesson_id:id,rule_id:cur&&cur.rules[0]});
+   window.TutorUI.syncView('learn');
+  }
+ }
+ function selectLesson(id){if(api.openPath)api.openPath(id);}
  return {render,selectLesson};
 }
- function toolMarkup(type){
-   if(type==='number')return `<details class="panel concept-tool"><summary>Конструктор чисел: проверь свой пример</summary><p>Сначала назови число сама. Затем посмотри, из каких частей оно складывается.</p><form id="number-builder"><label for="number-value">Целое число от 0 до 999999</label><div class="builder-controls"><input id="number-value" type="text" inputmode="numeric" pattern="[0-9]{1,6}" maxlength="6" value="47" required><button type="submit" class="secondary-button">Разобрать</button></div></form><div id="number-result" class="builder-result" role="status" aria-live="polite"></div></details>`;
-   return `<details class="panel concept-tool"><summary>${type==='plural'?'Разбор окончания по шагам':'Найди последний слог'}</summary><p>Выбери слово и предскажи ответ. Нажми «Разобрать», чтобы сравнить свои рассуждения.</p><form id="harmony-builder"><label for="harmony-word">Слово для разбора</label><div class="builder-controls"><select id="harmony-word">${data.analyses.map((a,i)=>`<option value="${i}">${esc(a.word)}</option>`).join('')}</select><button type="submit" class="secondary-button">Разобрать</button></div></form><div id="harmony-result" class="builder-result" role="status" aria-live="polite"></div></details>`;
- }
- function bindTool(type){
-   if(type==='number')$('#number-builder').onsubmit=e=>{
-     e.preventDefault();const raw=$('#number-value').value.trim(),parts=/^\d{1,6}$/.test(raw)?core.numberParts(raw):null;
-     $('#number-result').innerHTML=parts?`<p class="decomposition">${Number(raw)} = ${parts.map(p=>p.value).join(' + ')}</p><div class="number-parts">${parts.map(p=>`<div><span>${p.value}</span><strong lang="kk">${p.word}</strong></div>`).join('')}</div><p class="assembled-word" lang="kk">${core.numberToKazakh(raw)}</p><p class="small">Большие разряды первыми. Нулевые разряды внутри числа пропускаем. Между словами — пробел.</p>`:'<p>Введи целое число от 0 до 999999.</p>';
-   };
-   if(type==='harmony'||type==='plural')$('#harmony-builder').onsubmit=e=>{
-     e.preventDefault();const a=data.analyses[Number($('#harmony-word').value)];
-     $('#harmony-result').innerHTML=`<ol class="learning-steps"><li><span lang="kk">${esc(a.split)}</span>: последний слог <strong lang="kk">${esc(a.last)}</strong>.</li><li>${a.family} группа → <strong>${a.vowel.toUpperCase()}</strong> в окончании.</li><li>${esc(a.reason)}</li></ol><p class="assembled-word" lang="kk">${esc(a.word)} + ${a.suffix} = ${esc(a.plural)}</p><p class="small">Гласная — по последнему слогу. Согласная — по последней букве.</p>`;
-   };
- }
  window.LearningUI={create};
 })();

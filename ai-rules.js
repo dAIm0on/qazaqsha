@@ -54,6 +54,9 @@
  }
  function toRuleContext(card){
   if(!card)return null;
+  const Bank=typeof module!=='undefined'&&module.exports?(function(){try{return require('./explain-bank-adapter.js');}catch{return null;}}()):(typeof window!=='undefined'?window.ExplainBankUI:null);
+  const fromBank=Bank&&Bank.context&&card.rule_id?Bank.context(card.rule_id):null;
+  if(fromBank&&fromBank.medium)return fromBank;
   const medium=card.medium||card.explanation_ru||'';
   return {
    rule_id:card.rule_id,

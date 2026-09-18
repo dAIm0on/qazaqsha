@@ -218,10 +218,26 @@
  function showView(next){
    pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
    view=next;document.body.dataset.view=next;
-   ['today','learn','review','vocabulary','practice','rules','materials','exam','homework','path'].forEach(v=>{const el=$('#'+v+'-view');if(el)el.hidden=v!==next;});
+   document.querySelectorAll('main > section').forEach(el=>{el.hidden=el.id!==next+'-view';});
    const tab=next==='practice'?(mode==='exam'?'exam':'review'):next;
    $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();save();
+   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();
+   if(window.TutorUI){
+     window.TutorUI.mount();
+     window.TutorUI.syncView(next==='practice'&&mode==='exam'?'exam':next);
+   }
+   save();
+ }
+ function openPathLesson(lessonId){
+   const G=window.GrammarPath;if(!G){showView('path');return;}
+   G.startLesson(state,lessonId);
+   const gp=state.grammarPath,les=G.lesson(lessonId);
+   if(les){
+     const next=(les.chapters||[]).find(c=>!(gp.completedChapters&&gp.completedChapters[les.id+':'+c.id]));
+     if(next)G.startChapter(state,les.id,next.id);
+     else{gp.phase='done';gp.chapterId=null;}
+   }
+   save();showView('path');
  }
  function filterSummary(){
    const t=topics.find(x=>x[0]===topic);
@@ -624,16 +640,28 @@
    state.grammarPath=G.migrateProgress(state.grammarPath||G.emptyProgress());
    const gp=state.grammarPath,list=G.lessons();
    const crumb=(les,ch)=>{
-     const bits=['<button type="button" class="text-button" data-path-hub>Уроки</button>'];
+     const Bank=window.ExplainBankUI;
+     const title=ch&&Bank?Bank.chapterTitle(ch):(ch&&ch.title)||'';
+     const bits=['<button type="button" class="text-button" data-path-learn>← Учить</button>'];
      if(les)bits.push('<span>→</span><button type="button" class="text-button" data-path-les="'+esc(les.id)+'">Урок '+esc(les.id)+'</button>');
-     if(ch)bits.push('<span>→</span><strong>'+esc(ch.title)+'</strong>');
+     if(ch)bits.push('<span>→</span><strong>'+esc(title)+'</strong>');
      return '<nav class="path-crumb">'+bits.join(' ')+'</nav>';
    };
    const bindCrumb=()=>{
+     const back=root.querySelector('[data-path-learn]');if(back)back.onclick=()=>showView('learn');
      const h=root.querySelector('[data-path-hub]');if(h)h.onclick=()=>{gp.phase='hub';gp.lessonId=null;gp.chapterId=null;save();renderPath();};
      const l=root.querySelector('[data-path-les]');if(l)l.onclick=()=>{G.startLesson(state,l.dataset.pathLes);save();renderPath();};
    };
+   const bindTutor=(les,ch)=>{
+     if(!window.TutorUI)return;
+     const Bank=window.ExplainBankUI;
+     window.TutorUI.setContext({surface:'path',lesson_id:les&&les.id||'',chapter_id:ch&&ch.id||'',rule_id:ch&&Bank?Bank.ruleForChapter(ch):''});
+     window.TutorUI.syncView('path');
+   };
+   const isCanonBeat=k=>['goal','why','bridge','slots','algo','ex','trap','fold'].includes(k);
+   document.body.classList.toggle('path-immersive',!!(gp.lessonId&&gp.phase==='beat'));
    if(gp.phase==='hub'||gp.phase==='pick'||!gp.lessonId){
+     bindTutor(null,null);
      root.innerHTML=`<div class="panel path-map"><h2>Уроки и правила</h2><p>Разбираем только то, что уже было на занятиях. Это не домашка и не «Пора повторить».</p>
        <div class="path-lessons">${list.map(les=>{
          const n=les.chapters.length,done=les.chapters.filter(c=>gp.completedChapters&&gp.completedChapters[les.id+':'+c.id]).length;
@@ -645,14 +673,27 @@
    }
    const les=G.lesson(gp.lessonId);
    if(!les){gp.phase='hub';renderPath();return;}
+   const Bank=window.ExplainBankUI;
+   const courseRow=Bank&&Bank.courseById(les.id);
+   if(gp.phase==='done'){
+     bindTutor(les,null);
+     root.innerHTML=`<div class="panel path-paper">${crumb(les,null)}<h2>Урок разобран</h2><p>${esc(courseRow?courseRow.name:les.title)}</p>
+       <div class="lesson-actions"><button type="button" class="primary-button" id="path-to-practice">Перейти к практике</button>
+       <button type="button" class="secondary-button" data-path-learn>К урокам</button></div></div>`;
+     bindCrumb();
+     const go=$('#path-to-practice');if(go)go.onclick=()=>startCourse(les.id);
+     return;
+   }
    if(gp.phase==='lesson'||!gp.chapterId){
-     root.innerHTML=`<div class="panel">${crumb(les,null)}<h2>Урок ${esc(les.id)}</h2><p>${esc(les.title)}</p>
-       <p class="small">Глава — один кусок правила. Не прыгай через непонятое.</p>
+     bindTutor(les,null);
+     root.innerHTML=`<div class="panel">${crumb(les,null)}<h2>Урок ${esc(courseRow?courseRow.label:les.id)}</h2><p>${esc(courseRow?courseRow.name:les.title)}</p>
+       <p class="small">${esc((les.chapters||[]).filter(c=>gp.completedChapters&&gp.completedChapters[les.id+':'+c.id]).length)} из ${les.chapters.length} глав</p>
        <div class="path-chapters">${les.chapters.map((c,i)=>{
          const ok=gp.completedChapters&&gp.completedChapters[les.id+':'+c.id];
-         return `<button type="button" class="secondary-button" data-ch="${c.id}">Глава ${i+1} из ${les.chapters.length} · ${esc(c.title)}${ok?' ✓':''}</button>`;
+         const title=Bank?Bank.chapterTitle(c):c.title;
+         return `<button type="button" class="secondary-button" data-ch="${c.id}">Глава ${i+1} из ${les.chapters.length} · ${esc(title)}${ok?' ✓':''}</button>`;
        }).join('')}</div>
-       <p><button type="button" class="text-button" data-path-hub>Ко всем урокам</button></p></div>`;
+       <p><button type="button" class="text-button" data-path-learn>К урокам</button></p></div>`;
      bindCrumb();
      root.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{G.startChapter(state,les.id,b.dataset.ch);save();renderPath();});
      return;
@@ -660,9 +701,13 @@
    const ch=G.chapter(les.id,gp.chapterId);if(!ch){gp.phase='lesson';renderPath();return;}
    const beats=ch.beats||[],beat=beats[gp.beat];
    if(!beat){
-     G.markChapterDone(gp,les.id,ch.id);gp.phase='lesson';gp.chapterId=null;save();renderPath();return;
+     G.markChapterDone(gp,les.id,ch.id);
+     const nxt=(les.chapters||[]).find(c=>c.id!==ch.id&&!(gp.completedChapters&&gp.completedChapters[les.id+':'+c.id]));
+     if(nxt){G.startChapter(state,les.id,nxt.id);save();renderPath();return;}
+     gp.phase='done';gp.chapterId=null;save();renderPath();return;
    }
-   const head=`${crumb(les,ch)}<p class="small">Глава ${les.chapters.findIndex(c=>c.id===ch.id)+1} из ${les.chapters.length} · шаг ${gp.beat+1} из ${beats.length}</p>`;
+   const chTitle=Bank?Bank.chapterTitle(ch):ch.title;
+   const head=`${crumb(les,ch)}<p class="small">Урок ${esc(courseRow?courseRow.label:les.id)} · ${esc(courseRow?courseRow.name:les.title)}</p><p class="small">Глава ${les.chapters.findIndex(c=>c.id===ch.id)+1} из ${les.chapters.length} · ${esc(chTitle)}</p>`;
    const nextBeat=()=>{gp.beat++;save();renderPath();};
    const letters=state.prefs.letters;
    const kb=letters?`<div class="letter-keyboard" lang="kk">${[...'әғқңөұүһі'].map(ch=>'<button type="button" lang="kk" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`:'';
@@ -819,6 +864,32 @@
        }).catch(()=>{if(token===tutorToken)showLocal('examples');}).finally(()=>{go.disabled=false;});
      };
    }
+   const bankCard=Bank&&Bank.cardForChapter(ch);
+   const canonKey=les.id+':'+ch.id;
+   if(bankCard&&isCanonBeat(beat.k)){
+     if(gp.canonShownFor===canonKey){
+       while(beats[gp.beat]&&isCanonBeat(beats[gp.beat].k))gp.beat++;
+       save();renderPath();return;
+     }
+     gp.canonShownFor=canonKey;
+     const paras=Bank.paras;
+     const ru=paras(bankCard.ru_refresh).map(p=>'<p>'+esc(p)+'</p>').join('');
+     const med=paras(bankCard.medium).map(p=>'<p>'+esc(p)+'</p>').join('');
+     const ex=(bankCard.examples||[]).map(x=>'<li lang="kk">'+esc(x)+'</li>').join('');
+     const traps=(bankCard.traps||[]).map(t=>'<li>Не так: <span lang="kk">'+esc(String(t).replace(/^\*/,''))+'</span></li>').join('');
+     const rest=beats.find((b,i)=>i>=gp.beat&&!isCanonBeat(b.k));
+     const cta=rest&&rest.k==='ask'?'Проверить себя':'Продолжить →';
+     root.innerHTML=`<div class="panel path-paper path-canon">${head}<h2>${esc(bankCard.title)}</h2>
+       ${ru?'<section class="path-block path-ru"><h3>Сравни с русским</h3>'+ru+'</section>':''}
+       ${med?'<section class="path-block"><h3>Как работает</h3>'+med+'</section>':''}
+       ${ex?'<section class="path-block"><h3>Примеры</h3><ul class="path-ex">'+ex+'</ul></section>':''}
+       ${traps?'<section class="path-block"><h3>Не перепутай</h3><ul class="path-traps">'+traps+'</ul></section>':''}
+       <button type="button" class="primary-button" id="path-next">${cta}</button></div>`;
+     bindCrumb();bindTutor(les,ch);attachPathAsk();
+     $('#path-next').onclick=()=>{while(beats[gp.beat]&&isCanonBeat(beats[gp.beat].k))gp.beat++;save();renderPath();};
+     return;
+   }
+   bindTutor(les,ch);
    if(beat.k==='goal'){
      root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">ЦЕЛЬ ГЛАВЫ</p><h2>После этой главы</h2><p>${esc(beat.t)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
      bindCrumb();attachPathAsk();$('#path-next').onclick=nextBeat;return;
@@ -926,7 +997,9 @@
        if(ok){nextBeat();return;}
        const right=exp();
        const diag=formAsk&&val.trim()?G.diagnoseProd(right,val):'Пока неверно.';
-       showPathFb('error','<p>'+esc(diag)+'</p>'+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+'<p>Правильно: <strong>'+esc(right)+'</strong></p><button type="button" class="primary-button" id="path-go">Дальше</button>');
+       showPathFb('error','<p>'+esc(diag)+'</p>'+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+'<p>Правильно: <strong>'+esc(right)+'</strong></p><div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
+       const again=$('#path-again-rule');if(again)again.onclick=()=>{const c=window.ExplainBankUI&&window.ExplainBankUI.cardForChapter(ch);showPathFb('hinted','<p>'+esc(c&&(c.short||c.medium)||hintLine())+'</p>');};
+       const askT=$('#path-ask-tutor');if(askT)askT.onclick=()=>{if(window.TutorUI)window.TutorUI.open();};
        save();
      };
      attachPathAsk();
@@ -1177,7 +1250,8 @@
    try{localStorage.setItem(BACKUP,P.serialize(state));}catch{}const retainedPackages=state.lesson_packages;state=P.empty();state.lesson_packages=retainedPackages;records=state.records;learningState=state.learning;storageReadError=null;topic='all';mode='smart';sourceFilter=null;activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;showView('today');
  }
  const learning=window.LearningUI.create({
-   get state(){return learningState;},save,startLesson,startCourse,courseJumpMarkup,bindCourseJump,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today')
+   get state(){return learningState;},save,startLesson,startCourse,courseJumpMarkup,bindCourseJump,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today'),
+   grammarPath:()=>state.grammarPath,openPath:openPathLesson,openHomework(id){hwLesson=id;showView('homework');}
  });
  const dashboard=window.DashboardUI.create({
    state:()=>state,questions:()=>questions,eligible,hasSession:()=>queue.length>position,

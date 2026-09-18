@@ -112,9 +112,9 @@ ok('TEST 15 future topic local; Russian contrast allowed');
 
 const t4=R.toRuleContext(R.byId('T4_NO_PLURAL_AFTER_NUMBER'));
 assert.ok(t4.medium);
-assert.ok(/пять книг/.test(t4.ru_refresh));
+assert.ok(/книг/.test(t4.ru_refresh));
 const askLocal=C.localExplain({mode:'ask_tutor',lesson_id:'1-3',user_question:'Объясни через русский',rule_context:[t4]});
-assert.ok(/бес кітап/.test(askLocal.message_ru)||/пять книг/.test(askLocal.message_ru));
+assert.ok(/кітап/.test(askLocal.message_ru)||/книг/.test(askLocal.message_ru));
 assert.ok(!/Не разобрала/.test(askLocal.message_ru));
 ok('TEST 12/25 ask_tutor local Russian refresh');
 

@@ -608,7 +608,48 @@ body.keyboard-open #account-dialog{
   .bottom-nav button{font-size:.5625rem;padding:6px 0}
 }
 
+.learn-now{background:var(--lilac,#DDD0F6)}
+.learn-now h2{margin:0 0 4px}
+.learn-now-name{font-size:1.15rem;margin:0 0 8px}
+.learn-lessons{display:flex;flex-direction:column;gap:8px}
+.learn-lessons .lesson{display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center;text-align:left;width:100%;padding:12px 14px;min-height:56px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.learn-lessons .lesson[aria-current=true]{background:var(--oil,#F3E18A);border-color:transparent}
+.learn-lessons h3{margin:0;font-size:1rem}
+.path-paper{max-width:44rem;margin:0 auto}
+.path-canon .path-block{margin:16px 0}
+.path-canon h3{font-size:1.05rem;margin:0 0 8px}
+.path-canon p{margin:0 0 10px;line-height:1.55}
+.path-ru{background:var(--oil,#F3E18A);padding:12px 14px;border-radius:14px}
+.path-ex,.path-traps{margin:0;padding-left:1.2rem;line-height:1.5}
+.path-traps{color:var(--ink)}
+body.path-immersive .bottom-nav{display:none!important}
+body.path-immersive #path-view .section-heading{display:none}
+body[data-view=path] #path-view,body[data-view=learn] #learn-view{display:block!important}
+body[data-view=path] #today-view,body[data-view=learn] #today-view{display:none!important}
+body[data-view=learn] #learn-content,body[data-view=path] #path-content{padding-bottom:72px}
+body[data-view=learn] .issue-toggle,body[data-view=path] .issue-toggle{display:none!important}
+#tutor-host{position:fixed;z-index:35;right:10px;bottom:calc(10px + var(--bottom-nav-height,64px));pointer-events:none}
+body.path-immersive #tutor-host{bottom:16px}
+#tutor-host[hidden]{display:none}
+.tutor-launch{pointer-events:auto;width:52px;height:52px;padding:0;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:0 6px 16px rgba(22,20,18,.12);display:grid;place-items:center}
+.tutor-launch img{width:40px;height:46px;object-fit:contain;pointer-events:none}
+.tutor-sheet{pointer-events:auto;position:fixed;left:0;right:0;bottom:0;z-index:36;max-height:min(78dvh,640px);overflow:auto;background:var(--surface);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px) + var(--kbinset,0px));box-shadow:0 -10px 24px rgba(22,20,18,.12)}
+.tutor-sheet-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;margin-bottom:8px}
+.tutor-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+#tutor-q{width:100%;min-height:54px;font-size:max(16px,1rem);margin:6px 0}
+.tutor-out{margin-top:10px;line-height:1.5}
+html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
+@media(min-width:900px){
+  .tutor-launch{width:60px;height:60px;right:20px}
+  .tutor-launch img{width:46px;height:54px}
+  .tutor-sheet{left:auto;right:24px;bottom:88px;width:min(380px,42vw);border:1px solid var(--line);border-radius:16px;max-height:70vh}
+  .path-paper{max-width:42rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .tutor-launch{transition:none}
+}
 @media print{
   body{background:#fff!important;color:#000!important}
   .exercise-card,.panel{background:#fff!important;box-shadow:none!important}
+  #tutor-host{display:none!important}
 }
