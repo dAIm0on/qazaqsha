@@ -58,6 +58,14 @@
    phase2b:{genre:'G6',rewrite:true,lesson_order:order,error_type:error_type||''}
   };
  }
+ const HOMEWORK={
+  '1-1':['p2b-11-g1-edge-kitap','p2b-11-g6-kitap-edge'],
+  '1-2':['p2b-12-g2-kitap','p2b-12-g3-people','p2b-12-g6-kitaplar'],
+  '1-3':['p2b-13-g3-n32','p2b-13-g3-two-books','p2b-13-g6-eki-kitaptar'],
+  '2-1':['p2b-21-g3-scientist','p2b-21-g5-neg-qyz','p2b-21-g6-dosmyn'],
+  '2-2':['p2b-22-g3-we-friends','p2b-22-g5-neg-reader','p2b-22-g6-adammiz'],
+  '2-3':['p2b-23-g2-qonaq','p2b-23-g3-he-guest-q','p2b-23-g6-konak-ba']
+ };
  const G1={
   '1-1':[
    cell({id:'p2b-11-g1-class-ae',lesson:'1-1',order:1,topic:'sounds',title:'Одна клетка: какой ряд?',stimulus:'Ә',answers:['мягкий'],rule:'T1_HARMONY',error_type:'harmony_class',explanation:'Ә относится к мягкому ряду.'}),
@@ -211,6 +219,8 @@
  function allG6(){return Object.keys(G6).flatMap(id=>cardsFor(id,'G6'));}
  function all(){return [...allG1(),...allG2(),...allG3(),...allG4(),...allG5(),...allG6()];}
  function byId(id){return all().find(q=>q.id===id)||null;}
+ function homeworkIdsFor(lessonId){return (HOMEWORK[lessonId]||[]).slice();}
+ function homeworkFor(lessonId){return homeworkIdsFor(lessonId).map(byId).filter(Boolean);}
  function checkCell(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
   if(!q||!core||!core.evaluate)throw new Error('Phase 2B card/core unavailable');
@@ -238,7 +248,7 @@
   }
   return added;
  }
- const api={G1,G2,G3,G4,G5,G6,cardsFor,allG1,allG2,allG3,allG4,allG5,allG6,all,byId,checkCell,checkTask:checkCell,install,lessonSession};
+ const api={G1,G2,G3,G4,G5,G6,HOMEWORK,cardsFor,allG1,allG2,allG3,allG4,allG5,allG6,all,byId,homeworkIdsFor,homeworkFor,checkCell,checkTask:checkCell,install,lessonSession};
  if(node)module.exports=api;
  else{
   root.Phase2BPractice=api;

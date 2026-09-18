@@ -1211,6 +1211,22 @@ assert.ok(/\['phrase','Фразы','07'\]/.test(appPhase2B));
 assert.ok(/q\.phase2b&&q\.phase2b\.phrase\?\[\]:words\.filter/.test(fs.readFileSync(path.join(__dirname,'curriculum.js'),'utf8')));
 ok('Phase 2B P1a Phrase Drill: 1-2/1-3 only, no mirrors, balanced directions, >=70% earlier roots, no word-FSRS binding');
 
+assert.deepEqual(P2BG1.homeworkIdsFor('1-1'),['p2b-11-g1-edge-kitap','p2b-11-g6-kitap-edge']);
+for(const id of ['1-2','1-3','2-1','2-2','2-3'])assert.equal(P2BG1.homeworkIdsFor(id).length,3);
+const phaseHwQuestions=P2BG1.all();
+const phaseHw12=hw.buildPack('1-2',phaseHwQuestions,{sources:{}});
+assert.ok(phaseHw12.homework.exercise_ids.includes('p2b-12-g2-kitap'));
+assert.ok(phaseHw12.homework.exercise_ids.includes('p2b-12-g6-kitaplar'));
+assert.equal(phaseHw12.homework.rule_map['p2b-12-g6-kitaplar'],'T2_PLURAL_LDT');
+assert.ok(hw.ruleText(P2BG1.byId('p2b-12-g6-kitaplar')).length>20);
+const phaseHw13=hw.buildPack('1-3',phaseHwQuestions,{sources:{}});
+assert.equal(phaseHw13.homework.rule_map['p2b-13-g6-eki-kitaptar'],'T4_NO_PLURAL_AFTER_NUMBER');
+const phaseHw22=hw.buildPack('2-2',phaseHwQuestions,{sources:{}});
+assert.equal(phaseHw22.homework.rule_map['p2b-22-g5-neg-reader'],'T7_EMES');
+const phaseHw23=hw.buildPack('2-3',phaseHwQuestions,{sources:{}});
+assert.equal(phaseHw23.homework.rule_map['p2b-23-g3-he-guest-q'],'T10_QUESTION');
+assert.ok(!phaseHwQuestions.some(q=>q.lessonId==='3-1'));
+ok('Phase 2B Homework: compact G1-G6 set reuses canonical rule IDs and ExplainBank');
 
 const PhraseDrillGuard=require('./phrase-drill.js');
 const phraseExamProbe=PhraseDrillGuard.forLesson('1-2')[0];
