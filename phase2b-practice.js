@@ -126,7 +126,7 @@
   '2-1':[
    produce({id:'p2b-21-g3-scientist',lesson:'2-1',order:5,topic:'person',stimulus:'Я учёный.',answers:['Мен ғалыммын.','Мен ғалыммын','Ғалыммын.','Ғалыммын'],rule:'T6_PERSON_SG',error_type:'person_sg_form',explanation:'Мен + ғалым → Мен ғалыммын.'}),
    produce({id:'p2b-21-g3-not-doctor',lesson:'2-1',order:5,topic:'person',stimulus:'Ты не врач.',answers:['Сен дәрігер емессің.','Сен дәрігер емессің'],rule:'T7_EMES',error_type:'emes_position',explanation:'Отрицание: дәрігер + емес; личное окончание стоит на емес → емессің.'}),
-   produce({id:'p2b-21-g3-polite-teacher-q',lesson:'2-1',order:5,topic:'person',stimulus:'Вы учитель?',answers:['Сіз мұғалімсіз бе?','Сіз мұғалімсіз бе'],rule:['T6_PERSON_SG','T10_QUESTION'],error_type:'question_class',explanation:'Сіз мұғалімсіз бе? Вопросительная частица стоит отдельно в конце.'})
+   produce({id:'p2b-21-g3-polite-teacher-q',lesson:'2-1',order:5,topic:'person',stimulus:'Вы учитель?',answers:['Сіз мұғалімсіз бе?','Сіз мұғалімсіз бе'],rule:'T6_PERSON_SG',error_type:'question_class',explanation:'Сіз мұғалімсіз бе? Вопросительная частица стоит отдельно в конце.'})
   ],
   '2-2':[
    produce({id:'p2b-22-g3-we-friends',lesson:'2-2',order:4,topic:'person',stimulus:'Мы друзья.',answers:['Біз доспыз.','Біз доспыз'],rule:'T8_PERSON_PL',error_type:'person_pl_form',explanation:'Біз + дос → Біз доспыз.'}),
