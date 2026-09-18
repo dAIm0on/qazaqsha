@@ -155,6 +155,27 @@
    explanation:'Не мысығым + дар. Правильно: мысық + тар + ым → мысықтарым.'
   })
  ];
+ const SESSION_G=[
+  field({id:'p3-31-g-g4-heart',order:1,session:'G',kind:'phrase',title:'KK → RU',stimulus:'Менің жүрегім',answers:['моё сердце','мое сердце'],rule:['T20_POSS','T21_POSS_ASSIM'],error_type:'poss_phrase',explanation:'Менің жүрегім = моё сердце.'}),
+  field({id:'p3-31-g-g4-fingers',order:2,session:'G',kind:'phrase',title:'KK → RU',stimulus:'Сенің саусақтарың',answers:['твои пальцы'],rule:['T20_POSS','T23_POSS_PL'],error_type:'poss_phrase',explanation:'Сенің саусақтарың = твои пальцы.'}),
+  field({id:'p3-31-g-g4-his-book',order:3,session:'G',kind:'phrase',title:'KK → RU',stimulus:'Оның кітабы',answers:['его книга','её книга','ее книга'],rule:['T20_POSS','T21_POSS_ASSIM'],error_type:'poss_phrase',explanation:'Оның кітабы = его/её книга.'}),
+  field({id:'p3-31-g-g4-my-guest',order:4,session:'G',kind:'phrase',title:'KK → RU',stimulus:'Менің қонағым',answers:['мой гость'],rule:['T20_POSS','T21_POSS_ASSIM'],error_type:'poss_phrase',explanation:'Менің қонағым = мой гость.'}),
+  field({id:'p3-31-g-g4-friend-girl',order:5,session:'G',kind:'phrase',title:'KK → RU',stimulus:'Оның құрбысы',answers:['его подруга','её подруга','ее подруга'],rule:'T20_POSS',error_type:'poss_phrase',explanation:'Оның құрбысы = его/её подруга.'}),
+  field({id:'p3-31-g-g4-your-friend',order:6,session:'G',kind:'phrase',title:'KK → RU',stimulus:'Сенің досың',answers:['твой друг'],rule:'T20_POSS',error_type:'poss_phrase',explanation:'Сенің досың = твой друг.'}),
+  field({id:'p3-31-g-g4-teacher',order:7,session:'G',kind:'phrase',title:'KK → RU',stimulus:'Оның мұғалімі',answers:['его учитель','её учитель','ее учитель'],rule:'T20_POSS',error_type:'poss_phrase',explanation:'Оның мұғалімі = его/её учитель.'}),
+  field({id:'p3-31-g-g4-my-finger',order:8,session:'G',kind:'phrase',title:'KK → RU',stimulus:'Менің саусағым',answers:['мой палец'],rule:['T20_POSS','T21_POSS_ASSIM'],error_type:'poss_phrase',explanation:'Менің саусағым = мой палец.'}),
+  field({id:'p3-31-g-g4-your-friends',order:9,session:'G',kind:'phrase',title:'KK → RU',stimulus:'Сенің достарың',answers:['твои друзья'],rule:['T20_POSS','T23_POSS_PL'],error_type:'poss_phrase',explanation:'Сенің достарың = твои друзья.'}),
+
+  field({id:'p3-31-g-g3-my-book',order:10,session:'G',kind:'phrase',title:'RU → KK',stimulus:'моя книга',answers:['менің кітабым'],rule:['T20_POSS','T21_POSS_ASSIM'],error_type:'poss_phrase',explanation:'моя книга → менің кітабым.'}),
+  field({id:'p3-31-g-g3-your-friend',order:11,session:'G',kind:'phrase',title:'RU → KK',stimulus:'твой друг',answers:['сенің досың'],rule:'T20_POSS',error_type:'poss_phrase',explanation:'твой друг → сенің досың.'}),
+  field({id:'p3-31-g-g3-teacher',order:12,session:'G',kind:'phrase',title:'RU → KK',stimulus:'его/её учитель',answers:['оның мұғалімі'],rule:'T20_POSS',error_type:'poss_phrase',explanation:'его/её учитель → оның мұғалімі.'}),
+  field({id:'p3-31-g-g3-beard',order:13,session:'G',kind:'phrase',title:'RU → KK',stimulus:'моя борода',answers:['менің сақалым'],rule:'T20_POSS',error_type:'poss_phrase',explanation:'моя борода → менің сақалым.'}),
+  field({id:'p3-31-g-g3-your-books',order:14,session:'G',kind:'phrase',title:'RU → KK',stimulus:'твои книги',answers:['сенің кітаптарың'],rule:['T20_POSS','T23_POSS_PL'],error_type:'poss_phrase',explanation:'твои книги → сенің кітаптарың.'}),
+  field({id:'p3-31-g-g3-guest',order:15,session:'G',kind:'phrase',title:'RU → KK',stimulus:'его/её гость',answers:['оның қонағы'],rule:['T20_POSS','T21_POSS_ASSIM'],error_type:'poss_phrase',explanation:'его/её гость → оның қонағы.'}),
+  field({id:'p3-31-g-g3-heart',order:16,session:'G',kind:'phrase',title:'RU → KK',stimulus:'моё сердце',answers:['менің жүрегім'],rule:['T20_POSS','T21_POSS_ASSIM'],error_type:'poss_phrase',explanation:'моё сердце → менің жүрегім.'}),
+  field({id:'p3-31-g-g3-cat-bald',order:17,session:'G',kind:'phrase',title:'RU → KK',stimulus:'мой кот лысый',answers:['менің мысығым таз'],rule:'T20_POSS',error_type:'poss_phrase',explanation:'мой кот лысый → менің мысығым таз.'}),
+  field({id:'p3-31-g-g3-cats-bald',order:18,session:'G',kind:'phrase',title:'RU → KK',stimulus:'мои котики лысые',answers:['менің мысықтарым таз'],rule:['T20_POSS','T23_POSS_PL'],error_type:'poss_phrase',explanation:'мои котики лысые → менің мысықтарым таз.'})
+ ];
 
  function sessionA(){return SESSION_A.map(clone);}
  function sessionB(){return SESSION_B.map(clone);}
@@ -162,8 +183,9 @@
  function sessionD(){return SESSION_D.map(clone);}
  function sessionE(){return SESSION_E.map(clone);}
  function sessionF(){return SESSION_F.map(clone);}
- function all(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD(),...sessionE(),...sessionF()];}
- function byId(id){const q=[...SESSION_A,...SESSION_B,...SESSION_C,...SESSION_D,...SESSION_E,...SESSION_F].find(x=>x.id===id);return q?clone(q):null;}
+ function sessionG(){return SESSION_G.map(clone);}
+ function all(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD(),...sessionE(),...sessionF(),...sessionG()];}
+ function byId(id){const q=[...SESSION_A,...SESSION_B,...SESSION_C,...SESSION_D,...SESSION_E,...SESSION_F,...SESSION_G].find(x=>x.id===id);return q?clone(q):null;}
  function check(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
   if(!q||!core||!core.evaluate)throw new Error('Lesson 3-1 closed pack unavailable');
@@ -174,6 +196,6 @@
  }
  function isClosed(){return true;}
 
- const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,SESSION_E,SESSION_F,sessionA,sessionB,sessionC,sessionD,sessionE,sessionF,all,byId,check,isClosed};
+ const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,SESSION_E,SESSION_F,SESSION_G,sessionA,sessionB,sessionC,sessionD,sessionE,sessionF,sessionG,all,byId,check,isClosed};
  if(node)module.exports=api;else root.Lesson31Pack=api;
 })(typeof window!=='undefined'?window:globalThis);

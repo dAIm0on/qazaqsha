@@ -1270,6 +1270,26 @@ assert.match(Diag.line('poss_plural_order','Менің мысықтарым','М
 assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 ok('Phase 3 Session F: T23 plural-before-possessive order works while Phrase Drill and 3-1 stay closed');
 
+const g31=Lesson31A.sessionG();
+assert.equal(g31.length,18);
+assert.ok(g31.every(q=>q.lessonId==='3-1'&&q.phase3&&q.phase3.session==='G'&&q.practiceOnly&&q.kind==='phrase'));
+assert.equal(g31.filter(q=>q.title==='KK → RU').length,9);
+assert.equal(g31.filter(q=>q.title==='RU → KK').length,9);
+assert.ok(g31.every(q=>(q.ruleIds||[]).every(r=>['T20_POSS','T21_POSS_ASSIM','T23_POSS_PL'].includes(r))));
+assert.ok(!/сіздің|біздің|олардың/u.test(JSON.stringify(g31)));
+assert.ok(Lesson31A.check('p3-31-g-g4-heart','мое сердце').result.correct);
+assert.ok(Lesson31A.check('p3-31-g-g4-his-book','её книга').result.correct);
+assert.ok(Lesson31A.check('p3-31-g-g3-my-book','менің кітабым').result.correct);
+assert.ok(Lesson31A.check('p3-31-g-g3-your-books','сенің кітаптарың').result.correct);
+assert.ok(Lesson31A.check('p3-31-g-g3-cat-bald','менің мысығым таз').result.correct);
+assert.ok(Lesson31A.check('p3-31-g-g3-cats-bald','менің мысықтарым таз').result.correct);
+const g31Wrong=Lesson31A.check('p3-31-g-g3-my-book','менің кітап');
+assert.ok(g31Wrong.errors.some(e=>e.error_type==='poss_phrase'));
+assert.match(Diag.line('poss_phrase','менің кітабым','менің кітап',Lesson31A.byId('p3-31-g-g3-my-book')),/владелец.*правильная форма.*менің кітабым/u);
+assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
+assert.ok(!fs.readFileSync(path.join(__dirname,'phrase-banks.js'),'utf8').includes("'3-1':"));
+ok('Phase 3 Session G: closed two-way 3-1 phrase bank validated without exposing live Phrase Drill');
+
 const PhraseBanks=require('./phrase-banks.js');
 const PhraseDrill=require('./phrase-drill.js');
 assert.equal(PhraseBanks.forLesson('1-2').length,11);
