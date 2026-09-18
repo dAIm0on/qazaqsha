@@ -116,15 +116,16 @@
   </div>
 </dialog>
 <footer class="site-footer"><span lang="kk">Қазақша</span><span>Письменная практика по материалам курса · <a href="update.html">обновить без потери прогресса</a></span></footer>
-<dialog id="account-dialog" class="settings-dialog" aria-labelledby="account-title">
+<dialog id="account-dialog" class="settings-dialog account-dialog" aria-labelledby="account-title">
   <h2 id="account-title">Вход</h2>
+  <p class="small">Синхронизация прогресса. Форма не разворачивается в шапке.</p>
   <form id="account-form">
     <label for="account-email">Почта</label>
-    <input id="account-email" type="email" autocomplete="username" required>
+    <input id="account-email" type="email" autocomplete="username" enterkeyhint="next" required>
     <label for="account-password">Пароль</label>
-    <input id="account-password" type="password" autocomplete="current-password" minlength="6" required>
+    <input id="account-password" type="password" autocomplete="current-password" enterkeyhint="done" minlength="6" required>
     <p id="account-msg" class="small"></p>
-    <div class="ai-tutor-actions">
+    <div class="account-actions ai-tutor-actions">
       <button type="submit" class="primary-button" id="account-login">Войти</button>
       <button type="button" class="secondary-button" id="account-register">Создать аккаунт</button>
       <button type="button" class="text-button" id="account-cancel">Отмена</button>
@@ -148,6 +149,7 @@
     </select>
   </label>
   <label><input type="checkbox" id="motion-off"> Меньше движения</label>
+  <p class="small">Экранные казахские буквы включаются галочкой на экране задания. Для новых телефонов они уже включены.</p>
   <p class="glyph-check" lang="kk">Ә ә Ғ ғ Қ қ Ң ң Ө ө Ұ ұ Ү ү Һ һ І і</p>
   <button type="button" class="secondary-button" id="settings-close">Закрыть</button>
 </dialog>
