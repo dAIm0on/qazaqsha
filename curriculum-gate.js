@@ -74,7 +74,7 @@
   return 'none';
  }
  function examEligible(q,catalog){
-  if(!q||q.contextOnly)return false;
+  if(!q||q.contextOnly||q.source==='phrase'||q.kind==='phrase'||q.practiceOnly)return false;
   if(futureHits([q]).length)return false;
   const skill=(q.ruleIds||[])[0];
   if(skill==='case'||skill==='possessive'||skill==='labial'||skill==='degrees')return false;
