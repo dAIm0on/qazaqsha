@@ -1221,6 +1221,24 @@ assert.match(Diag.line('poss_assim_voice','Оның мектебі','Оның м
 assert.match(Diag.line('poss_assim_voice','Менің кітабым','Менің кітапым',Lesson31A.byId('p3-31-a-g6-kitapym')),/П.*Б.*кітабым/i);
 ok('Phase 3 possessive assimilation feedback derives the actual voicing pair, not a word whitelist');
 
+const d31=Lesson31A.sessionD();
+assert.equal(d31.length,2);
+assert.ok(d31.every(q=>q.lessonId==='3-1'&&q.phase3&&q.phase3.session==='D'&&q.practiceOnly));
+assert.ok(d31.every(q=>(q.ruleIds||[]).every(r=>['T20_POSS','T21_POSS_ASSIM'].includes(r))));
+assert.ok(d31.every(q=>/Сіздің/u.test(q.stimulus)));
+assert.ok(!/Менің|Сенің|Оның|Біздің|Олардың/u.test(JSON.stringify(d31)));
+assert.ok(Lesson31A.check('p3-31-d-g2-ata','атаңыз').result.correct);
+assert.ok(Lesson31A.check('p3-31-d-g2-kolik','көлігіңіз').result.correct);
+const d31Missing=Lesson31A.check('p3-31-d-g2-ata','ата');
+assert.ok(d31Missing.errors.some(e=>e.error_type==='poss_suffix_missing'));
+assert.match(Diag.line('poss_suffix_missing','Сіздің атаңыз','Сіздің ата',Lesson31A.byId('p3-31-d-g2-ata')),/Для сіздің нужна притяжательная наклейка/i);
+const d31Assim=Lesson31A.check('p3-31-d-g2-kolik','көлікiңіз');
+assert.ok(d31Assim.errors.some(e=>e.error_type==='poss_assim_voice'));
+assert.match(Diag.line('poss_assim_voice','Сіздің көлігіңіз','Сіздің көлікiңіз',Lesson31A.byId('p3-31-d-g2-kolik')),/К.*Г.*көлігіңіз/i);
+assert.ok(!/біздің|олардың/u.test(JSON.stringify(Lesson31A.all())));
+assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
+ok('Phase 3 Session D: structured сіздің T20/T21 only, free Phrase Drill and later persons still locked');
+
 const PhraseBanks=require('./phrase-banks.js');
 const PhraseDrill=require('./phrase-drill.js');
 assert.equal(PhraseBanks.forLesson('1-2').length,11);

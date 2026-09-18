@@ -89,12 +89,25 @@
    explanation:'кітап + ы → кітабы: перед гласной притяжательного окончания п озвончается в б.'
   })
  ];
+ const SESSION_D=[
+  field({
+   id:'p3-31-d-g2-ata',order:1,session:'D',title:'Сіздің: собери форму',stimulus:'Сіздің + ата → ?',
+   answers:['атаңыз','Сіздің атаңыз'],rule:'T20_POSS',error_type:'poss_suffix_missing',
+   explanation:'Сіздің + ата → атаңыз. После гласной в этой форме добавляется -ңыз/-ңіз.'
+  }),
+  field({
+   id:'p3-31-d-g2-kolik',order:2,session:'D',title:'Сіздің: собери форму',stimulus:'Сіздің + көлік → ?',
+   answers:['көлігіңіз','Сіздің көлігіңіз'],rule:['T20_POSS','T21_POSS_ASSIM'],error_type:'poss_assim_voice',
+   explanation:'көлік + іңіз → көлігіңіз: перед гласной притяжательного окончания к озвончается в г.'
+  })
+ ];
 
  function sessionA(){return SESSION_A.map(clone);}
  function sessionB(){return SESSION_B.map(clone);}
  function sessionC(){return SESSION_C.map(clone);}
- function all(){return [...sessionA(),...sessionB(),...sessionC()];}
- function byId(id){const q=[...SESSION_A,...SESSION_B,...SESSION_C].find(x=>x.id===id);return q?clone(q):null;}
+ function sessionD(){return SESSION_D.map(clone);}
+ function all(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD()];}
+ function byId(id){const q=[...SESSION_A,...SESSION_B,...SESSION_C,...SESSION_D].find(x=>x.id===id);return q?clone(q):null;}
  function check(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
   if(!q||!core||!core.evaluate)throw new Error('Lesson 3-1 closed pack unavailable');
@@ -105,6 +118,6 @@
  }
  function isClosed(){return true;}
 
- const api={SESSION_A,SESSION_B,SESSION_C,sessionA,sessionB,sessionC,all,byId,check,isClosed};
+ const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,sessionA,sessionB,sessionC,sessionD,all,byId,check,isClosed};
  if(node)module.exports=api;else root.Lesson31Pack=api;
 })(typeof window!=='undefined'?window:globalThis);
