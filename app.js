@@ -206,44 +206,47 @@
    $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
    renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();save();
  }
- function renderNav(){
-   $('#lesson-nav').innerHTML=topics.map(([id,name,num])=>{
-     const list=questions.filter(q=>id==='all'||q.topic===id), n=list.filter(q=>(records[q.id]?.streak||0)>=2).length;
-     return `<button type="button" class="topic-button" data-topic="${id}" ${topic===id?'aria-current="page"':''}><span class="topic-num">${num}</span><span><span class="topic-name">${name}</span><span class="topic-count">${n} в банке форм</span></span></button>`;
-   }).join('');
-   $$('[data-topic]').forEach(b=>b.addEventListener('click',()=>{topic=b.dataset.topic;sourceFilter=null;courseBlock=null;vocabRole=null;activeLesson=null;mode='smart';startQueue();showView('practice');}));
+ function filterSummary(){
+   const t=topics.find(x=>x[0]===topic);
+   const type=topic==='all'||!t?'Все типы':t[1];
+   const les=courseBlock?(COURSE_BLOCKS.find(b=>b.id===courseBlock)||{}).title:null;
+   return les?('Урок '+les+' · '+type):type;
  }
  function renderStats(){
-   const recallCards=questions.filter(q=>q.kind==='fields'&&q.fields.some(f=>f.kind!=='select'));
-   const learned=recallCards.filter(q=>['REMEMBERED','MASTERED'].includes(records[q.id]?.mastery_level)).length;
-   $('#mastery-count').textContent=`${learned} / ${recallCards.length}`;$('#mastery-progress').max=recallCards.length;$('#mastery-progress').value=learned;
-   $('#mistake-count').textContent=subset().filter(q=>records[q.id]?.needsReview).length;
-   $('#due-count').textContent=subset().filter(q=>core.isDue(records[q.id])).length;
-   $('#pause-session').hidden=queue.length===0||position>=queue.length;
-   $('#pause-session').textContent=mode==='homework'||(mode==='remediation'&&hwReturn)?'Сделать паузу · Домашка':mode==='exam'?'Сделать паузу · Экзамен':'Сделать паузу · Сегодня';
+   const pause=$('#pause-session');
+   if(pause){
+     pause.hidden=queue.length===0||position>=queue.length;
+     pause.textContent='←';
+     pause.setAttribute('aria-label',mode==='homework'||(mode==='remediation'&&hwReturn)?'Сделать паузу · Домашка':mode==='exam'?'Сделать паузу · Экзамен':'Сделать паузу · Сегодня');
+   }
    const scope=subset(), tried=scope.filter(q=>records[q.id]?.attempts>0).length;
-   $('#session-position').textContent=['smart','lesson','review','contrast'].includes(mode)?`В подходе ${new Set(queue).size} разных карточек · шаг ${Math.min(position+1,queue.length)} из ${queue.length}`:`Встречалось ${tried} из ${scope.length} карточек`;
-   $('#session-score').textContent=sessionAttempts?`Без подсказки: ${sessionCorrect} / ${sessionAttempts} · с подсказкой: ${sessionAssisted}`:'Можно отвечать сразу';
-   $('#practice-title').textContent=mode==='exam'?'Экзамен на время':activeLesson?window.LEARNING.lessons.find(l=>l.id===activeLesson).title:topic==='all'?'Практика казахского':topics.find(x=>x[0]===topic)[1];
-   $('.course-badge').textContent=mode==='homework'?'Домашка':mode==='exam'?'На время':'Письменно';
+   const sp=$('#session-position');
+   if(sp)sp.textContent=['smart','lesson','review','contrast'].includes(mode)?`Шаг ${Math.min(position+1,queue.length)} из ${queue.length}`:`Встречалось ${tried} из ${scope.length}`;
+   const ss=$('#session-score');
+   if(ss)ss.textContent=sessionAttempts?`Без подсказки: ${sessionCorrect} / ${sessionAttempts}`:'';
+   const pt=$('#practice-title');
+   if(pt)pt.textContent=mode==='exam'?'Экзамен':mode==='homework'?'Домашка':activeLesson?(window.LEARNING.lessons.find(l=>l.id===activeLesson)||{}).title||'Практика':topic==='all'?'Практика':(topics.find(x=>x[0]===topic)||[])[1]||'Практика';
+   const sum=$('#practice-filter-summary');
+   if(sum)sum.textContent=filterSummary();
    $$('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
    const sf=$('#source-filter');
-   if(courseBlock){
-     const b=COURSE_BLOCKS.find(x=>x.id===courseBlock);
-     sf.hidden=false;sf.innerHTML=`<span>Урок ${esc(b?b.title:courseBlock)} · ${esc(b?b.hint:'')}</span><button type="button">Все уроки</button>`;
-     sf.querySelector('button').onclick=()=>{courseBlock=null;startQueue();};
-   }else if(sourceFilter){
-     sf.hidden=false;sf.innerHTML=`<span>${esc(course.sources[sourceFilter].title)}</span><button type="button">Все материалы</button>`;sf.querySelector('button').onclick=()=>{sourceFilter=null;startQueue();};
-   }else sf.hidden=true;
+   if(sf){
+     if(courseBlock){
+       const b=COURSE_BLOCKS.find(x=>x.id===courseBlock);
+       sf.hidden=false;sf.innerHTML=`<span>Урок ${esc(b?b.title:courseBlock)} · ${esc(b?b.hint:'')}</span><button type="button">Все уроки</button>`;
+       sf.querySelector('button').onclick=()=>{courseBlock=null;startQueue();};
+     }else if(sourceFilter){
+       sf.hidden=false;sf.innerHTML=`<span>${esc(course.sources[sourceFilter].title)}</span><button type="button">Все материалы</button>`;sf.querySelector('button').onclick=()=>{sourceFilter=null;startQueue();};
+     }else sf.hidden=true;
+   }
    renderJumpBar();
-   renderNav();
  }
  function renderJumpBar(){
    const bar=$('#jump-bar');if(!bar)return;
-   bar.innerHTML=`<details class="filter-fold"><summary>Фильтр</summary><div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>name?`<button type="button" class="chip" data-jump-topic="${id}" ${topic===id?'aria-pressed="true"':''}>${esc(name)}</button>`:'').join('')}</div><div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-jump-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>${esc(b.title)}</button>`).join('')}<button type="button" class="chip" data-jump-course="" ${courseBlock?'':'aria-pressed="true"'}>Все</button></div></details>`;
-   $$('#jump-bar [data-jump-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.jumpTopic;activeLesson=null;vocabRole=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');});
-   $$('#jump-bar [data-jump-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.jumpCourse||null;activeLesson=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');});
-   const fold=$('#jump-bar details');if(fold&&typeof matchMedia==='function'&&matchMedia('(min-width:691px)').matches)fold.open=true;
+   bar.innerHTML=`<div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>name?`<button type="button" class="chip" data-jump-topic="${id}" ${topic===id?'aria-pressed="true"':''}>${esc(name)}</button>`:'').join('')}</div><div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-jump-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>${esc(b.title)}</button>`).join('')}<button type="button" class="chip" data-jump-course="" ${courseBlock?'':'aria-pressed="true"'}>Все</button></div>`;
+   const closeFilter=()=>{const dlg=$('#practice-filter');if(dlg&&dlg.open&&dlg.close)dlg.close();};
+   $$('#jump-bar [data-jump-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.jumpTopic;activeLesson=null;vocabRole=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');closeFilter();});
+   $$('#jump-bar [data-jump-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.jumpCourse||null;activeLesson=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');closeFilter();});
  }
  function encodingMarkup(q){
    if(!q||mode==='exam')return '';
@@ -1126,7 +1129,10 @@
    };
  }
  $$('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
- $$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;startQueue();}));
+ $$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;startQueue();showView('practice');const dlg=$('#practice-filter');if(dlg&&dlg.open&&dlg.close)dlg.close();}));
+ const filterOpen=$('#practice-filter-open'),filterClose=$('#practice-filter-close'),filterDlg=$('#practice-filter');
+ if(filterOpen&&filterDlg)filterOpen.onclick=()=>{if(filterDlg.showModal)filterDlg.showModal();else filterDlg.setAttribute('open','');};
+ if(filterClose&&filterDlg)filterClose.onclick=()=>{if(filterDlg.close)filterDlg.close();else filterDlg.removeAttribute('open');};
  function resetProgress(){
    if(!window.confirm('Сбросить весь прогресс в этом браузере? Ответы, ошибки, заметки и ассоциации будут очищены.'))return;
    try{localStorage.setItem(BACKUP,P.serialize(state));}catch{}const retainedPackages=state.lesson_packages;state=P.empty();state.lesson_packages=retainedPackages;records=state.records;learningState=state.learning;storageReadError=null;topic='all';mode='smart';sourceFilter=null;activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;showView('today');

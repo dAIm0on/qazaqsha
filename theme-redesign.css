@@ -87,36 +87,38 @@ h3{font-family:var(--sans);font-weight:550;font-size:1.125rem;letter-spacing:-.0
 #account-msg{color:var(--warning)}
 #account-form input{background:var(--surface)!important;color:var(--ink)!important;border-color:var(--input-line)!important}
 
-.workspace{max-width:1440px;padding:36px 48px 64px;gap:40px;grid-template-columns:208px minmax(0,1fr)}
-.sidebar .eyebrow{padding-left:12px}
-.topic-button{color:var(--body);border-radius:14px;min-height:48px}
-.topic-button:hover{background:var(--sage)}
-.topic-button[aria-current=page]{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:none}
-.topic-num{background:var(--surface-alt);color:var(--body)}
-.topic-button[aria-current=page] .topic-num{background:transparent;color:#fff}
-.topic-button[aria-current=page] .topic-count{color:#fff8}
-.topic-count{color:var(--muted)}
-.mastery-panel{border-top-color:var(--line)}
-.mastery-line strong{color:var(--primary)}
-progress{accent-color:var(--primary)}
-progress,progress::-webkit-progress-bar{background:var(--surface-alt)}
-progress::-webkit-progress-value,progress::-moz-progress-bar{background:var(--primary)}
-.mastery-panel p,.local-note,.text-button{color:var(--muted)}
-.course-badge{background:var(--sage);border-color:transparent;color:var(--primary);border-radius:999px}
-.modebar{border-bottom-color:var(--line)}
-.modebar button{color:var(--muted);border-radius:12px;min-height:44px}
-.modebar button[aria-pressed=true]{background:var(--sage);border-color:transparent;color:var(--primary);box-shadow:none;font-weight:550}
-.modebar button span{background:var(--surface);color:var(--ink)}
+.workspace{
+  display:block!important;max-width:1184px;width:100%;margin-left:auto;margin-right:auto;
+  padding:28px 24px 80px;grid-template-columns:none!important;gap:0
+}
 .session-line,.practice-note,.mastery-label,.pref-check{color:var(--muted)}
 .pref-check input{accent-color:var(--primary)}
+.practice-head{
+  display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;
+  margin:0 0 12px
+}
+.practice-back,#pause-session.practice-back{min-width:44px;min-height:44px;width:44px;margin:0;padding:0;font-size:1.25rem;text-align:center}
+.practice-head-copy{min-width:0}
+.practice-head h1{margin:0;font-size:1.35rem}
+.practice-filter-summary{margin:0;font-size:.8125rem;color:var(--muted)}
+#practice-filter-open{min-height:44px}
+.practice-filter{
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:24px;padding:20px 16px max(16px, env(safe-area-inset-bottom,0px));
+  max-width:440px;width:calc(100% - 32px)
+}
+.practice-filter::backdrop{background:#16141266}
+.practice-filter h2{margin:0 0 12px;font-family:var(--display);font-weight:400}
+.practice-filter .jump-bar,
+body[data-view=practice] #practice-filter .jump-bar{display:flex!important;flex-direction:column;gap:8px;margin:0 0 12px}
+.practice-filter .jump-row{margin:0 0 12px}
+.practice-filter .chip{min-height:40px}
+#practice-filter-close{width:100%;margin-top:8px}
 
 /* Practice — calm, no hero, no photos */
 body[data-view=practice]{background:var(--paper)}
-body[data-view=practice] .sidebar,
-body[data-view=practice] .site-footer,
-body[data-view=practice] .modebar,
-body[data-view=practice] #jump-bar,
-body[data-view=practice] #source-filter{opacity:.72}
+body[data-view=practice] .workspace{max-width:760px;padding-top:16px}
+body[data-view=practice] .site-footer{opacity:.72}
 .exercise-card{
   background:var(--surface);color:var(--ink);
   border:1px solid var(--line);border-top:1px solid var(--line);
@@ -255,6 +257,11 @@ body.keyboard-open[data-view=rules] #rules-ask-panel{
   background:transparent;border-radius:0;padding:0;
   margin:0 0 16px;border:0
 }
+.today-hero-card{
+  background:var(--lilac);border-radius:var(--radius-lg);padding:20px 18px;margin:12px 0 0
+}
+.today-lesson-title{display:block;font-size:.8125rem;color:var(--muted);font-weight:400;margin-top:2px}
+.today-lesson{min-height:88px}
 .today-hero h1{margin:0 0 12px;max-width:18ch}
 .today-hero p{color:var(--body);max-width:36rem}
 .today-path-quiet{
@@ -537,12 +544,15 @@ body.keyboard-open #account-dialog{
   .path-map .path-lessons{grid-template-columns:1fr 1fr}
 }
 @media(max-width:1199px){
-  .workspace{padding:28px 28px 50px;gap:24px;grid-template-columns:170px minmax(0,1fr)}
+  .workspace{padding:28px 28px 50px}
   .topbar{padding-inline:28px}
 }
 @media(max-width:899px){
-  .workspace{grid-template-columns:1fr;padding:16px 16px 100px}
-  .sidebar{display:none}
+  .workspace{padding:16px 16px 100px}
+  .practice-filter{
+    width:100%;max-width:none;margin:0;border-radius:24px 24px 0 0;
+    max-height:min(80dvh, calc(100dvh - var(--kbinset,0px)))
+  }
 }
 @media(max-width:690px){
   .topbar{padding:8px 16px;min-height:56px}
