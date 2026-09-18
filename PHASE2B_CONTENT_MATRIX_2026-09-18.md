@@ -314,4 +314,4 @@ Feedback template:
 9. unified Learn → Path → Practice → Homework → Review;
 10. regression + Preview acceptance.
 
-Первый implementation commit должен начинаться с 1-2 / G2 и G6 acceptance, а не с 3-1.
+Первый implementation commit: **G1 table/cell** на уже открытых уроках, без новой грамматики и без изменения старых question IDs. Следующий отдельный commit — **G2 suffix completion**. G6 добавляется позже своим отдельным шагом, после G3–G5, как зафиксировано в плане.
