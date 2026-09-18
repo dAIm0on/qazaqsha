@@ -123,14 +123,47 @@
    explanation:'Для отсутствия нужен жоқ: Менің көлігім жоқ. Емес означает «не является», а не «у меня нет».'
   })
  ];
+ const SESSION_F=[
+  field({
+   id:'p3-31-f-g2-kitaptarym',order:1,session:'F',title:'Сначала множественное',stimulus:'Менің + кітаптар → ?',
+   answers:['кітаптарым','Менің кітаптарым'],rule:'T23_POSS_PL',error_type:'poss_plural_order',
+   explanation:'кітап + тар + ым → кітаптарым. Сначала множественное, потом притяжательное.'
+  }),
+  field({
+   id:'p3-31-f-g2-sausaktaryn',order:2,session:'F',title:'Сначала множественное',stimulus:'Сенің + саусақтар → ?',
+   answers:['саусақтарың','Сенің саусақтарың'],rule:'T23_POSS_PL',error_type:'poss_plural_order',
+   explanation:'саусақ + тар + ың → саусақтарың. Притяжательное окончание ставится после множественного.'
+  }),
+  field({
+   id:'p3-31-f-g2-uldarym',order:3,session:'F',title:'Сначала множественное',stimulus:'Менің + ұлдар → ?',
+   answers:['ұлдарым','Менің ұлдарым'],rule:'T23_POSS_PL',error_type:'poss_plural_order',
+   explanation:'ұл + дар + ым → ұлдарым.'
+  }),
+  field({
+   id:'p3-31-f-g2-mysyktarym',order:4,session:'F',title:'Сначала множественное',stimulus:'Менің + мысықтар → ?',
+   answers:['мысықтарым','Менің мысықтарым'],rule:'T23_POSS_PL',error_type:'poss_plural_order',
+   explanation:'мысық + тар + ым → мысықтарым. После -тар притяжательное окончание уже не касается конечной қ.'
+  }),
+  field({
+   id:'p3-31-f-g6-kitabymdar',order:5,session:'F',title:'Исправь порядок',stimulus:'Менің кітабымдар',
+   answers:['Менің кітаптарым','кітаптарым'],rule:'T23_POSS_PL',error_type:'poss_plural_order',
+   explanation:'Не кітабым + дар. Правильно: кітап + тар + ым → кітаптарым.'
+  }),
+  field({
+   id:'p3-31-f-g6-mysygymdar',order:6,session:'F',title:'Исправь порядок',stimulus:'Менің мысығымдар',
+   answers:['Менің мысықтарым','мысықтарым'],rule:'T23_POSS_PL',error_type:'poss_plural_order',
+   explanation:'Не мысығым + дар. Правильно: мысық + тар + ым → мысықтарым.'
+  })
+ ];
 
  function sessionA(){return SESSION_A.map(clone);}
  function sessionB(){return SESSION_B.map(clone);}
  function sessionC(){return SESSION_C.map(clone);}
  function sessionD(){return SESSION_D.map(clone);}
  function sessionE(){return SESSION_E.map(clone);}
- function all(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD(),...sessionE()];}
- function byId(id){const q=[...SESSION_A,...SESSION_B,...SESSION_C,...SESSION_D,...SESSION_E].find(x=>x.id===id);return q?clone(q):null;}
+ function sessionF(){return SESSION_F.map(clone);}
+ function all(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD(),...sessionE(),...sessionF()];}
+ function byId(id){const q=[...SESSION_A,...SESSION_B,...SESSION_C,...SESSION_D,...SESSION_E,...SESSION_F].find(x=>x.id===id);return q?clone(q):null;}
  function check(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
   if(!q||!core||!core.evaluate)throw new Error('Lesson 3-1 closed pack unavailable');
@@ -141,6 +174,6 @@
  }
  function isClosed(){return true;}
 
- const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,SESSION_E,sessionA,sessionB,sessionC,sessionD,sessionE,all,byId,check,isClosed};
+ const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,SESSION_E,SESSION_F,sessionA,sessionB,sessionC,sessionD,sessionE,sessionF,all,byId,check,isClosed};
  if(node)module.exports=api;else root.Lesson31Pack=api;
 })(typeof window!=='undefined'?window:globalThis);

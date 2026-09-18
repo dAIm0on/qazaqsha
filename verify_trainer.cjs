@@ -1253,6 +1253,23 @@ assert.ok(!/T23_POSS_PL/.test(JSON.stringify(e31)));
 assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 ok('Phase 3 Session E: T22 bar/zhok contrast works while 3-1 remains closed');
 
+const f31=Lesson31A.sessionF();
+assert.equal(f31.length,6);
+assert.ok(f31.every(q=>q.lessonId==='3-1'&&q.phase3&&q.phase3.session==='F'&&q.practiceOnly));
+assert.ok(f31.every(q=>(q.ruleIds||[]).length===1&&(q.ruleIds||[])[0]==='T23_POSS_PL'));
+assert.ok(Lesson31A.check('p3-31-f-g2-kitaptarym','кітаптарым').result.correct);
+assert.ok(Lesson31A.check('p3-31-f-g2-sausaktaryn','саусақтарың').result.correct);
+assert.ok(Lesson31A.check('p3-31-f-g2-uldarym','ұлдарым').result.correct);
+assert.ok(Lesson31A.check('p3-31-f-g2-mysyktarym','мысықтарым').result.correct);
+const f31Bad1=Lesson31A.check('p3-31-f-g6-kitabymdar','Менің кітабымдар');
+assert.ok(f31Bad1.errors.some(e=>e.error_type==='poss_plural_order'));
+assert.match(Diag.line('poss_plural_order','Менің кітаптарым','Менің кітабымдар',Lesson31A.byId('p3-31-f-g6-kitabymdar')),/кітап \+ тар \+ ым.*кітаптарым.*не кітабымдар.*П не озвончается/u);
+const f31Bad2=Lesson31A.check('p3-31-f-g6-mysygymdar','Менің мысығымдар');
+assert.ok(f31Bad2.errors.some(e=>e.error_type==='poss_plural_order'));
+assert.match(Diag.line('poss_plural_order','Менің мысықтарым','Менің мысығымдар',Lesson31A.byId('p3-31-f-g6-mysygymdar')),/мысық \+ тар \+ ым.*мысықтарым.*не мысығымдар.*Қ не озвончается/u);
+assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
+ok('Phase 3 Session F: T23 plural-before-possessive order works while Phrase Drill and 3-1 stay closed');
+
 const PhraseBanks=require('./phrase-banks.js');
 const PhraseDrill=require('./phrase-drill.js');
 assert.equal(PhraseBanks.forLesson('1-2').length,11);
