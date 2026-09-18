@@ -6,16 +6,16 @@
  const diagnostics=node?require('./diagnostics.js'):root.ErrorDiagnostics;
 
  function clone(x){return JSON.parse(JSON.stringify(x));}
- function field({id,order,title,stimulus,answers,rule,error_type,explanation,kind='fields'}){
+ function field({id,order,title,stimulus,answers,rule,error_type,explanation,kind='fields',session='A'}){
   return {
-   id,source:'phase3-31',group:'3-1-A',part:String(order),lessonId:'3-1',topic:'possessive',kind,
+   id,source:'phase3-31',group:'3-1-'+session,part:String(order),lessonId:'3-1',topic:'possessive',kind,
    title,stimulus,
    fields:[{label:'Ответ',kind:'text',answers:Array.isArray(answers)?answers:[answers]}],
    explanation,
    ruleIds:Array.isArray(rule)?rule:[rule],
    vocabIds:[],
    practiceOnly:true,
-   phase3:{lesson:'3-1',session:'A',order,error_type,closed_pack:true}
+   phase3:{lesson:'3-1',session,order,error_type,closed_pack:true}
   };
  }
  const SESSION_A=[
@@ -50,13 +50,31 @@
    explanation:'Перед гласной -ым конечная п озвончается: кітап + ым → кітабым.'
   })
  ];
+ const SESSION_B=[
+  field({
+   id:'p3-31-b-g2-ake',order:1,session:'B',title:'Сенің: собери форму',stimulus:'Сенің + әке → ?',
+   answers:['әкең','Сенің әкең'],rule:'T20_POSS',error_type:'poss_suffix_missing',
+   explanation:'Сенің + әке → әкең. После гласной для сенің добавляется -ң.'
+  }),
+  field({
+   id:'p3-31-b-g2-kitap',order:2,session:'B',title:'Сенің: собери форму',stimulus:'Сенің + кітап → ?',
+   answers:['кітабың','Сенің кітабың'],rule:['T20_POSS','T21_POSS_ASSIM'],error_type:'poss_assim_voice',
+   explanation:'кітап + ың → кітабың: перед гласной притяжательного окончания п озвончается в б.'
+  }),
+  field({
+   id:'p3-31-b-g2-dos',order:3,session:'B',title:'Сенің: собери форму',stimulus:'Сенің + дос → ?',
+   answers:['досың','Сенің досың'],rule:'T20_POSS',error_type:'poss_suffix_missing',
+   explanation:'Сенің + дос → досың. После согласной здесь добавляется -ың.'
+  })
+ ];
 
  function sessionA(){return SESSION_A.map(clone);}
- function all(){return sessionA();}
- function byId(id){return SESSION_A.find(q=>q.id===id)?clone(SESSION_A.find(q=>q.id===id)):null;}
+ function sessionB(){return SESSION_B.map(clone);}
+ function all(){return [...sessionA(),...sessionB()];}
+ function byId(id){const q=[...SESSION_A,...SESSION_B].find(x=>x.id===id);return q?clone(q):null;}
  function check(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
-  if(!q||!core||!core.evaluate)throw new Error('Lesson 3-1 Session A unavailable');
+  if(!q||!core||!core.evaluate)throw new Error('Lesson 3-1 closed pack unavailable');
   const answers=Array.isArray(answer)?answer.map(x=>String(x??'')):[String(answer??'')];
   const result=core.evaluate(q,answers);
   const errors=result.correct||!diagnostics||!diagnostics.diagnose?[]:diagnostics.diagnose(q,answers,result,Date.now());
@@ -64,6 +82,6 @@
  }
  function isClosed(){return true;}
 
- const api={SESSION_A,sessionA,all,byId,check,isClosed};
+ const api={SESSION_A,SESSION_B,sessionA,sessionB,all,byId,check,isClosed};
  if(node)module.exports=api;else root.Lesson31Pack=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -98,8 +98,9 @@
   }
   if(error_type==='question_particle_missing'&&E)return 'Не хватает отдельной вопросительной частицы: нужно '+E+'.';
   if(error_type==='poss_suffix_missing'&&E){
-   const raw=core.normalize(q&&q.stimulus||''),base=(raw.match(/(?:менің\s*\+?\s*|менің\s+)([а-яәіңғүұқөһ]+)/u)||[])[1]||'основы';
-   return 'Для менің нужна притяжательная наклейка справа: '+base+' → '+E+'.';
+   const raw=core.normalize(q&&q.stimulus||''),m=raw.match(/(менің|сенің|оның|сіздің)\s*(?:\+\s*|\s+)([а-яәіңғүұқөһ]+)/u);
+   const pron=m&&m[1]||'притяжательной формы',base=m&&m[2]||'основы';
+   return 'Для '+pron+' нужна притяжательная наклейка справа: '+base+' → '+E+'.';
   }
   if(error_type==='poss_assim_voice'&&E){
    const raw=core.normalize(q&&q.stimulus||'');
