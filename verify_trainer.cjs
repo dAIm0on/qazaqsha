@@ -1179,7 +1179,7 @@ const a31Assim=Lesson31A.check('p3-31-a-g6-kitapym','Менің кітапым')
 assert.ok(a31Assim.errors.some(e=>e.error_type==='poss_assim_voice'));
 assert.match(Diag.line('poss_suffix_missing','Менің әкем','Менің әке',Lesson31A.byId('p3-31-a-g6-ake')),/притяжательная наклейка/i);
 assert.match(Diag.line('poss_assim_voice','Менің кітабым','Менің кітапым',Lesson31A.byId('p3-31-a-g6-kitapym')),/П.*Б.*кітабым/i);
-assert.equal(PhraseDrill.forLesson('3-1').length,0);
+assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 assert.ok(!fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson31-pack.js'));
 assert.ok(!fs.readFileSync(path.join(__dirname,'learning.js'),'utf8').includes("'3-1'"));
 ok('Phase 3 Session A: closed menің-only T20/T21 pack, 3-1 still not opened');
