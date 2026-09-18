@@ -1200,6 +1200,23 @@ assert.ok(!/оның|сіздің|біздің|олардың/u.test(JSON.string
 assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 ok('Phase 3 Session B: closed senің-only T20/T21 pack, later persons still locked');
 
+const c31=Lesson31A.sessionC();
+assert.equal(c31.length,4);
+assert.ok(c31.every(q=>q.lessonId==='3-1'&&q.phase3&&q.phase3.session==='C'&&q.practiceOnly));
+assert.ok(c31.every(q=>(q.ruleIds||[]).every(r=>['T20_POSS','T21_POSS_ASSIM'].includes(r))));
+assert.ok(c31.every(q=>/Оның/u.test(q.stimulus)));
+assert.ok(!/Менің|Сенің|Сіздің|Біздің|Олардың/u.test(JSON.stringify(c31)));
+assert.ok(Lesson31A.check('p3-31-c-g2-qala','қаласы').result.correct);
+assert.ok(Lesson31A.check('p3-31-c-g2-ul','ұлы').result.correct);
+assert.ok(Lesson31A.check('p3-31-c-g2-mektep','мектебі').result.correct);
+assert.ok(Lesson31A.check('p3-31-c-g2-kitap','кітабы').result.correct);
+const c31Assim=Lesson31A.check('p3-31-c-g2-mektep','мектепі');
+assert.ok(c31Assim.errors.some(e=>e.error_type==='poss_assim_voice'));
+assert.match(Diag.line('poss_assim_voice','Оның мектебі','Оның мектепі',Lesson31A.byId('p3-31-c-g2-mektep')),/П.*Б.*мектебі/i);
+assert.ok(!/сіздің|біздің|олардың/u.test(JSON.stringify(Lesson31A.all())));
+assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
+ok('Phase 3 Session C: closed оның-only T20/T21 pack, сіздің and later persons still locked');
+
 const PhraseBanks=require('./phrase-banks.js');
 const PhraseDrill=require('./phrase-drill.js');
 assert.equal(PhraseBanks.forLesson('1-2').length,11);
