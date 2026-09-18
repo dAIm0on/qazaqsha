@@ -4,9 +4,9 @@
  const hw=typeof module!=='undefined'&&module.exports?require('./homework.js'):root.Homework;
  const CARDS=[
   {rule_id:'T1_HARMONY',lesson_id:'1-1',course_rule:'harmony',title_ru:'Гармония последнего слога',explanation_ru:'Для окончания смотри последний слог. Задний ряд А О Ұ Ы → А. Передний Ә Ө Ү І Е → Е. И и У сами ряд не задают.',examples_correct:['қалалар','сөздер'],examples_wrong:[],error_codes:['HARMONY_FRONT_BACK','HARMONY_AMBIGUOUS_I_U_YU','PLURAL_HARMONY_AE']},
-  {rule_id:'T2_PLURAL_LDT',lesson_id:'1-2',course_rule:'plural',title_ru:'Множественное: Л / Д / Т',explanation_ru:'После гармонии смотри последнюю букву: гласные, Р, Й, У → лар/лер; Л М Н Ң Ж З → дар/дер; глухие и Б В Г Д → тар/тер.',examples_correct:['адамдар','кітаптар'],examples_wrong:['адамлар'],error_codes:['PLURAL_INITIAL_LDT','PLURAL_FORM_COMBINED']},
-  {rule_id:'T4_NO_PLURAL_AFTER_NUMBER',lesson_id:'1-3',course_rule:'quantity',title_ru:'После числа множественное не ставится',explanation_ru:'После конкретного числительного существительное без суффикса множественного числа. То же после аз, көп, қанша, неше.',examples_correct:['бес кітап','он студент'],examples_wrong:['бес кітаптар'],error_codes:['PLURAL_AFTER_NUMBER','QUANTIFIER_NO_PLURAL']},
-  {rule_id:'T5_NUMERAL_CONFUSION',lesson_id:'1-3',course_rule:'contrast',title_ru:'Единица и десяток одной семьи',explanation_ru:'6 алты — 60 алпыс. 7 жеті — 70 жетпіс. 8 сегіз — 80 сексен. 9 тоғыз — 90 тоқсан. Различаются окончанием, не началом.',examples_correct:['алты','алпыс','жеті','жетпіс'],examples_wrong:[],error_codes:['NUMERAL_CONFUSION_6_60','NUMERAL_CONFUSION_7_70','NUMERAL_CONFUSION_8_80','NUMERAL_CONFUSION_9_90']},
+  {rule_id:'T2_PLURAL_LDT',lesson_id:'1-2',course_rule:'plural',title_ru:'Множественное: Л / Д / Т',explanation_ru:'После гармонии смотри последнюю букву: гласные, Р, Й, У → лар/лер; Л М Н Ң Ж З → дар/дер; глухие и Б В Г Д → тар/тер.',ru_refresh:'В русском множественное часто одно: -ы/-и. В казахском сначала гармония, потом стык Л/Д/Т по последней букве.',examples_correct:['адамдар','кітаптар'],examples_wrong:['адамлар'],traps:['адамлар'],error_codes:['PLURAL_INITIAL_LDT','PLURAL_FORM_COMBINED']},
+  {rule_id:'T4_NO_PLURAL_AFTER_NUMBER',lesson_id:'1-3',course_rule:'quantity',title_ru:'После числа множественное не ставится',explanation_ru:'После конкретного числительного существительное без суффикса множественного числа. То же после аз, көп, қанша, неше.',ru_refresh:'В русском «пять книг» — множественное. В казахском число бес уже говорит «сколько», поэтому кітап без окончания множественного: бес кітап.',examples_correct:['бес кітап','он студент'],examples_wrong:['бес кітаптар'],traps:['бес кітаптар'],error_codes:['PLURAL_AFTER_NUMBER','QUANTIFIER_NO_PLURAL']},
+  {rule_id:'T5_NUMERAL_CONFUSION',lesson_id:'1-3',course_rule:'contrast',title_ru:'Единица и десяток одной семьи',explanation_ru:'6 алты — 60 алпыс. 7 жеті — 70 жетпіс. 8 сегіз — 80 сексен. 9 тоғыз — 90 тоқсан. Различаются окончанием, не началом.',ru_refresh:'Это как русские шесть и шестьдесят: похожее начало, разные слова, не одно окончание.',examples_correct:['алты','алпыс','жеті','жетпіс'],examples_wrong:[],traps:['алты↔алпыс'],error_codes:['NUMERAL_CONFUSION_6_60','NUMERAL_CONFUSION_7_70','NUMERAL_CONFUSION_8_80','NUMERAL_CONFUSION_9_90']},
   {rule_id:'T5_NUMERAL_COMPOSE',lesson_id:'1-3',course_rule:'numbers',title_ru:'Сборка составного числа',explanation_ru:'Сначала большая часть, потом меньшая. Между частями пробел, без «и». 100 = жүз. 1001–1999 начинай с бір мың.',examples_correct:['жетпіс бес мың тоғыз жүз елу'],examples_wrong:[],error_codes:['NUMERAL_COMPOSITION','NUMERAL_HUNDREDS_THOUSANDS','NUMERAL_LEXEME']},
   {rule_id:'T6_PERSON_SG',lesson_id:'2-1',course_rule:'person',title_ru:'Личные окончания ед. числа',explanation_ru:'Мен: пың/бын/мын. Сен: сың/сің. Сіз: сыз/сіз. Гласная по гармонии. Местоимение можно не писать.',examples_correct:['қазақпын','мамансыз'],examples_wrong:[],error_codes:['PERSON_MEN_ENDING','PERSON_SEN_ENDING','PERSON_SIZ_ENDING']},
   {rule_id:'T7_EMES',lesson_id:'2-1',course_rule:'emes_ba',title_ru:'Емес: окончание на емес',explanation_ru:'Отрицание: основа + емес + личное окончание. Не наоборот.',examples_correct:['ғалым емеспін'],examples_wrong:['ғалыммын емес'],error_codes:['EMES_SUFFIX_POSITION']},
@@ -52,6 +52,21 @@
   const max=new Set(lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3']);
   return CARDS.filter(c=>max.has(c.lesson_id)).map(c=>c.rule_id);
  }
- const api={CARDS,byId,byCourse,byError,cardsFor,allowedVocab,allowedRuleIds};
+ function toRuleContext(card){
+  if(!card)return null;
+  const medium=card.medium||card.explanation_ru||'';
+  return {
+   rule_id:card.rule_id,
+   title_ru:card.title_ru,
+   ru_refresh:card.ru_refresh||'',
+   short:card.short||card.title_ru||'',
+   medium,
+   explanation_ru:card.explanation_ru||medium,
+   examples_correct:card.examples_correct||[],
+   examples_wrong:card.examples_wrong||[],
+   traps:card.traps||[]
+  };
+ }
+ const api={CARDS,byId,byCourse,byError,cardsFor,allowedVocab,allowedRuleIds,toRuleContext};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.AiRules=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -37,6 +37,23 @@
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
  let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null,hwSection=0,hwReturn=null,remediationNote='',retrying=false,rulesArticle=null;
+ let tutorToken=0,tutorAbort=null;
+ function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
+ function currentLessonId(q){
+   if(q&&q.lessonId)return q.lessonId;
+   if(mode==='homework'&&hwLesson)return hwLesson;
+   if(activeLesson)return activeLesson;
+   if(learningState&&learningState.lessonId)return learningState.lessonId;
+   return '1-1';
+ }
+ function tutorSurface(){
+   if(mode==='exam')return 'exam';
+   if(mode==='homework')return 'homework';
+   if(view==='path')return 'path';
+   if(view==='rules')return 'rules';
+   if(view==='review')return 'review';
+   return 'practice';
+ }
  function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}
  let kbScrollLock=false;
  function syncKbInset(){
@@ -376,14 +393,6 @@
    hinted=true;hintEvent(q,'explanation');if($('#hint-button'))$('#hint-button').disabled=true;
    const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Для окончания важен последний слог.',plural:'Последний слог: А или Е. Потом последняя буква: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Сначала слепая попытка. Не открывай готовое слово — иначе это не вспоминание.',numbers:'Собери разряды: сначала большая часть. Не считай по порядку.',person:'Мен: пын/бын/мын. Сен: сың. Сіз: сыз. Біз после м/н/ң: біз. Сендер/сіздер без -лар на основу. Отрицание: основа + емес + окончание.',rules:'Набери суффикс или короткое слово правила, не целое новое существительное.'};
    const box=$('#hint-box');box.textContent=q.hint&&!/^[А-Яа-яӘәІіҢңҒғҚқӨөҰұҮүҺһ ]{1,24}$/.test(q.hint)?q.hint:(hints[q.topic]||'Вспомни правило, потом форму.');box.hidden=false;save();
-   if(mode!=='exam'&&window.AiTutor){
-     const expected=(q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'';
-     const req=window.AiTutor.buildRequest('hint',q,{hint_used:true,codes:[]});
-     window.AiTutor.callTutor(req).then(resp=>{
-       if(!resp||!window.AiTutor.isLiveMessage(resp.message_ru)||window.AiTutor.hintLeaks(resp,expected))return;
-       box.textContent=resp.message_ru+(resp.next_action_ru?' '+resp.next_action_ru:'');
-     });
-   }
  }
  function readAnswers(q){return q.kind==='multi'?$$('input[name=choice]:checked').map(el=>el.value):q.fields.map((_,i)=>$('#answer-'+i).value);}
  function checkAnswer(q,reveal=false){
@@ -499,19 +508,33 @@
    const morph=!result.correct?morphemeRow(errors,answerLine,answers.join(' ')):'';
    feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Нужно: <strong lang="kk">'+esc(answerLine)+'</strong>.</p>':''}${morph}${!tarErr?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;
    if(!result.correct&&mode!=='exam'&&window.AiTutor){
-     const paint=(resp)=>{
+     const unlock=()=>{['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=false;});};
+     const paint=(resp,token)=>{
+       if(token!==tutorToken)return;
        const out=$('#ai-tutor-out');if(!out||!resp)return;
+       const msg=String(resp.message_ru||'').trim();
+       if(!msg||resp.aborted)return;
        out.hidden=false;
-       const live=window.AiTutor.isLiveMessage(resp.message_ru);
-       out.innerHTML='<p>'+esc(live?resp.message_ru:'Не разобрала этот ответ. Смотри разбор на карточке выше.')+'</p>';
+       out.innerHTML='<p>'+esc(msg)+'</p>';
+       unlock();
      };
-     const ask=(m)=>{
+     const ask=(m,localOnly)=>{
+       const token=++tutorToken;
        const out=$('#ai-tutor-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
-       const req=window.AiTutor.buildRequest(m,q,{user_answer:answers.join(' '),is_correct:false,hint_used:hinted,codes:aiCodes});
-       window.AiTutor.callTutor(req,18000).then(paint);
+       ['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=true;});
+       const extra={user_answer:answers.join(' '),is_correct:false,hint_used:hinted,codes:aiCodes,surface:tutorSurface(),lesson_id:currentLessonId(q),repeat_count:aiCodes[0]?window.AiTutor.sameErrorCount(aiCodes[0]):0};
+       if(m==='explain_rule'||localOnly){
+         paint(window.AiTutor.localFallback(q,aiCodes,'explain_rule',extra),token);
+         unlock();
+         return;
+       }
+       const req=window.AiTutor.buildRequest(m,q,extra);
+       const ac=typeof AbortController!=='undefined'?new AbortController():null;
+       tutorAbort=ac;
+       window.AiTutor.callTutor(req,25000,{signal:ac&&ac.signal}).then(resp=>paint(resp,token)).catch(()=>paint(window.AiTutor.localFallback(q,aiCodes,m,extra),token)).finally(()=>{if(token===tutorToken)unlock();});
      };
      if($('#ai-why'))$('#ai-why').onclick=()=>ask('explain_error');
-     if($('#ai-rule'))$('#ai-rule').onclick=()=>ask('explain_rule');
+     if($('#ai-rule'))$('#ai-rule').onclick=()=>ask('explain_rule',true);
      if(aiRepeat)ask('explain_error');
      const extra=window.AiTutor.takeRemediation(byId);
      if(extra.length)window.AiTutor.spliceRemediation(queue,position,extra.map(x=>x.id));
@@ -525,7 +548,7 @@
      advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
    }
  }
- function nextQuestion(){cancelAdvance();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
+ function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
  function startHomework(lessonId,part,section){
    const H=window.Homework,pack=(H.packs(questions,course).find(p=>p.lesson_id===lessonId));
    if(!pack)return;
@@ -770,6 +793,7 @@
        out.hidden=false;
        out.textContent='Не разобрала этот вопрос. Смотри текст шага выше.';
      };
+     let pathTail=[];
      $$('[data-path-kind]').forEach(b=>b.onclick=()=>showLocal(b.dataset.pathKind||'simplify'));
      const go=$('#path-ask-send');
      if(go)go.onclick=()=>{
@@ -777,16 +801,22 @@
        if(!q){showLocal('simplify');return;}
        if(/пример|ещё\s*2|еще\s*2|больше\s+пример/i.test(q)){showLocal('examples');return;}
        const out=$('#path-ask-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
-       if(!window.AiTutor||!window.AiTutor.callTutor){showLocal('examples');return;}
+       go.disabled=true;
+       if(!window.AiTutor||!window.AiTutor.callTutor){showLocal('examples');go.disabled=false;return;}
        const tRules=(window.AiRules&&window.AiRules.allowedRuleIds([les.id]))||[];
        const step=beatPlain(beat).replace(/падеж\w*|посессив\w*|притяжательн\w*/gi,' ').replace(/\s+/g,' ').trim().slice(0,280);
        const dummy={id:'path:'+les.id+':'+ch.id,lessonId:les.id,title:'Глава: '+ch.title,stimulus:'Шаг: '+step,fields:[{answers:['']}],ruleIds:tRules};
-       const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:[les.id]});
-       window.AiTutor.callTutor(req,25000).then(resp=>{
-         const msg=resp&&typeof resp.message_ru==='string'?resp.message_ru:'';
-         if(window.AiTutor.isLiveMessage(msg)){if(out)out.textContent=msg;return;}
+       pathTail.push({role:'user',content:q});
+       pathTail=pathTail.slice(-4);
+       const token=++tutorToken;
+       const ac=typeof AbortController!=='undefined'?new AbortController():null;
+       tutorAbort=ac;
+       window.AiTutor.askTutor(dummy,q,{surface:'path',lesson_id:les.id,conversation_tail:pathTail,signal:ac&&ac.signal}).then(resp=>{
+         if(token!==tutorToken)return;
+         const msg=resp&&typeof resp.message_ru==='string'?resp.message_ru.trim():'';
+         if(msg){if(out)out.textContent=msg;pathTail.push({role:'assistant',content:msg});pathTail=pathTail.slice(-4);return;}
          showLocal('examples');
-       }).catch(()=>showLocal('examples'));
+       }).catch(()=>{if(token===tutorToken)showLocal('examples');}).finally(()=>{go.disabled=false;});
      };
    }
    if(beat.k==='goal'){
@@ -878,14 +908,7 @@
      $('#path-rule').onclick=()=>{
        pathPeek=true;
        const local=hintLine();
-       showPathFb('hinted','<p>Разбираю этот ответ…</p>');
-       if(!window.AiTutor||!window.AiTutor.callTutor){showPathFb('hinted','<p>'+esc(local)+'</p>');return;}
-       const req=window.AiTutor.buildRequest('hint',askDummy(),{hint_used:true,codes:[],allowed_lesson_ids:[les.id]});
-       window.AiTutor.callTutor(req,18000).then(resp=>{
-         const msg=resp&&resp.message_ru||'';
-         if(window.AiTutor.isLiveMessage(msg)&&!window.AiTutor.hintLeaks(resp,exp()))showPathFb('hinted','<p>'+esc(msg)+'</p>');
-         else showPathFb('hinted','<p>'+esc(local)+'</p>');
-       }).catch(()=>showPathFb('hinted','<p>'+esc(local)+'</p>'));
+       showPathFb('hinted','<p>'+esc(local)+'</p>');
      };
      $('#path-idk').onclick=()=>{
        pathPeek=true;
@@ -1078,20 +1101,36 @@
    if(rulesBack)rulesBack.onclick=()=>{if(rulesQ)rulesQ.value='';showRuleArticle(null);};
    showRuleArticle(rulesArticle);
    const rulesSend=$('#rules-ask-send');
+   let rulesTail=[];
+   const RULE_LESSON={quantity:'1-3',harmony:'1-1',plural:'1-2',soft:'1-1',numbers:'1-3','numbers-hw':'1-2',person:'2-3',alphabet:'1-1',vocab11:'1-1','words-22':'2-2',bank:'1-1'};
    if(rulesSend)rulesSend.onclick=()=>{
      const q=($('#rules-ask-q')&&$('#rules-ask-q').value.trim())||'';
      const out=$('#rules-ask-out');if(!out)return;
      if(!q){out.hidden=false;out.textContent='Напиши вопрос своими словами.';return;}
      out.hidden=false;out.textContent='Разбираю этот ответ…';
-     if(!window.AiTutor||!window.AiTutor.callTutor){out.textContent='Не разобрала этот вопрос. Смотри текст правила выше.';return;}
-     const lessons=['1-1','1-2','1-3','2-1','2-2','2-3'];
-     const tRules=(window.AiRules&&window.AiRules.allowedRuleIds(lessons))||[];
-     const dummy={id:'rules:ask',lessonId:'1-1',title:'Правила курса',stimulus:'',fields:[{answers:['']}],ruleIds:tRules};
-     const req=window.AiTutor.buildRequest('explain_rule',dummy,{user_question:q,is_correct:true,hint_used:false,codes:[],allowed_lesson_ids:lessons});
-     window.AiTutor.callTutor(req,18000).then(resp=>{
-       const msg=resp&&resp.message_ru||'';
-       out.textContent=window.AiTutor.isLiveMessage(msg)?msg:'Не разобрала этот вопрос. Смотри текст правила выше.';
-     }).catch(()=>{out.textContent='Не разобрала этот вопрос. Смотри текст правила выше.';});
+     rulesSend.disabled=true;
+     const lesson=RULE_LESSON[rulesArticle]||currentLessonId();
+     const tRules=(window.AiRules&&window.AiRules.allowedRuleIds(window.AiContract?window.AiContract.lessonsThrough(lesson):[lesson]))||[];
+     const dummy={id:'rules:ask:'+(rulesArticle||lesson),lessonId:lesson,title:'Правила курса',stimulus:'',fields:[{answers:['']}],ruleIds:tRules};
+     if(!window.AiTutor||!window.AiTutor.callTutor){
+       const local=window.AiTutor&&window.AiTutor.localFallback?window.AiTutor.localFallback(dummy,[], 'ask_tutor',{user_question:q,lesson_id:lesson,surface:'rules'}):null;
+       out.textContent=(local&&local.message_ru)||'Смотри текст правила выше.';
+       rulesSend.disabled=false;return;
+     }
+     rulesTail.push({role:'user',content:q});rulesTail=rulesTail.slice(-4);
+     const token=++tutorToken;
+     const ac=typeof AbortController!=='undefined'?new AbortController():null;
+     tutorAbort=ac;
+     window.AiTutor.askTutor(dummy,q,{surface:'rules',lesson_id:lesson,conversation_tail:rulesTail,signal:ac&&ac.signal}).then(resp=>{
+       if(token!==tutorToken)return;
+       const msg=resp&&resp.message_ru?String(resp.message_ru).trim():'';
+       if(msg){out.textContent=msg;rulesTail.push({role:'assistant',content:msg});rulesTail=rulesTail.slice(-4);return;}
+       const local=window.AiTutor.localFallback(dummy,[], 'ask_tutor',{user_question:q,lesson_id:lesson,surface:'rules'});
+       out.textContent=(local&&local.message_ru)||'Смотри текст правила выше.';
+     }).catch(()=>{
+       const local=window.AiTutor.localFallback(dummy,[], 'ask_tutor',{user_question:q,lesson_id:lesson,surface:'rules'});
+       out.textContent=(local&&local.message_ru)||'Смотри текст правила выше.';
+     }).finally(()=>{rulesSend.disabled=false;});
    };
    $$('[data-rule-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.ruleTopic;sourceFilter=null;mode='ordered';showView('practice');startQueue();});
    $$('#rules-content [data-source]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.source;vocabRole=null;topic='all';mode='ordered';showView('practice');startQueue();});
@@ -1152,10 +1191,11 @@
        startCustom(ids,'chunks');return;
      }
      if(next==='ai-summary'&&window.AiTutor){
-       const req=window.AiTutor.buildRequest('session_summary',{lessonId:'',id:'',title:'',stimulus:'',fields:[]},{codes:window.AiTutor.topWeak().map(w=>w.error_code)});
-       window.AiTutor.callTutor(req).then(resp=>{
+       const lesson=currentLessonId();
+       const req=window.AiTutor.buildRequest('session_summary',{lessonId:lesson,id:'',title:'',stimulus:'',fields:[]},{codes:window.AiTutor.topWeak().map(w=>w.error_code),surface:'practice',lesson_id:lesson});
+       window.AiTutor.callTutor(req,25000).then(resp=>{
          const root=document.getElementById('today-content');if(!root||!resp)return;
-         const msg=window.AiTutor.isLiveMessage(resp.message_ru)?resp.message_ru:'Не разобрала этот разбор. Смотри слабые места выше.';
+         const msg=String(resp.message_ru||'').trim()||'Слабые места сохранены локально.';
          const box=document.createElement('div');box.className='panel ai-tutor-out';box.innerHTML='<h2>Разбор</h2><p>'+esc(msg)+'</p>';
          root.prepend(box);
        });
