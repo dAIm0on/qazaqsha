@@ -1239,6 +1239,20 @@ assert.ok(!/біздің|олардың/u.test(JSON.stringify(Lesson31A.all())))
 assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 ok('Phase 3 Session D: structured сіздің T20/T21 only, free Phrase Drill and later persons still locked');
 
+const e31=Lesson31A.sessionE();
+assert.equal(e31.length,4);
+assert.ok(e31.every(q=>q.lessonId==='3-1'&&q.phase3&&q.phase3.session==='E'&&q.practiceOnly));
+assert.ok(e31.every(q=>(q.ruleIds||[]).length===1&&(q.ruleIds||[])[0]==='T22_BAR_ZHOK'));
+assert.ok(Lesson31A.check('p3-31-e-g5-bar','Менің көлігім бар').result.correct);
+assert.ok(Lesson31A.check('p3-31-e-g5-zhok','Менің көлігім жоқ').result.correct);
+assert.ok(Lesson31A.check('p3-31-e-g5-question','Сенің ағаң бар ма').result.correct);
+const e31Wrong=Lesson31A.check('p3-31-e-g6-emes','Менің көлігім емес');
+assert.ok(e31Wrong.errors.some(e=>e.error_type==='bar_zhok_not_emes'));
+assert.match(Diag.line('bar_zhok_not_emes','Менің көлігім жоқ','Менің көлігім емес',Lesson31A.byId('p3-31-e-g6-emes')),/жоқ, не емес.*Емес.*не является.*жоқ.*нет/u);
+assert.ok(!/T23_POSS_PL/.test(JSON.stringify(e31)));
+assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
+ok('Phase 3 Session E: T22 bar/zhok contrast works while 3-1 remains closed');
+
 const PhraseBanks=require('./phrase-banks.js');
 const PhraseDrill=require('./phrase-drill.js');
 assert.equal(PhraseBanks.forLesson('1-2').length,11);

@@ -101,13 +101,36 @@
    explanation:'көлік + іңіз → көлігіңіз: перед гласной притяжательного окончания к озвончается в г.'
   })
  ];
+ const SESSION_E=[
+  field({
+   id:'p3-31-e-g5-bar',order:1,session:'E',title:'Бар: у меня есть',stimulus:'Менің көлігім — есть → ?',
+   answers:['Менің көлігім бар','көлігім бар'],rule:'T22_BAR_ZHOK',error_type:'bar_zhok_choice',
+   explanation:'Менің көлігім бар = у меня есть машина. Бар говорит о наличии.'
+  }),
+  field({
+   id:'p3-31-e-g5-zhok',order:2,session:'E',title:'Жоқ: у меня нет',stimulus:'Менің көлігім — нет → ?',
+   answers:['Менің көлігім жоқ','көлігім жоқ'],rule:'T22_BAR_ZHOK',error_type:'bar_zhok_choice',
+   explanation:'Менің көлігім жоқ = у меня нет машины. Жоқ говорит об отсутствии.'
+  }),
+  field({
+   id:'p3-31-e-g5-question',order:3,session:'E',title:'Бар ма?: есть ли?',stimulus:'Сенің ағаң — есть? → ?',
+   answers:['Сенің ағаң бар ма','ағаң бар ма'],rule:'T22_BAR_ZHOK',error_type:'bar_zhok_choice',
+   explanation:'Сенің ағаң бар ма? = у тебя есть старший брат? Здесь бар + знакомая вопросительная частица ма.'
+  }),
+  field({
+   id:'p3-31-e-g6-emes',order:4,session:'E',title:'Жоқ ≠ емес',stimulus:'Менің көлігім емес',
+   answers:['Менің көлігім жоқ','көлігім жоқ'],rule:'T22_BAR_ZHOK',error_type:'bar_zhok_not_emes',
+   explanation:'Для отсутствия нужен жоқ: Менің көлігім жоқ. Емес означает «не является», а не «у меня нет».'
+  })
+ ];
 
  function sessionA(){return SESSION_A.map(clone);}
  function sessionB(){return SESSION_B.map(clone);}
  function sessionC(){return SESSION_C.map(clone);}
  function sessionD(){return SESSION_D.map(clone);}
- function all(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD()];}
- function byId(id){const q=[...SESSION_A,...SESSION_B,...SESSION_C,...SESSION_D].find(x=>x.id===id);return q?clone(q):null;}
+ function sessionE(){return SESSION_E.map(clone);}
+ function all(){return [...sessionA(),...sessionB(),...sessionC(),...sessionD(),...sessionE()];}
+ function byId(id){const q=[...SESSION_A,...SESSION_B,...SESSION_C,...SESSION_D,...SESSION_E].find(x=>x.id===id);return q?clone(q):null;}
  function check(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
   if(!q||!core||!core.evaluate)throw new Error('Lesson 3-1 closed pack unavailable');
@@ -118,6 +141,6 @@
  }
  function isClosed(){return true;}
 
- const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,sessionA,sessionB,sessionC,sessionD,all,byId,check,isClosed};
+ const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,SESSION_E,sessionA,sessionB,sessionC,sessionD,sessionE,all,byId,check,isClosed};
  if(node)module.exports=api;else root.Lesson31Pack=api;
 })(typeof window!=='undefined'?window:globalThis);
