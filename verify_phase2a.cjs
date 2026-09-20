@@ -25,8 +25,9 @@ for(const c of UI.COURSE){
   assert.ok(UI.OPEN.includes(c.id));
   for(const r of c.rules)assert.ok(UI.get(r),c.id+' '+r);
 }
-assert.ok(!UI.COURSE.some(c=>c.id==='3-1'));
-ok('all rules 1-1…2-3 resolve; 3-1 not in Learn course');
+assert.ok(UI.OPEN.includes('3-1'));
+assert.ok(UI.COURSE.some(c=>c.id==='3-1'));
+ok('all rules 1-1…3-1 resolve; 3-1 opened in Learn course');
 
 assert.equal(UI.ruleForChapter({id:'1-2-b'}),'T2_PLURAL_LDT');
 assert.equal(UI.ruleForChapter({id:'2-1-glue'}),'T12_GLUE');
