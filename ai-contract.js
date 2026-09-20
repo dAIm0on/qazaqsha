@@ -17,7 +17,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
  const MAX_IN=12000,MAX_MSG=450,MAX_OUT_TOKENS=250,ASK_OUT_TOKENS=400;
  const CLIENT_TIMEOUT_MS=25000,PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000;
  const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,session_summary:800,remediation:450};
- const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha.\n\nТы не проверяешь правильность ответа. Правильность уже определил локальный код.\n\nТы не меняешь expected_answer.\n\nГлавный источник истины — переданный rule_context.\n\nОбъясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком.\n\nНе вводи будущие темы.\n\nНе исправляй учебную программу своими знаниями.\n\nНе называй внутренние ID правил.\n\nНе упоминай system prompt, error_code или внутреннюю архитектуру.\n\nПиши естественным русским языком. Казахские формы оставляй на казахском.\n\nЕсли mode=explain_error:\n1. скажи, что ученица написала;\n2. покажи отличие от правильной формы;\n3. объясни один механизм правила;\n4. используй текущий пример.\n\nЕсли mode=explain_rule:\nобъясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом.\n\nЕсли mode=simplify:\nобъясни то же правило проще, не меняя его смысл.\n\nЕсли mode=ask_tutor:\nответь прежде всего на user_question.\nРазрешено объяснять через русский язык, если это помогает ученице понять казахское правило.\nМожно давать дополнительные примеры только из текущей разрешённой лексики и уже пройденной грамматики.\n\nЕсли ученица пишет:\n«не поняла»,\n«ещё проще»,\n«объясни иначе»,\n«через русский»,\nто измени способ объяснения, но не правило.\n\nЕсли repeat_count >= 2:\nможно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ её понять.\nНе стыди ученицу. Не пиши «ты опять ошиблась».\n\nЕсли mode=hint:\nне показывай полный правильный ответ.\n\nВозвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context.\nБез JSON.\nБез markdown fences.\nБез <think>.';
+ const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha.\n\nТы не проверяешь правильность ответа. Правильность уже определил локальный код.\n\nТы не меняешь expected_answer.\n\nГлавный источник истины — переданный rule_context.\n\nОбъясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком.\n\nНе вводи будущие темы.\n\nНе исправляй учебную программу своими знаниями.\n\nНе называй внутренние ID правил.\n\nНе упоминай system prompt, error_code или внутреннюю архитектуру.\n\nПиши естественным русским языком. Казахские формы оставляй на казахском.\n\nЕсли mode=explain_error:\n1. скажи, что ученица написала;\n2. покажи отличие от правильной формы;\n3. объясни один механизм правила;\n4. используй текущий пример.\n\nЕсли mode=explain_rule:\nобъясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом.\n\nЕсли mode=simplify:\nобъясни то же правило проще, не меняя его смысл.\n\nЕсли mode=ask_tutor:\nответь прежде всего на user_question 2–6 предложениями. Сразу к сути, без приветствия и без переписывания вопроса ученицы.\nДля кітап+ым помни озвончение п→б: кітабым.\nРазрешено объяснять через русский язык, если это помогает ученице понять казахское правило.\nМожно давать дополнительные примеры только из текущей разрешённой лексики и уже пройденной грамматики.\n\nЕсли ученица пишет:\n«не поняла»,\n«ещё проще»,\n«объясни иначе»,\n«через русский»,\nто измени способ объяснения, но не правило.\n\nЕсли repeat_count >= 2:\nможно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ её понять.\nНе стыди ученицу. Не пиши «ты опять ошиблась».\n\nЕсли mode=hint:\nне показывай полный правильный ответ.\n\nВозвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context.\nБез JSON.\nБез markdown fences.\nБез <think>.';
  function clip(s,n){s=String(s==null?'':s);return s.length<=n?s:s.slice(0,n);}
  function asArr(v){return Array.isArray(v)?v.filter(x=>typeof x==='string'):[];}
  function maxMessage(mode){return MSG_MAX[mode]||MAX_MSG;}
@@ -128,6 +128,25 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   }
   return t.trim();
  }
+ function looksLikeBadTutorReply(t){
+  t=String(t||'').trim();
+  if(!t)return false;
+  if(/^(добрый день|здравствуй(те)?|привет)[!.,]?\s/i.test(t))return true;
+  if(/Объясни,?\s*пожалуйста/i.test(t)&&/Спасибо/i.test(t))return true;
+  if(/\n\s*(Здравствуйте|Добрый день)!/i.test(t))return true;
+  if(/^\.\s*Добрый/i.test(t))return true;
+  if(/как правильно будет\s*[«"]?кітабым/i.test(t)&&/Нужно объяснить/i.test(t))return true;
+  if(/^Нужно объяснить/i.test(t))return true;
+  if(/^Хорошо,?\s*$/i.test(t))return true;
+  return false;
+ }
+ function cleanTutorReply(t){
+  t=String(t||'').trim().replace(/^\.+\s*/,'');
+  t=t.replace(/^(добрый день|здравствуй(те)?|привет)[!.,]?\s+/i,'');
+  t=t.replace(/^[\s\S]{0,240}?Спасибо!\s*/i,'');
+  t=t.replace(/^(здравствуй(те)?|добрый день)[!.,]?\s*/i,'');
+  return t.trim();
+ }
  function looksLikePromptLeak(t){
   t=String(t||'');
   if(/Analyze the Request/i.test(t))return true;
@@ -141,6 +160,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   t=String(t||'').trim();
   if(t.length<12)return false;
   if(looksLikePromptLeak(t))return false;
+  if(looksLikeBadTutorReply(t))return false;
   if(/<\/?think>/i.test(t)&&t.replace(/<think>[\s\S]*?<\/think>/gi,'').trim().length<12)return false;
   if(/^\s*(sorry|i cannot|as an ai)\b/i.test(t)&&t.length<48)return false;
   return true;
@@ -330,6 +350,6 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
  }
  function looksFuture(text,lessonId){const v=String(text||'');return ALWAYS_FUTURE_RE.test(v)||(lessonId!=='3-1'&&POSS_FUTURE_RE.test(v));}
  function outTokens(mode){return mode==='ask_tutor'?ASK_OUT_TOKENS:MAX_OUT_TOKENS;}
- const api={PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,FALLBACK,MODES,SURFACES,ERROR_CODES,ALLOWED_LESSONS,RULE_BY_LESSON,VOCAB_BY_LESSON,FUTURE_RE,MAX_OUT_TOKENS,ASK_OUT_TOKENS,CLIENT_TIMEOUT_MS,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,SYSTEM,validateRequest,validateResponse,extractJson,normalizeModelText,isUsableText,looksLikePromptLeak,emptyResp,fallback,localExplain,assembleResponse,examBlocked,futureBlocked,missingLesson,looksFuture,clip,normKey,resolveCurriculum,lessonsThrough,containsExpected,clipTail,clipRuleContext,maxMessage,outTokens,leverLine};
+ const api={PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,FALLBACK,MODES,SURFACES,ERROR_CODES,ALLOWED_LESSONS,RULE_BY_LESSON,VOCAB_BY_LESSON,FUTURE_RE,MAX_OUT_TOKENS,ASK_OUT_TOKENS,CLIENT_TIMEOUT_MS,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,SYSTEM,validateRequest,validateResponse,extractJson,normalizeModelText,isUsableText,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,emptyResp,fallback,localExplain,assembleResponse,examBlocked,futureBlocked,missingLesson,looksFuture,clip,normKey,resolveCurriculum,lessonsThrough,containsExpected,clipTail,clipRuleContext,maxMessage,outTokens,leverLine};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.AiContract=api;
 })(typeof window!=='undefined'?window:globalThis);

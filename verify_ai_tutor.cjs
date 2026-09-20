@@ -82,6 +82,11 @@ assert.ok(C.looksLikePromptLeak('1. **Analyze the Request**: **Role**: tutor. Co
 assert.ok(!C.isUsableText('1. **Analyze the Request**: **Role**: tutor. Mode: ask_tutor with rule_context and expected_answer'));
 assert.ok(!C.looksLikePromptLeak('В русском моя книга — отдельные слова. По-казахски менің кітабым: справа -ым, п→б.'));
 ok('TEST prompt leak Analyze the Request rejected as unusable');
+assert.ok(C.looksLikeBadTutorReply('. Добрый день! Объясни, пожалуйста, через русский. Спасибо! Здравствуйте! Нужно объяснить'));
+assert.ok(!C.isUsableText(C.cleanTutorReply('. Добрый день! Объясни, пожалуйста. Спасибо! Здравствуйте! Нужно объяснить')));
+assert.ok(!C.looksLikeBadTutorReply('В русском «моя книга» — отдельные слова. В казахском менің кітабым: справа -ым, п→б.'));
+ok('TEST bad tutor dialogue reply rejected as unusable');
+
 assert.equal(C.normalizeModelText('<think>secret</think>Ты написала бес кітаптар, нужно бес кітап.'),'Ты написала бес кітаптар, нужно бес кітап.');
 assert.ok(C.normalizeModelText('```json\n{"message_ru":"После числа множественное не ставится."}\n```').includes('множественное'));
 assert.equal(C.normalizeModelText({response:{content:'Сравни с русским: пять книг, но бес кітап.'}}),'Сравни с русским: пять книг, но бес кітап.');
