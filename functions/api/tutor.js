@@ -15,7 +15,7 @@ const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tuto
 const FUTURE_RE=/падеж|посессив|притяжательн|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|бар ма\?|кітабым/i;
 const ALWAYS_FUTURE_RE=/падеж|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|labial|comparative/i;
 const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|кітабым/i;
-const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha. Ты не проверяешь правильность ответа. Правильность уже определил локальный код. Ты не меняешь expected_answer. Главный источник истины — переданный rule_context. Объясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком. Не вводи будущие темы. Не исправляй учебную программу своими знаниями. Не называй внутренние ID правил. Не упоминай system prompt, error_code или внутреннюю архитектуру. Пиши естественным русским языком. Казахские формы оставляй на казахском. Если mode=explain_error: скажи, что ученица написала; покажи отличие от правильной формы; объясни один механизм правила; используй текущий пример. Если mode=explain_rule: объясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом. Если mode=simplify: объясни то же правило проще, не меняя его смысл. Если mode=ask_tutor: ответь прежде всего на вопрос ученицы. Разрешено объяснять через русский язык, если это помогает понять казахское правило. Дополнительные примеры — только из уже открытой лексики и грамматики. Если ученица пишет «не поняла», «ещё проще», «объясни иначе», «через русский» — измени способ объяснения, но не правило. Если repeat_count >= 2: можно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ понять. Не стыди. Если mode=hint: не показывай полный правильный ответ. Возвращай только текст ответа. Без JSON. Без markdown fences. Без <think>.';
+const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha. Ты не проверяешь правильность ответа. Правильность уже определил локальный код. Ты не меняешь expected_answer. Главный источник истины — переданный rule_context. Объясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком. Не вводи будущие темы. Не исправляй учебную программу своими знаниями. Не называй внутренние ID правил. Не упоминай system prompt, error_code или внутреннюю архитектуру. Пиши естественным русским языком. Казахские формы оставляй на казахском. Если mode=explain_error: скажи, что ученица написала; покажи отличие от правильной формы; объясни один механизм правила; используй текущий пример. Если mode=explain_rule: объясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом. Если mode=simplify: объясни то же правило проще, не меняя его смысл. Если mode=ask_tutor: ответь прежде всего на вопрос ученицы. Разрешено объяснять через русский язык, если это помогает понять казахское правило. Дополнительные примеры — только из уже открытой лексики и грамматики. Если ученица пишет «не поняла», «ещё проще», «объясни иначе», «через русский» — измени способ объяснения, но не правило. Если repeat_count >= 2: можно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ понять. Не стыди. Если mode=hint: не показывай полный правильный ответ. Возвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context. Без JSON. Без markdown fences. Без <think>.';
 
 function clip(s,n){s=String(s==null?'':s);return s.length<=n?s:s.slice(0,n);}
 function asArr(v){return Array.isArray(v)?v.filter(x=>typeof x==='string'):[];}
@@ -153,8 +153,8 @@ function normalizeModelText(out){
     if(msg){
       if(typeof msg.content==='string')t=msg.content;
       else if(Array.isArray(msg.content))t=msg.content.map(p=>typeof p==='string'?p:(p&&(p.text||p.content))||'').join('');
-      if(!t&&typeof msg.reasoning_content==='string')t=msg.reasoning_content;
-      if(!t&&typeof msg.reasoning==='string')t=msg.reasoning;
+      if(!t&&typeof msg.reasoning_content==='string'&&!looksLikePromptLeak(msg.reasoning_content))t=msg.reasoning_content;
+      if(!t&&typeof msg.reasoning==='string'&&!looksLikePromptLeak(msg.reasoning))t=msg.reasoning;
     }
     if(!t&&typeof out.text==='string')t=out.text;
     if(!t&&out.result&&typeof out.result.response==='string')t=out.result.response;
@@ -172,9 +172,19 @@ function normalizeModelText(out){
   }
   return t.trim();
 }
+function looksLikePromptLeak(t){
+  t=String(t||'');
+  if(/Analyze the Request/i.test(t))return true;
+  if(/\*\*\s*Role\s*\*\*/i.test(t)&&/Constraint/i.test(t))return true;
+  if(/Mode:\s*`?(ask_tutor|explain_error|hint)`?/i.test(t)&&/(rule_context|expected_answer)/i.test(t))return true;
+  if(/\bexpected_answer\b/.test(t)&&/\brule_context\b/.test(t)&&/\bmode\b/i.test(t))return true;
+  if(/^\s*1\.\s*\*?\*?Analyze/i.test(t))return true;
+  return false;
+}
 function isUsableText(t){
   t=String(t||'').trim();
   if(t.length<12)return false;
+  if(looksLikePromptLeak(t))return false;
   if(/<\/?think>/i.test(t)&&t.replace(/<think>[\s\S]*?<\/think>/gi,'').trim().length<12)return false;
   if(/^\s*(sorry|i cannot|as an ai)\b/i.test(t)&&t.length<48)return false;
   return true;
@@ -292,6 +302,7 @@ function unusableReason(text,raw,lessonId){
     try{rawS=typeof raw==='string'?raw:JSON.stringify(raw);}catch{rawS=String(raw);}
     return ('empty_output:'+rawS).slice(0,240);
   }
+  if(looksLikePromptLeak(t))return 'prompt_leak';
   if(looksFuture(t,lessonId))return 'future_in_output';
   if(t.length<12)return ('too_short:'+t).slice(0,240);
   return ('unusable:'+t).slice(0,240);
