@@ -298,7 +298,7 @@ ok('G11 bank 220 ids untouched');
 ok('G12 older verify scenarios still above');
 
 assert.ok(GP.navIsLessons());
-assert.deepEqual(GP.lessons().map(l=>l.id),['1-1','1-2','1-3','2-1','2-2','2-3']);
+assert.deepEqual(GP.lessons().map(l=>l.id),['1-1','1-2','1-3','2-1','2-2','2-3','3-1']);
 assert.ok(!GP.lessons().some(l=>/^T/.test(l.id)));
 ok('P1 nav by lesson_id not T-id');
 
@@ -331,10 +331,14 @@ assert.ok(GP.respectfulBye());
 assert.ok(/уважительн/.test(JSON.stringify(GP.chapter('2-3','2-3-bye'))));
 ok('P7 сау болыңыздар respectful plural');
 
-assert.ok(!GP.hasPossessiveGrammar());
-assert.ok(!GP.hasMeningGrammar());
+assert.ok(GP.hasPossessiveGrammar());
+assert.ok(GP.hasMeningGrammar());
+assert.ok(['1-1','1-2','1-3','2-1','2-2','2-3'].every(id=>{
+  const blob=JSON.stringify(GP.lesson(id)||{});
+  return !/притяжательн|посессив|менің|сенің|сіздің|оның|бар\/жоқ/i.test(blob);
+}));
 assert.ok(GP.FORBIDDEN.some(x=>/падеж|посессив|губн|степен/i.test(x)));
-ok('P8 no менің / possessive / labial / degrees chapters');
+ok('P8 possessive/менің only via opened 3-1; labial/degrees/cases stay forbidden');
 
 assertOriginal220('P9');
 ok('P9 original 220 bank IDs exact set + hash');
@@ -969,8 +973,11 @@ assert.ok(/id="path-go"/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf
 assert.ok(!/function showHint[\s\S]{0,900}callTutor/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/уже встречалась/.test(fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8')));
 assert.ok(/Правильно: <strong>/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
-assert.ok(/FUTURE_RE\.test\(req\.user_question/.test(fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8')));
-assert.ok(/пример\|ещё\\s\*2/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/function looksFuture/.test(fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8')));
+assert.ok(/looksFuture\(req\.user_question/.test(fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8')));
+assert.ok(/ALWAYS_FUTURE_RE/.test(fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8')));
+assert.ok(/POSS_FUTURE_RE/.test(fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8')));
+assert.ok(/ещё 2/.test(fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8')));
 const ordCh=GP.chapter('2-3','2-3-ord');
 assert.ok(ordCh.beats.filter(b=>b.k==='ex').length>=3);
 assert.ok(/екі кітап/.test(ordCh.beats.find(b=>b.k==='why').b));
@@ -1041,7 +1048,8 @@ assert.ok(g1BizBad.errors.some(e=>e.error_type==='person_pl_form'));
 const g1OlBad=P2BG1.checkCell('p2b-23-g1-mugalim','мұғаліммін');
 assert.ok(g1OlBad.errors.some(e=>e.error_type==='ol_suffix'));
 assert.ok(/phase2b-practice\.js/.test(htmlSrc));
-assert.ok(!/бирк|наклейк/i.test(fs.readFileSync(path.join(__dirname,'diagnostics.js'),'utf8')));
+assert.ok(!/\bбирк/i.test(fs.readFileSync(path.join(__dirname,'diagnostics.js'),'utf8')));
+assert.ok(/наклейк/i.test(fs.readFileSync(path.join(__dirname,'diagnostics.js'),'utf8')));
 assert.ok(/последний релевантный слог/.test(G1Diag.line('harmony_edge')));
 ok('Phase 2B G1: one-cell registry, local checking, precise diagnostics, 1-3 correctly has no G1');
 
@@ -1196,7 +1204,7 @@ assert.ok(Lesson31A.check('p3-31-b-g2-dos','досың').result.correct);
 const b31Missing=Lesson31A.check('p3-31-b-g2-ake','әке');
 assert.ok(b31Missing.errors.some(e=>e.error_type==='poss_suffix_missing'));
 assert.match(Diag.line('poss_suffix_missing','Сенің әкең','Сенің әке',Lesson31A.byId('p3-31-b-g2-ake')),/Для сенің нужна притяжательная наклейка/i);
-assert.ok(!/оның|сіздің|біздің|олардың/u.test(JSON.stringify(Lesson31A.all())));
+assert.ok(!/оның|сіздің|біздің|олардың/u.test(JSON.stringify([...a31,...b31])));
 assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 ok('Phase 3 Session B: closed senің-only T20/T21 pack, later persons still locked');
 
@@ -1213,7 +1221,7 @@ assert.ok(Lesson31A.check('p3-31-c-g2-kitap','кітабы').result.correct);
 const c31Assim=Lesson31A.check('p3-31-c-g2-mektep','мектепі');
 assert.ok(c31Assim.errors.some(e=>e.error_type==='poss_assim_voice'));
 assert.match(Diag.line('poss_assim_voice','Оның мектебі','Оның мектепі',Lesson31A.byId('p3-31-c-g2-mektep')),/П.*Б.*мектебі/i);
-assert.ok(!/сіздің|біздің|олардың/u.test(JSON.stringify(Lesson31A.all())));
+assert.ok(!/сіздің|біздің|олардың/u.test(JSON.stringify([...a31,...b31,...c31])));
 assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 ok('Phase 3 Session C: closed оның-only T20/T21 pack, сіздің and later persons still locked');
 
@@ -1235,7 +1243,7 @@ assert.match(Diag.line('poss_suffix_missing','Сіздің атаңыз','Сіз
 const d31Assim=Lesson31A.check('p3-31-d-g2-kolik','көлікіңіз');
 assert.ok(d31Assim.errors.some(e=>e.error_type==='poss_assim_voice'));
 assert.match(Diag.line('poss_assim_voice','Сіздің көлігіңіз','Сіздің көлікіңіз',Lesson31A.byId('p3-31-d-g2-kolik')),/К.*Г.*көлігіңіз/i);
-assert.ok(!/біздің|олардың/u.test(JSON.stringify(Lesson31A.all())));
+assert.ok(!/біздің|олардың/u.test(JSON.stringify([...a31,...b31,...c31,...d31])));
 assert.equal(require('./phrase-drill.js').forLesson('3-1').length,0);
 ok('Phase 3 Session D: structured сіздің T20/T21 only, free Phrase Drill and later persons still locked');
 

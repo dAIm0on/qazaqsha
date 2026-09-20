@@ -93,7 +93,11 @@
   if(error_type==='ol_suffix'&&E&&A)return 'У ол/олар личного окончания нет: '+E+', не '+A+'.';
   if(error_type==='question_class'&&E&&A){
     const ep=questionPart(E),ap=questionPart(A);
-    const base=baseFrom(q,core.normalize(E).replace(/\s+(ма|ме|ба|бе|па|пе)$/u,'').split(/\s+/u).pop()),last=lastLetter(base);
+    // Prefer stem from expected answer: stimulus often ends with the wrong particle (ба?), which must not become lastLetter.
+    const fromExpected=core.normalize(E).replace(/\s+(ма|ме|ба|бе|па|пе)$/u,'').split(/\s+/u).pop();
+    const fromStim=String(baseFrom(q,fromExpected)||'').replace(/(?:ма|ме|ба|бе|па|пе)$/u,'');
+    const base=(fromStim&&!/^(ма|ме|ба|бе|па|пе)$/u.test(fromStim))?fromStim:(fromExpected||'');
+    const last=lastLetter(base);
     if(ep&&ap&&last)return 'Ты выбрала '+ap+'. После '+last+' вопросительная частица начинается с '+ep[0].toUpperCase()+': '+ep+', не '+ap+'.';
   }
   if(error_type==='question_particle_missing'&&E)return 'Не хватает отдельной вопросительной частицы: нужно '+E+'.';
