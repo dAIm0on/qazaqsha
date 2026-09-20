@@ -3,14 +3,15 @@
  'use strict';
  const node=typeof module!=='undefined'&&module.exports;
  const Bank=node?require('./explain-bank.js'):root.ExplainBank;
- const OPEN=['1-1','1-2','1-3','2-1','2-2','2-3'];
+ const OPEN=['1-1','1-2','1-3','2-1','2-2','2-3','3-1'];
  const COURSE=[
   {id:'1-1',label:'1–1',name:'Звуки и первые слова',rules:['T1_HARMONY']},
   {id:'1-2',label:'1–2',name:'Окончания и числа',rules:['T2_PLURAL_LDT']},
   {id:'1-3',label:'1–3',name:'Числа, количество и новые слова',rules:['T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE','PHONE_GROUPS']},
   {id:'2-1',label:'2–1',name:'Мен, сен, сіз; емес; ба/бе',rules:['T12_GLUE','T6_PERSON_SG','T7_EMES']},
   {id:'2-2',label:'2–2',name:'Біз, сендер, сіздер и прилагательные',rules:['T8_PERSON_PL','T8_ADJ_PRED']},
-  {id:'2-3',label:'2–3',name:'Ол / олар, вопрос, порядковые',rules:['T9_OL','T10_QUESTION','T11_ORDINAL']}
+  {id:'2-3',label:'2–3',name:'Ол / олар, вопрос, порядковые',rules:['T9_OL','T10_QUESTION','T11_ORDINAL']},
+  {id:'3-1',label:'3–1',name:'Притяжательные формы: мой / твой / его; бар / жоқ',rules:['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']}
  ];
  const CHAPTER_RULE={
   '1-1-ru':'T1_HARMONY','1-1-row':'T1_HARMONY','1-1-sig':'T1_HARMONY','1-1-iyu':'T1_HARMONY','1-1-mix':'T1_HARMONY','1-1-ae':'T1_HARMONY',
@@ -22,7 +23,8 @@
   '2-1-emes':'T7_EMES',
   '2-2-glue':'T12_GLUE','2-2-adj':'T8_ADJ_PRED','2-2-biz':'T8_PERSON_PL','2-2-mn':'T8_PERSON_PL','2-2-sender':'T8_PERSON_PL','2-2-sizder':'T8_PERSON_PL','2-2-noextra':'T8_PERSON_PL',
   '2-3-glue':'T12_GLUE','2-3-ol':'T9_OL','2-3-olar':'T9_OL','2-3-q':'T10_QUESTION','2-3-qstem':'T10_QUESTION',
-  '2-3-ord':'T11_ORDINAL','2-3-suf':'T11_ORDINAL','2-3-ex':'T11_ORDINAL','2-3-comp':'T11_ORDINAL','2-3-ordp':'T11_ORDINAL'
+  '2-3-ord':'T11_ORDINAL','2-3-suf':'T11_ORDINAL','2-3-ex':'T11_ORDINAL','2-3-comp':'T11_ORDINAL','2-3-ordp':'T11_ORDINAL',
+  '3-1-poss':'T20_POSS','3-1-assim':'T21_POSS_ASSIM','3-1-bar':'T22_BAR_ZHOK','3-1-plural':'T23_POSS_PL'
  };
  const TITLE_FIX={
   '1-2-a':'Гласная А или Е','1-2-b':'Начало Л / Д / Т','1-2-glue':'Сборка двух шагов',

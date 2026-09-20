@@ -1,7 +1,10 @@
 /* All answers are checked locally against the reviewed course key. */
 (function(){
  'use strict';
- const course=window.COURSE, core=window.TrainerCore, questions=course.questions;
+ const course=window.COURSE, core=window.TrainerCore;
+ try{window.Lesson31Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{window.PhraseDrill?.install?.(course,window.CURRICULUM);}catch{}
+ const questions=course.questions;
  function coerceTyped(q){
    if(q.kind==='multi'){
      q.kind='fields';
@@ -27,9 +30,9 @@
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
- const COURSE_BLOCKS=[{id:'1-1',title:'1–1',hint:'Звуки и первые слова'},{id:'1-2',title:'1–2',hint:'Окончания и десятки'},{id:'1-3',title:'1–3',hint:'Числа и новые слова'},{id:'2-1',title:'2–1',hint:'Мен, сен, сіз'},{id:'2-2',title:'2–2',hint:'Біз, сендер, сіздер'},{id:'2-3',title:'2–3',hint:'Ол, вопрос, порядковые'}];
+ const COURSE_BLOCKS=[{id:'1-1',title:'1–1',hint:'Звуки и первые слова'},{id:'1-2',title:'1–2',hint:'Окончания и десятки'},{id:'1-3',title:'1–3',hint:'Числа и новые слова'},{id:'2-1',title:'2–1',hint:'Мен, сен, сіз'},{id:'2-2',title:'2–2',hint:'Біз, сендер, сіздер'},{id:'2-3',title:'2–3',hint:'Ол, вопрос, порядковые'},{id:'3-1',title:'3–1',hint:'Притяжательные формы'}];
  function courseJumpMarkup(id){
-   return `<div class="course-jump" id="${id}"><p>Уроки 1–1…2–3</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}><span class="today-lesson-id">Урок ${b.title}</span><small>${esc(b.hint)}</small></button>`).join('')}</div></div>`;
+   return `<div class="course-jump" id="${id}"><p>Уроки 1–1…3–1</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}><span class="today-lesson-id">Урок ${b.title}</span><small>${esc(b.hint)}</small></button>`).join('')}</div></div>`;
  }
  function bindCourseJump(root){
    (root?root.querySelectorAll('[data-course]'):[]).forEach(b=>b.onclick=()=>startCourse(b.dataset.course));
@@ -115,6 +118,7 @@
   if(!q)return false;
   if(q.source==='p2b'&&!records[q.id]?.seen&&mode!=='course')return false;
   if(q.source==='phrase'&&!records[q.id]?.seen&&mode!=='phrase'&&mode!=='course')return false;
+  if(q.source==='phase3-31'&&!records[q.id]?.seen&&mode!=='course'&&mode!=='phrase')return false;
   return catalog.eligible(q,state)&&(!q.promotedWord||state.vocabulary[q.promotedWord]?.target_or_context==='target');
  }
  function activateCard(){
@@ -185,7 +189,7 @@
    if(resumeCourse){render();showView('practice');return;}
    const first=window.LEARNING.lessons.find(l=>l.courseLesson===block);
    if(first)learningState.lessonId=first.id;
-   const lessonCards=window.Phase2BPractice?.lessonSession?.(block)||[];
+   const lessonCards=block==='3-1'?(window.Lesson31Pack?.lessonSession?.()||[]):(window.Phase2BPractice?.lessonSession?.(block)||[]);
    if(lessonCards.length&&mode!=='exam'){
      mode='course';
      let ordered=lessonCards.slice();
@@ -621,7 +625,8 @@
  }
  function renderHomework(){
    const root=$('#homework-content');if(!root||!window.Homework)return;
-   const list=window.Homework.packs(questions,course);
+   const sessionGUnlocked=!!(window.Lesson31Pack?.sessionG?.().length)&&window.Lesson31Pack.sessionG().every(q=>records[q.id]?.seen);
+   const list=window.Homework.packs(questions,course,{sessionGUnlocked});
    const weak=window.Homework.weakSpots(state,questions);
    const pick=hwLesson&&list.find(p=>p.lesson_id===hwLesson)||list[0];
    if(!pick){root.innerHTML='<div class="panel"><p>Пакеты ДЗ 1–1…1–3 ещё не собраны из банка.</p></div>';return;}

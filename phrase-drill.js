@@ -3,7 +3,9 @@
  'use strict';
  const node=typeof module!=='undefined'&&module.exports;
  const banks=node?require('./phrase-banks.js'):root.PhraseBanks;
- const ORDER=['1-1','1-2','1-3','2-1','2-2','2-3'];
+ const gate=node?require('./curriculum-gate.js'):root.CurriculumGate;
+ const lesson31=node?require('./lesson31-pack.js'):root.Lesson31Pack;
+ const ORDER=['1-1','1-2','1-3','2-1','2-2','2-3','3-1'];
  const clone=x=>JSON.parse(JSON.stringify(x));
  const pad=n=>String(n).padStart(2,'0');
  function allowedThrough(lessonId){
@@ -25,10 +27,15 @@
    phase2b:{genre:'PHRASE',phrase:true,error_type:pair.error_type||'',pair_key:pair.pair_key,root_lesson:pair.root_lesson}
   };
  }
- function forLesson(lessonId){
+ function lesson31Open(catalog){return !!(gate&&gate.allows&&gate.allows('possessive',catalog));}
+ function forLesson(lessonId,catalog){
+  if(lessonId==='3-1'){
+   if(!lesson31Open(catalog)||!lesson31||!lesson31.sessionG)return [];
+   return lesson31.sessionG().map(clone);
+  }
   return banks.forLesson(lessonId).flatMap(p=>[variant(p,'ru-kk'),variant(p,'kk-ru')]);
  }
- function allQuestions(){return ['1-2','1-3'].flatMap(forLesson);}
+ function allQuestions(catalog){return [...['1-2','1-3'].flatMap(id=>forLesson(id,catalog)),...forLesson('3-1',catalog)];}
  function weaknessKeys(profile){
   if(!profile)return new Set();
   if(Array.isArray(profile))return new Set(profile.flatMap(x=>typeof x==='string'?[x]:[x&&x.error_code,x&&x.error_type,x&&x.skill_tag].filter(Boolean)));
@@ -43,6 +50,15 @@
   return (weakHit?4:0)+(unseen?2:0);
  }
  function session(lessonId,opts={}){
+  const catalog=opts.catalog||(typeof window!=='undefined'?window.CURRICULUM:null);
+  if(lessonId==='3-1'){
+   if(!lesson31Open(catalog))return [];
+   const random=typeof opts.random==='function'?opts.random:Math.random,seen=new Set(opts.seen_ids||[]);
+   const cards=forLesson('3-1',catalog),requested=Math.max(2,Math.floor(Number(opts.count)||12)),count=Math.min(requested,cards.length);
+   const byDir=dir=>shuffled(cards.filter(q=>q.title===dir),random).sort((a,b)=>Number(!seen.has(b.id))-Number(!seen.has(a.id)));
+   const ruCount=Math.ceil(count/2),kkCount=count-ruCount;
+   return shuffled([...byDir('RU → KK').slice(0,ruCount),...byDir('KK → RU').slice(0,kkCount)],random);
+  }
   if(!['1-2','1-3'].includes(lessonId))return [];
   const random=typeof opts.random==='function'?opts.random:Math.random;
   const weak=weaknessKeys(opts.error_profile),seen=new Set(opts.seen_ids||[]);
@@ -84,15 +100,15 @@
    const q=variant(p,dir);q.phase2b.weakness_targeted=targetedPairs.has(p.pair_key);return q;
   });
  }
- function install(course){
+ function install(course,catalog){
   if(!course||!Array.isArray(course.questions))return [];
   course.sources=course.sources||{};
   if(!course.sources.phrase)course.sources.phrase={title:'Phrase Drill',url:'#',additional:true};
   const known=new Set(course.questions.map(q=>q.id)),added=[];
-  for(const q of allQuestions()){if(known.has(q.id))continue;course.questions.push(clone(q));known.add(q.id);added.push(q.id);}
+  for(const q of allQuestions(catalog)){if(known.has(q.id))continue;course.questions.push(clone(q));known.add(q.id);added.push(q.id);}
   return added;
  }
  const api={ORDER,allowedThrough,variant,forLesson,allQuestions,session,install};
  if(node)module.exports=api;
- else{root.PhraseDrill=api;if(root.COURSE)install(root.COURSE);}
+ else{root.PhraseDrill=api;if(root.COURSE)install(root.COURSE,root.CURRICULUM);}
 })(typeof window!=='undefined'?window:globalThis);

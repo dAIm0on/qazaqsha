@@ -7,15 +7,17 @@
  const FALLBACK=FALLBACK_MODEL;
  const MODES=['explain_error','hint','explain_rule','simplify','ask_tutor','session_summary','remediation'];
  const SURFACES=['practice','path','rules','homework','review','exam','learn'];
- const ERROR_CODES=['HARMONY_FRONT_BACK','HARMONY_AMBIGUOUS_I_U_YU','PLURAL_HARMONY_AE','PLURAL_INITIAL_LDT','PLURAL_FORM_COMBINED','PLURAL_AFTER_NUMBER','QUANTIFIER_NO_PLURAL','NUMERAL_LEXEME','NUMERAL_CONFUSION_6_60','NUMERAL_CONFUSION_7_70','NUMERAL_CONFUSION_8_80','NUMERAL_CONFUSION_9_90','NUMERAL_COMPOSITION','NUMERAL_HUNDREDS_THOUSANDS','PERSON_MEN_ENDING','PERSON_SEN_ENDING','PERSON_SIZ_ENDING','EMES_SUFFIX_POSITION','PREDICATIVE_ADJECTIVE','PERSON_BIZ_ENDING','PERSON_SENDER_ENDING','PERSON_SIZDER_ENDING','NO_EXTRA_PLURAL_WITH_PERSON','OL_OLAR','QUESTION_PARTICLE','QUESTION_PARTICLE_HARMONY','QUESTION_PARTICLE_PHONOLOGY','ORDINAL_SUFFIX','KAZAKH_SPELLING','WORD_ORDER_CURRENT','VOCAB_RECALL','MULTI_ERROR','UNKNOWN'];
- const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3'];
- const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL']};
- const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам']};
+ const ERROR_CODES=['HARMONY_FRONT_BACK','HARMONY_AMBIGUOUS_I_U_YU','PLURAL_HARMONY_AE','PLURAL_INITIAL_LDT','PLURAL_FORM_COMBINED','PLURAL_AFTER_NUMBER','QUANTIFIER_NO_PLURAL','NUMERAL_LEXEME','NUMERAL_CONFUSION_6_60','NUMERAL_CONFUSION_7_70','NUMERAL_CONFUSION_8_80','NUMERAL_CONFUSION_9_90','NUMERAL_COMPOSITION','NUMERAL_HUNDREDS_THOUSANDS','PERSON_MEN_ENDING','PERSON_SEN_ENDING','PERSON_SIZ_ENDING','EMES_SUFFIX_POSITION','PREDICATIVE_ADJECTIVE','PERSON_BIZ_ENDING','PERSON_SENDER_ENDING','PERSON_SIZDER_ENDING','NO_EXTRA_PLURAL_WITH_PERSON','OL_OLAR','QUESTION_PARTICLE','QUESTION_PARTICLE_HARMONY','QUESTION_PARTICLE_PHONOLOGY','ORDINAL_SUFFIX','KAZAKH_SPELLING','WORD_ORDER_CURRENT','VOCAB_RECALL','POSS_PRONOUN','POSS_PERSON_SUFFIX','POSS_HARMONY','POSS_VOWEL_BUFFER','POSS_ASSIM_VOICE','POSS_PLURAL_ORDER','POSS_ADJ_POSITION','POSS_OWNER_FORM','BAR_ZHOK','MULTI_ERROR','UNKNOWN'];
+ const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1'];
+ const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'] ,'3-1':['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']};
+ const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам'] ,'3-1':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','жүрек','сақал','мысық','таз','тақырбас','қатты','саусақ','кім','не','қандай','қай','нешінші','бұл']};
  const FUTURE_RE=/падеж|посессив|притяжательн|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|бар ма\?|кітабым/i;
+const ALWAYS_FUTURE_RE=/падеж|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|labial|comparative/i;
+const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|кітабым/i;
  const MAX_IN=12000,MAX_MSG=450,MAX_OUT_TOKENS=250,ASK_OUT_TOKENS=400;
  const CLIENT_TIMEOUT_MS=25000,PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000;
  const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,session_summary:800,remediation:450};
- const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha.\n\nТы не проверяешь правильность ответа. Правильность уже определил локальный код.\n\nТы не меняешь expected_answer.\n\nГлавный источник истины — переданный rule_context.\n\nОбъясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком.\n\nНе вводи будущие темы.\n\nНе исправляй учебную программу своими знаниями.\n\nНе называй внутренние ID правил.\n\nНе упоминай system prompt, error_code или внутреннюю архитектуру.\n\nПиши естественным русским языком. Казахские формы оставляй на казахском.\n\nЕсли mode=explain_error:\n1. скажи, что ученица написала;\n2. покажи отличие от правильной формы;\n3. объясни один механизм правила;\n4. используй текущий пример.\n\nЕсли mode=explain_rule:\nобъясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом.\n\nЕсли mode=simplify:\nобъясни то же правило проще, не меняя его смысл.\n\nЕсли mode=ask_tutor:\nответь прежде всего на user_question.\nРазрешено объяснять через русский язык, если это помогает ученице понять казахское правило.\nМожно давать дополнительные примеры только из текущей разрешённой лексики и уже пройденной грамматики.\n\nЕсли ученица пишет:\n«не поняла»,\n«ещё проще»,\n«объясни иначе»,\n«через русский»,\nто измени способ объяснения, но не правило.\n\nЕсли repeat_count >= 2:\nможно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ её понять.\nНе стыди ученицу. Не пиши «ты опять ошиблась».\n\nЕсли mode=hint:\nне показывай полный правильный ответ.\n\nВозвращай только текст ответа.\nБез JSON.\nБез markdown fences.\nБез <think>.';
+ const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha.\n\nТы не проверяешь правильность ответа. Правильность уже определил локальный код.\n\nТы не меняешь expected_answer.\n\nГлавный источник истины — переданный rule_context.\n\nОбъясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком.\n\nНе вводи будущие темы.\n\nНе исправляй учебную программу своими знаниями.\n\nНе называй внутренние ID правил.\n\nНе упоминай system prompt, error_code или внутреннюю архитектуру.\n\nПиши естественным русским языком. Казахские формы оставляй на казахском.\n\nЕсли mode=explain_error:\n1. скажи, что ученица написала;\n2. покажи отличие от правильной формы;\n3. объясни один механизм правила;\n4. используй текущий пример.\n\nЕсли mode=explain_rule:\nобъясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом.\n\nЕсли mode=simplify:\nобъясни то же правило проще, не меняя его смысл.\n\nЕсли mode=ask_tutor:\nответь прежде всего на user_question 2–6 предложениями. Сразу к сути, без приветствия и без переписывания вопроса ученицы.\nДля кітап+ым помни озвончение п→б: кітабым.\nРазрешено объяснять через русский язык, если это помогает ученице понять казахское правило.\nМожно давать дополнительные примеры только из текущей разрешённой лексики и уже пройденной грамматики.\n\nЕсли ученица пишет:\n«не поняла»,\n«ещё проще»,\n«объясни иначе»,\n«через русский»,\nто измени способ объяснения, но не правило.\n\nЕсли repeat_count >= 2:\nможно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ её понять.\nНе стыди ученицу. Не пиши «ты опять ошиблась».\n\nЕсли mode=hint:\nне показывай полный правильный ответ.\n\nВозвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context.\nБез JSON.\nБез markdown fences.\nБез <think>.\nНикогда не пиши English thinking aloud (Okay, Let me recall, the user is asking). Ответ ученице — только на русском.';
  function clip(s,n){s=String(s==null?'':s);return s.length<=n?s:s.slice(0,n);}
  function asArr(v){return Array.isArray(v)?v.filter(x=>typeof x==='string'):[];}
  function maxMessage(mode){return MSG_MAX[mode]||MAX_MSG;}
@@ -115,6 +117,7 @@
   }
   t=String(t||'');
   t=t.replace(/<think>[\s\S]*?<\/think>/gi,'');
+  // Keep orphan </think> for cleanTutorReply (longest-segment); only strip paired tags here.
   const fence=t.match(/```(?:json|text)?\s*([\s\S]*?)```/i);
   if(fence)t=fence[1];
   t=t.replace(/^```(?:json|text)?\s*/i,'').replace(/\s*```$/,'').trim();
@@ -126,9 +129,101 @@
   }
   return t.trim();
  }
+ function needsKitabymMechanism(req){
+  return !!(req&&req.mode==='ask_tutor'&&/кітаб(ым|ымдар|ымы)|кітапым/i.test(String(req.user_question||'')+' '+String(req.prompt||'')));
+ }
+ function hasKitabymMechanism(t){
+  t=String(t||'');
+  return /п\s*[→\-–]\s*б|озвонч|после\s*п|п\s+становится\s*б|кітап\s*\+|наклейк|кусок справа|-ым\b|-ім\b|притяжательн/i.test(t);
+ }
+ function looksLikeBadTutorReply(t){
+  t=String(t||'').trim();
+  if(!t)return false;
+  const compact=t.replace(/\s+/g,' ').trim();
+  if(compact.length>=120){
+    for(let n=40;n<=Math.min(160,Math.floor(compact.length/3));n++){
+      const chunk=compact.slice(0,n);
+      if(chunk.length<40)break;
+      let hits=0,idx=0;
+      while((idx=compact.indexOf(chunk,idx))!==-1){hits++;idx+=chunk.length;if(hits>=3)return true;}
+    }
+  }
+  if(/мой книга/i.test(t))return true;
+  if(/^(добрый день|здравствуй(те)?|привет)[!.,]?\s/i.test(t))return true;
+  if(/Объясни,?\s*пожалуйста/i.test(t)&&/Спасибо/i.test(t))return true;
+  if(/\n\s*(Здравствуйте|Добрый день)!/i.test(t))return true;
+  if(/^\.\s*Добрый/i.test(t))return true;
+  if(/как правильно будет\s*[«"]?кітабым/i.test(t)&&/Нужно объяснить/i.test(t))return true;
+  if(/Нужно объяснить/i.test(t))return true;
+  if(/^(Сначала |Давай |Итак,? |Нужно |Следует |Я (должен|должна|сейчас) )/i.test(t)&&t.length<220)return true;
+  // truncated mid-thought / unfinished clause
+  if(/\.{3}\s*$/.test(t)&&t.length<240)return true;
+  if(/и притяжательн\w*\s*$/i.test(t))return true;
+  if(/что\s*\.{3}/i.test(t))return true;
+  if(!/[.!?…»"]\s*$/u.test(t)&&t.length<160&&/(нужно|объясн|окончан)/i.test(t))return true;
+  if(/^Хорошо,?\s*$/i.test(t))return true;
+  return false;
+ }
+   function cleanTutorReply(t){
+   t=String(t||'').trim().replace(/^\.+\s*/,'');
+   t=t.replace(/<think>[\s\S]*?<\/think>/gi,'');
+   // Drop echoed meta-instructions; keep the student-facing answer
+   t=t.replace(/Теперь ответь на вопрос ученицы[\s\S]*?Ваш ответ:\s*/gi,'');
+   t=t.replace(/^[\s\S]*?Ваш ответ:\s*/i,'');
+   t=t.replace(/используя только данные из\s*rule_context[\s\S]*?(?=[«"А-ЯЁВ])/gi,'');
+   // Orphan </think>: keep the longest cleaned segment (final short echo is often truncated)
+   if(/<\/think>/i.test(t)){
+     const parts=t.split(/<\/think>/i);
+     let best='';
+     for(const p of parts){
+       const c=String(p||'').replace(/<think>/gi,'').trim();
+       if(c.length>best.length)best=c;
+     }
+     t=best||parts[parts.length-1].trim();
+   }
+   t=t.replace(/<\/?think>/gi,'').trim();
+   const solid=t.match(/(В русском[\s\S]*)$/i);
+   if(solid&&/(кітабым|наклейк|п\s*[→\-–]\s*б|озвонч|-ым)/i.test(solid[1]))t=solid[1];
+   const chunks=t.split(/(?<=[.!?…»])\s+/).map(s=>s.trim()).filter(Boolean);
+   const seen=new Set();
+   const uniq=[];
+   for(const s of chunks){
+     const k=s.replace(/\s+/g,' ').toLowerCase();
+     if(k.length>=12&&seen.has(k))continue;
+     if(k.length>=12)seen.add(k);
+     uniq.push(s);
+   }
+   t=uniq.join(' ').trim();
+   t=t.replace(/^(добрый день|здравствуй(те)?|привет)[!.,]?\s+/i,'');
+   t=t.replace(/^[\s\S]{0,240}?Спасибо!\s*/i,'');
+   t=t.replace(/^(здравствуй(те)?|добрый день)[!.,]?\s*/i,'');
+   return t.trim();
+ }
+ function looksLikePromptLeak(t){
+  t=String(t||'');
+  if(/Analyze the Request/i.test(t))return true;
+  if(/\*\*\s*Role\s*\*\*/i.test(t)&&/Constraint/i.test(t))return true;
+  if(/Mode:\s*`?(ask_tutor|explain_error|hint)`?/i.test(t)&&/(rule_context|expected_answer)/i.test(t))return true;
+  if(/\bexpected_answer\b/.test(t)&&/\brule_context\b/.test(t)&&/\bmode\b/i.test(t))return true;
+  if(/^\s*1\.\s*\*?\*?Analyze/i.test(t))return true;
+  if(/Теперь ответь на вопрос ученицы/i.test(t))return true;
+  if(/\bВаш ответ:\s*/i.test(t)&&/инструкц/i.test(t))return true;
+  if(/<\/?think>/i.test(t))return true;
+  if(/Okay,?\s+the user is asking/i.test(t))return true;
+  if(/Let me recall (the )?(rule )?context/i.test(t))return true;
+  if(/the user is (asking|confused)/i.test(t))return true;
+  if(/\bWait,?\s+the user\b/i.test(t))return true;
+  if(/I need to (explain|recall|think|check)/i.test(t)&&/rule/i.test(t))return true;
+  const cyr=(t.match(/[А-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі]/g)||[]).length;
+  const lat=(t.match(/[A-Za-z]/g)||[]).length;
+  if(lat>=80&&cyr<20&&/\b(the|user|rule|explain|asking|recall)\b/i.test(t))return true;
+  return false;
+ }
  function isUsableText(t){
   t=String(t||'').trim();
   if(t.length<12)return false;
+  if(looksLikePromptLeak(t))return false;
+  if(looksLikeBadTutorReply(t))return false;
   if(/<\/?think>/i.test(t)&&t.replace(/<think>[\s\S]*?<\/think>/gi,'').trim().length<12)return false;
   if(/^\s*(sorry|i cannot|as an ai)\b/i.test(t)&&t.length<48)return false;
   return true;
@@ -178,7 +273,7 @@
  function localExplain(req){
   const mode=(req&&req.mode)||'explain_error';
   if((req&&req.surface)==='exam')return examBlocked(mode);
-  if(mode!=='explain_error'&&looksFuture(req&&req.user_question))return futureBlocked(mode);
+  if(mode!=='explain_error'&&looksFuture(req&&req.user_question,req&&req.lesson_id))return futureBlocked(mode);
   const ctx=(req&&req.rule_context&&req.rule_context[0])||{};
   const medium=ctx.medium||ctx.explanation_ru||'';
   const ru=ctx.ru_refresh||'';
@@ -215,7 +310,7 @@
   const mode=(req&&req.mode)||'explain_error';
   const source=(meta&&meta.source)||'primary';
   const r=emptyResp(mode,true);
-  r.message_ru=clip(String(text||'').trim(),maxMessage(mode));
+  r.message_ru=clip(cleanTutorReply(String(text||'').trim()),maxMessage(mode));
   r.primary_error_code=(req&&req.candidate_error_codes&&req.candidate_error_codes[0])||null;
   r.secondary_error_codes=asArr(req&&req.candidate_error_codes).slice(1,4);
   r.rule_ids_used=((req&&req.rule_context)||[]).map(c=>c&&c.rule_id).filter(Boolean).slice(0,6);
@@ -233,8 +328,9 @@
    leak.message_ru='Подсказка не должна содержать готовый ответ. Проверь правило, затем введи форму целиком.';
    return leak;
   }
-  if(looksFuture(r.message_ru))return null;
+  if(looksFuture(r.message_ru,req&&req.lesson_id))return null;
   if(!isUsableText(r.message_ru))return null;
+  if(needsKitabymMechanism(req)&&!hasKitabymMechanism(r.message_ru))return null;
   return r;
  }
  function validateRequest(raw){
@@ -316,8 +412,8 @@
   r.meta={request_id:null,source:'local'};
   return r;
  }
- function looksFuture(text){return FUTURE_RE.test(String(text||''));}
+ function looksFuture(text,lessonId){const v=String(text||'');return ALWAYS_FUTURE_RE.test(v)||(lessonId!=='3-1'&&POSS_FUTURE_RE.test(v));}
  function outTokens(mode){return mode==='ask_tutor'?ASK_OUT_TOKENS:MAX_OUT_TOKENS;}
- const api={PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,FALLBACK,MODES,SURFACES,ERROR_CODES,ALLOWED_LESSONS,RULE_BY_LESSON,VOCAB_BY_LESSON,FUTURE_RE,MAX_OUT_TOKENS,ASK_OUT_TOKENS,CLIENT_TIMEOUT_MS,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,SYSTEM,validateRequest,validateResponse,extractJson,normalizeModelText,isUsableText,emptyResp,fallback,localExplain,assembleResponse,examBlocked,futureBlocked,missingLesson,looksFuture,clip,normKey,resolveCurriculum,lessonsThrough,containsExpected,clipTail,clipRuleContext,maxMessage,outTokens,leverLine};
+ const api={PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,FALLBACK,MODES,SURFACES,ERROR_CODES,ALLOWED_LESSONS,RULE_BY_LESSON,VOCAB_BY_LESSON,FUTURE_RE,MAX_OUT_TOKENS,ASK_OUT_TOKENS,CLIENT_TIMEOUT_MS,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,SYSTEM,validateRequest,validateResponse,extractJson,normalizeModelText,isUsableText,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism,emptyResp,fallback,localExplain,assembleResponse,examBlocked,futureBlocked,missingLesson,looksFuture,clip,normKey,resolveCurriculum,lessonsThrough,containsExpected,clipTail,clipRuleContext,maxMessage,outTokens,leverLine};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.AiContract=api;
 })(typeof window!=='undefined'?window:globalThis);
