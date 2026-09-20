@@ -172,9 +172,27 @@ function normalizeModelText(out){
   }
   return t.trim();
 }
+function needsKitabymMechanism(req){
+  return !!(req&&req.mode==='ask_tutor'&&/кітаб(ым|ымдар|ымы)|кітапым/i.test(String(req.user_question||'')+' '+String(req.prompt||'')));
+}
+function hasKitabymMechanism(t){
+  t=String(t||'');
+  return /п\s*[→\-–]\s*б|озвонч|после\s*п|п\s+становится\s*б|кітап\s*\+|наклейк|кусок справа|-ым\b|-ім\b|притяжательн/i.test(t);
+}
 function looksLikeBadTutorReply(t){
   t=String(t||'').trim();
   if(!t)return false;
+  // same 40+ char chunk repeated thrice → model loop
+  const compact=t.replace(/\s+/g,' ').trim();
+  if(compact.length>=120){
+    for(let n=40;n<=Math.min(160,Math.floor(compact.length/3));n++){
+      const chunk=compact.slice(0,n);
+      if(chunk.length<40)break;
+      let hits=0,idx=0;
+      while((idx=compact.indexOf(chunk,idx))!==-1){hits++;idx+=chunk.length;if(hits>=3)return true;}
+    }
+  }
+  if(/мой книга/i.test(t))return true;
   if(/^(добрый день|здравствуй(те)?|привет)[!.,]?\s/i.test(t))return true;
   if(/Объясни,?\s*пожалуйста/i.test(t)&&/Спасибо/i.test(t))return true;
   if(/\n\s*(Здравствуйте|Добрый день)!/i.test(t))return true;
@@ -390,10 +408,17 @@ async function runTutorModel(req,env,rid){
     }
   };
   if(env&&env.AI&&typeof env.AI.run==='function'){
-    const primary=await tryOne(PRIMARY_MODEL,PRIMARY_TIMEOUT_MS,'primary');
-    if(primary)return primary;
-    const fallback=await tryOne(FALLBACK_MODEL,FALLBACK_TIMEOUT_MS,'fallback');
-    if(fallback)return fallback;
+    if(req.mode==='ask_tutor'){
+      const fallback=await tryOne(FALLBACK_MODEL,FALLBACK_TIMEOUT_MS,'fallback');
+      if(fallback)return fallback;
+      const primary=await tryOne(PRIMARY_MODEL,PRIMARY_TIMEOUT_MS,'primary');
+      if(primary)return primary;
+    }else{
+      const primary=await tryOne(PRIMARY_MODEL,PRIMARY_TIMEOUT_MS,'primary');
+      if(primary)return primary;
+      const fallback=await tryOne(FALLBACK_MODEL,FALLBACK_TIMEOUT_MS,'fallback');
+      if(fallback)return fallback;
+    }
   }else{
     errors.primary='no_ai_binding';
   }
@@ -489,4 +514,4 @@ function json(body,status=200){
   return new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
 }
 
-export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,clipRuleContext,buildTutorMessages,userPayload,messagesToPrompt,glmPayload,qwenPayload,payloadFor,looksFuture};
+export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,clipRuleContext,buildTutorMessages,userPayload,messagesToPrompt,glmPayload,qwenPayload,payloadFor,looksFuture,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism};

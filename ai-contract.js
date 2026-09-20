@@ -128,9 +128,26 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   }
   return t.trim();
  }
+ function needsKitabymMechanism(req){
+  return !!(req&&req.mode==='ask_tutor'&&/кітаб(ым|ымдар|ымы)|кітапым/i.test(String(req.user_question||'')+' '+String(req.prompt||'')));
+ }
+ function hasKitabymMechanism(t){
+  t=String(t||'');
+  return /п\s*[→\-–]\s*б|озвонч|после\s*п|п\s+становится\s*б|кітап\s*\+|наклейк|кусок справа|-ым\b|-ім\b|притяжательн/i.test(t);
+ }
  function looksLikeBadTutorReply(t){
   t=String(t||'').trim();
   if(!t)return false;
+  const compact=t.replace(/\s+/g,' ').trim();
+  if(compact.length>=120){
+    for(let n=40;n<=Math.min(160,Math.floor(compact.length/3));n++){
+      const chunk=compact.slice(0,n);
+      if(chunk.length<40)break;
+      let hits=0,idx=0;
+      while((idx=compact.indexOf(chunk,idx))!==-1){hits++;idx+=chunk.length;if(hits>=3)return true;}
+    }
+  }
+  if(/мой книга/i.test(t))return true;
   if(/^(добрый день|здравствуй(те)?|привет)[!.,]?\s/i.test(t))return true;
   if(/Объясни,?\s*пожалуйста/i.test(t)&&/Спасибо/i.test(t))return true;
   if(/\n\s*(Здравствуйте|Добрый день)!/i.test(t))return true;
@@ -350,6 +367,6 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
  }
  function looksFuture(text,lessonId){const v=String(text||'');return ALWAYS_FUTURE_RE.test(v)||(lessonId!=='3-1'&&POSS_FUTURE_RE.test(v));}
  function outTokens(mode){return mode==='ask_tutor'?ASK_OUT_TOKENS:MAX_OUT_TOKENS;}
- const api={PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,FALLBACK,MODES,SURFACES,ERROR_CODES,ALLOWED_LESSONS,RULE_BY_LESSON,VOCAB_BY_LESSON,FUTURE_RE,MAX_OUT_TOKENS,ASK_OUT_TOKENS,CLIENT_TIMEOUT_MS,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,SYSTEM,validateRequest,validateResponse,extractJson,normalizeModelText,isUsableText,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,emptyResp,fallback,localExplain,assembleResponse,examBlocked,futureBlocked,missingLesson,looksFuture,clip,normKey,resolveCurriculum,lessonsThrough,containsExpected,clipTail,clipRuleContext,maxMessage,outTokens,leverLine};
+ const api={PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,FALLBACK,MODES,SURFACES,ERROR_CODES,ALLOWED_LESSONS,RULE_BY_LESSON,VOCAB_BY_LESSON,FUTURE_RE,MAX_OUT_TOKENS,ASK_OUT_TOKENS,CLIENT_TIMEOUT_MS,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,SYSTEM,validateRequest,validateResponse,extractJson,normalizeModelText,isUsableText,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism,emptyResp,fallback,localExplain,assembleResponse,examBlocked,futureBlocked,missingLesson,looksFuture,clip,normKey,resolveCurriculum,lessonsThrough,containsExpected,clipTail,clipRuleContext,maxMessage,outTokens,leverLine};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.AiContract=api;
 })(typeof window!=='undefined'?window:globalThis);

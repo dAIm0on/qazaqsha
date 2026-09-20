@@ -86,6 +86,13 @@ assert.ok(C.looksLikeBadTutorReply('. Добрый день! Объясни, п�
 assert.ok(!C.isUsableText(C.cleanTutorReply('. Добрый день! Объясни, пожалуйста. Спасибо! Здравствуйте! Нужно объяснить')));
 assert.ok(!C.looksLikeBadTutorReply('В русском «моя книга» — отдельные слова. В казахском менің кітабым: справа -ым, п→б.'));
 ok('TEST bad tutor dialogue reply rejected as unusable');
+assert.ok(C.looksLikeBadTutorReply(('кітап? Хорошо, я понял, что кітабым это менің кітап, но как получается? ').repeat(5)));
+assert.ok(C.needsKitabymMechanism({mode:'ask_tutor',user_question:'Объясни через русский про кітабым'}));
+assert.ok(C.hasKitabymMechanism('Менің кітабым: п→б и наклейка -ым справа.'));
+assert.ok(!C.hasKitabymMechanism('Кітабым это мой книга.'));
+assert.ok(/mode==='ask_tutor'[\s\S]{0,120}?tryOne\(FALLBACK_MODEL/.test(fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8')));
+ok('TEST tutor loop and kitabym gate');
+
 
 assert.equal(C.normalizeModelText('<think>secret</think>Ты написала бес кітаптар, нужно бес кітап.'),'Ты написала бес кітаптар, нужно бес кітап.');
 assert.ok(C.normalizeModelText('```json\n{"message_ru":"После числа множественное не ставится."}\n```').includes('множественное'));
