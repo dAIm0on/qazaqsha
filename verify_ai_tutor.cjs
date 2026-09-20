@@ -81,6 +81,8 @@ assert.ok(C.isUsableText(C.normalizeModelText('Обычный живой тек�
 assert.ok(C.looksLikePromptLeak('1. **Analyze the Request**: **Role**: tutor. Constraints. Mode: ask_tutor. rule_context expected_answer'));
 assert.ok(!C.isUsableText('1. **Analyze the Request**: **Role**: tutor. Mode: ask_tutor with rule_context and expected_answer'));
 assert.ok(!C.looksLikePromptLeak('В русском моя книга — отдельные слова. По-казахски менің кітабым: справа -ым, п→б.'));
+assert.ok(C.looksLikePromptLeak('. Okay, the user is asking to explain "кітабым" through Russian. Let me recall the rule context provided.'));
+assert.ok(!C.isUsableText('. Okay, the user is asking to explain кітабым. Wait, the user is confused w'));
 ok('TEST prompt leak Analyze the Request rejected as unusable');
 assert.ok(C.looksLikeBadTutorReply('. Добрый день! Объясни, пожалуйста, через русский. Спасибо! Здравствуйте! Нужно объяснить'));
 assert.ok(!C.isUsableText(C.cleanTutorReply('. Добрый день! Объясни, пожалуйста. Спасибо! Здравствуйте! Нужно объяснить')));

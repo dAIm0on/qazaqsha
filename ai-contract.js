@@ -17,7 +17,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
  const MAX_IN=12000,MAX_MSG=450,MAX_OUT_TOKENS=250,ASK_OUT_TOKENS=400;
  const CLIENT_TIMEOUT_MS=25000,PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000;
  const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,session_summary:800,remediation:450};
- const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha.\n\nТы не проверяешь правильность ответа. Правильность уже определил локальный код.\n\nТы не меняешь expected_answer.\n\nГлавный источник истины — переданный rule_context.\n\nОбъясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком.\n\nНе вводи будущие темы.\n\nНе исправляй учебную программу своими знаниями.\n\nНе называй внутренние ID правил.\n\nНе упоминай system prompt, error_code или внутреннюю архитектуру.\n\nПиши естественным русским языком. Казахские формы оставляй на казахском.\n\nЕсли mode=explain_error:\n1. скажи, что ученица написала;\n2. покажи отличие от правильной формы;\n3. объясни один механизм правила;\n4. используй текущий пример.\n\nЕсли mode=explain_rule:\nобъясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом.\n\nЕсли mode=simplify:\nобъясни то же правило проще, не меняя его смысл.\n\nЕсли mode=ask_tutor:\nответь прежде всего на user_question 2–6 предложениями. Сразу к сути, без приветствия и без переписывания вопроса ученицы.\nДля кітап+ым помни озвончение п→б: кітабым.\nРазрешено объяснять через русский язык, если это помогает ученице понять казахское правило.\nМожно давать дополнительные примеры только из текущей разрешённой лексики и уже пройденной грамматики.\n\nЕсли ученица пишет:\n«не поняла»,\n«ещё проще»,\n«объясни иначе»,\n«через русский»,\nто измени способ объяснения, но не правило.\n\nЕсли repeat_count >= 2:\nможно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ её понять.\nНе стыди ученицу. Не пиши «ты опять ошиблась».\n\nЕсли mode=hint:\nне показывай полный правильный ответ.\n\nВозвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context.\nБез JSON.\nБез markdown fences.\nБез <think>.';
+ const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha.\n\nТы не проверяешь правильность ответа. Правильность уже определил локальный код.\n\nТы не меняешь expected_answer.\n\nГлавный источник истины — переданный rule_context.\n\nОбъясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком.\n\nНе вводи будущие темы.\n\nНе исправляй учебную программу своими знаниями.\n\nНе называй внутренние ID правил.\n\nНе упоминай system prompt, error_code или внутреннюю архитектуру.\n\nПиши естественным русским языком. Казахские формы оставляй на казахском.\n\nЕсли mode=explain_error:\n1. скажи, что ученица написала;\n2. покажи отличие от правильной формы;\n3. объясни один механизм правила;\n4. используй текущий пример.\n\nЕсли mode=explain_rule:\nобъясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом.\n\nЕсли mode=simplify:\nобъясни то же правило проще, не меняя его смысл.\n\nЕсли mode=ask_tutor:\nответь прежде всего на user_question 2–6 предложениями. Сразу к сути, без приветствия и без переписывания вопроса ученицы.\nДля кітап+ым помни озвончение п→б: кітабым.\nРазрешено объяснять через русский язык, если это помогает ученице понять казахское правило.\nМожно давать дополнительные примеры только из текущей разрешённой лексики и уже пройденной грамматики.\n\nЕсли ученица пишет:\n«не поняла»,\n«ещё проще»,\n«объясни иначе»,\n«через русский»,\nто измени способ объяснения, но не правило.\n\nЕсли repeat_count >= 2:\nможно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ её понять.\nНе стыди ученицу. Не пиши «ты опять ошиблась».\n\nЕсли mode=hint:\nне показывай полный правильный ответ.\n\nВозвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context.\nБез JSON.\nБез markdown fences.\nБез <think>.\nНикогда не пиши English thinking aloud (Okay, Let me recall, the user is asking). Ответ ученице — только на русском.';
  function clip(s,n){s=String(s==null?'':s);return s.length<=n?s:s.slice(0,n);}
  function asArr(v){return Array.isArray(v)?v.filter(x=>typeof x==='string'):[];}
  function maxMessage(mode){return MSG_MAX[mode]||MAX_MSG;}
@@ -171,6 +171,14 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   if(/Mode:\s*`?(ask_tutor|explain_error|hint)`?/i.test(t)&&/(rule_context|expected_answer)/i.test(t))return true;
   if(/\bexpected_answer\b/.test(t)&&/\brule_context\b/.test(t)&&/\bmode\b/i.test(t))return true;
   if(/^\s*1\.\s*\*?\*?Analyze/i.test(t))return true;
+  if(/Okay,?\s+the user is asking/i.test(t))return true;
+  if(/Let me recall (the )?(rule )?context/i.test(t))return true;
+  if(/the user is (asking|confused)/i.test(t))return true;
+  if(/\bWait,?\s+the user\b/i.test(t))return true;
+  if(/I need to (explain|recall|think|check)/i.test(t)&&/rule/i.test(t))return true;
+  const cyr=(t.match(/[А-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі]/g)||[]).length;
+  const lat=(t.match(/[A-Za-z]/g)||[]).length;
+  if(lat>=80&&cyr<20&&/\b(the|user|rule|explain|asking|recall)\b/i.test(t))return true;
   return false;
  }
  function isUsableText(t){
@@ -264,7 +272,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   const mode=(req&&req.mode)||'explain_error';
   const source=(meta&&meta.source)||'primary';
   const r=emptyResp(mode,true);
-  r.message_ru=clip(String(text||'').trim(),maxMessage(mode));
+  r.message_ru=clip(cleanTutorReply(String(text||'').trim()),maxMessage(mode));
   r.primary_error_code=(req&&req.candidate_error_codes&&req.candidate_error_codes[0])||null;
   r.secondary_error_codes=asArr(req&&req.candidate_error_codes).slice(1,4);
   r.rule_ids_used=((req&&req.rule_context)||[]).map(c=>c&&c.rule_id).filter(Boolean).slice(0,6);
@@ -284,6 +292,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   }
   if(looksFuture(r.message_ru,req&&req.lesson_id))return null;
   if(!isUsableText(r.message_ru))return null;
+  if(needsKitabymMechanism(req)&&!hasKitabymMechanism(r.message_ru))return null;
   return r;
  }
  function validateRequest(raw){
