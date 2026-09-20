@@ -644,7 +644,7 @@
          <li>Повторить методичку — ${h.method_url?`<a href="${esc(h.method_url)}" target="_blank" rel="noopener noreferrer">${esc(h.method_title)}</a>`:'ссылка на материал урока'}${check('method')}</li>
          <li>Упражнения сборника (${h.exercise_ids.length} пунктов, по ${window.Homework.HW_SECTION} в части) <button type="button" class="secondary-button" data-hw-part="exercises">${exP.done?'Продолжить упражнения':'Открыть упражнения'}</button>${secBtns('exercises',exN)}</li>
          <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${h.word_ids.length} слов. <button type="button" class="secondary-button" data-hw-part="words">${wP.done?'Продолжить слова':'Открыть слова'}</button>${secBtns('words',wN)}</li>
-         <li>Внешний тест: ${(h.external_tests&&h.external_tests.length?h.external_tests:[h.external_test_url]).filter(Boolean).map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u)}</a>`).join(' · ')||'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
+         <li>Внешний тест: ${(h.external_tests&&h.external_tests.length?h.external_tests:[h.external_test_url]).filter(Boolean).map(u=>`<a class="ext-test-link" href="${esc(u)}" target="_blank" rel="noopener noreferrer">BatylBol · внешний тест</a>`).join(' · ')||'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
          ${(h.extras||[]).map(x=>'<li>'+check(x)+'</li>').join('')}
        </ol>
        <p class="small">Повторно открыть лист можно. «Новая сдача» не стирает прошлый файл. Пауза на карточке возвращает сюда без потери набора.</p>

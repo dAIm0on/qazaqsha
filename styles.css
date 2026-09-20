@@ -80,3 +80,7 @@ input,select,textarea{font-size:max(16px,1em)}
 #account-form input{min-height:40px;width:11rem;border:1px solid #4a6580;border-radius:8px;background:#0f2342;color:#fff;padding:6px 10px}
 #account-msg{color:#ffd363;margin:0;flex-basis:100%}
 @media(max-width:690px){.account{margin:10px 0 0;width:100%}}
+
+/* Hotfix: long BatylBol URLs must not force horizontal scroll on mobile */
+a.ext-test-link{overflow-wrap:anywhere;word-break:break-word;}
+.panel a[href*="batylbol.kz"]{overflow-wrap:anywhere;word-break:break-word;max-width:100%;}
