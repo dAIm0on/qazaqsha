@@ -1489,6 +1489,11 @@ assert.ok(/mode==='course'&&courseBlock/.test(flowSrc));
 assert.ok(/id="course-to-homework"/.test(flowSrc));
 assert.ok(/data-hw-review/.test(flowSrc));
 assert.ok(/mode==='course'&&courseBlock===block&&queue\.length>0&&position<queue\.length/.test(flowSrc));
+
+assert.ok(/\['ordered','shuffle','homework','course'\]\.includes\(mode\)/.test(flowSrc));
+assert.ok(!/function nextQuestion\(\)\{[\s\S]*?if\(!\['ordered','shuffle','homework'\]\.includes\(mode\)&&sessionAttempts>=cfg\.session\.maxAttempts\)position=queue\.length/.test(flowSrc));
+ok('course mode is not cut off by session.maxAttempts');
+
 assert.ok(/'course','phrase'/.test(flowSrc));
 assert.ok(/hwLesson,hwPart,hwSection/.test(flowSrc));
 assert.ok(/\['practice','homework','learn','path','review'\]/.test(flowSrc));
