@@ -477,9 +477,10 @@ async function runTutorModel(req,env,rid){
   }
   if(needsKitabymMechanism(req)){
     const canned="В русском «моя книга» — отдельные слова. В казахском менің кітабым: справа наклейка -ым, а п озвончается в б → кітабым (не «кітапым»).";
-    const built=assemble(req,canned,{request_id:rid,source:'fallback',model:FALLBACK_MODEL,latency_ms:Date.now()-started});
+    // Honest local UX reserve — never pretend this is Workers AI primary/fallback.
+    const built=assemble(req,canned,{request_id:rid,source:'local',model:null,latency_ms:Date.now()-started});
     if(built){
-      logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model:FALLBACK_MODEL,source:'fallback',latency_ms:built.meta.latency_ms,result:'success',error_type:'kitabym_canned_after_unusable',primary_error:errors.primary,fallback_error:errors.fallback});
+      logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model:null,source:'local',latency_ms:built.meta.latency_ms,result:'local',error_type:'kitabym_canned_after_unusable',primary_error:errors.primary,fallback_error:errors.fallback});
       return built;
     }
   }
