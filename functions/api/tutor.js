@@ -161,12 +161,7 @@ function normalizeModelText(out){
   }
   t=String(t||'');
   t=t.replace(/<think>[\s\S]*?<\/think>/gi,'');
-  if(/<\/think>/i.test(t)){
-    const parts=t.split(/<\/think>/i);
-    const after=parts[parts.length-1].trim();
-    t=after.length>=12?after:parts.join(' ');
-  }
-  t=t.replace(/<\/?think>/gi,'');
+  // Keep orphan </think> for cleanTutorReply (longest-segment); only strip paired tags here.
   const fence=t.match(/```(?:json|text)?\s*([\s\S]*?)```/i);
   if(fence)t=fence[1];
   t=t.replace(/^```(?:json|text)?\s*/i,'').replace(/\s*```$/,'').trim();
