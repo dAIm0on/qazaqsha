@@ -161,6 +161,12 @@ function normalizeModelText(out){
   }
   t=String(t||'');
   t=t.replace(/<think>[\s\S]*?<\/think>/gi,'');
+  if(/<\/think>/i.test(t)){
+    const parts=t.split(/<\/think>/i);
+    const after=parts[parts.length-1].trim();
+    t=after.length>=12?after:parts.join(' ');
+  }
+  t=t.replace(/<\/?think>/gi,'');
   const fence=t.match(/```(?:json|text)?\s*([\s\S]*?)```/i);
   if(fence)t=fence[1];
   t=t.replace(/^```(?:json|text)?\s*/i,'').replace(/\s*```$/,'').trim();
@@ -205,8 +211,35 @@ function looksLikeBadTutorReply(t){
 }
 function cleanTutorReply(t){
   t=String(t||'').trim().replace(/^\.+\s*/,'');
+  t=t.replace(/<think>[\s\S]*?<\/think>/gi,'');
+  // Drop echoed meta-instructions; keep the student-facing answer
+  t=t.replace(/Теперь ответь на вопрос ученицы[\s\S]*?Ваш ответ:\s*/gi,'');
+  t=t.replace(/^[\s\S]*?Ваш ответ:\s*/i,'');
+  t=t.replace(/используя только данные из\s*rule_context[\s\S]*?(?=[«"А-ЯЁВ])/gi,'');
+  // Orphan </think>: keep the longest cleaned segment (final short echo is often truncated)
+  if(/<\/think>/i.test(t)){
+    const parts=t.split(/<\/think>/i);
+    let best='';
+    for(const p of parts){
+      const c=String(p||'').replace(/<think>/gi,'').trim();
+      if(c.length>best.length)best=c;
+    }
+    t=best||parts[parts.length-1].trim();
+  }
+  t=t.replace(/<\/?think>/gi,'').trim();
+  const solid=t.match(/(В русском[\s\S]*)$/i);
+  if(solid&&/(кітабым|наклейк|п\s*[→\-–]\s*б|озвонч|-ым)/i.test(solid[1]))t=solid[1];
+  const chunks=t.split(/(?<=[.!?…»])\s+/).map(s=>s.trim()).filter(Boolean);
+  const seen=new Set();
+  const uniq=[];
+  for(const s of chunks){
+    const k=s.replace(/\s+/g,' ').toLowerCase();
+    if(k.length>=12&&seen.has(k))continue;
+    if(k.length>=12)seen.add(k);
+    uniq.push(s);
+  }
+  t=uniq.join(' ').trim();
   t=t.replace(/^(добрый день|здравствуй(те)?|привет)[!.,]?\s+/i,'');
-  // drop a leading echoed student turn ending with Спасибо!
   t=t.replace(/^[\s\S]{0,240}?Спасибо!\s*/i,'');
   t=t.replace(/^(здравствуй(те)?|добрый день)[!.,]?\s*/i,'');
   return t.trim();
@@ -218,6 +251,9 @@ function looksLikePromptLeak(t){
   if(/Mode:\s*`?(ask_tutor|explain_error|hint)`?/i.test(t)&&/(rule_context|expected_answer)/i.test(t))return true;
   if(/\bexpected_answer\b/.test(t)&&/\brule_context\b/.test(t)&&/\bmode\b/i.test(t))return true;
   if(/^\s*1\.\s*\*?\*?Analyze/i.test(t))return true;
+  if(/Теперь ответь на вопрос ученицы/i.test(t))return true;
+  if(/\bВаш ответ:\s*/i.test(t)&&/инструкц/i.test(t))return true;
+  if(/<\/?think>/i.test(t))return true;
   // English chain-of-thought / meta-analysis leaked as the student answer
   if(/Okay,?\s+the user is asking/i.test(t))return true;
   if(/Let me recall (the )?(rule )?context/i.test(t))return true;
