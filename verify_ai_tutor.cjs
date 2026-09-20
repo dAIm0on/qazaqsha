@@ -99,7 +99,12 @@ assert.ok(C.looksLikeBadTutorReply(('кітап? Хорошо, я понял, ч
 assert.ok(C.needsKitabymMechanism({mode:'ask_tutor',user_question:'Объясни через русский про кітабым'}));
 assert.ok(C.hasKitabymMechanism('Менің кітабым: п→б и наклейка -ым справа.'));
 assert.ok(!C.hasKitabymMechanism('Кітабым это мой книга.'));
-assert.ok(/mode==='ask_tutor'[\s\S]{0,120}?tryOne\(FALLBACK_MODEL/.test(fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8')));
+const tutorSrc2=fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8');
+assert.ok(/mode==='ask_tutor'[\s\S]{0,120}?tryOne\(FALLBACK_MODEL/.test(tutorSrc2));
+assert.ok(/kitabym_canned_after_unusable/.test(tutorSrc2));
+assert.ok(C.looksLikeBadTutorReply('Нужно объяснить, что ... окончания множественного числа и притяжательное'));
+assert.ok(!C.isUsableText('Нужно объяснить, что окончания множественного числа и притяжательное'));
+ok('TEST planning meta Нужно объяснить rejected');
 ok('TEST tutor loop and kitabym gate');
 
 

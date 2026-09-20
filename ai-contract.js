@@ -154,7 +154,13 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   if(/\n\s*(Здравствуйте|Добрый день)!/i.test(t))return true;
   if(/^\.\s*Добрый/i.test(t))return true;
   if(/как правильно будет\s*[«"]?кітабым/i.test(t)&&/Нужно объяснить/i.test(t))return true;
-  if(/^Нужно объяснить/i.test(t))return true;
+  if(/Нужно объяснить/i.test(t))return true;
+  if(/^(Сначала |Давай |Итак,? |Нужно |Следует |Я (должен|должна|сейчас) )/i.test(t)&&t.length<220)return true;
+  // truncated mid-thought / unfinished clause
+  if(/\.{3}\s*$/.test(t)&&t.length<240)return true;
+  if(/и притяжательн\w*\s*$/i.test(t))return true;
+  if(/что\s*\.{3}/i.test(t))return true;
+  if(!/[.!?…»"]\s*$/u.test(t)&&t.length<160&&/(нужно|объясн|окончан)/i.test(t))return true;
   if(/^Хорошо,?\s*$/i.test(t))return true;
   return false;
  }
