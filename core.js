@@ -72,6 +72,19 @@
     return scheduler.migrate(previous,now);
   }
   function isDue(r,now=Date.now()){return scheduler.due(r,now);}
+  function isDay0Learning(record,now=Date.now()){
+    const r=record||{};
+    if((r.recall_review_successes||0)>=1)return false;
+    if(Number(r.last_successful_review)>0&&now-r.last_successful_review>=config.schedule.minSpacedMs)return false;
+    return true;
+  }
+  function pauseReady(record,now=Date.now()){
+    if(!record||isDay0Learning(record,now))return false;
+    const days=record.fsrs&&Number(record.fsrs.scheduled_days);
+    if(!(days>=(config.schedule.pauseIntervalDays||21)))return false;
+    const dueAt=Number(record.next_review||record.dueAt||0);
+    return dueAt>0&&dueAt<=now+DAY;
+  }
   function updateRecord(previous,correct,hinted,now=Date.now(),details={}){
     return scheduler.answer(previous,{at:now,correct,hinted,responseTime:details.responseTime,recall:!!details.recall,rating:details.rating});
   }
@@ -106,16 +119,25 @@
     const learning=items.filter(q=>!records[q.id]?.needsReview&&!isDue(records[q.id],now)&&(records[q.id]?.streak||0)<2);
     return [...errors,...due,...learning].slice(0,limit);
   }
-  function scheduleRepeat(queue,index,id,streak,fillers=[]){
-    if(streak>=config.schedule.cleanAnswersToConsolidate)return queue;
+  function scheduleRepeat(queue,index,id,streak,fillers=[],opts={}){
+    const blinds=Number.isFinite(opts.sessionBlinds)?opts.sessionBlinds:streak;
+    if(opts.learning){
+      if(blinds>=(config.schedule.learningSessionBlinds||3)){
+        for(let i=queue.length-1;i>index;i--)if(queue[i]===id)queue.splice(i,1);
+        return queue;
+      }
+    }else if(opts.review){
+      if(blinds>=1)return queue;
+    }else if(streak>=config.schedule.cleanAnswersToConsolidate)return queue;
+    const minGap=opts.learning?(config.schedule.learningIntervening||2):config.session.minIntervening;
     const future=queue.indexOf(id,index+1);
-    if(future>=0&&new Set(queue.slice(index+1,future)).size>=config.session.minIntervening)return queue;
+    if(future>=0&&new Set(queue.slice(index+1,future)).size>=minGap)return queue;
     for(let i=queue.length-1;i>index;i--)if(queue[i]===id)queue.splice(i,1);
     for(const filler of [...new Set(fillers)]){
-      if(new Set(queue.slice(index+1)).size>=config.session.minIntervening)break;
+      if(new Set(queue.slice(index+1)).size>=minGap)break;
       if(filler!==id&&!queue.slice(index+1).includes(filler))queue.push(filler);
     }
-    if(new Set(queue.slice(index+1)).size>=config.session.minIntervening)
+    if(new Set(queue.slice(index+1)).size>=minGap)
       queue.splice(Math.min(index+1+config.session.preferredIntervening,queue.length),0,id);
     return queue;
   }
@@ -162,6 +184,6 @@
     }
     return questions;
   }
-  const api={normalize,evaluate,migrateRecord,updateRecord,isDue,scheduleRepeat,chooseShortSession,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY,shareVocabAlts};
+  const api={normalize,evaluate,migrateRecord,updateRecord,isDue,isDay0Learning,pauseReady,scheduleRepeat,chooseShortSession,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY,shareVocabAlts};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TrainerCore=api;
 })(typeof window!=='undefined'?window:globalThis);
