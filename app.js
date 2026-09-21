@@ -3,6 +3,7 @@
  'use strict';
  const course=window.COURSE, core=window.TrainerCore;
  try{window.Lesson31Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{window.Lesson32Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{window.PhraseDrill?.install?.(course,window.CURRICULUM);}catch{}
  try{window.TransferItems?.install?.(course,window.CURRICULUM);}catch{}
  const questions=course.questions;
@@ -31,7 +32,7 @@
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
- const COURSE_BLOCKS=[{id:'1-1',title:'1–1',hint:'Звуки и первые слова'},{id:'1-2',title:'1–2',hint:'Окончания и десятки'},{id:'1-3',title:'1–3',hint:'Числа и новые слова'},{id:'2-1',title:'2–1',hint:'Мен, сен, сіз'},{id:'2-2',title:'2–2',hint:'Біз, сендер, сіздер'},{id:'2-3',title:'2–3',hint:'Ол, вопрос, порядковые'},{id:'3-1',title:'3–1',hint:'Притяжательные формы'}];
+ const COURSE_BLOCKS=[{id:'1-1',title:'1–1',hint:'Звуки и первые слова'},{id:'1-2',title:'1–2',hint:'Окончания и десятки'},{id:'1-3',title:'1–3',hint:'Числа и новые слова'},{id:'2-1',title:'2–1',hint:'Мен, сен, сіз'},{id:'2-2',title:'2–2',hint:'Біз, сендер, сіздер'},{id:'2-3',title:'2–3',hint:'Ол, вопрос, порядковые'},{id:'3-1',title:'3–1',hint:'Притяжательные формы'},{id:'3-2',title:'3–2',hint:'Наш / ваш / их'}];
  function courseJumpMarkup(id){
    return `<div class="course-jump" id="${id}"><p>Уроки 1–1…3–1</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}><span class="today-lesson-id">Урок ${b.title}</span><small>${esc(b.hint)}</small></button>`).join('')}</div></div>`;
  }
@@ -190,11 +191,16 @@
    if(resumeCourse){render();showView('practice');return;}
    const first=window.LEARNING.lessons.find(l=>l.courseLesson===block);
    if(first)learningState.lessonId=first.id;
-   const lessonCards=block==='3-1'?(window.Lesson31Pack?.lessonSession?.()||[]):(window.Phase2BPractice?.lessonSession?.(block)||[]);
+   const lessonCards=block==='3-1'?(window.Lesson31Pack?.lessonSession?.()||[]):block==='3-2'?(window.Lesson32Pack?.lessonSession?.()||[]):(window.Phase2BPractice?.lessonSession?.(block)||[]);
    if(lessonCards.length&&mode!=='exam'){
      mode='course';
      let ordered=lessonCards.slice();
      const phraseCut=block==='1-2'?2:block==='1-3'?3:null;
+     if(block==='3-2'&&window.PhraseDrill){
+       const seenIds=Object.keys(records).filter(id=>records[id]&&records[id].seen);
+       const phrases=window.PhraseDrill.session('3-2',{count:24,seen_ids:seenIds,error_profile:(window.AiTutor?.topWeak?.(4)||[])});
+       ordered=[...ordered,...phrases];
+     }
      if(phraseCut!=null&&window.PhraseDrill){
        const seenIds=Object.keys(records).filter(id=>records[id]&&records[id].seen);
        const phrases=window.PhraseDrill.session(block,{count:block==='1-2'?16:12,seen_ids:seenIds,error_profile:(window.AiTutor?.topWeak?.(4)||[])});

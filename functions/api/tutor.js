@@ -6,8 +6,8 @@ const FALLBACK_MODEL='@cf/qwen/qwen3-30b-a3b-fp8';
 const MODEL_ID=PRIMARY_MODEL;
 const MODES=['explain_error','hint','explain_rule','simplify','ask_tutor','session_summary','remediation'];
 const SURFACES=['practice','path','rules','homework','review','exam','learn'];
-const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1'];
-const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'] ,'3-1':['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']};
+const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2'];
+const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'] ,'3-1':['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL'],'3-2':['T24_POSS_BIZ','T25_POSS_SENDER','T26_POSS_OLAR','T27_DEIXIS']};
 const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам'] ,'3-1':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','жүрек','сақал','мысық','таз','тақырбас','қатты','саусақ','кім','не','қандай','қай','нешінші','бұл']};
 const MAX_IN=12000,MAX_OUT=250,ASK_OUT=500;
 const PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000;
@@ -21,7 +21,7 @@ function clip(s,n){s=String(s==null?'':s);return s.length<=n?s:s.slice(0,n);}
 function asArr(v){return Array.isArray(v)?v.filter(x=>typeof x==='string'):[];}
 function normKey(s){return String(s??'').normalize('NFC').toLocaleLowerCase('ru').replace(/[.!?,;:]+$/g,'').replace(/\s+/g,' ').trim();}
 function maxMessage(mode){return MSG_MAX[mode]||450;}
-function looksFuture(text,lessonId){const v=String(text||'');return ALWAYS_FUTURE_RE.test(v)||(lessonId!=='3-1'&&POSS_FUTURE_RE.test(v));}
+function looksFuture(text,lessonId){const v=String(text||'');return ALWAYS_FUTURE_RE.test(v)||(lessonId!=='3-1'&&lessonId!=='3-2'&&POSS_FUTURE_RE.test(v));}
 function lessonsThrough(currentLesson){
   const i=ALLOWED_LESSONS.indexOf(currentLesson);
   if(i<0)return [];

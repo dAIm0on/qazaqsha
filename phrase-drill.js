@@ -5,37 +5,43 @@
  const banks=node?require('./phrase-banks.js'):root.PhraseBanks;
  const gate=node?require('./curriculum-gate.js'):root.CurriculumGate;
  const lesson31=node?require('./lesson31-pack.js'):root.Lesson31Pack;
- const ORDER=['1-1','1-2','1-3','2-1','2-2','2-3','3-1'];
+ const ORDER=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2'];
  const clone=x=>JSON.parse(JSON.stringify(x));
  const pad=n=>String(n).padStart(2,'0');
  function allowedThrough(lessonId){
   const i=ORDER.indexOf(lessonId);return i<0?[]:ORDER.slice(0,i+1);
  }
+ function kzList(pair){const z=pair&&pair.kz;return Array.isArray(z)?z.slice():[z];}
  function variant(pair,dir){
-  const ru=pair.ru||[],ruPrompt=ru[0]||'';
+  const ru=pair.ru||[],ruPrompt=ru[0]||'',kz=kzList(pair),kzPrompt=kz[0]||'';
   const ruKk=dir==='ru-kk';
   const id='phrase:'+pair.lesson_id+':'+dir+':'+pad(pair.n);
   return {
    id,source:'phrase',group:'PHRASE',part:pad(pair.n),lessonId:pair.lesson_id,topic:'phrase',kind:'phrase',
    dir,pair_key:pair.pair_key,root_lesson:pair.root_lesson,
    title:ruKk?'Переведи фразу на казахский':'Переведи фразу на русский',
-   stimulus:ruKk?ruPrompt:pair.kz,
-   fields:[{label:ruKk?'Фраза по-казахски':'Перевод на русский',kind:'text',answers:ruKk?[pair.kz]:ru.slice()}],
-   explanation:pair.kz+' — '+ruPrompt+'.',
+   stimulus:ruKk?ruPrompt:kzPrompt,
+   fields:[{label:ruKk?'Фраза по-казахски':'Перевод на русский',kind:'text',answers:ruKk?kz:ru.slice()}],
+   explanation:kzPrompt+' — '+ruPrompt+'.',
    ruleIds:pair.rule_ids.slice(),allowed_lesson_ids:allowedThrough(pair.lesson_id),
    vocabIds:[],errorTargets:(pair.error_targets||[]).slice(),morph:pair.morph||'',contrast:pair.contrast||'',
    phase2b:{genre:'PHRASE',phrase:true,error_type:pair.error_type||'',pair_key:pair.pair_key,root_lesson:pair.root_lesson}
   };
  }
  function lesson31Open(catalog){return !!(gate&&gate.allows&&gate.allows('possessive',catalog));}
+ function lesson32Open(catalog){return !!(gate&&gate.allows&&gate.allows('poss_biz',catalog));}
  function forLesson(lessonId,catalog){
   if(lessonId==='3-1'){
    if(!lesson31Open(catalog)||!lesson31||!lesson31.sessionG)return [];
    return lesson31.sessionG().map(clone);
   }
+  if(lessonId==='3-2'){
+   if(!lesson32Open(catalog))return [];
+   return banks.forLesson('3-2').map(p=>variant(p,p.n<=12?'kk-ru':'ru-kk'));
+  }
   return banks.forLesson(lessonId).flatMap(p=>[variant(p,'ru-kk'),variant(p,'kk-ru')]);
  }
- function allQuestions(catalog){return [...['1-2','1-3'].flatMap(id=>forLesson(id,catalog)),...forLesson('3-1',catalog)];}
+ function allQuestions(catalog){return [...['1-2','1-3'].flatMap(id=>forLesson(id,catalog)),...forLesson('3-1',catalog),...forLesson('3-2',catalog)];}
  function weaknessKeys(profile){
   if(!profile)return new Set();
   if(Array.isArray(profile))return new Set(profile.flatMap(x=>typeof x==='string'?[x]:[x&&x.error_code,x&&x.error_type,x&&x.skill_tag].filter(Boolean)));
@@ -58,6 +64,12 @@
    const byDir=dir=>shuffled(cards.filter(q=>q.title===dir),random).sort((a,b)=>Number(!seen.has(b.id))-Number(!seen.has(a.id)));
    const ruCount=Math.ceil(count/2),kkCount=count-ruCount;
    return shuffled([...byDir('RU → KK').slice(0,ruCount),...byDir('KK → RU').slice(0,kkCount)],random);
+  }
+  if(lessonId==='3-2'){
+   if(!lesson32Open(catalog))return [];
+   const random=typeof opts.random==='function'?opts.random:Math.random,seen=new Set(opts.seen_ids||[]);
+   const cards=forLesson('3-2',catalog),requested=Math.max(2,Math.floor(Number(opts.count)||24)),count=Math.min(requested,cards.length);
+   return shuffled(cards.slice(),random).sort((a,b)=>Number(!seen.has(b.id))-Number(!seen.has(a.id))).slice(0,count);
   }
   if(!['1-2','1-3'].includes(lessonId))return [];
   const random=typeof opts.random==='function'?opts.random:Math.random;
