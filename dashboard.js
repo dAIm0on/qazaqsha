@@ -20,6 +20,7 @@
        const mainTitle=resume?'Продолжить текущую карточку':('Продолжить урок '+lesson.courseLesson);
        const mainHint=resume?'Продолжим с той же карточки.':esc(lesson.title);
        const dueHint=due?'карточек в очереди повторения':'На сегодня всё повторено';
+       const pauseN=cards.filter(q=>core.pauseReady(state.records[q.id])).length;
        const recallLine=retention.total?retention.correct+' из '+retention.total+' проверок после паузы — самостоятельно.':'';
        const tip=(id,text)=>`<details class="help-line"><summary aria-label="Что это значит">?</summary><p id="${id}">${text}</p></details>`;
        const pairN=progress.pairs(state).length;
@@ -30,7 +31,7 @@
        const recallCards=cards.filter(q=>q.kind==='fields'&&(q.fields||[]).some(f=>f.kind!=='select'));
        const remembered=recallCards.filter(q=>['REMEMBERED','MASTERED'].includes(state.records[q.id]?.mastery_level)).length;
        root.innerHTML=`<div class="today-hero"><p>Сначала текущий урок, потом то, что пора вспомнить, потом домашка.</p><article class="today-hero-card"><p class="eyebrow">Главное сейчас</p><button type="button" class="today-main" data-action="${mainAction}"><span>${mainTitle}</span></button><p class="small">${mainHint}</p><button type="button" class="today-path-quiet text-button" data-action="path">Прохождение</button></article></div>
-       <div class="today-tiles"><button type="button" class="today-option" data-action="review"><span>Пора вспомнить</span><strong>${due}</strong><small>${dueHint}</small></button><button type="button" class="today-option" data-action="homework"><span>Домашка</span><small>Задания урока</small></button></div>
+       <div class="today-tiles"><button type="button" class="today-option" data-action="review"><span>Пора вспомнить</span><strong>${due}</strong><small>${dueHint}</small></button><button type="button" class="today-option" data-action="homework"><span>Домашка</span><small>Задания урока</small></button>${pauseN?`<button type="button" class="today-option" data-action="pause-prep"><span>Готовится к паузе</span><strong>${pauseN}</strong><small>Интервал уже длинный</small></button>`:''}</div>
        <div class="today-actions"><button type="button" class="today-option" data-action="new"><span>Новые</span><strong>${Math.min(cfg.session.newLimit,newCount)}</strong><small>Рекомендовано на один подход</small></button><button type="button" class="today-option today-rules-quiet" data-view="rules"><span>Правила</span><small>Справочник</small></button>${chunkN?'<button type="button" class="today-option" data-action="chunks"><span>Приветствия и прощания</span><small>Готовые фразы</small></button>':''}</div>
        <div class="today-collage" aria-hidden="true"><div class="today-photo p1"></div><div class="today-photo p2"></div><div class="today-photo p3"></div><div class="today-photo p4"></div></div>
        <div class="today-lessons" aria-label="Уроки курса">${lessonBtn('1-1')}${lessonBtn('1-2')}${lessonBtn('1-3')}${lessonBtn('2-1')}${lessonBtn('2-2')}${lessonBtn('2-3')}</div>
