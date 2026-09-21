@@ -171,11 +171,47 @@
    const P=window.ProbeItems;
    const holes=P?P.summarize(state.sliceRun||[]):[];
    state.sliceLast=holes;mode='ordered';
-   const body=holes.length?holes.map(h=>`<article class="panel"><h2>Дыра ${esc(h.short)} · ${esc(h.title)}</h2><p><button type="button" class="secondary-button" data-view="rules">Правило</button></p></article>`).join(''):'<div class="panel"><h2>Дыр в этом блоке нет</h2><p>Это список, не процент.</p></div>';
+   const body=holes.length?holes.map(h=>`<article class="panel"><h2>Дыра ${esc(h.short)} · ${esc(h.title)}</h2><p><button type="button" class="secondary-button" data-view="rules">Правило</button> <button type="button" class="primary-button" data-repair="${esc(h.rule_id)}">Ремонт</button></p></article>`).join(''):'<div class="panel"><h2>Дыр в этом блоке нет</h2><p>Это список, не процент.</p></div>';
    showView('exam');
    $('#exam-content').innerHTML=`<div class="panel"><h2>Срез грамматики</h2><p class="small">Список дыр, не балл.</p></div>${body}${slicePanel()}`;
    bindSlice();
    $$('#exam-content [data-view="rules"]').forEach(b=>b.onclick=()=>showView('rules'));
+   $$('#exam-content [data-repair]').forEach(b=>b.onclick=()=>beginRepair(b.dataset.repair));
+ }
+ function launchRepair(list){
+  course.sources=course.sources||{};
+  if(!course.sources.repair)course.sources.repair={title:'Ремонт',url:'#',additional:true};
+  for(const q of list){if(!byId.has(q.id)){course.questions.push(q);byId.set(q.id,q);}}
+  mode='repair';topic='all';sourceFilter=null;activeLesson=null;courseBlock=null;vocabRole=null;
+  queue=list.map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;
+  state.sliceRun=[];resetCounts();render();showView('practice');
+ }
+ function beginRepair(ruleId){
+  const R=window.RepairState;if(!R||!ruleId)return false;
+  const cards=R.day0Cards(ruleId);
+  const roots=cards.map(q=>q.repairRoot);
+  if(!R.start(state,ruleId,Date.now(),roots))return false;
+  state.repairDay10=false;launchRepair(cards);return true;
+ }
+ function openRepair(){
+  const R=window.RepairState,repair=state.repair;if(!R||!repair)return;
+  if(Date.now()>=Number(repair.quiet_until)){
+   state.repairDay10=true;
+   launchRepair(R.day10Cards(repair.rule_id,repair.roots_used));
+  }else{
+   state.repairDay10=false;
+   launchRepair(R.day0Cards(repair.rule_id));
+  }
+ }
+ function finishRepair(){
+  const R=window.RepairState;
+  const rows=state.sliceRun||[];
+  const ok=rows.length>0&&rows.every(row=>row.correct);
+  if(state.repairDay10&&R){if(ok)R.passDay10(state);else R.failDay10(state,Date.now());}
+  state.repairDay10=false;mode='ordered';
+  showView('exam');
+  $('#exam-content').innerHTML=`<div class="panel"><h2>Ремонт</h2><p>${esc(R?R.PAPER:'')}</p><p class="small">${ok?'Этот заход сошёлся.':'День 0 снова. Вторая дыра не стартует.'}</p></div>${slicePanel()}`;
+  bindSlice();
  }
  function checkProbe(q,reveal){
    const P=window.ProbeItems;
@@ -184,6 +220,7 @@
    if(!reveal&&answers.some(a=>!String(a).trim())){const warning=$('#validation');warning.textContent='Набери ответ. Подсказка в зачёт не идёт.';warning.hidden=false;return;}
    const row=item?P.judge(item,answers,!!reveal):{id:q.id,item_rule:(q.ruleIds||[])[0],rule_id:(q.ruleIds||[])[0],correct:false,peek:!!reveal,signature:false};
    state.sliceRun=state.sliceRun||[];state.sliceRun.push(row);
+   if(mode==='repair'&&window.RepairState)window.RepairState.note(state,row.correct);
    checked=true;pauseTimer();hinted=!!reveal;
    const feedback=$('#feedback');
    const answerLine=(q.fields||[]).map(f=>f.answers[0]).join(' · ');
@@ -384,11 +421,12 @@
  }
  function renderJumpBar(){
    const bar=$('#jump-bar');if(!bar)return;
-   bar.innerHTML=`<div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>name?`<button type="button" class="chip" data-jump-topic="${id}" ${topic===id?'aria-pressed="true"':''}>${esc(name)}</button>`:'').join('')}</div><div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-jump-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>${esc(b.title)}</button>`).join('')}<button type="button" class="chip" data-jump-course="" ${courseBlock?'':'aria-pressed="true"'}>Все</button></div><div class="jump-row"><span>След</span><button type="button" class="chip" data-jump-transfer ${mode==='transfer'?'aria-pressed="true"':''}>Перенос</button></div>`;
+   bar.innerHTML=`<div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>name?`<button type="button" class="chip" data-jump-topic="${id}" ${topic===id?'aria-pressed="true"':''}>${esc(name)}</button>`:'').join('')}</div><div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-jump-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>${esc(b.title)}</button>`).join('')}<button type="button" class="chip" data-jump-course="" ${courseBlock?'':'aria-pressed="true"'}>Все</button></div><div class="jump-row"><span>След</span><button type="button" class="chip" data-jump-transfer ${mode==='transfer'?'aria-pressed="true"':''}>Перенос</button><button type="button" class="chip" data-jump-pause>Скоро пауза</button></div>`;
    const closeFilter=()=>{const dlg=$('#practice-filter');if(dlg&&dlg.open&&dlg.close)dlg.close();};
    $$('#jump-bar [data-jump-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.jumpTopic;activeLesson=null;vocabRole=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');closeFilter();});
    $$('#jump-bar [data-jump-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.jumpCourse||null;activeLesson=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');closeFilter();});
    const tr=$('#jump-bar [data-jump-transfer]');if(tr)tr.onclick=()=>{startTransfer();closeFilter();};
+   const soon=$('#jump-bar [data-jump-pause]');if(soon)soon.onclick=()=>{startPausePrep();closeFilter();};
  }
  function encodingMarkup(q){
    if(!q||mode==='exam')return '';
@@ -1003,7 +1041,8 @@
    nextBeat();
  }
  function renderEmpty(){
-   if((mode==='slice'||mode==='repair')&&(state.sliceRun||[]).length){showSliceResult();return;}
+   if(mode==='repair'&&(state.sliceRun||[]).length){finishRepair();return;}
+   if(mode==='slice'&&(state.sliceRun||[]).length){showSliceResult();return;}
    if(hwReturn&&mode==='remediation'){
      const back=hwReturn;hwReturn=null;hwLesson=back.lesson;hwPart=back.part;hwSection=back.section||0;mode='homework';showView('homework');save();return;
    }
@@ -1287,6 +1326,8 @@
      }
      if(next.startsWith('course:')){startCourse(next.split(':')[1]);return;}
      if(next==='pause-prep'){startPausePrep();return;}
+     if(next==='repair-open'){openRepair();return;}
+     if(next.startsWith('repair:')){beginRepair(next.slice(7));return;}
      if(next==='transfer'){startTransfer();return;}
      if(next==='learn'){showView('learn');return;}
      if(next==='resume'){showView('practice');return;}
