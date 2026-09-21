@@ -134,6 +134,7 @@ body[data-view=practice] .site-footer{opacity:.72}
   font-family:var(--display);font-weight:400;color:var(--ink);
   font-size:clamp(2rem,4vw,2.85rem);line-height:1.22;letter-spacing:-.03em
 }
+.stimulus[lang="kk"]{font-family:"Segoe UI",sans-serif}
 .translation{color:var(--muted);font-weight:400;font-size:1rem}
 input[type=text],select,textarea,input[type=search],input[type=email],input[type=password]{
   background:var(--surface);border:1.5px solid var(--input-line);color:var(--ink);
@@ -149,10 +150,13 @@ input.valid,select.valid{border-color:var(--success);background:var(--success-bg
 .letter-keyboard button{
   min-width:44px;min-height:44px;border-radius:var(--radius-letter,8px)
 }
+[lang="kk"],
+h1[lang="kk"],h2[lang="kk"],h3[lang="kk"],
+.brand-caption,
 .letter-keyboard button,
 input[id^="answer-"],
 .glyph-check{
-  font-family:"Segoe UI","Noto Serif","Golos Text",sans-serif;
+  font-family:"Segoe UI",sans-serif;
 }
 .practice-dock{
   position:sticky;bottom:var(--kbinset,0px);z-index:30;
