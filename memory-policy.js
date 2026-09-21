@@ -138,6 +138,8 @@
      const q=byId.get(id);if(!q)return false;
      if(isLetterClassifier(q))return false;
      if(scope.lessonId&&q.lessonId&&q.lessonId!==scope.lessonId)return false;
+     const repair=state&&state.repair;
+     if(repair&&Date.now()<Number(repair.quiet_until)&&(q.ruleIds||[]).includes(repair.rule_id))return false;
      if(scope.topic&&scope.topic!=='all'&&q.topic&&q.topic!==scope.topic)return false;
      return true;
    }).slice(0,2);

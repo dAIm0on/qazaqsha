@@ -191,5 +191,10 @@
    if(q.kind!=='fields'&&q.kind!=='phrase')return [];
    return q.fields.flatMap((f,i)=>result.parts[i]?[]:classify(f.answers[0],answers[i],q,f).map(error_type=>({expected_answer:f.answers[0],actual_answer:String(answers[i]||''),error_type,skill_tag:skillTag(error_type,q,f.answers[0],answers[i]),timestamp:at,field:i,card_id:q.id})));
  }
- const api={classify,diagnose,labels,skillTag,line,SKILL};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.ErrorDiagnostics=api;
+ function pauseLine(kind,value){
+  if(kind==='savings')return String(value);
+  if(kind==='first-try'||kind==='peek-rate'||kind==='transfer-rate')return kind+' '+value;
+  return String(value||'');
+ }
+ const api={classify,diagnose,labels,skillTag,line,pauseLine,SKILL};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.ErrorDiagnostics=api;
 })(typeof window!=='undefined'?window:globalThis);

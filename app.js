@@ -121,6 +121,7 @@
   if(q.source==='p2b'&&!records[q.id]?.seen&&mode!=='course')return false;
   if(q.source==='phrase'&&!records[q.id]?.seen&&mode!=='phrase'&&mode!=='course')return false;
   if(q.source==='phase3-31'&&!records[q.id]?.seen&&mode!=='course'&&mode!=='phrase')return false;
+  if(q.source==='slice'||q.source==='repair'||q.slice)return mode==='slice'||mode==='repair';
   return catalog.eligible(q,state)&&(!q.promotedWord||state.vocabulary[q.promotedWord]?.target_or_context==='target');
  }
  function activateCard(){
@@ -147,12 +148,96 @@
    };
    examRaf=requestAnimationFrame(tick);
  }
+ function slicePanel(){
+   const P=window.ProbeItems;if(!P)return '';
+   const blocks=P.openBlocks(window.CURRICULUM);
+   if(!blocks.length)return '';
+   return `<div class="panel"><h2>Срез грамматики</h2><p class="small">Список дыр, не балл. Один блок за заход. Подсказка не идёт в зачёт.</p><div class="review-actions">${blocks.map(b=>`<button type="button" class="secondary-button" data-slice="${b.id}">${esc(b.title)}</button>`).join('')}</div></div>`;
+ }
+ function bindSlice(){
+   $$('#exam-content [data-slice]').forEach(b=>b.onclick=()=>startSlice(b.dataset.slice));
+ }
+ function startSlice(block){
+   const P=window.ProbeItems;if(!P)return;
+   course.sources=course.sources||{};
+   if(!course.sources.slice)course.sources.slice={title:'Срез',url:'#',additional:true};
+   const list=P.session(block,window.CURRICULUM).map(P.toQuestion);
+   for(const q of list){if(!byId.has(q.id)){course.questions.push(q);byId.set(q.id,q);}}
+   mode='slice';topic='all';sourceFilter=null;activeLesson=null;courseBlock=null;vocabRole=null;
+   queue=list.map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;
+   state.sliceRun=[];state.sliceBlock=block;resetCounts();render();showView('practice');
+ }
+ function showSliceResult(){
+   const P=window.ProbeItems;
+   const holes=P?P.summarize(state.sliceRun||[]):[];
+   state.sliceLast=holes;mode='ordered';
+   const body=holes.length?holes.map(h=>`<article class="panel"><h2>Дыра ${esc(h.short)} · ${esc(h.title)}</h2><p><button type="button" class="secondary-button" data-view="rules">Правило</button> <button type="button" class="primary-button" data-repair="${esc(h.rule_id)}">Ремонт</button></p></article>`).join(''):'<div class="panel"><h2>Дыр в этом блоке нет</h2><p>Это список, не процент.</p></div>';
+   showView('exam');
+   $('#exam-content').innerHTML=`<div class="panel"><h2>Срез грамматики</h2><p class="small">Список дыр, не балл.</p></div>${body}${slicePanel()}`;
+   bindSlice();
+   $$('#exam-content [data-view="rules"]').forEach(b=>b.onclick=()=>showView('rules'));
+   $$('#exam-content [data-repair]').forEach(b=>b.onclick=()=>beginRepair(b.dataset.repair));
+ }
+ function launchRepair(list){
+  course.sources=course.sources||{};
+  if(!course.sources.repair)course.sources.repair={title:'Ремонт',url:'#',additional:true};
+  for(const q of list){if(!byId.has(q.id)){course.questions.push(q);byId.set(q.id,q);}}
+  mode='repair';topic='all';sourceFilter=null;activeLesson=null;courseBlock=null;vocabRole=null;
+  queue=list.map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;
+  state.sliceRun=[];resetCounts();render();showView('practice');
+ }
+ function beginRepair(ruleId){
+  const R=window.RepairState;if(!R||!ruleId)return false;
+  const cards=R.day0Cards(ruleId);
+  const roots=cards.map(q=>q.repairRoot);
+  if(!R.start(state,ruleId,Date.now(),roots))return false;
+  state.repairDay10=false;launchRepair(cards);return true;
+ }
+ function openRepair(){
+  const R=window.RepairState,repair=state.repair;if(!R||!repair)return;
+  if(Date.now()>=Number(repair.quiet_until)){
+   state.repairDay10=true;
+   launchRepair(R.day10Cards(repair.rule_id,repair.roots_used));
+  }else{
+   state.repairDay10=false;
+   launchRepair(R.day0Cards(repair.rule_id));
+  }
+ }
+ function finishRepair(){
+  const R=window.RepairState;
+  const rows=state.sliceRun||[];
+  const ok=rows.length>0&&rows.every(row=>row.correct);
+  if(state.repairDay10&&R){if(ok)R.passDay10(state);else R.failDay10(state,Date.now());}
+  state.repairDay10=false;mode='ordered';
+  showView('exam');
+  $('#exam-content').innerHTML=`<div class="panel"><h2>Ремонт</h2><p>${esc(R?R.PAPER:'')}</p><p class="small">${ok?'Этот заход сошёлся.':'День 0 снова. Вторая дыра не стартует.'}</p></div>${slicePanel()}`;
+  bindSlice();
+ }
+ function checkProbe(q,reveal){
+   const P=window.ProbeItems;
+   const item=P&&P.byId(q.id);
+   const answers=readAnswers(q);
+   if(!reveal&&answers.some(a=>!String(a).trim())){const warning=$('#validation');warning.textContent='Набери ответ. Подсказка в зачёт не идёт.';warning.hidden=false;return;}
+   const row=item?P.judge(item,answers,!!reveal):{id:q.id,item_rule:(q.ruleIds||[])[0],rule_id:(q.ruleIds||[])[0],correct:false,peek:!!reveal,signature:false};
+   state.sliceRun=state.sliceRun||[];state.sliceRun.push(row);
+   if(mode==='repair'&&window.RepairState)window.RepairState.note(state,row.correct);
+   checked=true;pauseTimer();hinted=!!reveal;
+   const feedback=$('#feedback');
+   const answerLine=(q.fields||[]).map(f=>f.answers[0]).join(' · ');
+   feedback.className='feedback '+(row.correct?'':'error');
+   feedback.innerHTML=`<h3>${row.correct?'Сходится.':'Пока не это.'}</h3><p><strong>Ответ:</strong> ${esc(answerLine)}</p><p class="small">${reveal?'Подсказка не засчитана.':'Это срез, не расписание повторения.'}</p>`;
+   feedback.hidden=false;
+   $$('#answer-form input, #hint-button, #reveal-button, [data-letter]').forEach(el=>{el.disabled=true;});
+   $('#check-button').hidden=true;$('#next-button').hidden=false;
+   try{save();}catch(_){}
+ }
  function renderExam(){
    const pool=questions.filter(q=>eligible(q)&&examReady(records[q.id])&&(!window.CurriculumGate||window.CurriculumGate.examEligible(q)));
    const n=Math.min(cfg.session.examSize,pool.length);
    if(!n){
-     $('#exam-content').innerHTML=`<div class="panel exam-intro exam-empty"><h2>Пока нечего закреплять</h2><p>Сюда попадают только формы, которые ты уже вспоминала после паузы в разные дни. Новое на таймер не отправляется.</p><p><button type="button" class="primary-button" data-view="today">К сегодня</button></p></div>`;
-     $('#exam-content [data-view="today"]').onclick=()=>showView('today');
+     $('#exam-content').innerHTML=`<div class="panel exam-intro exam-empty"><h2>Пока нечего закреплять</h2><p>Сюда попадают только формы, которые ты уже вспоминала после паузы в разные дни. Новое на таймер не отправляется.</p><p><button type="button" class="primary-button" data-view="today">К сегодня</button></p></div>${slicePanel()}`;
+     const back=$('#exam-content [data-view="today"]');if(back)back.onclick=()=>showView('today');
+     bindSlice();
      return;
    }
    $('#exam-content').innerHTML=`<div class="panel exam-intro exam-ready"><h2>Закрепление на время</h2><button type="button" class="primary-button" id="exam-start">Начать ${n} карточек</button><p class="small">Подсказки выключены. Только то, что уже вспоминалось после паузы. Короткий лимит на карточку.</p>
@@ -164,6 +249,8 @@
    $$('#exam-content [data-exam]').forEach(b=>b.onclick=()=>{topic=b.dataset.exam;go();});
    $$('#exam-content [data-exam-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.examCourse;go();});
    $('#exam-rules').onclick=()=>{topic='rules';courseBlock=null;go();};
+   $('#exam-content').insertAdjacentHTML('beforeend',slicePanel());
+   bindSlice();
  }
  function save(){
    captureDraft();state.records=records;state.learning=learningState;
@@ -216,7 +303,7 @@
  }
  function startTransfer(){
    const T=window.TransferItems;if(!T)return;
-   const rule=courseBlock==='3-1'?'T20_POSS':courseBlock==='2-1'?'T6_PERSON_SG':courseBlock==='1-3'?'T4_NO_PLURAL_AFTER_NUMBER':'T2_PLURAL_LDT';
+   const rule=courseBlock==='3-2'?'T24_POSS_BIZ':courseBlock==='3-1'?'T20_POSS':courseBlock==='2-1'?'T6_PERSON_SG':courseBlock==='1-3'?'T4_NO_PLURAL_AFTER_NUMBER':'T2_PLURAL_LDT';
    const list=(T.session(rule,{catalog:window.CURRICULUM})||[]).filter(q=>byId.has(q.id));
    if(!list.length)return;
    mode='transfer';topic='all';sourceFilter=null;activeLesson=null;activeStep=null;
@@ -334,11 +421,12 @@
  }
  function renderJumpBar(){
    const bar=$('#jump-bar');if(!bar)return;
-   bar.innerHTML=`<div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>name?`<button type="button" class="chip" data-jump-topic="${id}" ${topic===id?'aria-pressed="true"':''}>${esc(name)}</button>`:'').join('')}</div><div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-jump-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>${esc(b.title)}</button>`).join('')}<button type="button" class="chip" data-jump-course="" ${courseBlock?'':'aria-pressed="true"'}>Все</button></div><div class="jump-row"><span>След</span><button type="button" class="chip" data-jump-transfer ${mode==='transfer'?'aria-pressed="true"':''}>Перенос</button></div>`;
+   bar.innerHTML=`<div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>name?`<button type="button" class="chip" data-jump-topic="${id}" ${topic===id?'aria-pressed="true"':''}>${esc(name)}</button>`:'').join('')}</div><div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-jump-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>${esc(b.title)}</button>`).join('')}<button type="button" class="chip" data-jump-course="" ${courseBlock?'':'aria-pressed="true"'}>Все</button></div><div class="jump-row"><span>След</span><button type="button" class="chip" data-jump-transfer ${mode==='transfer'?'aria-pressed="true"':''}>Перенос</button><button type="button" class="chip" data-jump-pause>Скоро пауза</button></div>`;
    const closeFilter=()=>{const dlg=$('#practice-filter');if(dlg&&dlg.open&&dlg.close)dlg.close();};
    $$('#jump-bar [data-jump-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.jumpTopic;activeLesson=null;vocabRole=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');closeFilter();});
    $$('#jump-bar [data-jump-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.jumpCourse||null;activeLesson=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');closeFilter();});
    const tr=$('#jump-bar [data-jump-transfer]');if(tr)tr.onclick=()=>{startTransfer();closeFilter();};
+   const soon=$('#jump-bar [data-jump-pause]');if(soon)soon.onclick=()=>{startPausePrep();closeFilter();};
  }
  function encodingMarkup(q){
    if(!q||mode==='exam')return '';
@@ -397,6 +485,7 @@
    if($('#rule-button'))$('#rule-button').onclick=()=>showRule(q);
    $('#hint-button').onclick=()=>showHint(q);
    $('#reveal-button').onclick=()=>mode==='exam'?checkAnswer(q,true):peekAnswer(q);
+   if(mode==='slice'||mode==='repair'){const h=$('#hint-button'),r=$('#reveal-button');if(h)h.hidden=true;if(r)r.hidden=true;}
    $('#next-button').onclick=nextQuestion;
    $('#association-button').onclick=()=>openAssociation(q);
    $$('#answer-form input[type=text]').forEach(el=>el.addEventListener('focus',()=>{lastTextInput=el;syncKbInset();const dock=$('#practice-dock');if(dock&&dock.scrollIntoView)try{dock.scrollIntoView({block:'nearest'});}catch{}}));
@@ -471,6 +560,7 @@
  }
  function readAnswers(q){return q.kind==='multi'?$$('input[name=choice]:checked').map(el=>el.value):q.fields.map((_,i)=>$('#answer-'+i).value);}
  function checkAnswer(q,reveal=false){
+   if(mode==='slice'||mode==='repair'){checkProbe(q,reveal);return;}
    if(checked&&!retrying)return;
    if(retrying){
      const answers=readAnswers(q), warning=$('#validation');
@@ -628,7 +718,7 @@
      advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
    }
  }
- function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework','course','phrase','transfer'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
+ function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
  function startHomework(lessonId,part,section){
    const H=window.Homework,pack=(H.packs(questions,course).find(p=>p.lesson_id===lessonId));
    if(!pack)return;
@@ -938,7 +1028,7 @@
        const right=exp();
        const diag=formAsk&&val.trim()?G.diagnoseProd(right,val):'Пока неверно.';
        const bankCard=window.ExplainBankUI&&window.ExplainBankUI.cardForChapter(ch);
-       const tr=window.TransferItems&&window.TransferItems.oneForPath(ch,les);
+       const tr=window.TransferItems&&window.TransferItems.oneForPath(ch,les,{catalog:window.CURRICULUM});
        showPathFb('error','<p>'+esc(diag)+'</p>'+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+'<p>Правильно: <strong>'+esc(right)+'</strong></p>'+(bankCard&&bankCard.short?'<p class="small">'+esc(bankCard.short)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
        const again=$('#path-again-rule');if(again)again.onclick=()=>{showPathFb('hinted','<p>'+esc(bankCard&&(bankCard.short||bankCard.medium)||hintLine())+'</p>');};
        const goTr=$('#path-transfer');if(goTr&&tr)goTr.onclick=()=>{if(!byId.has(tr.id)){course.questions.push(tr);byId.set(tr.id,tr);}mode='transfer';queue=[tr.id];practiceIds=[tr.id];position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();render();showView('practice');};
@@ -951,6 +1041,8 @@
    nextBeat();
  }
  function renderEmpty(){
+   if(mode==='repair'&&(state.sliceRun||[]).length){finishRepair();return;}
+   if(mode==='slice'&&(state.sliceRun||[]).length){showSliceResult();return;}
    if(hwReturn&&mode==='remediation'){
      const back=hwReturn;hwReturn=null;hwLesson=back.lesson;hwPart=back.part;hwSection=back.section||0;mode='homework';showView('homework');save();return;
    }
@@ -1234,6 +1326,8 @@
      }
      if(next.startsWith('course:')){startCourse(next.split(':')[1]);return;}
      if(next==='pause-prep'){startPausePrep();return;}
+     if(next==='repair-open'){openRepair();return;}
+     if(next.startsWith('repair:')){beginRepair(next.slice(7));return;}
      if(next==='transfer'){startTransfer();return;}
      if(next==='learn'){showView('learn');return;}
      if(next==='resume'){showView('practice');return;}
