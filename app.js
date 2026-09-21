@@ -216,7 +216,7 @@
  }
  function startTransfer(){
    const T=window.TransferItems;if(!T)return;
-   const rule=courseBlock==='3-1'?'T20_POSS':courseBlock==='2-1'?'T6_PERSON_SG':courseBlock==='1-3'?'T4_NO_PLURAL_AFTER_NUMBER':'T2_PLURAL_LDT';
+   const rule=courseBlock==='3-2'?'T24_POSS_BIZ':courseBlock==='3-1'?'T20_POSS':courseBlock==='2-1'?'T6_PERSON_SG':courseBlock==='1-3'?'T4_NO_PLURAL_AFTER_NUMBER':'T2_PLURAL_LDT';
    const list=(T.session(rule,{catalog:window.CURRICULUM})||[]).filter(q=>byId.has(q.id));
    if(!list.length)return;
    mode='transfer';topic='all';sourceFilter=null;activeLesson=null;activeStep=null;
@@ -938,7 +938,7 @@
        const right=exp();
        const diag=formAsk&&val.trim()?G.diagnoseProd(right,val):'Пока неверно.';
        const bankCard=window.ExplainBankUI&&window.ExplainBankUI.cardForChapter(ch);
-       const tr=window.TransferItems&&window.TransferItems.oneForPath(ch,les);
+       const tr=window.TransferItems&&window.TransferItems.oneForPath(ch,les,{catalog:window.CURRICULUM});
        showPathFb('error','<p>'+esc(diag)+'</p>'+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+'<p>Правильно: <strong>'+esc(right)+'</strong></p>'+(bankCard&&bankCard.short?'<p class="small">'+esc(bankCard.short)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
        const again=$('#path-again-rule');if(again)again.onclick=()=>{showPathFb('hinted','<p>'+esc(bankCard&&(bankCard.short||bankCard.medium)||hintLine())+'</p>');};
        const goTr=$('#path-transfer');if(goTr&&tr)goTr.onclick=()=>{if(!byId.has(tr.id)){course.questions.push(tr);byId.set(tr.id,tr);}mode='transfer';queue=[tr.id];practiceIds=[tr.id];position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();render();showView('practice');};
