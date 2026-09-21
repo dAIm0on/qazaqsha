@@ -599,7 +599,7 @@
      advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
    }
  }
- function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework','course'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
+ function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework','course','phrase'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();$('#exercise').scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
  function startHomework(lessonId,part,section){
    const H=window.Homework,pack=(H.packs(questions,course).find(p=>p.lesson_id===lessonId));
    if(!pack)return;
@@ -1275,7 +1275,7 @@
    activeStep=activeLesson?Math.min(window.LEARNING.lessons.find(l=>l.id===activeLesson).chunks.length-1,Math.max(0,Number(savedSession.activeStep)||0)):null;
    queue=savedSession.queue;practiceIds=Array.isArray(savedSession.practiceIds)?savedSession.practiceIds.filter(id=>byId.has(id)):[...new Set(queue)];
    stepEvidence=savedSession.stepEvidence&&typeof savedSession.stepEvidence==='object'?savedSession.stepEvidence:{};
-   position=Math.min(queue.length,savedSession.position+(savedSession.answered?1:0));if(savedSession.answered&&!['ordered','shuffle','homework','course'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();
+   position=Math.min(queue.length,savedSession.position+(savedSession.answered?1:0));if(savedSession.answered&&!['ordered','shuffle','homework','course','phrase'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();
    if(!savedSession.answered){hinted=!!savedSession.hinted;elapsedMs=Number.isFinite(savedSession.elapsed_ms)?Math.max(0,savedSession.elapsed_ms):0;}
  }else{queue=[];practiceIds=[];renderStats();}
  const resumeView=validSaved&&['practice','homework','learn','path','review'].includes(savedSession.view)?savedSession.view:'today';
