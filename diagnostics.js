@@ -1,8 +1,8 @@
 (function(root){
  'use strict';
  const core=typeof module!=='undefined'&&module.exports?require('./core.js'):root.TrainerCore;
- const labels={plural_initial_consonant:'Множественное: Л/Д/Т',vowel_harmony:'Множественное: гармония А/Е',plural_after_numeral:'Множественное после числа',plural_form:'Множественное: два шага',number_order:'Порядок разрядов',number_confusion:'Перепутано число',letter_confusion:'Различие букв',lexical_retrieval:'Вспоминание слова',translation_variant:'Перевод формы',harmony_wrong_edge:'Неверно выбран край слова',person_sg_initial:'Личное окончание: начало после основы',person_marker_missing:'Не хватает личного окончания',person_biz_initial:'Біз: начало личного окончания',plural_on_predicate:'Лишнее множественное на сказуемом',question_particle_missing:'Не хватает вопросительной частицы',harmony_class:'Твёрдый / мягкий ряд',harmony_pair:'Парные гласные',harmony_edge:'Последний релевантный слог',person_sg_form:'Личное окончание: мен',person_sg_piece:'Кусок личного окончания: мен',person_pl_form:'Личное окончание: множественные лица',emes_position:'Емес: куда ставится личное окончание',person_sen_siz:'Сен / сіз',ordinal_20:'Порядковое: 20-е',ol_suffix:'Ол без личного окончания',question_class:'Вопросительная частица',poss_suffix_missing:'Притяжательное: не хватает наклейки',poss_assim_voice:'Притяжательное: озвончение П/К/Қ',bar_zhok_choice:'Бар / жоқ: наличие или отсутствие',bar_zhok_not_emes:'Жоқ ≠ емес',poss_plural_order:'Притяжательное множественное: порядок суффиксов',poss_phrase:'Притяжательная фраза',poss_owner_form:'Притяжательное: форма владельца',unclassified:'Нужно сверить весь ответ'};
- const SKILL={plural_initial_consonant:'rule:plural::ldt',vowel_harmony:'rule:plural::harmony',plural_after_numeral:'rule:plural_after_num',plural_form:'rule:plural',translation_variant:'rule:translation::recognition',harmony_wrong_edge:'rule:harmony',person_sg_initial:'rule:person::sg',person_marker_missing:'rule:person::sg',person_biz_initial:'rule:person::pl',plural_on_predicate:'rule:person::pl',question_particle_missing:'rule:question::particle',harmony_class:'rule:harmony',harmony_pair:'rule:harmony',harmony_edge:'rule:harmony',person_sg_form:'rule:person::sg',person_sg_piece:'rule:person::sg',person_pl_form:'rule:person::pl',number_order:'rule:numeral::assemble',number_confusion:'rule:numeral::atom',emes_position:'rule:emes::position',person_sen_siz:'rule:person::sen_siz',ordinal_20:'rule:ordinal::exception_20',ol_suffix:'rule:third_person::no_personal_suffix',question_class:'rule:question::consonant_class',poss_suffix_missing:'rule:poss::suffix',poss_assim_voice:'rule:poss::assim_voice',bar_zhok_choice:'rule:bar_zhok',bar_zhok_not_emes:'rule:bar_zhok::not_emes',poss_plural_order:'rule:poss::plural_order',poss_phrase:'rule:poss::phrase',poss_owner_form:'rule:poss::owner_form'};
+ const labels={plural_initial_consonant:'Множественное: Л/Д/Т',vowel_harmony:'Множественное: гармония А/Е',plural_after_numeral:'Множественное после числа',plural_form:'Множественное: два шага',number_order:'Порядок разрядов',number_confusion:'Перепутано число',letter_confusion:'Различие букв',lexical_retrieval:'Вспоминание слова',translation_variant:'Перевод формы',harmony_wrong_edge:'Неверно выбран край слова',person_sg_initial:'Личное окончание: начало после основы',person_marker_missing:'Не хватает личного окончания',person_biz_initial:'Біз: начало личного окончания',plural_on_predicate:'Лишнее множественное на сказуемом',question_particle_missing:'Не хватает вопросительной частицы',harmony_class:'Твёрдый / мягкий ряд',harmony_pair:'Парные гласные',harmony_edge:'Последний релевантный слог',person_sg_form:'Личное окончание: мен',person_sg_piece:'Кусок личного окончания: мен',person_pl_form:'Личное окончание: множественные лица',emes_position:'Емес: куда ставится личное окончание',person_sen_siz:'Сен / сіз',ordinal_20:'Порядковое: 20-е',ol_suffix:'Ол без личного окончания',question_class:'Вопросительная частица',poss_suffix_missing:'Притяжательное: не хватает наклейки',poss_assim_voice:'Притяжательное: озвончение П/К/Қ',bar_zhok_choice:'Бар / жоқ: наличие или отсутствие',bar_zhok_not_emes:'Жоқ ≠ емес',poss_plural_order:'Притяжательное множественное: порядок суффиксов',poss_phrase:'Притяжательная фраза',poss_owner_form:'Притяжательное: форма владельца',POSS_NO_SUFFIX:'Притяжательное: нет наклейки',POSS_WRONG_PERSON:'Притяжательное: чужое лицо',POSS_ORDER:'Притяжательное: порядок много→чьё',POSS_ASSIM:'Притяжательное: озвончение',POSS_GLIDE:'Притяжательное: связка после У/И/Ю',POSS_2PL_NO_PL:'Сендердің: нет куска «много»',POSS_2PL_READINGS:'Одна форма — несколько переводов',POSS_OLAR_FORCE_PL:'Олардың: «много» не всегда',DEIXIS_BARE:'Указательное не живёт одно',DEIXIS_OL:'Ол «он» и ол «тот»',PERSON_ON_POSS:'«Кто есть» вместо «чьё»',unclassified:'Нужно сверить весь ответ'};
+ const SKILL={plural_initial_consonant:'rule:plural::ldt',vowel_harmony:'rule:plural::harmony',plural_after_numeral:'rule:plural_after_num',plural_form:'rule:plural',translation_variant:'rule:translation::recognition',harmony_wrong_edge:'rule:harmony',person_sg_initial:'rule:person::sg',person_marker_missing:'rule:person::sg',person_biz_initial:'rule:person::pl',plural_on_predicate:'rule:person::pl',question_particle_missing:'rule:question::particle',harmony_class:'rule:harmony',harmony_pair:'rule:harmony',harmony_edge:'rule:harmony',person_sg_form:'rule:person::sg',person_sg_piece:'rule:person::sg',person_pl_form:'rule:person::pl',number_order:'rule:numeral::assemble',number_confusion:'rule:numeral::atom',emes_position:'rule:emes::position',person_sen_siz:'rule:person::sen_siz',ordinal_20:'rule:ordinal::exception_20',ol_suffix:'rule:third_person::no_personal_suffix',question_class:'rule:question::consonant_class',poss_suffix_missing:'rule:poss::suffix',poss_assim_voice:'rule:poss::assim_voice',bar_zhok_choice:'rule:bar_zhok',bar_zhok_not_emes:'rule:bar_zhok::not_emes',poss_plural_order:'rule:poss::plural_order',poss_phrase:'rule:poss::phrase',poss_owner_form:'rule:poss::owner_form',POSS_NO_SUFFIX:'rule:poss::suffix',POSS_WRONG_PERSON:'rule:poss::owner_form',POSS_ORDER:'rule:poss::plural_order',POSS_ASSIM:'rule:poss::assim_voice',POSS_GLIDE:'rule:poss::glide',POSS_2PL_NO_PL:'rule:poss::sender_plural',POSS_2PL_READINGS:'rule:poss::readings',POSS_OLAR_FORCE_PL:'rule:poss::olar',DEIXIS_BARE:'rule:deixis::bare',DEIXIS_OL:'rule:deixis::ol',PERSON_ON_POSS:'rule:poss::not_person'};
  function classify(expected,actual,q={},field={}){
    const e=core.normalize(expected,field.kind),a=core.normalize(actual,field.kind);if(e===a)return [];
    const out=[],suffix=/[лдт][ае]р$/u;
@@ -101,12 +101,12 @@
     if(ep&&ap&&last)return 'Ты выбрала '+ap+'. После '+last+' вопросительная частица начинается с '+ep[0].toUpperCase()+': '+ep+', не '+ap+'.';
   }
   if(error_type==='question_particle_missing'&&E)return 'Не хватает отдельной вопросительной частицы: нужно '+E+'.';
-  if(error_type==='poss_suffix_missing'&&E){
-   const raw=core.normalize(q&&q.stimulus||''),m=raw.match(/(менің|сенің|оның|сіздің)\s*(?:\+\s*|\s+)([а-яәіңғүұқөһ]+)/u);
+  if((error_type==='poss_suffix_missing'||error_type==='POSS_NO_SUFFIX')&&E){
+   const raw=core.normalize(q&&q.stimulus||''),m=raw.match(/(менің|сенің|оның|сіздің|біздің|сендердің|сіздердің|олардың)\s*(?:\+\s*|\s+)([а-яәіңғүұқөһ]+)/u);
    const pron=m&&m[1]||'притяжательной формы',base=m&&m[2]||'основы';
    return 'Для '+pron+' нужна притяжательная наклейка справа: '+base+' → '+E+'.';
   }
-  if(error_type==='poss_assim_voice'&&E){
+  if((error_type==='poss_assim_voice'||error_type==='POSS_ASSIM')&&E){
    const en=core.normalize(E),an=core.normalize(A),pairs={'п':'б','к':'г','қ':'ғ'};
    let from='',to='';
    const n=Math.min(en.length,an.length);
@@ -126,14 +126,23 @@
   }
   if(error_type==='bar_zhok_not_emes'&&E)return 'Здесь речь об отсутствии: нужно жоқ, не емес. Емес = «не является», жоқ = «нет / отсутствует»: '+E+'.';
   if(error_type==='bar_zhok_choice'&&E&&A)return 'Для наличия используй бар, для отсутствия — жоқ. Правильная форма: '+E+'.';
-  if(error_type==='poss_plural_order'&&E){
+  if((error_type==='poss_plural_order'||error_type==='POSS_ORDER')&&E){
    const raw=core.normalize(q&&q.stimulus||'');
+   if(/кітабымыздар/.test(raw)||/кітаптарымыз/.test(E))return 'Порядок такой: кітап + тар + ымыз → кітаптарымыз. Сначала «много», потом «чьё»; поэтому не кітабымыздар.';
    if(/кітабымдар/.test(raw)||/кітап/.test(E))return 'Порядок такой: кітап + тар + ым → кітаптарым. Сначала множественное, потом притяжательное; поэтому не кітабымдар и П не озвончается.';
    if(/мысығымдар/.test(raw)||/мысық/.test(E))return 'Порядок такой: мысық + тар + ым → мысықтарым. Сначала множественное, потом притяжательное; поэтому не мысығымдар и Қ не озвончается.';
    return 'Сначала ставится множественное окончание, потом притяжательное: нужно '+E+'.';
   }
   if(error_type==='poss_phrase'&&E)return 'Собери всю притяжательную фразу: владелец + правильная форма слова. Правильный ответ: '+E+'.';
   if(error_type==='poss_owner_form'&&E&&A)return 'Для оның нужна форма третьего лица: қала → қаласы. Окончание -м относится к менің, поэтому '+A+' здесь неверно. Нужно '+E+'.';
+  if(error_type==='POSS_WRONG_PERSON'&&E&&A)return 'Чужая наклейка «чьё»: в '+A+' хвост не от этого владельца. Нужно '+E+'.';
+  if(error_type==='POSS_GLIDE'&&E)return 'У / и / ю — согласные, нужна связка ы/і: '+E+', не '+A+'.';
+  if(error_type==='POSS_2PL_NO_PL'&&E)return 'У сендердің / сіздердің кусок «много» всегда, даже для руки: сендердің қолдарың, не *қолың. Нужно '+E+'.';
+  if(error_type==='POSS_2PL_READINGS'&&E)return 'Эта форма держит несколько чтений ключа. Один перевод неполный. Нужны все: '+E+'.';
+  if(error_type==='POSS_OLAR_FORCE_PL'&&E)return 'У олардың «много» можно, не обязательно на один объект. Живое: '+E+'.';
+  if(error_type==='DEIXIS_BARE'&&E)return 'Это слово не живёт одно: *мына — кітап нельзя. Нужно '+E+'.';
+  if(error_type==='DEIXIS_OL'&&E)return 'Ол «он» и ол «тот» — разные чтения. Нужно '+E+'.';
+  if(error_type==='PERSON_ON_POSS'&&E)return 'Сюда попал кусок «кто есть», а нужен «чьё». көршісің = ты сосед, не «твой сосед». Живое: '+E+'.';
   return {
     vowel_harmony:'Гармония: гласная окончания неверна.',
     plural_initial_consonant:'Стык Л/Д/Т выбран неверно.',
@@ -164,6 +173,17 @@
     poss_plural_order:'Сначала множественное окончание, потом притяжательное.',
     poss_phrase:'Проверь владельца и притяжательную форму целиком.',
     poss_owner_form:'Притяжательная форма должна соответствовать владельцу.',
+    POSS_NO_SUFFIX:'Не хватает притяжательной наклейки справа.',
+    POSS_WRONG_PERSON:'Чужая наклейка «чьё».',
+    POSS_ORDER:'Сначала «много», потом «чьё».',
+    POSS_ASSIM:'Перед гласной наклейкой П/К/Қ оживают.',
+    POSS_GLIDE:'После у/и/ю нужна связка ы/і.',
+    POSS_2PL_NO_PL:'У сендердің сначала всегда «много».',
+    POSS_2PL_READINGS:'Нужны все чтения ключа, не одно.',
+    POSS_OLAR_FORCE_PL:'У олардың «много» не обязательно.',
+    DEIXIS_BARE:'Это указательное не живёт одно.',
+    DEIXIS_OL:'Не мешай ол «он» и ол «тот».',
+    PERSON_ON_POSS:'Это кусок «кто есть», не «чьё».',
     number_confusion:'Перепутаны похожие числа.'
   }[error_type]||'';
  }

@@ -32,6 +32,11 @@
   if(type==='poss_plural_order')return 'POSS_PLURAL_ORDER';
   if(type==='poss_owner_form')return 'POSS_PRONOUN';
   if(type==='bar_zhok_choice'||type==='bar_zhok_not_emes')return 'BAR_ZHOK';
+  if(type==='POSS_NO_SUFFIX')return 'POSS_PERSON_SUFFIX';
+  if(type==='POSS_ASSIM'||type==='POSS_GLIDE')return 'POSS_ASSIM_VOICE';
+  if(type==='POSS_ORDER')return 'POSS_PLURAL_ORDER';
+  if(type==='POSS_WRONG_PERSON'||type==='PERSON_ON_POSS'||type==='POSS_2PL_NO_PL'||type==='POSS_OLAR_FORCE_PL'||type==='POSS_2PL_READINGS')return 'POSS_OWNER_FORM';
+  if(type==='DEIXIS_BARE'||type==='DEIXIS_OL')return 'WORD_ORDER_CURRENT';
   if(type==='number_confusion'){
    const b=(expected||'')+' '+(actual||'');
    if(/алты|алпыс/.test(b))return 'NUMERAL_CONFUSION_6_60';
