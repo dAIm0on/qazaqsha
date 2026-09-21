@@ -1388,7 +1388,8 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/qazaq-offline-live-20260922-transfer-t24/.test(openSw));
+assert.ok(/qazaq-offline-live-20260922-slice/.test(openSw));
+assert.ok(/probe-items\.js/.test(openSw));
 const AIC31=require('./ai-contract.js');
 assert.ok(AIC31.ALLOWED_LESSONS.includes('3-1'));
 assert.ok(['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL'].every(r=>AIC31.resolveCurriculum('3-1').allowed_rule_ids.includes(r)));
@@ -1493,7 +1494,7 @@ assert.ok(/id="course-to-homework"/.test(flowSrc));
 assert.ok(/data-hw-review/.test(flowSrc));
 assert.ok(/mode==='course'&&courseBlock===block&&queue\.length>0&&position<queue\.length/.test(flowSrc));
 
-assert.ok(/\['ordered','shuffle','homework','course','phrase','transfer'\]\.includes\(mode\)/.test(flowSrc));
+assert.ok(/\['ordered','shuffle','homework','course','phrase','transfer','slice','repair'\]\.includes\(mode\)/.test(flowSrc));
 assert.ok(!/function nextQuestion\(\)\{[\s\S]*?if\(!\['ordered','shuffle','homework'\]\.includes\(mode\)&&sessionAttempts>=cfg\.session\.maxAttempts\)position=queue\.length/.test(flowSrc));
 ok('course, phrase and transfer modes are not cut off by session.maxAttempts');
 
@@ -1676,5 +1677,28 @@ const path24=Transfer.oneForPath({id:'3-2-a',rule_ids:['T24_POSS_BIZ']},{id:'3-2
 assert.equal(path24.fields[0].answers[0],'біздің досымыз');
 assert.equal(path24.ruleIds[0],'T24_POSS_BIZ');
 ok('Pause remainder 1: 3-2 transfer is T24 біздің досымыз, not T2 кітаптар');
+
+const Probe=require('./probe-items.js');
+assert.equal(Probe.signatureOf('екі кітаптар'),'T4_NO_PLURAL_AFTER_NUMBER');
+assert.notEqual(Probe.signatureOf('екі кітаптар'),'T2_PLURAL_LDT');
+assert.equal(Probe.signatureOf('кітапым'),'T21_POSS_ASSIM');
+const catAll={lessons:['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2'].map(id=>({id,active:true}))};
+const sliceA=Probe.session('A',catAll);
+assert.ok(sliceA.every(item=>item.block==='A'));
+assert.ok(sliceA.filter(item=>item.rule_id==='T2_PLURAL_LDT').length<=2);
+assert.ok(sliceA.filter(item=>item.rule_id==='T4_NO_PLURAL_AFTER_NUMBER').length<=2);
+assert.equal(Probe.session('D',catPause).length,0);
+assert.ok(Probe.session('D',catAll).length);
+const a6=Probe.byId('slice:A6');
+const marked=Probe.judge(a6,['екі кітаптар'],false);
+assert.equal(marked.correct,false);
+assert.equal(marked.rule_id,'T4_NO_PLURAL_AFTER_NUMBER');
+const c8=Probe.byId('slice:C8');
+assert.equal(Probe.judge(c8,['кітапым'],false).rule_id,'T21_POSS_ASSIM');
+assert.equal(Probe.judge(a6,['екі кітап'],false).correct,true);
+assert.ok(/Срез грамматики/.test(appPause));
+assert.equal(cfg.session.examSize,8);
+assert.ok(!/data-view=["']memory["']/.test(fs.readFileSync(path.join(__dirname,'index.html'),'utf8')));
+ok('Pause remainder 2: slice marks екі кітаптар as T4 and кітапым as T21; timed exam size stays 8');
 
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
