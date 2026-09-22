@@ -77,15 +77,22 @@
    for(const id of courseIds())if(obj(src.lessons)&&src.lessons[id])out.lessons[id]=normalizeLesson(src.lessons[id]);
    const gp=state&&state.grammarPath;
    if(obj(gp)&&validId(gp.lessonId)){
-     const lp=out.lessons[gp.lessonId];
-     if(!src.lessons||!src.lessons[gp.lessonId]||!src.lessons[gp.lessonId].path){
+     const lp=out.lessons[gp.lessonId],hadLesson=obj(src.lessons)&&obj(src.lessons[gp.lessonId]);
+     if(!hadLesson||!src.lessons[gp.lessonId].path){
        lp.path=normalizePath({chapterId:gp.chapterId,beat:gp.beat,phase:gp.phase,pathDraft:gp.pathDraft,canonShownFor:gp.canonShownFor,updatedAt:0});
      }
+     if(!hadLesson&&['lesson','beat'].includes(gp.phase)&&lp.status!=='completed')lp.status='in_progress';
+   }
+   const live=liveSession(raw&&raw.session);
+   if(live){
+     const lp=out.lessons[live.lessonId],hadPractice=obj(src.lessons)&&obj(src.lessons[live.lessonId])&&src.lessons[live.lessonId].practiceSession;
+     if(!hadPractice)lp.practiceSession=normalizePractice(Object.assign({},raw.session,{updatedAt:0}));
+     if(lp.status!=='completed')lp.status='in_progress';
    }
    const rp=obj(src.resumePointer)&&validId(src.resumePointer.lessonId)&&surfaces.has(src.resumePointer.surface)?{
      lessonId:src.resumePointer.lessonId,surface:src.resumePointer.surface,updatedAt:Math.max(0,Number(src.resumePointer.updatedAt)||0)
    }:null;
-   const inferred=liveSession(raw&&raw.session)||legacyPath(state)||legacyPlace(state);
+   const inferred=live||legacyPath(state)||legacyPlace(state);
    out.resumePointer=rp||{lessonId:(inferred&&inferred.lessonId)||fallbackId(out.lessons),surface:(inferred&&inferred.surface)||'path',updatedAt:rp?rp.updatedAt:0};
    if(!validId(out.resumePointer.lessonId))out.resumePointer={lessonId:fallbackId(out.lessons),surface:'path',updatedAt:0};
    return out;
