@@ -92,13 +92,21 @@ test('K2.1-11 session JSON roundtrip preserves exact queue and cursor',()=>{
   assert.equal(restored.stage,2);
 });
 
-test('K2.1-12 dashboard contains separate Cat Trainer action',()=>{
+test('K2.1-12 default full rounds stay short while full banks remain available',()=>{
+  const classify=H.classifyRound(()=>0.4),words=H.wordRound(()=>0.4);
+  assert.ok(classify.length>=12&&classify.length<=13);
+  assert.equal(words.length,12);
+  assert.equal(H.classifyItems(()=>0.4).length,42);
+  for(const word of ['кітап','мұғалім','заңгер','мұхит','ит','ми','су','сүю'])assert.ok(words.some(x=>x.word===word&&x.type==='choice'));
+});
+
+test('K2.1-13 dashboard contains separate Cat Trainer action',()=>{
   const d=fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8');
   assert.ok(d.includes('data-action="personal-trainers"'));
   assert.ok(d.includes('Тренажёр кота'));
 });
 
-test('K2.1-13 standalone view and scripts are wired without adding a nav tab',()=>{
+test('K2.1-14 standalone view and scripts are wired without adding a nav tab',()=>{
   const html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
   assert.ok(html.includes('id="personal-view"'));
   assert.ok(html.includes('harmony-letter-trainer.js'));
@@ -107,7 +115,7 @@ test('K2.1-13 standalone view and scripts are wired without adding a nav tab',()
   assert.equal((bottom.match(/data-view=/g)||[]).length,3);
 });
 
-test('K2.1-14 app routes personal trainer without course start semantics',()=>{
+test('K2.1-15 app routes personal trainer without course start semantics',()=>{
   const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
   assert.ok(app.includes("if(next==='personal-trainers'){showView('personal');return;}"));
   assert.ok(app.includes("if(next==='personal'&&window.PersonalTrainers)window.PersonalTrainers.render()"));
@@ -116,7 +124,7 @@ test('K2.1-14 app routes personal trainer without course start semantics',()=>{
   assert.equal(/markLessonStarted|setResumePointer|courseProgress|fsrs-vendor|scheduler\.js/.test(personal),false);
 });
 
-test('K2.1-15 service worker caches both standalone trainer files',()=>{
+test('K2.1-16 service worker caches both standalone trainer files',()=>{
   const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
   assert.ok(sw.includes('"harmony-letter-trainer.js"'));
   assert.ok(sw.includes('"personal-trainers.js"'));
