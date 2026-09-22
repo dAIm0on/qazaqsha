@@ -1391,7 +1391,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/qazaq-offline-live-20260922-rules/.test(openSw));
+assert.ok(/qazaq-offline-live-20260922-full/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -2017,5 +2017,25 @@ assert.ok(/Заметки старой статьи/.test(fs.readFileSync(path.j
 assert.ok(/quantity:'T4_NO_PLURAL_AFTER_NUMBER'/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/bestRule/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 ok('Astra step 15: old rule articles fold into the canon; the possessive rule stays one');
+
+assert.ok(/data-voluntary/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/Это подход по желанию/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/mode!=='voluntary'&&!all/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+const dueBefore={seen:2,correct_count:1,wrong_count:0,streak:1,correct_streak:1,next_review:1,dueAt:1,needsReview:false,mastery_level:'LEARNING'};
+assert.equal(require('./scheduler.js').due(dueBefore,Date.now()),true);
+assert.equal(dueBefore.next_review,1);
+ok('Astra step 16: a voluntary approach does not reschedule the due queue');
+
+const Full=require('./full-sources.js');
+const l31=Full.forRule('T20_POSS');
+assert.equal(l31[0].title.includes('S31'),true);
+assert.ok(l31.some(row=>row.url.includes('1B2c2UJKpvBvty-LhSlkoC8ubPGZC9-aQ')));
+assert.ok(!fs.readFileSync(path.join(__dirname,'explain-bank.js'),'utf8').includes('1ARCqTuPPWGbE_bza36x8CDr6bZWWHYzT'));
+const t21note=Full.forRule('T21_POSS_ASSIM');
+assert.ok(/не исправлять/.test(t21note[0].note));
+assert.ok(/не Bank T3/.test(Full.forRule('T7_EMES')[0].note));
+assert.ok(/T10/.test(Full.forRule('T10_QUESTION')[0].note));
+assert.ok(fs.readFileSync(path.join(__dirname,'explain-open.js'),'utf8').includes('data-full-files'));
+ok('Astra step 18: 3-1 full text is the named file, not a new bank paragraph');
 
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

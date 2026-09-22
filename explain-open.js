@@ -5,6 +5,7 @@
  const Bank=node?require('./explain-bank.js'):root.ExplainBank;
  const G=node?require('./grammar-chapters.js'):root.GRAMMAR_CHAPTERS;
  const L31=node?require('./lesson31-pack.js'):root.Lesson31Pack;
+ const Full=node?require('./full-sources.js'):root.FullSources;
  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
  function ruleIdOf(q){
   const ids=(q&&q.ruleIds)||[];
@@ -39,7 +40,9 @@
   if(!card)return '';
   const paras=text=>String(text||'').split(/\n{2,}/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('');
   const chapters=chaptersFor(ruleId).map(ch=>'<section class="path-block"><h3>'+esc(ch.title)+'</h3>'+beatBlocks(ch)+'</section>').join('');
-  return '<section class="path-block"><h3>Сравни с русским</h3>'+paras(card.ru_refresh)+'</section>'
+  const files=Full&&Full.forRule?Full.forRule(ruleId):[];
+  const links=files.length?'<section class="path-block" data-full-files><h3>Полный текст — файл</h3><p class="small">Ниже по-прежнему краткий вид банка. Файл не вставлен в банк. Номер в имени файла и номер правила банка — разные вещи.</p><ul>'+files.map(f=>'<li><a href="'+esc(f.url)+'" target="_blank" rel="noopener noreferrer">'+esc(f.title)+'</a>'+(f.note?' <span class="small">'+esc(f.note)+'</span>':'')+'</li>').join('')+'</ul></section>':'';
+  return links+'<section class="path-block"><h3>Сравни с русским</h3>'+paras(card.ru_refresh)+'</section>'
    +'<section class="path-block"><h3>Коротко</h3>'+paras(card.short)+'</section>'
    +'<section class="path-block"><h3>Как работает</h3>'+paras(card.medium)+'</section>'
    +(card.examples&&card.examples.length?'<section class="path-block"><h3>Примеры</h3><ul>'+card.examples.map(x=>'<li lang="kk">'+esc(x)+'</li>').join('')+'</ul></section>':'')
