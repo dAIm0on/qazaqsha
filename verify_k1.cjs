@@ -61,6 +61,16 @@ test('K1-C view-only lesson open is distinct from meaningful start',()=>{
   assert.ok(body.includes("if(meaningful)"));
 });
 
+test('K1-C2 view-only state survives opening a chapter',()=>{
+  const a=app();
+  const start=a.indexOf('function openChapter'),end=a.indexOf('function openPathLesson',start),body=a.slice(start,end);
+  assert.ok(body.includes("viewOnlyPathLesson!==lessonId"));
+  const open=a.slice(a.indexOf('function openPathLesson'),a.indexOf('function filterSummary'));
+  assert.ok(open.includes("viewOnlyPathLesson=meaningful?null:lessonId"));
+  const cont=a.slice(a.indexOf('function continueLesson'),a.indexOf('function resetCounts'));
+  assert.ok(cont.includes('viewOnlyPathLesson=null'));
+});
+
 test('K1-D explicit start changes resume and marks in_progress',()=>{
   const s=P.empty();
   P.setResumePointer(s,'2-1','path',10);
@@ -201,6 +211,13 @@ test('K1-O Phrase Drill saved queue is restored before any generation path',()=>
   assert.equal(s.courseProgress.lessons['3-1'].practiceSession.position,5);
   const a=app(),start=a.indexOf('function startCourse'),restore=a.indexOf('restoreLessonPractice',start),generate=a.indexOf('PhraseDrill.session',start);
   assert.ok(start>=0&&restore>start&&generate>restore);
+});
+
+test('K1-O2 phrase mode keeps the generated queue fixed',()=>{
+  const a=app();
+  const check=a.slice(a.indexOf('const day0=core.isDay0Learning'),a.indexOf('const mate=',a.indexOf('const day0=core.isDay0Learning')));
+  assert.ok(check.includes("mode!=='phrase'"));
+  assert.ok(/if\(!homeworkMode&&mode!=='phrase'/.test(check));
 });
 
 test('K1-P Tutor context follows viewed lesson, not primary resume',()=>{
