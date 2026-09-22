@@ -36,10 +36,10 @@
   ['сендердің қолың','T25_POSS_SENDER']
  ];
  const BLOCKS=[
-  {id:'A',title:'Срез A · звук, много, число'},
-  {id:'B',title:'Срез B · кто есть, емес, вопрос'},
-  {id:'C',title:'Срез C · чьё, 3-1'},
-  {id:'D',title:'Срез D · 3-2'}
+  {id:'A',title:'Звук, много и число'},
+  {id:'B',title:'Кто есть, емес и вопрос'},
+  {id:'C',title:'Чьё: мой, твой, его'},
+  {id:'D',title:'Наш, ваш и их'}
  ];
  function row(id,block,rule,skill,prompt,answers,holes){
   return {id,block,rule_id:rule,skill,prompt,answers,holes:holes||[]};
@@ -104,7 +104,7 @@
  function toQuestion(item){
   return {
    id:item.id,source:'slice',group:item.block,part:'1',lessonId:'',topic:'rules',kind:'fields',
-   title:'Срез '+item.block,stimulus:item.prompt,fields:fieldsOf(item),
+   title:(BLOCKS.find(b=>b.id===item.block)||{}).title||'Проверка',stimulus:item.prompt,fields:fieldsOf(item),
    explanation:fieldsOf(item).map(f=>f.answers[0]).join(' · '),
    ruleIds:[item.rule_id],practiceOnly:true,slice:true
   };

@@ -6,18 +6,24 @@
  const DAY=86400000,QUIET_DAYS=10;
  const PAPER='Перед набором выпиши на лист, что помнишь про это. Потом сверка с Правилами.';
  function short(rule){const m=String(rule||'').match(/^T\d+/);return m?m[0]:String(rule||'');}
+ function humanTitle(ruleId){
+  let bank=root.ExplainBank;
+  if(node&&!bank){try{bank=require('./explain-bank.js');}catch(e){bank=null;}}
+  const card=bank&&bank.byId&&bank.byId(ruleId);
+  return card&&card.title?card.title:'это правило';
+ }
  function forms(ruleId){return (Transfer&&Transfer.FORMS&&Transfer.FORMS[ruleId])||{};}
  function card(ruleId,rootName,answer){
   return {
    id:'repair:'+ruleId+':'+rootName,source:'repair',group:'ремонт',part:'1',lessonId:'',topic:'rules',kind:'fields',
-   title:'Ремонт: '+short(ruleId),stimulus:rootName+' → ?',
+   title:'Проверим на новом слове: '+humanTitle(ruleId),stimulus:rootName+' → ?',
    fields:[{label:'Ответ',kind:'text',answers:[answer]}],explanation:answer+'.',
    ruleIds:[ruleId],practiceOnly:true,repairRoot:rootName
   };
  }
  function splitRoots(ruleId){
   const keys=Object.keys(forms(ruleId));
-  if(keys.length<=2)return {day0:keys.slice(0,1),day10:keys.slice(1)};
+  if(keys.length<=2)return {day0:keys.slice(0,1),day10:keys.slice()};
   const cut=Math.max(1,keys.length-2);
   return {day0:keys.slice(0,cut),day10:keys.slice(cut)};
  }
@@ -28,7 +34,10 @@
  function day10Cards(ruleId,rootsUsed){
   const used=new Set(rootsUsed||[]);
   const table=forms(ruleId);
-  return splitRoots(ruleId).day10.filter(rootName=>table[rootName]&&!used.has(rootName)).slice(0,2).map(rootName=>card(ruleId,rootName,table[rootName]));
+  const planned=splitRoots(ruleId).day10.filter(rootName=>table[rootName]);
+  const fresh=planned.filter(rootName=>!used.has(rootName));
+  const roots=(fresh.length>=2||planned.length<2)?fresh:planned;
+  return roots.slice(0,2).map(rootName=>card(ruleId,rootName,table[rootName]));
  }
  function busy(state,now){
   const repair=state&&state.repair;
@@ -52,10 +61,12 @@
  }
  function detail(state,now){
   const repair=state&&state.repair;if(!repair)return '';
-  return short(repair.rule_id)+' · день '+dayNumber(state,now)+'/'+QUIET_DAYS;
+  return humanTitle(repair.rule_id)+' · день '+dayNumber(state,now)+'/'+QUIET_DAYS;
  }
  function ribbon(state,now){
-  const bit=detail(state,now);return bit?'Дыра в ремонте · '+bit:'';
+  const repair=state&&state.repair;if(!repair)return '';
+  const ripe=now>=Number(repair.quiet_until);
+  return (ripe?'Проверим на новом слове':'Вернёмся после паузы')+' · '+humanTitle(repair.rule_id);
  }
  function note(state,correct){
   const repair=state&&state.repair;if(!repair)return null;

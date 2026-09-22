@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" data-season="autumn">
+<html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
@@ -65,6 +65,10 @@
   <script defer src="dashboard.js"></script>
   <script defer src="firebase-config.js"></script>
   <script defer src="cloud.js"></script>
+  <script defer src="full-sources.js"></script>
+  <script defer src="canon-texts.js"></script>
+  <script defer src="explain-open.js"></script>
+  <script defer src="corpus-search.js"></script>
   <script defer src="app.js"></script>
   <script defer src="design-ui.js"></script>
   <script defer src="pwa.js"></script>
@@ -74,20 +78,20 @@
 <a class="skip-link" href="#main">К заданию</a>
 <header class="topbar">
   <a class="brand" href="./" aria-label="Qazaqsha, сегодня"><span class="brand-mark">Qazaqsha</span><span class="brand-caption" lang="kk">Қазақша</span></a>
-  <nav class="topnav" aria-label="Разделы"><button type="button" data-view="today" aria-current="page">Сегодня</button><button type="button" data-view="learn">Учить</button><button type="button" data-view="review">Повторять</button><button type="button" data-view="exam">Экзамен</button><button type="button" data-view="rules">Правила</button></nav>
+  <nav class="topnav" aria-label="Разделы"><button type="button" data-view="today" aria-current="page">Заниматься</button><button type="button" data-view="materials">Материалы</button><button type="button" data-view="review">Мой результат</button></nav>
   <div class="account" id="account-box">
     <button type="button" class="text-button" id="account-toggle" hidden>Войти</button>
     <span id="account-user" hidden></span>
     <button type="button" class="text-button" id="account-logout" hidden>Выйти</button>
-    <button type="button" class="design-settings" id="design-settings" aria-haspopup="dialog" aria-controls="settings-dialog">Сезон</button>
+    <button type="button" class="design-settings" id="design-settings" aria-haspopup="dialog" aria-controls="settings-dialog">Оформление</button>
   </div>
 </header>
 <div class="workspace">
   <main id="main" tabindex="-1">
-    <section id="today-view" aria-labelledby="today-title"><div class="section-heading"><h1 id="today-title">Сегодня</h1></div><div id="today-content"></div><details class="panel" id="installation-panel"><summary>На телефон и без интернета</summary><p id="offline-status" role="status">Проверяю возможность сохранить приложение…</p><button id="install-app" type="button" class="secondary-button" hidden>Установить на телефон</button><button id="update-app" type="button" class="secondary-button" hidden>Сохранить ответ и обновить приложение</button><p>Android: открой сайт в браузере и выбери «Установить приложение» или «Добавить на главный экран». iPhone: открой сайт в Safari → «Поделиться» → «На экран Домой».</p><p class="small">Сначала открой тренажёр с интернетом и дождись сообщения о сохранении материалов. Прогресс зависит от браузера: перед переходом в установленное приложение скачай progress.json и при необходимости импортируй его. Очистка данных браузера удаляет и офлайн-копию, и прогресс.</p></details></section>
-    <section id="review-view" hidden aria-labelledby="review-title"><div class="section-heading"><h1 id="review-title">Повторять</h1></div><div id="review-content"></div></section>
+    <section id="today-view" aria-labelledby="today-title"><div class="section-heading"><h1 id="today-title">Заниматься</h1></div><div id="today-content"></div><details class="panel" id="installation-panel"><summary>На телефон и без интернета</summary><p id="offline-status" role="status">Проверяю возможность сохранить приложение…</p><button id="install-app" type="button" class="secondary-button" hidden>Установить на телефон</button><button id="update-app" type="button" class="secondary-button" hidden>Сохранить ответ и обновить приложение</button><p>Android: открой сайт в браузере и выбери «Установить приложение» или «Добавить на главный экран». iPhone: открой сайт в Safari → «Поделиться» → «На экран Домой».</p><p class="small">Сначала открой тренажёр с интернетом и дождись сообщения о сохранении материалов. Прогресс зависит от браузера: перед переходом в установленное приложение скачай progress.json и при необходимости импортируй его. Очистка данных браузера удаляет и офлайн-копию, и прогресс.</p></details></section>
+    <section id="review-view" hidden aria-labelledby="review-title"><div class="section-heading"><h1 id="review-title">Мой результат</h1></div><div id="review-content"></div></section>
     <section id="vocabulary-view" hidden aria-labelledby="vocabulary-title"><div class="section-heading"><h1 id="vocabulary-title">Мой словарь</h1><button type="button" class="text-button" data-view="today">К сегодняшнему плану</button></div><div id="vocabulary-content"></div></section>
-    <section id="learn-view" hidden aria-labelledby="learn-title"><div class="section-heading"><h1 id="learn-title">Учить</h1></div><div id="learn-content"></div></section>
+    <section id="learn-view" hidden aria-labelledby="learn-title"><div class="section-heading"><h1 id="learn-title">Выбрать занятие</h1></div><div id="learn-content"></div></section>
     <section hidden id="practice-view" aria-labelledby="practice-title">
       <div class="practice-head">
         <button type="button" id="pause-session" class="text-button practice-back">←</button>
@@ -115,14 +119,14 @@
         <button type="button" class="secondary-button" id="practice-filter-close">Закрыть</button>
       </dialog>
     </section>
-    <section id="homework-view" hidden aria-labelledby="homework-title"><div class="section-heading"><div><h1 id="homework-title">Домашка</h1></div><button type="button" class="text-button" data-view="today">К сегодня</button></div><div id="homework-content"></div></section>
-    <section id="path-view" hidden aria-labelledby="path-title"><div class="section-heading"><div><p class="eyebrow">РАЗБИРАЕМ ТО, ЧТО УЖЕ БЫЛО НА ЗАНЯТИЯХ</p><h1 id="path-title">Уроки и правила</h1></div><button type="button" class="text-button" data-view="today">К сегодня</button></div><div id="path-content"></div></section>
+    <section id="homework-view" hidden aria-labelledby="homework-title"><div class="section-heading"><div><h1 id="homework-title">Домашка</h1></div><button type="button" class="text-button" data-view="today">К занятию</button></div><div id="homework-content"></div></section>
+    <section id="path-view" hidden aria-labelledby="path-title"><div class="section-heading"><div><p class="eyebrow">РАЗБИРАЕМ ТО, ЧТО УЖЕ БЫЛО НА ЗАНЯТИЯХ</p><h1 id="path-title">Уроки и правила</h1></div><button type="button" class="text-button" data-view="today">К занятию</button></div><div id="path-content"></div></section>
     <section id="exam-view" hidden aria-labelledby="exam-title"><div class="section-heading"><div><p class="eyebrow">ЗАКРЕПЛЕНИЕ НА ВРЕМЯ</p><h1 id="exam-title">Экзамен</h1></div></div><div id="exam-content"></div></section>
     <section id="rules-view" hidden aria-labelledby="rules-title"><div class="section-heading"><div><p class="eyebrow">ПОД РУКОЙ</p><h1 id="rules-title">Правила и словарь</h1></div></div><div id="rules-content"></div></section>
-    <section id="materials-view" hidden aria-labelledby="materials-title"><div class="section-heading"><div><p class="eyebrow">ТВОИ МАТЕРИАЛЫ</p><h1 id="materials-title">Что вошло в тренажёр</h1></div></div><div id="materials-content"></div></section>
+    <section id="materials-view" hidden aria-labelledby="materials-title"><div class="section-heading"><div><p class="eyebrow">ТВОИ МАТЕРИАЛЫ</p><h1 id="materials-title">Материалы</h1></div></div><div id="materials-content"></div></section>
   </main>
 </div>
-<nav class="bottom-nav" aria-label="Основная навигация"><button type="button" data-view="today">Сегодня</button><button type="button" data-view="learn">Учить</button><button type="button" data-view="review">Повторять</button><button type="button" data-view="exam">Экзамен</button><button type="button" data-view="rules">Правила</button></nav>
+<nav class="bottom-nav" aria-label="Основная навигация"><button type="button" data-view="today">Заниматься</button><button type="button" data-view="materials">Материалы</button><button type="button" data-view="review">Мой результат</button></nav>
 <button type="button" id="issue-toggle" class="issue-toggle">Заметила ошибку</button>
 <dialog id="issue-dialog" class="settings-dialog" aria-labelledby="issue-title">
   <h2 id="issue-title">Что не так на этом экране</h2>
@@ -157,20 +161,6 @@
 </dialog>
 <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title">
   <h2 id="settings-title">Оформление</h2>
-  <p class="small">Сезон меняет цвет бумаги. На учёбу не влияет.</p>
-  <div class="season-swatches" role="group" aria-label="Сезон">
-    <button type="button" class="autumn" data-season-pick="autumn" aria-label="Осень" aria-pressed="true"></button>
-    <button type="button" class="summer" data-season-pick="summer" aria-label="Лето" aria-pressed="false"></button>
-    <button type="button" class="spring" data-season-pick="spring" aria-label="Весна" aria-pressed="false"></button>
-  </div>
-  <p class="season-captions"><span>Осень</span><span>Лето</span><span>Весна</span></p>
-  <label>Сезон
-    <select id="season-select">
-      <option value="autumn">Осень</option>
-      <option value="summer">Лето</option>
-      <option value="spring">Весна</option>
-    </select>
-  </label>
   <label><input type="checkbox" id="motion-off"> Меньше движения</label>
   <label class="pref-check glyph-check"><input type="checkbox" id="pref-letters"> Казахские буквы Ә Ғ Қ Ң Ө Ұ Ү Һ І на экране</label>
   <p class="glyph-check" lang="kk">Ә ә Ғ ғ Қ қ Ң ң Ө ө Ұ ұ Ү ү Һ һ І і</p>

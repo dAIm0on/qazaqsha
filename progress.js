@@ -20,10 +20,23 @@
    if(obj(raw.grammarPath)){
      const g=raw.grammarPath;
      state.grammarPath={topicId:typeof g.topicId==='string'?g.topicId:null,step:Math.max(0,Number(g.step)||0),phase:typeof g.phase==='string'?g.phase:'hub',queue:Array.isArray(g.queue)?g.queue.filter(safe).slice(0,40):[],index:Math.max(0,Number(g.index)||0),peeks:obj(g.peeks)?g.peeks:Object.create(null),fails:obj(g.fails)?g.fails:Object.create(null),passed:obj(g.passed)?g.passed:Object.create(null),blocked:!!g.blocked,completed:Array.isArray(g.completed)?g.completed.filter(safe).slice(0,40):[],lessonId:typeof g.lessonId==='string'?g.lessonId:null,chapterId:typeof g.chapterId==='string'?g.chapterId:null,beat:Math.max(0,Number(g.beat)||0),completedChapters:obj(g.completedChapters)?g.completedChapters:Object.create(null),legacyCompleted:Array.isArray(g.legacyCompleted)?g.legacyCompleted.concat(Array.isArray(g.completed)?g.completed:[]).filter(safe).slice(0,80):Array.isArray(g.completed)?g.completed.filter(safe):[]};
+     const d=g.pathDraft;
+     if(obj(d)&&typeof d.value==='string')state.grammarPath.pathDraft={lessonId:typeof d.lessonId==='string'?d.lessonId.slice(0,20):null,chapterId:typeof d.chapterId==='string'?d.chapterId.slice(0,80):null,beat:Math.max(0,Math.floor(Number(d.beat)||0)),value:d.value.slice(0,400)};
+     if(typeof g.canonShownFor==='string')state.grammarPath.canonShownFor=g.canonShownFor.slice(0,80);
    }
+   state.explainDepth=Object.create(null);
+   if(obj(raw.explainDepth)){
+     for(const [k,v] of Object.entries(raw.explainDepth)){
+       if(!safe(k)||(v!=='open'&&v!=='closed'))continue;
+       state.explainDepth[k.slice(0,40)]=v;
+       if(Object.keys(state.explainDepth).length>=40)break;
+     }
+   }
+   if(obj(raw.place)&&['path','practice','homework'].includes(raw.place.surface)&&typeof raw.place.lessonId==='string')state.place={surface:raw.place.surface,lessonId:raw.place.lessonId.slice(0,20),mode:typeof raw.place.mode==='string'?raw.place.mode.slice(0,40):null};
+   if(obj(raw.rulesDraft)&&typeof raw.rulesDraft.value==='string'&&raw.rulesDraft.value)state.rulesDraft={article:typeof raw.rulesDraft.article==='string'?raw.rulesDraft.article.slice(0,40):'',value:raw.rulesDraft.value.slice(0,400)};
    if(obj(raw.homeworkAttempts))state.homeworkAttempts=dictionary(raw.homeworkAttempts,(a,lesson)=>{
      if(!obj(a))return undefined;
-     const items=Array.isArray(a.items)?a.items.filter(it=>obj(it)&&safe(it.id)).map(it=>({id:it.id,answers:Array.isArray(it.answers)?it.answers.slice(0,20).map(x=>String(x).slice(0,300)):[],correct:!!it.correct,rule_peek:!!it.rule_peek,answer_peek:!!it.answer_peek,skipped:!!it.skipped,expected:typeof it.expected==='string'?it.expected.slice(0,300):'',at:Number(it.at)||0,status:typeof it.status==='string'?it.status.slice(0,40):''})): [];
+     const items=Array.isArray(a.items)?a.items.filter(it=>obj(it)&&safe(it.id)).map(it=>({id:it.id,answers:Array.isArray(it.answers)?it.answers.slice(0,20).map(x=>String(x).slice(0,300)):[],correct:!!it.correct,rule_peek:!!it.rule_peek,answer_peek:!!it.answer_peek,skipped:!!it.skipped,expected:typeof it.expected==='string'?it.expected.slice(0,300):'',at:Number(it.at)||0,status:typeof it.status==='string'?it.status.slice(0,40):'',event_id:typeof it.event_id==='string'?it.event_id.slice(0,120):''})): [];
      const previous=Array.isArray(a.previous)?a.previous.filter(obj).slice(-30):[];
      return {lessonId:safe(a.lessonId)?a.lessonId:lesson,started_at:Number(a.started_at)||0,items,rule_peeks:Math.max(0,Number(a.rule_peeks)||0),answer_peeks:Math.max(0,Number(a.answer_peeks)||0),submitted_at:Number(a.submitted_at)||null,export_rev:Math.max(0,Number(a.export_rev)||0),cursor:typeof a.cursor==='string'?a.cursor.slice(0,80):null,checklist:obj(a.checklist)?a.checklist:{method:false,exercises:false,words:false,external_test:false,keyboard:false,cheat:false},previous};
    });
@@ -40,7 +53,34 @@
    state.session=obj(raw.session)?raw.session:null;
    if(obj(raw.repair)&&typeof raw.repair.rule_id==='string')state.repair={rule_id:raw.repair.rule_id.slice(0,80),started:String(raw.repair.started||''),quiet_until:Number(raw.repair.quiet_until)||0,roots_used:Array.isArray(raw.repair.roots_used)?raw.repair.roots_used.filter(x=>typeof x==='string').slice(0,8):[],attempts:Math.max(0,Number(raw.repair.attempts)||0),blinds:Math.max(0,Number(raw.repair.blinds)||0)};
    if(obj(raw.savings))state.savings=dictionary(raw.savings,v=>Math.max(0,Math.floor(Number(v)||0)));
+   if(obj(raw.aiTutor))state.aiTutor=tidyTutor(raw.aiTutor);
    return state;
+ }
+ function tidyTutor(raw){
+   const errors=Object.create(null);
+   if(obj(raw.errors))for(const [k,v] of Object.entries(raw.errors)){
+     if(!safe(k)||!obj(v))continue;
+     const code=k.slice(0,80);
+     errors[code]={error_code:code,rule_id:typeof v.rule_id==='string'?v.rule_id.slice(0,40):'',lesson_id:typeof v.lesson_id==='string'?v.lesson_id.slice(0,20):'',count_total:Math.max(0,Math.floor(Number(v.count_total)||0)),count_recent:Math.max(0,Math.floor(Number(v.count_recent)||0)),last_seen:typeof v.last_seen==='string'?v.last_seen.slice(0,40):null,last_exercise_ids:Array.isArray(v.last_exercise_ids)?v.last_exercise_ids.filter(safe).slice(0,6):[],hint_count_recent:Math.max(0,Math.floor(Number(v.hint_count_recent)||0)),successful_retrievals_after_error:Math.max(0,Math.floor(Number(v.successful_retrievals_after_error)||0)),remediation_due:!!v.remediation_due};
+   }
+   const recent=Array.isArray(raw.recent)?raw.recent.filter(obj).slice(-80).map(e=>({code:typeof e.code==='string'?e.code.slice(0,80):null,at:Number(e.at)||0,correct:!!e.correct,hinted:!!e.hinted,id:safe(e.id)?e.id:''})):[];
+   return {errors,recent};
+ }
+ function mergeTutor(a,b){
+   if(!a)return b||null;
+   if(!b)return a;
+   const errors=Object.assign(Object.create(null),a.errors||{});
+   for(const [k,v] of Object.entries(b.errors||{})){
+     const old=errors[k];
+     if(!old||(v.count_total||0)>=(old.count_total||0))errors[k]=v;
+   }
+   const recent=[],seen=new Set();
+   for(const e of [...(a.recent||[]),...(b.recent||[])].sort((x,y)=>(x.at||0)-(y.at||0))){
+     const id=String(e.at||0)+'|'+String(e.code||'')+'|'+String(e.id||'');
+     if(seen.has(id))continue;
+     seen.add(id);recent.push(e);
+   }
+   return {errors,recent:recent.slice(-80)};
  }
  function serialize(state){return JSON.stringify({app:'qazaq-trainer',schema:6,exported_at:new Date().toISOString(),policy_version:cfg.version,scheduler_config:{implementation:cfg.algorithm,desired_retention:cfg.fsrs.desired_retention,standard_weights:true},...state});}
  function validate(text,knownIds,now=Date.now()){
@@ -92,6 +132,7 @@
      const map=new Map([...(out.issueLog||[]),...incoming.issueLog].map(x=>[String(x.at)+'|'+String(x.note||'').slice(0,80),x]));
      out.issueLog=[...map.values()].sort((a,b)=>a.at-b.at).slice(-80);
    }
+   if(incoming.aiTutor||out.aiTutor)out.aiTutor=mergeTutor(out.aiTutor,obj(incoming.aiTutor)?tidyTutor(incoming.aiTutor):null);
    return out;
  }
  function memoryStats(state,now=Date.now()){
@@ -127,7 +168,7 @@
    q.fields.forEach((f,i)=>{
      const expected=core.normalize(f.answers[0],f.kind),actual=core.normalize(answers[i],f.kind);
      if(result.parts[i]){
-       for(const pair of Object.values(state.confusions))if([pair.expected_answer,pair.wrong_answer_given].includes(expected)){
+       for(const pair of Object.values(state.confusions))if([pair.expected_answer,pair.wrong_answer_given].includes(expected)&&samePair(q,pair)){
          pair.successes[expected]=Math.min(2,(pair.successes[expected]||0)+1);
          pair.resolved=(pair.successes[pair.expected_answer]||0)>=2&&(!pair.known_alternative||(pair.successes[pair.wrong_answer_given]||0)>=2);
        }
@@ -143,14 +184,24 @@
    if(ordered.length>cfg.confusion.maxPairs)state.confusions=Object.fromEntries(ordered.slice(0,cfg.confusion.maxPairs));
  }
  function pairs(state){return Object.entries(state.confusions).filter(([,p])=>p.confusion_count>=cfg.confusion.minCount&&!p.resolved).sort((a,b)=>b[1].confusion_count-a[1].confusion_count);}
- function contrastIds(pair,index,questions){
-   const a=[...(index.get(pair.expected_answer)||[])],b=pair.known_alternative?[...(index.get(pair.wrong_answer_given)||[])]:[];
-   const byId=new Map(questions.map(q=>[q.id,q]));
-   const small=ids=>ids.filter(id=>byId.has(id)).sort((x,y)=>byId.get(x).fields.length-byId.get(y).fields.length);
-   const left=small([...new Set([...pair.card_ids,...a])]),right=small(b),out=[];
-   for(let i=0;i<Math.max(left.length,right.length);i++){if(left[i]&&!out.includes(left[i]))out.push(left[i]);if(right[i]&&!out.includes(right[i]))out.push(right[i]);if(out.length>=cfg.session.size)break;}
-   return out.slice(0,cfg.session.size);
+ const PAIR_WORDS=[['алты','алпыс'],['жеті','жетпіс'],['сегіз','сексен'],['тоғыз','тоқсан'],['сен','сіз'],['сың','сыз']];
+ function pairWordsOf(q){
+   const t=((q&&q.stimulus||'')+' '+((q&&q.fields)||[]).flatMap(f=>f.answers||[]).join(' ')+' '+(q&&q.title||'')).toLowerCase();
+   const has=w=>new RegExp('(?:^|[^\\p{L}])'+w+'(?:$|[^\\p{L}])','iu').test(t);
+   for(const [a,b] of PAIR_WORDS){if(has(b)||has(a))return [a,b];}
+   return null;
  }
- const api={empty,migrate,serialize,validate,merge,answerIndex,observeConfusions,pairs,contrastIds,memoryStats};
+ function samePair(q,pair){
+   if(!q||!pair)return false;
+   if((pair.card_ids||[]).includes(q.id))return true;
+   const words=pairWordsOf(q);
+   return !!(words&&words.includes(pair.expected_answer)&&words.includes(pair.wrong_answer_given));
+ }
+ function contrastIds(pair,index,questions){
+   const byId=new Map(questions.map(q=>[q.id,q]));
+   const ids=questions.filter(q=>samePair(q,pair)&&byId.has(q.id)).map(q=>q.id);
+   return [...new Set(ids)].slice(0,cfg.session.size);
+ }
+ const api={empty,migrate,serialize,validate,merge,answerIndex,observeConfusions,pairs,contrastIds,samePair,memoryStats};
  if(node)module.exports=api;else root.ProgressStore=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -14,6 +14,10 @@ function create(api){
  function currentId(){
   const Bank=window.ExplainBankUI;
   const list=Bank?Bank.COURSE:[];
+  if(api.currentCourse){
+   const id=api.currentCourse();
+   if(id&&list.some(c=>c.id===id))return id;
+  }
   const gp=api.grammarPath?api.grammarPath():{};
   if(gp.lessonId&&list.some(c=>c.id===gp.lessonId))return gp.lessonId;
   for(const c of list){
@@ -22,6 +26,7 @@ function create(api){
   }
   return list[0]&&list[0].id||'1-1';
  }
+ let picked='';
  function render(){
   const Bank=window.ExplainBankUI;
   const list=Bank?Bank.COURSE:[];
@@ -30,11 +35,23 @@ function create(api){
   const G=window.GrammarPath;
   const les=G&&G.lesson(id);
   const p=progressOf(id);
+  const gpNow=api.grammarPath?api.grammarPath():{};
+  const openCh=les&&les.chapters&&gpNow.lessonId===id&&gpNow.chapterId?les.chapters.find(c=>c.id===gpNow.chapterId):null;
   const chIndex=les&&les.chapters&&p.done<les.chapters.length?p.done:0;
-  const ch=les&&les.chapters?les.chapters[Math.min(chIndex,les.chapters.length-1)]:null;
+  const ch=openCh||(les&&les.chapters?les.chapters[Math.min(chIndex,les.chapters.length-1)]:null);
   const chTitle=ch&&Bank?Bank.chapterTitle(ch):(ch&&ch.title)||'';
   const cta=p.all?'Повторить урок':(p.started?'Продолжить урок':'Начать урок');
-  const prog=p.n?('Глава '+(Math.min(p.done+1,p.n))+' из '+p.n):'';
+  const chPos=ch&&les&&les.chapters?Math.max(0,les.chapters.findIndex(c=>c.id===ch.id)):p.done;
+  const prog=p.n?('Глава '+(Math.min(chPos+1,p.n))+' из '+p.n):'';
+  const ruleId=cur&&cur.rules&&cur.rules[0];
+  const ruleCard=ruleId&&window.ExplainBank&&window.ExplainBank.byId?window.ExplainBank.byId(ruleId):null;
+  const ruleBlock=ruleId&&window.ExplainOpen?'<div class="panel"><h2>Правило этого урока</h2><p>'+esc(ruleCard&&ruleCard.title||'')+'</p>'+window.ExplainOpen.openButton(ruleId)+'</div>':'';
+  const lessonWords=(window.CURRICULUM&&window.CURRICULUM.words||[]).filter(w=>w.lesson_first_seen===id);
+  const mustWords=lessonWords.filter(w=>w.target_or_context==='target');
+  const metWords=lessonWords.filter(w=>w.target_or_context!=='target');
+  const wordLine=list=>list.length?'<p lang="kk">'+list.map(w=>esc(w.kazakh)).join(' · ')+'</p>':'<p class="small">В этом уроке таких слов нет.</p>';
+  const wordBlock=lessonWords.length?'<div class="panel"><h2>Слова этого урока</h2><p class="small">Те же слова словаря. Нового списка нет.</p><h3>Задано выучить</h3>'+wordLine(mustWords)+'<h3>Встречается в объяснении</h3>'+wordLine(metWords)+'</div>':'';
+  const subjects=[['','Этот урок'],['numbers','Числа'],['plural','Окончания'],['vocab','Слова'],['person','Лица'],['phrase','Фразы']];
   $('#learn-content').innerHTML=
    '<article class="panel learn-now">'+
     '<p class="eyebrow">ТЕКУЩИЙ УРОК</p>'+
@@ -52,22 +69,64 @@ function create(api){
       '<span class="small">'+esc(mark)+'</span></button>';
     }).join('')+
    '</div></div>'+
-   '<div class="panel compact-panel learn-secondary"><p class="small">Дополнительно</p>'+
+   '<div class="panel"><h2>Предмет</h2><div class="review-actions">'+subjects.map(([key,label])=>'<button type="button" class="secondary-button" data-subject="'+esc(key)+'"'+(picked===key?' aria-pressed="true"':'')+'>'+esc(label)+'</button>').join('')+'</div></div>'+
+   tracksMarkup(id)+
+   ruleBlock+wordBlock+
+   '<div class="panel compact-panel learn-secondary"><p class="small">Тот же урок: практика и домашка</p>'+
     '<div class="review-actions">'+
      '<button type="button" class="secondary-button" id="learn-practice">Практика этого урока</button>'+
      '<button type="button" class="text-button" id="learn-homework">Домашка</button>'+
     '</div></div>';
   const go=$('#learn-continue');
-  if(go)go.onclick=()=>api.openPath?api.openPath(id):api.startCourse(id);
+  if(go)go.onclick=()=>api.continueStep?api.continueStep():(api.openPath?api.openPath(id):api.startCourse(id));
   document.querySelectorAll('[data-learn-les]').forEach(b=>b.onclick=()=>{
    if(api.openPath)api.openPath(b.dataset.learnLes);
   });
+  document.querySelectorAll('[data-track]').forEach(b=>{
+   if(b.disabled)return;
+   b.onclick=()=>{if(api.startLesson)api.startLesson(b.dataset.track);};
+  });
   const pr=$('#learn-practice');if(pr)pr.onclick=()=>api.startCourse(id);
   const hw=$('#learn-homework');if(hw)hw.onclick=()=>{if(api.openHomework)api.openHomework(id);else api.today();};
+  document.querySelectorAll('[data-subject]').forEach(b=>b.onclick=()=>{picked=b.dataset.subject||'';render();});
+  if(window.ExplainOpen&&window.ExplainOpen.bind)window.ExplainOpen.bind($('#learn-content'));
   if(window.TutorUI){
    window.TutorUI.setContext({surface:'learn',lesson_id:id,rule_id:cur&&cur.rules[0]});
    window.TutorUI.syncView('learn');
   }
+ }
+ function numberOpen(lesson){
+  if(!lesson||lesson.topic!=='numbers'||!window.NumberLadder)return true;
+  const full=api.progress?api.progress():{records:{}};
+  const ids=new Set(lesson.questionIds||[]);
+  const mine=(window.COURSE&&window.COURSE.questions||[]).filter(q=>ids.has(q.id));
+  if(!mine.length)return true;
+  return mine.some(q=>window.NumberLadder.allowed(q,full));
+ }
+ function tracksFor(lessonId){
+  const all=window.LEARNING&&window.LEARNING.lessons||[];
+  return all.filter(l=>l&&(l.courseLesson===lessonId||l.courseLesson==='bank'));
+ }
+ function tracksMarkup(lessonId){
+  const TOPIC={sounds:'Звуки',vocab:'Слова',numbers:'Числа',plural:'Окончания',person:'Лица',rules:'Правила',phrase:'Фразы',possessive:'Притяжательность'};
+  const all=window.LEARNING&&window.LEARNING.lessons||[];
+  const rows=picked?all.filter(l=>l&&l.topic===picked):tracksFor(lessonId);
+  const heading=picked?(TOPIC[picked]||'Ступени'):'Ступени этого урока';
+  if(!rows.length)return '';
+  const groups=new Map();
+  for(const l of rows){
+   const key=l.topic||'other';
+   if(!groups.has(key))groups.set(key,[]);
+   groups.get(key).push(l);
+  }
+  const body=[...groups.entries()].map(([topic,list])=>{
+   const buttons=list.map(l=>{
+    const open=numberOpen(l);
+    return '<button type="button" class="secondary-button" data-track="'+esc(l.id)+'"'+(open?'':' disabled')+'>'+esc(l.title)+(open?'':' · сначала меньшие числа')+'</button>';
+   }).join('');
+   return '<p class="small">'+esc(TOPIC[topic]||topic)+'</p><div class="review-actions">'+buttons+'</div>';
+  }).join('');
+  return '<div class="panel learn-tracks"><h2>'+esc(heading)+'</h2><p class="small">Те же короткие дорожки, что уже есть в курсе. Новых уроков здесь нет.</p>'+body+'</div>';
  }
  function selectLesson(id){if(api.openPath)api.openPath(id);}
  return {render,selectLesson};

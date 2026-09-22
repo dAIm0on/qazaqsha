@@ -46,7 +46,7 @@
    const row=bank().courseById(lesson_id);
    rule_id=row&&row.rules&&row.rules[0]||'';
   }
-  ctx={surface:next.surface||ctx.surface||'learn',lesson_id,chapter_id,rule_id};
+  ctx={surface:next.surface||ctx.surface||'learn',lesson_id,chapter_id,rule_id,user_answer:next.user_answer!=null?String(next.user_answer).slice(0,400):'',expected_answer:next.expected_answer!=null?String(next.expected_answer).slice(0,400):'',codes:Array.isArray(next.codes)?next.codes.filter(x=>typeof x==='string').slice(0,8):[]};
   const now=ctx.lesson_id+':'+ctx.chapter_id+':'+ctx.rule_id;
   if(now!==prev){tail=[];exampleIndex=0;}
  }
@@ -114,13 +114,15 @@
  }
  function dummyQ(){
   const c=card()||{};
-  return {id:'tutor:'+ctx.surface+':'+ctx.lesson_id+':'+(ctx.chapter_id||''),lessonId:ctx.lesson_id,title:c.title||'',stimulus:'',fields:[{answers:['']}],ruleIds:[ctx.rule_id].filter(Boolean)};
+  return {id:'tutor:'+ctx.surface+':'+ctx.lesson_id+':'+(ctx.chapter_id||''),lessonId:ctx.lesson_id,title:c.title||'',stimulus:ctx.user_answer||'',fields:[{answers:[ctx.expected_answer||'']}],ruleIds:[ctx.rule_id].filter(Boolean)};
  }
  function extra(more){
   return Object.assign({
    surface:ctx.surface==='learn'?'learn':(ctx.surface||'path'),
    lesson_id:ctx.lesson_id,
-   codes:[],
+   codes:ctx.codes||[],
+   user_answer:ctx.user_answer||'',
+   is_correct:false,
    conversation_tail:tail.slice()
   },more||{});
  }

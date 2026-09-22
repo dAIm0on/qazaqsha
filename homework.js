@@ -67,9 +67,11 @@
    return '';
  }
  function canonicalRuleId(q){
-   if(!q||!(q.phase2b||q.phase3))return '';
+   if(!q)return '';
+   const phase=q.phase3||q.phase2b;
+   if(!phase)return '';
    const bank=explainBank(),ids=q.ruleIds||[];
-   const type=String(q.phase2b.error_type||'');
+   const type=String(phase.error_type||'');
    const preferred=/question/.test(type)?'T10_QUESTION':/emes/.test(type)?'T7_EMES':/plural_after_numeral/.test(type)?'T4_NO_PLURAL_AFTER_NUMBER':'';
    if(preferred&&ids.includes(preferred)&&bank&&bank.byId&&bank.byId(preferred))return preferred;
    return ids.find(id=>bank&&bank.byId&&bank.byId(id))||'';
@@ -199,7 +201,7 @@
  }
  function recordItem(state,lessonId,payload,now=Date.now()){
    const attempt=ensureAttempt(state,lessonId,now);
-   const item={id:payload.id,answers:payload.answers||[],correct:!!payload.correct,rule_peek:!!payload.rule_peek,answer_peek:!!payload.answer_peek,skipped:!!payload.skipped,expected:payload.expected||'',at:now,status:''};
+   const item={id:payload.id,answers:payload.answers||[],correct:!!payload.correct,rule_peek:!!payload.rule_peek,answer_peek:!!payload.answer_peek,skipped:!!payload.skipped,expected:payload.expected||'',at:now,status:'',event_id:typeof payload.event_id==='string'?payload.event_id.slice(0,120):''};
    item.status=statusOf(item);
    const idx=attempt.items.findIndex(x=>x.id===item.id);
    if(idx>=0)attempt.items[idx]=item;else attempt.items.push(item);
@@ -362,26 +364,37 @@
      b.n++;b.days.add(new Date(at).toISOString().slice(0,10));if(at>=b.lastAt){b.lastAt=at;b.expected=expected||b.expected;b.actual=actual||b.actual;b.cardId=cardId||b.cardId;}
      b.target=b.target||target;
    }
+   const seen=new Set();
+   function markSeen(id,card,at){
+     if(id)seen.add('id:'+id);
+     if(card&&at)seen.add('at:'+card+'@'+at);
+   }
+   function already(id,card,at){
+     if(id&&seen.has('id:'+id))return true;
+     if(card&&at&&seen.has('at:'+card+'@'+at))return true;
+     return false;
+   }
    for(const e of state.events||[]){
      if(e.at<cutoff||e.type!=='answer')continue;
      const q=byId.get(e.card_id);
-     if(e.confusion_tag==='lexical_confuse'||e.confuse_pair_id){
+     if(firstTryFail(e)&&(e.confusion_tag==='lexical_confuse'||e.confuse_pair_id)){
        const pair=e.confuse_pair_id==='lex-0'?'confuse:алты_алпыс':('confuse:'+(e.confuse_pair_id||'pair'));
        add(pair,e.at,e.expected_answer,(e.answers||[])[0],e.card_id,true);
      }
-     if(!firstTryFail(e))continue;
+     if(!firstTryFail(e)){markSeen(e.id,e.card_id,e.at);continue;}
      const key=weaknessKey(e,q);
-     add(key,e.at,(q&&q.fields&&q.fields[0]&&q.fields[0].answers[0])||'',(e.answers||[])[0],e.card_id,isTargetKey(key,targetWords));
+     add(key,e.at,(q&&q.fields&&q.fields[0]&&q.fields[0].answers[0])||e.expected_answer||'',(e.answers||[])[0],e.card_id,isTargetKey(key,targetWords));
+     markSeen(e.id,e.card_id,e.at);
    }
    for(const attempt of Object.values(state.homeworkAttempts||{})){
      const list=[attempt,...(attempt.previous||[])];
      for(const a of list)for(const it of a.items||[]){
-       if(it.at<cutoff)continue;
+       if(it.at<cutoff||it.status!=='ошибка')continue;
+       if(already(it.event_id,it.id,it.at))continue;
        const q=byId.get(it.id);
-       if(it.status==='ошибка'){
-         const key=weaknessKey({type:'answer',card_id:it.id,answers:it.answers,first_try_correct:0,correct:false},q);
-         add(key,it.at,it.expected,(it.answers||[])[0],it.id,isTargetKey(key,targetWords));
-       }
+       const key=weaknessKey({type:'answer',card_id:it.id,answers:it.answers,first_try_correct:0,correct:false},q);
+       add(key,it.at,it.expected,(it.answers||[])[0],it.id,isTargetKey(key,targetWords));
+       markSeen(it.event_id,it.id,it.at);
      }
    }
    const out=[];

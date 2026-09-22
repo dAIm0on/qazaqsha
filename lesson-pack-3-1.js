@@ -7,12 +7,12 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
   "sources": {
     "m31": {
       "title": "Методичка 3–1 · притяжательные формы",
-      "url": "https://qazaqsha.pages.dev/",
+      "url": "https://drive.google.com/file/d/1B2c2UJKpvBvty-LhSlkoC8ubPGZC9-aQ/view",
       "lesson_id": "3-1"
     },
     "hw31": {
       "title": "Слова домашней работы 3–1",
-      "url": "https://qazaqsha.pages.dev/",
+      "url": "https://drive.google.com/file/d/1B2c2UJKpvBvty-LhSlkoC8ubPGZC9-aQ/view",
       "lesson_id": "3-1"
     }
   },

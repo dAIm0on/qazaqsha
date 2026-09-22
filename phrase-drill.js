@@ -55,21 +55,53 @@
   const unseen=vars.some(q=>!seen.has(q.id));
   return (weakHit?4:0)+(unseen?2:0);
  }
+ function rulesApi(){
+  if(node){if(!rulesApi.mod){try{rulesApi.mod=require('./ai-rules.js');}catch{rulesApi.mod=null;}}return rulesApi.mod;}
+  return root.AiRules||null;
+ }
+ function tutorApi(){
+  if(node){if(!tutorApi.mod){try{tutorApi.mod=require('./ai-tutor.js');}catch{tutorApi.mod=null;}}return tutorApi.mod;}
+  return root.AiTutor||null;
+ }
+ function cardHits(q,weak){
+  if(!q||!weak||!weak.size)return false;
+  const bits=[];
+  const add=x=>{if(typeof x==='string'&&x)bits.push(x);};
+  (q.errorTargets||[]).forEach(add);
+  if(q.phase2b)add(q.phase2b.error_type);
+  if(q.phase3)add(q.phase3.error_type);
+  (q.ruleIds||[]).forEach(add);
+  const T=tutorApi();
+  if(T&&T.mapDiag){
+   if(q.phase3&&q.phase3.error_type)add(T.mapDiag(q.phase3.error_type,'',''));
+   if(q.phase2b&&q.phase2b.error_type)add(T.mapDiag(q.phase2b.error_type,'',''));
+  }
+  const R=rulesApi();
+  if(R&&R.byId)for(const id of q.ruleIds||[]){const card=R.byId(id);if(card&&card.error_codes)card.error_codes.forEach(add);}
+  return bits.some(x=>weak.has(x));
+ }
+ function byWeak(list,weak,seen,random){
+  return shuffled(list,random).sort((a,b)=>{
+   const d=Number(cardHits(b,weak))-Number(cardHits(a,weak));
+   if(d)return d;
+   return Number(!seen.has(b.id))-Number(!seen.has(a.id));
+  });
+ }
  function session(lessonId,opts={}){
   const catalog=opts.catalog||(typeof window!=='undefined'?window.CURRICULUM:null);
   if(lessonId==='3-1'){
    if(!lesson31Open(catalog))return [];
-   const random=typeof opts.random==='function'?opts.random:Math.random,seen=new Set(opts.seen_ids||[]);
+   const random=typeof opts.random==='function'?opts.random:Math.random,seen=new Set(opts.seen_ids||[]),weak=weaknessKeys(opts.error_profile);
    const cards=forLesson('3-1',catalog),requested=Math.max(2,Math.floor(Number(opts.count)||12)),count=Math.min(requested,cards.length);
-   const byDir=dir=>shuffled(cards.filter(q=>q.title===dir),random).sort((a,b)=>Number(!seen.has(b.id))-Number(!seen.has(a.id)));
+   const byDir=dir=>byWeak(cards.filter(q=>q.title===dir),weak,seen,random);
    const ruCount=Math.ceil(count/2),kkCount=count-ruCount;
    return shuffled([...byDir('RU → KK').slice(0,ruCount),...byDir('KK → RU').slice(0,kkCount)],random);
   }
   if(lessonId==='3-2'){
    if(!lesson32Open(catalog))return [];
-   const random=typeof opts.random==='function'?opts.random:Math.random,seen=new Set(opts.seen_ids||[]);
+   const random=typeof opts.random==='function'?opts.random:Math.random,seen=new Set(opts.seen_ids||[]),weak=weaknessKeys(opts.error_profile);
    const cards=forLesson('3-2',catalog),requested=Math.max(2,Math.floor(Number(opts.count)||24)),count=Math.min(requested,cards.length);
-   return shuffled(cards.slice(),random).sort((a,b)=>Number(!seen.has(b.id))-Number(!seen.has(a.id))).slice(0,count);
+   return byWeak(cards,weak,seen,random).slice(0,count);
   }
   if(!['1-2','1-3'].includes(lessonId))return [];
   const random=typeof opts.random==='function'?opts.random:Math.random;

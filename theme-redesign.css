@@ -56,7 +56,7 @@ a{color:var(--accent);text-underline-offset:3px}
   outline:3px solid var(--focus);outline-offset:3px
 }
 h1,h2,h3{color:var(--ink);letter-spacing:-.03em;font-family:var(--display);font-weight:600}
-h1{font-size:clamp(2rem,4vw,3.5rem);line-height:1.08;letter-spacing:-.04em;font-weight:700}
+h1{font-size:clamp(58px,15vw,104px);line-height:.9;letter-spacing:-.055em;font-weight:700}
 h2{font-size:clamp(1.35rem,2vw,2rem);line-height:1.16}
 h3{font-size:1.125rem;letter-spacing:-.02em}
 .eyebrow{display:flex;align-items:center;gap:8px;color:var(--muted);letter-spacing:.14em;font-size:.6875rem;font-weight:600}
@@ -117,7 +117,7 @@ body[data-view=practice] #practice-filter .jump-bar{display:flex!important;flex-
 #practice-filter-close{width:100%;margin-top:8px}
 
 /* Practice — calm, no hero, no photos */
-body[data-view=practice]{background:var(--paper)}
+body[data-view=practice]{background-color:var(--paper)}
 body[data-view=practice] .workspace{max-width:760px;padding-top:16px}
 body[data-view=practice] .site-footer{opacity:.72}
 .exercise-card{
@@ -165,12 +165,15 @@ input[id^="answer-"],
   box-shadow:0 -8px 18px rgba(22,20,18,.08)
 }
 html.keyboard-open body[data-view=practice] .practice-dock,
-body.keyboard-open[data-view=practice] .practice-dock{
+body.keyboard-open[data-view=practice] .practice-dock,
+body.keyboard-open[data-view=path] #path-form{
   position:fixed;left:0;right:0;bottom:var(--kbinset,0px);z-index:40;
   margin:0;max-height:calc(100dvh - var(--kbinset) - 96px);
   overflow:auto;border-top:1px solid var(--line);
+  background:var(--surface);
   border-radius:18px 18px 0 0;padding:8px 12px 10px
 }
+body.keyboard-open[data-view=path] .path-paper{padding-bottom:240px}
 body.keyboard-open[data-view=practice] .exercise-card{
   padding-bottom:calc(var(--dockh, 180px) + 12px)
 }
@@ -286,6 +289,12 @@ body.keyboard-open[data-view=rules] #rules-ask-panel{
 }
 .today-tiles .today-option:nth-child(1){background:var(--oil)}
 .today-tiles .today-option:nth-child(2){background:var(--lilac)}
+.hero-spot,.today-option.hero-spot{
+  background:var(--spot,#FF5A1F);color:#fff;border-color:transparent
+}
+.today-option.hero-spot span,
+.today-option.hero-spot strong,
+.today-option.hero-spot small{color:#fff}
 .today-actions .today-option{min-height:72px;padding:14px 16px}
 .today-actions button,.today-tiles button{
   border-radius:var(--radius);border:1px solid var(--line);min-height:88px;text-align:left;
@@ -298,6 +307,10 @@ body.keyboard-open[data-view=rules] #rules-ask-panel{
 .today-main:disabled{background:var(--surface-alt)!important;color:var(--muted)!important;border-color:var(--line)!important}
 .today-option{background:var(--surface);color:var(--ink);border-color:var(--line)!important}
 .today-option strong{font-family:var(--display);font-weight:600;font-size:2rem;color:var(--ink)}
+.today-option.hero-spot,
+.today-option.hero-spot span,
+.today-option.hero-spot strong,
+.today-option.hero-spot small{color:#fff}
 .today-actions small,.today-tiles small{color:var(--muted)}
 .today-collage{
   display:grid;grid-template-columns:1fr 1fr;grid-template-rows:126px 126px;gap:8px;
@@ -359,7 +372,11 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
 }
 .review-due h2{font-family:var(--display);font-weight:600;margin:8px 0 12px}
 .review-due .primary-button{width:100%}
-body[data-view=review]{background:var(--paper)}
+body[data-view=review]{background-color:var(--paper)}
+.review-empty{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:18px 20px;margin:0 0 16px;text-align:left}
+.review-label{margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.review-empty h2{font-family:var(--display);font-weight:600;margin:0 0 8px}
+.review-empty p{color:var(--muted);margin:0}
 .pair-strip-compact{gap:8px;margin:12px 0}
 .pair-strip-compact span{background:var(--surface);border:1px solid var(--line);color:var(--ink);font-size:.8125rem;padding:8px 10px;border-radius:12px}
 .rules-toc{display:grid;gap:8px;margin:0 0 24px}
@@ -406,8 +423,9 @@ body[data-view=practice] .issue-toggle{
 }
 #issue-dialog textarea{width:100%;min-height:96px;margin:8px 0;font:inherit}
 .bottom-nav{
-  background:var(--surface);border:1px solid var(--line);
-  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  background:rgba(255,250,244,.72);border:1px solid var(--line);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
   left:8px;right:8px;bottom:8px;width:auto;
   border-radius:20px;box-shadow:0 12px 40px rgba(22,20,18,.16);
   padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))
@@ -415,7 +433,7 @@ body[data-view=practice] .issue-toggle{
 :root{--bottom-nav-height:calc(64px + env(safe-area-inset-bottom, 0px))}
 .bottom-nav button{
   position:relative;color:var(--muted);border-radius:8px;
-  font-size:.625rem;line-height:1.15;min-height:52px;min-width:0;
+  font-size:.8125rem;line-height:1.15;min-height:52px;min-width:0;
   padding:6px 2px;white-space:normal;overflow:visible
 }
 .bottom-nav button[aria-current=page]{color:var(--ink);background:transparent;box-shadow:none;font-weight:700}
@@ -498,14 +516,6 @@ body[data-view=practice] .issue-toggle{
 .settings-dialog input[type=password]{
   width:100%;min-height:48px;margin-top:6px;font-size:max(16px,1rem)
 }
-.season-swatches{display:flex;gap:9px;margin:8px 0 0}
-.season-swatches button{width:44px;height:44px;border-radius:50%;border:2px solid transparent;padding:0}
-.season-swatches button[aria-pressed=true]{border-color:var(--ink)}
-.season-swatches .autumn{background:#161412}
-.season-swatches .summer{background:#DDD0F6}
-.season-swatches .spring{background:#F3E18A}
-.season-captions{display:flex;gap:9px;margin:8px 0 0;font-size:.8125rem;color:var(--ink);font-weight:550}
-.season-captions span{width:44px;text-align:center}
 .glyph-check{font-size:1.15rem;letter-spacing:.04em;overflow-wrap:anywhere;margin:12px 0 0}
 #account-form{display:flex;flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:0;min-height:0}
 .account-actions{position:sticky;bottom:0;background:var(--surface);padding-top:12px;display:grid;gap:8px}
@@ -570,7 +580,7 @@ body.keyboard-open #account-dialog{
 }
 @media(max-width:690px){
   .topbar{padding:8px 16px;min-height:56px}
-  h1{font-size:clamp(2.75rem,12vw,3.625rem);letter-spacing:-.045em;line-height:.95}
+  h1{font-size:clamp(58px,15vw,104px);letter-spacing:-.055em;line-height:.9}
   .today-hero{padding:0}
   .today-tiles,.today-actions,.today-lessons,.course-jump .review-actions{grid-template-columns:1fr 1fr;gap:8px}
   .exercise-card{margin-bottom:var(--bottom-nav-height,64px);border-radius:22px;box-shadow:none;overflow:visible}
@@ -616,10 +626,10 @@ body.keyboard-open #account-dialog{
   .micro-lesson .lesson-intro{margin:8px 0 12px}
 }
 @media(max-width:359px){
-  h1{font-size:1.95rem}
+  h1{font-size:58px;letter-spacing:-.055em;line-height:.9}
   .today-hero{padding:0}
   .workspace{padding-inline:16px}
-  .bottom-nav button{font-size:.5625rem;padding:6px 0}
+  .bottom-nav button{font-size:.75rem;padding:6px 0}
 }
 
 .learn-now{background:var(--lilac,#DDD0F6)}

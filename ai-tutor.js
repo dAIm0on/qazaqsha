@@ -14,6 +14,27 @@
   return {errors:Object.create(null),recent:[]};
  }
  function save(st){if(node)return;try{localStorage.setItem(KEY,JSON.stringify({v:1,errors:st.errors,recent:st.recent.slice(-80)}));}catch{}}
+ function snapshot(){
+  return JSON.parse(JSON.stringify({errors:store.errors,recent:(store.recent||[]).slice(-80)}));
+ }
+ function restore(data){
+  if(!data||typeof data!=='object')return snapshot();
+  const local=snapshot();
+  const incoming=data.errors||data.recent?data:{errors:{},recent:[]};
+  const errors=Object.assign({},local.errors||{});
+  for(const [k,v] of Object.entries(incoming.errors||{})){
+   const old=errors[k];
+   if(!old||(v.count_total||0)>=(old.count_total||0))errors[k]=v;
+  }
+  const recent=[],seen=new Set();
+  for(const e of [...(local.recent||[]),...(incoming.recent||[])].sort((a,b)=>(a.at||0)-(b.at||0))){
+   const id=String(e.at||0)+'|'+String(e.code||'')+'|'+String(e.id||'');
+   if(seen.has(id))continue;
+   seen.add(id);recent.push(e);
+  }
+  store.errors=errors;store.recent=recent.slice(-80);save(store);
+  return snapshot();
+ }
  let store=load();
  function mapDiag(type,expected,actual){
   if(type==='plural_after_numeral')return 'PLURAL_AFTER_NUMBER';
@@ -78,8 +99,12 @@
   store.recent.push({code:codes[0]||(result&&result.correct?'OK':null),at:now,correct:!!(result&&result.correct),hinted:!!hinted,id:q&&q.id});
   store.recent=store.recent.slice(-80);
   if(result&&result.correct&&!hinted){
+   const related=new Set();
+   for(const card of R.cardsFor(q,''))for(const code of card.error_codes||[])related.add(code);
+   const phase=q&&(q.phase3||q.phase2b);
+   if(phase&&phase.error_type)related.add(String(phase.error_type).toUpperCase());
    for(const rec of Object.values(store.errors)){
-    if(!rec||!rec.count_recent)continue;
+    if(!rec||!rec.count_recent||!related.has(rec.error_code))continue;
     rec.successful_retrievals_after_error=(rec.successful_retrievals_after_error||0)+1;
     if(rec.successful_retrievals_after_error>=2){rec.count_recent=Math.max(0,(rec.count_recent||0)-1);rec.remediation_due=false;rec.successful_retrievals_after_error=0;}
    }
@@ -162,8 +187,10 @@
   const expected=canonicalExpected(q,extra);
   const codes=extra.codes||[];
   const cards=R.cardsFor(q,codes[0]).slice(0,2);
+  const related=new Set((codes||[]).filter(Boolean));
+  for(const card of cards)for(const code of card.error_codes||[])related.add(code);
   const summary={};
-  for(const [k,v] of Object.entries(store.errors))if(v&&v.count_recent)summary[k]=v.count_recent;
+  for(const [k,v] of Object.entries(store.errors))if(v&&v.count_recent&&related.has(k))summary[k]=v.count_recent;
   const ctx=cards.map(toContext).filter(Boolean);
   return {
     mode,locale:'ru',
@@ -260,7 +287,8 @@
   VOCAB_RECALL:[{ru:'человек',kk:'адам',w:'адам'},{ru:'книга',kk:'кітап',w:'кітап'},{ru:'друг',kk:'дос',w:'дос'}]
  };
  function templateQuestions(code,now=Date.now()){
-  const rows=TEMPLATES[code]||TEMPLATES.PLURAL_AFTER_NUMBER;
+  const rows=TEMPLATES[code];
+  if(!rows)return [];
   const vocab=new Set(R.allowedVocab(C.ALLOWED_LESSONS).map(w=>w.toLowerCase()));
   return rows.slice(0,3).map((row,i)=>{
    const kk=row.kk,used=(row.w? [row.w,row.n]:kk.split(' ')).filter(Boolean);
@@ -276,11 +304,19 @@
    };
   }).filter(Boolean);
  }
+ const GAP_PHRASE='Отдельного упражнения для этой ошибки нет.';
+ function coverageGaps(){
+  return dueRemediation().filter(r=>!templateQuestions(r.error_code).length).map(r=>{
+   const name=label(r.error_code);
+   return {error_code:r.error_code,label:name===r.error_code?'':name,phrase:GAP_PHRASE};
+  });
+ }
  function takeRemediation(byId){
-  const due=dueRemediation()[0];if(!due)return [];
-  const items=templateQuestions(due.error_code);
+  const ready=dueRemediation().find(r=>templateQuestions(r.error_code).length);
+  if(!ready)return [];
+  const items=templateQuestions(ready.error_code);
   for(const q of items)if(byId&&q)byId.set(q.id,q);
-  due.remediation_due=false;save(store);
+  ready.remediation_due=false;save(store);
   return items;
  }
  function spliceRemediation(queue,position,ids){
@@ -309,6 +345,6 @@
  function hintLeaks(resp,expected){
   return C.containsExpected(resp,expected);
  }
- const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,localFallback,isLiveMessage,buildRequest,callTutor,askTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset};
+ const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,coverageGaps,localFallback,isLiveMessage,buildRequest,callTutor,askTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset,snapshot,restore};
  if(node)module.exports=api;else root.AiTutor=api;
 })(typeof window!=='undefined'?window:globalThis);
