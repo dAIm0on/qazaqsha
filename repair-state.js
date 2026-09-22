@@ -17,7 +17,7 @@
  }
  function splitRoots(ruleId){
   const keys=Object.keys(forms(ruleId));
-  if(keys.length<=2)return {day0:keys.slice(0,1),day10:keys.slice(1)};
+  if(keys.length<=2)return {day0:keys.slice(0,1),day10:keys.slice()};
   const cut=Math.max(1,keys.length-2);
   return {day0:keys.slice(0,cut),day10:keys.slice(cut)};
  }
@@ -28,7 +28,10 @@
  function day10Cards(ruleId,rootsUsed){
   const used=new Set(rootsUsed||[]);
   const table=forms(ruleId);
-  return splitRoots(ruleId).day10.filter(rootName=>table[rootName]&&!used.has(rootName)).slice(0,2).map(rootName=>card(ruleId,rootName,table[rootName]));
+  const planned=splitRoots(ruleId).day10.filter(rootName=>table[rootName]);
+  const fresh=planned.filter(rootName=>!used.has(rootName));
+  const roots=(fresh.length>=2||planned.length<2)?fresh:planned;
+  return roots.slice(0,2).map(rootName=>card(ruleId,rootName,table[rootName]));
  }
  function busy(state,now){
   const repair=state&&state.repair;

@@ -78,8 +78,12 @@
   store.recent.push({code:codes[0]||(result&&result.correct?'OK':null),at:now,correct:!!(result&&result.correct),hinted:!!hinted,id:q&&q.id});
   store.recent=store.recent.slice(-80);
   if(result&&result.correct&&!hinted){
+   const related=new Set();
+   for(const card of R.cardsFor(q,''))for(const code of card.error_codes||[])related.add(code);
+   const phase=q&&(q.phase3||q.phase2b);
+   if(phase&&phase.error_type)related.add(String(phase.error_type).toUpperCase());
    for(const rec of Object.values(store.errors)){
-    if(!rec||!rec.count_recent)continue;
+    if(!rec||!rec.count_recent||!related.has(rec.error_code))continue;
     rec.successful_retrievals_after_error=(rec.successful_retrievals_after_error||0)+1;
     if(rec.successful_retrievals_after_error>=2){rec.count_recent=Math.max(0,(rec.count_recent||0)-1);rec.remediation_due=false;rec.successful_retrievals_after_error=0;}
    }
@@ -260,7 +264,8 @@
   VOCAB_RECALL:[{ru:'человек',kk:'адам',w:'адам'},{ru:'книга',kk:'кітап',w:'кітап'},{ru:'друг',kk:'дос',w:'дос'}]
  };
  function templateQuestions(code,now=Date.now()){
-  const rows=TEMPLATES[code]||TEMPLATES.PLURAL_AFTER_NUMBER;
+  const rows=TEMPLATES[code];
+  if(!rows)return [];
   const vocab=new Set(R.allowedVocab(C.ALLOWED_LESSONS).map(w=>w.toLowerCase()));
   return rows.slice(0,3).map((row,i)=>{
    const kk=row.kk,used=(row.w? [row.w,row.n]:kk.split(' ')).filter(Boolean);
