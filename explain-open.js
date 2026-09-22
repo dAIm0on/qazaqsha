@@ -5,7 +5,7 @@
  const Bank=node?require('./explain-bank.js'):root.ExplainBank;
  const G=node?require('./grammar-chapters.js'):root.GRAMMAR_CHAPTERS;
  const L31=node?require('./lesson31-pack.js'):root.Lesson31Pack;
- const Full=node?require('./full-sources.js'):root.FullSources;
+ const Canon=node?require('./canon-texts.js'):root.CanonTexts;
  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
  function ruleIdOf(q){
   const ids=(q&&q.ruleIds)||[];
@@ -35,14 +35,62 @@
   }
   return bits.join('');
  }
+ function inlineMd(s){
+  let t=esc(s);
+  t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
+  t=t.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  return t;
+ }
+ function renderMd(src){
+  const lines=String(src||'').replace(/\r\n/g,'\n').split('\n');
+  let html='',list='',code=false,buf=[];
+  function close(){if(list){html+='</'+list+'>';list='';}}
+  function flush(){if(!buf.length)return;close();html+='<p>'+buf.map(inlineMd).join('<br>')+'</p>';buf=[];}
+  for(const line of lines){
+   if(line.trim().startsWith('```')){
+    if(code){html+='<pre><code>'+esc(buf.join('\n'))+'</code></pre>';buf=[];code=false;}
+    else{flush();code=true;}
+    continue;
+   }
+   if(code){buf.push(line);continue;}
+   if(!line.trim()){flush();continue;}
+   const h=line.match(/^(#{1,4})\s+(.*)$/);
+   if(h){flush();const n=Math.min(6,h[1].length+1);html+='<h'+n+'>'+inlineMd(h[2])+'</h'+n+'>';continue;}
+   if(/^---+$/.test(line.trim())){flush();html+='<hr>';continue;}
+   const ol=line.match(/^\d+\.\s+(.*)$/);
+   const ul=line.match(/^[-*]\s+(.*)$/);
+   if(ol||ul){
+    if(buf.length)flush();
+    const kind=ol?'ol':'ul';
+    if(list!==kind){close();html+='<'+kind+'>';list=kind;}
+    html+='<li>'+inlineMd((ol||ul)[1])+'</li>';
+    continue;
+   }
+   if(list)close();
+   buf.push(line);
+  }
+  if(code)html+='<pre><code>'+esc(buf.join('\n'))+'</code></pre>';
+  else flush();
+  close();
+  return html;
+ }
+ function canonHtml(ruleId){
+  const pack=Canon&&Canon.packFor&&Canon.packFor(ruleId);
+  if(!pack||!pack.docs||!pack.docs.length)return '';
+  const card=Bank&&Bank.byId&&Bank.byId(ruleId);
+  const head=card?'<section class="path-block"><p class="small">Карточка</p><p>'+esc(card.short||card.title||'')+'</p></section>':'';
+  const body=pack.docs.map(d=>'<section class="path-block" data-canon-doc="'+esc(d.id)+'"><h3>'+esc(d.title)+'</h3>'+renderMd(d.text)+'</section>').join('');
+  const src='<section class="path-block" data-canon-source><h3>Исходник</h3><ul>'+pack.docs.map(d=>'<li><a href="'+esc(d.url)+'" target="_blank" rel="noopener noreferrer">'+esc(d.title)+'</a></li>').join('')+'</ul></section>';
+  return '<div data-canon-lesson="'+esc(pack.lesson)+'">'+head+body+src+'</div>';
+ }
  function fullHtml(ruleId){
+  const canon=canonHtml(ruleId);
+  if(canon)return canon;
   const card=Bank&&Bank.byId&&Bank.byId(ruleId);
   if(!card)return '';
   const paras=text=>String(text||'').split(/\n{2,}/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('');
   const chapters=chaptersFor(ruleId).map(ch=>'<section class="path-block"><h3>'+esc(ch.title)+'</h3>'+beatBlocks(ch)+'</section>').join('');
-  const files=Full&&Full.forRule?Full.forRule(ruleId):[];
-  const links=files.length?'<section class="path-block" data-full-files><h3>Полный текст — файл</h3><p class="small">Ниже по-прежнему краткий вид банка. Файл не вставлен в банк. Номер в имени файла и номер правила банка — разные вещи.</p><ul>'+files.map(f=>'<li><a href="'+esc(f.url)+'" target="_blank" rel="noopener noreferrer">'+esc(f.title)+'</a>'+(f.note?' <span class="small">'+esc(f.note)+'</span>':'')+'</li>').join('')+'</ul></section>':'';
-  return links+'<section class="path-block"><h3>Сравни с русским</h3>'+paras(card.ru_refresh)+'</section>'
+  return '<section class="path-block"><h3>Сравни с русским</h3>'+paras(card.ru_refresh)+'</section>'
    +'<section class="path-block"><h3>Коротко</h3>'+paras(card.short)+'</section>'
    +'<section class="path-block"><h3>Как работает</h3>'+paras(card.medium)+'</section>'
    +(card.examples&&card.examples.length?'<section class="path-block"><h3>Примеры</h3><ul>'+card.examples.map(x=>'<li lang="kk">'+esc(x)+'</li>').join('')+'</ul></section>':'')
@@ -90,7 +138,7 @@
    ['G',L31.SESSION_G.length,'фразы в обе стороны']
   ];
   return '<section class="panel path-paper"><h2>Карта урока 3–1</h2>'
-   +'<p class="small">Полного конструктора «7 шагов, 8 рецептов» из S31 в репозитории нет. Ниже только то, что уже записано в банке и главах.</p>'
+   +'<p class="small">Конструктор «7 шагов, 8 рецептов» открывается в полном правиле урока. Круг A — не 15 слов методички.</p>'
    +'<h3>Схема</h3><p>'+esc(t20&&t20.short||'')+'</p>'
    +'<h3>Бар / жоқ, не емес</h3><p>'+esc(t22&&t22.short||'')+'</p>'
    +'<h3>Круги A–G</h3><ul>'+rows.map(([k,n,note])=>'<li>Круг '+k+': '+n+' заданий. '+esc(note)+'</li>').join('')+'</ul>'
