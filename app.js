@@ -592,14 +592,15 @@
  function openChapter(lessonId,chapterId){
    const G=window.GrammarPath;
    if(!G||!P.courseIds().includes(lessonId))return;
+   const lp=P.ensureLessonProgress(state,lessonId),changesResume=lp&&lp.status!=='completed';
    let gp=state.grammarPath;
    if(!gp||gp.lessonId!==lessonId)gp=loadLessonPath(lessonId);
    if(gp&&gp.lessonId===lessonId&&gp.chapterId===chapterId&&G.keepChapter(gp,lessonId)){
-     gp.phase='beat';markLessonStarted(lessonId,'path');markPlace('path',lessonId);save();renderPath();return;
+     gp.phase='beat';if(changesResume)markLessonStarted(lessonId,'path');markPlace('path',lessonId);save();renderPath();return;
    }
    captureDraft();persistLessonPath();
    G.startChapter(state,lessonId,chapterId);
-   markLessonStarted(lessonId,'path');markPlace('path',lessonId);save();renderPath();
+   if(changesResume)markLessonStarted(lessonId,'path');markPlace('path',lessonId);save();renderPath();
  }
  function openPathLesson(lessonId,options){
    const G=window.GrammarPath;if(!G){showView('path');return;}
