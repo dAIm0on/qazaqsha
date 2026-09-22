@@ -48,7 +48,7 @@
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
  let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),sessionUnaided=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null,hwSection=0,hwReturn=null,remediationNote='',retrying=false,rulesArticle=null;
- let tutorToken=0,tutorAbort=null;
+ let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null;
  function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
  function currentLessonId(q){
    if(q&&q.lessonId)return q.lessonId;
@@ -175,6 +175,7 @@
    return done;
  }
  function continueLesson(id){
+   viewOnlyPathLesson=null;
    const lp=P.ensureLessonProgress(state,id);
    if(lp&&lp.practiceSession&&restoreLessonPractice(id)){
      markLessonStarted(id,'practice');render();showView('practice');return;
@@ -384,6 +385,7 @@
  }
  function startCourse(block){
    if(!P.courseIds().includes(block))return;
+   viewOnlyPathLesson=null;
    persistLessonPractice();persistLessonPath();
    courseBlock=block;vocabRole=null;sourceFilter=null;activeLesson=null;activeStep=null;if(view!=='practice'&&view!=='exam')topic='all';
    if(restoreLessonPractice(block)){
@@ -592,7 +594,7 @@
  function openChapter(lessonId,chapterId){
    const G=window.GrammarPath;
    if(!G||!P.courseIds().includes(lessonId))return;
-   const lp=P.ensureLessonProgress(state,lessonId),changesResume=lp&&lp.status!=='completed';
+   const lp=P.ensureLessonProgress(state,lessonId),changesResume=viewOnlyPathLesson!==lessonId&&lp&&lp.status!=='completed';
    let gp=state.grammarPath;
    if(!gp||gp.lessonId!==lessonId)gp=loadLessonPath(lessonId);
    if(gp&&gp.lessonId===lessonId&&gp.chapterId===chapterId&&G.keepChapter(gp,lessonId)){
@@ -606,6 +608,7 @@
    const G=window.GrammarPath;if(!G){showView('path');return;}
    if(!P.courseIds().includes(lessonId))return;
    const meaningful=!!(options&&options.meaningful);
+   viewOnlyPathLesson=meaningful?null:lessonId;
    persistLessonPractice();persistLessonPath();
    const lp=P.ensureLessonProgress(state,lessonId);
    let gp=loadLessonPath(lessonId);
@@ -867,7 +870,7 @@
    const day0=core.isDay0Learning(rec,now);
    if(hinted||!result.correct)sessionUnaided[q.id]=0;
    else if(!hinted&&result.correct)sessionUnaided[q.id]=(sessionUnaided[q.id]||0)+1;
-   if(!homeworkMode&&(sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
+   if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
    const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);
    if(mate&&!result.correct&&!hinted){
      const other=questions.find(x=>x.id!==q.id&&window.MemoryPolicy.contrastSide(x)?.pair===mate.pair&&window.MemoryPolicy.contrastSide(x)?.side!==mate.side);
