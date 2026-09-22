@@ -9,7 +9,7 @@
    analytics:{retentionGapMs:86400000},
    remediation:{threshold:2,historyWindow:12,cleanToResolve:3,exerciseCount:4},
    confusion:{minCount:2,maxPairs:300},
-   storage:{schema:6,maxImportBytes:20000000,maxEvents:Infinity,maxAssociationLength:1200},
+   storage:{schema:7,maxImportBytes:20000000,maxEvents:Infinity,maxAssociationLength:1200},
    labels:{NEW:'Новое',LEARNING:'Изучается',FAMILIAR:'Знакомо',REMEMBERED:'Помню после паузы',MASTERED:'Устойчиво вспоминаю'}
  };
  if(typeof module!=='undefined'&&module.exports)module.exports=config;else root.TRAINER_CONFIG=config;

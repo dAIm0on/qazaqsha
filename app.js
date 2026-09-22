@@ -38,9 +38,9 @@
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
  let reviewReasonMap=Object.create(null),materialsQuery='',materialsLesson='',materialsKind='';
- const COURSE_BLOCKS=[{id:'1-1',title:'1–1',hint:'Звуки и первые слова'},{id:'1-2',title:'1–2',hint:'Окончания и десятки'},{id:'1-3',title:'1–3',hint:'Числа и новые слова'},{id:'2-1',title:'2–1',hint:'Мен, сен, сіз'},{id:'2-2',title:'2–2',hint:'Біз, сендер, сіздер'},{id:'2-3',title:'2–3',hint:'Ол, вопрос, порядковые'},{id:'3-1',title:'3–1',hint:'Притяжательные формы'},{id:'3-2',title:'3–2',hint:'Наш / ваш / их'}];
+ const COURSE_BLOCKS=(window.ExplainBankUI&&window.ExplainBankUI.COURSE||[]).map(row=>({id:row.id,title:row.label,hint:row.name}));
  function courseJumpMarkup(id){
-   return `<div class="course-jump" id="${id}"><p>Уроки 1–1…3–1</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}><span class="today-lesson-id">Урок ${b.title}</span><small>${esc(b.hint)}</small></button>`).join('')}</div></div>`;
+   return `<div class="course-jump" id="${id}"><p>Уроки 1–1…3–2</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}><span class="today-lesson-id">Урок ${b.title}</span><small>${esc(b.hint)}</small></button>`).join('')}</div></div>`;
  }
  function bindCourseJump(root){
    (root?root.querySelectorAll('[data-course]'):[]).forEach(b=>b.onclick=()=>startCourse(b.dataset.course));
@@ -48,7 +48,7 @@
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
  let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),sessionUnaided=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null,hwSection=0,hwReturn=null,remediationNote='',retrying=false,rulesArticle=null;
- let tutorToken=0,tutorAbort=null;
+ let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null;
  function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
  function currentLessonId(q){
    if(q&&q.lessonId)return q.lessonId;
@@ -116,6 +116,71 @@
      if(ask.value)state.rulesDraft={article:rulesArticle||'',value:ask.value.slice(0,400)};
      else if(state.rulesDraft&&(state.rulesDraft.article||'')===(rulesArticle||''))state.rulesDraft=null;
    }
+ }
+
+ function runtimePracticeLessonId(){
+   if(!['course','phrase','lesson','transfer','remediation'].includes(mode)||queue.length<=position)return null;
+   if(P.courseIds().includes(courseBlock))return courseBlock;
+   const l=activeLesson&&window.LEARNING.lessons.find(x=>x.id===activeLesson);
+   return l&&P.courseIds().includes(l.courseLesson)?l.courseLesson:null;
+ }
+ function runtimePracticeSnapshot(){
+   return {topic,mode,sourceFilter,courseBlock,queue:[...queue],position,answered:checked,view,activeLesson,activeStep,practiceIds:[...practiceIds],stepEvidence:{...stepEvidence},variants:{...variants},hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft:draft?JSON.parse(JSON.stringify(draft)):null,sessionAttempts,sessionCorrect,sessionAssisted,remediation:remediation?JSON.parse(JSON.stringify(remediation)):null};
+ }
+ function persistLessonPractice(id=runtimePracticeLessonId()){
+   if(!id)return null;
+   return P.saveLessonPractice(state,id,runtimePracticeSnapshot(),Date.now());
+ }
+ function restoreLessonPractice(id){
+   const lp=P.ensureLessonProgress(state,id),s=lp&&lp.practiceSession;
+   if(!s||!Array.isArray(s.queue)||s.queue.some(qid=>!byId.has(qid)))return false;
+   topic=s.topic||'all';mode=s.mode||'course';sourceFilter=s.sourceFilter||null;courseBlock=id;
+   activeLesson=s.mode==='lesson'?s.activeLesson||null:null;activeStep=s.activeStep==null?null:s.activeStep;
+   queue=[...s.queue];practiceIds=Array.isArray(s.practiceIds)?s.practiceIds.filter(qid=>byId.has(qid)):[...new Set(queue)];
+   stepEvidence=s.stepEvidence&&typeof s.stepEvidence==='object'?s.stepEvidence:{};variants=s.variants&&typeof s.variants==='object'?s.variants:{};
+   queueEpoch=typeof s.queueEpoch==='number'?s.queueEpoch:Date.now()+Math.random();presented=typeof s.presented==='string'?s.presented:null;
+   sessionAttempts=Math.max(0,Number(s.sessionAttempts)||0);sessionCorrect=Math.min(sessionAttempts,Math.max(0,Number(s.sessionCorrect)||0));sessionAssisted=Math.min(sessionAttempts-sessionCorrect,Math.max(0,Number(s.sessionAssisted)||0));
+   draft=s.draft&&Array.isArray(s.draft.answers)?s.draft:null;remediation=s.remediation||null;
+   position=Math.min(queue.length,Math.max(0,Number(s.position)||0)+(s.answered?1:0));checked=false;hinted=!s.answered&&!!s.hinted;elapsedMs=Number.isFinite(s.elapsed_ms)?Math.max(0,s.elapsed_ms):0;
+   return true;
+ }
+ function persistLessonPath(id){
+   const gp=state.grammarPath;if(!gp)return null;
+   const lessonId=id||gp.lessonId;if(!P.courseIds().includes(lessonId))return null;
+   return P.saveLessonPath(state,lessonId,gp,Date.now());
+ }
+ function loadLessonPath(id){
+   const G=window.GrammarPath;if(!G||!P.courseIds().includes(id))return null;
+   const gp=state.grammarPath||(state.grammarPath=G.emptyProgress());
+   G.migrateProgress(gp);
+   if(gp.lessonId&&gp.lessonId!==id)persistLessonPath(gp.lessonId);
+   const lp=P.ensureLessonProgress(state,id),p=lp&&lp.path;
+   gp.lessonId=id;gp.chapterId=p&&p.chapterId||null;gp.beat=Math.max(0,Number(p&&p.beat)||0);gp.phase=p&&['lesson','beat','done'].includes(p.phase)?p.phase:'lesson';
+   if(p&&p.pathDraft)gp.pathDraft=JSON.parse(JSON.stringify(p.pathDraft));else delete gp.pathDraft;
+   if(p&&p.canonShownFor)gp.canonShownFor=p.canonShownFor;else delete gp.canonShownFor;
+   return gp;
+ }
+ function markLessonStarted(id,surface){
+   return P.markLessonStarted(state,id,surface,Date.now());
+ }
+ function markLessonCompleted(id){
+   const cp=P.ensureCourseProgress(state),wasPrimary=cp.resumePointer&&cp.resumePointer.lessonId===id;
+   const done=P.markLessonCompleted(state,id,Date.now());
+   if(wasPrimary){
+     const ids=P.courseIds(),at=Math.max(0,ids.indexOf(id));
+     const ordered=ids.slice(at+1).concat(ids.slice(0,at));
+     const next=ordered.find(x=>(P.ensureLessonProgress(state,x)||{}).status!=='completed');
+     if(next)P.setResumePointer(state,next,'path',Date.now()+1);
+   }
+   return done;
+ }
+ function continueLesson(id){
+   viewOnlyPathLesson=null;
+   const lp=P.ensureLessonProgress(state,id);
+   if(lp&&lp.practiceSession&&restoreLessonPractice(id)){
+     markLessonStarted(id,'practice');render();showView('practice');return;
+   }
+   openPathLesson(id,{meaningful:true});
  }
  function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;sessionUnaided=Object.create(null);}
  function sameSkillOffers(q){
@@ -299,7 +364,7 @@
    bindSlice();
  }
  function save(){
-   captureDraft();if(window.AiTutor&&window.AiTutor.snapshot)state.aiTutor=window.AiTutor.snapshot();state.records=records;state.learning=learningState;
+   captureDraft();persistLessonPath();persistLessonPractice();if(window.AiTutor&&window.AiTutor.snapshot)state.aiTutor=window.AiTutor.snapshot();state.records=records;state.learning=learningState;
    state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection};
    try{if(storageReadError)throw storageReadError;localStorage.setItem(KEY,JSON.stringify(state));storageAvailable=true;}catch{storageAvailable=false;}
    $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
@@ -319,9 +384,13 @@
    return list;
  }
  function startCourse(block){
-   const resumeCourse=mode==='course'&&courseBlock===block&&queue.length>0&&position<queue.length;
+   if(!P.courseIds().includes(block))return;
+   viewOnlyPathLesson=null;
+   persistLessonPractice();persistLessonPath();
    courseBlock=block;vocabRole=null;sourceFilter=null;activeLesson=null;activeStep=null;if(view!=='practice'&&view!=='exam')topic='all';
-   if(resumeCourse){render();showView('practice');return;}
+   if(restoreLessonPractice(block)){
+     markLessonStarted(block,'practice');render();showView('practice');return;
+   }
    const first=window.LEARNING.lessons.find(l=>l.courseLesson===block);
    if(first)learningState.lessonId=first.id;
    const lessonCards=block==='3-1'?(window.Lesson31Pack?.lessonSession?.()||[]):block==='3-2'?(window.Lesson32Pack?.lessonSession?.()||[]):(window.Phase2BPractice?.lessonSession?.(block)||[]);
@@ -343,8 +412,9 @@
      }
      queue=ordered.map(q=>q.id).filter(id=>byId.has(id));
      practiceIds=[...queue];stepEvidence={};queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
-     render();showView('practice');return;
+     markLessonStarted(block,'practice');render();showView('practice');return;
    }
+   markLessonStarted(block,'practice');
    mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');
  }
  function startTransfer(){
@@ -502,56 +572,55 @@
  function courseIds(){return (window.ExplainBankUI&&window.ExplainBankUI.COURSE||[]).map(c=>c.id);}
  function studyLive(){return ['homework','course','lesson','phrase','transfer','remediation'].includes(mode)&&queue.length>position;}
  function namedCourse(){
-   const ids=courseIds();
-   const gp=state.grammarPath||{};
-   const p=state.place||{};
-   if(mode==='homework'&&hwLesson&&ids.includes(hwLesson)&&queue.length>position)return hwLesson;
-   if(p.surface==='practice'&&studyLive()&&p.lessonId&&ids.includes(p.lessonId))return p.lessonId;
-   if(gp.lessonId&&ids.includes(gp.lessonId)&&(gp.phase==='beat'||gp.phase==='lesson'))return gp.lessonId;
-   if(p.lessonId&&ids.includes(p.lessonId))return p.lessonId;
-   const G=window.GrammarPath;
-   for(const id of ids){
-     const les=G&&G.lesson(id);
-     const n=les&&les.chapters?les.chapters.length:0;
-     const done=n?les.chapters.filter(ch=>gp.completedChapters&&gp.completedChapters[id+':'+ch.id]).length:0;
-     if(!(n>0&&done>=n))return id;
-   }
-   return ids[0]||'1-1';
+   const ids=courseIds(),cp=P.ensureCourseProgress(state),rp=cp.resumePointer||{};
+   if(ids.includes(rp.lessonId))return rp.lessonId;
+   return ids.find(id=>(P.ensureLessonProgress(state,id)||{}).status!=='completed')||ids[0]||'1-1';
  }
  function stepNow(){
-   const gp=state.grammarPath||{};
-   const lessonId=namedCourse();
-   if(mode==='homework'&&hwLesson&&queue.length>position)return {lessonId:hwLesson,surface:'homework',title:'Продолжить домашку '+hwLesson,hint:'Тот же шаг, набранный ответ на месте.'};
-   if(studyLive()&&(state.place||{}).surface==='practice')return {lessonId,surface:'practice',title:'Продолжить урок '+lessonId,hint:'Тот же шаг, набранный ответ на месте.'};
-   if(gp.lessonId&&gp.chapterId&&(gp.phase==='beat'||gp.phase==='lesson')&&!(gp.completedChapters&&gp.completedChapters[gp.lessonId+':'+gp.chapterId]))return {lessonId:gp.lessonId,surface:'path',title:'Продолжить урок '+gp.lessonId,hint:'Тот же шаг прохождения.'};
-   return {lessonId,surface:'path',title:'Продолжить урок '+lessonId,hint:'Текущий урок курса.'};
+   const ids=courseIds(),cp=P.ensureCourseProgress(state);
+   const allDone=ids.length&&ids.every(id=>(P.ensureLessonProgress(state,id)||{}).status==='completed');
+   const lessonId=namedCourse(),lp=P.ensureLessonProgress(state,lessonId),rp=cp.resumePointer||{};
+   if(allDone)return {lessonId,surface:'path',title:'Основное прохождение завершено',hint:'Можно выбрать любой урок и повторить его.'};
+   if(rp.surface==='practice'&&lp&&lp.practiceSession)return {lessonId,surface:'practice',title:'Продолжить урок '+lessonId,hint:'Очередь, позиция и набранный ответ сохранены.'};
+   const p=lp&&lp.path;
+   const checkpoint=p&&p.chapterId?('Глава · шаг '+(Math.max(0,Number(p.beat)||0)+1)):(lp&&lp.status==='not_started'?'Урок ещё не начат':'Место прохождения сохранено');
+   return {lessonId,surface:'path',title:(lp&&lp.status==='not_started'?'Начать урок ':'Продолжить урок ')+lessonId,hint:checkpoint};
  }
  function continueStep(){
    const s=stepNow();
-   if(s.surface==='homework'&&mode==='homework'&&queue.length>position){showView('practice');return;}
-   if(s.surface==='practice'&&studyLive()){showView('practice');return;}
-   openPathLesson(s.lessonId);
+   if(s.title==='Основное прохождение завершено'){showView('path');return;}
+   continueLesson(s.lessonId);
  }
  function openChapter(lessonId,chapterId){
-   const G=window.GrammarPath,gp=state.grammarPath;
+   const G=window.GrammarPath;
+   if(!G||!P.courseIds().includes(lessonId))return;
+   const lp=P.ensureLessonProgress(state,lessonId),changesResume=viewOnlyPathLesson!==lessonId&&lp&&lp.status!=='completed';
+   let gp=state.grammarPath;
+   if(!gp||gp.lessonId!==lessonId)gp=loadLessonPath(lessonId);
    if(gp&&gp.lessonId===lessonId&&gp.chapterId===chapterId&&G.keepChapter(gp,lessonId)){
-     gp.phase='beat';markPlace('path',lessonId);save();renderPath();return;
+     gp.phase='beat';if(changesResume)markLessonStarted(lessonId,'path');markPlace('path',lessonId);save();renderPath();return;
    }
-   captureDraft();
+   captureDraft();persistLessonPath();
    G.startChapter(state,lessonId,chapterId);
-   markPlace('path',lessonId);save();renderPath();
+   if(changesResume)markLessonStarted(lessonId,'path');markPlace('path',lessonId);save();renderPath();
  }
- function openPathLesson(lessonId){
+ function openPathLesson(lessonId,options){
    const G=window.GrammarPath;if(!G){showView('path');return;}
-   const gp=state.grammarPath||(state.grammarPath=G.emptyProgress());
-   G.migrateProgress(gp);
-   if(G.keepChapter(gp,lessonId)){gp.phase='beat';markPlace('path',lessonId);save();showView('path');return;}
-   G.startLesson(state,lessonId);
-   const les=G.lesson(lessonId);
-   if(les){
-     const next=(les.chapters||[]).find(c=>!(gp.completedChapters&&gp.completedChapters[les.id+':'+c.id]));
-     if(next)G.startChapter(state,les.id,next.id);
-     else{gp.phase='done';gp.chapterId=null;}
+   if(!P.courseIds().includes(lessonId))return;
+   const meaningful=!!(options&&options.meaningful);
+   viewOnlyPathLesson=meaningful?null:lessonId;
+   persistLessonPractice();persistLessonPath();
+   const lp=P.ensureLessonProgress(state,lessonId);
+   let gp=loadLessonPath(lessonId);
+   if(meaningful){
+     markLessonStarted(lessonId,'path');
+     if(lp&&lp.status!=='completed'&&(!gp.chapterId||gp.phase==='lesson')&&!(lp.path&&lp.path.updatedAt)){
+       G.startLesson(state,lessonId);gp=state.grammarPath;
+       const les=G.lesson(lessonId);
+       const next=les&&(les.chapters||[]).find(ch=>!(gp.completedChapters&&gp.completedChapters[les.id+':'+ch.id]));
+       if(next)G.startChapter(state,les.id,next.id);
+       else{gp.phase='done';gp.chapterId=null;}
+     }
    }
    markPlace('path',lessonId);save();showView('path');
  }
@@ -801,7 +870,7 @@
    const day0=core.isDay0Learning(rec,now);
    if(hinted||!result.correct)sessionUnaided[q.id]=0;
    else if(!hinted&&result.correct)sessionUnaided[q.id]=(sessionUnaided[q.id]||0)+1;
-   if(!homeworkMode&&(sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
+   if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
    const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);
    if(mate&&!result.correct&&!hinted){
      const other=questions.find(x=>x.id!==q.id&&window.MemoryPolicy.contrastSide(x)?.pair===mate.pair&&window.MemoryPolicy.contrastSide(x)?.side!==mate.side);
@@ -988,7 +1057,7 @@
    };
    const bindCrumb=()=>{
      const back=root.querySelector('[data-path-learn]');if(back)back.onclick=()=>showView('learn');
-     const h=root.querySelector('[data-path-hub]');if(h)h.onclick=()=>{gp.phase='hub';gp.lessonId=null;gp.chapterId=null;save();renderPath();};
+     const h=root.querySelector('[data-path-hub]');if(h)h.onclick=()=>{persistLessonPath(gp.lessonId);gp.phase='hub';gp.lessonId=null;gp.chapterId=null;save();renderPath();};
      const l=root.querySelector('[data-path-les]');if(l)l.onclick=()=>{captureDraft();gp.phase='lesson';save();renderPath();};
    };
    const bindTutor=(les,ch)=>{
@@ -1304,6 +1373,7 @@
    }
    if(mode==='course'&&courseBlock){
      const lessonId=courseBlock;
+     markLessonCompleted(lessonId);
      $('#exercise').innerHTML='<div class="empty-state"><h2>Практика урока завершена</h2><p>Следующий шаг — домашка этого же урока. Можно выйти и вернуться: место сохранено.</p><div class="finish-actions"><button type="button" class="primary-button" id="course-to-homework">Перейти к домашке</button><button type="button" class="secondary-button" id="course-to-learn">К урокам</button></div></div>';
      $('#course-to-homework').onclick=()=>{hwLesson=lessonId;hwPart='exercises';hwSection=0;showView('homework');};
      $('#course-to-learn').onclick=()=>showView('learn');
@@ -1666,6 +1736,8 @@
        for(const lesson of lessons){const i=lesson.chunks.findIndex(step=>step.questionIds.every(eligible)&&step.questionIds.some(id=>!records[id]?.seen));if(i>=0){learningState.lessonId=lesson.id;learningState.steps[lesson.id]=i;break;}}
        showView('learn');return;
      }
+     if(next.startsWith('lesson-view:')){openPathLesson(next.slice(12));return;}
+     if(next.startsWith('lesson-start:')){continueLesson(next.slice(13));return;}
      if(next.startsWith('course:')){startCourse(next.split(':')[1]);return;}
      if(next==='pause-prep'){startPausePrep();return;}
      if(next==='repair-open'){openRepair();return;}
