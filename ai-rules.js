@@ -19,6 +19,8 @@
   {rule_id:'T21_POSS_ASSIM',lesson_id:'3-1',course_rule:'poss-assim',title_ru:'Озвончение П / К / Қ',explanation_ru:'Перед гласным притяжательным окончанием конечные п, к, қ озвончаются: п→б, к→г, қ→ғ. кітап + ым → кітабым.',examples_correct:['кітабым','жүрегім','қонағым'],examples_wrong:['кітапым','жүрекім'],error_codes:['POSS_ASSIM_VOICE']},
   {rule_id:'T22_BAR_ZHOK',lesson_id:'3-1',course_rule:'bar-zhok',title_ru:'Бар / жоқ: наличие и отсутствие',explanation_ru:'Бар = есть/имеется. Жоқ = нет/отсутствует. Емес = не является и не заменяет жоқ в конструкции «у меня нет».',examples_correct:['менің көлігім бар','менің көлігім жоқ'],examples_wrong:['менің көлігім емес'],error_codes:['BAR_ZHOK']},
   {rule_id:'T23_POSS_PL',lesson_id:'3-1',course_rule:'poss-plural',title_ru:'Множественное перед притяжательным',explanation_ru:'Сначала множественное, потом притяжательное: кітап + тар + ым → кітаптарым. Не *кітабымдар.',examples_correct:['кітаптарым','мысықтарым'],examples_wrong:['кітабымдар'],error_codes:['POSS_PLURAL_ORDER']},
+  {rule_id:'PHONE_GROUPS',lesson_id:'1-3',course_rule:'phone-groups',title_ru:'Телефон группами',explanation_ru:'Номер после +7 читаем группами. Ноль в группе — нөл.',examples_correct:['нөл'],examples_wrong:['одной лентой'],error_codes:['NUMERAL_COMPOSITION']},
+  {rule_id:'T12_GLUE',lesson_id:'2-1',course_rule:'glue',title_ru:'Кусок смотрит на край справа',explanation_ru:'Наклейка смотрит на правый край основы.',examples_correct:[],examples_wrong:[],error_codes:['PERSON_MEN_ENDING']},
   {rule_id:'T24_POSS_BIZ',lesson_id:'3-2',course_rule:'poss_biz',title_ru:'Наш: мыз вместо ңыз',explanation_ru:'',examples_correct:['біздің әкеміз'],examples_wrong:['біздің әке'],error_codes:['POSS_NO_SUFFIX','POSS_ASSIM','POSS_ORDER','POSS_GLIDE','POSS_WRONG_PERSON']},
   {rule_id:'T25_POSS_SENDER',lesson_id:'3-2',course_rule:'poss_sender',title_ru:'Сендердің и сіздердің: сначала всегда много',explanation_ru:'',examples_correct:['сендердің қолдарың'],examples_wrong:['сендердің қолың'],error_codes:['POSS_2PL_NO_PL','POSS_WRONG_PERSON','PERSON_ON_POSS']},
   {rule_id:'T26_POSS_OLAR',lesson_id:'3-2',course_rule:'poss_olar',title_ru:'Их: наклейка как у оның',explanation_ru:'',examples_correct:['олардың інісі'],examples_wrong:['олардың іні'],error_codes:['POSS_NO_SUFFIX','POSS_OLAR_FORCE_PL','POSS_2PL_READINGS']},
@@ -43,7 +45,7 @@
     else if(r==='question'||r==='вопрос'||r==='ba_me')out.push(...byCourse('question'));
     else if(r==='contrast')out.push(...byCourse('contrast'));
     else if(r==='numbers'||r==='разряды')out.push(...byCourse('numbers'),...byCourse('contrast'));
-    else if(r==='T1_HARMONY'||r==='T2_PLURAL_LDT'||r==='T4_NO_PLURAL_AFTER_NUMBER'||r==='T5_NUMERAL_CONFUSION'||r==='T5_NUMERAL_COMPOSE'||r==='T6_PERSON_SG'||r==='T7_EMES'||r==='T8_PERSON_PL'||r==='T8_ADJ_PRED'||r==='T9_OL'||r==='T10_QUESTION'||r==='T11_ORDINAL'||r==='T20_POSS'||r==='T21_POSS_ASSIM'||r==='T22_BAR_ZHOK'||r==='T23_POSS_PL'){const hit=byId(r);if(hit)out.push(hit);}
+    else {const hit=byId(r);if(hit)out.push(hit);}
    }
   }
   const seen=new Set();

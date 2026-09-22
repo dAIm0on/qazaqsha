@@ -67,9 +67,11 @@
    return '';
  }
  function canonicalRuleId(q){
-   if(!q||!(q.phase2b||q.phase3))return '';
+   if(!q)return '';
+   const phase=q.phase3||q.phase2b;
+   if(!phase)return '';
    const bank=explainBank(),ids=q.ruleIds||[];
-   const type=String(q.phase2b.error_type||'');
+   const type=String(phase.error_type||'');
    const preferred=/question/.test(type)?'T10_QUESTION':/emes/.test(type)?'T7_EMES':/plural_after_numeral/.test(type)?'T4_NO_PLURAL_AFTER_NUMBER':'';
    if(preferred&&ids.includes(preferred)&&bank&&bank.byId&&bank.byId(preferred))return preferred;
    return ids.find(id=>bank&&bank.byId&&bank.byId(id))||'';
@@ -365,7 +367,7 @@
    for(const e of state.events||[]){
      if(e.at<cutoff||e.type!=='answer')continue;
      const q=byId.get(e.card_id);
-     if(e.confusion_tag==='lexical_confuse'||e.confuse_pair_id){
+     if(firstTryFail(e)&&(e.confusion_tag==='lexical_confuse'||e.confuse_pair_id)){
        const pair=e.confuse_pair_id==='lex-0'?'confuse:алты_алпыс':('confuse:'+(e.confuse_pair_id||'pair'));
        add(pair,e.at,e.expected_answer,(e.answers||[])[0],e.card_id,true);
      }
