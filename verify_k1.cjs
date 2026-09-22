@@ -133,6 +133,22 @@ test('K1-I cloud merge completion is monotonic and newer pointer wins',()=>{
   assert.equal(m.courseProgress.resumePointer.lessonId,'1-2');
 });
 
+test('K1-I2 merged course path stays authoritative over legacy grammarPath',()=>{
+  const local=P.empty(),remote=P.empty();
+  local.grammarPath.lessonId='2-1';local.grammarPath.chapterId='local-old';local.grammarPath.beat=1;local.grammarPath.phase='beat';
+  remote.grammarPath.lessonId='2-1';remote.grammarPath.chapterId='remote-new';remote.grammarPath.beat=7;remote.grammarPath.phase='beat';
+  local.grammarPath.completedChapters={'1-1:a':true};
+  remote.grammarPath.completedChapters={'1-2:b':true};
+  P.saveLessonPath(local,'2-1',{chapterId:'local-old',beat:1,phase:'beat'},100);
+  P.saveLessonPath(remote,'2-1',{chapterId:'remote-new',beat:7,phase:'beat'},200);
+  const m=P.merge(local,remote);
+  assert.equal(m.courseProgress.lessons['2-1'].path.chapterId,'remote-new');
+  assert.equal(m.grammarPath.chapterId,'remote-new');
+  assert.equal(m.grammarPath.beat,7);
+  assert.equal(m.grammarPath.completedChapters['1-1:a'],true);
+  assert.equal(m.grammarPath.completedChapters['1-2:b'],true);
+});
+
 test('K1-J picker IDs equal canonical ExplainBankUI.COURSE',()=>{
   assert.deepEqual(P.courseIds(),ids());
   assert.deepEqual(ids(),['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2']);
