@@ -14,6 +14,27 @@
   return {errors:Object.create(null),recent:[]};
  }
  function save(st){if(node)return;try{localStorage.setItem(KEY,JSON.stringify({v:1,errors:st.errors,recent:st.recent.slice(-80)}));}catch{}}
+ function snapshot(){
+  return JSON.parse(JSON.stringify({errors:store.errors,recent:(store.recent||[]).slice(-80)}));
+ }
+ function restore(data){
+  if(!data||typeof data!=='object')return snapshot();
+  const local=snapshot();
+  const incoming=data.errors||data.recent?data:{errors:{},recent:[]};
+  const errors=Object.assign({},local.errors||{});
+  for(const [k,v] of Object.entries(incoming.errors||{})){
+   const old=errors[k];
+   if(!old||(v.count_total||0)>=(old.count_total||0))errors[k]=v;
+  }
+  const recent=[],seen=new Set();
+  for(const e of [...(local.recent||[]),...(incoming.recent||[])].sort((a,b)=>(a.at||0)-(b.at||0))){
+   const id=String(e.at||0)+'|'+String(e.code||'')+'|'+String(e.id||'');
+   if(seen.has(id))continue;
+   seen.add(id);recent.push(e);
+  }
+  store.errors=errors;store.recent=recent.slice(-80);save(store);
+  return snapshot();
+ }
  let store=load();
  function mapDiag(type,expected,actual){
   if(type==='plural_after_numeral')return 'PLURAL_AFTER_NUMBER';
@@ -314,6 +335,6 @@
  function hintLeaks(resp,expected){
   return C.containsExpected(resp,expected);
  }
- const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,localFallback,isLiveMessage,buildRequest,callTutor,askTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset};
+ const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,localFallback,isLiveMessage,buildRequest,callTutor,askTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset,snapshot,restore};
  if(node)module.exports=api;else root.AiTutor=api;
 })(typeof window!=='undefined'?window:globalThis);

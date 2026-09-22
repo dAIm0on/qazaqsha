@@ -1391,7 +1391,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/qazaq-offline-live-20260922-one-step/.test(openSw));
+assert.ok(/qazaq-offline-live-20260922-one-event/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1808,5 +1808,49 @@ assert.ok(!/lesson\.courseLesson/.test(dashStep));
 assert.ok(/continueStep/.test(learnStep));
 assert.ok(/currentCourse/.test(learnStep));
 ok('Astra step 2: one continue step, path draft and rules question survive a reload');
+
+const HwStep=require('./homework.js');
+const dayMs=86400000;
+const nowStep=Date.now();
+const qPlural={id:'q-path-hw',topic:'plural',kind:'fields',fields:[{answers:['кітаптар']}],stimulus:'кітап'};
+const stOnce=progress.empty();
+stOnce.events=[
+ {id:'ev:a',type:'answer',card_id:'q-path-hw',at:nowStep-2*dayMs,correct:false,first_try_correct:0,answers:['кітаплар'],hinted:false},
+ {id:'ev:b',type:'answer',card_id:'q-path-hw',at:nowStep-dayMs,correct:false,first_try_correct:0,answers:['кітаплар'],hinted:false}
+];
+stOnce.homeworkAttempts={'1-2':{items:[
+ {id:'q-path-hw',event_id:'ev:a',at:nowStep-2*dayMs,status:'ошибка',answers:['кітаплар'],expected:'кітаптар',correct:false},
+ {id:'q-path-hw',event_id:'ev:b',at:nowStep-dayMs,status:'ошибка',answers:['кітаплар'],expected:'кітаптар',correct:false}
+],previous:[]}};
+const onceSpots=HwStep.weakSpots(stOnce,[qPlural],nowStep);
+const onceHit=onceSpots.find(s=>s.cardId==='q-path-hw');
+assert.ok(onceHit);
+assert.equal(onceHit.count,2);
+const stBare=progress.empty();
+stBare.homeworkAttempts={'1-2':{items:[{id:'q-path-hw',at:nowStep-2*dayMs,status:'ошибка',answers:['кітаплар'],expected:'кітаптар',correct:false},{id:'q-path-hw',at:nowStep-dayMs,status:'ошибка',answers:['кітаплар'],expected:'кітаптар',correct:false}],previous:[]}};
+const bareSpots=HwStep.weakSpots(stBare,[qPlural],nowStep);
+assert.equal(bareSpots.find(s=>s.cardId==='q-path-hw').count,2);
+const pathEv=PathKeep.recordPath(progress.empty(),{id:'12b1',error_key:'junction_ldt'},false,false,1000,{event_id:'path:12b1:1000',actual:'кітаплар',expected:'кітаптар',codes:['plural_initial_consonant']});
+assert.equal(pathEv.id,'path:12b1:1000');
+assert.equal(pathEv.type,'path');
+assert.equal(pathEv.actual_answer,'кітаплар');
+assert.equal(pathEv.expected_answer,'кітаптар');
+assert.deepEqual(pathEv.codes,['plural_initial_consonant']);
+const tutorState=progress.migrate({schema:6,records:{},aiTutor:{errors:{PLURAL_AFTER_NUMBER:{error_code:'PLURAL_AFTER_NUMBER',count_total:3,count_recent:2,remediation_due:true,lesson_id:'1-3',rule_id:'T4',last_exercise_ids:['hw-x']}},recent:[{code:'PLURAL_AFTER_NUMBER',at:5,correct:false,hinted:false,id:'hw-x'}]},homeworkAttempts:{'1-2':{lessonId:'1-2',started_at:1,items:[{id:'hw-x',answers:['кітаплар'],correct:false,status:'ошибка',at:5,expected:'кітаптар',event_id:'ev:5:hw-x'}]}}});
+assert.equal(tutorState.aiTutor.errors.PLURAL_AFTER_NUMBER.count_total,3);
+assert.equal(tutorState.aiTutor.recent[0].code,'PLURAL_AFTER_NUMBER');
+assert.equal(tutorState.homeworkAttempts['1-2'].items[0].event_id,'ev:5:hw-x');
+const tutorFile=JSON.parse(progress.serialize(tutorState));
+assert.equal(tutorFile.aiTutor.errors.PLURAL_AFTER_NUMBER.count_recent,2);
+assert.equal(tutorFile.session,null);
+const appStep3=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+const tutorUi=fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8');
+assert.ok(/event_id:eventId/.test(appStep3));
+assert.ok(/user_answer:val/.test(appStep3));
+assert.ok(/AiTutor\.noteAnswer\(qPath/.test(appStep3));
+assert.ok(/Knowledge\.observe\(state,qPath/.test(appStep3));
+assert.ok(/user_answer:ctx\.user_answer/.test(tutorUi));
+assert.ok(/state\.aiTutor=window\.AiTutor\.snapshot\(\)/.test(appStep3));
+ok('Astra step 3: one event id, path diagnostics, tutor gets the typed form, AI memory stays in export');
 
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

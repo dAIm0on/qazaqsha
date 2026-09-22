@@ -27,6 +27,7 @@
  try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);}}
  catch(error){storageAvailable=false;storageReadError=error;}
  if(!state.prefs.lettersChosen&&typeof matchMedia==='function'&&matchMedia('(max-width:690px)').matches)state.prefs.letters=true;
+ if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
  window.NumberLadder?.parkLearn(state.learning,state.records);
  let records=state.records,learningState=state.learning;
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
@@ -267,7 +268,7 @@
    bindSlice();
  }
  function save(){
-   captureDraft();state.records=records;state.learning=learningState;
+   captureDraft();if(window.AiTutor&&window.AiTutor.snapshot)state.aiTutor=window.AiTutor.snapshot();state.records=records;state.learning=learningState;
    state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection};
    try{if(storageReadError)throw storageReadError;localStorage.setItem(KEY,JSON.stringify(state));storageAvailable=true;}catch{storageAvailable=false;}
    $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
@@ -669,7 +670,8 @@
    const policy=window.MemoryPolicy;
    const flags=policy&&policy.answerFlags?policy.answerFlags({hinted,correct:result.correct}):{first_try_correct:hinted?0:(result.correct?1:0),peek:hinted?1:0,retype_after_peek_ok:hinted?(result.correct?1:0):null};
    if(rulePeeked)flags.first_try_correct=0;
-   const event={session_id:String(queueEpoch),presentation:position,type:'answer',card_id:q.id,at:now,correct:result.correct,hinted,response_time_ms:elapsedMs,response_time:elapsedMs,latency_ms:elapsedMs,recall,answers,
+   const eventId='ev:'+now+':'+q.id;
+   const event={id:eventId,session_id:String(queueEpoch),presentation:position,type:'answer',card_id:q.id,at:now,correct:result.correct,hinted,response_time_ms:elapsedMs,response_time:elapsedMs,latency_ms:elapsedMs,recall,answers,
      item_type:policy?policy.classify(q):null,direction:policy?policy.direction(q):null,
      first_try_correct:flags.first_try_correct,peek:flags.peek,retype_after_peek_ok:flags.retype_after_peek_ok,
      confusion_tag:policy?policy.confusionTag(q,answers,result):'',
@@ -682,7 +684,7 @@
    state.events.push(event);rec=records[q.id]||rec;
    if(homeworkMode&&hwLesson){
      const expected=q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers[0]).join('; ');
-     window.Homework.recordItem(state,hwLesson,{id:q.id,answers,correct:result.correct,rule_peek:rulePeeked,answer_peek:hinted,skipped:!!reveal,expected},now);
+     window.Homework.recordItem(state,hwLesson,{id:q.id,answers,correct:result.correct,rule_peek:rulePeeked,answer_peek:hinted,skipped:!!reveal,expected,event_id:eventId},now);
    }
    P.observeConfusions(state,q,answers,result,now,confusionIndex,hinted||reveal||rulePeeked);
    for(const pair of Object.values(state.confusions)){pair.expected_item=[...confusionIndex.get(pair.expected_answer)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.given_item=[...confusionIndex.get(pair.wrong_answer_given)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.last_confused=pair.last_wrong;}
@@ -1088,28 +1090,76 @@
        const local=hintLine();
        showPathFb('hinted','<p>'+esc(local)+'</p>');
      };
+     const pathSkillFor=(errorType,errorKey)=>{
+       const known={
+         vowel_harmony:{item_id:'rule:plural',skill_type:'harmony'},
+         plural_initial_consonant:{item_id:'rule:plural',skill_type:'initial_consonant'},
+         plural_after_numeral:{item_id:'rule:plural',skill_type:'plural_suppression'},
+         emes_position:{item_id:'rule:emes',skill_type:'application'},
+         ordinal_20:{item_id:'rule:ordinal',skill_type:'exception_20'},
+         person_sen_siz:{item_id:'rule:person',skill_type:'application'},
+         harmony:{item_id:'rule:plural',skill_type:'harmony'},
+         junction_ldt:{item_id:'rule:plural',skill_type:'initial_consonant'},
+         quantity:{item_id:'rule:plural',skill_type:'plural_suppression'}
+       };
+       return known[errorType]||known[errorKey]||null;
+     };
+     const commitPath=(ok,peeked,val)=>{
+       const now=Date.now(),right=exp(),written=String(val||'');
+       const qPath={id:'path:'+les.id+':'+ch.id+':'+(beat.id||''),lessonId:les.id,kind:'fields',stimulus:beat.stem||'',title:beat.prompt||ch.title,fields:[{kind:'text',answers:[right]}],ruleIds:(ch.rule_ids||[]).filter(id=>/^T\d/.test(id)),vocabIds:[],topic:beat.error_key==='harmony'?'sounds':''};
+       const result={correct:!!ok,parts:[!!ok]};
+       const diagErrors=(!ok&&window.ErrorDiagnostics)?window.ErrorDiagnostics.diagnose(qPath,[written],result,now):[];
+       const binds=[];
+       const seenBind=new Set();
+       for(const err of diagErrors){
+         const b=pathSkillFor(err.error_type,beat.error_key);
+         if(!b)continue;
+         const k=b.item_id+'::'+b.skill_type;
+         if(seenBind.has(k))continue;
+         seenBind.add(k);
+         binds.push({item_id:b.item_id,skill_type:b.skill_type,field:0,facet:null});
+       }
+       if(!binds.length){
+         const b=pathSkillFor('',beat.error_key);
+         if(b)binds.push({item_id:b.item_id,skill_type:b.skill_type,field:0,facet:null});
+       }
+       qPath.skillBindings=binds;
+       let skills=[];
+       if(binds.length&&window.Knowledge)skills=window.Knowledge.observe(state,qPath,result,{at:now,answers:[written],hinted:!!peeked,rule_peek:peeked?1:0,recall:true,response_time_ms:null},diagErrors)||[];
+       const aiCodes=window.AiTutor?window.AiTutor.noteAnswer(qPath,[written],result,!!peeked,diagErrors,now).filter(c=>c&&c!=='UNKNOWN'):[];
+       if(diagErrors.length)state.errors.push(...diagErrors);
+       const eventId='path:'+(beat.id||ch.id)+':'+now;
+       G.recordPath(state,beat,ok,peeked,now,{event_id:eventId,actual:written,expected:right,codes:diagErrors.map(e=>e.error_type),skills});
+       return {right,written,diagErrors,aiCodes};
+     };
      $('#path-idk').onclick=()=>{
        pathPeek=true;
-       G.recordPath(state,beat,false,true);
-       const right=exp();
-       if(input)input.value=right;
-       showPathFb('hinted','<p>Правильно: <strong>'+esc(right)+'</strong></p><p class="small">Это подсказка, не самостоятельный ответ.</p><button type="button" class="primary-button" id="path-go">Дальше</button>');
+       const typed=input?input.value:'';
+       const noted=commitPath(false,true,typed);
+       if(input)input.value=noted.right;
+       showPathFb('hinted','<p>Правильно: <strong>'+esc(noted.right)+'</strong></p><p class="small">Это подсказка, не самостоятельный ответ.</p><button type="button" class="primary-button" id="path-go">Дальше</button>');
        save();
      };
      $('#path-form').onsubmit=e=>{
        e.preventDefault();
        if(e.isComposing||(e.nativeEvent&&e.nativeEvent.isComposing))return;
        const val=$('#path-answer').value,ok=G.evalCheck(beat,val);
-       G.recordPath(state,beat,ok,pathPeek);
+       const noted=commitPath(ok,pathPeek,val);
        if(ok){nextBeat();return;}
-       const right=exp();
+       const right=noted.right;
        const diag=formAsk&&val.trim()?G.diagnoseProd(right,val):'Пока неверно.';
+       const why=noted.diagErrors.map(err=>window.ErrorDiagnostics&&window.ErrorDiagnostics.labels[err.error_type]||err.error_type).filter(Boolean);
        const bankCard=window.ExplainBankUI&&window.ExplainBankUI.cardForChapter(ch);
        const tr=window.TransferItems&&window.TransferItems.oneForPath(ch,les,{catalog:window.CURRICULUM});
-       showPathFb('error','<p>'+esc(diag)+'</p>'+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+'<p>Правильно: <strong>'+esc(right)+'</strong></p>'+(bankCard&&bankCard.short?'<p class="small">'+esc(bankCard.short)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
+       showPathFb('error','<p>Ты написала: <strong lang="kk">'+esc(val.trim()||'пусто')+'</strong></p><p>Нужно: <strong lang="kk">'+esc(right)+'</strong></p>'+(why.length?'<p>'+esc([...new Set(why)].join(' · '))+'</p>':'')+'<p>'+esc(diag)+'</p>'+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+(bankCard&&bankCard.short?'<p class="small">'+esc(bankCard.short)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
        const again=$('#path-again-rule');if(again)again.onclick=()=>{showPathFb('hinted','<p>'+esc(bankCard&&(bankCard.short||bankCard.medium)||hintLine())+'</p>');};
        const goTr=$('#path-transfer');if(goTr&&tr)goTr.onclick=()=>{if(!byId.has(tr.id)){course.questions.push(tr);byId.set(tr.id,tr);}mode='transfer';queue=[tr.id];practiceIds=[tr.id];position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();render();showView('practice');};
-       const askT=$('#path-ask-tutor');if(askT)askT.onclick=()=>{if(window.TutorUI)window.TutorUI.open();};
+       const askT=$('#path-ask-tutor');if(askT)askT.onclick=()=>{
+         if(!window.TutorUI)return;
+         const Bank=window.ExplainBankUI;
+         window.TutorUI.setContext({surface:'path',lesson_id:les.id,chapter_id:ch.id,rule_id:Bank?Bank.ruleForChapter(ch):'',user_answer:val,expected_answer:right,codes:noted.aiCodes});
+         window.TutorUI.open();
+       };
        save();
      };
      
@@ -1206,6 +1256,7 @@
    const next=mode==='replace'?P.migrate(incoming):P.merge(state,incoming);next.session=null;next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
    try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
    state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;
+   if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
    window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);
    activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;checked=false;presented=null;pauseTimer();elapsedMs=0;showView('today');
  }
@@ -1507,6 +1558,7 @@
    if(!incoming)return;
    cloudApplying=true;
    state=P.merge(state,incoming);records=state.records;learningState=state.learning;
+   if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
    try{window.LessonPackages.install(state.lesson_packages);}catch{}
    catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
    confusionIndex=P.answerIndex(questions);save();cloudApplying=false;renderStats();

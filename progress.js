@@ -28,7 +28,7 @@
    if(obj(raw.rulesDraft)&&typeof raw.rulesDraft.value==='string'&&raw.rulesDraft.value)state.rulesDraft={article:typeof raw.rulesDraft.article==='string'?raw.rulesDraft.article.slice(0,40):'',value:raw.rulesDraft.value.slice(0,400)};
    if(obj(raw.homeworkAttempts))state.homeworkAttempts=dictionary(raw.homeworkAttempts,(a,lesson)=>{
      if(!obj(a))return undefined;
-     const items=Array.isArray(a.items)?a.items.filter(it=>obj(it)&&safe(it.id)).map(it=>({id:it.id,answers:Array.isArray(it.answers)?it.answers.slice(0,20).map(x=>String(x).slice(0,300)):[],correct:!!it.correct,rule_peek:!!it.rule_peek,answer_peek:!!it.answer_peek,skipped:!!it.skipped,expected:typeof it.expected==='string'?it.expected.slice(0,300):'',at:Number(it.at)||0,status:typeof it.status==='string'?it.status.slice(0,40):''})): [];
+     const items=Array.isArray(a.items)?a.items.filter(it=>obj(it)&&safe(it.id)).map(it=>({id:it.id,answers:Array.isArray(it.answers)?it.answers.slice(0,20).map(x=>String(x).slice(0,300)):[],correct:!!it.correct,rule_peek:!!it.rule_peek,answer_peek:!!it.answer_peek,skipped:!!it.skipped,expected:typeof it.expected==='string'?it.expected.slice(0,300):'',at:Number(it.at)||0,status:typeof it.status==='string'?it.status.slice(0,40):'',event_id:typeof it.event_id==='string'?it.event_id.slice(0,120):''})): [];
      const previous=Array.isArray(a.previous)?a.previous.filter(obj).slice(-30):[];
      return {lessonId:safe(a.lessonId)?a.lessonId:lesson,started_at:Number(a.started_at)||0,items,rule_peeks:Math.max(0,Number(a.rule_peeks)||0),answer_peeks:Math.max(0,Number(a.answer_peeks)||0),submitted_at:Number(a.submitted_at)||null,export_rev:Math.max(0,Number(a.export_rev)||0),cursor:typeof a.cursor==='string'?a.cursor.slice(0,80):null,checklist:obj(a.checklist)?a.checklist:{method:false,exercises:false,words:false,external_test:false,keyboard:false,cheat:false},previous};
    });
@@ -45,7 +45,34 @@
    state.session=obj(raw.session)?raw.session:null;
    if(obj(raw.repair)&&typeof raw.repair.rule_id==='string')state.repair={rule_id:raw.repair.rule_id.slice(0,80),started:String(raw.repair.started||''),quiet_until:Number(raw.repair.quiet_until)||0,roots_used:Array.isArray(raw.repair.roots_used)?raw.repair.roots_used.filter(x=>typeof x==='string').slice(0,8):[],attempts:Math.max(0,Number(raw.repair.attempts)||0),blinds:Math.max(0,Number(raw.repair.blinds)||0)};
    if(obj(raw.savings))state.savings=dictionary(raw.savings,v=>Math.max(0,Math.floor(Number(v)||0)));
+   if(obj(raw.aiTutor))state.aiTutor=tidyTutor(raw.aiTutor);
    return state;
+ }
+ function tidyTutor(raw){
+   const errors=Object.create(null);
+   if(obj(raw.errors))for(const [k,v] of Object.entries(raw.errors)){
+     if(!safe(k)||!obj(v))continue;
+     const code=k.slice(0,80);
+     errors[code]={error_code:code,rule_id:typeof v.rule_id==='string'?v.rule_id.slice(0,40):'',lesson_id:typeof v.lesson_id==='string'?v.lesson_id.slice(0,20):'',count_total:Math.max(0,Math.floor(Number(v.count_total)||0)),count_recent:Math.max(0,Math.floor(Number(v.count_recent)||0)),last_seen:typeof v.last_seen==='string'?v.last_seen.slice(0,40):null,last_exercise_ids:Array.isArray(v.last_exercise_ids)?v.last_exercise_ids.filter(safe).slice(0,6):[],hint_count_recent:Math.max(0,Math.floor(Number(v.hint_count_recent)||0)),successful_retrievals_after_error:Math.max(0,Math.floor(Number(v.successful_retrievals_after_error)||0)),remediation_due:!!v.remediation_due};
+   }
+   const recent=Array.isArray(raw.recent)?raw.recent.filter(obj).slice(-80).map(e=>({code:typeof e.code==='string'?e.code.slice(0,80):null,at:Number(e.at)||0,correct:!!e.correct,hinted:!!e.hinted,id:safe(e.id)?e.id:''})):[];
+   return {errors,recent};
+ }
+ function mergeTutor(a,b){
+   if(!a)return b||null;
+   if(!b)return a;
+   const errors=Object.assign(Object.create(null),a.errors||{});
+   for(const [k,v] of Object.entries(b.errors||{})){
+     const old=errors[k];
+     if(!old||(v.count_total||0)>=(old.count_total||0))errors[k]=v;
+   }
+   const recent=[],seen=new Set();
+   for(const e of [...(a.recent||[]),...(b.recent||[])].sort((x,y)=>(x.at||0)-(y.at||0))){
+     const id=String(e.at||0)+'|'+String(e.code||'')+'|'+String(e.id||'');
+     if(seen.has(id))continue;
+     seen.add(id);recent.push(e);
+   }
+   return {errors,recent:recent.slice(-80)};
  }
  function serialize(state){return JSON.stringify({app:'qazaq-trainer',schema:6,exported_at:new Date().toISOString(),policy_version:cfg.version,scheduler_config:{implementation:cfg.algorithm,desired_retention:cfg.fsrs.desired_retention,standard_weights:true},...state});}
  function validate(text,knownIds,now=Date.now()){
@@ -97,6 +124,7 @@
      const map=new Map([...(out.issueLog||[]),...incoming.issueLog].map(x=>[String(x.at)+'|'+String(x.note||'').slice(0,80),x]));
      out.issueLog=[...map.values()].sort((a,b)=>a.at-b.at).slice(-80);
    }
+   if(incoming.aiTutor||out.aiTutor)out.aiTutor=mergeTutor(out.aiTutor,obj(incoming.aiTutor)?tidyTutor(incoming.aiTutor):null);
    return out;
  }
  function memoryStats(state,now=Date.now()){
