@@ -123,7 +123,11 @@
      const a=out.incidentalWeek||{key:'',added:0},b=incoming.incidentalWeek;
      out.incidentalWeek=a.key===b.key?{key:a.key,added:Math.max(a.added||0,b.added||0)}:(b.key||'')>(a.key||'')?{key:b.key,added:b.added||0}:a;
    }
-   if(incoming.grammarPath)out.grammarPath=incoming.grammarPath;
+   if(incoming.grammarPath){
+     out.grammarPath=out.grammarPath||{};
+     out.grammarPath.completedChapters=Object.assign(Object.create(null),out.grammarPath.completedChapters||{},incoming.grammarPath.completedChapters||{});
+     out.grammarPath.legacyCompleted=[...new Set([...(out.grammarPath.legacyCompleted||[]),...(incoming.grammarPath.legacyCompleted||[])])].slice(0,80);
+   }
    if(incoming.homeworkAttempts){
      out.homeworkAttempts=out.homeworkAttempts||Object.create(null);
      for(const [lesson,a] of Object.entries(incoming.homeworkAttempts)){
@@ -137,6 +141,14 @@
    }
    if(incoming.aiTutor||out.aiTutor)out.aiTutor=mergeTutor(out.aiTutor,obj(incoming.aiTutor)?tidyTutor(incoming.aiTutor):null);
    out.courseProgress=courseProgress.merge(out.courseProgress,incoming.courseProgress,out);
+   const runtimeId=courseProgress.validId(out.grammarPath&&out.grammarPath.lessonId)?out.grammarPath.lessonId:(out.courseProgress.resumePointer&&out.courseProgress.resumePointer.lessonId);
+   const mergedPath=runtimeId&&out.courseProgress.lessons[runtimeId]&&out.courseProgress.lessons[runtimeId].path;
+   if(runtimeId&&mergedPath&&(mergedPath.chapterId||mergedPath.phase!=='hub')){
+     out.grammarPath=out.grammarPath||{};
+     out.grammarPath.lessonId=runtimeId;out.grammarPath.chapterId=mergedPath.chapterId;out.grammarPath.beat=mergedPath.beat;out.grammarPath.phase=mergedPath.phase;
+     if(mergedPath.pathDraft)out.grammarPath.pathDraft=JSON.parse(JSON.stringify(mergedPath.pathDraft));else delete out.grammarPath.pathDraft;
+     if(mergedPath.canonShownFor)out.grammarPath.canonShownFor=mergedPath.canonShownFor;else delete out.grammarPath.canonShownFor;
+   }
    out.schema=7;
    return out;
  }
