@@ -681,7 +681,7 @@
    const aiCodes=window.AiTutor&&mode!=='exam'?window.AiTutor.noteAnswer(q,answers,result,hinted,errors,now):[];
    const aiRepeat=window.AiTutor&&aiCodes[0]&&window.AiTutor.shouldOfferExplain(aiCodes[0]);
    const morph=!result.correct?morphemeRow(errors,answerLine,answers.join(' ')):'';
-   feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Нужно: <strong lang="kk">'+esc(answerLine)+'</strong>.</p>':''}${morph}${!tarErr?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;
+   feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Нужно: <strong lang="kk">'+esc(answerLine)+'</strong>.</p>':''}${morph}${!tarErr?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){feedback.insertAdjacentHTML('beforeend',window.ExplainOpen.forQuestion(q,answers));window.ExplainOpen.bind(feedback);}
    if(!result.correct&&mode!=='exam'&&window.AiTutor){
      const unlock=()=>{['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=false;});};
      const paint=(resp,token)=>{
@@ -853,7 +853,8 @@
    }
    if(gp.phase==='lesson'||!gp.chapterId){
      bindTutor(les,null);
-     root.innerHTML=`<div class="panel">${crumb(les,null)}<h2>Урок ${esc(courseRow?courseRow.label:les.id)}</h2><p>${esc(courseRow?courseRow.name:les.title)}</p>
+     const map31=les.id==='3-1'&&window.ExplainOpen?window.ExplainOpen.map31():'';
+     root.innerHTML=`${map31}<div class="panel">${crumb(les,null)}<h2>Урок ${esc(courseRow?courseRow.label:les.id)}</h2><p>${esc(courseRow?courseRow.name:les.title)}</p>
        <p class="small">${esc((les.chapters||[]).filter(c=>gp.completedChapters&&gp.completedChapters[les.id+':'+c.id]).length)} из ${les.chapters.length} глав</p>
        <div class="path-chapters">${les.chapters.map((c,i)=>{
          const ok=gp.completedChapters&&gp.completedChapters[les.id+':'+c.id];
@@ -863,6 +864,7 @@
        <p><button type="button" class="text-button" data-path-learn>К урокам</button></p></div>`;
      bindCrumb();
      root.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{G.startChapter(state,les.id,b.dataset.ch);save();renderPath();});
+     if(window.ExplainOpen)window.ExplainOpen.bind(root);
      return;
    }
    const ch=G.chapter(les.id,gp.chapterId);if(!ch){gp.phase='lesson';renderPath();return;}
@@ -916,9 +918,12 @@
        ${med?'<section class="path-block"><h3>Как работает</h3>'+med+'</section>':''}
        ${ex?'<section class="path-block"><h3>Примеры</h3><ul class="path-ex">'+ex+'</ul></section>':''}
        ${traps?'<section class="path-block"><h3>Не перепутай</h3><ul class="path-traps">'+traps+'</ul></section>':''}
+       <button type="button" class="secondary-button" id="path-full">Показать полностью</button>
+       <div id="path-full-panel" hidden>${window.ExplainOpen?window.ExplainOpen.fullHtml((ch.rule_ids||[])[0]||''):''}</div>
        <button type="button" class="primary-button" id="path-next">${cta}</button></div>`;
      bindCrumb();bindTutor(les,ch);
      $('#path-next').onclick=()=>{save();renderPath();};
+     const fullBtn=$('#path-full');if(fullBtn)fullBtn.onclick=()=>{const panel=$('#path-full-panel');if(panel)panel.hidden=!panel.hidden;};
      return;
    }
    bindTutor(les,ch);
