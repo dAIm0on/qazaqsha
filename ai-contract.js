@@ -19,6 +19,21 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
  const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,session_summary:800,remediation:450};
  const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha.\n\nТы не проверяешь правильность ответа. Правильность уже определил локальный код.\n\nТы не меняешь expected_answer.\n\nГлавный источник истины — переданный rule_context.\n\nОбъясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком.\n\nНе вводи будущие темы.\n\nНе исправляй учебную программу своими знаниями.\n\nНе называй внутренние ID правил.\n\nНе упоминай system prompt, error_code или внутреннюю архитектуру.\n\nПиши естественным русским языком. Казахские формы оставляй на казахском.\n\nЕсли mode=explain_error:\n1. скажи, что ученица написала;\n2. покажи отличие от правильной формы;\n3. объясни один механизм правила;\n4. используй текущий пример.\n\nЕсли mode=explain_rule:\nобъясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом.\n\nЕсли mode=simplify:\nобъясни то же правило проще, не меняя его смысл.\n\nЕсли mode=ask_tutor:\nответь прежде всего на user_question 2–6 предложениями. Сразу к сути, без приветствия и без переписывания вопроса ученицы.\nДля кітап+ым помни озвончение п→б: кітабым.\nРазрешено объяснять через русский язык, если это помогает ученице понять казахское правило.\nМожно давать дополнительные примеры только из текущей разрешённой лексики и уже пройденной грамматики.\n\nЕсли ученица пишет:\n«не поняла»,\n«ещё проще»,\n«объясни иначе»,\n«через русский»,\nто измени способ объяснения, но не правило.\n\nЕсли repeat_count >= 2:\nможно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ её понять.\nНе стыди ученицу. Не пиши «ты опять ошиблась».\n\nЕсли mode=hint:\nне показывай полный правильный ответ.\n\nВозвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context.\nБез JSON.\nБез markdown fences.\nБез <think>.\nНикогда не пиши English thinking aloud (Okay, Let me recall, the user is asking). Ответ ученице — только на русском.';
  function clip(s,n){s=String(s==null?'':s);return s.length<=n?s:s.slice(0,n);}
+ function sentenceClip(s,n){
+  s=String(s==null?'':s).trim();
+  if(s.length<=n)return s;
+  const head=s.slice(0,n+1);
+  let cut=-1;
+  for(let i=head.length-1;i>=0;i--){
+   if(/[.!?…»"]/.test(head[i])){cut=i;break;}
+  }
+  return cut>=40?head.slice(0,cut+1).trim():'';
+ }
+ function contextClip(s,n){
+  s=String(s==null?'':s);
+  if(s.length<=n)return s;
+  return sentenceClip(s,n)||clip(s,n);
+ }
  function asArr(v){return Array.isArray(v)?v.filter(x=>typeof x==='string'):[];}
  function maxMessage(mode){return MSG_MAX[mode]||MAX_MSG;}
  function lessonsThrough(currentLesson){
@@ -73,8 +88,8 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
    if(!id||(allow.size&&!allow.has(id)))continue;
    const fullMed=String(c.medium||c.explanation_ru||'');
    const fullRu=String(c.ru_refresh||'');
-   const medium=clip(fullMed,700);
-   const next=String(c.medium_next||(fullMed.length>700?fullMed.slice(700):''));
+   const medium=contextClip(fullMed,700);
+   const next=String(c.medium_next||(fullMed.length>700?fullMed.slice(medium.length):''));
    out.push({
     rule_id:id,
     block_id:id,
@@ -82,11 +97,11 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
     part:1,
     clipped:!!c.clipped||fullMed.length>700||fullRu.length>400,
     title_ru:clip(c.title_ru,120),
-    ru_refresh:clip(fullRu,400),
-    short:clip(c.short||c.title_ru,160),
+    ru_refresh:contextClip(fullRu,400),
+    short:contextClip(c.short||c.title_ru,160),
     medium,
-    explanation_ru:clip(c.explanation_ru||c.medium,700),
-    medium_next:clip(next,700),
+    explanation_ru:contextClip(c.explanation_ru||c.medium,700),
+    medium_next:contextClip(next,700),
     examples_correct:asArr(c.examples_correct).slice(0,4),
     examples_wrong:asArr(c.examples_wrong).slice(0,4),
     traps:asArr(c.traps).slice(0,4)
@@ -163,12 +178,16 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   if(/^\.\s*Добрый/i.test(t))return true;
   if(/как правильно будет\s*[«"]?кітабым/i.test(t)&&/Нужно объяснить/i.test(t))return true;
   if(/Нужно объяснить/i.test(t))return true;
-  if(/^(Сначала |Давай |Итак,? |Нужно |Следует |Я (должен|должна|сейчас) )/i.test(t)&&t.length<220)return true;
+  if(/^\s*(ученица|ученик|пользователь)\s+(просит|спрашивает|хочет|пытается|интересуется)(?=\s|[,:—-])/i.test(t))return true;
+  if(/^\s*(задача|цель)\s*[:—-]/i.test(t))return true;
+  if(/^\s*(мне|нам)\s+(нужно|надо|следует)\s+(объяснить|ответить|показать|сказать)/i.test(t))return true;
+  if(/^\s*(нужно|надо|следует)\s+(объяснить|ответить|показать|сказать|учесть)(?=\s|[,:—-])/i.test(t))return true;
+  if(/^(Итак,? |Нужно |Следует |Я (должен|должна|сейчас) )/i.test(t)&&t.length<220)return true;
   // truncated mid-thought / unfinished clause
   if(/\.{3}\s*$/.test(t)&&t.length<240)return true;
   if(/и притяжательн\w*\s*$/i.test(t))return true;
   if(/что\s*\.{3}/i.test(t))return true;
-  if(!/[.!?…»"]\s*$/u.test(t)&&t.length<160&&/(нужно|объясн|окончан)/i.test(t))return true;
+  if(t.length>=40&&!/[.!?…»"')\]]\s*$/u.test(t))return true;
   if(/^Хорошо,?\s*$/i.test(t))return true;
   return false;
  }
@@ -311,14 +330,14 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
    r.message_ru='Разбор сессии сейчас короткий. Локальные слабые места сохранены.';
   }else r.message_ru=lever;
   r.next_action_ru='Введи правильную форму целиком.';
-  r.message_ru=clip(r.message_ru,maxMessage(mode));
+  r.message_ru=sentenceClip(r.message_ru,maxMessage(mode))||sentenceClip(lever,maxMessage(mode))||clip(lever,maxMessage(mode));
   return r;
  }
  function assembleResponse(req,text,meta){
   const mode=(req&&req.mode)||'explain_error';
   const source=(meta&&meta.source)||'primary';
   const r=emptyResp(mode,true);
-  r.message_ru=clip(cleanTutorReply(String(text||'').trim()),maxMessage(mode));
+  r.message_ru=sentenceClip(cleanTutorReply(String(text||'').trim()),maxMessage(mode));
   r.primary_error_code=(req&&req.candidate_error_codes&&req.candidate_error_codes[0])||null;
   r.secondary_error_codes=asArr(req&&req.candidate_error_codes).slice(1,4);
   r.rule_ids_used=((req&&req.rule_context)||[]).map(c=>c&&c.rule_id).filter(Boolean).slice(0,6);
