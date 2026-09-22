@@ -201,12 +201,17 @@ function looksLikeBadTutorReply(t){
   // student-voice rewrite of the ask before the actual explanation
   if(/как правильно будет\s*[«"]?кітабым/i.test(t)&&/Нужно объяснить/i.test(t))return true;
   if(/Нужно объяснить/i.test(t))return true;
+  // Russian planning / chain-of-thought must never be shown as the tutor answer.
+  if(/^\s*(ученица|ученик|пользователь)\s+(просит|спрашивает|хочет|пытается|нужно|интересуется)\b/i.test(t))return true;
+  if(/^\s*(задача|цель)\s*[:—-]/i.test(t))return true;
+  if(/^\s*(мне|нам)\s+(нужно|надо|следует)\s+(объяснить|ответить|показать|сказать)/i.test(t))return true;
+  if(/^\s*(нужно|надо|следует)\s+(объяснить|ответить|показать|сказать|учесть)\b/i.test(t))return true;
   if(/^(Сначала |Давай |Итак,? |Нужно |Следует |Я (должен|должна|сейчас) )/i.test(t)&&t.length<220)return true;
-  // truncated mid-thought / unfinished clause
+  // Truncated mid-thought / unfinished clause. Student-facing model answers must end cleanly.
   if(/\.{3}\s*$/.test(t)&&t.length<240)return true;
   if(/и притяжательн\w*\s*$/i.test(t))return true;
   if(/что\s*\.{3}/i.test(t))return true;
-  if(!/[.!?…»"]\s*$/u.test(t)&&t.length<160&&/(нужно|объясн|окончан)/i.test(t))return true;
+  if(t.length>=40&&!/[.!?…»"')\]]\s*$/u.test(t))return true;
   if(/^Хорошо,?\s*$/i.test(t))return true;
   return false;
 }
@@ -405,7 +410,7 @@ function unusableReason(text,raw,lessonId){
     return ('empty_output:'+rawS).slice(0,240);
   }
   if(looksLikePromptLeak(t))return 'prompt_leak';
-  if(looksLikeBadTutorReply(t))return 'bad_tutor_reply';
+  if(looksLikeBadTutorReply(t))return 'bad_tutor_reply_or_truncated';
   if(looksFuture(t,lessonId))return 'future_in_output';
   if(t.length<12)return ('too_short:'+t).slice(0,240);
   return ('unusable:'+t).slice(0,240);
