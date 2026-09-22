@@ -416,7 +416,16 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   out.next_action_ru=raw.next_action_ru?clip(raw.next_action_ru,180):null;
   out.needs_rule_context=!!raw.needs_rule_context;
   out.confidence=['high','medium','low'].includes(raw.confidence)?raw.confidence:'medium';
-  out.meta=raw.meta&&typeof raw.meta==='object'?{request_id:raw.meta.request_id||null,source:['primary','fallback','local'].includes(raw.meta.source)?raw.meta.source:'local',model:raw.meta.model||null,latency_ms:raw.meta.latency_ms||null}:{request_id:null,source:'local'};
+  out.meta=raw.meta&&typeof raw.meta==='object'?{
+    request_id:raw.meta.request_id||null,
+    source:['primary','fallback','local'].includes(raw.meta.source)?raw.meta.source:'local',
+    model:raw.meta.model||null,
+    latency_ms:raw.meta.latency_ms||null,
+    recovery:raw.meta.recovery===true||undefined,
+    primary_error:raw.meta.primary_error?clip(raw.meta.primary_error,240):null,
+    fallback_error:raw.meta.fallback_error?clip(raw.meta.fallback_error,240):null,
+    recovery_error:raw.meta.recovery_error?clip(raw.meta.recovery_error,240):null
+  }:{request_id:null,source:'local',model:null,latency_ms:null,recovery:undefined,primary_error:null,fallback_error:null,recovery_error:null};
   if(out.mode==='hint'){
     out.contrast.correct=null;
     if(containsExpected({message_ru:out.message_ru,micro_rule_ru:out.micro_rule_ru,next_action_ru:out.next_action_ru,contrast:out.contrast},req&&req.expected_answer)){
@@ -426,7 +435,16 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   out.remediation=null;
   if(!out.message_ru||!isUsableText(out.message_ru)){
     const local=localExplain(req||{mode});
-    local.meta={request_id:out.meta&&out.meta.request_id||null,source:'local',model:null,latency_ms:out.meta&&out.meta.latency_ms||null};
+    local.meta={
+      request_id:out.meta&&out.meta.request_id||null,
+      source:'local',
+      model:null,
+      latency_ms:out.meta&&out.meta.latency_ms||null,
+      recovery:out.meta&&out.meta.recovery===true||undefined,
+      primary_error:out.meta&&out.meta.primary_error||null,
+      fallback_error:out.meta&&out.meta.fallback_error||null,
+      recovery_error:out.meta&&out.meta.recovery_error||null
+    };
     return {ok:false,resp:local};
   }
   return {ok:true,resp:out};
