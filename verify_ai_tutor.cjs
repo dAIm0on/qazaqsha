@@ -108,7 +108,12 @@ assert.ok(!/kitabym_canned_after_unusable[\s\S]{0,220}?source:'fallback'/.test(t
 assert.ok(!/assemble\(req,canned,\{[\s\S]*?source:'fallback'/.test(tutorSrc2));
 assert.ok(C.looksLikeBadTutorReply('Нужно объяснить, что ... окончания множественного числа и притяжательное'));
 assert.ok(!C.isUsableText('Нужно объяснить, что окончания множественного числа и притяжательное'));
-ok('TEST planning meta Нужно объяснить rejected');
+assert.ok(C.looksLikeBadTutorReply('Ученица просит объяснить множественное число через последний слог и выбор окончания.'));
+assert.ok(!C.isUsableText('Ученица просит объяснить множественное число через последний слог и выбор окончания.'));
+assert.ok(C.looksLikeBadTutorReply('Множественное число зависит от последнего слога: после гласной выбирается лар или лер, после звонкой согласной дар или дер, а после глухой'));
+assert.ok(!C.isUsableText('Множественное число зависит от последнего слога: после гласной выбирается лар или лер, после звонкой согласной дар или дер, а после глухой'));
+assert.ok(C.isUsableText('Множественное число зависит от последнего слога. После гласной выбирается -лар/-лер, после некоторых согласных — -дар/-дер или -тар/-тер.'));
+ok('TEST Russian planning draft + truncated answer rejected; complete answer accepted');
 ok('TEST tutor loop and kitabym gate');
 
 
