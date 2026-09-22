@@ -59,7 +59,8 @@ h1,h2,h3{color:var(--ink);letter-spacing:-.03em;font-family:var(--display);font-
 h1{font-size:clamp(2rem,4vw,3.5rem);line-height:1.08;letter-spacing:-.04em;font-weight:700}
 h2{font-size:clamp(1.35rem,2vw,2rem);line-height:1.16}
 h3{font-size:1.125rem;letter-spacing:-.02em}
-.eyebrow{color:var(--muted);letter-spacing:.14em;font-size:.6875rem;font-weight:600}
+.eyebrow{display:flex;align-items:center;gap:8px;color:var(--muted);letter-spacing:.14em;font-size:.6875rem;font-weight:600}
+.eyebrow:before{content:"";width:24px;height:1px;background:var(--ink);flex:0 0 24px}
 
 /* Shell */
 .topbar,.topnav,.bottom-nav{
@@ -78,7 +79,8 @@ h3{font-size:1.125rem;letter-spacing:-.02em}
 .brand-caption{color:var(--muted);font-family:var(--sans);font-weight:400;letter-spacing:.12em;text-transform:uppercase;font-size:.6875rem}
 .topnav button{color:var(--muted);border-radius:12px;padding:10px 14px;min-height:44px}
 .topnav button[aria-current=page]{
-  background:var(--sage);color:var(--primary);box-shadow:none;font-weight:550
+  background:transparent;color:var(--ink);box-shadow:none;font-weight:600;
+  border-radius:0;border-bottom:2px solid var(--spot,#FF5A1F)
 }
 .topnav button:hover{background:var(--surface-alt)}
 .account .text-button,#account-user{color:var(--muted)}
@@ -239,7 +241,15 @@ body.keyboard-open[data-view=rules] #rules-ask-panel{
 .feedback.hinted{background:var(--warning-bg);border-color:color-mix(in srgb,var(--warning) 28%,var(--line));color:var(--warning)}
 .feedback h3{font-family:var(--display);font-weight:600;color:inherit}
 .feedback h3::before{content:"✓ ";color:var(--success);font-weight:700}
-.feedback.error h3::before{content:"✕ ";color:var(--error)}
+.feedback.error h3{
+  display:inline-block;width:max-content;max-width:100%;
+  margin:0 0 10px;padding:10px 14px;
+  background:var(--spot,#FF5A1F);color:#fff;
+  border-radius:6px 12px 5px 10px;
+  font-family:var(--display);font-style:italic;font-weight:600;
+  transform:rotate(-2deg) skewX(-4deg)
+}
+.feedback.error h3::before{content:none}
 .feedback.hinted h3::before{content:"◌ ";color:var(--warning)}
 .hint{background:var(--sage);border-color:transparent;color:var(--primary);border-radius:var(--radius-control)}
 .hint::before{content:"Подсказка · ";font-weight:600;color:var(--primary)}
@@ -396,9 +406,11 @@ body[data-view=practice] .issue-toggle{
 }
 #issue-dialog textarea{width:100%;min-height:96px;margin:8px 0;font:inherit}
 .bottom-nav{
-  background:var(--surface);border-top:1px solid var(--line);
+  background:var(--surface);border:1px solid var(--line);
   grid-template-columns:repeat(5,minmax(0,1fr))!important;
-  padding-bottom:env(safe-area-inset-bottom,0px)
+  left:8px;right:8px;bottom:8px;width:auto;
+  border-radius:20px;box-shadow:0 12px 40px rgba(22,20,18,.16);
+  padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))
 }
 :root{--bottom-nav-height:calc(64px + env(safe-area-inset-bottom, 0px))}
 .bottom-nav button{
@@ -408,8 +420,8 @@ body[data-view=practice] .issue-toggle{
 }
 .bottom-nav button[aria-current=page]{color:var(--ink);background:transparent;box-shadow:none;font-weight:700}
 .bottom-nav button[aria-current=page]::after{
-  content:"";position:absolute;left:50%;bottom:6px;width:28px;height:3px;
-  margin-left:-14px;border-radius:999px;background:var(--spot,#FF5A1F)
+  content:"";position:absolute;left:50%;bottom:2px;width:28px;height:3px;
+  margin-left:-14px;border-radius:999px;background:var(--spot,#FF5A1F);z-index:1
 }
 
 .path-crumb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 12px;font-size:.875rem;color:var(--muted)}
@@ -558,7 +570,7 @@ body.keyboard-open #account-dialog{
 }
 @media(max-width:690px){
   .topbar{padding:8px 16px;min-height:56px}
-  h1{font-size:2.1rem;letter-spacing:-.03em}
+  h1{font-size:clamp(2.75rem,12vw,3.625rem);letter-spacing:-.045em;line-height:.95}
   .today-hero{padding:0}
   .today-tiles,.today-actions,.today-lessons,.course-jump .review-actions{grid-template-columns:1fr 1fr;gap:8px}
   .exercise-card{margin-bottom:var(--bottom-nav-height,64px);border-radius:22px;box-shadow:none;overflow:visible}
