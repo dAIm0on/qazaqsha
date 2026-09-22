@@ -27,7 +27,7 @@ test('K1-A schema 6 -> 7 preserves learning stores and derives resume',()=>{
     homeworkAttempts:{'1-2':{lessonId:'1-2',started_at:1,items:[]}},
     aiTutor:{errors:{E:{error_code:'E',count_total:1,count_recent:1,lesson_id:'1-2'}},recent:[]},
     grammarPath:{lessonId:'2-1',chapterId:'2-1-emes',beat:3,phase:'beat',completedChapters:{},pathDraft:{lessonId:'2-1',chapterId:'2-1-emes',beat:3,value:'draft'}},
-    session:null
+    session:{mode:'course',courseBlock:'3-1',queue:['q1','q2'],position:1,answered:false,view:'practice'}
   };
   const s=P.migrate(raw,now);
   assert.equal(s.schema,7);
@@ -36,7 +36,10 @@ test('K1-A schema 6 -> 7 preserves learning stores and derives resume',()=>{
   assert.ok(s.homeworkAttempts['1-2']);
   assert.equal(s.aiTutor.errors.E.count_total,1);
   assert.equal(s.grammarPath.lessonId,'2-1');
-  assert.equal(s.courseProgress.resumePointer.lessonId,'2-1');
+  assert.equal(s.courseProgress.resumePointer.lessonId,'3-1');
+  assert.equal(s.courseProgress.resumePointer.surface,'practice');
+  assert.deepEqual(s.courseProgress.lessons['3-1'].practiceSession.queue,['q1','q2']);
+  assert.equal(s.courseProgress.lessons['3-1'].status,'in_progress');
 });
 
 test('K1-B picker open/close has no resume mutation hook',()=>{
