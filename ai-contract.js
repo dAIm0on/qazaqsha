@@ -409,7 +409,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   out.primary_error_code=(code&&allowedCodes.has(code))?code:null;
   out.secondary_error_codes=asArr(raw.secondary_error_codes).filter(c=>allowedCodes.has(c)).slice(0,4);
   out.rule_ids_used=asArr(raw.rule_ids_used).filter(id=>!allowedRules.size||allowedRules.has(id)).slice(0,6);
-  out.message_ru=clip(raw.message_ru||'',maxMessage(out.mode));
+  out.message_ru=sentenceClip(cleanTutorReply(raw.message_ru||''),maxMessage(out.mode));
   out.micro_rule_ru=raw.micro_rule_ru?clip(raw.micro_rule_ru,220):null;
   const c=raw.contrast&&typeof raw.contrast==='object'?raw.contrast:{};
   out.contrast={wrong:c.wrong?clip(c.wrong,80):null,correct:c.correct?clip(c.correct,80):null};
@@ -424,7 +424,11 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
     }
   }
   out.remediation=null;
-  if(!out.message_ru)return {ok:false,resp:fallback(mode,req,'empty')};
+  if(!out.message_ru||!isUsableText(out.message_ru)){
+    const local=localExplain(req||{mode});
+    local.meta={request_id:out.meta&&out.meta.request_id||null,source:'local',model:null,latency_ms:out.meta&&out.meta.latency_ms||null};
+    return {ok:false,resp:local};
+  }
   return {ok:true,resp:out};
  }
  function fallback(mode,req,reason){
@@ -441,6 +445,6 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
  }
  function looksFuture(text,lessonId){const v=String(text||'');return ALWAYS_FUTURE_RE.test(v)||(lessonId!=='3-1'&&lessonId!=='3-2'&&POSS_FUTURE_RE.test(v));}
  function outTokens(mode){return mode==='ask_tutor'?ASK_OUT_TOKENS:MAX_OUT_TOKENS;}
- const api={PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,FALLBACK,MODES,SURFACES,ERROR_CODES,ALLOWED_LESSONS,RULE_BY_LESSON,VOCAB_BY_LESSON,FUTURE_RE,MAX_OUT_TOKENS,ASK_OUT_TOKENS,CLIENT_TIMEOUT_MS,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,SYSTEM,validateRequest,validateResponse,extractJson,normalizeModelText,isUsableText,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism,emptyResp,fallback,localExplain,assembleResponse,examBlocked,futureBlocked,missingLesson,looksFuture,clip,normKey,resolveCurriculum,lessonsThrough,containsExpected,clipTail,clipRuleContext,maxMessage,outTokens,leverLine};
+ const api={PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,FALLBACK,MODES,SURFACES,ERROR_CODES,ALLOWED_LESSONS,RULE_BY_LESSON,VOCAB_BY_LESSON,FUTURE_RE,MAX_OUT_TOKENS,ASK_OUT_TOKENS,CLIENT_TIMEOUT_MS,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,SYSTEM,validateRequest,validateResponse,extractJson,normalizeModelText,isUsableText,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism,emptyResp,fallback,localExplain,assembleResponse,examBlocked,futureBlocked,missingLesson,looksFuture,clip,sentenceClip,contextClip,normKey,resolveCurriculum,lessonsThrough,containsExpected,clipTail,clipRuleContext,maxMessage,outTokens,leverLine};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.AiContract=api;
 })(typeof window!=='undefined'?window:globalThis);
