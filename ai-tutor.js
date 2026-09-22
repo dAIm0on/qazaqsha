@@ -302,11 +302,19 @@
    };
   }).filter(Boolean);
  }
+ const GAP_PHRASE='Отдельного упражнения для этой ошибки нет.';
+ function coverageGaps(){
+  return dueRemediation().filter(r=>!templateQuestions(r.error_code).length).map(r=>{
+   const name=label(r.error_code);
+   return {error_code:r.error_code,label:name===r.error_code?'':name,phrase:GAP_PHRASE};
+  });
+ }
  function takeRemediation(byId){
-  const due=dueRemediation()[0];if(!due)return [];
-  const items=templateQuestions(due.error_code);
+  const ready=dueRemediation().find(r=>templateQuestions(r.error_code).length);
+  if(!ready)return [];
+  const items=templateQuestions(ready.error_code);
   for(const q of items)if(byId&&q)byId.set(q.id,q);
-  due.remediation_due=false;save(store);
+  ready.remediation_due=false;save(store);
   return items;
  }
  function spliceRemediation(queue,position,ids){
@@ -335,6 +343,6 @@
  function hintLeaks(resp,expected){
   return C.containsExpected(resp,expected);
  }
- const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,localFallback,isLiveMessage,buildRequest,callTutor,askTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset,snapshot,restore};
+ const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,coverageGaps,localFallback,isLiveMessage,buildRequest,callTutor,askTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset,snapshot,restore};
  if(node)module.exports=api;else root.AiTutor=api;
 })(typeof window!=='undefined'?window:globalThis);
