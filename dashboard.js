@@ -94,8 +94,13 @@
        const picker=root.querySelector('#lesson-picker'),openPicker=root.querySelector('[data-picker-open]'),closePicker=root.querySelector('[data-picker-close]');
        if(openPicker&&picker)openPicker.onclick=()=>{if(picker.showModal)picker.showModal();else picker.setAttribute('open','');};
        if(closePicker&&picker)closePicker.onclick=()=>{if(picker.close)picker.close();else picker.removeAttribute('open');};
+       if(openPicker&&picker)picker.addEventListener('close',()=>{if(document.body.getAttribute('data-view')==='today')openPicker.focus();});
      }
-     root.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>api.action(b.dataset.action));
+     root.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>{
+       const picker=b.closest&&b.closest('#lesson-picker');
+       if(picker&&picker.open&&picker.close)picker.close();
+       api.action(b.dataset.action);
+     });
      root.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{
        const nav=document.querySelector('.bottom-nav [data-view="'+b.dataset.view+'"], .topnav [data-view="'+b.dataset.view+'"]');
        if(nav)nav.click();
