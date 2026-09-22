@@ -677,3 +677,48 @@ html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
   .exercise-card,.panel{background:#fff!important;box-shadow:none!important}
   #tutor-host{display:none!important}
 }
+
+
+/* K1: primary progression + lesson picker */
+.today-course-actions{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px
+}
+.today-course-actions .secondary-button{min-height:44px}
+.lesson-picker{
+  width:min(720px,calc(100vw - 24px));max-width:720px;
+  max-height:calc(100dvh - 24px);overflow-x:hidden
+}
+.lesson-picker-head{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+  margin-bottom:16px
+}
+.lesson-picker-head h2{margin:0}
+.lesson-picker-head .text-button{min-height:44px;flex:0 0 auto}
+.lesson-picker-list{display:grid;gap:10px;min-width:0}
+.lesson-picker-row{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;
+  min-width:0;padding:14px;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface)
+}
+.lesson-picker-row.current{background:var(--lilac);border-color:var(--lilac)}
+.lesson-picker-copy{min-width:0}
+.lesson-picker-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lesson-picker-row h3{margin:6px 0 4px;font-family:var(--display);font-size:1rem;font-weight:600}
+.lesson-picker-row p{margin:0;overflow-wrap:anywhere}
+.lesson-status,.lesson-primary{
+  display:inline-flex;align-items:center;min-height:24px;padding:2px 8px;
+  border:1px solid var(--line);border-radius:999px;font-size:.75rem;color:var(--muted)
+}
+.lesson-primary{color:var(--primary);border-color:color-mix(in srgb,var(--primary) 30%,var(--line))}
+.lesson-picker-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.lesson-picker-actions button{min-height:44px;white-space:nowrap}
+
+@media(max-width:620px){
+  .lesson-picker{width:calc(100vw - 16px);padding-left:14px;padding-right:14px}
+  .lesson-picker-head{gap:8px}
+  .lesson-picker-row{grid-template-columns:minmax(0,1fr);gap:10px}
+  .lesson-picker-actions{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  .lesson-picker-actions button{width:100%;min-width:0}
+  .today-course-actions{display:grid;grid-template-columns:1fr;width:100%}
+  .today-course-actions .secondary-button,.today-course-actions .text-button{width:100%}
+}
