@@ -3,10 +3,11 @@
  const node=typeof module!=='undefined'&&module.exports;
  const cfg=node?require('./config.js'):root.TRAINER_CONFIG,core=node?require('./core.js'):root.TrainerCore;
  const packages=node?require('./package-schema.js'):root.LessonPackageSchema;
+ const courseProgress=node?require('./course-progress.js'):root.CourseProgress;
  const obj=v=>v&&typeof v==='object'&&!Array.isArray(v);
  const safe=k=>typeof k==='string'&&k.length<=300&&!['__proto__','prototype','constructor'].includes(k);
  function dictionary(value,transform){const out=Object.create(null);if(obj(value))for(const [k,v] of Object.entries(value))if(safe(k)){const next=transform(v,k);if(next!==undefined)out[k]=next;}return out;}
- function empty(){return {schema:6,records:Object.create(null),skills:Object.create(null),errors:[],issueLog:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:false,lettersChosen:false},incidentalWeek:{key:'',added:0},homeworkAttempts:Object.create(null),grammarPath:{topicId:null,step:0,phase:'hub',queue:[],index:0,peeks:Object.create(null),fails:Object.create(null),passed:Object.create(null),blocked:false,completed:[],lessonId:null,chapterId:null,beat:0,completedChapters:Object.create(null),legacyCompleted:[]},session:null,lesson_packages:[],repair:null,savings:Object.create(null)};}
+ function empty(){return {schema:7,records:Object.create(null),skills:Object.create(null),errors:[],issueLog:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:false,lettersChosen:false},incidentalWeek:{key:'',added:0},homeworkAttempts:Object.create(null),grammarPath:{topicId:null,step:0,phase:'hub',queue:[],index:0,peeks:Object.create(null),fails:Object.create(null),passed:Object.create(null),blocked:false,completed:[],lessonId:null,chapterId:null,beat:0,completedChapters:Object.create(null),legacyCompleted:[]},courseProgress:courseProgress.empty(),session:null,lesson_packages:[],repair:null,savings:Object.create(null)};}
  function migrate(raw={},now=Date.now()){
    const state=empty();state.lesson_packages=packages.merge([],raw.lesson_packages||[]);state.skills=dictionary(raw.skills,r=>obj(r)?core.migrateRecord(r,now):undefined);state.errors=Array.isArray(raw.errors)?raw.errors.filter(e=>obj(e)&&typeof e.error_type==='string'&&Number.isFinite(e.timestamp)):[];state.records=dictionary(raw.records,r=>obj(r)?core.migrateRecord(r,now):undefined);
    state.associations=dictionary(raw.associations,v=>typeof v==='string'?{text:v.slice(0,cfg.storage.maxAssociationLength),updated_at:now}:obj(v)&&typeof v.text==='string'?{text:v.text.slice(0,cfg.storage.maxAssociationLength),updated_at:Number(v.updated_at)||0}:undefined);
@@ -54,6 +55,8 @@
    if(obj(raw.repair)&&typeof raw.repair.rule_id==='string')state.repair={rule_id:raw.repair.rule_id.slice(0,80),started:String(raw.repair.started||''),quiet_until:Number(raw.repair.quiet_until)||0,roots_used:Array.isArray(raw.repair.roots_used)?raw.repair.roots_used.filter(x=>typeof x==='string').slice(0,8):[],attempts:Math.max(0,Number(raw.repair.attempts)||0),blinds:Math.max(0,Number(raw.repair.blinds)||0)};
    if(obj(raw.savings))state.savings=dictionary(raw.savings,v=>Math.max(0,Math.floor(Number(v)||0)));
    if(obj(raw.aiTutor))state.aiTutor=tidyTutor(raw.aiTutor);
+   state.schema=7;
+   state.courseProgress=courseProgress.migrate(raw.courseProgress,state,raw,now);
    return state;
  }
  function tidyTutor(raw){
@@ -82,12 +85,12 @@
    }
    return {errors,recent:recent.slice(-80)};
  }
- function serialize(state){return JSON.stringify({app:'qazaq-trainer',schema:6,exported_at:new Date().toISOString(),policy_version:cfg.version,scheduler_config:{implementation:cfg.algorithm,desired_retention:cfg.fsrs.desired_retention,standard_weights:true},...state});}
+ function serialize(state){return JSON.stringify({app:'qazaq-trainer',schema:7,exported_at:new Date().toISOString(),policy_version:cfg.version,scheduler_config:{implementation:cfg.algorithm,desired_retention:cfg.fsrs.desired_retention,standard_weights:true},...state});}
  function validate(text,knownIds,now=Date.now()){
    if(new TextEncoder().encode(text).length>cfg.storage.maxImportBytes)throw Error('Файл слишком большой: максимум 20 МБ.');
    let raw;try{raw=JSON.parse(text);}catch{throw Error('Это не корректный JSON-файл.');}
    if(!obj(raw)||!obj(raw.records)||(raw.app&&raw.app!=='qazaq-trainer'))throw Error('Файл не похож на резервную копию тренажёра.');
-   if(raw.schema!==undefined&&![1,2,3,4,5,6].includes(raw.schema))throw Error('Эта версия резервной копии пока не поддерживается.');
+   if(raw.schema!==undefined&&![1,2,3,4,5,6,7].includes(raw.schema))throw Error('Эта версия резервной копии пока не поддерживается.');
    if(Object.keys(raw.records).length+Object.keys(raw.skills||{}).length>20000)throw Error('Слишком много карточек в файле.');
    for(const [id,r] of [...Object.entries(raw.records),...Object.entries(raw.skills||{})]){
      if(!safe(id)||!obj(r))throw Error('В файле есть некорректная запись карточки.');
@@ -133,6 +136,8 @@
      out.issueLog=[...map.values()].sort((a,b)=>a.at-b.at).slice(-80);
    }
    if(incoming.aiTutor||out.aiTutor)out.aiTutor=mergeTutor(out.aiTutor,obj(incoming.aiTutor)?tidyTutor(incoming.aiTutor):null);
+   out.courseProgress=courseProgress.merge(out.courseProgress,incoming.courseProgress,out);
+   out.schema=7;
    return out;
  }
  function memoryStats(state,now=Date.now()){
@@ -202,6 +207,6 @@
    const ids=questions.filter(q=>samePair(q,pair)&&byId.has(q.id)).map(q=>q.id);
    return [...new Set(ids)].slice(0,cfg.session.size);
  }
- const api={empty,migrate,serialize,validate,merge,answerIndex,observeConfusions,pairs,contrastIds,samePair,memoryStats};
+ const api={empty,migrate,serialize,validate,merge,answerIndex,observeConfusions,pairs,contrastIds,samePair,memoryStats,courseIds:courseProgress.courseIds,ensureCourseProgress:courseProgress.ensure,ensureLessonProgress:courseProgress.ensureLesson,setResumePointer:courseProgress.setResume,markLessonStarted:courseProgress.markStarted,markLessonCompleted:courseProgress.markCompleted,saveLessonPath:courseProgress.savePath,saveLessonPractice:courseProgress.savePractice,clearLessonPractice:courseProgress.clearPractice,normalizePracticeSession:courseProgress.normalizePractice};
  if(node)module.exports=api;else root.ProgressStore=api;
 })(typeof window!=='undefined'?window:globalThis);
