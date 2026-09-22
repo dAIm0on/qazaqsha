@@ -722,3 +722,88 @@ html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
   .today-course-actions{display:grid;grid-template-columns:1fr;width:100%}
   .today-course-actions .secondary-button,.today-course-actions .text-button{width:100%}
 }
+
+
+/* K2.1 · standalone Cat Trainer */
+.cat-trainer-card{
+  background:var(--oil)!important;
+  border-color:color-mix(in srgb,var(--oil) 72%,var(--line))!important;
+}
+.cat-trainer-card span,.cat-trainer-card small{color:var(--ink)!important}
+#personal-content{max-width:880px;margin:0 auto 32px}
+.cat-trainer-hero{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;
+  background:var(--oil);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px
+}
+.cat-trainer-hero h2,.personal-trainer-head h2,.personal-trainer-card h2,.cat-stage-card h2{margin:.2rem 0 .45rem;font-family:var(--display);font-weight:600}
+.cat-trainer-hero img{width:112px;height:112px;object-fit:contain;align-self:end}
+.personal-trainer-list{display:grid;gap:12px}
+.personal-trainer-card{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px
+}
+.personal-trainer-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.personal-trainer-head{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px 18px;align-items:center;margin-bottom:14px
+}
+.personal-trainer-head .text-button{min-height:44px}
+.cat-stage-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+  padding:clamp(18px,4vw,28px);max-width:760px;margin:0 auto
+}
+.cat-stage-progress{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px;color:var(--muted)}
+.cat-focus-letter{
+  font-family:"Segoe UI",sans-serif;font-size:clamp(4rem,16vw,7rem);line-height:1;text-align:center;
+  margin:18px auto 22px;color:var(--ink)
+}
+.cat-word{font-family:var(--display);font-size:clamp(2.3rem,9vw,4.6rem);line-height:1.05;text-align:center;margin:18px 0}
+.cat-pair-map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0}
+.cat-pair{
+  display:flex;align-items:center;justify-content:center;gap:10px;min-height:64px;
+  background:var(--surface-alt);border:1px solid var(--line);border-radius:16px;font-size:1.35rem
+}
+.cat-pair strong{font-size:1.65rem}
+.cat-memory-note{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;background:var(--paper2);border-radius:16px;padding:14px 16px;margin:16px 0}
+.cat-memory-note p{margin:0}
+.cat-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.cat-choice,.cat-letter-choice{
+  min-height:52px;border:1px solid var(--line);background:var(--surface-alt);color:var(--ink);border-radius:14px;
+  font:inherit;font-weight:550;padding:12px;cursor:pointer
+}
+.cat-choice:disabled,.cat-letter-choice:disabled{cursor:default;opacity:.75}
+.cat-letter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(52px,1fr));gap:8px;margin:18px 0}
+.cat-letter-choice{font-size:1.3rem;min-width:52px}
+.cat-letter-choice.selected{outline:3px solid var(--primary);outline-offset:1px;background:var(--sage)}
+.cat-word-letters{grid-template-columns:repeat(auto-fit,minmax(48px,64px));justify-content:center}
+.cat-pairs-recall{display:grid;gap:8px;margin:18px 0}
+.cat-pairs-recall label{
+  display:grid;grid-template-columns:64px minmax(0,160px);gap:12px;align-items:center;justify-content:center;
+  min-height:52px
+}
+.cat-pairs-recall label span{font-size:1.3rem;font-weight:600}
+.cat-pairs-recall select{min-height:48px;font-size:1.1rem}
+.cat-info{
+  text-align:center;background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin:14px 0
+}
+.cat-feedback{margin:18px 0 12px;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--paper2)}
+.cat-feedback.correct{background:var(--sage)}
+.cat-feedback.wrong{background:var(--oil)}
+.cat-feedback p{margin:.35rem 0 0}
+.cat-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
+.cat-summary div{display:grid;gap:4px;text-align:center;background:var(--surface-alt);border-radius:14px;padding:14px}
+.cat-summary strong{font-size:1.6rem}
+.cat-summary span{font-size:.8rem;color:var(--muted)}
+.cat-stage-card > .primary-button{margin-top:12px}
+@media(max-width:690px){
+  #personal-content{max-width:none}
+  .cat-trainer-hero{grid-template-columns:1fr 84px;padding:16px}
+  .cat-trainer-hero img{width:84px;height:84px}
+  .personal-trainer-card{grid-template-columns:1fr}
+  .personal-trainer-actions{align-items:stretch}
+  .personal-trainer-actions .primary-button,.personal-trainer-actions .secondary-button,.personal-trainer-actions .text-button{width:100%;justify-content:center}
+  .cat-pair-map{grid-template-columns:1fr 1fr}
+  .cat-memory-note{grid-template-columns:1fr}
+  .cat-choice-grid{grid-template-columns:1fr}
+  .cat-summary{grid-template-columns:1fr}
+  .personal-trainer-head{grid-template-columns:1fr}
+}
