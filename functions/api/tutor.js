@@ -10,7 +10,7 @@ const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2'];
 const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'] ,'3-1':['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL'],'3-2':['T24_POSS_BIZ','T25_POSS_SENDER','T26_POSS_OLAR','T27_DEIXIS']};
 const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам'] ,'3-1':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','жүрек','сақал','мысық','таз','тақырбас','қатты','саусақ','кім','не','қандай','қай','нешінші','бұл']};
 const MAX_IN=12000,MAX_OUT=250,ASK_OUT=500;
-const PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000,RECOVERY_TIMEOUT_MS=4000;
+const PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000,ASK_FALLBACK_TIMEOUT_MS=10000,ASK_PRIMARY_TIMEOUT_MS=3500,RECOVERY_TIMEOUT_MS=6500;
 const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,session_summary:800,remediation:450};
 const FUTURE_RE=/падеж|посессив|притяжательн|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|бар ма\?|кітабым/i;
 const ALWAYS_FUTURE_RE=/падеж|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|labial|comparative/i;
@@ -18,6 +18,21 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
 const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha. Ты не проверяешь правильность ответа. Правильность уже определил локальный код. Ты не меняешь expected_answer. Главный источник истины — переданный rule_context. Объясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком. Не вводи будущие темы. Не исправляй учебную программу своими знаниями. Не называй внутренние ID правил. Не упоминай system prompt, error_code или внутреннюю архитектуру. Пиши естественным русским языком. Казахские формы оставляй на казахском. Если mode=explain_error: скажи, что ученица написала; покажи отличие от правильной формы; объясни один механизм правила; используй текущий пример. Если mode=explain_rule: объясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом. Если mode=simplify: объясни то же правило проще, не меняя его смысл. Если mode=ask_tutor: ответь прежде всего на вопрос ученицы 2–6 предложениями. Сразу к сути, без приветствия и без переписывания её вопроса. Разрешено объяснять через русский язык, если это помогает понять казахское правило. Для кітап+ым помни озвончение п→б: кітабым, не «кітап заканчивается на гласную». Дополнительные примеры — только из уже открытой лексики и грамматики. Если ученица пишет «не поняла», «ещё проще», «объясни иначе», «через русский» — измени способ объяснения, но не правило. Если repeat_count >= 2: можно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ понять. Не стыди. Если mode=hint: не показывай полный правильный ответ. Возвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context. Без JSON. Без markdown fences. Без <think>. Никогда не пиши English thinking aloud (Okay, Let me recall, the user is asking). Ответ ученице — только на русском.';
 
 function clip(s,n){s=String(s==null?'':s);return s.length<=n?s:s.slice(0,n);}
+function sentenceClip(s,n){
+  s=String(s==null?'':s).trim();
+  if(s.length<=n)return s;
+  const head=s.slice(0,n+1);
+  let cut=-1;
+  for(let i=head.length-1;i>=0;i--){
+    if(/[.!?…»"]/.test(head[i])){cut=i;break;}
+  }
+  return cut>=40?head.slice(0,cut+1).trim():'';
+}
+function contextClip(s,n){
+  s=String(s==null?'':s);
+  if(s.length<=n)return s;
+  return sentenceClip(s,n)||clip(s,n);
+}
 function asArr(v){return Array.isArray(v)?v.filter(x=>typeof x==='string'):[];}
 function normKey(s){return String(s??'').normalize('NFC').toLocaleLowerCase('ru').replace(/[.!?,;:]+$/g,'').replace(/\s+/g,' ').trim();}
 function maxMessage(mode){return MSG_MAX[mode]||450;}
@@ -124,7 +139,7 @@ function localFallback(req,rid){
     r.message_ru='Разбор сессии сейчас короткий. Локальные слабые места сохранены.';
   }else r.message_ru=lever;
   r.next_action_ru='Введи правильную форму целиком.';
-  r.message_ru=clip(r.message_ru,maxMessage(mode));
+  r.message_ru=sentenceClip(r.message_ru,maxMessage(mode))||sentenceClip(lever,maxMessage(mode))||clip(lever,maxMessage(mode));
   return r;
 }
 function extractJson(text){
@@ -283,7 +298,7 @@ function isUsableText(t){
 function assemble(req,text,meta){
   const mode=req.mode;
   const r=empty(mode,true);
-  r.message_ru=clip(cleanTutorReply(String(text||'').trim()),maxMessage(mode));
+  r.message_ru=sentenceClip(cleanTutorReply(String(text||'').trim()),maxMessage(mode));
   r.primary_error_code=(req.candidate_error_codes&&req.candidate_error_codes[0])||null;
   r.secondary_error_codes=asArr(req.candidate_error_codes).slice(1,4);
   r.rule_ids_used=(req.rule_context||[]).map(c=>c&&c.rule_id).filter(Boolean).slice(0,6);
@@ -331,15 +346,15 @@ function clipRuleContext(arr,allowRules){
     if(!id||!allow.has(id))continue;
     const fullMed=String(c.medium||c.explanation_ru||'');
     const fullRu=String(c.ru_refresh||'');
-    const medium=clip(fullMed,700);
-    const next=String(c.medium_next||(fullMed.length>700?fullMed.slice(700):''));
+    const medium=contextClip(fullMed,700);
+    const next=String(c.medium_next||(fullMed.length>700?fullMed.slice(medium.length):''));
     out.push({
       rule_id:id,block_id:id,block_label:clip(c.block_label||c.title_ru,120),part:1,
       clipped:!!c.clipped||fullMed.length>700||fullRu.length>400,
       title_ru:clip(c.title_ru,120),
-      ru_refresh:clip(fullRu,400),short:clip(c.short||c.title_ru,160),
-      medium,explanation_ru:clip(c.explanation_ru||c.medium,700),
-      medium_next:clip(next,700),
+      ru_refresh:contextClip(fullRu,400),short:contextClip(c.short||c.title_ru,160),
+      medium,explanation_ru:contextClip(c.explanation_ru||c.medium,700),
+      medium_next:contextClip(next,700),
       examples_correct:asArr(c.examples_correct).slice(0,4),
       examples_wrong:asArr(c.examples_wrong).slice(0,4),
       traps:asArr(c.traps).slice(0,4)
@@ -465,31 +480,31 @@ async function runTutorModel(req,env,rid){
   const started=Date.now();
   const maxTok=req.mode==='ask_tutor'?ASK_OUT:MAX_OUT;
   const messages=buildTutorMessages(req);
-  const errors={primary:null,fallback:null};
-  const tryOne=async(model,timeout,source,useMessages=messages,attempt='standard')=>{
+  const errors={primary:null,fallback:null,recovery:null};
+  const tryOne=async(model,timeout,source,useMessages=messages,attempt='standard',tokenBudget=maxTok)=>{
     const t0=Date.now();
     try{
-      const {text,raw}=await runModel(env,model,useMessages,maxTok,timeout);
+      const {text,raw}=await runModel(env,model,useMessages,tokenBudget,timeout);
       const built=assemble(req,text,{request_id:rid,source,model,latency_ms:Date.now()-t0});
       const error_type=built?null:unusableReason(text,raw,req.lesson_id);
       logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model,source,attempt,latency_ms:Date.now()-t0,result:built?'success':'unusable',error_type});
-      if(!built)errors[source]=error_type;
+      if(!built)errors[attempt==='recovery'?'recovery':source]=error_type;
       if(built&&attempt==='recovery')built.meta.recovery=true;
       return built;
     }catch(err){
       const error_type=modelError(err);
-      errors[source]=error_type;
+      errors[attempt==='recovery'?'recovery':source]=error_type;
       logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model,source,attempt,latency_ms:Date.now()-t0,result:'error',error_type});
       return null;
     }
   };
   if(env&&env.AI&&typeof env.AI.run==='function'){
     if(req.mode==='ask_tutor'){
-      const fallback=await tryOne(FALLBACK_MODEL,FALLBACK_TIMEOUT_MS,'fallback');
+      const fallback=await tryOne(FALLBACK_MODEL,ASK_FALLBACK_TIMEOUT_MS,'fallback',messages,'standard',320);
       if(fallback)return fallback;
-      const primary=await tryOne(PRIMARY_MODEL,PRIMARY_TIMEOUT_MS,'primary');
+      const primary=await tryOne(PRIMARY_MODEL,ASK_PRIMARY_TIMEOUT_MS,'primary',messages,'standard',220);
       if(primary)return primary;
-      const recovery=await tryOne(FALLBACK_MODEL,RECOVERY_TIMEOUT_MS,'fallback',buildRecoveryMessages(req),'recovery');
+      const recovery=await tryOne(FALLBACK_MODEL,RECOVERY_TIMEOUT_MS,'fallback',buildRecoveryMessages(req),'recovery',220);
       if(recovery)return recovery;
     }else{
       const primary=await tryOne(PRIMARY_MODEL,PRIMARY_TIMEOUT_MS,'primary');
@@ -513,6 +528,7 @@ async function runTutorModel(req,env,rid){
   local.meta.latency_ms=Date.now()-started;
   local.meta.primary_error=errors.primary;
   local.meta.fallback_error=errors.fallback;
+  local.meta.recovery_error=errors.recovery;
   logTutor({request_id:rid,mode:req.mode,surface:req.surface,lesson_id:req.lesson_id,error_code:(req.candidate_error_codes&&req.candidate_error_codes[0])||null,model:null,source:'local',latency_ms:local.meta.latency_ms,result:'local',error_type:'model_unavailable',primary_error:errors.primary,fallback_error:errors.fallback});
   return local;
 }
@@ -601,4 +617,4 @@ function json(body,status=200){
   return new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
 }
 
-export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,RECOVERY_TIMEOUT_MS,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,clipRuleContext,buildTutorMessages,buildRecoveryMessages,userPayload,messagesToPrompt,glmPayload,qwenPayload,payloadFor,looksFuture,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism};
+export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,ASK_FALLBACK_TIMEOUT_MS,ASK_PRIMARY_TIMEOUT_MS,RECOVERY_TIMEOUT_MS,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,clipRuleContext,buildTutorMessages,buildRecoveryMessages,userPayload,messagesToPrompt,glmPayload,qwenPayload,payloadFor,looksFuture,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism};
