@@ -1391,7 +1391,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/qazaq-offline-live-20260922-gap/.test(openSw));
+assert.ok(/qazaq-offline-live-20260922-chain/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1948,5 +1948,46 @@ assert.equal(possGap.label,'Притяжательное П/К/Қ');
 assert.ok(/data-coverage-gap/.test(fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8')));
 assert.ok(/data-coverage-gap/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 ok('Astra step 8: a voicing error with no exercise stays due and says so');
+
+const OpenChain=require('./explain-open.js');
+const chainQ={id:'m1',ruleIds:['T1_HARMONY'],fields:[{answers:['кітаптар']}],explanation:'Смотри последний слог.'};
+const chainHtml=OpenChain.chainHtml(chainQ,'кітаплар');
+assert.ok(chainHtml.includes('data-error-chain')&&chainHtml.includes('Отличие')&&chainHtml.includes('Неверно')&&chainHtml.includes('Верно')&&chainHtml.includes('Показать полностью'));
+assert.ok(/data-error-chain|chainHtml/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/Проверить этот навык отдельно/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/Другой пример/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+ok('Astra step 9: wrong answer shows the difference, the block, and an existing same-skill offer');
+
+const depthState=progress.migrate({schema:6,records:{},explainDepth:{T1_HARMONY:'closed',T2_PLURAL_LDT:'open',bad:true}});
+assert.equal(depthState.explainDepth.T1_HARMONY,'closed');
+assert.equal(depthState.explainDepth.T2_PLURAL_LDT,'open');
+assert.equal(depthState.explainDepth.bad,undefined);
+assert.ok(/ExplainDepth/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(!/data-full-panel hidden/.test(fs.readFileSync(path.join(__dirname,'explain-open.js'),'utf8').split('function openButton')[1].split('function forQuestion')[0])||/ruleOpen/.test(fs.readFileSync(path.join(__dirname,'explain-open.js'),'utf8')));
+ok('Astra step 10: rule depth is remembered and does not start closed');
+
+const TutorBlock=require('./ai-tutor.js');
+TutorBlock.reset();
+TutorBlock.noteAnswer({id:'num',lessonId:'1-3',ruleIds:['quantity'],fields:[{answers:['үш кітап']}],topic:'numbers'},['үш кітаптар'],{correct:false},false,[],1);
+TutorBlock.noteAnswer({id:'num',lessonId:'1-3',ruleIds:['quantity'],fields:[{answers:['үш кітап']}],topic:'numbers'},['үш кітаптар'],{correct:false},false,[],2);
+TutorBlock.noteAnswer({id:'num',lessonId:'1-3',ruleIds:['quantity'],fields:[{answers:['үш кітап']}],topic:'numbers'},['үш кітаптар'],{correct:false},false,[],3);
+TutorBlock.noteAnswer({id:'poss',lessonId:'3-1',ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],phase3:{error_type:'poss_assim_voice'}},['кітапым'],{correct:false},false,[],4);
+TutorBlock.noteAnswer({id:'poss',lessonId:'3-1',ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],phase3:{error_type:'poss_assim_voice'}},['кітапым'],{correct:false},false,[],5);
+TutorBlock.noteAnswer({id:'poss',lessonId:'3-1',ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],phase3:{error_type:'poss_assim_voice'}},['кітапым'],{correct:false},false,[],6);
+const blockReq=TutorBlock.buildRequest('explain_error',{id:'poss',lessonId:'3-1',ruleIds:['T21_POSS_ASSIM'],title:'кітап',stimulus:'кітабым',fields:[{answers:['кітабым']}]},{user_answer:'кітапым',expected_answer:'кітабым',codes:['POSS_ASSIM_VOICE'],surface:'practice'});
+assert.equal(blockReq.recent_error_summary.POSS_ASSIM_VOICE>0,true);
+assert.equal(blockReq.recent_error_summary.PLURAL_AFTER_NUMBER,undefined);
+assert.ok((blockReq.rule_ids||[]).includes('T21_POSS_ASSIM'));
+const ContractBlock=require('./ai-contract.js');
+const clipped=ContractBlock.clipRuleContext([{rule_id:'T21_POSS_ASSIM',title_ru:'Озвончение',medium:'а'.repeat(800),ru_refresh:'б'.repeat(500)}],new Set(['T21_POSS_ASSIM']));
+assert.equal(clipped[0].block_label,'Озвончение');
+assert.equal(clipped[0].clipped,true);
+assert.equal(clipped[0].medium.length,700);
+assert.equal(clipped[0].medium_next.length,100);
+ok('Astra step 11: tutor request keeps this block and only this skill');
+
+assert.ok(/Задано выучить/.test(fs.readFileSync(path.join(__dirname,'learning.js'),'utf8')));
+assert.ok(/Встречается в объяснении/.test(fs.readFileSync(path.join(__dirname,'learning.js'),'utf8')));
+ok('Astra step 12: lesson words stay in two dictionary groups');
 
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

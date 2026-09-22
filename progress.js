@@ -24,6 +24,14 @@
      if(obj(d)&&typeof d.value==='string')state.grammarPath.pathDraft={lessonId:typeof d.lessonId==='string'?d.lessonId.slice(0,20):null,chapterId:typeof d.chapterId==='string'?d.chapterId.slice(0,80):null,beat:Math.max(0,Math.floor(Number(d.beat)||0)),value:d.value.slice(0,400)};
      if(typeof g.canonShownFor==='string')state.grammarPath.canonShownFor=g.canonShownFor.slice(0,80);
    }
+   state.explainDepth=Object.create(null);
+   if(obj(raw.explainDepth)){
+     for(const [k,v] of Object.entries(raw.explainDepth)){
+       if(!safe(k)||(v!=='open'&&v!=='closed'))continue;
+       state.explainDepth[k.slice(0,40)]=v;
+       if(Object.keys(state.explainDepth).length>=40)break;
+     }
+   }
    if(obj(raw.place)&&['path','practice','homework'].includes(raw.place.surface)&&typeof raw.place.lessonId==='string')state.place={surface:raw.place.surface,lessonId:raw.place.lessonId.slice(0,20),mode:typeof raw.place.mode==='string'?raw.place.mode.slice(0,40):null};
    if(obj(raw.rulesDraft)&&typeof raw.rulesDraft.value==='string'&&raw.rulesDraft.value)state.rulesDraft={article:typeof raw.rulesDraft.article==='string'?raw.rulesDraft.article.slice(0,40):'',value:raw.rulesDraft.value.slice(0,400)};
    if(obj(raw.homeworkAttempts))state.homeworkAttempts=dictionary(raw.homeworkAttempts,(a,lesson)=>{

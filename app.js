@@ -28,6 +28,10 @@
  catch(error){storageAvailable=false;storageReadError=error;}
  if(!state.prefs.lettersChosen&&typeof matchMedia==='function'&&matchMedia('(max-width:690px)').matches)state.prefs.letters=true;
  if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
+ window.ExplainDepth={
+   get(id){return !(state.explainDepth&&state.explainDepth[id]==='closed');},
+   set(id,open){if(!id)return;state.explainDepth=state.explainDepth||Object.create(null);state.explainDepth[String(id).slice(0,40)]=open?'open':'closed';save();}
+ };
  window.NumberLadder?.parkLearn(state.learning,state.records);
  let records=state.records,learningState=state.learning;
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
@@ -114,6 +118,32 @@
    }
  }
  function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;sessionUnaided=Object.create(null);}
+ function sameSkillOffers(q){
+   if(!q)return {isolated:'',other:''};
+   const iso=window.Homework&&window.Homework.isolatedFor?window.Homework.isolatedFor(q,questions,state):[];
+   const rules=new Set((q.ruleIds||[]).filter(Boolean));
+   const hit=questions.find(x=>x&&x.id!==q.id&&!iso.includes(x.id)&&(x.ruleIds||[]).some(r=>rules.has(r)));
+   return {isolated:iso[0]||'',other:hit?hit.id:''};
+ }
+ function offerHtml(offers){
+   const bits=[];
+   if(offers.isolated)bits.push('<button type="button" class="secondary-button" data-chain-offer="'+esc(offers.isolated)+'">Проверить этот навык отдельно</button>');
+   if(offers.other)bits.push('<button type="button" class="secondary-button" data-chain-offer="'+esc(offers.other)+'">Другой пример</button>');
+   if(!bits.length)bits.push('<p class="small" data-coverage-gap>Отдельного упражнения для этой ошибки нет.</p>');
+   return '<div data-error-offers>'+bits.join('')+'</div>';
+ }
+ function openOffer(id){
+   captureDraft();
+   const kept=state.grammarPath&&state.grammarPath.pathDraft;
+   if(!byId.has(id))return;
+   startCustom([id],'course');
+   if(kept&&state.grammarPath)state.grammarPath.pathDraft=kept;
+   save();
+ }
+ function bindOffers(box){
+   if(!box)return;
+   box.querySelectorAll('[data-chain-offer]').forEach(b=>b.onclick=()=>openOffer(b.dataset.chainOffer));
+ }
  function elapsed(){return Math.round(elapsedMs+(timerSince===null?0:Math.max(0,performance.now()-timerSince)));}
  function morphemeRow(errors,expected,actual){
    const types=(errors||[]).map(e=>e.error_type);
@@ -788,7 +818,7 @@
    const aiCodes=window.AiTutor&&mode!=='exam'?window.AiTutor.noteAnswer(q,answers,result,hinted,errors,now):[];
    const aiRepeat=window.AiTutor&&aiCodes[0]&&window.AiTutor.shouldOfferExplain(aiCodes[0]);
    const morph=!result.correct?morphemeRow(errors,answerLine,answers.join(' ')):'';
-   feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Нужно: <strong lang="kk">'+esc(answerLine)+'</strong>.</p>':''}${morph}${!tarErr?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){feedback.insertAdjacentHTML('beforeend',window.ExplainOpen.forQuestion(q,answers));window.ExplainOpen.bind(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
+   feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Нужно: <strong lang="kk">'+esc(answerLine)+'</strong>.</p>':''}${morph}${!tarErr?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
    if(!result.correct&&mode!=='exam'&&window.AiTutor){
      const unlock=()=>{['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=false;});};
      const paint=(resp,token)=>{
@@ -1026,12 +1056,12 @@
        ${med?'<section class="path-block"><h3>Как работает</h3>'+med+'</section>':''}
        ${ex?'<section class="path-block"><h3>Примеры</h3><ul class="path-ex">'+ex+'</ul></section>':''}
        ${traps?'<section class="path-block"><h3>Не перепутай</h3><ul class="path-traps">'+traps+'</ul></section>':''}
-       <button type="button" class="secondary-button" id="path-full">Показать полностью</button>
-       <div id="path-full-panel" hidden>${window.ExplainOpen?window.ExplainOpen.fullHtml((ch.rule_ids||[])[0]||''):''}</div>
+       <button type="button" class="secondary-button" id="path-full" data-full-rule="${esc((ch.rule_ids||[])[0]||canonKey)}">Показать полностью</button>
+       <div id="path-full-panel" data-full-panel${(window.ExplainDepth&&window.ExplainDepth.get((ch.rule_ids||[])[0]||canonKey))?'':' hidden'}>${window.ExplainOpen?window.ExplainOpen.fullHtml((ch.rule_ids||[])[0]||''):''}</div>
        <button type="button" class="primary-button" id="path-next">${cta}</button></div>`;
      bindCrumb();bindTutor(les,ch);
      $('#path-next').onclick=()=>{save();renderPath();};
-     const fullBtn=$('#path-full');if(fullBtn)fullBtn.onclick=()=>{const panel=$('#path-full-panel');if(panel)panel.hidden=!panel.hidden;};
+     if(window.ExplainOpen)window.ExplainOpen.bind(root);
      return;
    }
    bindTutor(les,ch);
@@ -1194,9 +1224,17 @@
        const why=noted.diagErrors.map(err=>window.ErrorDiagnostics&&window.ErrorDiagnostics.labels[err.error_type]||err.error_type).filter(Boolean);
        const bankCard=window.ExplainBankUI&&window.ExplainBankUI.cardForChapter(ch);
        const tr=window.TransferItems&&window.TransferItems.oneForPath(ch,les,{catalog:window.CURRICULUM});
+       const ruleId=window.ExplainBankUI&&window.ExplainBankUI.ruleForChapter?window.ExplainBankUI.ruleForChapter(ch):'';
+       const pathRules=(ch.rule_ids||[]).filter(id=>/^T\d/.test(id)||(window.ExplainBank&&window.ExplainBank.byId&&window.ExplainBank.byId(id)));
+       if(ruleId&&!pathRules.includes(ruleId))pathRules.unshift(ruleId);
+       const pathQ={id:'path:'+ch.id,lessonId:les.id,ruleIds:pathRules,fields:[{answers:[right]}],explanation:diag,stimulus:beat.stem||''};
+       const offers=sameSkillOffers(pathQ);
+       const chain=window.ExplainOpen&&window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(pathQ,val):'';
        const gap=window.AiTutor&&window.AiTutor.coverageGaps?window.AiTutor.coverageGaps().find(g=>noted.aiCodes.includes(g.error_code)):null;
-       const gapHtml=gap?'<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>':'';
-       showPathFb('error','<p>Ты написала: <strong lang="kk">'+esc(val.trim()||'пусто')+'</strong></p><p>Нужно: <strong lang="kk">'+esc(right)+'</strong></p>'+(why.length?'<p>'+esc([...new Set(why)].join(' · '))+'</p>':'')+'<p>'+esc(diag)+'</p>'+gapHtml+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+(bankCard&&bankCard.short?'<p class="small">'+esc(bankCard.short)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
+       const gapHtml=gap&&!offers.isolated&&!offers.other?'<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>':'';
+       showPathFb('error','<p data-error-diff>Отличие: <s lang="kk">'+esc(val.trim()||'пусто')+'</s> → <strong lang="kk">'+esc(right)+'</strong></p><p>Ты написала: <strong lang="kk">'+esc(val.trim()||'пусто')+'</strong></p><p>Нужно: <strong lang="kk">'+esc(right)+'</strong></p>'+(why.length?'<p>'+esc([...new Set(why)].join(' · '))+'</p>':'')+'<p>'+esc(diag)+'</p>'+chain+offerHtml(offers)+gapHtml+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+(bankCard&&bankCard.short?'<p class="small">'+esc(bankCard.short)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
+       if(window.ExplainOpen)window.ExplainOpen.bind($('#path-fb'));
+       bindOffers($('#path-fb'));
        const again=$('#path-again-rule');if(again)again.onclick=()=>{showPathFb('hinted','<p>'+esc(bankCard&&(bankCard.short||bankCard.medium)||hintLine())+'</p>');};
        const goTr=$('#path-transfer');if(goTr&&tr)goTr.onclick=()=>{if(!byId.has(tr.id)){course.questions.push(tr);byId.set(tr.id,tr);}mode='transfer';queue=[tr.id];practiceIds=[tr.id];position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();render();showView('practice');};
        const askT=$('#path-ask-tutor');if(askT)askT.onclick=()=>{

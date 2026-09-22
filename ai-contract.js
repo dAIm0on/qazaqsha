@@ -71,14 +71,22 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
    if(!c||typeof c!=='object')continue;
    const id=clip(c.rule_id,40).trim();
    if(!id||(allow.size&&!allow.has(id)))continue;
-   const medium=clip(c.medium||c.explanation_ru,700);
+   const fullMed=String(c.medium||c.explanation_ru||'');
+   const fullRu=String(c.ru_refresh||'');
+   const medium=clip(fullMed,700);
+   const next=String(c.medium_next||(fullMed.length>700?fullMed.slice(700):''));
    out.push({
     rule_id:id,
+    block_id:id,
+    block_label:clip(c.block_label||c.title_ru,120),
+    part:1,
+    clipped:!!c.clipped||fullMed.length>700||fullRu.length>400,
     title_ru:clip(c.title_ru,120),
-    ru_refresh:clip(c.ru_refresh,400),
+    ru_refresh:clip(fullRu,400),
     short:clip(c.short||c.title_ru,160),
     medium,
     explanation_ru:clip(c.explanation_ru||c.medium,700),
+    medium_next:clip(next,700),
     examples_correct:asArr(c.examples_correct).slice(0,4),
     examples_wrong:asArr(c.examples_wrong).slice(0,4),
     traps:asArr(c.traps).slice(0,4)

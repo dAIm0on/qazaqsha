@@ -46,10 +46,15 @@
    +(card.traps&&card.traps.length?'<section class="path-block"><h3>Неверно → верно</h3><ul>'+card.traps.map(t=>'<li lang="kk">'+esc(t)+'</li>').join('')+'</ul></section>':'')
    +chapters;
  }
+ function ruleOpen(ruleId){
+  if(root.ExplainDepth&&ruleId&&typeof root.ExplainDepth.get==='function')return root.ExplainDepth.get(ruleId)!==false;
+  return true;
+ }
  function openButton(ruleId){
   const body=fullHtml(ruleId);
   if(!body)return '';
-  return '<p><button type="button" class="secondary-button" data-full-rule="'+esc(ruleId)+'">Показать полностью</button></p><div data-full-panel hidden>'+body+'</div>';
+  const hidden=ruleOpen(ruleId)?'':' hidden';
+  return '<p><button type="button" class="secondary-button" data-full-rule="'+esc(ruleId)+'">Показать полностью</button></p><div data-full-panel'+hidden+'>'+body+'</div>';
  }
  function forQuestion(q,typed){
   const ruleId=ruleIdOf(q);
@@ -60,6 +65,14 @@
   return '<p><strong>Неверно:</strong> <span lang="kk">'+esc(actual)+'</span> → <strong>Верно:</strong> <span lang="kk">'+esc(expected)+'</span></p>'
    +(why?'<p><strong>Почему:</strong> '+esc(why)+'</p>':'')
    +openButton(ruleId);
+ }
+ function chainHtml(q,typed){
+  const expected=q&&q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0]||'';
+  const actual=Array.isArray(typed)?String(typed[0]||''):String(typed||'');
+  const diff=actual&&expected&&actual!==expected?'<p data-error-diff>Отличие: <s lang="kk">'+esc(actual)+'</s> → <strong lang="kk">'+esc(expected)+'</strong></p>':'';
+  const body=forQuestion(q,typed);
+  if(!diff&&!body)return '';
+  return '<div data-error-chain>'+diff+body+'</div>';
  }
  function map31(){
   if(!L31||!Bank)return '';
@@ -83,10 +96,17 @@
  function bind(rootEl){
   if(!rootEl)return;
   rootEl.querySelectorAll('[data-full-rule]').forEach(btn=>{
-   btn.onclick=()=>{const panel=btn.parentElement&&btn.parentElement.nextElementSibling; if(panel)panel.hidden=!panel.hidden;};
+   btn.onclick=()=>{
+    const next=btn.nextElementSibling;
+    const panel=next&&next.hasAttribute&&next.hasAttribute('data-full-panel')?next:(btn.parentElement&&btn.parentElement.nextElementSibling);
+    if(!panel)return;
+    panel.hidden=!panel.hidden;
+    const id=btn.getAttribute('data-full-rule');
+    if(root.ExplainDepth&&id&&typeof root.ExplainDepth.set==='function')root.ExplainDepth.set(id,!panel.hidden);
+   };
   });
  }
- const api={ruleIdOf,fullHtml,openButton,forQuestion,map31,bind,chaptersFor};
+ const api={ruleIdOf,fullHtml,openButton,forQuestion,chainHtml,map31,bind,chaptersFor};
  if(node)module.exports=api;
  else root.ExplainOpen=api;
 })(typeof window!=='undefined'?window:globalThis);

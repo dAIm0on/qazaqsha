@@ -187,8 +187,10 @@
   const expected=canonicalExpected(q,extra);
   const codes=extra.codes||[];
   const cards=R.cardsFor(q,codes[0]).slice(0,2);
+  const related=new Set((codes||[]).filter(Boolean));
+  for(const card of cards)for(const code of card.error_codes||[])related.add(code);
   const summary={};
-  for(const [k,v] of Object.entries(store.errors))if(v&&v.count_recent)summary[k]=v.count_recent;
+  for(const [k,v] of Object.entries(store.errors))if(v&&v.count_recent&&related.has(k))summary[k]=v.count_recent;
   const ctx=cards.map(toContext).filter(Boolean);
   return {
     mode,locale:'ru',

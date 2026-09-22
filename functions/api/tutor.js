@@ -324,11 +324,17 @@ function clipRuleContext(arr,allowRules){
     if(!c||typeof c!=='object')continue;
     const id=clip(c.rule_id,40).trim();
     if(!id||!allow.has(id))continue;
-    const medium=clip(c.medium||c.explanation_ru,700);
+    const fullMed=String(c.medium||c.explanation_ru||'');
+    const fullRu=String(c.ru_refresh||'');
+    const medium=clip(fullMed,700);
+    const next=String(c.medium_next||(fullMed.length>700?fullMed.slice(700):''));
     out.push({
-      rule_id:id,title_ru:clip(c.title_ru,120),
-      ru_refresh:clip(c.ru_refresh,400),short:clip(c.short||c.title_ru,160),
+      rule_id:id,block_id:id,block_label:clip(c.block_label||c.title_ru,120),part:1,
+      clipped:!!c.clipped||fullMed.length>700||fullRu.length>400,
+      title_ru:clip(c.title_ru,120),
+      ru_refresh:clip(fullRu,400),short:clip(c.short||c.title_ru,160),
       medium,explanation_ru:clip(c.explanation_ru||c.medium,700),
+      medium_next:clip(next,700),
       examples_correct:asArr(c.examples_correct).slice(0,4),
       examples_wrong:asArr(c.examples_wrong).slice(0,4),
       traps:asArr(c.traps).slice(0,4)
@@ -338,7 +344,8 @@ function clipRuleContext(arr,allowRules){
 }
 function userPayload(req){
   const ctx=(req.rule_context||[]).map(c=>({
-    title_ru:c.title_ru,medium:c.medium||c.explanation_ru,ru_refresh:c.ru_refresh||'',
+    title_ru:c.title_ru,block_label:c.block_label||c.title_ru,part:c.part||1,clipped:!!c.clipped,
+    medium:c.medium||c.explanation_ru,medium_next:c.medium_next||'',ru_refresh:c.ru_refresh||'',
     examples_correct:(c.examples_correct||[]).slice(0,3),
     examples_wrong:(c.examples_wrong||[]).slice(0,2)
   }));
@@ -346,6 +353,7 @@ function userPayload(req){
     'mode: '+req.mode,
     'surface: '+req.surface,
     'lesson_id: '+req.lesson_id,
+    ctx[0]&&ctx[0].block_label?'block: '+ctx[0].block_label+(ctx[0].clipped?' · часть блока, не замена полного текста':''):'',
     req.prompt?'prompt: '+req.prompt:'',
     req.user_answer?'user_answer: '+req.user_answer:'',
     req.mode==='hint'?'':'expected_answer: '+(req.expected_answer||''),

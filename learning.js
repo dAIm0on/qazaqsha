@@ -46,8 +46,11 @@ function create(api){
   const ruleId=cur&&cur.rules&&cur.rules[0];
   const ruleCard=ruleId&&window.ExplainBank&&window.ExplainBank.byId?window.ExplainBank.byId(ruleId):null;
   const ruleBlock=ruleId&&window.ExplainOpen?'<div class="panel"><h2>Правило этого урока</h2><p>'+esc(ruleCard&&ruleCard.title||'')+'</p>'+window.ExplainOpen.openButton(ruleId)+'</div>':'';
-  const lessonWords=(window.CURRICULUM&&window.CURRICULUM.words||[]).filter(w=>w.lesson_first_seen===id&&w.target_or_context==='target').slice(0,12);
-  const wordBlock=lessonWords.length?'<div class="panel"><h2>Слова этого урока</h2><p class="small">Те же слова словаря. Нового списка нет.</p><p lang="kk">'+lessonWords.map(w=>esc(w.kazakh)).join(' · ')+'</p></div>':'';
+  const lessonWords=(window.CURRICULUM&&window.CURRICULUM.words||[]).filter(w=>w.lesson_first_seen===id);
+  const mustWords=lessonWords.filter(w=>w.target_or_context==='target');
+  const metWords=lessonWords.filter(w=>w.target_or_context!=='target');
+  const wordLine=list=>list.length?'<p lang="kk">'+list.map(w=>esc(w.kazakh)).join(' · ')+'</p>':'<p class="small">В этом уроке таких слов нет.</p>';
+  const wordBlock=lessonWords.length?'<div class="panel"><h2>Слова этого урока</h2><p class="small">Те же слова словаря. Нового списка нет.</p><h3>Задано выучить</h3>'+wordLine(mustWords)+'<h3>Встречается в объяснении</h3>'+wordLine(metWords)+'</div>':'';
   const subjects=[['','Этот урок'],['numbers','Числа'],['plural','Окончания'],['vocab','Слова'],['person','Лица'],['phrase','Фразы']];
   $('#learn-content').innerHTML=
    '<article class="panel learn-now">'+
