@@ -137,8 +137,9 @@
    prev.prepare(q,variants,random);
  }
  function session(range,state){
-   const generated=c.questions.filter(q=>q.generatedNumber&&q.generatedNumber.range===range);
-   const atoms=c.questions.filter(q=>q.topic==='numbers'&&q.source==='hw2');
+   const generated=c.questions.filter(q=>q.generatedNumber&&q.generatedNumber.range===range).filter(q=>!state||allowed(q,state));
+   if(state&&!generated.length)return [];
+   const atoms=c.questions.filter(q=>q.topic==='numbers'&&q.source==='hw2'&&(!state||allowed(q,state)));
    return [...generated,...atoms.sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);
  }
  window.NumberPractice={prepare,session,templates:[...prev.templates,...extraTemplates],POOLS};

@@ -59,6 +59,7 @@ function create(api){
       '<span class="small">'+esc(mark)+'</span></button>';
     }).join('')+
    '</div></div>'+
+   tracksMarkup(id)+
    '<div class="panel compact-panel learn-secondary"><p class="small">Дополнительно</p>'+
     '<div class="review-actions">'+
      '<button type="button" class="secondary-button" id="learn-practice">Практика этого урока</button>'+
@@ -69,12 +70,47 @@ function create(api){
   document.querySelectorAll('[data-learn-les]').forEach(b=>b.onclick=()=>{
    if(api.openPath)api.openPath(b.dataset.learnLes);
   });
+  document.querySelectorAll('[data-track]').forEach(b=>{
+   if(b.disabled)return;
+   b.onclick=()=>{if(api.startLesson)api.startLesson(b.dataset.track);};
+  });
   const pr=$('#learn-practice');if(pr)pr.onclick=()=>api.startCourse(id);
   const hw=$('#learn-homework');if(hw)hw.onclick=()=>{if(api.openHomework)api.openHomework(id);else api.today();};
   if(window.TutorUI){
    window.TutorUI.setContext({surface:'learn',lesson_id:id,rule_id:cur&&cur.rules[0]});
    window.TutorUI.syncView('learn');
   }
+ }
+ function numberOpen(lesson){
+  if(!lesson||lesson.topic!=='numbers'||!window.NumberLadder)return true;
+  const full=api.progress?api.progress():{records:{}};
+  const ids=new Set(lesson.questionIds||[]);
+  const mine=(window.COURSE&&window.COURSE.questions||[]).filter(q=>ids.has(q.id));
+  if(!mine.length)return true;
+  return mine.some(q=>window.NumberLadder.allowed(q,full));
+ }
+ function tracksFor(lessonId){
+  const all=window.LEARNING&&window.LEARNING.lessons||[];
+  return all.filter(l=>l&&(l.courseLesson===lessonId||l.courseLesson==='bank'));
+ }
+ function tracksMarkup(lessonId){
+  const TOPIC={sounds:'Звуки',vocab:'Слова',numbers:'Числа',plural:'Окончания',person:'Лица',rules:'Правила',phrase:'Фразы',possessive:'Притяжательность'};
+  const rows=tracksFor(lessonId);
+  if(!rows.length)return '';
+  const groups=new Map();
+  for(const l of rows){
+   const key=l.topic||'other';
+   if(!groups.has(key))groups.set(key,[]);
+   groups.get(key).push(l);
+  }
+  const body=[...groups.entries()].map(([topic,list])=>{
+   const buttons=list.map(l=>{
+    const open=numberOpen(l);
+    return '<button type="button" class="secondary-button" data-track="'+esc(l.id)+'"'+(open?'':' disabled')+'>'+esc(l.title)+(open?'':' · сначала меньшие числа')+'</button>';
+   }).join('');
+   return '<p class="small">'+esc(TOPIC[topic]||topic)+'</p><div class="review-actions">'+buttons+'</div>';
+  }).join('');
+  return '<div class="panel learn-tracks"><h2>Ступени этого урока</h2><p class="small">Те же короткие дорожки, что уже есть в курсе. Новых уроков здесь нет.</p>'+body+'</div>';
  }
  function selectLesson(id){if(api.openPath)api.openPath(id);}
  return {render,selectLesson};

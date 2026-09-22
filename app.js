@@ -281,7 +281,7 @@
    if(courseBlock)list=list.filter(q=>q.lessonId===courseBlock);
    if(topic!=='all')list=list.filter(q=>q.topic===topic);
    if(sourceFilter)list=list.filter(q=>q.source===sourceFilter);
-   if(topic==='numbers'&&!courseBlock&&mode!=='numbers'&&window.NumberLadder){
+   if(topic==='numbers'&&!courseBlock&&window.NumberLadder){
      list=window.NumberLadder.filter(list,state);
      list=[...list].sort((a,b)=>(window.NumberLadder.extractN(a)??0)-(window.NumberLadder.extractN(b)??0));
    }
@@ -365,9 +365,19 @@
  }
  function startLesson(id,step=learningState.steps[id]||0){
    const lesson=window.LEARNING.lessons.find(l=>l.id===id),chunk=lesson?.chunks[step];if(!chunk)return;
+   let stepIds=[...chunk.questionIds];
+   if(lesson.topic==='numbers'&&window.NumberLadder){
+     stepIds=chunk.questionIds.filter(qid=>{const q=byId.get(qid);return q&&window.NumberLadder.allowed(q,state);});
+     if(!stepIds.length){
+       const order=window.NumberLadder.ORDER||[];
+       const nextId=order.find(lid=>lid!==id&&window.LEARNING.lessons.some(l=>l.id===lid&&(l.questionIds||[]).some(qid=>{const q=byId.get(qid);return q&&window.NumberLadder.allowed(q,state);})));
+       if(nextId)return startLesson(nextId,0);
+       return;
+     }
+   }
    courseBlock=lesson.courseLesson||courseBlock;
    activeLesson=id;activeStep=step;learningState.lessonId=id;learningState.steps[id]=step;topic=lesson.topic;mode='lesson';sourceFilter=null;
-   queue=lesson.topic==='numbers'?shuffled(chunk.questionIds):[...chunk.questionIds];practiceIds=[...queue];stepEvidence={};queueEpoch=Date.now()+Math.random();
+   queue=lesson.topic==='numbers'?shuffled(stepIds):stepIds;practiceIds=[...queue];stepEvidence={};queueEpoch=Date.now()+Math.random();
    position=0;variants={};checked=false;resetCounts();render();showView('practice');$('#exercise').scrollIntoView({block:'start'});
  }
  function startContrast(pair){
@@ -1437,7 +1447,7 @@
  }
  const learning=window.LearningUI.create({
    get state(){return learningState;},save,startLesson,startCourse,courseJumpMarkup,bindCourseJump,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today'),
-   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,continueStep,openHomework(id){hwLesson=id;showView('homework');}
+   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,continueStep,progress:()=>state,openHomework(id){hwLesson=id;showView('homework');}
  });
  const dashboard=window.DashboardUI.create({
    state:()=>state,questions:()=>questions,eligible,hasSession:()=>queue.length>position,continueInfo:stepNow,
