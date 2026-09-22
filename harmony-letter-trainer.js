@@ -148,11 +148,30 @@
     }));
   }
 
+  function classifyRound(random=Math.random){
+    const bank=classifyItems(random),byLetter=new Map(bank.map(item=>[item.letter,item]));
+    const fixed=['Е','И','У','Ю','Я','Э'];
+    const pairRefresh=shuffled(['А','Ә','О','Ө','Ы','І','Ұ','Ү','Қ','К','Ғ','Г'],random).slice(0,2);
+    const neutralPool=shuffled([...BUCKETS.NEUTRAL,...BUCKETS.SIGNS],random).slice(0,4);
+    const rows=[...fixed,...pairRefresh,...neutralPool].map(letter=>byLetter.get(letter)).filter(Boolean);
+    if(random()<0.35)rows.push(byLetter.get('Ё'));
+    return shuffled(rows.filter(Boolean),random);
+  }
+
+  function wordRound(random=Math.random){
+    const all=wordItems(random);
+    const mustWords=['кітап','мұғалім','заңгер','мұхит','ит','ми','су','сүю'];
+    const rows=mustWords.map(word=>all.find(item=>item.word===word&&item.type==='choice')).filter(Boolean);
+    const signalPool=all.filter(item=>item.type==='signal');
+    rows.push(...shuffled(signalPool,random).slice(0,4));
+    return shuffled(rows,random);
+  }
+
   function buildStage(stage,random=Math.random){
     if(stage===1)return pairItems(random);
-    if(stage===2)return classifyItems(random);
+    if(stage===2)return classifyRound(random);
     if(stage===3)return recallItems(random);
-    if(stage===4)return wordItems(random);
+    if(stage===4)return wordRound(random);
     if(stage===5)return fluencyItems(random);
     return [];
   }
@@ -236,5 +255,5 @@
     return {attempts:stats.attempts,correct:stats.correct,accuracy:stats.attempts?Math.round(stats.correct/stats.attempts*100):0,medianResponseMs:m,fluent:stats.attempts>0&&stats.correct/stats.attempts>=.9&&m!=null&&m<=2200};
   }
 
-  return {BUCKETS,BUCKET_LABELS,PAIRS,WORD_BANK,ALL_LETTERS,bucketOf,labelForLetter,coverage,pairItems,classifyItems,recallItems,wordItems,fluencyItems,buildStage,createSession,startStage,grade,answer,advance,summary,shuffled};
+  return {BUCKETS,BUCKET_LABELS,PAIRS,WORD_BANK,ALL_LETTERS,bucketOf,labelForLetter,coverage,pairItems,classifyItems,classifyRound,recallItems,wordItems,wordRound,fluencyItems,buildStage,createSession,startStage,grade,answer,advance,summary,shuffled};
 });
