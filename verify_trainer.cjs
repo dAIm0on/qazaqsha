@@ -1517,7 +1517,7 @@ const flowSrc=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 assert.ok(/mode==='course'&&courseBlock/.test(flowSrc));
 assert.ok(/id="course-to-homework"/.test(flowSrc));
 assert.ok(/data-hw-review/.test(flowSrc));
-assert.ok(/mode==='course'&&courseBlock===block&&queue\.length>0&&position<queue\.length/.test(flowSrc));
+assert.ok(/function startCourse\(block\)\{[\s\S]*?restoreLessonPractice\(block\)[\s\S]*?PhraseDrill\.session/.test(flowSrc));
 
 assert.ok(/\['ordered','shuffle','homework','course','phrase','transfer','slice','repair'\]\.includes\(mode\)/.test(flowSrc));
 assert.ok(!/function nextQuestion\(\)\{[\s\S]*?if\(!\['ordered','shuffle','homework'\]\.includes\(mode\)&&sessionAttempts>=cfg\.session\.maxAttempts\)position=queue\.length/.test(flowSrc));
