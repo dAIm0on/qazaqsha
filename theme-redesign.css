@@ -117,7 +117,7 @@ body[data-view=practice] #practice-filter .jump-bar{display:flex!important;flex-
 #practice-filter-close{width:100%;margin-top:8px}
 
 /* Practice — calm, no hero, no photos */
-body[data-view=practice]{background:var(--paper)}
+body[data-view=practice]{background-color:var(--paper)}
 body[data-view=practice] .workspace{max-width:760px;padding-top:16px}
 body[data-view=practice] .site-footer{opacity:.72}
 .exercise-card{
@@ -369,7 +369,11 @@ table td,table th{border-bottom-color:var(--line);color:var(--ink)}
 }
 .review-due h2{font-family:var(--display);font-weight:600;margin:8px 0 12px}
 .review-due .primary-button{width:100%}
-body[data-view=review]{background:var(--paper)}
+body[data-view=review]{background-color:var(--paper)}
+.review-empty{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:18px 20px;margin:0 0 16px;text-align:left}
+.review-label{margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.review-empty h2{font-family:var(--display);font-weight:600;margin:0 0 8px}
+.review-empty p{color:var(--muted);margin:0}
 .pair-strip-compact{gap:8px;margin:12px 0}
 .pair-strip-compact span{background:var(--surface);border:1px solid var(--line);color:var(--ink);font-size:.8125rem;padding:8px 10px;border-radius:12px}
 .rules-toc{display:grid;gap:8px;margin:0 0 24px}
