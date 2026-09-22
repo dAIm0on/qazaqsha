@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" data-season="autumn">
+<html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
@@ -83,7 +83,7 @@
     <button type="button" class="text-button" id="account-toggle" hidden>Войти</button>
     <span id="account-user" hidden></span>
     <button type="button" class="text-button" id="account-logout" hidden>Выйти</button>
-    <button type="button" class="design-settings" id="design-settings" aria-haspopup="dialog" aria-controls="settings-dialog">Сезон</button>
+    <button type="button" class="design-settings" id="design-settings" aria-haspopup="dialog" aria-controls="settings-dialog">Оформление</button>
   </div>
 </header>
 <div class="workspace">
@@ -161,20 +161,6 @@
 </dialog>
 <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title">
   <h2 id="settings-title">Оформление</h2>
-  <p class="small">Сезон меняет цвет бумаги. На учёбу не влияет.</p>
-  <div class="season-swatches" role="group" aria-label="Сезон">
-    <button type="button" class="autumn" data-season-pick="autumn" aria-label="Осень" aria-pressed="true"></button>
-    <button type="button" class="summer" data-season-pick="summer" aria-label="Лето" aria-pressed="false"></button>
-    <button type="button" class="spring" data-season-pick="spring" aria-label="Весна" aria-pressed="false"></button>
-  </div>
-  <p class="season-captions"><span>Осень</span><span>Лето</span><span>Весна</span></p>
-  <label>Сезон
-    <select id="season-select">
-      <option value="autumn">Осень</option>
-      <option value="summer">Лето</option>
-      <option value="spring">Весна</option>
-    </select>
-  </label>
   <label><input type="checkbox" id="motion-off"> Меньше движения</label>
   <label class="pref-check glyph-check"><input type="checkbox" id="pref-letters"> Казахские буквы Ә Ғ Қ Ң Ө Ұ Ү Һ І на экране</label>
   <p class="glyph-check" lang="kk">Ә ә Ғ ғ Қ қ Ң ң Ө ө Ұ ұ Ү ү Һ һ І і</p>

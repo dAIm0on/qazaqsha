@@ -516,14 +516,6 @@ body[data-view=practice] .issue-toggle{
 .settings-dialog input[type=password]{
   width:100%;min-height:48px;margin-top:6px;font-size:max(16px,1rem)
 }
-.season-swatches{display:flex;gap:9px;margin:8px 0 0}
-.season-swatches button{width:44px;height:44px;border-radius:50%;border:2px solid transparent;padding:0}
-.season-swatches button[aria-pressed=true]{border-color:var(--ink)}
-.season-swatches .autumn{background:#161412}
-.season-swatches .summer{background:#DDD0F6}
-.season-swatches .spring{background:#F3E18A}
-.season-captions{display:flex;gap:9px;margin:8px 0 0;font-size:.8125rem;color:var(--ink);font-weight:550}
-.season-captions span{width:44px;text-align:center}
 .glyph-check{font-size:1.15rem;letter-spacing:.04em;overflow-wrap:anywhere;margin:12px 0 0}
 #account-form{display:flex;flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:0;min-height:0}
 .account-actions{position:sticky;bottom:0;background:var(--surface);padding-top:12px;display:grid;gap:8px}
