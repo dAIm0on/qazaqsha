@@ -287,7 +287,7 @@ body.keyboard-open[data-view=rules] #rules-ask-panel{
 .today-tiles .today-option:nth-child(1){background:var(--oil)}
 .today-tiles .today-option:nth-child(2){background:var(--lilac)}
 .hero-spot,.today-option.hero-spot{
-  background:#E15F2C;color:#fff;border-color:transparent
+  background:var(--spot,#FF5A1F);color:#fff;border-color:transparent
 }
 .today-option.hero-spot span,
 .today-option.hero-spot strong,
