@@ -115,12 +115,12 @@ ok('7 exam after 2 delayed');
 // 8. schema 5 → 6
 const raw5={app:'qazaq-trainer',schema:5,records:{hw1:{seen:3,correct_count:2,wrong_count:1,correct_streak:1,next_review:10}},events:[{type:'answer',card_id:'hw1',at:5,correct:true,hinted:false,answers:['x']}],skills:{'word:hw1::production':{seen:2,correct_count:2,wrong_count:0,correct_streak:2,next_review:10}},associations:{hw1:{text:'доска друга',updated_at:4}},confusions:{},vocabulary:{},errors:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}}};
 const v=progress.validate(JSON.stringify(raw5),new Set(['hw1']),20);
-assert.equal(v.state.schema,6);
+assert.equal(v.state.schema,7);
 assert.ok(v.state.records.hw1);
 assert.equal(v.state.events.length,1);
 assert.equal(v.state.associations.hw1.text,'доска друга');
 assert.ok(v.state.skills['word:hw1::production']);
-ok('8 schema 5 imports to 6');
+ok('8 schema 5 imports to 7');
 
 // 10. JSON roundtrip
 const ser=progress.serialize(v.state);
@@ -200,10 +200,10 @@ ok('hw9 unknown exercise_ids rejected');
 
 const rawNoHw={app:'qazaq-trainer',schema:6,records:{hw1:{seen:1,correct_count:1,wrong_count:0,correct_streak:1,next_review:10}},events:[],skills:{},associations:{}};
 const imported=progress.validate(JSON.stringify(rawNoHw),new Set(['hw1']),20);
-assert.equal(imported.state.schema,6);
+assert.equal(imported.state.schema,7);
 assert.ok(imported.state.homeworkAttempts);
 assert.equal(Object.keys(imported.state.homeworkAttempts).length,0);
-ok('hw10 schema without homeworkAttempts imports');
+ok('hw10 schema 6 without homeworkAttempts imports to 7');
 
 function packExercises(file){
   const box={window:{LESSON_PACKS:[]}};
