@@ -202,10 +202,10 @@ function looksLikeBadTutorReply(t){
   if(/как правильно будет\s*[«"]?кітабым/i.test(t)&&/Нужно объяснить/i.test(t))return true;
   if(/Нужно объяснить/i.test(t))return true;
   // Russian planning / chain-of-thought must never be shown as the tutor answer.
-  if(/^\s*(ученица|ученик|пользователь)\s+(просит|спрашивает|хочет|пытается|нужно|интересуется)\b/i.test(t))return true;
+  if(/^\s*(ученица|ученик|пользователь)\s+(просит|спрашивает|хочет|пытается|интересуется)(?=\s|[,:—-])/i.test(t))return true;
   if(/^\s*(задача|цель)\s*[:—-]/i.test(t))return true;
   if(/^\s*(мне|нам)\s+(нужно|надо|следует)\s+(объяснить|ответить|показать|сказать)/i.test(t))return true;
-  if(/^\s*(нужно|надо|следует)\s+(объяснить|ответить|показать|сказать|учесть)\b/i.test(t))return true;
+  if(/^\s*(нужно|надо|следует)\s+(объяснить|ответить|показать|сказать|учесть)(?=\s|[,:—-])/i.test(t))return true;
   if(/^(Сначала |Давай |Итак,? |Нужно |Следует |Я (должен|должна|сейчас) )/i.test(t)&&t.length<220)return true;
   // Truncated mid-thought / unfinished clause. Student-facing model answers must end cleanly.
   if(/\.{3}\s*$/.test(t)&&t.length<240)return true;
