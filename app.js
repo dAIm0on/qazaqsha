@@ -411,6 +411,8 @@
    captureDraft();
    pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
    view=next;document.body.dataset.view=next;
+   const gpNow=state.grammarPath||{};
+   document.body.classList.toggle('path-immersive',next==='path'&&!!(gpNow.lessonId&&gpNow.phase==='beat'));
    document.querySelectorAll('main > section').forEach(el=>{el.hidden=el.id!==next+'-view';});
    const tab=shellTab(next);
    $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});

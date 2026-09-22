@@ -1391,7 +1391,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/qazaq-offline-live-20260922-three/.test(openSw));
+assert.ok(/qazaq-offline-live-20260922-live/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1928,6 +1928,8 @@ const app6=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 assert.ok(/Правило этого урока/.test(learn6)&&/Слова этого урока/.test(learn6)&&/'numbers','Числа'/.test(learn6));
 assert.ok(/Повторить сегодня/.test(dash6)&&/Выбрать занятие/.test(dash6)&&/Сейчас трудно/.test(dash6)&&/Разобрать и попробовать/.test(dash6));
 assert.ok(/function shellTab/.test(app6)&&/QazaqShell/.test(app6));
+assert.ok(/path-immersive',next==='path'/.test(app6));
+assert.ok(/keyboard-open\[data-view=path\] #path-form/.test(fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8')));
 assert.ok(/body\[data-view=practice\] \.bottom-nav\{display:none/.test(fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8')));
 ok('Astra step 6: three entries, lesson workspace on existing screens, nav hidden inside a task');
 
