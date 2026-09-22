@@ -16,9 +16,11 @@
        const weak=window.LearningSupport.weakSpots?window.LearningSupport.weakSpots(state,api.questions()):[];
        const chunkN=(window.MemoryPolicy?api.questions().filter(q=>window.MemoryPolicy.isChunk(q)&&api.eligible(q)):[]).length;
        const resume=api.hasSession();
-       const mainAction=resume?'resume':'learn';
-       const mainTitle=resume?'Продолжить текущую карточку':('Продолжить урок '+lesson.courseLesson);
-       const mainHint=resume?'Продолжим с той же карточки.':esc(lesson.title);
+       const gp=state.grammarPath;
+       const pathOpen=gp&&gp.phase==='beat'&&gp.lessonId&&gp.chapterId;
+       const mainAction=resume?'resume':pathOpen?'path':'learn';
+       const mainTitle=resume?'Продолжить текущую карточку':pathOpen?('Продолжить урок '+gp.lessonId):('Продолжить урок '+lesson.courseLesson);
+       const mainHint=resume?'Продолжим с той же карточки.':pathOpen?'Тот же шаг прохождения.':esc(lesson.title);
        const dueHint=due?'карточек в очереди повторения':'На сегодня всё повторено';
        const pauseN=cards.filter(q=>core.pauseReady(state.records[q.id])).length;
        const repairOn=state.repair&&window.RepairState;

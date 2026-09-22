@@ -1740,4 +1740,28 @@ assert.ok(/data-jump-pause/.test(appPause)&&/startPausePrep/.test(appPause));
 assert.ok(!/выучено \d+%/.test(dashPause));
 ok('Pause remainder 4: Скоро пауза uses pauseReady, savings is a number, day-0 learning stays out');
 
+const HwA=require('./homework.js');
+const phase3Card={id:'p3-31-a-g1-ake',phase3:{error_type:'poss_assim_voice'},ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['әкем']}],stimulus:'әке'};
+assert.equal(HwA.ruleText(phase3Card).length>0,true);
+assert.ok(/drive\.google\.com\/file\/d\/1B2c2UJKpvBvty-LhSlkoC8ubPGZC9-aQ/.test(fs.readFileSync(path.join(__dirname,'lesson-pack-3-1.js'),'utf8')));
+assert.ok(!/while\(beats\[gp\.beat\]&&isCanonBeat/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/pathDraft/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+const TutorA=require('./ai-tutor.js');
+TutorA.reset();
+TutorA.noteAnswer({id:'poss',ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],phase3:{error_type:'poss_assim_voice'}},['кітапым'],{correct:false},false,[]);
+TutorA.noteAnswer({id:'poss',ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],phase3:{error_type:'poss_assim_voice'}},['кітапым'],{correct:false},false,[]);
+TutorA.noteAnswer({id:'poss',ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],phase3:{error_type:'poss_assim_voice'}},['кітапым'],{correct:false},false,[]);
+const possDue=TutorA.dueRemediation().some(r=>r.error_code==='POSS_ASSIM_VOICE');
+TutorA.noteAnswer({id:'num',ruleIds:['quantity'],fields:[{answers:['үш кітап']}],topic:'numbers'},['үш кітап'],{correct:true},false,[]);
+TutorA.noteAnswer({id:'num',ruleIds:['quantity'],fields:[{answers:['үш кітап']}],topic:'numbers'},['үш кітап'],{correct:true},false,[]);
+assert.equal(TutorA.dueRemediation().some(r=>r.error_code==='POSS_ASSIM_VOICE'),possDue);
+assert.equal(TutorA.templateQuestions('POSS_ASSIM_VOICE').length,0);
+const RulesA=require('./ai-rules.js');
+assert.ok(RulesA.cardsFor({ruleIds:['T24_POSS_BIZ']},'').some(c=>c.rule_id==='T24_POSS_BIZ'));
+assert.ok(RulesA.cardsFor({ruleIds:['T12_GLUE']},'').some(c=>c.rule_id==='T12_GLUE'));
+assert.ok(RulesA.cardsFor({ruleIds:['PHONE_GROUPS']},'').some(c=>c.rule_id==='PHONE_GROUPS'));
+const two=Repair.day10Cards('T20_POSS',['дос']);
+assert.ok(two.length>=1);
+ok('Astra P0: 3-1 homework rule, chapter beats stay, same-skill close, no plural fallback');
+
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

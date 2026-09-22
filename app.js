@@ -96,7 +96,12 @@
    const dock=$('#practice-dock');
    if(dock&&dock.scrollIntoView)try{dock.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
  }
- function captureDraft(){const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};}
+ function captureDraft(){
+   const pathInput=$('#path-answer');
+   const gp=state.grammarPath;
+   if(pathInput&&gp){gp.pathDraft={lessonId:gp.lessonId,chapterId:gp.chapterId,beat:gp.beat,value:pathInput.value};}
+   const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};
+ }
  function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;sessionUnaided=Object.create(null);}
  function elapsed(){return Math.round(elapsedMs+(timerSince===null?0:Math.max(0,performance.now()-timerSince)));}
  function morphemeRow(errors,expected,actual){
@@ -756,7 +761,8 @@
    const resumeAt=window.Homework.resumeIndex(h.exercise_ids,attempt);
    const check=key=>`<label class="pref-check"><input type="checkbox" data-hw-check="${key}" ${attempt.checklist[key]?'checked':''}> ${{method:'Повторила методичку',exercises:'Упражнения сборника',words:'Слова урока',external_test:'Зафиксировала на сайте',keyboard:'Казахская раскладка на телефоне',cheat:'Шпаргалка сохранена'}[key]||key}</label>`;
    const secBtns=(part,n)=>n<=1?'':`<div class="jump-row">${Array.from({length:n},(_,i)=>`<button type="button" class="chip" data-hw-part="${part}" data-hw-sec="${i}">Часть ${i+1}</button>`).join('')}</div>`;
-   root.innerHTML=`<div class="panel homework-head"><p class="eyebrow">УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>Готово ${exP.done} из ${exP.total} упражнений · ${wP.done} из ${wP.total} слов. Это задания урока, не повторение.</p><button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button></div>
+   const wordLine=(pack.lesson_id==='3-1'||pack.lesson_id==='3-2')?`${(h.word_ids||[]).length} слов × направления, карточек ${wP.done} из ${wP.total}`:`${wP.done} из ${wP.total} слов`;
+   root.innerHTML=`<div class="panel homework-head"><p class="eyebrow">УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>Готово ${exP.done} из ${exP.total} упражнений · ${wordLine}. Это выборка урока, не весь сборник и не повторение.</p><button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button></div>
      <div class="panel"><div class="jump-row">${list.map(p=>`<button type="button" class="chip" data-hw-lesson="${p.lesson_id}" ${p.lesson_id===pack.lesson_id?'aria-pressed="true"':''}>${esc(p.homework.title)}</button>`).join('')}</div>
        <p class="small">Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике. Можно выйти в любой момент: ответы уже в листе.</p>
        <ol class="learning-steps">
@@ -896,11 +902,7 @@
    }
    const bankCard=Bank&&Bank.cardForChapter(ch);
    const canonKey=les.id+':'+ch.id;
-   if(bankCard&&isCanonBeat(beat.k)){
-     if(gp.canonShownFor===canonKey){
-       while(beats[gp.beat]&&isCanonBeat(beats[gp.beat].k))gp.beat++;
-       save();renderPath();return;
-     }
+   if(bankCard&&isCanonBeat(beat.k)&&gp.canonShownFor!==canonKey){
      gp.canonShownFor=canonKey;
      const paras=Bank.paras;
      const ru=paras(bankCard.ru_refresh).map(p=>'<p>'+esc(p)+'</p>').join('');
@@ -916,7 +918,7 @@
        ${traps?'<section class="path-block"><h3>Не перепутай</h3><ul class="path-traps">'+traps+'</ul></section>':''}
        <button type="button" class="primary-button" id="path-next">${cta}</button></div>`;
      bindCrumb();bindTutor(les,ch);
-     $('#path-next').onclick=()=>{while(beats[gp.beat]&&isCanonBeat(beats[gp.beat].k))gp.beat++;save();renderPath();};
+     $('#path-next').onclick=()=>{save();renderPath();};
      return;
    }
    bindTutor(les,ch);
@@ -982,7 +984,13 @@
            <button type="button" class="secondary-button" id="path-rule">Подсказка</button>
            <button type="button" class="text-button" id="path-idk">Не знаю</button></div></form></div>`;
      bindCrumb();
-     const input=$('#path-answer');if(input)input.focus();
+     const input=$('#path-answer');
+     if(input){
+       const saved=gp.pathDraft;
+       if(saved&&saved.chapterId===ch.id&&saved.beat===gp.beat)input.value=saved.value||'';
+       input.addEventListener('input',()=>{gp.pathDraft={lessonId:les.id,chapterId:ch.id,beat:gp.beat,value:input.value};});
+       input.focus();
+     }
      $$('#path-form [data-letter]').forEach(b=>{b.addEventListener('pointerdown',e=>e.preventDefault());b.onclick=()=>{const s=input.selectionStart||input.value.length,e=input.selectionEnd||s;input.value=input.value.slice(0,s)+b.dataset.letter+input.value.slice(e);input.focus();};});
      let pathPeek=false;
      const exp=()=>String([].concat(beat.answers||[],beat.answer||[])[0]||'');
@@ -1133,6 +1141,14 @@
    activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;checked=false;presented=null;pauseTimer();elapsedMs=0;showView('today');
  }
  function vocabTable(rows){return `<div class="table-wrap"><table><thead><tr><th scope="col">Қазақша</th><th scope="col">По-русски / число</th></tr></thead><tbody>${rows.map(([k,r])=>`<tr><td lang="kk">${esc(k)}</td><td>${esc(Array.isArray(r)?r.join(', '):r)}</td></tr>`).join('')}</tbody></table></div>`;}
+ function explainCanonMarkup(){
+   const Bank=window.ExplainBank;if(!Bank||!Bank.BANK)return '';
+   return Object.keys(Bank.BANK).map(id=>{
+     const card=Bank.BANK[id]||{};
+     const body=[card.ru_refresh,card.medium,card.short,(card.examples||[]).join('\n'),(card.traps||[]).join('\n')].filter(Boolean).join('\n\n');
+     return `<div class="panel rule-block" data-rule="${esc(id)}"><h2>${esc(card.title||id)}</h2><p class="small">Канон ${esc(id)}. Краткая карточка не заменяет этот текст.</p><pre class="rule-pre">${esc(body)}</pre></div>`;
+   }).join('');
+ }
  function bankMarkup(){
    const B=window.WORD_BANK;if(!B)return '';
    const titles={'1-1':'1–1','1-2':'1–2','1-3':'1–3','2-1':'2–1','2-2':'2–2','2-3':'2–3'};
@@ -1201,7 +1217,7 @@
      <div class="panel rule-block" data-rule="vocab11"><h2>11 слов из домашней работы 1–1</h2>${vocabTable(course.vocabulary)}<p><button type="button" class="secondary-button" data-rule-topic="vocab">Тренировать слова</button></p></div>
      <div class="panel rule-block" data-rule="numbers-hw"><h2>Числа и количество из домашней работы 1–2</h2>${vocabTable(course.numbers)}<p><button type="button" class="secondary-button" data-rule-topic="numbers">Тренировать числа</button></p></div>
      <div class="panel rule-block" data-rule="words-22"><h2>Слова урока 2–2</h2>${vocabTable(catalog.words.filter(w=>w.lesson_first_seen==='2-2').map(w=>[w.kazakh,w.translation]))}<p><button type="button" class="secondary-button" data-rule-topic="vocab">Тренировать слова</button></p></div>
-     ${bankMarkup()}`;
+     ${explainCanonMarkup()}${bankMarkup()}`;
    const rulesQ=$('#rules-q');
    if(rulesQ)rulesQ.oninput=()=>{
      const n=core.normalize(rulesQ.value);
