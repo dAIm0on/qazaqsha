@@ -7,7 +7,7 @@
   --success:#1E6B3A; --success-bg:#E5EFDF; --ok:#1E6B3A;
   --error:#FF5A1F; --error-bg:#FFE8E0;
   --warning:#77550F; --warning-bg:#F3E18A; --focus:#161412;
-  --display:'Noto Serif',Georgia,serif; --sans:'Golos Text','Segoe UI','Noto Sans',sans-serif;
+  --display:"IBM Plex Serif",Georgia,serif; --sans:"IBM Plex Sans","Segoe UI",sans-serif;
   --radius-lg:24px; --radius:20px; --radius-control:12px; --radius-letter:8px;
   --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px; --space-8:32px; --space-12:48px;
   --motion-fast:140ms; --motion-base:220ms; --motion-panel:280ms;
