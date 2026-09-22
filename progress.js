@@ -168,7 +168,7 @@
    q.fields.forEach((f,i)=>{
      const expected=core.normalize(f.answers[0],f.kind),actual=core.normalize(answers[i],f.kind);
      if(result.parts[i]){
-       for(const pair of Object.values(state.confusions))if([pair.expected_answer,pair.wrong_answer_given].includes(expected)){
+       for(const pair of Object.values(state.confusions))if([pair.expected_answer,pair.wrong_answer_given].includes(expected)&&samePair(q,pair)){
          pair.successes[expected]=Math.min(2,(pair.successes[expected]||0)+1);
          pair.resolved=(pair.successes[pair.expected_answer]||0)>=2&&(!pair.known_alternative||(pair.successes[pair.wrong_answer_given]||0)>=2);
        }
@@ -184,14 +184,24 @@
    if(ordered.length>cfg.confusion.maxPairs)state.confusions=Object.fromEntries(ordered.slice(0,cfg.confusion.maxPairs));
  }
  function pairs(state){return Object.entries(state.confusions).filter(([,p])=>p.confusion_count>=cfg.confusion.minCount&&!p.resolved).sort((a,b)=>b[1].confusion_count-a[1].confusion_count);}
- function contrastIds(pair,index,questions){
-   const a=[...(index.get(pair.expected_answer)||[])],b=pair.known_alternative?[...(index.get(pair.wrong_answer_given)||[])]:[];
-   const byId=new Map(questions.map(q=>[q.id,q]));
-   const small=ids=>ids.filter(id=>byId.has(id)).sort((x,y)=>byId.get(x).fields.length-byId.get(y).fields.length);
-   const left=small([...new Set([...pair.card_ids,...a])]),right=small(b),out=[];
-   for(let i=0;i<Math.max(left.length,right.length);i++){if(left[i]&&!out.includes(left[i]))out.push(left[i]);if(right[i]&&!out.includes(right[i]))out.push(right[i]);if(out.length>=cfg.session.size)break;}
-   return out.slice(0,cfg.session.size);
+ const PAIR_WORDS=[['алты','алпыс'],['жеті','жетпіс'],['сегіз','сексен'],['тоғыз','тоқсан'],['сен','сіз'],['сың','сыз']];
+ function pairWordsOf(q){
+   const t=((q&&q.stimulus||'')+' '+((q&&q.fields)||[]).flatMap(f=>f.answers||[]).join(' ')+' '+(q&&q.title||'')).toLowerCase();
+   const has=w=>new RegExp('(?:^|[^\\p{L}])'+w+'(?:$|[^\\p{L}])','iu').test(t);
+   for(const [a,b] of PAIR_WORDS){if(has(b)||has(a))return [a,b];}
+   return null;
  }
- const api={empty,migrate,serialize,validate,merge,answerIndex,observeConfusions,pairs,contrastIds,memoryStats};
+ function samePair(q,pair){
+   if(!q||!pair)return false;
+   if((pair.card_ids||[]).includes(q.id))return true;
+   const words=pairWordsOf(q);
+   return !!(words&&words.includes(pair.expected_answer)&&words.includes(pair.wrong_answer_given));
+ }
+ function contrastIds(pair,index,questions){
+   const byId=new Map(questions.map(q=>[q.id,q]));
+   const ids=questions.filter(q=>samePair(q,pair)&&byId.has(q.id)).map(q=>q.id);
+   return [...new Set(ids)].slice(0,cfg.session.size);
+ }
+ const api={empty,migrate,serialize,validate,merge,answerIndex,observeConfusions,pairs,contrastIds,samePair,memoryStats};
  if(node)module.exports=api;else root.ProgressStore=api;
 })(typeof window!=='undefined'?window:globalThis);

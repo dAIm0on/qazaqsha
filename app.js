@@ -434,8 +434,39 @@
  }
  function startContrast(pair){
    activeLesson=null;activeStep=null;topic='all';sourceFilter=null;mode='contrast';
-   queue=shuffled(P.contrastIds(pair,confusionIndex,questions).filter(eligible));practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;resetCounts();
+   const ids=P.contrastIds(pair,confusionIndex,questions).filter(id=>{
+     const q=byId.get(id);
+     if(!q||!eligible(q))return false;
+     if(q.topic==='numbers'&&window.NumberLadder&&!window.NumberLadder.allowed(q,state))return false;
+     return true;
+   });
+   if(!ids.length)return;
+   queue=shuffled(ids);practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;resetCounts();
    render();showView('practice');
+ }
+ const RULE_TRACKS={
+   T1_HARMONY:['harmony-syllables','harmony-pairs'],
+   T2_PLURAL_LDT:['plural-1','plural-2']
+ };
+ function tryRule(ruleId,host){
+   const tracks=(RULE_TRACKS[ruleId]||[]).map(id=>(window.LEARNING&&window.LEARNING.lessons||[]).find(l=>l.id===id)).filter(Boolean).slice(0,2);
+   if(tracks.length>1&&host){
+     host.innerHTML=tracks.map(l=>'<button type="button" class="secondary-button" data-try-track="'+esc(l.id)+'">'+esc(l.title)+'</button>').join('');
+     host.querySelectorAll('[data-try-track]').forEach(b=>b.onclick=()=>startLesson(b.dataset.tryTrack));
+     return;
+   }
+   if(tracks.length===1){startLesson(tracks[0].id);return;}
+   const ids=questions.filter(q=>{
+     if(!q||!(q.ruleIds||[]).includes(ruleId))return false;
+     if(!catalog.eligible(q,state))return false;
+     if(q.topic==='numbers'&&window.NumberLadder&&!window.NumberLadder.allowed(q,state))return false;
+     return true;
+   }).slice(0,cfg.session.size).map(q=>q.id);
+   if(!ids.length){
+     if(host)host.innerHTML='<p class="small" data-coverage-gap>Отдельного упражнения для этой ошибки нет.</p>';
+     return;
+   }
+   startCustom(ids,'course');
  }
  function showView(next){
    captureDraft();
@@ -1476,6 +1507,21 @@
    $$('[data-rule-open]').forEach(b=>b.onclick=()=>showRuleArticle(b.dataset.ruleOpen));
    const rulesBack=$('.rules-back');
    if(rulesBack)rulesBack.onclick=()=>{if(rulesQ)rulesQ.value='';showRuleArticle(null);};
+   const oldCanon={quantity:'T4_NO_PLURAL_AFTER_NUMBER',harmony:'T2_PLURAL_LDT',plural:'T2_PLURAL_LDT',soft:'T1_HARMONY',numbers:'T5_NUMERAL_COMPOSE',person:'T8_PERSON_PL'};
+   if(oldCanon[rulesArticle])rulesArticle=oldCanon[rulesArticle];
+   for(const [oldId,canonId] of Object.entries(oldCanon)){
+     const old=document.querySelector('#rules-content .rule-block[data-rule="'+oldId+'"]');
+     const canon=document.querySelector('#rules-content .rule-block[data-rule="'+canonId+'"]');
+     if(!old||!canon||old===canon)continue;
+     const notes=document.createElement('details');
+     notes.className='old-rule-notes';
+     notes.innerHTML='<summary>Заметки старой статьи</summary>';
+     const h2=old.querySelector('h2');
+     [...old.childNodes].forEach(node=>{if(node!==h2)notes.append(node);});
+     canon.append(notes);
+     old.remove();
+   }
+   $$('#rules-content [data-rule-open]').forEach(b=>{if(oldCanon[b.dataset.ruleOpen])b.dataset.ruleOpen=oldCanon[b.dataset.ruleOpen];});
    showRuleArticle(rulesArticle);
    const rulesAsk=$('#rules-ask-q');if(rulesAsk)rulesAsk.addEventListener('input',save);
    const rulesSend=$('#rules-ask-send');
@@ -1537,9 +1583,10 @@
      const full=best&&window.ExplainOpen&&window.ExplainOpen.fullHtml?window.ExplainOpen.fullHtml(best.id):'';
      const more=found.rules.slice(best?1:0,6).map(r=>`<button type="button" class="text-button" data-open-canon="${esc(r.id)}">${esc(r.title)}</button>`).join(' ');
      const words=found.words.length?`<p class="small">Слова, не вместо правила: ${found.words.map(w=>esc(w.title)+(w.gloss?' — '+esc(w.gloss):'')).join(' · ')}</p>`:'';
-     box.innerHTML=(best?`<article class="panel"><h2>${esc(best.title)}</h2><p class="small">${best.lesson?'Урок '+esc(String(best.lesson).replace('-','–')):''}</p>${full}<p><button type="button" class="secondary-button" data-open-canon="${esc(best.id)}">Открыть в правилах</button></p></article>`:'')+(more?`<p>${more}</p>`:'')+words;
+     box.innerHTML=(best?`<article class="panel"><h2>${esc(best.title)}</h2><p class="small">${best.lesson?'Урок '+esc(String(best.lesson).replace('-','–')):''}</p>${full}<p><button type="button" class="secondary-button" data-open-canon="${esc(best.id)}">Открыть в правилах</button> <button type="button" class="secondary-button" data-try-rule="${esc(best.id)}">Попробовать</button></p><div data-try-choices></div></article>`:'')+(more?`<p>${more}</p>`:'')+words;
      if(window.ExplainOpen&&window.ExplainOpen.bind)window.ExplainOpen.bind(box);
      box.querySelectorAll('[data-open-canon]').forEach(b=>b.onclick=()=>openSearchedRule(b.dataset.openCanon));
+     box.querySelectorAll('[data-try-rule]').forEach(b=>b.onclick=()=>tryRule(b.dataset.tryRule,b.parentElement&&b.parentElement.nextElementSibling));
    };
    if(materialsQ)materialsQ.oninput=()=>{materialsQuery=materialsQ.value;drawMaterialSearch();};
    if(materialsLes)materialsLes.onchange=()=>{materialsLesson=materialsLes.value;drawMaterialSearch();};
@@ -1588,6 +1635,12 @@
      if(next==='homework'){hwLesson=null;showView('homework');return;}
      if(next==='path'){showView('path');return;}
      if(next.startsWith('weak:')){startBlockReview(next.slice(5));return;}
+     if(next.startsWith('pair:')){
+       const [a,b]=next.slice(5).split(':');
+       const found=Object.values(state.confusions||{}).find(p=>(p.expected_answer===a&&p.wrong_answer_given===b)||(p.expected_answer===b&&p.wrong_answer_given===a));
+       startContrast(found||{expected_answer:a,wrong_answer_given:b,card_ids:[],known_alternative:true});
+       return;
+     }
      if(next==='chunks'){
        const ids=questions.filter(q=>window.MemoryPolicy&&window.MemoryPolicy.isChunk(q)&&eligible(q)).map(q=>q.id);
        startCustom(ids,'chunks');return;

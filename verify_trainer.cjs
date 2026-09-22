@@ -1391,7 +1391,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/qazaq-offline-live-20260922-chain/.test(openSw));
+assert.ok(/qazaq-offline-live-20260922-rules/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1989,5 +1989,33 @@ ok('Astra step 11: tutor request keeps this block and only this skill');
 assert.ok(/Задано выучить/.test(fs.readFileSync(path.join(__dirname,'learning.js'),'utf8')));
 assert.ok(/Встречается в объяснении/.test(fs.readFileSync(path.join(__dirname,'learning.js'),'utf8')));
 ok('Astra step 12: lesson words stay in two dictionary groups');
+
+assert.ok(/data-try-rule/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/Попробовать/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/'numbers','Числа'/.test(fs.readFileSync(path.join(__dirname,'learning.js'),'utf8')));
+assert.ok(/harmony-syllables/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8'))&&/plural-1/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+ok('Astra step 13: a found rule can open its existing exercises; numbers stay a separate choice');
+
+const pair14={expected_answer:'алты',wrong_answer_given:'алпыс',card_ids:['six'],known_alternative:true,successes:{},resolved:false,confusion_count:3};
+const st14=progress.empty();
+st14.confusions={k:pair14};
+const six14={id:'six',kind:'fields',stimulus:'6',fields:[{kind:'text',answers:['алты']}]};
+const other14={id:'other',kind:'fields',stimulus:'книги',ruleIds:['T2_PLURAL_LDT'],fields:[{kind:'text',answers:['кітаптар']}]};
+progress.observeConfusions(st14,other14,['кітаптар'],{parts:[true]},1,new Map(),false);
+assert.equal(pair14.successes.алты||0,0);
+assert.equal(pair14.resolved,false);
+progress.observeConfusions(st14,six14,['алты'],{parts:[true]},2,new Map(),false);
+progress.observeConfusions(st14,six14,['алты'],{parts:[true]},3,new Map(),false);
+assert.equal(pair14.successes.алты,2);
+assert.equal(pair14.resolved,false);
+const ids14=progress.contrastIds(pair14,new Map(),[six14,other14]);
+assert.deepEqual(ids14,['six']);
+assert.ok(/Короткая тренировка/.test(fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8')));
+ok('Astra step 14: one pair drills only itself and another rule does not close it');
+
+assert.ok(/Заметки старой статьи/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/quantity:'T4_NO_PLURAL_AFTER_NUMBER'/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/bestRule/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+ok('Astra step 15: old rule articles fold into the canon; the possessive rule stays one');
 
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
