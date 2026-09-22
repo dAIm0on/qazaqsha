@@ -33,6 +33,7 @@
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
+ let reviewReasonMap=Object.create(null),materialsQuery='',materialsLesson='',materialsKind='';
  const COURSE_BLOCKS=[{id:'1-1',title:'1–1',hint:'Звуки и первые слова'},{id:'1-2',title:'1–2',hint:'Окончания и десятки'},{id:'1-3',title:'1–3',hint:'Числа и новые слова'},{id:'2-1',title:'2–1',hint:'Мен, сен, сіз'},{id:'2-2',title:'2–2',hint:'Біз, сендер, сіздер'},{id:'2-3',title:'2–3',hint:'Ол, вопрос, порядковые'},{id:'3-1',title:'3–1',hint:'Притяжательные формы'},{id:'3-2',title:'3–2',hint:'Наш / ваш / их'}];
  function courseJumpMarkup(id){
    return `<div class="course-jump" id="${id}"><p>Уроки 1–1…3–1</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}><span class="today-lesson-id">Урок ${b.title}</span><small>${esc(b.hint)}</small></button>`).join('')}</div></div>`;
@@ -167,7 +168,7 @@
    const P=window.ProbeItems;if(!P)return '';
    const blocks=P.openBlocks(window.CURRICULUM);
    if(!blocks.length)return '';
-   return `<div class="panel"><h2>Срез грамматики</h2><p class="small">Список дыр, не балл. Один блок за заход. Подсказка не идёт в зачёт.</p><div class="review-actions">${blocks.map(b=>`<button type="button" class="secondary-button" data-slice="${b.id}">${esc(b.title)}</button>`).join('')}</div></div>`;
+   return `<div class="panel"><h2>Проверить дыры</h2><p class="small">Список дыр, не балл. Один блок за заход. Подсказка не идёт в зачёт. Это не очередь «пора вспомнить».</p><div class="review-actions">${blocks.map(b=>`<button type="button" class="secondary-button" data-slice="${b.id}">${esc(b.title)}</button>`).join('')}</div></div>`;
  }
  function bindSlice(){
    $$('#exam-content [data-slice]').forEach(b=>b.onclick=()=>startSlice(b.dataset.slice));
@@ -175,7 +176,7 @@
  function startSlice(block){
    const P=window.ProbeItems;if(!P)return;
    course.sources=course.sources||{};
-   if(!course.sources.slice)course.sources.slice={title:'Срез',url:'#',additional:true};
+   if(!course.sources.slice)course.sources.slice={title:'Проверка дыр',url:'#',additional:true};
    const list=P.session(block,window.CURRICULUM).map(P.toQuestion);
    for(const q of list){if(!byId.has(q.id)){course.questions.push(q);byId.set(q.id,q);}}
    mode='slice';topic='all';sourceFilter=null;activeLesson=null;courseBlock=null;vocabRole=null;
@@ -186,16 +187,16 @@
    const P=window.ProbeItems;
    const holes=P?P.summarize(state.sliceRun||[]):[];
    state.sliceLast=holes;mode='ordered';
-   const body=holes.length?holes.map(h=>`<article class="panel"><h2>Дыра ${esc(h.short)} · ${esc(h.title)}</h2><p><button type="button" class="secondary-button" data-view="rules">Правило</button> <button type="button" class="primary-button" data-repair="${esc(h.rule_id)}">Ремонт</button></p></article>`).join(''):'<div class="panel"><h2>Дыр в этом блоке нет</h2><p>Это список, не процент.</p></div>';
+   const body=holes.length?holes.map(h=>`<article class="panel"><h2>${esc(h.title)}</h2><p><button type="button" class="secondary-button" data-view="rules">Правило</button> <button type="button" class="primary-button" data-repair="${esc(h.rule_id)}">Разберём</button></p></article>`).join(''):'<div class="panel"><h2>Дыр в этом блоке нет</h2><p>Это список, не процент.</p></div>';
    showView('exam');
-   $('#exam-content').innerHTML=`<div class="panel"><h2>Срез грамматики</h2><p class="small">Список дыр, не балл.</p></div>${body}${slicePanel()}`;
+   $('#exam-content').innerHTML=`<div class="panel"><h2>Проверить дыры</h2><p class="small">Список дыр, не балл. Очередь «пора вспомнить» от этого не меняется.</p></div>${body}${slicePanel()}`;
    bindSlice();
    $$('#exam-content [data-view="rules"]').forEach(b=>b.onclick=()=>showView('rules'));
    $$('#exam-content [data-repair]').forEach(b=>b.onclick=()=>beginRepair(b.dataset.repair));
  }
  function launchRepair(list){
   course.sources=course.sources||{};
-  if(!course.sources.repair)course.sources.repair={title:'Ремонт',url:'#',additional:true};
+  if(!course.sources.repair)course.sources.repair={title:'Разберём',url:'#',additional:true};
   for(const q of list){if(!byId.has(q.id)){course.questions.push(q);byId.set(q.id,q);}}
   mode='repair';topic='all';sourceFilter=null;activeLesson=null;courseBlock=null;vocabRole=null;
   queue=list.map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;
@@ -225,7 +226,7 @@
   if(state.repairDay10&&R){if(ok)R.passDay10(state);else R.failDay10(state,Date.now());}
   state.repairDay10=false;mode='ordered';
   showView('exam');
-  $('#exam-content').innerHTML=`<div class="panel"><h2>Ремонт</h2><p>${esc(R?R.PAPER:'')}</p><p class="small">${ok?'Этот заход сошёлся.':'День 0 снова. Вторая дыра не стартует.'}</p></div>${slicePanel()}`;
+  $('#exam-content').innerHTML=`<div class="panel"><h2>Разберём</h2><p>${esc(R?R.PAPER:'')}</p><p class="small">${ok?'Этот заход сошёлся.':'День 0 снова. Вторая дыра не стартует.'}</p></div>${slicePanel()}`;
   bindSlice();
  }
  function checkProbe(q,reveal){
@@ -240,7 +241,7 @@
    const feedback=$('#feedback');
    const answerLine=(q.fields||[]).map(f=>f.answers[0]).join(' · ');
    feedback.className='feedback '+(row.correct?'':'error');
-   feedback.innerHTML=`<h3>${row.correct?'Сходится.':'Пока не это.'}</h3><p><strong>Ответ:</strong> ${esc(answerLine)}</p><p class="small">${reveal?'Подсказка не засчитана.':'Это срез, не расписание повторения.'}</p>`;
+   feedback.innerHTML=`<h3>${row.correct?'Сходится.':'Пока не это.'}</h3><p><strong>Ответ:</strong> ${esc(answerLine)}</p><p class="small">${reveal?'Подсказка не засчитана.':'Это проверка дыр. Очередь «пора вспомнить» от неё не меняется.'}</p>`;
    feedback.hidden=false;
    $$('#answer-form input, #hint-button, #reveal-button, [data-letter]').forEach(el=>{el.disabled=true;});
    $('#check-button').hidden=true;$('#next-button').hidden=false;
@@ -347,7 +348,28 @@
    let list=subset();
    if(!vocabRole)list=list.filter(q=>q.wordRole!=='used');
    if(mode==='smart'){list=shuffled(list).sort((a,b)=>Number(window.Knowledge.bindings(b).some(x=>x.skill_type==='production'))-Number(window.Knowledge.bindings(a).some(x=>x.skill_type==='production')));list=core.chooseShortSession(list,records,Date.now(),questions.length);}
-   else if(mode==='review')list=list.filter(q=>core.isDue(records[q.id])).sort((a,b)=>records[a.id].dueAt-records[b.id].dueAt);
+   else if(mode==='review'){
+     const nowReview=Date.now();
+     const remediation=window.AiTutor&&window.AiTutor.dueRemediation?window.AiTutor.dueRemediation().slice(0,1).flatMap(rec=>window.AiTutor.templateQuestions(rec.error_code,0)):[];
+     for(const item of remediation){if(item&&!byId.has(item.id)){course.questions.push(item);byId.set(item.id,item);}}
+     const rows=window.CorpusSearch?window.CorpusSearch.todayQueue(state,list,nowReview,{
+       isDue:(r,t)=>core.isDue(r,t),
+       remediation,
+       ruleTitle:id=>{const card=window.ExplainBank&&window.ExplainBank.byId(id);return card&&card.title||'это правило';}
+     }):list.filter(q=>core.isDue(records[q.id])).map(q=>({id:q.id,reason:'пора вспомнить',action:'review'}));
+     reviewReasonMap=Object.create(null);
+     const picked=[];
+     for(const row of rows){
+       if(row.action!=='review')continue;
+       const item=byId.get(row.id);
+       if(!item)continue;
+       reviewReasonMap[item.id]=row.reason;
+       picked.push(item);
+     }
+     list=picked;
+     const rank=id=>reviewReasonMap[id]==='проверим на новом слове'?0:reviewReasonMap[id]==='дважды путала окончание'?1:reviewReasonMap[id]==='ещё раз это окончание'?2:3;
+     list.sort((a,b)=>rank(a.id)-rank(b.id)||((records[a.id]&&records[a.id].dueAt)||0)-((records[b.id]&&records[b.id].dueAt)||0));
+   }
    else if(mode==='mistakes')list=list.filter(q=>records[q.id]?.needsReview);
    else if(mode==='exam')list=list.filter(q=>examReady(records[q.id])&&(!window.CurriculumGate||window.CurriculumGate.examEligible(q)));
    else if(!all)list=list.filter(q=>(records[q.id]?.streak||0)<2||core.isDue(records[q.id]));
@@ -538,7 +560,9 @@
    window.NumberPractice.prepare(q,variants);confusionIndex=P.answerIndex(questions);
    if(course.sources&&!course.sources['ai-remed'])course.sources['ai-remed']={title:'Разбор навыка',url:'#',additional:true};
    const source=course.sources[q.source]||course.sources['ai-remed']||{title:'Практика',url:'#',additional:true}, streak=records[q.id]?.streak||0;
-   const location=q.source.startsWith('hw')?'Слово '+q.group:`Задание ${q.group}${q.part!=='1'?' · пункт '+q.part:''}`;
+   const sourceUrl=liveSource(source.url);
+   const sourceLabel=sourceUrl?`<a href="${esc(sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`:esc(source.title);
+   const location=placeLine(q);
    const hasText=(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='number-text'&&!classifierOptions(f));
    const letters=hasText&&state.prefs.letters;
    const exam=mode==='exam';
@@ -546,7 +570,7 @@
    const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
    const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
    const letterBar=letters?`<div class="letter-keyboard" lang="kk" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div>`:'';
-   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${source.additional?esc(source.title):`<a href="${source.url}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`}<br>${esc(location)}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(q.title)}</h2>${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div>${letterBar}</div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
+   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(q.title)}</h2>${mode==='review'&&reviewReasonMap[q.id]?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div>${letterBar}</div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
    const goCard=()=>{if(checked)nextQuestion();else checkAnswer(q);};
    if(window._qazaqEnter)document.removeEventListener('keydown',window._qazaqEnter);
    window._qazaqEnter=e=>{
@@ -1275,9 +1299,41 @@
    const Bank=window.ExplainBank;if(!Bank||!Bank.BANK)return '';
    return Object.keys(Bank.BANK).map(id=>{
      const card=Bank.BANK[id]||{};
-     const body=[card.ru_refresh,card.medium,card.short,(card.examples||[]).join('\n'),(card.traps||[]).join('\n')].filter(Boolean).join('\n\n');
-     return `<div class="panel rule-block" data-rule="${esc(id)}"><h2>${esc(card.title||id)}</h2><p class="small">Канон ${esc(id)}. Краткая карточка не заменяет этот текст.</p><pre class="rule-pre">${esc(body)}</pre></div>`;
+     const full=window.ExplainOpen&&window.ExplainOpen.fullHtml?window.ExplainOpen.fullHtml(id):'';
+     const body=full||esc([card.ru_refresh,card.medium,card.short,(card.examples||[]).join('\n'),(card.traps||[]).join('\n')].filter(Boolean).join('\n\n'));
+     return `<div class="panel rule-block" data-rule="${esc(id)}"><h2>${esc(card.title||'Правило')}</h2><p class="small">Полный текст. Краткая карточка его не заменяет.</p>${full?body:'<pre class="rule-pre">'+body+'</pre>'}</div>`;
    }).join('');
+ }
+ function liveSource(url){
+   const u=String(url||'');
+   if(!/^https?:\/\//i.test(u))return '';
+   if(/qazaqsha\.pages\.dev\/?$/i.test(u))return '';
+   return u;
+ }
+ function canonForSource(key,source){
+   const lesson=source&&source.lesson_id;
+   const byLesson={'1-1':'T1_HARMONY','1-2':'T2_PLURAL_LDT','1-3':'T4_NO_PLURAL_AFTER_NUMBER','2-1':'T6_PERSON_SG','2-2':'T8_PERSON_PL','2-3':'T9_OL','3-1':'T20_POSS','3-2':'T24_POSS_BIZ'};
+   if(lesson&&byLesson[lesson])return byLesson[lesson];
+   if(key==='phase3-31'||key==='m31'||key==='hw31')return 'T20_POSS';
+   if(key==='phase3-32'||key==='m32'||key==='hw32')return 'T24_POSS_BIZ';
+   return '';
+ }
+ function openSearchedRule(id){
+   if(!id)return;
+   showView('rules');
+   showRuleArticle(id);
+ }
+ function placeLine(q){
+   if(!q)return '';
+   if(q.slice||q.source==='slice')return 'Проверка дыр';
+   if(q.source==='repair'||q.repairRoot)return 'Проверим на новом слове';
+   if(q.source==='transfer')return 'Проверим на новом слове';
+   if(q.source==='phrase'||q.topic==='phrase')return 'Фраза урока';
+   if(q.source==='plus'||q.source==='ai-remed')return 'Короткая ступень';
+   if(String(q.source||'').startsWith('hw'))return 'Слово домашки';
+   if(/^\d+$/.test(String(q.group||'')))return 'Задание '+q.group+(q.part&&q.part!=='1'?' · пункт '+q.part:'');
+   if(q.lessonId)return 'Урок '+String(q.lessonId).replace('-','–');
+   return '';
  }
  function bankMarkup(){
    const B=window.WORD_BANK;if(!B)return '';
@@ -1287,7 +1343,7 @@
    return `<div class="panel rule-block" data-rule="bank"><h2>Как запоминать слова</h2>
      <p>Два разных набора — два разных упражнения. Не смешивай.</p>
      <ol class="learning-steps"><li><strong>Задали выучить</strong> — домашка. Смотри пару → закрой → скажи вслух → напиши. Свою ассоциацию (дос = «доска друга») держи 1–2 раза, потом убери.</li><li><strong>Просто встречались</strong> — сначала только узнать (казахский → русский). Писать казахский — отдельным шагом, позже.</li><li>Маленькие пачки по 4. Интервал считает сам тренажёр. Подсказка не считается самостоятельным ответом.</li></ol>
-     <p class="small">Опора: retrieval practice (Karpicke), keyword+retrieval (Memory & Cognition 2019), FSRS уже в тренажёре. Chrome для ChatGPT/Gemini сейчас закрыт — методика сверена с папкой ИССЛЕДОВАНИЯ и этими работами.</p></div>
+     <p class="small">Интервал считает сам тренажёр. Подсказка не считается самостоятельным ответом.</p></div>
      <div class="panel rule-block" data-rule="bank"><h2>Слова «выучить» из методичек</h2><p>Домашки 1–1, 1–2, 1–3, 2–1 и 2–2. Все <strong>${B.mustCount}</strong> позиций в тренажёре.</p>${mustBlocks}<p><button type="button" class="secondary-button" data-vocab="must">Тренировать заданные слова</button></p></div>
      <div class="panel rule-block" data-rule="bank"><h2>Слова, которые просто встречались</h2><p>${B.extraCount} слов не зубрить списком. Сначала узнать, потом писать.</p>${vocabTable(all.filter(w=>w.role==='used').map(w=>[w.kazakh,(Array.isArray(w.translation)?w.translation.join(', '):w.translation)+' · урок '+w.from_lesson]))}<p><button type="button" class="secondary-button" data-vocab="used">Тренировать встретившиеся слова</button></p></div>`;
  }
@@ -1308,7 +1364,7 @@
  }
  function renderRules(){
    $('#rules-content').innerHTML=`
-     <div class="panel rules-search"><label for="rules-q">Найти правило или слово</label><input id="rules-q" type="search" placeholder="казахское слово или тема" autocomplete="off" enterkeyhint="search"><p class="small">Поиск по этой странице. Несуществующее слово не становится новой статьёй.</p></div>
+     <div class="panel rules-search"><label for="rules-q">Найти правило, форму или пример</label><input id="rules-q" type="search" placeholder="менің, мой, кітапым" autocomplete="off" enterkeyhint="search"><p class="small">Ищет по всем уже записанным правилам, примерам и полным объяснениям. Новая статья не создаётся.</p></div>
      <button type="button" class="text-button rules-back" hidden>Ко всем правилам</button>
      <nav class="rules-toc" aria-label="Оглавление">
        <p class="eyebrow">Окончания</p>
@@ -1326,6 +1382,8 @@
        <button type="button" class="rules-toc-item" data-rule-open="vocab11">11 слов из домашней работы 1–1</button>
        <button type="button" class="rules-toc-item" data-rule-open="words-22">Слова урока 2–2</button>
        <button type="button" class="rules-toc-item" data-rule-open="bank">Как запоминать слова</button>
+       <p class="eyebrow">Полные тексты</p>
+       ${(window.ExplainBank&&window.ExplainBank.BANK?Object.keys(window.ExplainBank.BANK):[]).map(id=>`<button type="button" class="rules-toc-item" data-rule-open="${esc(id)}">${esc((window.ExplainBank.BANK[id]||{}).title||'Правило')}</button>`).join('')}
      </nav>
      <div class="panel rule-block" data-rule="quantity"><h2>После числа множественное не ставится</h2><p>Число перед существительным уже сообщает количество: <span lang="kk">екі кітап</span>, <span lang="kk">көп адам</span>.</p><p>После числительного и слов көп, аз множественное окончание обычно не нужно: <span lang="kk">екі кітап</span>, <span lang="kk">көп адам</span>, <span lang="kk">аз қалам</span>.</p><p><s lang="kk">екі кітаптар</s> → <strong lang="kk">екі кітап</strong>.</p><p class="small"><a href="https://kaz-tili.kz/su_mn1.htm" target="_blank" rel="noopener noreferrer">Объяснение и примеры на kaz-tili.kz</a> — дополнительный материал из методички.</p></div>
      <div class="panel ask-zone" id="rules-ask-panel" hidden><p class="small">Свой вопрос по правилу этой страницы. Не открывает падежи и будущие темы.</p><label class="input-label" for="rules-ask-q">Не поняла</label><textarea id="rules-ask-q" rows="2" maxlength="400" autocomplete="off" enterkeyhint="send" placeholder="Напиши вопрос"></textarea><button type="button" class="text-button" id="rules-ask-send">Спросить</button><div id="rules-ask-out" hidden></div></div>
@@ -1359,6 +1417,8 @@
    if(rulesQ)rulesQ.oninput=()=>{
      const n=core.normalize(rulesQ.value);
      if(!n){showRuleArticle(rulesArticle);return;}
+     const best=window.CorpusSearch&&window.CorpusSearch.bestRule(rulesQ.value);
+     if(best){showRuleArticle(best.id);return;}
      showRuleArticle(null);
      const toc=$('.rules-toc');if(toc)toc.hidden=false;
      $$('#rules-content .rule-block').forEach(p=>{p.hidden=!core.normalize(p.textContent).includes(n);});
@@ -1406,13 +1466,36 @@
    $$('#rules-content [data-vocab]').forEach(b=>b.onclick=()=>{vocabRole=b.dataset.vocab;courseBlock=null;sourceFilter=null;topic='vocab';mode='ordered';startQueue({all:true});showView('practice');});
  }
  function renderMaterials(){
+   const lessonOpts=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2'].map(id=>`<option value="${id}"${materialsLesson===id?' selected':''}>${id.replace('-','–')}</option>`).join('');
    const cards=Object.entries(course.sources).filter(([,s])=>!s.additional).map(([key,s])=>{
      const n=questions.filter(q=>q.source===key).length;
-     return `<div class="source-card"><div><h3>${esc(s.title)}</h3><p>${s.groups?s.groups+' групп заданий · ':''}${n} карточек</p></div><div class="source-actions"><button type="button" class="secondary-button" data-source="${key}">Тренировать</button><a href="${s.url}" target="_blank" rel="noopener noreferrer">Открыть оригинал</a></div></div>`;
+     const url=liveSource(s.url);
+     const canon=canonForSource(key,s);
+     return `<div class="source-card"><div><h3>${esc(s.title)}</h3><p>${n} карточек</p></div><div class="source-actions"><button type="button" class="secondary-button" data-source="${key}">Тренировать</button>${url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Открыть оригинал</a>`:''}${canon?`<button type="button" class="secondary-button" data-open-canon="${esc(canon)}">Открыть правило</button>`:''}</div></div>`;
    }).join('');
-   $('#materials-content').innerHTML=`<div class="panel"><div class="coverage-stats"><div><span class="coverage-number">15</span><p>файлов проверено</p></div><div><span class="coverage-number">${Object.keys(course.sources).filter(k=>!course.sources[k].additional).length}</span><p>источников в практике</p></div><div><span class="coverage-number">${questions.filter(q=>!q.source||q.source!=='plus').length}</span><p>карточек по урокам</p></div></div><p>Дополнительно: ${window.LEARNING.lessons.length} маленьких уроков и ${questions.filter(q=>q.source==='plus').length} карточек и шаблонов для постепенного обучения. Они разработаны для тренажёра и не выданы за задания автора курса.</p><p>Включены упражнения уроков 1–1, 1–2, 1–3 и 2–2. Слова домашки 2–2 и новые прилагательные/профессии тренируются в обе стороны. Расхождения ключей 2–2 (мұғалімбіз, кәсіпкерлер, бастықтармыз) отмечены в карточках: принимается и ключ, и форма по правилу урока.</p><p class="coverage-note">Новые PDF лежат в «Казахский / учебные материалы». Файлы с Диска в тренажёр сами не подмешиваются.</p><a href="${course.folder}" target="_blank" rel="noopener noreferrer">Открыть папку с исходными материалами</a></div><div class="panel"><h2>Упражнения и домашняя работа</h2>${cards}</div><div class="panel"><h2>Остальные файлы учтены</h2><p><a href="https://drive.google.com/file/d/1HIVPE51FqFOcHBOOXFNfsmDKxvfCKpui/view" target="_blank" rel="noopener noreferrer">«Мягкие и твёрдые.pdf»</a> — шпаргалка; её схема включена в «Правила».</p><p><a href="https://docs.google.com/document/d/1Y-dWGwCJL04Pbp015V3_T91_n2f15-ep/edit" target="_blank" rel="noopener noreferrer">Uroki_1_1_Otvety.docx</a> — ответы к сборнику 1–1; использованы для сверки.</p><p><a href="https://drive.google.com/file/d/1P45V0RTvcpKEAjutHpPXM6KARx1MZbgd/view" target="_blank" rel="noopener noreferrer">Вторая копия методички 1–1</a> — текст полностью совпадает с первой. Задания не удваивались.</p><p class="small">Ключи воспроизведены по курсу, для перевода добавлены допустимые синонимы. Исправлена опечатка «Дукен» → «дүкен». Особенность задания с -мен объяснена прямо в карточке.</p></div><div class="panel"><h2>Завершение домашней работы на сайте курса</h2><p>Чтобы преподаватель получил результат, выполни официальный тест и нажми «Зафиксировать результат» на сайте BatylBol. При необходимости войди в свой аккаунт.</p><div class="link-list"><a href="https://batylbol.kz/test/Zvuki.html" target="_blank" rel="noopener noreferrer">BatylBol · твёрдые и мягкие звуки</a><a href="https://batylbol.kz/test/MnozhChislo.html" target="_blank" rel="noopener noreferrer">BatylBol · множественное число</a><a href="https://batylbol.kz/test/LichnyeLitso1-2.html" target="_blank" rel="noopener noreferrer">BatylBol · біз, сендер, сіздер</a><a href="https://batylbol.kz/test/LichnyeEdChislo.html" target="_blank" rel="noopener noreferrer">BatylBol · мен, сен, сіз</a></div><p class="small">Эти внешние банки вопросов не были доступны для переноса. Здесь сохранены ссылки из домашней работы; результаты личной тренировки в BatylBol не передаются.</p><p>Для заданий на письмо используй казахскую раскладку или кнопки букв под ответом. Шпаргалка всегда доступна в разделе «Правила».</p><details><summary>Дополнительные ссылки из методичек</summary><div class="link-list"><a href="https://kaz-tili.kz/su_fonetika.htm" target="_blank" rel="noopener noreferrer">Фонетика</a><a href="https://kaz-tili.kz/su_prav.htm" target="_blank" rel="noopener noreferrer">Мягкие и твёрдые слова</a><a href="https://kaz-tili.kz/progd/prog_mnozhestv_chislo.html" target="_blank" rel="noopener noreferrer">Множественное число · первый уровень</a><a href="https://kaz-tili.kz/prog/prog_mnozhestv_chislo.html" target="_blank" rel="noopener noreferrer">Множественное число · второй уровень</a><a href="https://sozdik.kz/" target="_blank" rel="noopener noreferrer">Русско-казахский словарь</a></div></details></div>`;
+   $('#materials-content').innerHTML=`<div class="panel rules-search"><label for="materials-q">Найти по названию, форме или примеру</label><input id="materials-q" type="search" value="${esc(materialsQuery)}" placeholder="менің, мой отец, кітапым" autocomplete="off" enterkeyhint="search"><div class="jump-row"><label>Урок <select id="materials-lesson"><option value="">Все</option>${lessonOpts}</select></label><label>Тип <select id="materials-kind"><option value="">Всё</option><option value="rule"${materialsKind==='rule'?' selected':''}>Правило</option><option value="word"${materialsKind==='word'?' selected':''}>Слово</option><option value="example"${materialsKind==='example'?' selected':''}>Пример</option></select></label></div><p class="small">Ищет по уже записанным правилам, словам, примерам и полным объяснениям. Новая статья не создаётся.</p><div id="materials-search-out"></div></div><div class="panel"><div class="coverage-stats"><div><span class="coverage-number">15</span><p>файлов проверено</p></div><div><span class="coverage-number">${Object.keys(course.sources).filter(k=>!course.sources[k].additional).length}</span><p>источников в практике</p></div><div><span class="coverage-number">${questions.filter(q=>!q.source||q.source!=='plus').length}</span><p>карточек по урокам</p></div></div><p>Дополнительно: ${window.LEARNING.lessons.length} маленьких уроков и ${questions.filter(q=>q.source==='plus').length} карточек и шаблонов для постепенного обучения. Они разработаны для тренажёра и не выданы за задания автора курса.</p><p>Включены упражнения уроков 1–1, 1–2, 1–3 и 2–2. Слова домашки 2–2 и новые прилагательные/профессии тренируются в обе стороны. Расхождения ключей 2–2 (мұғалімбіз, кәсіпкерлер, бастықтармыз) отмечены в карточках: принимается и ключ, и форма по правилу урока.</p><p class="coverage-note">Новые PDF лежат в «Казахский / учебные материалы». Файлы с Диска в тренажёр сами не подмешиваются.</p><a href="${course.folder}" target="_blank" rel="noopener noreferrer">Открыть папку с исходными материалами</a></div><div class="panel"><h2>Упражнения и домашняя работа</h2>${cards}</div><div class="panel"><h2>Остальные файлы учтены</h2><p><a href="https://drive.google.com/file/d/1HIVPE51FqFOcHBOOXFNfsmDKxvfCKpui/view" target="_blank" rel="noopener noreferrer">«Мягкие и твёрдые.pdf»</a> — шпаргалка; её схема включена в «Правила».</p><p><a href="https://docs.google.com/document/d/1Y-dWGwCJL04Pbp015V3_T91_n2f15-ep/edit" target="_blank" rel="noopener noreferrer">Uroki_1_1_Otvety.docx</a> — ответы к сборнику 1–1; использованы для сверки.</p><p><a href="https://drive.google.com/file/d/1P45V0RTvcpKEAjutHpPXM6KARx1MZbgd/view" target="_blank" rel="noopener noreferrer">Вторая копия методички 1–1</a> — текст полностью совпадает с первой. Задания не удваивались.</p><p class="small">Ключи воспроизведены по курсу, для перевода добавлены допустимые синонимы. Исправлена опечатка «Дукен» → «дүкен». Особенность задания с -мен объяснена прямо в карточке.</p></div><div class="panel"><h2>Завершение домашней работы на сайте курса</h2><p>Чтобы преподаватель получил результат, выполни официальный тест и нажми «Зафиксировать результат» на сайте BatylBol. При необходимости войди в свой аккаунт.</p><div class="link-list"><a href="https://batylbol.kz/test/Zvuki.html" target="_blank" rel="noopener noreferrer">BatylBol · твёрдые и мягкие звуки</a><a href="https://batylbol.kz/test/MnozhChislo.html" target="_blank" rel="noopener noreferrer">BatylBol · множественное число</a><a href="https://batylbol.kz/test/LichnyeLitso1-2.html" target="_blank" rel="noopener noreferrer">BatylBol · біз, сендер, сіздер</a><a href="https://batylbol.kz/test/LichnyeEdChislo.html" target="_blank" rel="noopener noreferrer">BatylBol · мен, сен, сіз</a></div><p class="small">Эти внешние банки вопросов не были доступны для переноса. Здесь сохранены ссылки из домашней работы; результаты личной тренировки в BatylBol не передаются.</p><p>Для заданий на письмо используй казахскую раскладку или кнопки букв под ответом. Шпаргалка всегда доступна в разделе «Правила».</p><details><summary>Дополнительные ссылки из методичек</summary><div class="link-list"><a href="https://kaz-tili.kz/su_fonetika.htm" target="_blank" rel="noopener noreferrer">Фонетика</a><a href="https://kaz-tili.kz/su_prav.htm" target="_blank" rel="noopener noreferrer">Мягкие и твёрдые слова</a><a href="https://kaz-tili.kz/progd/prog_mnozhestv_chislo.html" target="_blank" rel="noopener noreferrer">Множественное число · первый уровень</a><a href="https://kaz-tili.kz/prog/prog_mnozhestv_chislo.html" target="_blank" rel="noopener noreferrer">Множественное число · второй уровень</a><a href="https://sozdik.kz/" target="_blank" rel="noopener noreferrer">Русско-казахский словарь</a></div></details></div>`;
    renderPackageImport();
    $$('[data-source]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.source;topic='all';mode='ordered';showView('practice');startQueue();});
+   $$('#materials-content [data-open-canon]').forEach(b=>b.onclick=()=>openSearchedRule(b.dataset.openCanon));
+   const materialsQ=$('#materials-q'),materialsLes=$('#materials-lesson'),materialsType=$('#materials-kind');
+   const drawMaterialSearch=()=>{
+     const box=$('#materials-search-out');if(!box)return;
+     const query=materialsQuery.trim();
+     if(!query||!window.CorpusSearch){box.innerHTML='';return;}
+     const found=window.CorpusSearch.search(query,{lesson:materialsLesson,kind:materialsKind});
+     if(!found.rules.length&&!found.words.length){box.innerHTML='<p>В уже записанных материалах этого нет. Новая статья не создаётся.</p>';return;}
+     const best=found.rules[0];
+     const full=best&&window.ExplainOpen&&window.ExplainOpen.fullHtml?window.ExplainOpen.fullHtml(best.id):'';
+     const more=found.rules.slice(best?1:0,6).map(r=>`<button type="button" class="text-button" data-open-canon="${esc(r.id)}">${esc(r.title)}</button>`).join(' ');
+     const words=found.words.length?`<p class="small">Слова, не вместо правила: ${found.words.map(w=>esc(w.title)+(w.gloss?' — '+esc(w.gloss):'')).join(' · ')}</p>`:'';
+     box.innerHTML=(best?`<article class="panel"><h2>${esc(best.title)}</h2><p class="small">${best.lesson?'Урок '+esc(String(best.lesson).replace('-','–')):''}</p>${full}<p><button type="button" class="secondary-button" data-open-canon="${esc(best.id)}">Открыть в правилах</button></p></article>`:'')+(more?`<p>${more}</p>`:'')+words;
+     if(window.ExplainOpen&&window.ExplainOpen.bind)window.ExplainOpen.bind(box);
+     box.querySelectorAll('[data-open-canon]').forEach(b=>b.onclick=()=>openSearchedRule(b.dataset.openCanon));
+   };
+   if(materialsQ)materialsQ.oninput=()=>{materialsQuery=materialsQ.value;drawMaterialSearch();};
+   if(materialsLes)materialsLes.onchange=()=>{materialsLesson=materialsLes.value;drawMaterialSearch();};
+   if(materialsType)materialsType.onchange=()=>{materialsKind=materialsType.value;drawMaterialSearch();};
+   drawMaterialSearch();
  }
  function renderPackageImport(){
    const panel=document.createElement('details');panel.className='panel';

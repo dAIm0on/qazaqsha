@@ -210,7 +210,9 @@
  function install(course,catalog){
   if(!course||!Array.isArray(course.questions)||!gate||!gate.allows||!gate.allows('possessive',catalog))return [];
   course.sources=course.sources||{};
-  if(!course.sources['phase3-31'])course.sources['phase3-31']={title:'Урок 3-1 · притяжательные формы',url:'#',additional:true};
+  const drive31='https://drive.google.com/file/d/1B2c2UJKpvBvty-LhSlkoC8ubPGZC9-aQ/view';
+  course.sources['phase3-31']=Object.assign({title:'Урок 3–1 · притяжательные формы',url:drive31,additional:true,lesson_id:'3-1'},course.sources['phase3-31']||{});
+  if(!course.sources['phase3-31'].url||course.sources['phase3-31'].url==='#')course.sources['phase3-31'].url=drive31;
   const known=new Set(course.questions.map(q=>q.id)),added=[];
   for(const q of grammarQuestions()){if(known.has(q.id))continue;course.questions.push(clone(q));known.add(q.id);added.push(q.id);}
   return added;

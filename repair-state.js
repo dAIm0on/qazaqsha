@@ -6,11 +6,17 @@
  const DAY=86400000,QUIET_DAYS=10;
  const PAPER='Перед набором выпиши на лист, что помнишь про это. Потом сверка с Правилами.';
  function short(rule){const m=String(rule||'').match(/^T\d+/);return m?m[0]:String(rule||'');}
+ function humanTitle(ruleId){
+  let bank=root.ExplainBank;
+  if(node&&!bank){try{bank=require('./explain-bank.js');}catch(e){bank=null;}}
+  const card=bank&&bank.byId&&bank.byId(ruleId);
+  return card&&card.title?card.title:'это правило';
+ }
  function forms(ruleId){return (Transfer&&Transfer.FORMS&&Transfer.FORMS[ruleId])||{};}
  function card(ruleId,rootName,answer){
   return {
    id:'repair:'+ruleId+':'+rootName,source:'repair',group:'ремонт',part:'1',lessonId:'',topic:'rules',kind:'fields',
-   title:'Ремонт: '+short(ruleId),stimulus:rootName+' → ?',
+   title:'Проверим на новом слове: '+humanTitle(ruleId),stimulus:rootName+' → ?',
    fields:[{label:'Ответ',kind:'text',answers:[answer]}],explanation:answer+'.',
    ruleIds:[ruleId],practiceOnly:true,repairRoot:rootName
   };
@@ -55,10 +61,12 @@
  }
  function detail(state,now){
   const repair=state&&state.repair;if(!repair)return '';
-  return short(repair.rule_id)+' · день '+dayNumber(state,now)+'/'+QUIET_DAYS;
+  return humanTitle(repair.rule_id)+' · день '+dayNumber(state,now)+'/'+QUIET_DAYS;
  }
  function ribbon(state,now){
-  const bit=detail(state,now);return bit?'Дыра в ремонте · '+bit:'';
+  const repair=state&&state.repair;if(!repair)return '';
+  const ripe=now>=Number(repair.quiet_until);
+  return (ripe?'Проверим на новом слове':'Вернёмся после паузы')+' · '+humanTitle(repair.rule_id);
  }
  function note(state,correct){
   const repair=state&&state.repair;if(!repair)return null;

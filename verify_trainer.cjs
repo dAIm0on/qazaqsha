@@ -1391,7 +1391,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/qazaq-offline-live-20260922-tracks/.test(openSw));
+assert.ok(/qazaq-offline-live-20260922-search/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1721,7 +1721,7 @@ assert.equal(marked.rule_id,'T4_NO_PLURAL_AFTER_NUMBER');
 const c8=Probe.byId('slice:C8');
 assert.equal(Probe.judge(c8,['кітапым'],false).rule_id,'T21_POSS_ASSIM');
 assert.equal(Probe.judge(a6,['екі кітап'],false).correct,true);
-assert.ok(/Срез грамматики/.test(appPause));
+assert.ok(/Проверить дыры/.test(appPause));
 assert.equal(cfg.session.examSize,8);
 assert.ok(!/data-view=["']memory["']/.test(fs.readFileSync(path.join(__dirname,'index.html'),'utf8')));
 ok('Pause remainder 2: slice marks екі кітаптар as T4 and кітапым as T21; timed exam size stays 8');
@@ -1738,8 +1738,8 @@ assert.equal(Repair.start(stRepair,'T4_NO_PLURAL_AFTER_NUMBER',Date.now(),['до
 assert.ok(!Mem.mixRulesProbes([],[probeT21],stRepair,{}).includes('probe-t21'));
 assert.equal(stRepair.records['word:кітап'].seen,2);
 assert.equal(stRepair.records['word:кітап'].next_review,1);
-assert.ok(/Дыра в ремонте/.test(Repair.ribbon(stRepair,Date.now())));
-assert.ok(/Дыра в ремонте/.test(dashPause));
+assert.ok(/Вернёмся после паузы/.test(Repair.ribbon(stRepair,Date.now())));
+assert.ok(/Вернёмся после паузы/.test(dashPause));
 assert.ok(Repair.PAPER.includes('выпиши на лист'));
 ok('Pause remainder 3: one repair quiets T21 probes, leaves кітап due, blocks a second hole');
 
@@ -1879,5 +1879,36 @@ assert.ok(/courseLesson===lessonId\|\|l\.courseLesson==='bank'/.test(learnTracks
 assert.ok(/Ступени этого урока/.test(learnTracks));
 assert.ok(/data-min-cap="3"/.test(fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8')));
 ok('Astra step 4: existing tracks by lesson, one number ladder, phrase profile on 3-1 and 3-2');
+
+const Search=require('./corpus-search.js');
+const mine=Search.bestRule('менің');
+assert.ok(mine&&mine.id==='T20_POSS');
+assert.equal(Search.bestRule('кітапым').id,'T21_POSS_ASSIM');
+const chapterHit=Search.search('незаконченная конструкция');
+assert.equal(chapterHit.rules[0].id,'T20_POSS');
+assert.ok(!/T20/.test(chapterHit.rules[0].title));
+const queueHuman=Search.todayQueue({
+ records:{a:{needsReview:true,wrong_count:2},b:{}},
+ repair:{rule_id:'T20_POSS',quiet_until:Date.now()+86400000}
+},[{id:'a',stimulus:'кітап'},{id:'b',stimulus:'адам'}],Date.now(),{isDue:r=>r&&r.id==null&&false,ruleTitle:()=>'Мой: местоимение и наклейка'});
+assert.ok(queueHuman.some(row=>row.reason==='вернёмся после паузы'&&row.action==='wait'));
+assert.ok(queueHuman.some(row=>row.id==='a'&&row.reason==='дважды путала окончание'));
+const dueHuman=Search.todayQueue({records:{c:{needsReview:false}},repair:null},[{id:'c',stimulus:'алты'}],Date.now(),{isDue:()=>true});
+assert.equal(dueHuman[0].reason,'пора вспомнить');
+const freshHuman=Search.todayQueue({records:{},repair:{rule_id:'T21_POSS_ASSIM',quiet_until:1}},[],Date.now()+10,{ruleTitle:()=>'П К Қ'});
+assert.equal(freshHuman[0].reason,'проверим на новом слове');
+assert.equal(freshHuman[0].action,'repair');
+const appSearch=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(/id="materials-q"/.test(appSearch));
+assert.ok(/CorpusSearch\.bestRule/.test(appSearch));
+assert.ok(/Открыть правило/.test(appSearch));
+assert.ok(!/FSRS уже в тренажёре/.test(appSearch));
+assert.ok(!/Это срез, не расписание/.test(appSearch));
+assert.ok(!/Канон \$\{/.test(appSearch));
+assert.ok(!/групп заданий/.test(appSearch));
+assert.ok(/1B2c2UJKpvBvty-LhSlkoC8ubPGZC9-aQ/.test(fs.readFileSync(path.join(__dirname,'lesson-pack-3-1.js'),'utf8')));
+assert.ok(!/Срез [ABCD]/.test(fs.readFileSync(path.join(__dirname,'probe-items.js'),'utf8')));
+assert.ok(/corpus-search\.js/.test(fs.readFileSync(path.join(__dirname,'index.html'),'utf8')));
+ok('Astra step 5: corpus search opens менің on the possessive canon; learner reasons stay human');
 
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
