@@ -154,6 +154,12 @@
   gp.completedChapters=gp.completedChapters||Object.create(null);
   gp.completedChapters[lessonId+':'+chapterId]=true;
  }
- const api={topic,topics,lexOk,typesOk,stepMeta,mixOf,sameTopicMix,tableText,hasAnswerIn,evalCheck,feedback,schedule,emptyProgress,startTopic,beginChecks,peekRate,canMix,recordPath,thousandOk,TABLE:data.TABLE,LEX:data.LEX,lessons,lesson,chapter,asksOf,productionAsks,navIsLessons,questionTableLesson,ordinalLessons,hasPossessiveGrammar,hasMeningGrammar,respectfulBye,diagnoseProd,migrateProgress,startLesson,startChapter,markChapterDone,FORBIDDEN:(chData&&chData.FORBIDDEN)||[]};
+ function keepChapter(gp,lessonId){
+  if(!gp||gp.lessonId!==lessonId||!gp.chapterId)return false;
+  if(gp.phase!=='beat'&&gp.phase!=='lesson')return false;
+  if(gp.completedChapters&&gp.completedChapters[lessonId+':'+gp.chapterId])return false;
+  return true;
+ }
+ const api={topic,topics,lexOk,typesOk,stepMeta,mixOf,sameTopicMix,tableText,hasAnswerIn,evalCheck,feedback,schedule,emptyProgress,startTopic,beginChecks,peekRate,canMix,recordPath,thousandOk,TABLE:data.TABLE,LEX:data.LEX,lessons,lesson,chapter,asksOf,productionAsks,navIsLessons,questionTableLesson,ordinalLessons,hasPossessiveGrammar,hasMeningGrammar,respectfulBye,diagnoseProd,migrateProgress,startLesson,startChapter,markChapterDone,keepChapter,FORBIDDEN:(chData&&chData.FORBIDDEN)||[]};
  if(node)module.exports=api;else root.GrammarPath=api;
 })(typeof window!=='undefined'?window:globalThis);

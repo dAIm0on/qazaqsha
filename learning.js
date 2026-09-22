@@ -14,6 +14,10 @@ function create(api){
  function currentId(){
   const Bank=window.ExplainBankUI;
   const list=Bank?Bank.COURSE:[];
+  if(api.currentCourse){
+   const id=api.currentCourse();
+   if(id&&list.some(c=>c.id===id))return id;
+  }
   const gp=api.grammarPath?api.grammarPath():{};
   if(gp.lessonId&&list.some(c=>c.id===gp.lessonId))return gp.lessonId;
   for(const c of list){
@@ -30,11 +34,14 @@ function create(api){
   const G=window.GrammarPath;
   const les=G&&G.lesson(id);
   const p=progressOf(id);
+  const gpNow=api.grammarPath?api.grammarPath():{};
+  const openCh=les&&les.chapters&&gpNow.lessonId===id&&gpNow.chapterId?les.chapters.find(c=>c.id===gpNow.chapterId):null;
   const chIndex=les&&les.chapters&&p.done<les.chapters.length?p.done:0;
-  const ch=les&&les.chapters?les.chapters[Math.min(chIndex,les.chapters.length-1)]:null;
+  const ch=openCh||(les&&les.chapters?les.chapters[Math.min(chIndex,les.chapters.length-1)]:null);
   const chTitle=ch&&Bank?Bank.chapterTitle(ch):(ch&&ch.title)||'';
   const cta=p.all?'Повторить урок':(p.started?'Продолжить урок':'Начать урок');
-  const prog=p.n?('Глава '+(Math.min(p.done+1,p.n))+' из '+p.n):'';
+  const chPos=ch&&les&&les.chapters?Math.max(0,les.chapters.findIndex(c=>c.id===ch.id)):p.done;
+  const prog=p.n?('Глава '+(Math.min(chPos+1,p.n))+' из '+p.n):'';
   $('#learn-content').innerHTML=
    '<article class="panel learn-now">'+
     '<p class="eyebrow">ТЕКУЩИЙ УРОК</p>'+
@@ -58,7 +65,7 @@ function create(api){
      '<button type="button" class="text-button" id="learn-homework">Домашка</button>'+
     '</div></div>';
   const go=$('#learn-continue');
-  if(go)go.onclick=()=>api.openPath?api.openPath(id):api.startCourse(id);
+  if(go)go.onclick=()=>api.continueStep?api.continueStep():(api.openPath?api.openPath(id):api.startCourse(id));
   document.querySelectorAll('[data-learn-les]').forEach(b=>b.onclick=()=>{
    if(api.openPath)api.openPath(b.dataset.learnLes);
   });

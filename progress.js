@@ -20,7 +20,12 @@
    if(obj(raw.grammarPath)){
      const g=raw.grammarPath;
      state.grammarPath={topicId:typeof g.topicId==='string'?g.topicId:null,step:Math.max(0,Number(g.step)||0),phase:typeof g.phase==='string'?g.phase:'hub',queue:Array.isArray(g.queue)?g.queue.filter(safe).slice(0,40):[],index:Math.max(0,Number(g.index)||0),peeks:obj(g.peeks)?g.peeks:Object.create(null),fails:obj(g.fails)?g.fails:Object.create(null),passed:obj(g.passed)?g.passed:Object.create(null),blocked:!!g.blocked,completed:Array.isArray(g.completed)?g.completed.filter(safe).slice(0,40):[],lessonId:typeof g.lessonId==='string'?g.lessonId:null,chapterId:typeof g.chapterId==='string'?g.chapterId:null,beat:Math.max(0,Number(g.beat)||0),completedChapters:obj(g.completedChapters)?g.completedChapters:Object.create(null),legacyCompleted:Array.isArray(g.legacyCompleted)?g.legacyCompleted.concat(Array.isArray(g.completed)?g.completed:[]).filter(safe).slice(0,80):Array.isArray(g.completed)?g.completed.filter(safe):[]};
+     const d=g.pathDraft;
+     if(obj(d)&&typeof d.value==='string')state.grammarPath.pathDraft={lessonId:typeof d.lessonId==='string'?d.lessonId.slice(0,20):null,chapterId:typeof d.chapterId==='string'?d.chapterId.slice(0,80):null,beat:Math.max(0,Math.floor(Number(d.beat)||0)),value:d.value.slice(0,400)};
+     if(typeof g.canonShownFor==='string')state.grammarPath.canonShownFor=g.canonShownFor.slice(0,80);
    }
+   if(obj(raw.place)&&['path','practice','homework'].includes(raw.place.surface)&&typeof raw.place.lessonId==='string')state.place={surface:raw.place.surface,lessonId:raw.place.lessonId.slice(0,20),mode:typeof raw.place.mode==='string'?raw.place.mode.slice(0,40):null};
+   if(obj(raw.rulesDraft)&&typeof raw.rulesDraft.value==='string'&&raw.rulesDraft.value)state.rulesDraft={article:typeof raw.rulesDraft.article==='string'?raw.rulesDraft.article.slice(0,40):'',value:raw.rulesDraft.value.slice(0,400)};
    if(obj(raw.homeworkAttempts))state.homeworkAttempts=dictionary(raw.homeworkAttempts,(a,lesson)=>{
      if(!obj(a))return undefined;
      const items=Array.isArray(a.items)?a.items.filter(it=>obj(it)&&safe(it.id)).map(it=>({id:it.id,answers:Array.isArray(it.answers)?it.answers.slice(0,20).map(x=>String(x).slice(0,300)):[],correct:!!it.correct,rule_peek:!!it.rule_peek,answer_peek:!!it.answer_peek,skipped:!!it.skipped,expected:typeof it.expected==='string'?it.expected.slice(0,300):'',at:Number(it.at)||0,status:typeof it.status==='string'?it.status.slice(0,40):''})): [];

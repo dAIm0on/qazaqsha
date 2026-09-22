@@ -8,19 +8,13 @@
      const root=document.getElementById(view+'-content');if(!root)return;
      const state=api.state(),cards=api.questions().filter(api.eligible),rows=Array.from(new Set(cards.flatMap(q=>window.Knowledge.bindings(q).map(window.Knowledge.key)))).map(id=>state.skills[id]).filter(Boolean);
      const due=window.Knowledge.choose(cards.filter(q=>core.isDue(state.records[q.id])),state,Infinity).length,newCount=cards.filter(q=>!state.records[q.id]?.seen).length;
-     const lesson=window.LEARNING.lessons.find(l=>l.id===state.learning.lessonId)||window.LEARNING.lessons[0];
      if(view==='today'){
        const retention=window.LearningSupport.retention(state);
        const weakWords=catalog.words.filter(w=>catalog.wordStats(w,state).weak),weakRules=catalog.rules.filter(r=>cards.some(q=>q.ruleIds?.includes(r.id)&&state.records[q.id]?.needsReview));
        const ms=progress.memoryStats(state);
        const weak=window.LearningSupport.weakSpots?window.LearningSupport.weakSpots(state,api.questions()):[];
        const chunkN=(window.MemoryPolicy?api.questions().filter(q=>window.MemoryPolicy.isChunk(q)&&api.eligible(q)):[]).length;
-       const resume=api.hasSession();
-       const gp=state.grammarPath;
-       const pathOpen=gp&&gp.phase==='beat'&&gp.lessonId&&gp.chapterId;
-       const mainAction=resume?'resume':pathOpen?'path':'learn';
-       const mainTitle=resume?'Продолжить текущую карточку':pathOpen?('Продолжить урок '+gp.lessonId):('Продолжить урок '+lesson.courseLesson);
-       const mainHint=resume?'Продолжим с той же карточки.':pathOpen?'Тот же шаг прохождения.':esc(lesson.title);
+       const step=api.continueInfo?api.continueInfo():{lessonId:'1-1',title:'Продолжить урок',hint:'Текущий урок курса.'};
        const dueHint=due?'карточек в очереди повторения':'На сегодня всё повторено';
        const pauseN=cards.filter(q=>core.pauseReady(state.records[q.id])).length;
        const repairOn=state.repair&&window.RepairState;
@@ -29,12 +23,12 @@
        const tip=(id,text)=>`<details class="help-line"><summary aria-label="Что это значит">?</summary><p id="${id}">${text}</p></details>`;
        const pairN=progress.pairs(state).length;
        const weakOpen=weak.length||weakWords.length||weakRules.length||(window.AiTutor&&window.AiTutor.topWeak().length);
-       const curCourse=lesson.courseLesson||'';
+       const curCourse=['1-1','1-2','1-3','2-1','2-2','2-3'].includes(step.lessonId)?step.lessonId:'';
        const courseTitles={'1-1':'Звуки и первые слова','1-2':'Окончания и числа','1-3':'Числа, количество и новые слова','2-1':'мен, сен, сіз; емес; ба/бе','2-2':'біз, сендер, сіздер и прилагательные','2-3':'ол / олар, вопрос, порядковые'};
        const lessonBtn=id=>`<button type="button" class="today-lesson${curCourse===id?' current':''}" data-action="course:${id}"><span class="today-lesson-id">${id.replace('-','–')}</span><span class="today-lesson-title">${courseTitles[id]}</span></button>`;
        const recallCards=cards.filter(q=>q.kind==='fields'&&(q.fields||[]).some(f=>f.kind!=='select'));
        const remembered=recallCards.filter(q=>['REMEMBERED','MASTERED'].includes(state.records[q.id]?.mastery_level)).length;
-       root.innerHTML=`<div class="today-hero"><p>Сначала текущий урок, потом то, что пора вспомнить, потом домашка.</p><article class="today-hero-card"><p class="eyebrow">Главное сейчас</p><button type="button" class="today-main" data-action="${mainAction}"><span>${mainTitle}</span></button><p class="small">${mainHint}</p><button type="button" class="today-path-quiet text-button" data-action="path">Прохождение</button></article></div>
+       root.innerHTML=`<div class="today-hero"><p>Сначала текущий урок, потом то, что пора вспомнить, потом домашка.</p><article class="today-hero-card"><p class="eyebrow">Главное сейчас</p><button type="button" class="today-main" data-action="continue"><span>${esc(step.title)}</span></button><p class="small">${esc(step.hint)}</p><button type="button" class="today-path-quiet text-button" data-action="path">Прохождение</button></article></div>
        <div class="today-tiles"><button type="button" class="today-option" data-action="review"><span>Пора вспомнить</span><strong>${due}</strong><small>${dueHint}</small></button><button type="button" class="today-option" data-action="homework"><span>Домашка</span><small>Задания урока</small></button>${pauseN?`<button type="button" class="today-option" data-action="pause-prep"><span>Готовится к паузе</span><strong>${pauseN}</strong><small>Интервал уже длинный</small></button>`:''}${repairOn?`<button type="button" class="today-option" data-action="repair-open"><span>Дыра в ремонте</span><small>${esc(repairDetail)}</small></button>`:''}</div>
        <div class="today-actions"><button type="button" class="today-option hero-spot" data-action="new"><span>Новые</span><strong>${Math.min(cfg.session.newLimit,newCount)}</strong><small>Рекомендовано на один подход</small></button><button type="button" class="today-option today-rules-quiet" data-view="rules"><span>Правила</span><small>Справочник</small></button>${chunkN?'<button type="button" class="today-option" data-action="chunks"><span>Приветствия и прощания</span><small>Готовые фразы</small></button>':''}</div>
        <div class="today-collage" aria-hidden="true"><div class="today-photo p1"></div><div class="today-photo p2"></div><div class="today-photo p3"></div><div class="today-photo p4"></div></div>
