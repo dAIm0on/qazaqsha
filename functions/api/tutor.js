@@ -206,7 +206,7 @@ function looksLikeBadTutorReply(t){
   if(/^\s*(задача|цель)\s*[:—-]/i.test(t))return true;
   if(/^\s*(мне|нам)\s+(нужно|надо|следует)\s+(объяснить|ответить|показать|сказать)/i.test(t))return true;
   if(/^\s*(нужно|надо|следует)\s+(объяснить|ответить|показать|сказать|учесть)(?=\s|[,:—-])/i.test(t))return true;
-  if(/^(Сначала |Давай |Итак,? |Нужно |Следует |Я (должен|должна|сейчас) )/i.test(t)&&t.length<220)return true;
+  if(/^(Итак,? |Нужно |Следует |Я (должен|должна|сейчас) )/i.test(t)&&t.length<220)return true;
   // Truncated mid-thought / unfinished clause. Student-facing model answers must end cleanly.
   if(/\.{3}\s*$/.test(t)&&t.length<240)return true;
   if(/и притяжательн\w*\s*$/i.test(t))return true;
