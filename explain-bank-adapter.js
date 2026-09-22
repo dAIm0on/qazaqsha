@@ -3,7 +3,6 @@
  'use strict';
  const node=typeof module!=='undefined'&&module.exports;
  const Bank=node?require('./explain-bank.js'):root.ExplainBank;
- const OPEN=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2'];
  const COURSE=[
   {id:'1-1',label:'1–1',name:'Звуки и первые слова',rules:['T1_HARMONY']},
   {id:'1-2',label:'1–2',name:'Окончания и числа',rules:['T2_PLURAL_LDT']},
@@ -14,6 +13,7 @@
   {id:'3-1',label:'3–1',name:'Притяжательные формы: мой / твой / его; бар / жоқ',rules:['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']},
   {id:'3-2',label:'3–2',name:'Наш / ваш / их; указательные',rules:['T24_POSS_BIZ','T25_POSS_SENDER','T26_POSS_OLAR','T27_DEIXIS']}
  ];
+ const OPEN=COURSE.map(row=>row.id);
  const CHAPTER_RULE={
   '1-1-ru':'T1_HARMONY','1-1-row':'T1_HARMONY','1-1-sig':'T1_HARMONY','1-1-iyu':'T1_HARMONY','1-1-mix':'T1_HARMONY','1-1-ae':'T1_HARMONY',
   '1-2-slot':'T2_PLURAL_LDT','1-2-a':'T2_PLURAL_LDT','1-2-b':'T2_PLURAL_LDT','1-2-glue':'T2_PLURAL_LDT','1-2-traps':'T2_PLURAL_LDT',
