@@ -13,6 +13,7 @@ function ok(name){passed.push(name);console.log('OK',name);}
 const appSrc=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 const tutorSrc=fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8');
 const contractSrc=fs.readFileSync(path.join(__dirname,'ai-contract.js'),'utf8');
+const clientTutorSrc=fs.readFileSync(path.join(__dirname,'ai-tutor.js'),'utf8');
 
 assert.deepEqual(C.lessonsThrough('1-1'),['1-1']);
 assert.deepEqual(C.lessonsThrough('1-2'),['1-1','1-2']);
@@ -41,8 +42,10 @@ assert.ok(C.SURFACES.includes('exam'));
 assert.equal(C.CLIENT_TIMEOUT_MS,25000);
 assert.equal(C.PRIMARY_TIMEOUT_MS,11000);
 assert.equal(C.FALLBACK_TIMEOUT_MS,8000);
-assert.ok(/RECOVERY_TIMEOUT_MS=4000/.test(tutorSrc));
-assert.ok(C.CLIENT_TIMEOUT_MS>C.PRIMARY_TIMEOUT_MS+C.FALLBACK_TIMEOUT_MS+4000);
+assert.ok(/ASK_FALLBACK_TIMEOUT_MS=10000/.test(tutorSrc));
+assert.ok(/ASK_PRIMARY_TIMEOUT_MS=3500/.test(tutorSrc));
+assert.ok(/RECOVERY_TIMEOUT_MS=6500/.test(tutorSrc));
+assert.ok(C.CLIENT_TIMEOUT_MS>10000+3500+6500);
 assert.ok(/PRIMARY_MODEL/.test(tutorSrc)&&/FALLBACK_MODEL/.test(tutorSrc));
 assert.ok(/11000/.test(tutorSrc)&&/8000/.test(tutorSrc));
 assert.ok(/runTutorModel/.test(tutorSrc));
@@ -114,6 +117,14 @@ assert.ok(C.looksLikeBadTutorReply('Множественное число зав
 assert.ok(!C.isUsableText('Множественное число зависит от последнего слога: после гласной выбирается лар или лер, после звонкой согласной дар или дер, а после глухой'));
 assert.ok(C.isUsableText('Множественное число зависит от последнего слога. После гласной выбирается -лар/-лер, после некоторых согласных — -дар/-дер или -тар/-тер.'));
 assert.ok(C.isUsableText('Сначала смотри на последний звук основы. Затем выбери гласную окончания.'));
+assert.equal(C.sentenceClip('Первая законченная фраза. Вторая очень длинная '+('слово '.repeat(200)),60),'Первая законченная фраза.');
+const badValidated=C.validateResponse({ok:true,mode:'ask_tutor',message_ru:'Ученица просит объяснить множественное число через последний слог и выбор окончания.',meta:{source:'fallback',model:'qwen'}},{mode:'ask_tutor',lesson_id:'1-2',candidate_error_codes:[],rule_context:[{rule_id:'T2_PLURAL_LDT',medium:'Сначала выбери согласную окончания. Затем выбери а или е.'}]});
+assert.equal(badValidated.ok,false);
+assert.equal(badValidated.resp.meta.source,'local');
+assert.ok(!/Ученица просит/.test(badValidated.resp.message_ru));
+const truncatedValidated=C.validateResponse({ok:true,mode:'ask_tutor',message_ru:'Множественное число зависит от последнего слога и после глухой',meta:{source:'fallback'}},{mode:'ask_tutor',lesson_id:'1-2',candidate_error_codes:[],rule_context:[{rule_id:'T2_PLURAL_LDT',medium:'Сначала выбери согласную окончания. Затем выбери а или е.'}]});
+assert.equal(truncatedValidated.ok,false);
+assert.equal(truncatedValidated.resp.meta.source,'local');
 ok('TEST Russian planning draft + truncated answer rejected; complete answer accepted');
 ok('TEST tutor loop and kitabym gate');
 
@@ -233,6 +244,11 @@ const reqHint=T.buildRequest('hint',qNum,{});
 assert.equal(reqHint.expected_answer,'');
 assert.deepEqual(reqHint.allowed_lesson_ids,['1-1','1-2','1-3']);
 ok('TEST 34 hint request omits expected_answer; scope from lesson');
+
+assert.ok(!/resp\.message_ru\s*=\s*json\.message_ru/.test(clientTutorSrc));
+assert.ok(!/resp\.meta\s*=\s*json\.meta/.test(clientTutorSrc));
+assert.ok(/const checked=C\.validateResponse\(json,v\.req\)/.test(clientTutorSrc));
+ok('TEST client keeps validated tutor response; raw API text cannot overwrite it');
 
 assert.ok(typeof T.callTutor==='function');
 assert.ok(/25000/.test(fs.readFileSync(path.join(__dirname,'ai-tutor.js'),'utf8'))||T.callTutor.length>=1);
