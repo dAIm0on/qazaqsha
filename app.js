@@ -412,9 +412,9 @@
    pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
    view=next;document.body.dataset.view=next;
    document.querySelectorAll('main > section').forEach(el=>{el.hidden=el.id!==next+'-view';});
-   const tab=next==='practice'?(mode==='exam'?'exam':'review'):next;
+   const tab=shellTab(next);
    $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();
+   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='materials')renderMaterials();if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();
    if(next==='practice'&&['homework','course','lesson','phrase','transfer','remediation'].includes(mode)){const id=mode==='homework'?hwLesson:(courseBlock||(state.grammarPath&&state.grammarPath.lessonId)||null);if(id)markPlace(mode==='homework'?'homework':'practice',id);}
    if(next==='path'&&state.grammarPath&&state.grammarPath.phase==='beat'&&state.grammarPath.lessonId)markPlace('path',state.grammarPath.lessonId);
    if(window.TutorUI){
@@ -422,6 +422,13 @@
      window.TutorUI.syncView(next==='practice'&&mode==='exam'?'exam':next);
    }
    save();
+ }
+ function shellTab(next){
+   if(next==='practice')return mode==='exam'?'review':'today';
+   if(['learn','homework','path'].includes(next))return 'today';
+   if(['rules','vocabulary'].includes(next))return 'materials';
+   if(next==='exam')return 'review';
+   return next;
  }
  function markPlace(surface,lessonId){
    const id=String(lessonId||'');
@@ -1627,6 +1634,7 @@
    });
  }
  bindIssueBar();
+ window.QazaqShell={show:showView};
  renderRules();renderMaterials();
  const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','course','phrase','transfer','contrast','numbers','remediation','words','exam','homework','chunks'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){

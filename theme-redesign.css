@@ -422,7 +422,7 @@ body[data-view=practice] .issue-toggle{
 .bottom-nav{
   background:rgba(255,250,244,.72);border:1px solid var(--line);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
   left:8px;right:8px;bottom:8px;width:auto;
   border-radius:20px;box-shadow:0 12px 40px rgba(22,20,18,.16);
   padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))
@@ -430,7 +430,7 @@ body[data-view=practice] .issue-toggle{
 :root{--bottom-nav-height:calc(64px + env(safe-area-inset-bottom, 0px))}
 .bottom-nav button{
   position:relative;color:var(--muted);border-radius:8px;
-  font-size:.625rem;line-height:1.15;min-height:52px;min-width:0;
+  font-size:.8125rem;line-height:1.15;min-height:52px;min-width:0;
   padding:6px 2px;white-space:normal;overflow:visible
 }
 .bottom-nav button[aria-current=page]{color:var(--ink);background:transparent;box-shadow:none;font-weight:700}
@@ -634,7 +634,7 @@ body.keyboard-open #account-dialog{
   h1{font-size:58px;letter-spacing:-.055em;line-height:.9}
   .today-hero{padding:0}
   .workspace{padding-inline:16px}
-  .bottom-nav button{font-size:.5625rem;padding:6px 0}
+  .bottom-nav button{font-size:.75rem;padding:6px 0}
 }
 
 .learn-now{background:var(--lilac,#DDD0F6)}

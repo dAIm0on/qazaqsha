@@ -26,6 +26,7 @@ function create(api){
   }
   return list[0]&&list[0].id||'1-1';
  }
+ let picked='';
  function render(){
   const Bank=window.ExplainBankUI;
   const list=Bank?Bank.COURSE:[];
@@ -42,6 +43,12 @@ function create(api){
   const cta=p.all?'Повторить урок':(p.started?'Продолжить урок':'Начать урок');
   const chPos=ch&&les&&les.chapters?Math.max(0,les.chapters.findIndex(c=>c.id===ch.id)):p.done;
   const prog=p.n?('Глава '+(Math.min(chPos+1,p.n))+' из '+p.n):'';
+  const ruleId=cur&&cur.rules&&cur.rules[0];
+  const ruleCard=ruleId&&window.ExplainBank&&window.ExplainBank.byId?window.ExplainBank.byId(ruleId):null;
+  const ruleBlock=ruleId&&window.ExplainOpen?'<div class="panel"><h2>Правило этого урока</h2><p>'+esc(ruleCard&&ruleCard.title||'')+'</p>'+window.ExplainOpen.openButton(ruleId)+'</div>':'';
+  const lessonWords=(window.CURRICULUM&&window.CURRICULUM.words||[]).filter(w=>w.lesson_first_seen===id&&w.target_or_context==='target').slice(0,12);
+  const wordBlock=lessonWords.length?'<div class="panel"><h2>Слова этого урока</h2><p class="small">Те же слова словаря. Нового списка нет.</p><p lang="kk">'+lessonWords.map(w=>esc(w.kazakh)).join(' · ')+'</p></div>':'';
+  const subjects=[['','Этот урок'],['numbers','Числа'],['plural','Окончания'],['vocab','Слова'],['person','Лица'],['phrase','Фразы']];
   $('#learn-content').innerHTML=
    '<article class="panel learn-now">'+
     '<p class="eyebrow">ТЕКУЩИЙ УРОК</p>'+
@@ -59,8 +66,10 @@ function create(api){
       '<span class="small">'+esc(mark)+'</span></button>';
     }).join('')+
    '</div></div>'+
+   '<div class="panel"><h2>Предмет</h2><div class="review-actions">'+subjects.map(([key,label])=>'<button type="button" class="secondary-button" data-subject="'+esc(key)+'"'+(picked===key?' aria-pressed="true"':'')+'>'+esc(label)+'</button>').join('')+'</div></div>'+
    tracksMarkup(id)+
-   '<div class="panel compact-panel learn-secondary"><p class="small">Дополнительно</p>'+
+   ruleBlock+wordBlock+
+   '<div class="panel compact-panel learn-secondary"><p class="small">Тот же урок: практика и домашка</p>'+
     '<div class="review-actions">'+
      '<button type="button" class="secondary-button" id="learn-practice">Практика этого урока</button>'+
      '<button type="button" class="text-button" id="learn-homework">Домашка</button>'+
@@ -76,6 +85,8 @@ function create(api){
   });
   const pr=$('#learn-practice');if(pr)pr.onclick=()=>api.startCourse(id);
   const hw=$('#learn-homework');if(hw)hw.onclick=()=>{if(api.openHomework)api.openHomework(id);else api.today();};
+  document.querySelectorAll('[data-subject]').forEach(b=>b.onclick=()=>{picked=b.dataset.subject||'';render();});
+  if(window.ExplainOpen&&window.ExplainOpen.bind)window.ExplainOpen.bind($('#learn-content'));
   if(window.TutorUI){
    window.TutorUI.setContext({surface:'learn',lesson_id:id,rule_id:cur&&cur.rules[0]});
    window.TutorUI.syncView('learn');
@@ -95,7 +106,9 @@ function create(api){
  }
  function tracksMarkup(lessonId){
   const TOPIC={sounds:'Звуки',vocab:'Слова',numbers:'Числа',plural:'Окончания',person:'Лица',rules:'Правила',phrase:'Фразы',possessive:'Притяжательность'};
-  const rows=tracksFor(lessonId);
+  const all=window.LEARNING&&window.LEARNING.lessons||[];
+  const rows=picked?all.filter(l=>l&&l.topic===picked):tracksFor(lessonId);
+  const heading=picked?(TOPIC[picked]||'Ступени'):'Ступени этого урока';
   if(!rows.length)return '';
   const groups=new Map();
   for(const l of rows){
@@ -110,7 +123,7 @@ function create(api){
    }).join('');
    return '<p class="small">'+esc(TOPIC[topic]||topic)+'</p><div class="review-actions">'+buttons+'</div>';
   }).join('');
-  return '<div class="panel learn-tracks"><h2>Ступени этого урока</h2><p class="small">Те же короткие дорожки, что уже есть в курсе. Новых уроков здесь нет.</p>'+body+'</div>';
+  return '<div class="panel learn-tracks"><h2>'+esc(heading)+'</h2><p class="small">Те же короткие дорожки, что уже есть в курсе. Новых уроков здесь нет.</p>'+body+'</div>';
  }
  function selectLesson(id){if(api.openPath)api.openPath(id);}
  return {render,selectLesson};

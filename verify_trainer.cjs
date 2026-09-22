@@ -672,7 +672,7 @@ assert.ok(ordPack.every(q=>q.kind!=='multi'));
 ok('P1.8 typed ordinal skills: cardinal→ordinal, ыншы/ншы, қырқыншы, suffix on last piece');
 
 const dash=fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8');
-assert.ok(/Сначала текущий урок/.test(dash));
+assert.ok(/Сейчас урок/.test(dash));
 assert.ok(dash.includes('Память'));
 assert.ok(dash.includes('Навыки'));
 assert.ok(!/не SRS/.test(dash));
@@ -1026,9 +1026,9 @@ ok('AI-1 student UI does not name the model');
 assert.ok(!/\bSRS\b/.test(dash));
 assert.ok(!/замок на весь курс/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/Начать \$\{n\} карточек|Пока нечего закреплять/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
-assert.ok(/repeat\(5,/.test(theme));
+assert.ok(/repeat\(3,/.test(theme));
 assert.ok(/id="homework-title">Домашка/.test(htmlSrc));
-ok('COPY-2/NAV-1 exam start or empty; 5-col nav; homework title');
+ok('COPY-2/NAV-1 exam start or empty; 3-entry nav; homework title');
 
 
 const P2BG1=require('./phase2b-practice.js');
@@ -1391,7 +1391,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/qazaq-offline-live-20260922-search/.test(openSw));
+assert.ok(/qazaq-offline-live-20260922-three/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1620,7 +1620,7 @@ const html32=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
 assert.ok(html32.includes('lesson32-pack.js')&&html32.includes('lesson-pack-3-2.js'));
 assert.ok(!/data-view=["']circles["']/.test(html32));
 assert.ok(!/data-view=["']notebook["']/.test(html32));
-assert.ok(/Сегодня/.test(html32)&&/Учить/.test(html32)&&/Экзамен/.test(html32)&&/Правила/.test(html32));
+assert.ok(/Заниматься/.test(html32)&&/Материалы/.test(html32)&&/Мой результат/.test(html32)&&/Экзамен/.test(html32)&&/Правила/.test(html32));
 const HW32=require('./homework.js');
 const hw32=HW32.buildPack('3-2',Pack32.all(),{sources:{m32:{title:'Методичка 3-2',url:'#'}}});
 assert.equal(hw32.homework.external_test_url,'https://batylbol.kz/test/Prityazh.html');
@@ -1910,5 +1910,25 @@ assert.ok(/1B2c2UJKpvBvty-LhSlkoC8ubPGZC9-aQ/.test(fs.readFileSync(path.join(__d
 assert.ok(!/Срез [ABCD]/.test(fs.readFileSync(path.join(__dirname,'probe-items.js'),'utf8')));
 assert.ok(/corpus-search\.js/.test(fs.readFileSync(path.join(__dirname,'index.html'),'utf8')));
 ok('Astra step 5: corpus search opens менің on the possessive canon; learner reasons stay human');
+
+const html6=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
+const bottom6=(html6.match(/<nav class="bottom-nav"[\s\S]*?<\/nav>/)||[''])[0];
+const top6=(html6.match(/<nav class="topnav"[\s\S]*?<\/nav>/)||[''])[0];
+assert.equal((bottom6.match(/data-view=/g)||[]).length,3);
+assert.equal((top6.match(/data-view=/g)||[]).length,3);
+assert.ok(/Заниматься/.test(bottom6)&&/Материалы/.test(bottom6)&&/Мой результат/.test(bottom6));
+assert.ok(!/data-view="learn"/.test(bottom6)&&!/data-view="exam"/.test(bottom6)&&!/data-view="rules"/.test(bottom6));
+assert.ok(!/data-view=["']lesson-space["']/.test(html6));
+assert.ok(!/data-view=["']memory["']/.test(html6));
+assert.ok(/Выбрать занятие/.test(html6));
+assert.ok(/id="exam-title">Экзамен/.test(html6)&&/id="rules-title">Правила/.test(html6));
+const learn6=fs.readFileSync(path.join(__dirname,'learning.js'),'utf8');
+const dash6=fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8');
+const app6=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(/Правило этого урока/.test(learn6)&&/Слова этого урока/.test(learn6)&&/'numbers','Числа'/.test(learn6));
+assert.ok(/Повторить сегодня/.test(dash6)&&/Выбрать занятие/.test(dash6)&&/Сейчас трудно/.test(dash6)&&/Разобрать и попробовать/.test(dash6));
+assert.ok(/function shellTab/.test(app6)&&/QazaqShell/.test(app6));
+assert.ok(/body\[data-view=practice\] \.bottom-nav\{display:none/.test(fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8')));
+ok('Astra step 6: three entries, lesson workspace on existing screens, nav hidden inside a task');
 
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
