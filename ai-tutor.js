@@ -245,8 +245,6 @@
     if(json&&typeof json.message_ru==='string'&&json.message_ru.trim()){
       const checked=C.validateResponse(json,v.req);
       const resp=checked.resp;
-      resp.message_ru=json.message_ru.trim().slice(0,C.maxMessage(v.req.mode));
-      if(json.meta)resp.meta=json.meta;
       if(v.req.mode==='hint'&&hintLeaks(resp,req&&req.expected_answer))return localFallback(null,v.req.candidate_error_codes,'hint',v.req);
       return resp;
     }
