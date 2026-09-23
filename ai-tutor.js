@@ -37,6 +37,8 @@
  }
  let store=load();
  function mapDiag(type,expected,actual){
+  const lesson33=['PERSON_VS_POSS','OWNER_SUBJECT_SWAP','OWNER_WRONG','SUBJECT_WRONG','POSS_PERSON_STACK','PERSON_AFTER_POSS_WRONG','PERSON_AFTER_POSS_MISSING','THIRD_PERSON_EXTRA_PERSONAL','EMES_PERSON_POSITION','EMES_POSS_DROPPED','OTBASY_DOUBLE_POSS','ADJ_ROLE_ORDER','INTERROGATIVE_CHOICE','MULTI_ERROR'];
+  if(lesson33.includes(type))return type;
   if(type==='plural_after_numeral')return 'PLURAL_AFTER_NUMBER';
   if(type==='vowel_harmony')return 'PLURAL_HARMONY_AE';
   if(type==='plural_initial_consonant')return 'PLURAL_INITIAL_LDT';

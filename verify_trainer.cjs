@@ -298,7 +298,7 @@ ok('G11 bank 220 ids untouched');
 ok('G12 older verify scenarios still above');
 
 assert.ok(GP.navIsLessons());
-assert.deepEqual(GP.lessons().map(l=>l.id),['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2']);
+assert.deepEqual(GP.lessons().map(l=>l.id),['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3']);
 assert.ok(!GP.lessons().some(l=>/^T/.test(l.id)));
 ok('P1 nav by lesson_id not T-id');
 
@@ -1379,7 +1379,7 @@ assert.ok(start31.indexOf('restoreLessonPractice(block)')<start31.indexOf('cours
 ok('Phase 3 dormant Practice/Phrase integration installs nothing while closed and all 46 items when 3-1 gate opens');
 
 const openAdapter=require('./explain-bank-adapter.js');
-assert.deepEqual(openAdapter.OPEN,['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2']);
+assert.deepEqual(openAdapter.OPEN,['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3']);
 assert.deepEqual(openAdapter.courseById('3-1').rules,['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']);
 assert.equal(openAdapter.CHAPTER_RULE['3-1-poss'],'T20_POSS');
 assert.equal(openAdapter.CHAPTER_RULE['3-1-assim'],'T21_POSS_ASSIM');
@@ -1393,7 +1393,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/const CACHE='qazaq-offline-live-20260923-cat-trainer'/.test(openSw));
+assert.ok(/const CACHE='qazaq-offline-live-20260923-lesson33'/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);

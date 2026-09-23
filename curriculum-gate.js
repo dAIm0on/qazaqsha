@@ -10,7 +10,8 @@
   '2-2':['person_pl','adjective_predicate','greetings','question_after_r'],
   '2-3':['ordinal','question_full','third_person','farewell'],
   '3-1':['possessive','existence'],
-  '3-2':['poss_biz','poss_sender','poss_olar','deixis']
+  '3-2':['poss_biz','poss_sender','poss_olar','deixis'],
+  '3-3':['poss_person_stack']
  };
  const FUTURE=['case','possessive','labial','degrees','existence','imperative_paradigm'];
  const FUTURE_RE=/падеж|посессив|притяжательн|губн(ая|ой) гармо|степен(и|ей) сравнен|менің \S+ым|кітабым|бар ма\?|labial|comparative/i;

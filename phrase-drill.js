@@ -5,7 +5,7 @@
  const banks=node?require('./phrase-banks.js'):root.PhraseBanks;
  const gate=node?require('./curriculum-gate.js'):root.CurriculumGate;
  const lesson31=node?require('./lesson31-pack.js'):root.Lesson31Pack;
- const ORDER=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2'];
+ const ORDER=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
  const clone=x=>JSON.parse(JSON.stringify(x));
  const pad=n=>String(n).padStart(2,'0');
  function allowedThrough(lessonId){
@@ -30,6 +30,7 @@
  }
  function lesson31Open(catalog){return !!(gate&&gate.allows&&gate.allows('possessive',catalog));}
  function lesson32Open(catalog){return !!(gate&&gate.allows&&gate.allows('poss_biz',catalog));}
+ function lesson33Open(catalog){return !!(gate&&gate.allows&&gate.allows('poss_person_stack',catalog));}
  function forLesson(lessonId,catalog){
   if(lessonId==='3-1'){
    if(!lesson31Open(catalog)||!lesson31||!lesson31.sessionG)return [];
@@ -39,9 +40,13 @@
    if(!lesson32Open(catalog))return [];
    return banks.forLesson('3-2').map(p=>variant(p,p.n<=12?'kk-ru':'ru-kk'));
   }
+  if(lessonId==='3-3'){
+   if(!lesson33Open(catalog))return [];
+   return banks.forLesson('3-3').flatMap(p=>[variant(p,'kk-ru'),variant(p,'ru-kk')]);
+  }
   return banks.forLesson(lessonId).flatMap(p=>[variant(p,'ru-kk'),variant(p,'kk-ru')]);
  }
- function allQuestions(catalog){return [...['1-2','1-3'].flatMap(id=>forLesson(id,catalog)),...forLesson('3-1',catalog),...forLesson('3-2',catalog)];}
+ function allQuestions(catalog){return [...['1-2','1-3'].flatMap(id=>forLesson(id,catalog)),...forLesson('3-1',catalog),...forLesson('3-2',catalog),...forLesson('3-3',catalog)];}
  function weaknessKeys(profile){
   if(!profile)return new Set();
   if(Array.isArray(profile))return new Set(profile.flatMap(x=>typeof x==='string'?[x]:[x&&x.error_code,x&&x.error_type,x&&x.skill_tag].filter(Boolean)));
@@ -101,6 +106,15 @@
    if(!lesson32Open(catalog))return [];
    const random=typeof opts.random==='function'?opts.random:Math.random,seen=new Set(opts.seen_ids||[]),weak=weaknessKeys(opts.error_profile);
    const cards=forLesson('3-2',catalog),requested=Math.max(2,Math.floor(Number(opts.count)||24)),count=Math.min(requested,cards.length);
+   return byWeak(cards,weak,seen,random).slice(0,count);
+  }
+  if(lessonId==='3-3'){
+   if(!lesson33Open(catalog))return [];
+   const random=typeof opts.random==='function'?opts.random:Math.random,seen=new Set(opts.seen_ids||[]),weak=weaknessKeys(opts.error_profile);
+   const pack33=node?require('./lesson33-pack.js'):root.Lesson33Pack;
+   let cards=forLesson('3-3',catalog);
+   if(pack33&&pack33.phraseUnlocked)cards=cards.filter(q=>pack33.phraseUnlocked(q.id,{events:opts.events||[]}));
+   const requested=Math.max(2,Math.floor(Number(opts.count)||12)),count=Math.min(requested,cards.length);
    return byWeak(cards,weak,seen,random).slice(0,count);
   }
   if(!['1-2','1-3'].includes(lessonId))return [];

@@ -8,6 +8,7 @@
   for(const q of (window.Lesson31Pack?.extraQuestions?.()||[])){if(q&&!known31.has(q.id)){course.questions.push(q);known31.add(q.id);}}
  }catch{}
  try{window.Lesson32Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{window.Lesson33Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{window.PhraseDrill?.install?.(course,window.CURRICULUM);}catch{}
  try{window.TransferItems?.install?.(course,window.CURRICULUM);}catch{}
  const questions=course.questions;
@@ -33,19 +34,20 @@
  if(!state.prefs.lettersChosen&&typeof matchMedia==='function'&&matchMedia('(max-width:690px)').matches)state.prefs.letters=true;
  if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
  window.ExplainDepth={
-   get(id){const key=String(id||''),chosen=state.explainDepth&&state.explainDepth[key];if(chosen==='open')return true;if(chosen==='closed')return false;if(/^T2[4-7]_/.test(key))return false;return true;},
+   get(id){const key=String(id||''),chosen=state.explainDepth&&state.explainDepth[key];if(chosen==='open')return true;if(chosen==='closed')return false;if(/^T2[4-7]_/.test(key)||/^T2[89]_|^T3[0-4]_/.test(key))return false;return true;},
    set(id,open){if(!id)return;state.explainDepth=state.explainDepth||Object.create(null);state.explainDepth[String(id).slice(0,40)]=open?'open':'closed';save();}
  };
  window.NumberLadder?.parkLearn(state.learning,state.records);
  let records=state.records,learningState=state.learning;
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);try{if(window.Lesson31Pack&&P.registerStages)P.registerStages('3-1',window.Lesson31Pack.stagePlans());}catch{}
  try{if(window.Lesson32Pack&&P.registerStages)P.registerStages('3-2',window.Lesson32Pack.stagePlans());}catch{}
+ try{if(window.Lesson33Pack&&P.registerStages)P.registerStages('3-3',window.Lesson33Pack.stagePlans());}catch{}
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
  let reviewReasonMap=Object.create(null),materialsQuery='',materialsLesson='',materialsKind='';
  const COURSE_BLOCKS=(window.ExplainBankUI&&window.ExplainBankUI.COURSE||[]).map(row=>({id:row.id,title:row.label,hint:row.name}));
  function courseJumpMarkup(id){
-   return `<div class="course-jump" id="${id}"><p>Уроки 1–1…3–2</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}><span class="today-lesson-id">Урок ${b.title}</span><small>${esc(b.hint)}</small></button>`).join('')}</div></div>`;
+   return `<div class="course-jump" id="${id}"><p>Уроки 1–1…3–3</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}><span class="today-lesson-id">Урок ${b.title}</span><small>${esc(b.hint)}</small></button>`).join('')}</div></div>`;
  }
  function bindCourseJump(root){
    (root?root.querySelectorAll('[data-course]'):[]).forEach(b=>b.onclick=()=>startCourse(b.dataset.course));
@@ -257,6 +259,7 @@
   if(!q)return false;
   if(q.source==='p2b'&&!records[q.id]?.seen&&mode!=='course')return false;
   if(q.source==='phrase'&&!records[q.id]?.seen&&mode!=='phrase'&&mode!=='course')return false;
+  if(q.lessonId==='3-3'&&q.source==='phrase'&&window.Lesson33Pack&&window.Lesson33Pack.phraseUnlocked&&!window.Lesson33Pack.phraseUnlocked(q.id,{events:state.events}))return false;
   if(q.source==='phase3-31'&&!records[q.id]?.seen&&mode!=='course'&&mode!=='phrase')return false;
   if(q.source==='slice'||q.source==='repair'||q.slice)return mode==='slice'||mode==='repair';
   return catalog.eligible(q,state)&&(!q.promotedWord||state.vocabulary[q.promotedWord]?.target_or_context==='target');
@@ -446,13 +449,14 @@
    mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');
  }
  function beginPacked(id){
-   const pack=id==='3-1'?window.Lesson31Pack:id==='3-2'?window.Lesson32Pack:null;
+   const pack=id==='3-1'?window.Lesson31Pack:id==='3-2'?window.Lesson32Pack:id==='3-3'?window.Lesson33Pack:null;
    if(!pack||!pack.courseSession)return false;
    const built=pack.courseSession(records,{events:state.events});
    return !!(built&&built.stage&&beginStaged(id,Object.assign({},built.stage,{extraIds:built.remediationIds||[]})));
  }
  function startTransfer(){
    const T=window.TransferItems;if(!T)return;
+   if(courseBlock==='3-3')return;
    const rule=courseBlock==='3-2'&&window.Lesson32Pack&&window.Lesson32Pack.transferRule?window.Lesson32Pack.transferRule({stageId:stageContext&&stageContext.stageId,events:state.events}):courseBlock==='3-1'?'T20_POSS':courseBlock==='2-1'?'T6_PERSON_SG':courseBlock==='1-3'?'T4_NO_PLURAL_AFTER_NUMBER':'T2_PLURAL_LDT';
    let list=(T.forRule?T.forRule(rule,{catalog:window.CURRICULUM}):T.session(rule,{catalog:window.CURRICULUM}))||[];
    if(!list.length&&courseBlock==='3-2'&&T.forRule)list=T.forRule('T24_POSS_BIZ',{catalog:window.CURRICULUM})||[];
@@ -479,7 +483,7 @@
    if(topic==='phrase'&&courseBlock&&window.PhraseDrill&&mode!=='exam'){
      mode='phrase';
      const seenIds=Object.keys(records).filter(id=>records[id]&&records[id].seen);
-     const list=window.PhraseDrill.session(courseBlock,{count:courseBlock==='1-2'?16:12,seen_ids:seenIds,error_profile:(window.AiTutor?.topWeak?.(4)||[])});
+     const list=window.PhraseDrill.session(courseBlock,{count:courseBlock==='1-2'?16:12,seen_ids:seenIds,error_profile:(window.AiTutor?.topWeak?.(4)||[]),events:state.events});
      queue=list.map(q=>q.id).filter(id=>byId.has(id));practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);resetCounts();render();return;
    }
    let list=subset();
@@ -1053,7 +1057,7 @@
    const resumeAt=window.Homework.resumeIndex(h.exercise_ids,attempt);
    const check=key=>`<label class="pref-check"><input type="checkbox" data-hw-check="${key}" ${attempt.checklist[key]?'checked':''}> ${{method:'Повторила методичку',exercises:'Упражнения сборника',words:'Слова урока',external_test:'Зафиксировала на сайте',keyboard:'Казахская раскладка на телефоне',cheat:'Шпаргалка сохранена'}[key]||key}</label>`;
    const secBtns=(part,n)=>n<=1?'':`<div class="jump-row">${Array.from({length:n},(_,i)=>`<button type="button" class="chip" data-hw-part="${part}" data-hw-sec="${i}">Часть ${i+1}</button>`).join('')}</div>`;
-   const wordLine=(pack.lesson_id==='3-1'||pack.lesson_id==='3-2')?`${(h.word_ids||[]).length} слов × направления, карточек ${wP.done} из ${wP.total}`:`${wP.done} из ${wP.total} слов`;
+   const wordLine=(pack.lesson_id==='3-1'||pack.lesson_id==='3-2'||pack.lesson_id==='3-3')?`${(h.word_ids||[]).length} слов × направления, карточек ${wP.done} из ${wP.total}`:`${wP.done} из ${wP.total} слов`;
    root.innerHTML=`<div class="panel homework-head"><p class="eyebrow">УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>Готово ${exP.done} из ${exP.total} упражнений · ${wordLine}. Это выборка урока, не весь сборник и не повторение.</p><button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button></div>
      <div class="panel"><div class="jump-row">${list.map(p=>`<button type="button" class="chip" data-hw-lesson="${p.lesson_id}" ${p.lesson_id===pack.lesson_id?'aria-pressed="true"':''}>${esc(p.homework.title)}</button>`).join('')}</div>
        <p class="small">Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике. Можно выйти в любой момент: ответы уже в листе.</p>
@@ -1564,7 +1568,7 @@
  }
  function canonForSource(key,source){
    const lesson=source&&source.lesson_id;
-   const byLesson={'1-1':'T1_HARMONY','1-2':'T2_PLURAL_LDT','1-3':'T4_NO_PLURAL_AFTER_NUMBER','2-1':'T6_PERSON_SG','2-2':'T8_PERSON_PL','2-3':'T9_OL','3-1':'T20_POSS','3-2':'T24_POSS_BIZ'};
+   const byLesson={'1-1':'T1_HARMONY','1-2':'T2_PLURAL_LDT','1-3':'T4_NO_PLURAL_AFTER_NUMBER','2-1':'T6_PERSON_SG','2-2':'T8_PERSON_PL','2-3':'T9_OL','3-1':'T20_POSS','3-2':'T24_POSS_BIZ','3-3':'T28_OWNER_SUBJECT'};
    if(lesson&&byLesson[lesson])return byLesson[lesson];
    if(key==='phase3-31'||key==='m31'||key==='hw31')return 'T20_POSS';
    if(key==='phase3-32'||key==='m32'||key==='hw32')return 'T24_POSS_BIZ';
@@ -1733,7 +1737,7 @@
    $$('#rules-content [data-vocab]').forEach(b=>b.onclick=()=>{vocabRole=b.dataset.vocab;courseBlock=null;sourceFilter=null;topic='vocab';mode='ordered';startQueue({all:true});showView('practice');});
  }
  function renderMaterials(){
-   const lessonOpts=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2'].map(id=>`<option value="${id}"${materialsLesson===id?' selected':''}>${id.replace('-','–')}</option>`).join('');
+   const lessonOpts=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'].map(id=>`<option value="${id}"${materialsLesson===id?' selected':''}>${id.replace('-','–')}</option>`).join('');
    const cards=Object.entries(course.sources).filter(([,s])=>!s.additional).map(([key,s])=>{
      const n=questions.filter(q=>q.source===key).length;
      const url=liveSource(s.url);

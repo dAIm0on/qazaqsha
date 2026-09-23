@@ -128,7 +128,7 @@ test('K2.1-16 service worker caches both standalone trainer files',()=>{
   const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
   assert.ok(sw.includes('"harmony-letter-trainer.js"'));
   assert.ok(sw.includes('"personal-trainers.js"'));
-  assert.ok(sw.includes('20260923-cat-trainer'));
+  assert.ok(sw.includes('20260923-lesson33'));
 });
 
 console.log('\nK2.1 verify PASS:',passed,'tests');

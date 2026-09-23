@@ -24,7 +24,14 @@
   {rule_id:'T24_POSS_BIZ',lesson_id:'3-2',course_rule:'poss_biz',title_ru:'Наш: мыз вместо ңыз',explanation_ru:'',examples_correct:['біздің әкеміз'],examples_wrong:['біздің әке'],error_codes:['POSS_NO_SUFFIX','POSS_ASSIM','POSS_ORDER','POSS_GLIDE','POSS_WRONG_PERSON']},
   {rule_id:'T25_POSS_SENDER',lesson_id:'3-2',course_rule:'poss_sender',title_ru:'Сендердің и сіздердің: в модели урока сначала много',explanation_ru:'В модели этого урока для сендердің / сіздердің множественное ставится перед притяжательным: сендердің қолдарың, сіздердің бастықтарыңыз. Это учебная модель урока, не закон всего языка.',examples_correct:['сендердің қолдарың','сіздердің бастықтарыңыз'],examples_wrong:['сендердің қолың'],error_codes:['POSS_2PL_NO_PL','POSS_WRONG_PERSON','PERSON_ON_POSS']},
   {rule_id:'T26_POSS_OLAR',lesson_id:'3-2',course_rule:'poss_olar',title_ru:'Их: наклейка как у оның',explanation_ru:'',examples_correct:['олардың інісі'],examples_wrong:['олардың іні'],error_codes:['POSS_NO_SUFFIX','POSS_OLAR_FORCE_PL','POSS_2PL_READINGS']},
-  {rule_id:'T27_DEIXIS',lesson_id:'3-2',course_rule:'deixis',title_ru:'Это и тот: в модели урока часть слов при существительном',explanation_ru:'Тренируем мына кітап, осы кітап и сол кітап. Мынау и анау могут стоять одни. Самостоятельные осы и сол в языке этим уроком не объявляются невозможными.',examples_correct:['мына кітап жақсы','осы кітап','сол кітап'],examples_wrong:['мына — кітап'],error_codes:['DEIXIS_BARE','DEIXIS_OL']}
+  {rule_id:'T27_DEIXIS',lesson_id:'3-2',course_rule:'deixis',title_ru:'Это и тот: в модели урока часть слов при существительном',explanation_ru:'Тренируем мына кітап, осы кітап и сол кітап. Мынау и анау могут стоять одни. Самостоятельные осы и сол в языке этим уроком не объявляются невозможными.',examples_correct:['мына кітап жақсы','осы кітап','сол кітап'],examples_wrong:['мына — кітап'],error_codes:['DEIXIS_BARE','DEIXIS_OL']},
+  {rule_id:'T28_OWNER_SUBJECT',lesson_id:'3-3',course_rule:'owner_subject',title_ru:'Кто и чей — разные места',explanation_ru:'В этом уроке біз баламыз — мы дети, біздің баламыз — наш ребёнок. Поле «кто» и поле «чей» не меняются местами.',examples_correct:['Біз баламыз','Біздің баламыз'],examples_wrong:['Біздің баламыз в значении мы дети'],error_codes:['PERSON_VS_POSS','OWNER_SUBJECT_SWAP','OWNER_WRONG','SUBJECT_WRONG']},
+  {rule_id:'T29_POSS_PERSON_STACK',lesson_id:'3-3',course_rule:'poss_person_stack',title_ru:'Сначала чьё, потом кто',explanation_ru:'Мен сенің досыңмын: владелец сен даёт досың, субъект мен даёт мын.',examples_correct:['Мен сенің досыңмын'],examples_wrong:['Мен сенің досымсың'],error_codes:['POSS_PERSON_STACK','PERSON_AFTER_POSS_WRONG','PERSON_AFTER_POSS_MISSING','POSS_WRONG_PERSON']},
+  {rule_id:'T30_THIRD_ZERO',lesson_id:'3-3',course_rule:'third_zero',title_ru:'Ол без личного хвоста',explanation_ru:'Ол менің досым. Личный хвост сың или мын к ол не добавляется.',examples_correct:['Ол менің досым'],examples_wrong:['Ол менің досымсың'],error_codes:['THIRD_PERSON_EXTRA_PERSONAL']},
+  {rule_id:'T31_EMES_STACK',lesson_id:'3-3',course_rule:'emes_stack',title_ru:'Емес забирает личное',explanation_ru:'Сен менің жауым емессің. Наклейка владельца остаётся, личное переезжает на емес.',examples_correct:['Сен менің жауым емессің'],examples_wrong:['Сен менің жауымсың емес'],error_codes:['EMES_PERSON_POSITION','EMES_POSS_DROPPED']},
+  {rule_id:'T32_OTBASY',lesson_id:'3-3',course_rule:'otbasy',title_ru:'Отбасы без лишней сы',explanation_ru:'Оның отбасы. Сен оның отбасысың — это личное сың, не вторая сы.',examples_correct:['Оның отбасы','Сен оның отбасысың'],examples_wrong:['Оның отбасысы','Сен оның отбасысысың'],error_codes:['OTBASY_DOUBLE_POSS']},
+  {rule_id:'T33_ADJ_ROLE',lesson_id:'3-3',course_rule:'adj_role',title_ru:'Признак слева или справа',explanation_ru:'Ақылды бала и Бала ақылды в этом уроке не подменяют друг друга.',examples_correct:['Ақылды бала','Бала ақылды'],examples_wrong:[],error_codes:['ADJ_ROLE_ORDER']},
+  {rule_id:'T34_INTERROGATIVE',lesson_id:'3-3',course_rule:'interrogative',title_ru:'Кім, не, қандай, қай, нешінші',explanation_ru:'Характеристика — қандай. Выбор из нескольких — қай. По счёту — нешінші.',examples_correct:['қандай','қай','нешінші'],examples_wrong:[],error_codes:['INTERROGATIVE_CHOICE']}
  ];
  function byId(id){return CARDS.find(c=>c.rule_id===id)||null;}
  function byCourse(rule){return CARDS.filter(c=>c.course_rule===rule);}
@@ -53,13 +60,13 @@
  }
  function allowedVocab(lessonIds){
   const src=hw&&hw.WORD_LEMMAS||{};
-  const ids=lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2'];
+  const ids=lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
   const out=[];
   for(const id of ids)for(const w of src[id]||[])if(!out.includes(w))out.push(w);
   return out;
  }
  function allowedRuleIds(lessonIds){
-  const max=new Set(lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2']);
+  const max=new Set(lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3']);
   return CARDS.filter(c=>max.has(c.lesson_id)).map(c=>c.rule_id);
  }
  function toRuleContext(card){
