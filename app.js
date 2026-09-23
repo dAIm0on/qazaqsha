@@ -1019,8 +1019,12 @@
    }
  }
  function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
+ function homeworkOpts(){
+   const sessionGUnlocked=!!(window.Lesson31Pack?.sessionG?.().length)&&window.Lesson31Pack.sessionG().every(q=>records[q.id]?.seen);
+   return {sessionGUnlocked,events:state.events};
+ }
  function startHomework(lessonId,part,section){
-   const H=window.Homework,pack=(H.packs(questions,course).find(p=>p.lesson_id===lessonId));
+   const H=window.Homework,pack=(H.packs(questions,course,homeworkOpts()).find(p=>p.lesson_id===lessonId));
    if(!pack)return;
    hwLesson=lessonId;hwPart=part||'exercises';mode='homework';topic='all';sourceFilter=null;vocabRole=null;activeLesson=null;activeStep=null;courseBlock=lessonId;
    const attempt=H.ensureAttempt(state,lessonId);
@@ -1045,25 +1049,27 @@
  }
  function renderHomework(){
    const root=$('#homework-content');if(!root||!window.Homework)return;
-   const sessionGUnlocked=!!(window.Lesson31Pack?.sessionG?.().length)&&window.Lesson31Pack.sessionG().every(q=>records[q.id]?.seen);
-   const list=window.Homework.packs(questions,course,{sessionGUnlocked});
+   const list=window.Homework.packs(questions,course,homeworkOpts());
    const weak=window.Homework.weakSpots(state,questions);
    const pick=hwLesson&&list.find(p=>p.lesson_id===hwLesson)||list[0];
    if(!pick){root.innerHTML='<div class="panel"><p>Пакеты ДЗ 1–1…1–3 ещё не собраны из банка.</p></div>';return;}
    const pack=pick,attempt=window.Homework.ensureAttempt(state,pack.lesson_id),h=pack.homework;
-   const ready=window.Homework.sheetReady(attempt,pack);
+   const exercisesClosed=pack.lesson_id==='3-3'&&!h.exercise_ids.length;
+   const ready=!exercisesClosed&&window.Homework.sheetReady(attempt,pack);
    const exP=window.Homework.partProgress(attempt,h.exercise_ids),wP=window.Homework.partProgress(attempt,h.word_question_ids||[]);
    const exN=window.Homework.sectionCount(h.exercise_ids),wN=window.Homework.sectionCount(h.word_question_ids||[]);
    const resumeAt=window.Homework.resumeIndex(h.exercise_ids,attempt);
    const check=key=>`<label class="pref-check"><input type="checkbox" data-hw-check="${key}" ${attempt.checklist[key]?'checked':''}> ${{method:'Повторила методичку',exercises:'Упражнения сборника',words:'Слова урока',external_test:'Зафиксировала на сайте',keyboard:'Казахская раскладка на телефоне',cheat:'Шпаргалка сохранена'}[key]||key}</label>`;
    const secBtns=(part,n)=>n<=1?'':`<div class="jump-row">${Array.from({length:n},(_,i)=>`<button type="button" class="chip" data-hw-part="${part}" data-hw-sec="${i}">Часть ${i+1}</button>`).join('')}</div>`;
    const wordLine=(pack.lesson_id==='3-1'||pack.lesson_id==='3-2'||pack.lesson_id==='3-3')?`${(h.word_ids||[]).length} слов × направления, карточек ${wP.done} из ${wP.total}`:`${wP.done} из ${wP.total} слов`;
-   root.innerHTML=`<div class="panel homework-head"><p class="eyebrow">УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>Готово ${exP.done} из ${exP.total} упражнений · ${wordLine}. Это выборка урока, не весь сборник и не повторение.</p><button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button></div>
+   const headLine=exercisesClosed?'Упражнения ещё закрыты. Они появятся после сдачи правила. Просмотр карточки их не открывает.':`Готово ${exP.done} из ${exP.total} упражнений · ${wordLine}. Это выборка урока, не весь сборник и не повторение.`;
+   const openExercises=exercisesClosed?'':`<button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button>`;
+   root.innerHTML=`<div class="panel homework-head"><p class="eyebrow">УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>${headLine}</p>${openExercises}</div>
      <div class="panel"><div class="jump-row">${list.map(p=>`<button type="button" class="chip" data-hw-lesson="${p.lesson_id}" ${p.lesson_id===pack.lesson_id?'aria-pressed="true"':''}>${esc(p.homework.title)}</button>`).join('')}</div>
        <p class="small">Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике. Можно выйти в любой момент: ответы уже в листе.</p>
        <ol class="learning-steps">
          <li>Повторить методичку — ${h.method_url?`<a href="${esc(h.method_url)}" target="_blank" rel="noopener noreferrer">${esc(h.method_title)}</a>`:'ссылка на материал урока'}${check('method')}</li>
-         <li>Упражнения сборника (${h.exercise_ids.length} пунктов, по ${window.Homework.HW_SECTION} в части) <button type="button" class="secondary-button" data-hw-part="exercises">${exP.done?'Продолжить упражнения':'Открыть упражнения'}</button>${secBtns('exercises',exN)}</li>
+         <li>${exercisesClosed?'Упражнения сборника откроются вместе с правилом.':`Упражнения сборника (${h.exercise_ids.length} пунктов, по ${window.Homework.HW_SECTION} в части) <button type="button" class="secondary-button" data-hw-part="exercises">${exP.done?'Продолжить упражнения':'Открыть упражнения'}</button>${secBtns('exercises',exN)}`}</li>
          <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${h.word_ids.length} слов. <button type="button" class="secondary-button" data-hw-part="words">${wP.done?'Продолжить слова':'Открыть слова'}</button>${secBtns('words',wN)}</li>
          <li>Внешний тест: ${(h.external_tests&&h.external_tests.length?h.external_tests:[h.external_test_url]).filter(Boolean).map(u=>`<a class="ext-test-link" href="${esc(u)}" target="_blank" rel="noopener noreferrer">BatylBol · внешний тест</a>`).join(' · ')||'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
          ${(h.extras||[]).map(x=>'<li>'+check(x)+'</li>').join('')}
@@ -1459,7 +1465,7 @@
      const back=hwReturn;hwReturn=null;hwLesson=back.lesson;hwPart=back.part;hwSection=back.section||0;mode='homework';showView('homework');save();return;
    }
    if(mode==='homework'){
-     const pack=window.Homework.packs(questions,course).find(p=>p.lesson_id===hwLesson);
+     const pack=window.Homework.packs(questions,course,homeworkOpts()).find(p=>p.lesson_id===hwLesson);
      if(pack){
        const all=hwPart==='words'?pack.homework.word_question_ids||[]:pack.homework.exercise_ids;
        const done=new Set((state.homeworkAttempts[hwLesson]&&state.homeworkAttempts[hwLesson].items||[]).map(i=>i.id));

@@ -374,6 +374,7 @@
   if(n>=20&&n<=23)return 'i';
   return '';
  }
+ function stageClosed(stageId,events){return closed(events,stageId);}
  function phraseUnlocked(id,opts){
   const n=phraseNumber(id);
   if(!n)return true;
@@ -410,7 +411,7 @@
  const api={
   sessionA,sessionB,sessionC,sessionD,sessionE,sessionF,sessionG,sessionH,sessionI,sessionJ,
   lessonSession,grammarQuestions,extras,all,byId,check,install,
-  stagePlan,stagePlans,stageSession,nextStage,courseSession,phraseUnlocked,phraseGroup,goldRows
+  stagePlan,stagePlans,stageSession,nextStage,courseSession,stageClosed,phraseUnlocked,phraseGroup,goldRows
  };
  if(node)module.exports=api;else root.Lesson33Pack=api;
 })(typeof window!=='undefined'?window:globalThis);

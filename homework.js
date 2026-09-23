@@ -128,10 +128,13 @@
    if(lessonId==='3-3'&&lesson33Homework){
      const spec=lesson33Homework.build({events:opts.events||[]});
      const qById=new Map((questions||[]).map(q=>[q.id,q]));
+     const pack33=node?require('./lesson33-pack.js'):root.Lesson33Pack;
+     const present=id=>qById.has(id)||!!(pack33&&pack33.byId&&pack33.byId(id));
      const words=(questions||[]).filter(q=>q&&q.lessonId==='3-3'&&q.topic==='vocab');
      const method=methodSource(lessonId,course);
-     const phraseIds=(spec.phrase_ids||[]).filter(id=>qById.has(id));
-     return {lesson_id:'3-3',homework:{title:spec.title,word_ids:(spec.target_vocabulary||[]).map(w=>w.id),exercise_ids:spec.item_ids.filter(id=>qById.has(id)||phraseIds.includes(id)),word_question_ids:words.map(q=>q.id),rule_map:{...spec.rule_map},external_test_url:spec.external_test_url,external_tests:[spec.external_test_url],checklist:['method','exercises','words','external_test'],extras:[],method_title:method.title,method_url:method.url}};
+     const exercise_ids=(spec.item_ids||[]).filter(present);
+     const missing_ids=(spec.item_ids||[]).filter(id=>!present(id));
+     return {lesson_id:'3-3',homework:{title:spec.title,word_ids:(spec.target_vocabulary||[]).map(w=>w.id),exercise_ids,missing_ids,word_question_ids:words.map(q=>q.id),rule_map:{...spec.rule_map},external_test_url:spec.external_test_url,external_tests:[spec.external_test_url],checklist:['method','exercises','words','external_test'],extras:[],method_title:method.title,method_url:method.url}};
    }
    if(lessonId==='3-2'&&lesson32Homework){
      const spec=lesson32Homework.build({sessionHUnlocked:!!opts.sessionHUnlocked});
