@@ -148,16 +148,22 @@ test('K2.1-18 encountered-word trainer mixes both directions in one queue',()=>{
   const personal=fs.readFileSync(path.join(__dirname,'personal-trainers.js'),'utf8');
   assert.ok(app.includes("kind==='vocab:used'?'used':'must'"));
   assert.ok(app.includes("q.topic==='vocab'&&q.wordRole===role"));
-  assert.ok(app.includes('shuffled(list)'));
+  assert.ok(app.includes("list.filter(q=>/-ru$/.test(q.id))"));
+  assert.ok(app.includes("list.filter(q=>/-kk$/.test(q.id))"));
+  assert.ok(app.includes('Math.random()<0.5'));
   assert.ok(personal.includes('Узнать и написать вперемешку в одном подходе'));
   assert.equal(personal.includes('vocab_seen_write'),false);
 });
 
-test('K2.1-19 number catalog preserves NumberLadder gating',()=>{
+test('K2.1-19 number catalog preserves NumberLadder gating without lesson progression',()=>{
   const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
   assert.ok(app.includes('window.NumberLadder&&window.NumberLadder.ORDER'));
   assert.ok(app.includes('window.NumberLadder.allowed(q,state)'));
-  assert.ok(app.includes("startLesson(String(kind).slice(7),0,{voluntary:true})"));
+  assert.ok(app.includes("topic='numbers';vocabRole=null;mode='numbers'"));
+  const block=(app.match(/if\(String\(kind\)\.startsWith\('number:'\)\)[\s\S]*?const role=/)||[''])[0];
+  assert.ok(block);
+  assert.equal(block.includes('startLesson('),false);
+  assert.ok(block.includes('activeLesson=null'));
 });
 
 test('K2.1-20 trainer-origin sessions return to catalog and survive session save',()=>{
