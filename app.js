@@ -1391,7 +1391,7 @@
      const returnKind=trainerReturn;
      $('#exercise').innerHTML='<div class="empty-state"><h2>Подход завершён</h2><p>Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё подход</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
      $('#restart').onclick=()=>startCatalogTrainer(returnKind);
-     $('#back-to-learning').onclick=()=>{trainerReturn=null;showView('personal');};
+     $('#back-to-learning').onclick=()=>{trainerReturn=null;showView('personal');if(window.PersonalTrainers&&window.PersonalTrainers.openCatalog)window.PersonalTrainers.openCatalog();};
      save();return;
    }
    const waiting=practiceIds.filter(id=>(records[id]?.streak||0)<cfg.schedule.cleanAnswersToConsolidate).length;
@@ -1424,16 +1424,29 @@
  function catalogVocabIds(role){
    let list=questions.filter(q=>eligible(q)&&q.topic==='vocab'&&q.wordRole===role);
    list=window.Knowledge&&window.Knowledge.choose?window.Knowledge.choose(shuffled(list),state,Infinity):shuffled(list);
+   const recognize=shuffled(list.filter(q=>/-ru$/.test(q.id)));
+   const produce=shuffled(list.filter(q=>/-kk$/.test(q.id)));
+   const other=shuffled(list.filter(q=>!/-ru$|-kk$/.test(q.id)));
+   const mixed=[];
+   while(recognize.length||produce.length){
+     if(recognize.length&&produce.length)mixed.push((Math.random()<0.5?recognize:produce).shift());
+     else mixed.push((recognize.length?recognize:produce).shift());
+   }
+   mixed.push(...other);
    const limit=Math.max(2,(cfg.session.size||10)+(cfg.session.newLimit||0));
-   let ids=list.map(q=>q.id);
+   let ids=mixed.map(q=>q.id);
    if(window.MemoryPolicy&&window.MemoryPolicy.breakRuns)ids=window.MemoryPolicy.breakRuns(ids,questions);
    return ids.slice(0,limit);
  }
  function startCatalogTrainer(kind){
    trainerReturn=kind;
    if(String(kind).startsWith('number:')){
-     vocabRole=null;
-     return startLesson(String(kind).slice(7),0,{voluntary:true});
+     const id=String(kind).slice(7),lesson=(window.LEARNING&&window.LEARNING.lessons||[]).find(l=>l.id===id);
+     const ids=(lesson&&lesson.questionIds||[]).filter(qid=>{const q=byId.get(qid);return q&&eligible(q)&&(!window.NumberLadder||window.NumberLadder.allowed(q,state));});
+     activeLesson=null;activeStep=null;sourceFilter=null;courseBlock=null;topic='numbers';vocabRole=null;mode='numbers';
+     queue=shuffled(ids);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;resetCounts();
+     if(!queue.length){trainerReturn=null;showView('personal');return;}
+     render();showView('practice');return;
    }
    const role=kind==='vocab:used'?'used':'must';
    activeLesson=null;activeStep=null;sourceFilter=null;courseBlock=null;topic='vocab';vocabRole=role;mode='words';
