@@ -548,7 +548,7 @@
    document.querySelectorAll('main > section').forEach(el=>{el.hidden=el.id!==next+'-view';});
    const tab=shellTab(next);
    $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-   renderStats();if(next==='learn')learning.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='materials')renderMaterials();if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();
+   renderStats();if(next==='learn')learning.render();if(next==='personal'&&window.PersonalTrainers)window.PersonalTrainers.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='materials')renderMaterials();if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();
    if(next==='practice'&&['homework','course','lesson','phrase','transfer','remediation'].includes(mode)){const id=mode==='homework'?hwLesson:(courseBlock||(state.grammarPath&&state.grammarPath.lessonId)||null);if(id)markPlace(mode==='homework'?'homework':'practice',id);}
    if(next==='path'&&state.grammarPath&&state.grammarPath.phase==='beat'&&state.grammarPath.lessonId)markPlace('path',state.grammarPath.lessonId);
    if(window.TutorUI){
@@ -559,7 +559,7 @@
  }
  function shellTab(next){
    if(next==='practice')return mode==='exam'?'review':'today';
-   if(['learn','homework','path'].includes(next))return 'today';
+   if(['learn','homework','path','personal'].includes(next))return 'today';
    if(['rules','vocabulary'].includes(next))return 'materials';
    if(next==='exam')return 'review';
    return next;
@@ -1707,6 +1707,7 @@
      if(next.startsWith('remedy:')){startRemedy(next.slice(7));return;}
      if(next==='homework'){hwLesson=null;showView('homework');return;}
      if(next==='path'){showView('path');return;}
+     if(next==='personal-trainers'){showView('personal');return;}
      if(next.startsWith('weak:')){startBlockReview(next.slice(5));return;}
      if(next.startsWith('pair:')){
        const [a,b]=next.slice(5).split(':');
