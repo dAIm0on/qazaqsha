@@ -129,7 +129,7 @@ test('K2.1-16 service worker caches both standalone trainer files',()=>{
   const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
   assert.ok(sw.includes('"harmony-letter-trainer.js"'));
   assert.ok(sw.includes('"personal-trainers.js"'));
-  assert.ok(sw.includes('20260924-trainer-catalog'));
+  assert.ok(sw.includes('20260924-trainer-catalog-mobilefix'));
 });
 
 
@@ -174,4 +174,10 @@ test('K2.1-20 trainer-origin sessions return to catalog and survive session save
   assert.ok(app.includes("showView(trainerReturn?'personal'"));
 });
 
+
+test('K2.1-21 mobile trainer lists clear the fixed bottom navigation',()=>{
+  const css=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
+  assert.ok(css.includes('#personal-view .personal-trainer-list{padding-bottom:calc(12px + var(--bottom-nav-height,64px))}'));
+  assert.ok(css.includes(':root{--bottom-nav-height:calc(64px + env(safe-area-inset-bottom, 0px))}'));
+});
 console.log('\nK2.1 verify PASS:',passed,'tests');
