@@ -3,6 +3,10 @@
  'use strict';
  const course=window.COURSE, core=window.TrainerCore;
  try{window.Lesson31Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{
+  const known31=new Set((course.questions||[]).map(q=>q.id));
+  for(const q of (window.Lesson31Pack?.extraQuestions?.()||[])){if(q&&!known31.has(q.id)){course.questions.push(q);known31.add(q.id);}}
+ }catch{}
  try{window.Lesson32Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{window.PhraseDrill?.install?.(course,window.CURRICULUM);}catch{}
  try{window.TransferItems?.install?.(course,window.CURRICULUM);}catch{}
@@ -34,7 +38,7 @@
  };
  window.NumberLadder?.parkLearn(state.learning,state.records);
  let records=state.records,learningState=state.learning;
- try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
+ try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);try{if(window.Lesson31Pack&&P.registerStages)P.registerStages('3-1',window.Lesson31Pack.stagePlans());}catch{}
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
  let reviewReasonMap=Object.create(null),materialsQuery='',materialsLesson='',materialsKind='';
@@ -184,9 +188,11 @@
  function beginStaged(id,ctx){
    const ids=(ctx.coreIds||[]).filter(qid=>byId.has(qid));
    if(!ids.length||ids.length!==ctx.coreIds.length)return false;
+   const extra=(ctx.extraIds||[]).filter(qid=>byId.has(qid)&&!ids.includes(qid)).slice(0,3);
    mode='course';courseBlock=id;topic='all';sourceFilter=null;activeLesson=null;activeStep=null;
-   queue=ids.slice();practiceIds=ids.slice();stepEvidence={};variants={};
-   stageContext=Object.assign({},ctx,{presentations:0,limitReached:false});
+   queue=ids.concat(extra);practiceIds=[...queue];stepEvidence={};variants={};
+   stageContext=Object.assign({},ctx,{coreIds:ids.slice(),presentations:0,limitReached:false});
+   delete stageContext.extraIds;
    queueEpoch=Date.now()+Math.random();position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
    markLessonStarted(id,'practice');render();showView('practice');return true;
  }
@@ -195,6 +201,10 @@
    const lp=P.ensureLessonProgress(state,id);
    if(lp&&lp.practiceSession&&restoreLessonPractice(id)){
      markLessonStarted(id,'practice');render();showView('practice');return;
+   }
+   if(id==='3-1'&&window.Lesson31Pack&&window.Lesson31Pack.courseSession){
+     const built=window.Lesson31Pack.courseSession(records,{events:state.events});
+     if(built&&built.stage&&beginStaged(id,Object.assign({},built.stage,{extraIds:built.remediationIds||[]})))return;
    }
    const nxt=P.nextRegistered&&P.nextRegistered(id,state.events);
    if(nxt&&beginStaged(id,nxt))return;
@@ -417,7 +427,11 @@
    }
    const first=window.LEARNING.lessons.find(l=>l.courseLesson===block);
    if(first)learningState.lessonId=first.id;
-   const lessonCards=block==='3-1'?(window.Lesson31Pack?.lessonSession?.()||[]):block==='3-2'?(window.Lesson32Pack?.lessonSession?.()||[]):(window.Phase2BPractice?.lessonSession?.(block)||[]);
+   if(block==='3-1'&&window.Lesson31Pack&&window.Lesson31Pack.courseSession&&mode!=='exam'){
+     const built=window.Lesson31Pack.courseSession(records,{events:state.events});
+     if(built&&built.stage&&beginStaged(block,Object.assign({},built.stage,{extraIds:built.remediationIds||[]})))return;
+   }
+   const lessonCards=block==='3-2'?(window.Lesson32Pack?.lessonSession?.()||[]):(window.Phase2BPractice?.lessonSession?.(block)||[]);
    if(lessonCards.length&&mode!=='exam'){
      mode='course';
      let ordered=lessonCards.slice();

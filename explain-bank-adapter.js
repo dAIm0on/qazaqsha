@@ -25,7 +25,7 @@
   '2-2-glue':'T12_GLUE','2-2-adj':'T8_ADJ_PRED','2-2-biz':'T8_PERSON_PL','2-2-mn':'T8_PERSON_PL','2-2-sender':'T8_PERSON_PL','2-2-sizder':'T8_PERSON_PL','2-2-noextra':'T8_PERSON_PL',
   '2-3-glue':'T12_GLUE','2-3-ol':'T9_OL','2-3-olar':'T9_OL','2-3-q':'T10_QUESTION','2-3-qstem':'T10_QUESTION',
   '2-3-ord':'T11_ORDINAL','2-3-suf':'T11_ORDINAL','2-3-ex':'T11_ORDINAL','2-3-comp':'T11_ORDINAL','2-3-ordp':'T11_ORDINAL',
-  '3-1-poss':'T20_POSS','3-1-assim':'T21_POSS_ASSIM','3-1-bar':'T22_BAR_ZHOK','3-1-plural':'T23_POSS_PL',
+  '3-1-poss':'T20_POSS','3-1-assim':'T21_POSS_ASSIM','3-1-bar':'T22_BAR_ZHOK','3-1-plural':'T23_POSS_PL','3-1-repair':'T20_POSS',
   '3-2-a':'T24_POSS_BIZ','3-2-b':'T24_POSS_BIZ','3-2-c':'T23_POSS_PL','3-2-d':'T24_POSS_BIZ',
   '3-2-e':'T25_POSS_SENDER','3-2-f':'T25_POSS_SENDER','3-2-g':'T26_POSS_OLAR','3-2-h':'T26_POSS_OLAR',
   '3-2-i':'T27_DEIXIS','3-2-j':'T25_POSS_SENDER'
