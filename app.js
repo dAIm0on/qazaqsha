@@ -48,7 +48,7 @@
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
  let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),sessionUnaided=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null,hwSection=0,hwReturn=null,remediationNote='',retrying=false,rulesArticle=null;
- let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null;
+ let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null,stageContext=null,practiceHold=null;
  function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
  function currentLessonId(q){
    if(q&&q.lessonId)return q.lessonId;
@@ -125,15 +125,21 @@
    return l&&P.courseIds().includes(l.courseLesson)?l.courseLesson:null;
  }
  function runtimePracticeSnapshot(){
-   return {topic,mode,sourceFilter,courseBlock,queue:[...queue],position,answered:checked,view,activeLesson,activeStep,practiceIds:[...practiceIds],stepEvidence:{...stepEvidence},variants:{...variants},hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft:draft?JSON.parse(JSON.stringify(draft)):null,sessionAttempts,sessionCorrect,sessionAssisted,remediation:remediation?JSON.parse(JSON.stringify(remediation)):null};
+   const snap={topic,mode,sourceFilter,courseBlock,queue:[...queue],position,answered:checked,view,activeLesson,activeStep,practiceIds:[...practiceIds],stepEvidence:{...stepEvidence},variants:{...variants},hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft:draft?JSON.parse(JSON.stringify(draft)):null,sessionAttempts,sessionCorrect,sessionAssisted,remediation:remediation?JSON.parse(JSON.stringify(remediation)):null};
+   if(stageContext)snap.stageContext=JSON.parse(JSON.stringify(stageContext));
+   return snap;
  }
  function persistLessonPractice(id=runtimePracticeLessonId()){
    if(!id)return null;
    return P.saveLessonPractice(state,id,runtimePracticeSnapshot(),Date.now());
  }
  function restoreLessonPractice(id){
+   practiceHold=null;
    const lp=P.ensureLessonProgress(state,id),s=lp&&lp.practiceSession;
-   if(!s||!Array.isArray(s.queue)||s.queue.some(qid=>!byId.has(qid)))return false;
+   if(!s||!Array.isArray(s.queue))return false;
+   const missing=P.unknownQueueIds?P.unknownQueueIds(s.queue,byId):s.queue.filter(qid=>!byId.has(qid));
+   if(missing.length){practiceHold={lessonId:id,missing,kept:s.queue.slice()};return false;}
+   if(!s.queue.length)return false;
    topic=s.topic||'all';mode=s.mode||'course';sourceFilter=s.sourceFilter||null;courseBlock=id;
    activeLesson=s.mode==='lesson'?s.activeLesson||null:null;activeStep=s.activeStep==null?null:s.activeStep;
    queue=[...s.queue];practiceIds=Array.isArray(s.practiceIds)?s.practiceIds.filter(qid=>byId.has(qid)):[...new Set(queue)];
@@ -141,6 +147,7 @@
    queueEpoch=typeof s.queueEpoch==='number'?s.queueEpoch:Date.now()+Math.random();presented=typeof s.presented==='string'?s.presented:null;
    sessionAttempts=Math.max(0,Number(s.sessionAttempts)||0);sessionCorrect=Math.min(sessionAttempts,Math.max(0,Number(s.sessionCorrect)||0));sessionAssisted=Math.min(sessionAttempts-sessionCorrect,Math.max(0,Number(s.sessionAssisted)||0));
    draft=s.draft&&Array.isArray(s.draft.answers)?s.draft:null;remediation=s.remediation||null;
+   stageContext=P.normalizeStageContext?P.normalizeStageContext(s.stageContext):null;
    position=Math.min(queue.length,Math.max(0,Number(s.position)||0)+(s.answered?1:0));checked=false;hinted=!s.answered&&!!s.hinted;elapsedMs=Number.isFinite(s.elapsed_ms)?Math.max(0,s.elapsed_ms):0;
    return true;
  }
@@ -174,12 +181,23 @@
    }
    return done;
  }
+ function beginStaged(id,ctx){
+   const ids=(ctx.coreIds||[]).filter(qid=>byId.has(qid));
+   if(!ids.length||ids.length!==ctx.coreIds.length)return false;
+   mode='course';courseBlock=id;topic='all';sourceFilter=null;activeLesson=null;activeStep=null;
+   queue=ids.slice();practiceIds=ids.slice();stepEvidence={};variants={};
+   stageContext=Object.assign({},ctx,{presentations:0,limitReached:false});
+   queueEpoch=Date.now()+Math.random();position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
+   markLessonStarted(id,'practice');render();showView('practice');return true;
+ }
  function continueLesson(id){
    viewOnlyPathLesson=null;
    const lp=P.ensureLessonProgress(state,id);
    if(lp&&lp.practiceSession&&restoreLessonPractice(id)){
      markLessonStarted(id,'practice');render();showView('practice');return;
    }
+   const nxt=P.nextRegistered&&P.nextRegistered(id,state.events);
+   if(nxt&&beginStaged(id,nxt))return;
    openPathLesson(id,{meaningful:true});
  }
  function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;sessionUnaided=Object.create(null);}
@@ -365,7 +383,7 @@
  }
  function save(){
    captureDraft();persistLessonPath();persistLessonPractice();if(window.AiTutor&&window.AiTutor.snapshot)state.aiTutor=window.AiTutor.snapshot();state.records=records;state.learning=learningState;
-   state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection};
+   state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null};
    try{if(storageReadError)throw storageReadError;localStorage.setItem(KEY,JSON.stringify(state));storageAvailable=true;}catch{storageAvailable=false;}
    $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
    if(!cloudApplying)window.QazaqCloud?.pushSoon?.(state);
@@ -390,6 +408,12 @@
    courseBlock=block;vocabRole=null;sourceFilter=null;activeLesson=null;activeStep=null;if(view!=='practice'&&view!=='exam')topic='all';
    if(restoreLessonPractice(block)){
      markLessonStarted(block,'practice');render();showView('practice');return;
+   }
+   if(practiceHold&&practiceHold.lessonId===block){
+     const hold=practiceHold;
+     $('#exercise').innerHTML='<div class="empty-state"><h2>Сохранённая очередь на месте</h2><p>В снимке есть задание, которого нет в этой версии: '+esc(hold.missing.join(', '))+'. Очередь не пересобрана.</p><div class="finish-actions"><button type="button" class="secondary-button" id="hold-lessons">Выбрать занятие</button></div></div>';
+     $('#hold-lessons').onclick=()=>showView('learn');
+     showView('practice');save();return;
    }
    const first=window.LEARNING.lessons.find(l=>l.courseLesson===block);
    if(first)learningState.lessonId=first.id;
@@ -856,6 +880,12 @@
      predicted_R:predicted,
      hours_since_last:hours,
      rule_peek:rulePeeked?1:0,homework:homeworkMode?1:0,block:window.Homework?window.Homework.inferBlock(q,mode,hwLesson,activeLesson):''};
+   if(stageContext){
+     event.lesson_id=stageContext.lessonId;
+     event.stage_id=stageContext.stageId;
+     event.content_revision=stageContext.contentRevision;
+     event.practice_kind=stageContext.kind;
+   }
    if(!homeworkMode&&!aiRemed&&!voluntary)event.skills=window.Knowledge.observe(state,q,result,event,errors);
    state.events.push(event);rec=records[q.id]||rec;
    if(homeworkMode&&hwLesson){
@@ -870,9 +900,17 @@
    const day0=core.isDay0Learning(rec,now);
    if(hinted||!result.correct)sessionUnaided[q.id]=0;
    else if(!hinted&&result.correct)sessionUnaided[q.id]=(sessionUnaided[q.id]||0)+1;
-   if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
+   if(stageContext){
+     stageContext.presentations=(stageContext.presentations||0)+1;
+     if(stageContext.presentations>=stageContext.maxPresentations){
+       stageContext.limitReached=true;
+       queue.splice(position+1);
+     }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2){
+       core.scheduleRepeat(queue,position,q.id,rec.streak,stageContext.coreIds.filter(id=>id!==q.id&&byId.has(id)),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
+     }
+   }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
    const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);
-   if(mate&&!result.correct&&!hinted){
+   if(!stageContext&&mate&&!result.correct&&!hinted){
      const other=questions.find(x=>x.id!==q.id&&window.MemoryPolicy.contrastSide(x)?.pair===mate.pair&&window.MemoryPolicy.contrastSide(x)?.side!==mate.side);
      if(other&&!queue.slice(position+1).includes(other.id))queue.splice(Math.min(position+4,queue.length),0,other.id);
    }
@@ -1372,6 +1410,31 @@
    }
    nextBeat();
  }
+ function finishStagedPractice(lessonId){
+   const ctx=stageContext;
+   const report=P.evaluateStage(state.events,ctx);
+   if(report.pass){
+     const done=P.pushStageCompletion(state.events,ctx,report.independent,Date.now());
+     if(done)state.events.push(done);
+   }
+   const status=P.lessonStatusAfterStage((P.ensureLessonProgress(state,lessonId)||{}).status,ctx,report);
+   stageContext=null;
+   P.clearLessonPractice(state,lessonId,Date.now());
+   if(status==='completed'){
+     markLessonCompleted(lessonId);
+     $('#exercise').innerHTML='<div class="empty-state"><h2>Практика урока завершена</h2><p>Следующий шаг — домашка этого же урока. Можно выйти и вернуться: место сохранено.</p><div class="finish-actions"><button type="button" class="primary-button" id="course-to-homework">Перейти к домашке</button><button type="button" class="secondary-button" id="course-to-learn">К урокам</button></div></div>';
+     $('#course-to-homework').onclick=()=>{hwLesson=lessonId;hwPart='exercises';hwSection=0;showView('homework');};
+     $('#course-to-learn').onclick=()=>showView('learn');
+     return;
+   }
+   const lp=P.ensureLessonProgress(state,lessonId);
+   if(lp&&lp.status!=='completed')lp.status='in_progress';
+   P.setResumePointer(state,lessonId,'practice',Date.now());
+   const line=ctx.limitReached||!report.pass?'Подход завершён, продолжим этот навык.':'Этот шаг сдан. Следующий шаг — в том же уроке.';
+   $('#exercise').innerHTML='<div class="empty-state"><h2>Шаг урока</h2><p>'+esc(line)+'</p><div class="finish-actions"><button type="button" class="primary-button" id="stage-continue">Продолжить</button><button type="button" class="secondary-button" id="stage-lessons">К урокам</button></div></div>';
+   $('#stage-continue').onclick=()=>continueLesson(lessonId);
+   $('#stage-lessons').onclick=()=>showView('learn');
+ }
  function renderEmpty(){
    if(mode==='repair'&&(state.sliceRun||[]).length){finishRepair();return;}
    if(mode==='slice'&&(state.sliceRun||[]).length){showSliceResult();return;}
@@ -1392,6 +1455,10 @@
    }
    if(mode==='course'&&courseBlock){
      const lessonId=courseBlock;
+     if(stageContext){
+       finishStagedPractice(lessonId);
+       save();return;
+     }
      markLessonCompleted(lessonId);
      $('#exercise').innerHTML='<div class="empty-state"><h2>Практика урока завершена</h2><p>Следующий шаг — домашка этого же урока. Можно выйти и вернуться: место сохранено.</p><div class="finish-actions"><button type="button" class="primary-button" id="course-to-homework">Перейти к домашке</button><button type="button" class="secondary-button" id="course-to-learn">К урокам</button></div></div>';
      $('#course-to-homework').onclick=()=>{hwLesson=lessonId;hwPart='exercises';hwSection=0;showView('homework');};
@@ -1833,6 +1900,7 @@
    presented=typeof savedSession.presented==='string'?savedSession.presented:null;
    sessionAttempts=Math.max(0,Number(savedSession.sessionAttempts)||0);sessionCorrect=Math.min(sessionAttempts,Math.max(0,Number(savedSession.sessionCorrect)||0));sessionAssisted=Math.min(sessionAttempts-sessionCorrect,Math.max(0,Number(savedSession.sessionAssisted)||0));
    draft=savedSession.draft&&Array.isArray(savedSession.draft.answers)?savedSession.draft:null;remediation=savedSession.remediation||null;
+   stageContext=P.normalizeStageContext?P.normalizeStageContext(savedSession.stageContext):null;
    topic=savedSession.topic;mode=savedSession.mode;sourceFilter=savedSession.sourceFilter||null;courseBlock=savedSession.courseBlock||null;hwLesson=savedSession.hwLesson||((mode==='homework'||savedSession.view==='homework')?savedSession.courseBlock||null:null);hwPart=savedSession.hwPart||null;hwSection=Math.max(0,Number(savedSession.hwSection)||0);activeLesson=mode==='lesson'?savedSession.activeLesson:null;
    activeStep=activeLesson?Math.min(window.LEARNING.lessons.find(l=>l.id===activeLesson).chunks.length-1,Math.max(0,Number(savedSession.activeStep)||0)):null;
    queue=savedSession.queue;practiceIds=Array.isArray(savedSession.practiceIds)?savedSession.practiceIds.filter(id=>byId.has(id)):[...new Set(queue)];

@@ -40,7 +40,132 @@
    out.queue=out.queue||[];
    out.position=Math.min(out.queue.length,Math.max(0,Number(out.position)||0));
    out.updatedAt=Math.max(0,Number(raw.updatedAt)||0);
+   const stage=normalizeStageContext(raw.stageContext);
+   if(stage)out.stageContext=stage;
    return out;
+ }
+ const STAGE_REVISION='t-integration-v1';
+ const STAGE_KINDS=new Set(['learning','repair','checkpoint']);
+ const stagePlans=Object.create(null);
+ function cleanToken(v,max){
+   if(typeof v!=='string'||!v.length||v.length>max||/[\s\u0000]/.test(v))return '';
+   return v;
+ }
+ function idList(raw,max){
+   if(!Array.isArray(raw))return [];
+   const out=[];
+   for(const id of raw){
+     const s=cleanToken(id,80);
+     if(!s||out.includes(s))continue;
+     out.push(s);
+     if(out.length>=max)break;
+   }
+   return out;
+ }
+ function normalizeStageContext(raw){
+   if(!obj(raw))return null;
+   const lessonId=cleanToken(raw.lessonId,20);
+   if(!validId(lessonId))return null;
+   const stageId=cleanToken(raw.stageId,80);
+   if(!/^[a-z0-9][a-z0-9_-]{0,79}$/.test(stageId))return null;
+   if(raw.contentRevision!==STAGE_REVISION)return null;
+   const coreIds=idList(raw.coreIds,24);
+   if(!coreIds.length)return null;
+   const kind=STAGE_KINDS.has(raw.kind)?raw.kind:'learning';
+   const nextStageId=cleanToken(raw.nextStageId,80);
+   const safeNext=/^[a-z0-9][a-z0-9_-]{0,79}$/.test(nextStageId)?nextStageId:null;
+   const ratio=Number(raw.minIndependentRatio);
+   return {
+     lessonId,
+     contentRevision:STAGE_REVISION,
+     stageId,
+     kind,
+     coreIds,
+     requiredIndependentIds:idList(raw.requiredIndependentIds,24).filter(id=>coreIds.includes(id)),
+     ruleIds:idList(raw.ruleIds,12),
+     nextStageId:safeNext,
+     minIndependentRatio:Number.isFinite(ratio)?Math.min(1,Math.max(0,ratio)):0.8,
+     maxPresentations:Math.min(24,Math.max(1,Math.floor(Number(raw.maxPresentations)||24))),
+     final:raw.final===true,
+     presentations:Math.max(0,Math.min(24,Math.floor(Number(raw.presentations)||0))),
+     limitReached:raw.limitReached===true
+   };
+ }
+ function stageCardId(ctx){return 'course-stage:'+ctx.lessonId+':'+ctx.stageId;}
+ function stageAnswers(events,ctx){
+   return (events||[]).filter(e=>e&&e.type==='answer'&&e.lesson_id===ctx.lessonId&&e.stage_id===ctx.stageId&&e.content_revision===ctx.contentRevision&&ctx.coreIds.includes(e.card_id));
+ }
+ function independentAnswer(e){
+   return !!(e&&e.correct&&!e.hinted&&!e.peek&&!e.rule_peek&&e.first_try_correct!==0);
+ }
+ function evaluateStage(events,ctx){
+   const stage=normalizeStageContext(ctx);
+   if(!stage)return {pass:false,attempted:[],independent:[],presentations:0,limitReached:false};
+   const answers=stageAnswers(events,stage);
+   const byCard=Object.create(null);
+   for(const e of answers){(byCard[e.card_id]||(byCard[e.card_id]=[])).push(e);}
+   const attempted=stage.coreIds.filter(id=>(byCard[id]||[]).length);
+   const independent=stage.coreIds.filter(id=>(byCard[id]||[]).some(independentAnswer));
+   const required=stage.requiredIndependentIds.length?stage.requiredIndependentIds:stage.coreIds;
+   const need=Math.ceil(stage.coreIds.length*stage.minIndependentRatio-1e-9);
+   let repeatCritical=false;
+   const fails=answers.filter(e=>!e.correct&&e.confusion_tag);
+   for(let i=1;i<fails.length;i++){
+     if(fails[i].card_id!==fails[i-1].card_id&&fails[i].confusion_tag===fails[i-1].confusion_tag)repeatCritical=true;
+   }
+   const pass=!stage.limitReached&&required.every(id=>independent.includes(id))&&independent.length>=need&&!repeatCritical;
+   return {pass,attempted,independent,presentations:answers.length,limitReached:!!stage.limitReached,need};
+ }
+ function lessonStatusAfterStage(status,ctx,report){
+   if(status==='completed')return 'completed';
+   if(report&&report.pass&&ctx&&ctx.final)return 'completed';
+   return 'in_progress';
+ }
+ function pushStageCompletion(events,ctx,evidenceIds,at){
+   const stage=normalizeStageContext(ctx);
+   if(!stage)return null;
+   const card=stageCardId(stage);
+   if((events||[]).some(e=>e&&e.type==='course_stage_completed'&&e.card_id===card&&e.content_revision===stage.contentRevision))return null;
+   return {
+     id:'stage:'+stage.lessonId+':'+stage.stageId+':'+stage.contentRevision,
+     type:'course_stage_completed',
+     card_id:card,
+     at:Number(at)||Date.now(),
+     lesson_id:stage.lessonId,
+     stage_id:stage.stageId,
+     content_revision:stage.contentRevision,
+     evidence_ids:(evidenceIds||[]).filter(id=>typeof id==='string').slice(0,24)
+   };
+ }
+ function dedupeStageEvents(events){
+   const seen=new Set(),out=[];
+   for(const e of [...(events||[])].sort((a,b)=>(a.at||0)-(b.at||0))){
+     if(e&&e.type==='course_stage_completed'){
+       const key=String(e.card_id)+'|'+String(e.content_revision||'');
+       if(seen.has(key))continue;
+       seen.add(key);
+     }
+     out.push(e);
+   }
+   return out;
+ }
+ function registerStages(lessonId,stages){
+   if(!validId(lessonId)||!Array.isArray(stages))return [];
+   stagePlans[lessonId]=stages.map(normalizeStageContext).filter(Boolean);
+   return stagePlans[lessonId].slice();
+ }
+ function stageDone(events,stage){
+   const card=stageCardId(stage);
+   return (events||[]).some(e=>e&&e.type==='course_stage_completed'&&e.card_id===card&&e.content_revision===stage.contentRevision);
+ }
+ function nextRegistered(lessonId,events){
+   const list=stagePlans[lessonId];
+   if(!list||!list.length)return null;
+   return list.find(stage=>!stageDone(events,stage))||null;
+ }
+ function unknownQueueIds(queue,known){
+   const has=known&&typeof known.has==='function'?id=>known.has(id):(set=>id=>set.has(id))(new Set(known||[]));
+   return (queue||[]).filter(id=>typeof id!=='string'||!has(id));
  }
  function normalizeLesson(raw){
    const out=emptyLesson();if(!obj(raw))return out;
@@ -158,6 +283,6 @@
    if(!validId(out.resumePointer.lessonId))out.resumePointer={lessonId:fallbackId(out.lessons),surface:'path',updatedAt:0};
    return out;
  }
- const api={courseIds,validId,empty,emptyLesson,normalizePath,normalizePractice,migrate,ensure,ensureLesson,setResume,markStarted,markCompleted,savePath,savePractice,clearPractice,merge};
+ const api={courseIds,validId,empty,emptyLesson,normalizePath,normalizePractice,normalizeStageContext,evaluateStage,lessonStatusAfterStage,pushStageCompletion,dedupeStageEvents,registerStages,nextRegistered,unknownQueueIds,STAGE_REVISION,migrate,ensure,ensureLesson,setResume,markStarted,markCompleted,savePath,savePractice,clearPractice,merge};
  if(node)module.exports=api;else root.CourseProgress=api;
 })(typeof window!=='undefined'?window:globalThis);
