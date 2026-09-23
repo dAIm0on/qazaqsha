@@ -82,7 +82,12 @@
   function numbersMarkup(){
     const bridge=window.TrainerCatalogBridge;
     const tracks=bridge&&bridge.numberTracks?bridge.numberTracks():[];
-    const rows=tracks.map((item,i)=>'<article class="personal-trainer-card"><div><p class="eyebrow">СТУПЕНЬ '+(i+1)+'</p><h2>'+esc(item.title)+'</h2><p class="small">'+(item.open?'Доступно по текущему прогрессу':'Сначала закрепи предыдущую ступень')+'</p></div><div class="personal-trainer-actions"><button type="button" class="primary-button" data-number-track="'+esc(item.id)+'"'+(item.open?'':' disabled')+'>'+(item.open?'Открыть':'Пока закрыто')+'</button></div></article>').join('');
+    const rows=tracks.map((item,i)=>{
+      const live=bridge&&bridge.status?bridge.status('number:'+item.id):null;
+      const hint=live?('В процессе · осталось '+live.remaining+' из '+live.total):(item.open?'Доступно по текущему прогрессу':'Сначала закрепи предыдущую ступень');
+      const label=live?'Продолжить':(item.open?'Открыть':'Пока закрыто');
+      return '<article class="personal-trainer-card"><div><p class="eyebrow">СТУПЕНЬ '+(i+1)+'</p><h2>'+esc(item.title)+'</h2><p class="small">'+esc(hint)+'</p></div><div class="personal-trainer-actions"><button type="button" class="primary-button" data-number-track="'+esc(item.id)+'"'+(item.open?'':' disabled')+'>'+label+'</button></div></article>';
+    }).join('');
     return '<div class="personal-trainer-head"><button type="button" class="text-button" data-back-catalog>← Все тренажёры</button><div><p class="eyebrow">ЧИСЛА</p><h2>Лестница чисел</h2><p class="small">Используется существующий NumberLadder. Закрытые ступени не обходятся.</p></div></div><div class="personal-trainer-list">'+rows+'</div>';
   }
   function stageIntro(session){
