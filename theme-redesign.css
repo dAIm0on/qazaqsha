@@ -794,6 +794,11 @@ html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
 .cat-summary strong{font-size:1.6rem}
 .cat-summary span{font-size:.8rem;color:var(--muted)}
 .cat-stage-card > .primary-button{margin-top:12px}
+/* K2.1 mobile Gate 9: keep personal heading + Next above bottom nav without sitewide overflow:hidden */
+#personal-view .section-heading{flex-wrap:wrap;align-items:flex-start;gap:12px 16px}
+#personal-view .section-heading > div{min-width:0;flex:1 1 12rem}
+#personal-view .section-heading > .text-button{flex:0 0 auto;max-width:100%}
+
 @media(max-width:690px){
   #personal-content{max-width:none}
   .cat-trainer-hero{grid-template-columns:1fr 84px;padding:16px}
@@ -806,4 +811,6 @@ html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
   .cat-choice-grid{grid-template-columns:1fr}
   .cat-summary{grid-template-columns:1fr}
   .personal-trainer-head{grid-template-columns:1fr}
+  #personal-view .cat-stage-card{padding-bottom:calc(18px + var(--bottom-nav-height,64px))}
+  #personal-view #personal-content{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
 }
