@@ -20,7 +20,7 @@
  };
  function forRule(id){
   const rows=(MAP[id]||[]).map(row=>Object.assign({},row));
-  if(id==='T21_POSS_ASSIM'&&rows[0])rows[0].note=(rows[0].note?rows[0].note+' ':'')+'Ключи оқушысым и доссы и формулировка T21 спорны, не исправлять.';
+  if(id==='T21_POSS_ASSIM'&&rows[0])rows[0].note=(rows[0].note?rows[0].note+' ':'')+'Активный ключ: менің оқушым, оның досы. Формы оқушысым и доссы не принимаются. Старый PDF-ключ в ответ не копируется.';
   return rows;
  }
  const api={forRule,MAP};

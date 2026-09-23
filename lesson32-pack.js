@@ -63,9 +63,9 @@
  ];
 
  const SESSION_C=[
-  field({id:'p3-32-c-g2-dos',order:1,session:'C',title:'Сендердің: всегда «много»',stimulus:'Сендердің + дос → ?',
+  field({id:'p3-32-c-g2-dos',order:1,session:'C',title:'Сендердің: в модели урока «много»',stimulus:'Сендердің + дос → ?',
    answers:['достарың','сендердің достарың'],rule:'T25_POSS_SENDER',error_type:'POSS_2PL_NO_PL',
-   explanation:'Сендердің достарың. Не *досың. «Много» всегда.'}),
+   explanation:'Сендердің достарың. Не *досың. В модели этого урока сначала «много».'}),
   field({id:'p3-32-c-g2-kol',order:2,session:'C',title:'Сендердің: руки',stimulus:'Сендердің + қол → ?',
    answers:['қолдарың','сендердің қолдарың'],rule:'T25_POSS_SENDER',error_type:'POSS_2PL_NO_PL',
    explanation:'Пилот круга C: сендердің қолдарың, не қолың. Тело не исключение.'}),
@@ -131,13 +131,13 @@
  const SESSION_G=[
   field({id:'p3-32-g-g2-myna',order:1,session:'G',title:'Указательные: при слове',stimulus:'эта книга хорошая → ?',
    answers:['мына кітап жақсы','осы кітап жақсы'],rule:'T27_DEIXIS',error_type:'DEIXIS_BARE',
-   explanation:'мына кітап жақсы / осы кітап жақсы. *мына — кітап нельзя.'}),
+   explanation:'мына кітап жақсы / осы кітап жақсы. *мына — кітап в упражнении не принимается. Сол кітап тренируем так же, при слове.'}),
   field({id:'p3-32-g-g2-mynau',order:2,session:'G',title:'Указательные: одно',stimulus:'это — книга (рядом) → ?',
    answers:['мынау — кітап','бұл — кітап','мынау кітап','бұл кітап'],rule:'T27_DEIXIS',error_type:'DEIXIS_BARE',
-   explanation:'мынау / бұл могут стоять одни. *мына — кітап нельзя.'}),
+   explanation:'мынау / бұл могут стоять одни. *мына — кітап в упражнении не принимается. Самостоятельные осы и сол в языке не запрещаем.'}),
   field({id:'p3-32-g-g6-bare',order:3,session:'G',title:'Исправь голое мына',stimulus:'мына — кітап',
    answers:['мына кітап','мынау — кітап','мынау кітап'],rule:'T27_DEIXIS',error_type:'DEIXIS_BARE',
-   explanation:'мына живёт только при существительном. Нужно мына кітап или мынау — кітап.'}),
+   explanation:'В модели урока мына пишем при слове. Нужно мына кітап или мынау — кітап. Осы кітап и сол кітап — те же учебные формы при слове.'}),
   field({id:'p3-32-g-g5-bar',order:4,session:'G',title:'Recycle 3-1: бар ма',stimulus:'У нас есть машина? → ?',
    answers:['біздің көлігіміз бар ма','көлігіміз бар ма'],rule:['T24_POSS_BIZ','T22_BAR_ZHOK'],error_type:'bar_zhok_choice',
    explanation:'біздің көлігіміз бар ма. Бар/жоқ не новая глава 3-2.'}),

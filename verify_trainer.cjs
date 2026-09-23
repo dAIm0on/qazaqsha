@@ -2045,7 +2045,8 @@ assert.ok(String(BankRead.byId('T20_POSS').medium).length<500);
 assert.ok(String(BankRead.byId('T24_POSS_BIZ').medium).length<500);
 assert.equal(Full.forRule('T1_HARMONY').length,0);
 const t21note=Full.forRule('T21_POSS_ASSIM');
-assert.ok(/не исправлять/.test(t21note[0].note));
+assert.ok(/менің оқушым/.test(t21note[0].note)&&/оның досы/.test(t21note[0].note));
+assert.ok(/не принимаются/.test(t21note[0].note)&&/оқушысым/.test(t21note[0].note)&&/доссы/.test(t21note[0].note));
 ok('Astra step 18: 3-1 and 3-2 show the lesson files, not the short bank card');
 
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));
