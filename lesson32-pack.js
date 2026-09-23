@@ -44,7 +44,7 @@
    explanation:'Перед гласной наклейкой к озвончается: көлігіміз, не *көлікіміз.'}),
   field({id:'p3-32-a-g6-sumiz',order:8,title:'Исправь стык',stimulus:'біздің суміз',
    answers:['біздің суымыз','суымыз'],rule:'T24_POSS_BIZ',error_type:'POSS_GLIDE',
-   explanation:'У — согласный. Нужна связка ы: суымыз, не *суміз.'})
+   explanation:'Нужна полная связка: суымыз, не *суміз.'})
  ];
 
  const SESSION_B=[
@@ -182,6 +182,97 @@
   for(const q of grammarQuestions()){if(known.has(q.id))continue;course.questions.push(clone(q));known.add(q.id);added.push(q.id);}
   return added;
  }
+ const CP=node?require('./course-progress.js'):root.CourseProgress;
+ const REV='t-integration-v1';
+ const RULES=['T24_POSS_BIZ','T25_POSS_SENDER','T26_POSS_OLAR','T27_DEIXIS'];
+ const SPEC=[
+  ['32-biz-basic','T24_POSS_BIZ',['p3-32-a-g2-ake','p3-32-a-g2-ui','p3-32-a-g2-bala','p3-32-a-g6-ake'],['p3-32-a-g2-ake']],
+  ['32-biz-assim','T24_POSS_BIZ',['p3-32-a-g2-kolik','p3-32-a-g2-mektep','p3-32-a-g6-kolikimiz','p3-32-a-g6-sumiz','p3-32-b-g2-kitap','p3-32-b-g6-order'],['p3-32-b-g2-kitap','p3-32-a-g2-kolik']],
+  ['32-body','T24_POSS_BIZ',['p3-32-b-g2-bas','p3-32-b-g2-ayak','transfer:T24_POSS_BIZ:дос'],['p3-32-b-g2-bas']],
+  ['32-sender','T25_POSS_SENDER',['p3-32-c-g2-dos','p3-32-c-g2-kol','p3-32-c-g2-ata','p3-32-c-g6-kolyn','p3-32-c-g6-dosyn'],['p3-32-c-g2-kol']],
+  ['32-sizder','T25_POSS_SENDER',['p3-32-d-g2-bastyk','p3-32-d-g2-kol','p3-32-d-g6-aken','p3-32-d-g6-balanyzdar'],['p3-32-d-g2-bastyk']],
+  ['32-olar','T26_POSS_OLAR',['p3-32-e-g2-ini','p3-32-e-g2-bala','p3-32-e-g2-kolik','p3-32-e-g2-qala','p3-32-e-g6-ini'],['p3-32-e-g2-ini']],
+  ['32-readings','T25_POSS_SENDER',['p3-32-f-g4-atalaryn','p3-32-f-g4-dostaryn','p3-32-f-g4-qalasy'],['p3-32-f-g4-atalaryn','p3-32-f-g4-dostaryn','p3-32-f-g4-qalasy']],
+  ['32-deixis','T27_DEIXIS',['p3-32-g-g2-myna','p3-32-g-g2-mynau','p3-32-g-g6-bare','p3-32-g-g5-bar','p3-32-g-g5-bar2'],['p3-32-g-g2-myna']],
+  ['32-mix','T24_POSS_BIZ',['p3-32-a-g2-ake','p3-32-c-g2-kol','p3-32-e-g2-ini','p3-32-g-g2-myna','p3-32-x-g6-korshisin','p3-32-x-g6-aganiz','phrase:3-2:kk-ru:01','phrase:3-2:kk-ru:07','phrase:3-2:ru-kk:13','phrase:3-2:ru-kk:17'],['p3-32-a-g2-ake','p3-32-c-g2-kol','p3-32-e-g2-ini','p3-32-g-g2-myna']]
+ ];
+ function fullPlan(row){
+  const [stageId,rule,coreIds,required]=row;
+  return {
+   lessonId:'3-2',contentRevision:REV,stageId,kind:'learning',
+   coreIds:coreIds.slice(),requiredIndependentIds:required.slice(),ruleIds:[rule],
+   nextStageId:null,minIndependentRatio:0.8,maxPresentations:24,
+   final:stageId==='32-mix',presentations:0,limitReached:false
+  };
+ }
+ function stagePlans(){
+  const rows=SPEC.map(fullPlan);
+  rows.forEach((plan,i)=>{plan.nextStageId=rows[i+1]?rows[i+1].stageId:null;});
+  return rows;
+ }
+ function stagePlan(stageId){return stagePlans().find(plan=>plan.stageId===stageId)||null;}
+ function stageSession(stageId){
+  const plan=stagePlan(stageId);
+  return plan?plan.coreIds.map(byId).filter(Boolean):[];
+ }
+ function closed(events,stageId){
+  return (events||[]).some(e=>e&&e.type==='course_stage_completed'&&e.lesson_id==='3-2'&&e.content_revision===REV&&(e.stage_id===stageId||e.stage_id===stageId+'-fix'));
+ }
+ function tried(events,stageId){
+  return (events||[]).some(e=>e&&e.type==='answer'&&e.lesson_id==='3-2'&&e.stage_id===stageId&&e.content_revision===REV);
+ }
+ function transferId(rule){
+  const root={T24_POSS_BIZ:'дос',T25_POSS_SENDER:'қала',T26_POSS_OLAR:'дос',T27_DEIXIS:'осы'}[rule]||'дос';
+  return 'transfer:'+rule+':'+root;
+ }
+ function fixPlan(full,events){
+  const report=CP&&CP.evaluateStage?CP.evaluateStage(events,full):{independent:[]};
+  const missed=full.requiredIndependentIds.filter(id=>!(report.independent||[]).includes(id));
+  const core=(missed.length?missed:full.requiredIndependentIds).slice(0,2);
+  return {
+   lessonId:'3-2',contentRevision:REV,stageId:full.stageId+'-fix',kind:'repair',
+   coreIds:core,requiredIndependentIds:core.slice(),ruleIds:full.ruleIds.slice(),
+   nextStageId:full.nextStageId,minIndependentRatio:1,maxPresentations:24,
+   final:full.final,presentations:0,limitReached:false,
+   remediationIds:[transferId(full.ruleIds[0])]
+  };
+ }
+ function nextStage(events){
+  const plans=stagePlans();
+  for(const plan of plans){
+   if(closed(events,plan.stageId))continue;
+   const report=CP&&CP.evaluateStage?CP.evaluateStage(events,plan):{pass:false};
+   if(report.pass)continue;
+   if(!tried(events,plan.stageId))return plan;
+   return fixPlan(plan,events);
+  }
+  return plans[plans.length-1];
+ }
+ function courseSession(records,opts){
+  void records;
+  const events=opts&&opts.events||[];
+  const stage=nextStage(events);
+  const remediationIds=(stage.remediationIds||[]).filter(id=>!stage.coreIds.includes(id)).slice(0,3);
+  const clean=Object.assign({},stage);
+  delete clean.remediationIds;
+  return {stage:clean,cards:clean.coreIds.map(byId).filter(Boolean),coreIds:clean.coreIds.slice(),remediationIds};
+ }
+ function transferRule(opts){
+  const stageId=opts&&opts.stageId||'';
+  const parent=String(stageId).replace(/-fix$/,'');
+  const row=SPEC.find(item=>item[0]===parent);
+  if(row)return row[1];
+  const events=(opts&&opts.events)||[];
+  const tally=Object.create(null);
+  for(const e of events){
+   if(!e||e.type!=='answer'||e.lesson_id!=='3-2'||e.correct)continue;
+   const q=byId(e.card_id);
+   const rule=q&&q.ruleIds&&q.ruleIds.find(id=>RULES.includes(id));
+   if(rule)tally[rule]=(tally[rule]||0)+1;
+  }
+  const weakest=RULES.slice().sort((a,b)=>(tally[b]||0)-(tally[a]||0)||RULES.indexOf(a)-RULES.indexOf(b))[0];
+  return (tally[weakest]||0)>0?weakest:'T24_POSS_BIZ';
+ }
  function check(cardOrId,answer){
   const q=typeof cardOrId==='string'?byId(cardOrId):clone(cardOrId);
   if(!q||!core||!core.evaluate)throw new Error('Lesson 3-2 pack unavailable');
@@ -191,6 +282,6 @@
   return {question:q,result,errors};
  }
 
- const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,SESSION_E,SESSION_F,SESSION_G,SESSION_H,ERROR_PACK,sessionA,sessionB,sessionC,sessionD,sessionE,sessionF,sessionG,sessionH,errorPack,defaultSession,lessonSession,grammarQuestions,all,byId,check,install};
+ const api={SESSION_A,SESSION_B,SESSION_C,SESSION_D,SESSION_E,SESSION_F,SESSION_G,SESSION_H,ERROR_PACK,sessionA,sessionB,sessionC,sessionD,sessionE,sessionF,sessionG,sessionH,errorPack,defaultSession,lessonSession,grammarQuestions,all,byId,check,install,stagePlan,stagePlans,stageSession,nextStage,courseSession,transferRule};
  if(node)module.exports=api;else root.Lesson32Pack=api;
 })(typeof window!=='undefined'?window:globalThis);

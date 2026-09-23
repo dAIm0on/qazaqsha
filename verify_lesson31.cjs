@@ -135,6 +135,7 @@ const app = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
 const start = app.slice(app.indexOf('function startCourse'), app.indexOf('function startTransfer'));
 assert.ok(start.indexOf('restoreLessonPractice(block)') < start.indexOf('courseSession'));
 assert.ok(start.includes('lessonSession'));
+assert.ok(start.includes('beginPacked'));
 assert.equal(Progress.STAGE_REVISION, 't-integration-v1');
 assert.equal(typeof Progress.registerStages, 'function');
 ok('explanations name the owner table, and the saved queue still comes before a new 3-1 stage');
