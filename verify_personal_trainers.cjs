@@ -100,10 +100,11 @@ test('K2.1-12 default full rounds stay short while full banks remain available',
   for(const word of ['кітап','мұғалім','заңгер','мұхит','ит','ми','су','сүю'])assert.ok(words.some(x=>x.word===word&&x.type==='choice'));
 });
 
-test('K2.1-13 dashboard contains separate Cat Trainer action',()=>{
+test('K2.1-13 dashboard exposes the shared trainer catalog',()=>{
   const d=fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8');
   assert.ok(d.includes('data-action="personal-trainers"'));
-  assert.ok(d.includes('Тренажёр кота'));
+  assert.ok(d.includes('<span>Тренажёры</span>'));
+  assert.ok(d.includes('Буквы · числа · слова'));
 });
 
 test('K2.1-14 standalone view and scripts are wired without adding a nav tab',()=>{
@@ -129,6 +130,42 @@ test('K2.1-16 service worker caches both standalone trainer files',()=>{
   assert.ok(sw.includes('"harmony-letter-trainer.js"'));
   assert.ok(sw.includes('"personal-trainers.js"'));
   assert.ok(sw.includes('20260923-cat-trainer'));
+});
+
+
+test('K2.1-17 catalog reuses existing trainer engines instead of copying them',()=>{
+  const personal=fs.readFileSync(path.join(__dirname,'personal-trainers.js'),'utf8');
+  assert.ok(personal.includes("id:'harmony_letters'"));
+  assert.ok(personal.includes("id:'numbers'"));
+  assert.ok(personal.includes("target:'vocab:must'"));
+  assert.ok(personal.includes("target:'vocab:used'"));
+  assert.ok(personal.includes('window.TrainerCatalogBridge'));
+  assert.equal(/window\.WORD_BANK\s*=|window\.NumberLadder\s*=/.test(personal),false);
+});
+
+test('K2.1-18 encountered-word trainer mixes both directions in one queue',()=>{
+  const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+  const personal=fs.readFileSync(path.join(__dirname,'personal-trainers.js'),'utf8');
+  assert.ok(app.includes("kind==='vocab:used'?'used':'must'"));
+  assert.ok(app.includes("q.topic==='vocab'&&q.wordRole===role"));
+  assert.ok(app.includes('shuffled(list)'));
+  assert.ok(personal.includes('Узнать и написать вперемешку в одном подходе'));
+  assert.equal(personal.includes('vocab_seen_write'),false);
+});
+
+test('K2.1-19 number catalog preserves NumberLadder gating',()=>{
+  const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+  assert.ok(app.includes('window.NumberLadder&&window.NumberLadder.ORDER'));
+  assert.ok(app.includes('window.NumberLadder.allowed(q,state)'));
+  assert.ok(app.includes("startLesson(String(kind).slice(7),0,{voluntary:true})"));
+});
+
+test('K2.1-20 trainer-origin sessions return to catalog and survive session save',()=>{
+  const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+  assert.ok(app.includes('trainerReturn'));
+  assert.ok(app.includes("trainerReturn=savedSession.trainerReturn||null"));
+  assert.ok(app.includes("К тренажёрам"));
+  assert.ok(app.includes("showView(trainerReturn?'personal'"));
 });
 
 console.log('\nK2.1 verify PASS:',passed,'tests');
