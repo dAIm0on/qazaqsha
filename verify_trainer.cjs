@@ -1098,11 +1098,11 @@ ok('Phase 2B G3: directed production uses only open lesson grammar and local che
 
 
 const g4All=P2BG1.allG4();
-assert.equal(g4All.length,6);
+assert.equal(g4All.length,10);
 assert.ok(g4All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G4'&&q.phase2b.recognition));
 assert.equal(P2BG1.cardsFor('2-1','G4').length,0);
 assert.equal(P2BG1.cardsFor('2-2','G4').length,0);
-assert.equal(P2BG1.cardsFor('2-3','G4').length,0);
+assert.equal(P2BG1.cardsFor('2-3','G4').length,4);
 assert.ok(P2BG1.checkTask('p2b-12-g4-girls','девушки').result.correct);
 assert.ok(P2BG1.checkTask('p2b-12-g4-girls','девочки').result.correct);
 const g4LandBad=P2BG1.checkTask('p2b-12-g4-lands','земля');
@@ -1115,12 +1115,12 @@ ok('Phase 2B G4: KK→RU/number recognition uses explicit accepted variants');
 
 
 const g5All=P2BG1.allG5();
-assert.equal(g5All.length,4);
+assert.equal(g5All.length,8);
 assert.ok(g5All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G5'&&q.phase2b.transform));
 assert.equal(P2BG1.cardsFor('1-1','G5').length,0);
 assert.equal(P2BG1.cardsFor('1-2','G5').length,0);
 assert.equal(P2BG1.cardsFor('1-3','G5').length,0);
-assert.equal(P2BG1.cardsFor('2-3','G5').length,0);
+assert.equal(P2BG1.cardsFor('2-3','G5').length,4);
 assert.ok(P2BG1.checkTask('p2b-21-g5-neg-qyz','Қыз емеспін').result.correct);
 const g5NegBad=P2BG1.checkTask('p2b-21-g5-neg-qyz','Қыз емесбін');
 assert.ok(g5NegBad.errors.some(e=>e.error_type==='emes_position'));

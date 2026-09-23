@@ -29,6 +29,30 @@
    if(!out.length&&e.length===a.length){const diff=[...e].map((c,i)=>[c,a[i]]).filter(([x,y])=>x!==y);if(diff.length===1&&['ыі','ұү','кқ','гғ','нң','аә','оө','иі'].some(pair=>diff[0].every(x=>pair.includes(x))))out.push('letter_confusion');}
    return out.length?out:[q.topic==='vocab'?'lexical_retrieval':'unclassified'];
  }
+ const MICRO={
+  person_sg_initial:{item_id:'rule:person',skill_type:'sg_initial'},
+  person_marker_missing:{item_id:'rule:person',skill_type:'marker_presence'},
+  person_sen_siz:{item_id:'rule:person',skill_type:'sen_siz'},
+  person_biz_initial:{item_id:'rule:person-pl',skill_type:'biz_initial'},
+  plural_on_predicate:{item_id:'rule:person-pl',skill_type:'no_extra_plural'},
+  emes_position:{item_id:'rule:person-neg',skill_type:'position'},
+  question_particle_missing:{item_id:'rule:person-q',skill_type:'presence'},
+  question_class:{item_id:'rule:person-q',skill_type:'class'}
+ };
+ function microBinding(error_type){
+  const row=MICRO[error_type];
+  return row?{item_id:row.item_id,skill_type:row.skill_type}:null;
+ }
+ function ordinalSkill(stimulus,answers){
+  const stim=String(stimulus||'');
+  const ans=Array.isArray(answers)?answers.join(' '):String(answers||'');
+  const blob=stim+' '+ans;
+  if(/жиырмасыншы/.test(ans)&&!/бірінші|екінші/.test(ans))return 'exception_20';
+  if(/жиырма\s+бірінші|он\s+екінші|қырық\s+бірінші/.test(blob))return 'last_component';
+  if(/[мс]ін$|сыңдар|сіздер|мын$/.test(core.normalize(ans))&&/інші|ыншы|нші|ншы/.test(ans))return 'application';
+  if(/\s/.test(stim)&&/інші|ыншы|ншы|нші/.test(ans))return 'last_component';
+  return 'suffix_family';
+ }
  function skillTag(error_type,q,expected,actual){
   if(error_type==='number_confusion'){
     const blob=(expected||'')+' '+(actual||'');
@@ -196,5 +220,5 @@
   if(kind==='first-try'||kind==='peek-rate'||kind==='transfer-rate')return kind+' '+value;
   return String(value||'');
  }
- const api={classify,diagnose,labels,skillTag,line,pauseLine,SKILL};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.ErrorDiagnostics=api;
+ const api={classify,diagnose,labels,skillTag,line,pauseLine,SKILL,MICRO,microBinding,ordinalSkill};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.ErrorDiagnostics=api;
 })(typeof window!=='undefined'?window:globalThis);

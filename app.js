@@ -1266,18 +1266,34 @@
        const local=hintLine();
        showPathFb('hinted','<p>'+esc(local)+'</p>');
      };
-     const pathSkillFor=(errorType,errorKey)=>{
+     const pathSkillFor=(errorType,errorKey,beat)=>{
        const known={
          vowel_harmony:{item_id:'rule:plural',skill_type:'harmony'},
          plural_initial_consonant:{item_id:'rule:plural',skill_type:'initial_consonant'},
          plural_after_numeral:{item_id:'rule:plural',skill_type:'plural_suppression'},
-         emes_position:{item_id:'rule:emes',skill_type:'application'},
          ordinal_20:{item_id:'rule:ordinal',skill_type:'exception_20'},
-         person_sen_siz:{item_id:'rule:person',skill_type:'application'},
          harmony:{item_id:'rule:plural',skill_type:'harmony'},
          junction_ldt:{item_id:'rule:plural',skill_type:'initial_consonant'},
-         quantity:{item_id:'rule:plural',skill_type:'plural_suppression'}
+         quantity:{item_id:'rule:plural',skill_type:'plural_suppression'},
+         ol_no_ending:{item_id:'rule:T9_OL',skill_type:'application'},
+         ba_me:{item_id:'rule:T10_QUESTION',skill_type:'application'},
+         chunk_address:{item_id:'rule:farewell',skill_type:'application'},
+         person_sg_initial:{item_id:'rule:person',skill_type:'sg_initial'},
+         person_marker_missing:{item_id:'rule:person',skill_type:'marker_presence'},
+         person_sen_siz:{item_id:'rule:person',skill_type:'sen_siz'},
+         person_biz_initial:{item_id:'rule:person-pl',skill_type:'biz_initial'},
+         plural_on_predicate:{item_id:'rule:person-pl',skill_type:'no_extra_plural'},
+         extra_plural:{item_id:'rule:person-pl',skill_type:'no_extra_plural'},
+         emes_position:{item_id:'rule:person-neg',skill_type:'position'},
+         question_particle_missing:{item_id:'rule:person-q',skill_type:'presence'},
+         question_class:{item_id:'rule:person-q',skill_type:'class'}
        };
+       if(errorType==='ordinal_20')return known.ordinal_20;
+       if(errorKey==='ordinal'||errorType==='ordinal'){
+         const blob=[beat&&beat.prompt,beat&&beat.answer,beat&&beat.stem].filter(Boolean).join(' ');
+         const skill=window.ErrorDiagnostics&&window.ErrorDiagnostics.ordinalSkill?window.ErrorDiagnostics.ordinalSkill(blob,''):'suffix_family';
+         return {item_id:'rule:ordinal',skill_type:skill};
+       }
        return known[errorType]||known[errorKey]||null;
      };
      const commitPath=(ok,peeked,val)=>{
@@ -1288,7 +1304,7 @@
        const binds=[];
        const seenBind=new Set();
        for(const err of diagErrors){
-         const b=pathSkillFor(err.error_type,beat.error_key);
+         const b=pathSkillFor(err.error_type,beat.error_key,beat);
          if(!b)continue;
          const k=b.item_id+'::'+b.skill_type;
          if(seenBind.has(k))continue;
@@ -1296,8 +1312,11 @@
          binds.push({item_id:b.item_id,skill_type:b.skill_type,field:0,facet:null});
        }
        if(!binds.length){
-         const b=pathSkillFor('',beat.error_key);
+         const b=pathSkillFor('',beat.error_key,beat);
          if(b)binds.push({item_id:b.item_id,skill_type:b.skill_type,field:0,facet:null});
+       }
+       if(binds.some(b=>b.item_id==='rule:person-neg'&&b.skill_type==='position')&&!binds.some(b=>b.item_id==='rule:emes'&&b.skill_type==='application')){
+         binds.push({item_id:'rule:emes',skill_type:'application',field:0,facet:null});
        }
        qPath.skillBindings=binds;
        let skills=[];
