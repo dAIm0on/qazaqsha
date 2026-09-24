@@ -7,6 +7,7 @@
  const phase2b=node?require('./phase2b-practice.js'):root.Phase2BPractice;
  const lesson31Homework=node?require('./lesson31-homework.js'):root.Lesson31Homework;
  const lesson32Homework=node?require('./lesson32-homework.js'):root.Lesson32Homework;
+ const lesson33Homework=node?require('./lesson33-homework.js'):root.Lesson33Homework;
  const explainNode=node?require('./explain-bank.js'):null;
  function explainBank(){return explainNode||root.ExplainBank||null;}
  const DAY=86400000;
@@ -32,9 +33,10 @@
    '2-2':'https://batylbol.kz/test/LichnyeLitso1-2.html',
    '2-3':['https://batylbol.kz/test/Lichnye.html','https://batylbol.kz/test/VoprositelnyeChastitsy.html'],
    '3-1':'https://batylbol.kz/test/PrityazhEdChislo.html',
-   '3-2':'https://batylbol.kz/test/Prityazh.html'
+   '3-2':'https://batylbol.kz/test/Prityazh.html',
+   '3-3':'https://batylbol.kz/test/LichPrityazh.html'
  };
- const EXTRAS={'1-1':['keyboard','cheat'],'1-2':['keyboard'],'1-3':[],'2-1':[],'2-2':[],'2-3':[],'3-1':[],'3-2':[]};
+ const EXTRAS={'1-1':['keyboard','cheat'],'1-2':['keyboard'],'1-3':[],'2-1':[],'2-2':[],'2-3':[],'3-1':[],'3-2':[],'3-3':[]};
  const WORD_LEMMAS={
    '1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],
    '1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],
@@ -43,7 +45,8 @@
    '2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз','сау бол','сау болыңдар','сау болыңыз','сау болыңыздар'],
    '2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам','ми','аю','менің','сенің','сіздің','оның','бар','жоқ'],
    '3-1':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','жүрек','сақал','мысық','таз','тақырбас','қатты','саусақ','кім','не','қандай','қай','нешінші','бұл'],
-   '3-2':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','бұл','мынау','осы','мына','анау','ана','ол','сол','сынып','сыныптас','отбасы','баба','іс','аяқ','кім','не','қандай','қай','нешінші']
+   '3-2':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','бұл','мынау','осы','мына','анау','ана','ол','сол','сынып','сыныптас','отбасы','баба','іс','аяқ','кім','не','қандай','қай','нешінші'],
+   '3-3':['келу','кету','кіру','шығу','іздеу','табу','асығу','кешігу','жұмыс істеу','жазу','сөйлеу','алу','беру','көру','қарау']
  };
  function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
  function bySource(questions,source){return (questions||[]).filter(q=>q&&q.source===source&&q.id);}
@@ -106,7 +109,7 @@
    return [...ru,...kk].filter(q=>!/-rev$/.test(q.id));
  }
  function methodSource(lessonId,course){
-   const key={ '1-1':'m1','1-2':'m2','1-3':'m3','2-1':'m21','2-2':'m22','2-3':'m23','3-1':'m31','3-2':'m32' }[lessonId];
+   const key={ '1-1':'m1','1-2':'m2','1-3':'m3','2-1':'m21','2-2':'m22','2-3':'m23','3-1':'m31','3-2':'m32','3-3':'m33' }[lessonId];
    const s=course&&course.sources&&course.sources[key];
    return s?{title:s.title,url:s.url}:{title:'Методичка '+lessonId,url:''};
  }
@@ -122,6 +125,17 @@
    return orderedWords((questions||[]).filter(q=>lemmas.has(vocabLemma(q))));
  }
  function buildPack(lessonId,questions,course,opts={}){
+   if(lessonId==='3-3'&&lesson33Homework){
+     const spec=lesson33Homework.build({events:opts.events||[]});
+     const qById=new Map((questions||[]).map(q=>[q.id,q]));
+     const pack33=node?require('./lesson33-pack.js'):root.Lesson33Pack;
+     const present=id=>qById.has(id)||!!(pack33&&pack33.byId&&pack33.byId(id));
+     const words=(questions||[]).filter(q=>q&&q.lessonId==='3-3'&&q.topic==='vocab');
+     const method=methodSource(lessonId,course);
+     const exercise_ids=(spec.item_ids||[]).filter(present);
+     const missing_ids=(spec.item_ids||[]).filter(id=>!present(id));
+     return {lesson_id:'3-3',homework:{title:spec.title,word_ids:(spec.target_vocabulary||[]).map(w=>w.id),exercise_ids,missing_ids,word_question_ids:words.map(q=>q.id),rule_map:{...spec.rule_map},external_test_url:spec.external_test_url,external_tests:[spec.external_test_url],checklist:['method','exercises','words','external_test'],extras:[],method_title:method.title,method_url:method.url}};
+   }
    if(lessonId==='3-2'&&lesson32Homework){
      const spec=lesson32Homework.build({sessionHUnlocked:!!opts.sessionHUnlocked});
      const qById=new Map((questions||[]).map(q=>[q.id,q]));
@@ -168,7 +182,7 @@
    };
  }
  function packs(questions,course,opts={}){
-   return ['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2'].map(id=>buildPack(id,questions,course,opts)).filter(p=>p.homework.exercise_ids.length||p.homework.word_ids.length);
+   return ['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'].map(id=>buildPack(id,questions,course,opts)).filter(p=>p.homework.exercise_ids.length||p.homework.word_ids.length);
  }
  function validateHomework(raw,knownIds){
    return schema.validateHomework(raw,knownIds);

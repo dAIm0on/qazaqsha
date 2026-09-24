@@ -10,9 +10,14 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "url": "https://drive.google.com/file/d/1B2c2UJKpvBvty-LhSlkoC8ubPGZC9-aQ/view",
       "lesson_id": "3-1"
     },
+    "e31": {
+      "title": "Упражнения 3–1",
+      "url": "https://drive.google.com/file/d/1SXf2AzFXedKI_VpCyhqlAO_1DyvkRI1E/view",
+      "lesson_id": "3-1"
+    },
     "hw31": {
       "title": "Слова домашней работы 3–1",
-      "url": "https://drive.google.com/file/d/1B2c2UJKpvBvty-LhSlkoC8ubPGZC9-aQ/view",
+      "url": "https://drive.google.com/file/d/1X2BqOVav3sb01ni8MIe4f-J-JO2UHAyo/view",
       "lesson_id": "3-1"
     }
   },

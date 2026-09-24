@@ -3,7 +3,12 @@
  'use strict';
  const course=window.COURSE, core=window.TrainerCore;
  try{window.Lesson31Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{
+  const known31=new Set((course.questions||[]).map(q=>q.id));
+  for(const q of (window.Lesson31Pack?.extraQuestions?.()||[])){if(q&&!known31.has(q.id)){course.questions.push(q);known31.add(q.id);}}
+ }catch{}
  try{window.Lesson32Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{window.Lesson33Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{window.PhraseDrill?.install?.(course,window.CURRICULUM);}catch{}
  try{window.TransferItems?.install?.(course,window.CURRICULUM);}catch{}
  const questions=course.questions;
@@ -29,18 +34,20 @@
  if(!state.prefs.lettersChosen&&typeof matchMedia==='function'&&matchMedia('(max-width:690px)').matches)state.prefs.letters=true;
  if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
  window.ExplainDepth={
-   get(id){return !(state.explainDepth&&state.explainDepth[id]==='closed');},
+   get(id){const key=String(id||''),chosen=state.explainDepth&&state.explainDepth[key];if(chosen==='open')return true;if(chosen==='closed')return false;if(/^T2[4-7]_/.test(key)||/^T2[89]_|^T3[0-4]_/.test(key))return false;return true;},
    set(id,open){if(!id)return;state.explainDepth=state.explainDepth||Object.create(null);state.explainDepth[String(id).slice(0,40)]=open?'open':'closed';save();}
  };
  window.NumberLadder?.parkLearn(state.learning,state.records);
  let records=state.records,learningState=state.learning;
- try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
+ try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);try{if(window.Lesson31Pack&&P.registerStages)P.registerStages('3-1',window.Lesson31Pack.stagePlans());}catch{}
+ try{if(window.Lesson32Pack&&P.registerStages)P.registerStages('3-2',window.Lesson32Pack.stagePlans());}catch{}
+ try{if(window.Lesson33Pack&&P.registerStages)P.registerStages('3-3',window.Lesson33Pack.stagePlans());}catch{}
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null,trainerReturn=null;
  let reviewReasonMap=Object.create(null),materialsQuery='',materialsLesson='',materialsKind='';
  const COURSE_BLOCKS=(window.ExplainBankUI&&window.ExplainBankUI.COURSE||[]).map(row=>({id:row.id,title:row.label,hint:row.name}));
  function courseJumpMarkup(id){
-   return `<div class="course-jump" id="${id}"><p>Уроки 1–1…3–2</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}><span class="today-lesson-id">Урок ${b.title}</span><small>${esc(b.hint)}</small></button>`).join('')}</div></div>`;
+   return `<div class="course-jump" id="${id}"><p>Уроки 1–1…3–3</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}><span class="today-lesson-id">Урок ${b.title}</span><small>${esc(b.hint)}</small></button>`).join('')}</div></div>`;
  }
  function bindCourseJump(root){
    (root?root.querySelectorAll('[data-course]'):[]).forEach(b=>b.onclick=()=>startCourse(b.dataset.course));
@@ -48,7 +55,7 @@
  let variants={},practiceIds=[],stepEvidence={},queueEpoch=Date.now(),presented=null,elapsedMs=0,timerSince=null;
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
  let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),sessionUnaided=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null,hwSection=0,hwReturn=null,remediationNote='',retrying=false,rulesArticle=null;
- let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null;
+ let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null,stageContext=null,practiceHold=null;
  function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
  function currentLessonId(q){
    if(q&&q.lessonId)return q.lessonId;
@@ -125,15 +132,21 @@
    return l&&P.courseIds().includes(l.courseLesson)?l.courseLesson:null;
  }
  function runtimePracticeSnapshot(){
-   return {topic,mode,sourceFilter,courseBlock,queue:[...queue],position,answered:checked,view,activeLesson,activeStep,practiceIds:[...practiceIds],stepEvidence:{...stepEvidence},variants:{...variants},hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft:draft?JSON.parse(JSON.stringify(draft)):null,sessionAttempts,sessionCorrect,sessionAssisted,remediation:remediation?JSON.parse(JSON.stringify(remediation)):null};
+   const snap={topic,mode,sourceFilter,courseBlock,queue:[...queue],position,answered:checked,view,activeLesson,activeStep,practiceIds:[...practiceIds],stepEvidence:{...stepEvidence},variants:{...variants},hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft:draft?JSON.parse(JSON.stringify(draft)):null,sessionAttempts,sessionCorrect,sessionAssisted,remediation:remediation?JSON.parse(JSON.stringify(remediation)):null};
+   if(stageContext)snap.stageContext=JSON.parse(JSON.stringify(stageContext));
+   return snap;
  }
  function persistLessonPractice(id=runtimePracticeLessonId()){
    if(!id)return null;
    return P.saveLessonPractice(state,id,runtimePracticeSnapshot(),Date.now());
  }
  function restoreLessonPractice(id){
+   practiceHold=null;
    const lp=P.ensureLessonProgress(state,id),s=lp&&lp.practiceSession;
-   if(!s||!Array.isArray(s.queue)||s.queue.some(qid=>!byId.has(qid)))return false;
+   if(!s||!Array.isArray(s.queue))return false;
+   const missing=P.unknownQueueIds?P.unknownQueueIds(s.queue,byId):s.queue.filter(qid=>!byId.has(qid));
+   if(missing.length){practiceHold={lessonId:id,missing,kept:s.queue.slice()};return false;}
+   if(!s.queue.length)return false;
    topic=s.topic||'all';mode=s.mode||'course';sourceFilter=s.sourceFilter||null;courseBlock=id;
    activeLesson=s.mode==='lesson'?s.activeLesson||null:null;activeStep=s.activeStep==null?null:s.activeStep;
    queue=[...s.queue];practiceIds=Array.isArray(s.practiceIds)?s.practiceIds.filter(qid=>byId.has(qid)):[...new Set(queue)];
@@ -141,6 +154,7 @@
    queueEpoch=typeof s.queueEpoch==='number'?s.queueEpoch:Date.now()+Math.random();presented=typeof s.presented==='string'?s.presented:null;
    sessionAttempts=Math.max(0,Number(s.sessionAttempts)||0);sessionCorrect=Math.min(sessionAttempts,Math.max(0,Number(s.sessionCorrect)||0));sessionAssisted=Math.min(sessionAttempts-sessionCorrect,Math.max(0,Number(s.sessionAssisted)||0));
    draft=s.draft&&Array.isArray(s.draft.answers)?s.draft:null;remediation=s.remediation||null;
+   stageContext=P.normalizeStageContext?P.normalizeStageContext(s.stageContext):null;
    position=Math.min(queue.length,Math.max(0,Number(s.position)||0)+(s.answered?1:0));checked=false;hinted=!s.answered&&!!s.hinted;elapsedMs=Number.isFinite(s.elapsed_ms)?Math.max(0,s.elapsed_ms):0;
    return true;
  }
@@ -174,12 +188,26 @@
    }
    return done;
  }
+ function beginStaged(id,ctx){
+   const ids=(ctx.coreIds||[]).filter(qid=>byId.has(qid));
+   if(!ids.length||ids.length!==ctx.coreIds.length)return false;
+   const extra=(ctx.extraIds||[]).filter(qid=>byId.has(qid)&&!ids.includes(qid)).slice(0,3);
+   mode='course';courseBlock=id;topic='all';sourceFilter=null;activeLesson=null;activeStep=null;
+   queue=ids.concat(extra);practiceIds=[...queue];stepEvidence={};variants={};
+   stageContext=Object.assign({},ctx,{coreIds:ids.slice(),presentations:0,limitReached:false});
+   delete stageContext.extraIds;
+   queueEpoch=Date.now()+Math.random();position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
+   markLessonStarted(id,'practice');render();showView('practice');return true;
+ }
  function continueLesson(id){
    viewOnlyPathLesson=null;
    const lp=P.ensureLessonProgress(state,id);
    if(lp&&lp.practiceSession&&restoreLessonPractice(id)){
      markLessonStarted(id,'practice');render();showView('practice');return;
    }
+   if(beginPacked(id))return;
+   const nxt=P.nextRegistered&&P.nextRegistered(id,state.events);
+   if(nxt&&beginStaged(id,nxt))return;
    openPathLesson(id,{meaningful:true});
  }
  function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;sessionUnaided=Object.create(null);}
@@ -231,6 +259,7 @@
   if(!q)return false;
   if(q.source==='p2b'&&!records[q.id]?.seen&&mode!=='course')return false;
   if(q.source==='phrase'&&!records[q.id]?.seen&&mode!=='phrase'&&mode!=='course')return false;
+  if(q.lessonId==='3-3'&&q.source==='phrase'&&window.Lesson33Pack&&window.Lesson33Pack.phraseUnlocked&&!window.Lesson33Pack.phraseUnlocked(q.id,{events:state.events}))return false;
   if(q.source==='phase3-31'&&!records[q.id]?.seen&&mode!=='course'&&mode!=='phrase')return false;
   if(q.source==='slice'||q.source==='repair'||q.slice)return mode==='slice'||mode==='repair';
   return catalog.eligible(q,state)&&(!q.promotedWord||state.vocabulary[q.promotedWord]?.target_or_context==='target');
@@ -365,7 +394,7 @@
  }
  function save(){
    captureDraft();persistLessonPath();persistLessonPractice();if(window.AiTutor&&window.AiTutor.snapshot)state.aiTutor=window.AiTutor.snapshot();state.records=records;state.learning=learningState;
-   state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,trainerReturn};
+   state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null,trainerReturn};
    try{if(storageReadError)throw storageReadError;localStorage.setItem(KEY,JSON.stringify(state));storageAvailable=true;}catch{storageAvailable=false;}
    $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
    if(!cloudApplying)window.QazaqCloud?.pushSoon?.(state);
@@ -391,18 +420,20 @@
    if(restoreLessonPractice(block)){
      markLessonStarted(block,'practice');render();showView('practice');return;
    }
+   if(practiceHold&&practiceHold.lessonId===block){
+     const hold=practiceHold;
+     $('#exercise').innerHTML='<div class="empty-state"><h2>Сохранённая очередь на месте</h2><p>В снимке есть задание, которого нет в этой версии: '+esc(hold.missing.join(', '))+'. Очередь не пересобрана.</p><div class="finish-actions"><button type="button" class="secondary-button" id="hold-lessons">Выбрать занятие</button></div></div>';
+     $('#hold-lessons').onclick=()=>showView('learn');
+     showView('practice');save();return;
+   }
    const first=window.LEARNING.lessons.find(l=>l.courseLesson===block);
    if(first)learningState.lessonId=first.id;
-   const lessonCards=block==='3-1'?(window.Lesson31Pack?.lessonSession?.()||[]):block==='3-2'?(window.Lesson32Pack?.lessonSession?.()||[]):(window.Phase2BPractice?.lessonSession?.(block)||[]);
+   if(mode!=='exam'&&beginPacked(block))return;
+   const lessonCards=(window.Phase2BPractice?.lessonSession?.(block)||[]);
    if(lessonCards.length&&mode!=='exam'){
      mode='course';
      let ordered=lessonCards.slice();
      const phraseCut=block==='1-2'?2:block==='1-3'?3:null;
-     if(block==='3-2'&&window.PhraseDrill){
-       const seenIds=Object.keys(records).filter(id=>records[id]&&records[id].seen);
-       const phrases=window.PhraseDrill.session('3-2',{count:24,seen_ids:seenIds,error_profile:(window.AiTutor?.topWeak?.(4)||[])});
-       ordered=[...ordered,...phrases];
-     }
      if(phraseCut!=null&&window.PhraseDrill){
        const seenIds=Object.keys(records).filter(id=>records[id]&&records[id].seen);
        const phrases=window.PhraseDrill.session(block,{count:block==='1-2'?16:12,seen_ids:seenIds,error_profile:(window.AiTutor?.topWeak?.(4)||[])});
@@ -417,10 +448,20 @@
    markLessonStarted(block,'practice');
    mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');
  }
+ function beginPacked(id){
+   const pack=id==='3-1'?window.Lesson31Pack:id==='3-2'?window.Lesson32Pack:id==='3-3'?window.Lesson33Pack:null;
+   if(!pack||!pack.courseSession)return false;
+   const built=pack.courseSession(records,{events:state.events});
+   return !!(built&&built.stage&&beginStaged(id,Object.assign({},built.stage,{extraIds:built.remediationIds||[]})));
+ }
  function startTransfer(){
    const T=window.TransferItems;if(!T)return;
-   const rule=courseBlock==='3-2'?'T24_POSS_BIZ':courseBlock==='3-1'?'T20_POSS':courseBlock==='2-1'?'T6_PERSON_SG':courseBlock==='1-3'?'T4_NO_PLURAL_AFTER_NUMBER':'T2_PLURAL_LDT';
-   const list=(T.session(rule,{catalog:window.CURRICULUM})||[]).filter(q=>byId.has(q.id));
+   if(courseBlock==='3-3')return;
+   const rule=courseBlock==='3-2'&&window.Lesson32Pack&&window.Lesson32Pack.transferRule?window.Lesson32Pack.transferRule({stageId:stageContext&&stageContext.stageId,events:state.events}):courseBlock==='3-1'?'T20_POSS':courseBlock==='2-1'?'T6_PERSON_SG':courseBlock==='1-3'?'T4_NO_PLURAL_AFTER_NUMBER':'T2_PLURAL_LDT';
+   let list=(T.forRule?T.forRule(rule,{catalog:window.CURRICULUM}):T.session(rule,{catalog:window.CURRICULUM}))||[];
+   if(!list.length&&courseBlock==='3-2'&&T.forRule)list=T.forRule('T24_POSS_BIZ',{catalog:window.CURRICULUM})||[];
+   if(!list.length)list=T.session(rule,{catalog:window.CURRICULUM})||[];
+   list=list.filter(q=>byId.has(q.id));
    if(!list.length)return;
    mode='transfer';topic='all';sourceFilter=null;activeLesson=null;activeStep=null;
    queue=list.map(q=>q.id);practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
@@ -442,7 +483,7 @@
    if(topic==='phrase'&&courseBlock&&window.PhraseDrill&&mode!=='exam'){
      mode='phrase';
      const seenIds=Object.keys(records).filter(id=>records[id]&&records[id].seen);
-     const list=window.PhraseDrill.session(courseBlock,{count:courseBlock==='1-2'?16:12,seen_ids:seenIds,error_profile:(window.AiTutor?.topWeak?.(4)||[])});
+     const list=window.PhraseDrill.session(courseBlock,{count:courseBlock==='1-2'?16:12,seen_ids:seenIds,error_profile:(window.AiTutor?.topWeak?.(4)||[]),events:state.events});
      queue=list.map(q=>q.id).filter(id=>byId.has(id));practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);resetCounts();render();return;
    }
    let list=subset();
@@ -856,6 +897,12 @@
      predicted_R:predicted,
      hours_since_last:hours,
      rule_peek:rulePeeked?1:0,homework:homeworkMode?1:0,block:window.Homework?window.Homework.inferBlock(q,mode,hwLesson,activeLesson):''};
+   if(stageContext){
+     event.lesson_id=stageContext.lessonId;
+     event.stage_id=stageContext.stageId;
+     event.content_revision=stageContext.contentRevision;
+     event.practice_kind=stageContext.kind;
+   }
    if(!homeworkMode&&!aiRemed&&!voluntary)event.skills=window.Knowledge.observe(state,q,result,event,errors);
    state.events.push(event);rec=records[q.id]||rec;
    if(homeworkMode&&hwLesson){
@@ -870,9 +917,17 @@
    const day0=core.isDay0Learning(rec,now);
    if(hinted||!result.correct)sessionUnaided[q.id]=0;
    else if(!hinted&&result.correct)sessionUnaided[q.id]=(sessionUnaided[q.id]||0)+1;
-   if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
+   if(stageContext){
+     stageContext.presentations=(stageContext.presentations||0)+1;
+     if(stageContext.presentations>=stageContext.maxPresentations){
+       stageContext.limitReached=true;
+       queue.splice(position+1);
+     }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2){
+       core.scheduleRepeat(queue,position,q.id,rec.streak,stageContext.coreIds.filter(id=>id!==q.id&&byId.has(id)),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
+     }
+   }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
    const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);
-   if(mate&&!result.correct&&!hinted){
+   if(!stageContext&&mate&&!result.correct&&!hinted){
      const other=questions.find(x=>x.id!==q.id&&window.MemoryPolicy.contrastSide(x)?.pair===mate.pair&&window.MemoryPolicy.contrastSide(x)?.side!==mate.side);
      if(other&&!queue.slice(position+1).includes(other.id))queue.splice(Math.min(position+4,queue.length),0,other.id);
    }
@@ -964,8 +1019,12 @@
    }
  }
  function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
+ function homeworkOpts(){
+   const sessionGUnlocked=!!(window.Lesson31Pack?.sessionG?.().length)&&window.Lesson31Pack.sessionG().every(q=>records[q.id]?.seen);
+   return {sessionGUnlocked,events:state.events};
+ }
  function startHomework(lessonId,part,section){
-   const H=window.Homework,pack=(H.packs(questions,course).find(p=>p.lesson_id===lessonId));
+   const H=window.Homework,pack=(H.packs(questions,course,homeworkOpts()).find(p=>p.lesson_id===lessonId));
    if(!pack)return;
    hwLesson=lessonId;hwPart=part||'exercises';mode='homework';topic='all';sourceFilter=null;vocabRole=null;activeLesson=null;activeStep=null;courseBlock=lessonId;
    const attempt=H.ensureAttempt(state,lessonId);
@@ -990,25 +1049,27 @@
  }
  function renderHomework(){
    const root=$('#homework-content');if(!root||!window.Homework)return;
-   const sessionGUnlocked=!!(window.Lesson31Pack?.sessionG?.().length)&&window.Lesson31Pack.sessionG().every(q=>records[q.id]?.seen);
-   const list=window.Homework.packs(questions,course,{sessionGUnlocked});
+   const list=window.Homework.packs(questions,course,homeworkOpts());
    const weak=window.Homework.weakSpots(state,questions);
    const pick=hwLesson&&list.find(p=>p.lesson_id===hwLesson)||list[0];
    if(!pick){root.innerHTML='<div class="panel"><p>Пакеты ДЗ 1–1…1–3 ещё не собраны из банка.</p></div>';return;}
    const pack=pick,attempt=window.Homework.ensureAttempt(state,pack.lesson_id),h=pack.homework;
-   const ready=window.Homework.sheetReady(attempt,pack);
+   const exercisesClosed=pack.lesson_id==='3-3'&&!h.exercise_ids.length;
+   const ready=!exercisesClosed&&window.Homework.sheetReady(attempt,pack);
    const exP=window.Homework.partProgress(attempt,h.exercise_ids),wP=window.Homework.partProgress(attempt,h.word_question_ids||[]);
    const exN=window.Homework.sectionCount(h.exercise_ids),wN=window.Homework.sectionCount(h.word_question_ids||[]);
    const resumeAt=window.Homework.resumeIndex(h.exercise_ids,attempt);
    const check=key=>`<label class="pref-check"><input type="checkbox" data-hw-check="${key}" ${attempt.checklist[key]?'checked':''}> ${{method:'Повторила методичку',exercises:'Упражнения сборника',words:'Слова урока',external_test:'Зафиксировала на сайте',keyboard:'Казахская раскладка на телефоне',cheat:'Шпаргалка сохранена'}[key]||key}</label>`;
    const secBtns=(part,n)=>n<=1?'':`<div class="jump-row">${Array.from({length:n},(_,i)=>`<button type="button" class="chip" data-hw-part="${part}" data-hw-sec="${i}">Часть ${i+1}</button>`).join('')}</div>`;
-   const wordLine=(pack.lesson_id==='3-1'||pack.lesson_id==='3-2')?`${(h.word_ids||[]).length} слов × направления, карточек ${wP.done} из ${wP.total}`:`${wP.done} из ${wP.total} слов`;
-   root.innerHTML=`<div class="panel homework-head"><p class="eyebrow">УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>Готово ${exP.done} из ${exP.total} упражнений · ${wordLine}. Это выборка урока, не весь сборник и не повторение.</p><button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button></div>
+   const wordLine=(pack.lesson_id==='3-1'||pack.lesson_id==='3-2'||pack.lesson_id==='3-3')?`${(h.word_ids||[]).length} слов × направления, карточек ${wP.done} из ${wP.total}`:`${wP.done} из ${wP.total} слов`;
+   const headLine=exercisesClosed?'Упражнения ещё закрыты. Они появятся после сдачи правила. Просмотр карточки их не открывает.':`Готово ${exP.done} из ${exP.total} упражнений · ${wordLine}. Это выборка урока, не весь сборник и не повторение.`;
+   const openExercises=exercisesClosed?'':`<button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button>`;
+   root.innerHTML=`<div class="panel homework-head"><p class="eyebrow">УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>${headLine}</p>${openExercises}</div>
      <div class="panel"><div class="jump-row">${list.map(p=>`<button type="button" class="chip" data-hw-lesson="${p.lesson_id}" ${p.lesson_id===pack.lesson_id?'aria-pressed="true"':''}>${esc(p.homework.title)}</button>`).join('')}</div>
        <p class="small">Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике. Можно выйти в любой момент: ответы уже в листе.</p>
        <ol class="learning-steps">
          <li>Повторить методичку — ${h.method_url?`<a href="${esc(h.method_url)}" target="_blank" rel="noopener noreferrer">${esc(h.method_title)}</a>`:'ссылка на материал урока'}${check('method')}</li>
-         <li>Упражнения сборника (${h.exercise_ids.length} пунктов, по ${window.Homework.HW_SECTION} в части) <button type="button" class="secondary-button" data-hw-part="exercises">${exP.done?'Продолжить упражнения':'Открыть упражнения'}</button>${secBtns('exercises',exN)}</li>
+         <li>${exercisesClosed?'Упражнения сборника откроются вместе с правилом.':`Упражнения сборника (${h.exercise_ids.length} пунктов, по ${window.Homework.HW_SECTION} в части) <button type="button" class="secondary-button" data-hw-part="exercises">${exP.done?'Продолжить упражнения':'Открыть упражнения'}</button>${secBtns('exercises',exN)}`}</li>
          <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${h.word_ids.length} слов. <button type="button" class="secondary-button" data-hw-part="words">${wP.done?'Продолжить слова':'Открыть слова'}</button>${secBtns('words',wN)}</li>
          <li>Внешний тест: ${(h.external_tests&&h.external_tests.length?h.external_tests:[h.external_test_url]).filter(Boolean).map(u=>`<a class="ext-test-link" href="${esc(u)}" target="_blank" rel="noopener noreferrer">BatylBol · внешний тест</a>`).join(' · ')||'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
          ${(h.extras||[]).map(x=>'<li>'+check(x)+'</li>').join('')}
@@ -1266,18 +1327,34 @@
        const local=hintLine();
        showPathFb('hinted','<p>'+esc(local)+'</p>');
      };
-     const pathSkillFor=(errorType,errorKey)=>{
+     const pathSkillFor=(errorType,errorKey,beat)=>{
        const known={
          vowel_harmony:{item_id:'rule:plural',skill_type:'harmony'},
          plural_initial_consonant:{item_id:'rule:plural',skill_type:'initial_consonant'},
          plural_after_numeral:{item_id:'rule:plural',skill_type:'plural_suppression'},
-         emes_position:{item_id:'rule:emes',skill_type:'application'},
          ordinal_20:{item_id:'rule:ordinal',skill_type:'exception_20'},
-         person_sen_siz:{item_id:'rule:person',skill_type:'application'},
          harmony:{item_id:'rule:plural',skill_type:'harmony'},
          junction_ldt:{item_id:'rule:plural',skill_type:'initial_consonant'},
-         quantity:{item_id:'rule:plural',skill_type:'plural_suppression'}
+         quantity:{item_id:'rule:plural',skill_type:'plural_suppression'},
+         ol_no_ending:{item_id:'rule:T9_OL',skill_type:'application'},
+         ba_me:{item_id:'rule:T10_QUESTION',skill_type:'application'},
+         chunk_address:{item_id:'rule:farewell',skill_type:'application'},
+         person_sg_initial:{item_id:'rule:person',skill_type:'sg_initial'},
+         person_marker_missing:{item_id:'rule:person',skill_type:'marker_presence'},
+         person_sen_siz:{item_id:'rule:person',skill_type:'sen_siz'},
+         person_biz_initial:{item_id:'rule:person-pl',skill_type:'biz_initial'},
+         plural_on_predicate:{item_id:'rule:person-pl',skill_type:'no_extra_plural'},
+         extra_plural:{item_id:'rule:person-pl',skill_type:'no_extra_plural'},
+         emes_position:{item_id:'rule:person-neg',skill_type:'position'},
+         question_particle_missing:{item_id:'rule:person-q',skill_type:'presence'},
+         question_class:{item_id:'rule:person-q',skill_type:'class'}
        };
+       if(errorType==='ordinal_20')return known.ordinal_20;
+       if(errorKey==='ordinal'||errorType==='ordinal'){
+         const blob=[beat&&beat.prompt,beat&&beat.answer,beat&&beat.stem].filter(Boolean).join(' ');
+         const skill=window.ErrorDiagnostics&&window.ErrorDiagnostics.ordinalSkill?window.ErrorDiagnostics.ordinalSkill(blob,''):'suffix_family';
+         return {item_id:'rule:ordinal',skill_type:skill};
+       }
        return known[errorType]||known[errorKey]||null;
      };
      const commitPath=(ok,peeked,val)=>{
@@ -1288,7 +1365,7 @@
        const binds=[];
        const seenBind=new Set();
        for(const err of diagErrors){
-         const b=pathSkillFor(err.error_type,beat.error_key);
+         const b=pathSkillFor(err.error_type,beat.error_key,beat);
          if(!b)continue;
          const k=b.item_id+'::'+b.skill_type;
          if(seenBind.has(k))continue;
@@ -1296,8 +1373,11 @@
          binds.push({item_id:b.item_id,skill_type:b.skill_type,field:0,facet:null});
        }
        if(!binds.length){
-         const b=pathSkillFor('',beat.error_key);
+         const b=pathSkillFor('',beat.error_key,beat);
          if(b)binds.push({item_id:b.item_id,skill_type:b.skill_type,field:0,facet:null});
+       }
+       if(binds.some(b=>b.item_id==='rule:person-neg'&&b.skill_type==='position')&&!binds.some(b=>b.item_id==='rule:emes'&&b.skill_type==='application')){
+         binds.push({item_id:'rule:emes',skill_type:'application',field:0,facet:null});
        }
        qPath.skillBindings=binds;
        let skills=[];
@@ -1353,6 +1433,31 @@
    }
    nextBeat();
  }
+ function finishStagedPractice(lessonId){
+   const ctx=stageContext;
+   const report=P.evaluateStage(state.events,ctx);
+   if(report.pass){
+     const done=P.pushStageCompletion(state.events,ctx,report.independent,Date.now());
+     if(done)state.events.push(done);
+   }
+   const status=P.lessonStatusAfterStage((P.ensureLessonProgress(state,lessonId)||{}).status,ctx,report);
+   stageContext=null;
+   P.clearLessonPractice(state,lessonId,Date.now());
+   if(status==='completed'){
+     markLessonCompleted(lessonId);
+     $('#exercise').innerHTML='<div class="empty-state"><h2>Практика урока завершена</h2><p>Следующий шаг — домашка этого же урока. Можно выйти и вернуться: место сохранено.</p><div class="finish-actions"><button type="button" class="primary-button" id="course-to-homework">Перейти к домашке</button><button type="button" class="secondary-button" id="course-to-learn">К урокам</button></div></div>';
+     $('#course-to-homework').onclick=()=>{hwLesson=lessonId;hwPart='exercises';hwSection=0;showView('homework');};
+     $('#course-to-learn').onclick=()=>showView('learn');
+     return;
+   }
+   const lp=P.ensureLessonProgress(state,lessonId);
+   if(lp&&lp.status!=='completed')lp.status='in_progress';
+   P.setResumePointer(state,lessonId,'practice',Date.now());
+   const line=ctx.limitReached||!report.pass?'Подход завершён, продолжим этот навык.':'Этот шаг сдан. Следующий шаг — в том же уроке.';
+   $('#exercise').innerHTML='<div class="empty-state"><h2>Шаг урока</h2><p>'+esc(line)+'</p><div class="finish-actions"><button type="button" class="primary-button" id="stage-continue">Продолжить</button><button type="button" class="secondary-button" id="stage-lessons">К урокам</button></div></div>';
+   $('#stage-continue').onclick=()=>continueLesson(lessonId);
+   $('#stage-lessons').onclick=()=>showView('learn');
+ }
  function renderEmpty(){
    if(mode==='repair'&&(state.sliceRun||[]).length){finishRepair();return;}
    if(mode==='slice'&&(state.sliceRun||[]).length){showSliceResult();return;}
@@ -1360,7 +1465,7 @@
      const back=hwReturn;hwReturn=null;hwLesson=back.lesson;hwPart=back.part;hwSection=back.section||0;mode='homework';showView('homework');save();return;
    }
    if(mode==='homework'){
-     const pack=window.Homework.packs(questions,course).find(p=>p.lesson_id===hwLesson);
+     const pack=window.Homework.packs(questions,course,homeworkOpts()).find(p=>p.lesson_id===hwLesson);
      if(pack){
        const all=hwPart==='words'?pack.homework.word_question_ids||[]:pack.homework.exercise_ids;
        const done=new Set((state.homeworkAttempts[hwLesson]&&state.homeworkAttempts[hwLesson].items||[]).map(i=>i.id));
@@ -1373,6 +1478,10 @@
    }
    if(mode==='course'&&courseBlock){
      const lessonId=courseBlock;
+     if(stageContext){
+       finishStagedPractice(lessonId);
+       save();return;
+     }
      markLessonCompleted(lessonId);
      $('#exercise').innerHTML='<div class="empty-state"><h2>Практика урока завершена</h2><p>Следующий шаг — домашка этого же урока. Можно выйти и вернуться: место сохранено.</p><div class="finish-actions"><button type="button" class="primary-button" id="course-to-homework">Перейти к домашке</button><button type="button" class="secondary-button" id="course-to-learn">К урокам</button></div></div>';
      $('#course-to-homework').onclick=()=>{hwLesson=lessonId;hwPart='exercises';hwSection=0;showView('homework');};
@@ -1521,7 +1630,7 @@
  }
  function canonForSource(key,source){
    const lesson=source&&source.lesson_id;
-   const byLesson={'1-1':'T1_HARMONY','1-2':'T2_PLURAL_LDT','1-3':'T4_NO_PLURAL_AFTER_NUMBER','2-1':'T6_PERSON_SG','2-2':'T8_PERSON_PL','2-3':'T9_OL','3-1':'T20_POSS','3-2':'T24_POSS_BIZ'};
+   const byLesson={'1-1':'T1_HARMONY','1-2':'T2_PLURAL_LDT','1-3':'T4_NO_PLURAL_AFTER_NUMBER','2-1':'T6_PERSON_SG','2-2':'T8_PERSON_PL','2-3':'T9_OL','3-1':'T20_POSS','3-2':'T24_POSS_BIZ','3-3':'T28_OWNER_SUBJECT'};
    if(lesson&&byLesson[lesson])return byLesson[lesson];
    if(key==='phase3-31'||key==='m31'||key==='hw31')return 'T20_POSS';
    if(key==='phase3-32'||key==='m32'||key==='hw32')return 'T24_POSS_BIZ';
@@ -1690,7 +1799,7 @@
    $$('#rules-content [data-vocab]').forEach(b=>b.onclick=()=>{vocabRole=b.dataset.vocab;courseBlock=null;sourceFilter=null;topic='vocab';mode='ordered';startQueue({all:true});showView('practice');});
  }
  function renderMaterials(){
-   const lessonOpts=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2'].map(id=>`<option value="${id}"${materialsLesson===id?' selected':''}>${id.replace('-','–')}</option>`).join('');
+   const lessonOpts=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'].map(id=>`<option value="${id}"${materialsLesson===id?' selected':''}>${id.replace('-','–')}</option>`).join('');
    const cards=Object.entries(course.sources).filter(([,s])=>!s.additional).map(([key,s])=>{
      const n=questions.filter(q=>q.source===key).length;
      const url=liveSource(s.url);
@@ -1875,6 +1984,7 @@
    presented=typeof savedSession.presented==='string'?savedSession.presented:null;
    sessionAttempts=Math.max(0,Number(savedSession.sessionAttempts)||0);sessionCorrect=Math.min(sessionAttempts,Math.max(0,Number(savedSession.sessionCorrect)||0));sessionAssisted=Math.min(sessionAttempts-sessionCorrect,Math.max(0,Number(savedSession.sessionAssisted)||0));
    draft=savedSession.draft&&Array.isArray(savedSession.draft.answers)?savedSession.draft:null;remediation=savedSession.remediation||null;
+   stageContext=P.normalizeStageContext?P.normalizeStageContext(savedSession.stageContext):null;
    topic=savedSession.topic;mode=savedSession.mode;sourceFilter=savedSession.sourceFilter||null;courseBlock=savedSession.courseBlock||null;hwLesson=savedSession.hwLesson||((mode==='homework'||savedSession.view==='homework')?savedSession.courseBlock||null:null);hwPart=savedSession.hwPart||null;hwSection=Math.max(0,Number(savedSession.hwSection)||0);trainerReturn=savedSession.trainerReturn||null;activeLesson=mode==='lesson'?savedSession.activeLesson:null;
    activeStep=activeLesson?Math.min(window.LEARNING.lessons.find(l=>l.id===activeLesson).chunks.length-1,Math.max(0,Number(savedSession.activeStep)||0)):null;
    queue=savedSession.queue;practiceIds=Array.isArray(savedSession.practiceIds)?savedSession.practiceIds.filter(id=>byId.has(id)):[...new Set(queue)];

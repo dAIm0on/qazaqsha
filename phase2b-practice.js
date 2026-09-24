@@ -9,54 +9,61 @@
  const field=(answers,label='Ответ',kind='text')=>({
   label,kind,answers:Array.isArray(answers)?answers:[answers]
  });
- function cell({id,lesson,order,topic,title,stimulus,answers,rule,error_type,explanation,label='Ответ'}){
-  return {
+ function finish(q,extra){
+  if(!extra)return q;
+  if(extra.skills)q.skillBindings=extra.skills;
+  if(extra.practiceOnly)q.practiceOnly=true;
+  return q;
+ }
+ const skill=(item,type)=>({item_id:item,skill_type:type,field:0,facet:null});
+ function cell({id,lesson,order,topic,title,stimulus,answers,rule,error_type,explanation,label='Ответ',extra}){
+  return finish({
    id,source:'p2b',group:'G1',part:String(order),lessonId:lesson,topic,kind:'fields',
    title,stimulus,fields:[field(answers,label)],explanation,
    ruleIds:Array.isArray(rule)?rule:[rule],
    phase2b:{genre:'G1',cell:true,lesson_order:order,error_type:error_type||''}
-  };
+  },extra);
  }
- function suffix({id,lesson,order,topic,title,stimulus,answers,rule,error_type,explanation,label='Кусок справа'}){
-  return {
+ function suffix({id,lesson,order,topic,title,stimulus,answers,rule,error_type,explanation,label='Кусок справа',extra}){
+  return finish({
    id,source:'p2b',group:'G2',part:String(order),lessonId:lesson,topic,kind:'fields',
    title,stimulus,fields:[field(answers,label)],explanation,
-   ruleIds:[rule],
+   ruleIds:Array.isArray(rule)?rule:[rule],
    phase2b:{genre:'G2',suffix:true,lesson_order:order,error_type:error_type||''}
-  };
+  },extra);
  }
- function produce({id,lesson,order,topic,title='Переведи на казахский',stimulus,answers,rule,error_type,explanation,label='Ответ на казахском'}){
-  return {
+ function produce({id,lesson,order,topic,title='Переведи на казахский',stimulus,answers,rule,error_type,explanation,label='Ответ на казахском',extra}){
+  return finish({
    id,source:'p2b',group:'G3',part:String(order),lessonId:lesson,topic,kind:'fields',
    title,stimulus,fields:[field(answers,label)],explanation,
    ruleIds:Array.isArray(rule)?rule:[rule],
    phase2b:{genre:'G3',production:true,lesson_order:order,error_type:error_type||''}
-  };
+  },extra);
  }
- function recognize({id,lesson,order,topic,title='Переведи на русский',stimulus,answers,rule,error_type='translation_variant',explanation,label='Ответ',kind='text'}){
-  return {
+ function recognize({id,lesson,order,topic,title='Переведи на русский',stimulus,answers,rule,error_type='translation_variant',explanation,label='Ответ',kind='text',extra}){
+  return finish({
    id,source:'p2b',group:'G4',part:String(order),lessonId:lesson,topic,kind:'fields',
    title,stimulus,fields:[field(answers,label,kind)],explanation,
    ruleIds:Array.isArray(rule)?rule:[rule],
    phase2b:{genre:'G4',recognition:true,lesson_order:order,error_type:error_type||''}
-  };
+  },extra);
  }
- function transform({id,lesson,order,topic,title,stimulus,answers,rule,error_type,explanation,label='Новая форма'}){
-  return {
+ function transform({id,lesson,order,topic,title,stimulus,answers,rule,error_type,explanation,label='Новая форма',extra}){
+  return finish({
    id,source:'p2b',group:'G5',part:String(order),lessonId:lesson,topic,kind:'fields',
    title,stimulus,fields:[field(answers,label)],explanation,
    ruleIds:Array.isArray(rule)?rule:[rule],
    phase2b:{genre:'G5',transform:true,lesson_order:order,error_type:error_type||''}
-  };
+  },extra);
  }
- function rewrite({id,lesson,order,topic,stimulus,answers,fields,rule,error_type,explanation,label='Исправленная форма'}){
-  return {
+ function rewrite({id,lesson,order,topic,stimulus,answers,fields,rule,error_type,explanation,label='Исправленная форма',extra}){
+  return finish({
    id,source:'p2b',group:'G6',part:String(order),lessonId:lesson,topic,kind:'fields',
    title:'Найди ошибку и перепиши',stimulus,
    fields:fields?fields.map(x=>field(x.answers,x.label||'Ответ',x.kind||'text')):[field(answers,label)],
    explanation,ruleIds:Array.isArray(rule)?rule:[rule],
    phase2b:{genre:'G6',rewrite:true,lesson_order:order,error_type:error_type||''}
-  };
+  },extra);
  }
  const HOMEWORK={
   '1-1':['p2b-11-g1-edge-kitap','p2b-11-g6-kitap-edge'],
@@ -96,7 +103,9 @@
   '2-3':[
    cell({id:'p2b-23-g1-qonaq',lesson:'2-3',order:1,topic:'person',title:'Одна клетка: ол + основа',stimulus:'Ол + қонақ',answers:['қонақ'],rule:'T9_OL',error_type:'ol_suffix',explanation:'После ол личного окончания нет: ол қонақ.'}),
    cell({id:'p2b-23-g1-mugalim',lesson:'2-3',order:1,topic:'person',title:'Одна клетка: ол + основа',stimulus:'Ол + мұғалім',answers:['мұғалім'],rule:'T9_OL',error_type:'ol_suffix',explanation:'После ол личного окончания нет: ол мұғалім.'}),
-   cell({id:'p2b-23-g1-korshi',lesson:'2-3',order:1,topic:'person',title:'Одна клетка: ол + основа',stimulus:'Ол + көрші',answers:['көрші'],rule:'T9_OL',error_type:'ol_suffix',explanation:'После ол личного окончания нет: ол көрші.'})
+   cell({id:'p2b-23-g1-korshi',lesson:'2-3',order:1,topic:'person',title:'Одна клетка: ол + основа',stimulus:'Ол + көрші',answers:['көрші'],rule:'T9_OL',error_type:'ol_suffix',explanation:'После ол личного окончания нет: ол көрші.'}),
+   cell({id:'p2b-23-g1-olar-semiz',lesson:'2-3',order:1,topic:'person',title:'Одна клетка: олар + основа',stimulus:'Олар + семіз',answers:['семіз'],rule:'T9_OL',error_type:'ol_suffix',explanation:'После олар личного окончания нет: олар семіз.',extra:{practiceOnly:true,skills:[skill('rule:T9_OL','application')]}}),
+   cell({id:'p2b-23-g1-olar-maman',lesson:'2-3',order:1,topic:'person',title:'Одна клетка: олар + основа',stimulus:'Олар + маман',answers:['маман'],rule:'T9_OL',error_type:'ol_suffix',explanation:'После олар личного окончания нет: олар маман.',extra:{practiceOnly:true,skills:[skill('rule:T9_OL','application')]}})
   ]
  };
  const G2={
@@ -116,7 +125,15 @@
    suffix({id:'p2b-23-g2-qonaq',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Ол қонақ + ___ ?',answers:['па'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Қонақ заканчивается на Қ, поэтому вопросительная частица начинается с П: па.'}),
    suffix({id:'p2b-23-g2-adam',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Ол адам + ___ ?',answers:['ба'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Адам заканчивается на М, поэтому здесь ба.'}),
    suffix({id:'p2b-23-g2-aqyldy',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Олар ақылды + ___ ?',answers:['ма'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Последнее слово оканчивается гласной; ряд твёрдый, поэтому ма.'}),
-   suffix({id:'p2b-23-g2-ordinal20',lesson:'2-3',order:4,topic:'numbers',title:'Сделай порядковое число',stimulus:'жиырма → ___',answers:['жиырмасыншы'],rule:'T11_ORDINAL',error_type:'ordinal_20',explanation:'20-й — жиырмасыншы. Это закреплённая форма курса.',label:'Порядковая форма'})
+   suffix({id:'p2b-23-g2-ordinal20',lesson:'2-3',order:4,topic:'numbers',title:'Сделай порядковое число',stimulus:'жиырма → ___',answers:['жиырмасыншы'],rule:'T11_ORDINAL',error_type:'ordinal_20',explanation:'20-й — жиырмасыншы. Это закреплённая форма курса.',label:'Порядковая форма'}),
+   suffix({id:'p2b-23-g2-zhigit',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Ол жігіт + ___ ?',answers:['пе'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Жігіт мягкое и заканчивается на Т, поэтому пе.',extra:{practiceOnly:true,skills:[skill('rule:T10_QUESTION','application')]}}),
+   suffix({id:'p2b-23-g2-semiz',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Ол семіз + ___ ?',answers:['бе'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Семіз заканчивается на З, ряд твёрдый, поэтому бе.',extra:{practiceOnly:true,skills:[skill('rule:T10_QUESTION','application')]}}),
+   suffix({id:'p2b-23-g2-emes',lesson:'2-3',order:2,topic:'person',title:'Дополни вопросительную частицу',stimulus:'Олар туыс емес + ___ ?',answers:['пе'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Частица смотрит на емес: мягкое С даёт пе.',extra:{practiceOnly:true,skills:[skill('rule:T10_QUESTION','application')]}}),
+   suffix({id:'p2b-23-g2-bir',lesson:'2-3',order:4,topic:'numbers',title:'Сделай порядковое число',stimulus:'бір → ___',answers:['бірінші'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'Р — согласная, бір мягкое → інші.',label:'Порядковая форма',extra:{practiceOnly:true,skills:[skill('rule:ordinal','suffix_family')]}}),
+   suffix({id:'p2b-23-g2-eki',lesson:'2-3',order:4,topic:'numbers',title:'Сделай порядковое число',stimulus:'екі → ___',answers:['екінші'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'І — гласная, поэтому короткая нші.',label:'Порядковая форма',extra:{practiceOnly:true,skills:[skill('rule:ordinal','suffix_family')]}}),
+   suffix({id:'p2b-23-g2-alty',lesson:'2-3',order:4,topic:'numbers',title:'Сделай порядковое число',stimulus:'алты → ___',answers:['алтыншы'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'Алты заканчивается на ы. Это гласная: алты + ншы → алтыншы.',label:'Порядковая форма',extra:{practiceOnly:true,skills:[skill('rule:ordinal','suffix_family')]}}),
+   suffix({id:'p2b-23-g2-qyryq',lesson:'2-3',order:4,topic:'numbers',title:'Сделай порядковое число',stimulus:'қырық → ___',answers:['қырқыншы'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'40-й в курсе — қырқыншы.',label:'Порядковая форма',extra:{practiceOnly:true,skills:[skill('rule:ordinal','suffix_family')]}}),
+   suffix({id:'p2b-23-g2-eki-piece',lesson:'2-3',order:4,topic:'numbers',title:'Какая наклейка после гласной?',stimulus:'екі + ___',answers:['нші'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'После гласной в екі нужна нші. Інші здесь не принимается.',label:'Наклейка',extra:{practiceOnly:true,skills:[skill('rule:ordinal','suffix_family')]}})
   ]
  };
  const G3={
@@ -145,7 +162,19 @@
   ],
   '2-3':[
    produce({id:'p2b-23-g3-he-guest-q',lesson:'2-3',order:3,topic:'person',stimulus:'Он гость?',answers:['Ол қонақ па?','Ол қонақ па'],rule:['T9_OL','T10_QUESTION'],error_type:'question_class',explanation:'После ол личного окончания нет; после қ в қонақ выбираем па.'}),
-   produce({id:'p2b-23-g3-he-not-teacher-q',lesson:'2-3',order:3,topic:'person',stimulus:'Он не учитель?',answers:['Ол мұғалім емес пе?','Ол мұғалім емес пе'],rule:['T9_OL','T10_QUESTION'],error_type:'question_class',explanation:'Ол мұғалім емес пе? Частицу выбираем по последнему слову емес: пе.'})
+   produce({id:'p2b-23-g3-he-not-teacher-q',lesson:'2-3',order:3,topic:'person',stimulus:'Он не учитель?',answers:['Ол мұғалім емес пе?','Ол мұғалім емес пе'],rule:['T9_OL','T10_QUESTION'],error_type:'question_class',explanation:'Ол мұғалім емес пе? Частицу выбираем по последнему слову емес: пе.'}),
+   produce({id:'p2b-23-g3-they-smart',lesson:'2-3',order:3,topic:'person',stimulus:'Они умные?',answers:['Олар ақылды ма?','Олар ақылды ма'],rule:['T9_OL','T10_QUESTION'],error_type:'question_class',explanation:'Олар без личного окончания. Ақылды на гласную, твёрдый ряд → ма.',extra:{practiceOnly:true,skills:[skill('rule:T10_QUESTION','application')]}}),
+   produce({id:'p2b-23-g3-they-not-kin',lesson:'2-3',order:3,topic:'person',stimulus:'Они не родственники?',answers:['Олар туыстар емес пе?','Олар туыстар емес пе'],rule:['T9_OL','T10_QUESTION'],error_type:'question_class',explanation:'Частица смотрит на емес: пе.',extra:{practiceOnly:true,skills:[skill('rule:T10_QUESTION','application')]}}),
+   produce({id:'p2b-23-g3-you-colleague',lesson:'2-3',order:3,topic:'person',stimulus:'Ты коллега?',answers:['Сен әріптессің бе?','Сен әріптессің бе'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Личная форма уже собрана. После ң в этом вопросе бе.',extra:{practiceOnly:true,skills:[skill('rule:T10_QUESTION','application')]}}),
+   produce({id:'p2b-23-g3-sender-generous',lesson:'2-3',order:3,topic:'person',stimulus:'Вы (сендер) щедрые?',answers:['Сендер жомартсыңдар ма?','Сендер жомартсыңдар ма'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Сыңдар кончается на р, поэтому ма.',extra:{practiceOnly:true,skills:[skill('rule:person-q','class')]}}),
+   produce({id:'p2b-23-g3-ord-12',lesson:'2-3',order:5,topic:'numbers',stimulus:'12-й',answers:['он екінші'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'Порядковая наклейка только на последнем слове: он екінші.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','last_component')]}}),
+   produce({id:'p2b-23-g3-ord-21',lesson:'2-3',order:5,topic:'numbers',stimulus:'21-й',answers:['жиырма бірінші'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'Жиырма бірінші проверяет последний компонент, не форму жиырмасыншы.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','last_component')]}}),
+   produce({id:'p2b-23-g3-ord-41',lesson:'2-3',order:5,topic:'numbers',stimulus:'41-й',answers:['қырық бірінші'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'Наклейка на бірінші, қырық остаётся.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','last_component')]}}),
+   produce({id:'p2b-23-g3-i-first',lesson:'2-3',order:5,topic:'numbers',stimulus:'Я первый',answers:['біріншімін','Мен біріншімін'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'Сначала порядковое, потом знакомая бирка мен.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','application')]}}),
+   produce({id:'p2b-23-g3-i-twentieth',lesson:'2-3',order:5,topic:'numbers',stimulus:'Я двадцатый',answers:['жиырмасыншымын','Мен жиырмасыншымын'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'Исключение 20-го плюс бирка мен: жиырмасыншымын.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','application')]}}),
+   produce({id:'p2b-23-g3-you-42',lesson:'2-3',order:5,topic:'numbers',stimulus:'Вы (сендер) 42-е',answers:['қырық екіншісіңдер','Сендер қырық екіншісіңдер'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'Наклейка на последнем компоненте, затем сыңдар.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','last_component')]}}),
+   produce({id:'p2b-23-g3-bye-sen',lesson:'2-3',order:6,topic:'person',title:'Готовая фраза прощания',stimulus:'До свидания одному на ты',answers:['сау бол'],rule:'T9_OL',error_type:'farewell_address',explanation:'Сен → сау бол. Глагол бол не разбираем.',extra:{practiceOnly:true,skills:[skill('rule:farewell','application')]}}),
+   produce({id:'p2b-23-g3-bye-sizder',lesson:'2-3',order:6,topic:'person',title:'Готовая фраза прощания',stimulus:'До свидания многим уважительно',answers:['сау болыңыздар'],rule:'T9_OL',error_type:'farewell_address',explanation:'Сіздер → сау болыңыздар. Это чанк, не урок императива.',extra:{practiceOnly:true,skills:[skill('rule:farewell','application')]}})
   ]
  };
  const G4={
@@ -162,7 +191,12 @@
   ],
   '2-1':[],
   '2-2':[],
-  '2-3':[]
+  '2-3':[
+   recognize({id:'p2b-23-g4-olar-semiz',lesson:'2-3',order:7,topic:'person',stimulus:'Олар семіз',answers:['они толстые','они толстые.'],rule:'T9_OL',explanation:'Олар семіз — они толстые. Личного окончания нет.',extra:{practiceOnly:true,skills:[skill('rule:T9_OL','recognition')]}}),
+   recognize({id:'p2b-23-g4-i-twentieth',lesson:'2-3',order:7,topic:'numbers',stimulus:'Жиырмасыншымын',answers:['я двадцатый','я двадцатая'],rule:'T11_ORDINAL',explanation:'Жиырмасыншымын — я двадцатый.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','recognition')]}}),
+   recognize({id:'p2b-23-g4-bye-sender',lesson:'2-3',order:7,topic:'person',stimulus:'Сау болыңдар',answers:['до свидания нескольким на ты','до свидания своим многим'],rule:'T9_OL',explanation:'Сау болыңдар — прощание с несколькими на ты.',extra:{practiceOnly:true,skills:[skill('rule:farewell','recognition')]}}),
+   recognize({id:'p2b-23-g4-bye-siz',lesson:'2-3',order:7,topic:'person',stimulus:'Сау болыңыз',answers:['до свидания одному уважительно','до свидания одному на вы'],rule:'T9_OL',explanation:'Сау болыңыз — прощание одному уважительно.',extra:{practiceOnly:true,skills:[skill('rule:farewell','recognition')]}})
+  ]
  };
  const G5={
   '1-1':[],
@@ -176,7 +210,12 @@
    transform({id:'p2b-22-g5-neg-reader',lesson:'2-2',order:3,topic:'person',title:'Сделай отрицание',stimulus:'Оқырмансыңдар.',answers:['Оқырман емессіңдер.','Оқырман емессіңдер'],rule:['T8_PERSON_PL','T7_EMES'],error_type:'emes_position',explanation:'При отрицании личное окончание стоит на емес: оқырман емессіңдер.'}),
    transform({id:'p2b-22-g5-neg-students',lesson:'2-2',order:3,topic:'person',title:'Сделай отрицание',stimulus:'Біз студентпіз.',answers:['Біз студент емеспіз.','Біз студент емеспіз'],rule:['T8_PERSON_PL','T7_EMES'],error_type:'emes_position',explanation:'Біз студент емеспіз: показатель лица стоит на емес.'})
   ],
-  '2-3':[]
+  '2-3':[
+   transform({id:'p2b-23-g5-ol-teacher',lesson:'2-3',order:8,topic:'person',title:'Замени мен на ол',stimulus:'Мен мұғаліммін',answers:['Ол мұғалім','Ол мұғалім.'],rule:'T9_OL',error_type:'ol_suffix',explanation:'Меняется один слой: ол не берёт личное окончание.',extra:{practiceOnly:true,skills:[skill('rule:T9_OL','application')]}}),
+   transform({id:'p2b-23-g5-eki-ord',lesson:'2-3',order:8,topic:'numbers',title:'Сделай порядковым',stimulus:'екі',answers:['екінші'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'Один слой: екі → екінші.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','suffix_family')]}}),
+   transform({id:'p2b-23-g5-21-ord',lesson:'2-3',order:8,topic:'numbers',title:'Сделай порядковым',stimulus:'жиырма бір',answers:['жиырма бірінші'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'Наклейка только на бір. Это не жиырмасыншы.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','last_component')]}}),
+   transform({id:'p2b-23-g5-i-first',lesson:'2-3',order:8,topic:'numbers',title:'Скажи «я первый»',stimulus:'бірінші',answers:['біріншімін','Мен біріншімін'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'Один добавленный слой: бирка мен.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','application')]}})
+  ]
  };
  const G6={
   '1-1':[
@@ -201,9 +240,11 @@
    rewrite({id:'p2b-22-g6-dostar',lesson:'2-2',order:6,topic:'person',stimulus:'Сендер достарсыңдар',answers:['Сендер доссыңдар','Сендер доссыңдар.'],rule:'T8_PERSON_PL',error_type:'plural_on_predicate',explanation:'Лишнее -тар: сендер уже показывает, что людей несколько. Нужно: Сендер доссыңдар.'})
   ],
   '2-3':[
-   rewrite({id:'p2b-23-g6-ol-mugalimmin',lesson:'2-3',order:5,topic:'person',stimulus:'Ол мұғаліммін',answers:['Ол мұғалім','Ол мұғалім.'],rule:'T9_OL',error_type:'ol_suffix',explanation:'Лишнее -мін: у ол личного окончания нет. Нужно: Ол мұғалім.'}),
-   rewrite({id:'p2b-23-g6-konak-ba',lesson:'2-3',order:5,topic:'person',stimulus:'Ол қонақ ба?',answers:['Ол қонақ па?','Ол қонақ па'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Қонақ заканчивается на Қ, поэтому вопросительная частица начинается с П: қонақ па?'}),
-   rewrite({id:'p2b-23-g6-missing-question',lesson:'2-3',order:5,topic:'person',stimulus:'Ол қонақ?',answers:['Ол қонақ па?','Ол қонақ па'],rule:'T10_QUESTION',error_type:'question_particle_missing',explanation:'Для закрытого вопроса здесь нужна отдельная частица: Ол қонақ па?'})
+   rewrite({id:'p2b-23-g6-ol-mugalimmin',lesson:'2-3',order:9,topic:'person',stimulus:'Ол мұғаліммін',answers:['Ол мұғалім','Ол мұғалім.'],rule:'T9_OL',error_type:'ol_suffix',explanation:'Лишнее -мін: у ол личного окончания нет. Нужно: Ол мұғалім.'}),
+   rewrite({id:'p2b-23-g6-konak-ba',lesson:'2-3',order:9,topic:'person',stimulus:'Ол қонақ ба?',answers:['Ол қонақ па?','Ол қонақ па'],rule:'T10_QUESTION',error_type:'question_class',explanation:'Қонақ заканчивается на Қ, поэтому вопросительная частица начинается с П: қонақ па?'}),
+   rewrite({id:'p2b-23-g6-missing-question',lesson:'2-3',order:9,topic:'person',stimulus:'Ол қонақ?',answers:['Ол қонақ па?','Ол қонақ па'],rule:'T10_QUESTION',error_type:'question_particle_missing',explanation:'Для закрытого вопроса здесь нужна отдельная частица: Ол қонақ па?'}),
+   rewrite({id:'p2b-23-g6-zhyirman',lesson:'2-3',order:9,topic:'numbers',stimulus:'Олар жиырманшы ма?',answers:['Олар жиырмасыншы ма?','Олар жиырмасыншы ма'],rule:'T11_ORDINAL',error_type:'ordinal_20',explanation:'20-й — жиырмасыншы, не жиырманшы.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','exception_20')]}}),
+   rewrite({id:'p2b-23-g6-qyryqynshy',lesson:'2-3',order:9,topic:'numbers',stimulus:'Қырықыншы',answers:['Қырқыншы'],rule:'T11_ORDINAL',error_type:'ordinal',explanation:'40-й в курсе пишется қырқыншы.',extra:{practiceOnly:true,skills:[skill('rule:ordinal','suffix_family')]}})
   ]
  };
  function clone(q){return JSON.parse(JSON.stringify(q));}

@@ -298,7 +298,7 @@ ok('G11 bank 220 ids untouched');
 ok('G12 older verify scenarios still above');
 
 assert.ok(GP.navIsLessons());
-assert.deepEqual(GP.lessons().map(l=>l.id),['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2']);
+assert.deepEqual(GP.lessons().map(l=>l.id),['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3']);
 assert.ok(!GP.lessons().some(l=>/^T/.test(l.id)));
 ok('P1 nav by lesson_id not T-id');
 
@@ -1098,11 +1098,11 @@ ok('Phase 2B G3: directed production uses only open lesson grammar and local che
 
 
 const g4All=P2BG1.allG4();
-assert.equal(g4All.length,6);
+assert.equal(g4All.length,10);
 assert.ok(g4All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G4'&&q.phase2b.recognition));
 assert.equal(P2BG1.cardsFor('2-1','G4').length,0);
 assert.equal(P2BG1.cardsFor('2-2','G4').length,0);
-assert.equal(P2BG1.cardsFor('2-3','G4').length,0);
+assert.equal(P2BG1.cardsFor('2-3','G4').length,4);
 assert.ok(P2BG1.checkTask('p2b-12-g4-girls','девушки').result.correct);
 assert.ok(P2BG1.checkTask('p2b-12-g4-girls','девочки').result.correct);
 const g4LandBad=P2BG1.checkTask('p2b-12-g4-lands','земля');
@@ -1115,12 +1115,12 @@ ok('Phase 2B G4: KK→RU/number recognition uses explicit accepted variants');
 
 
 const g5All=P2BG1.allG5();
-assert.equal(g5All.length,4);
+assert.equal(g5All.length,8);
 assert.ok(g5All.every(q=>q.kind==='fields'&&q.fields.length===1&&q.phase2b&&q.phase2b.genre==='G5'&&q.phase2b.transform));
 assert.equal(P2BG1.cardsFor('1-1','G5').length,0);
 assert.equal(P2BG1.cardsFor('1-2','G5').length,0);
 assert.equal(P2BG1.cardsFor('1-3','G5').length,0);
-assert.equal(P2BG1.cardsFor('2-3','G5').length,0);
+assert.equal(P2BG1.cardsFor('2-3','G5').length,4);
 assert.ok(P2BG1.checkTask('p2b-21-g5-neg-qyz','Қыз емеспін').result.correct);
 const g5NegBad=P2BG1.checkTask('p2b-21-g5-neg-qyz','Қыз емесбін');
 assert.ok(g5NegBad.errors.some(e=>e.error_type==='emes_position'));
@@ -1320,10 +1320,10 @@ const HW31=require('./lesson31-homework.js');
 const hw31Locked=HW31.build();
 const hw31Open=HW31.build({sessionGUnlocked:true});
 assert.equal(hw31Locked.lesson_id,'3-1');
-assert.equal(hw31Locked.exercise_ids.length,6);
+assert.equal(hw31Locked.exercise_ids.length,12);
 assert.equal(hw31Locked.phrase_ids.length,0);
 assert.equal(hw31Open.phrase_ids.length,4);
-assert.equal(hw31Open.item_ids.length,10);
+assert.equal(hw31Open.item_ids.length,16);
 assert.equal(hw31Open.rule_map['p3-31-a-g2-kitap'],'T21_POSS_ASSIM');
 assert.equal(hw31Open.rule_map['p3-31-e-g6-emes'],'T22_BAR_ZHOK');
 assert.equal(hw31Open.rule_map['p3-31-f-g6-kitabymdar'],'T23_POSS_PL');
@@ -1373,11 +1373,13 @@ assert.equal(s31.filter(q=>q.title==='KK → RU').length,6);
 assert.ok(!/сіздің|біздің|олардың/u.test(JSON.stringify(s31)));
 const app31Src=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 assert.ok(/Lesson31Pack\?\.install\?\.\(course,window\.CURRICULUM\)/.test(app31Src));
-assert.ok(/block==='3-1'\?\(window\.Lesson31Pack\?\.lessonSession/.test(app31Src));
+assert.ok(/courseSession/.test(app31Src));
+const start31=app31Src.slice(app31Src.indexOf('function startCourse'),app31Src.indexOf('function startTransfer'));
+assert.ok(start31.indexOf('restoreLessonPractice(block)')<start31.indexOf('courseSession'));
 ok('Phase 3 dormant Practice/Phrase integration installs nothing while closed and all 46 items when 3-1 gate opens');
 
 const openAdapter=require('./explain-bank-adapter.js');
-assert.deepEqual(openAdapter.OPEN,['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2']);
+assert.deepEqual(openAdapter.OPEN,['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3']);
 assert.deepEqual(openAdapter.courseById('3-1').rules,['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']);
 assert.equal(openAdapter.CHAPTER_RULE['3-1-poss'],'T20_POSS');
 assert.equal(openAdapter.CHAPTER_RULE['3-1-assim'],'T21_POSS_ASSIM');
@@ -1391,7 +1393,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/const CACHE='qazaq-offline-live-20260924-trainer-catalog-mobilefix'/.test(openSw));
+assert.ok(/const CACHE='qazaq-offline-live-20260924-t-integration-catalog'/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1443,8 +1445,8 @@ assert.ok(/T20_POSS/.test(Pack31Source)&&/T21_POSS_ASSIM/.test(Pack31Source)&&/T
 const GC31=require('./grammar-chapters.js');
 const path31=GC31.LESSONS.find(l=>l.id==='3-1');
 assert.ok(path31);
-assert.deepEqual(path31.chapters.map(c=>c.rule_ids[0]),['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']);
-assert.deepEqual(path31.chapters.map(c=>c.id),['3-1-poss','3-1-assim','3-1-bar','3-1-plural']);
+assert.deepEqual(path31.chapters.map(c=>c.rule_ids[0]),['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL','T20_POSS']);
+assert.deepEqual(path31.chapters.map(c=>c.id),['3-1-poss','3-1-assim','3-1-bar','3-1-plural','3-1-repair']);
 assert.ok(!/рычаг|бирка|алломорф|слот/i.test(JSON.stringify(path31)));
 assert.ok(fs.readFileSync(path.join(__dirname,'index.html'),'utf8').includes('lesson-pack-3-1.js'));
 ok('Phase 3 curriculum pack and Path 3-1 are prepared but still not live-loaded');
@@ -1697,7 +1699,8 @@ assert.ok(t27.some(q=>q.fields[0].answers[0]==='осы қала'));
 assert.ok(t27.some(q=>q.fields[0].answers[0]==='анау үй'));
 assert.ok(!t27.some(q=>q.fields[0].answers.some(a=>a==='бұл кітап')));
 assert.equal(Transfer.session('T24_POSS_BIZ',{catalog:cat32tr})[0].ruleIds[0],'T24_POSS_BIZ');
-assert.ok(/courseBlock==='3-2'\?'T24_POSS_BIZ':courseBlock==='3-1'\?'T20_POSS'/.test(appPause));
+assert.ok(/Lesson32Pack\.transferRule/.test(appPause));
+assert.ok(/T24_POSS_BIZ/.test(fs.readFileSync(path.join(__dirname,'lesson32-pack.js'),'utf8')));
 const path24=Transfer.oneForPath({id:'3-2-a',rule_ids:['T24_POSS_BIZ']},{id:'3-2'},{catalog:cat32tr});
 assert.equal(path24.fields[0].answers[0],'біздің досымыз');
 assert.equal(path24.ruleIds[0],'T24_POSS_BIZ');
@@ -2045,7 +2048,8 @@ assert.ok(String(BankRead.byId('T20_POSS').medium).length<500);
 assert.ok(String(BankRead.byId('T24_POSS_BIZ').medium).length<500);
 assert.equal(Full.forRule('T1_HARMONY').length,0);
 const t21note=Full.forRule('T21_POSS_ASSIM');
-assert.ok(/не исправлять/.test(t21note[0].note));
+assert.ok(/менің оқушым/.test(t21note[0].note)&&/оның досы/.test(t21note[0].note));
+assert.ok(/не принимаются/.test(t21note[0].note)&&/оқушысым/.test(t21note[0].note)&&/доссы/.test(t21note[0].note));
 ok('Astra step 18: 3-1 and 3-2 show the lesson files, not the short bank card');
 
 console.log('\nPassed',passed.length,'scenarios:\n'+passed.map(x=>' - '+x).join('\n'));

@@ -161,7 +161,7 @@ test('K1-I2 merged course path stays authoritative over legacy grammarPath',()=>
 
 test('K1-J picker IDs equal canonical ExplainBankUI.COURSE',()=>{
   assert.deepEqual(P.courseIds(),ids());
-  assert.deepEqual(ids(),['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2']);
+  assert.deepEqual(ids(),['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3']);
   const d=dash();
   assert.ok(d.includes('ExplainBankUI.COURSE'));
   assert.ok(!d.includes("const courseTitles={'1-1'"));

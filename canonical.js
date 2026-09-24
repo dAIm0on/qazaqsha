@@ -85,7 +85,39 @@
    q.note=q.note?String(q.note).replace(/сороков[а-я]*/gi,'вторые'):q.note;
    q.key_heading='вторые';
   }
+  applyIdFix(q);
   return q;
+ }
+ const ID_FIX={
+  'e21-fix-8':{
+   lesson:'2-1',
+   drop:['сен мұғалімсің емессің.','сен мұғалімсің емессің'],
+   keep:['Сен мұғалім емессің.','Сен мұғалім емессің'],
+   explanation:'По правилу урока личное окончание стоит только на емес: Сен мұғалім емессің. Форма с окончанием и на основу, и на емес не принимается.'
+  },
+  'e22-5-8':{
+   lesson:'2-2',
+   drop:['сендер құрбысыңдар емессіңдер.','сендер құрбысыңдар емессіңдер'],
+   keep:['Сендер құрбы емессіңдер.','Сендер құрбы емессіңдер'],
+   explanation:'По правилу урока личное окончание стоит только на емес: Сендер құрбы емессіңдер. Форма с окончанием и на основу, и на емес не принимается.'
+  }
+ };
+ function applyIdFix(q){
+  const fix=q&&ID_FIX[q.id];
+  if(!fix)return;
+  if(q.lessonId&&q.lessonId!==fix.lesson)return;
+  for(const f of q.fields||[]){
+   if(!Array.isArray(f.answers))continue;
+   const russian=/русск/i.test(f.label||'');
+   const next=[];
+   for(const a of f.answers){
+    if(!russian&&fix.drop.includes(n(a)))continue;
+    if(!next.some(x=>n(x)===n(a)))next.push(a);
+   }
+   if(!russian)for(const c of fix.keep)if(!next.some(x=>n(x)===n(c)))next.push(c);
+   if(next.length)f.answers=next;
+  }
+  q.explanation=fix.explanation;
  }
  function applyAll(list){
   for(const q of list||[])applyQuestion(q);
@@ -118,6 +150,6 @@
   }))return true;
   return false;
  }
- const api={ITEMS,MIXED,suffixRow,applyQuestion,applyAll,forbidsWrong,canonicalOf,farewellRole,isTrapItem,isAccepted,isKeepForm};
+ const api={ITEMS,MIXED,ID_FIX,suffixRow,applyQuestion,applyAll,forbidsWrong,canonicalOf,farewellRole,isTrapItem,isAccepted,isKeepForm};
  if(node)module.exports=api;else root.Canonical=api;
 })(typeof window!=='undefined'?window:globalThis);

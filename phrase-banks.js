@@ -1,4 +1,4 @@
-/* Phase 2B P1a closed phrase banks. Lessons 1-2 and 1-3 only. */
+/* Phrase banks for lessons 1-2, 1-3, 3-2 and 3-3. */
 (function(root){
  'use strict';
  const pair=(lesson,n,kz,ru,rootLesson,rule,errorTargets,errorType,morph,contrast)=>({
@@ -61,6 +61,32 @@
    pair('3-2',22,['мына кітап жақсы','осы кітап жақсы'],'эта книга хорошая','3-2','deixis',['DEIXIS_BARE'],'DEIXIS_BARE','мына кітап','осы кітап жақсы тоже'),
    pair('3-2',23,['анау — кітап','мынау — кітап'],'то — книга','3-2','deixis',['DEIXIS_BARE'],'DEIXIS_BARE','анау','*ана — кітап *мына — кітап'),
    pair('3-2',24,'біздің көлігіміз бар','у нас есть машина','3-1',['poss_biz','bar_zhok'],['BAR_ZHOK'],'bar_zhok_choice','көлігіміз + бар','*біз көлік бар *көлігіміз емес')
+  ],
+  '3-3':[
+   pair('3-3',1,'Мен сенің досыңмын.','Я твой друг.','3-3','T29_POSS_PERSON_STACK',['OWNER_SUBJECT_SWAP'],'OWNER_SUBJECT_SWAP','досың + мын',''),
+   pair('3-3',2,'Сен менің досымсың.','Ты мой друг.','3-3','T29_POSS_PERSON_STACK',['OWNER_SUBJECT_SWAP'],'OWNER_SUBJECT_SWAP','досым + сың',''),
+   pair('3-3',3,'Сіз менің қонағымсыз.','Вы мой гость.','3-3','T29_POSS_PERSON_STACK',['PERSON_AFTER_POSS_WRONG'],'PERSON_AFTER_POSS_WRONG','қонағым + сыз',''),
+   pair('3-3',4,'Мен сіздің қонағыңызбын.','Я Ваш гость.','3-3','T29_POSS_PERSON_STACK',['PERSON_AFTER_POSS_WRONG'],'PERSON_AFTER_POSS_WRONG','қонағыңыз + бын',''),
+   pair('3-3',5,'Мен сіздің мұғаліміңізбін.','Я Ваш учитель.','3-3','T29_POSS_PERSON_STACK',['PERSON_AFTER_POSS_WRONG'],'PERSON_AFTER_POSS_WRONG','мұғаліміңіз + бін',''),
+   pair('3-3',6,'Сіз менің мұғалімімсіз.','Вы мой учитель.','3-3','T29_POSS_PERSON_STACK',['PERSON_AFTER_POSS_WRONG'],'PERSON_AFTER_POSS_WRONG','мұғалімім + сіз',''),
+   pair('3-3',7,'Мен сенің сыныптасыңмын.','Я твой одноклассник.','3-3','T29_POSS_PERSON_STACK',['POSS_WRONG_PERSON'],'POSS_WRONG_PERSON','сыныптасың + мын',''),
+   pair('3-3',8,'Сен менің жауымсың.','Ты мой враг.','3-3','T29_POSS_PERSON_STACK',['POSS_WRONG_PERSON'],'POSS_WRONG_PERSON','жауым + сың',''),
+   pair('3-3',9,'Мен оның жігітімін.',['Я её парень.','Я его парень.'],'3-3','T29_POSS_PERSON_STACK',['POSS_PERSON_STACK'],'POSS_PERSON_STACK','жігіті + мін',''),
+   pair('3-3',10,'Сен оның сіңлісісің.','Ты её младшая сестра.','3-3','T29_POSS_PERSON_STACK',['POSS_WRONG_PERSON'],'POSS_WRONG_PERSON','сіңлісі + сің',''),
+   pair('3-3',11,'Ол сіздің қонағыңыз.',['Он Ваш гость.','Она Ваш гость.'],'3-3','T30_THIRD_ZERO',['THIRD_PERSON_EXTRA_PERSONAL'],'THIRD_PERSON_EXTRA_PERSONAL','қонағыңыз',''),
+   pair('3-3',12,'Сіз менің туысымсыз.','Вы мой родственник.','3-3','T29_POSS_PERSON_STACK',['PERSON_AFTER_POSS_MISSING'],'PERSON_AFTER_POSS_MISSING','туысым + сыз',''),
+   pair('3-3',13,'Сен менің жауым емессің.','Ты не мой враг.','3-3','T31_EMES_STACK',['EMES_PERSON_POSITION'],'EMES_PERSON_POSITION','емес + сің',''),
+   pair('3-3',14,'Мен сенің балаң емеспін.','Я не твой ребёнок.','3-3','T31_EMES_STACK',['EMES_PERSON_POSITION'],'EMES_PERSON_POSITION','емес + пін',''),
+   pair('3-3',15,'Сіз менің көршім емессіз.','Вы не мой сосед.','3-3','T31_EMES_STACK',['EMES_PERSON_POSITION'],'EMES_PERSON_POSITION','емес + сіз',''),
+   pair('3-3',16,'Мен сіздің мұғаліміңіз емеспін.','Я не Ваш учитель.','3-3','T31_EMES_STACK',['EMES_PERSON_POSITION'],'EMES_PERSON_POSITION','емес + пін',''),
+   pair('3-3',17,'Ол оның қарындасы емес.','Она не его младшая сестра.','3-3','T31_EMES_STACK',['EMES_PERSON_POSITION'],'EMES_PERSON_POSITION','емес',''),
+   pair('3-3',18,'Оның отбасы жақсы.',['Его семья хорошая.','Её семья хорошая.'],'3-3','T32_OTBASY',['OTBASY_DOUBLE_POSS'],'OTBASY_DOUBLE_POSS','отбасы',''),
+   pair('3-3',19,'Сен оның отбасысың.',['Ты его семья.','Ты её семья.'],'3-3','T32_OTBASY',['OTBASY_DOUBLE_POSS'],'OTBASY_DOUBLE_POSS','отбасы + сың',''),
+   pair('3-3',20,'Менің сыныбым жақсы.','Мой класс хороший.','3-3','T33_ADJ_ROLE',['ADJ_ROLE_ORDER'],'ADJ_ROLE_ORDER','сыныбым жақсы',''),
+   pair('3-3',21,'Оның баласы жаман.',['Его ребёнок плохой.','Её ребёнок плохой.'],'3-3','T33_ADJ_ROLE',['ADJ_ROLE_ORDER'],'ADJ_ROLE_ORDER','баласы жаман',''),
+   pair('3-3',22,'Сендердің сыныптастарың ақылды.','Ваш одноклассник умный.','3-3','T33_ADJ_ROLE',['ADJ_ROLE_ORDER'],'ADJ_ROLE_ORDER','сыныптастарың',''),
+   pair('3-3',23,'Сіздердің істеріңіз жақсы.','Ваше дело хорошее.','3-3','T33_ADJ_ROLE',['ADJ_ROLE_ORDER'],'ADJ_ROLE_ORDER','істеріңіз',''),
+   pair('3-3',24,'Ол менің досым.',['Он мой друг.','Она мой друг.'],'3-3','T30_THIRD_ZERO',['THIRD_PERSON_EXTRA_PERSONAL'],'THIRD_PERSON_EXTRA_PERSONAL','досым','')
   ]
  };
  function forLesson(id){return (BANKS[id]||[]).map(x=>JSON.parse(JSON.stringify(x)));}

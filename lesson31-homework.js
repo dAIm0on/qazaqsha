@@ -10,7 +10,13 @@
   'p3-31-c-g2-mektep',
   'p3-31-e-g6-emes',
   'p3-31-f-g6-kitabymdar',
-  'p3-31-x-g6-zhurekim'
+  'p3-31-x-g6-zhurekim',
+  'p3-31-h-ake-mine',
+  'p3-31-i-suf-pater',
+  'p3-31-k-su',
+  'p3-31-l-oqushy',
+  'p3-31-l-dos',
+  'p3-31-m-books'
  ];
  const PHRASE_IDS=[
   'p3-31-g-g3-my-book',
@@ -28,7 +34,13 @@
   'p3-31-g-g3-my-book':'T21_POSS_ASSIM',
   'p3-31-g-g3-your-friend':'T20_POSS',
   'p3-31-g-g4-heart':'T21_POSS_ASSIM',
-  'p3-31-g-g4-your-friends':'T23_POSS_PL'
+  'p3-31-g-g4-your-friends':'T23_POSS_PL',
+  'p3-31-h-ake-mine':'T20_POSS',
+  'p3-31-i-suf-pater':'T20_POSS',
+  'p3-31-k-su':'T21_POSS_ASSIM',
+  'p3-31-l-oqushy':'T20_POSS',
+  'p3-31-l-dos':'T20_POSS',
+  'p3-31-m-books':'T23_POSS_PL'
  };
  const TARGET_VOCAB=[
   ['бас','голова'],['қол','рука'],['көз','глаз'],['тіл','язык'],

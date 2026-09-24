@@ -115,7 +115,7 @@
      const old=out.vocabulary[id];out.vocabulary[id]=old?{times_seen:Math.max(old.times_seen,v.times_seen),last_seen:Math.max(old.last_seen,v.last_seen),last_seen_lesson:old.last_seen>v.last_seen?old.last_seen_lesson:v.last_seen_lesson,target_or_context:old.target_or_context==='target'||v.target_or_context==='target'?'target':'context'}:v;
    }
    const eventMap=new Map([...out.events,...incoming.events].map(e=>[JSON.stringify([e.type,e.card_id,e.at,e.answers,e.correct]),e]));
-   out.events=[...eventMap.values()].sort((a,b)=>a.at-b.at).slice(-cfg.storage.maxEvents);
+   out.events=courseProgress.dedupeStageEvents([...eventMap.values()]).sort((a,b)=>a.at-b.at).slice(-cfg.storage.maxEvents);
    out.prefs={letters:!!(incoming.prefs&&incoming.prefs.letters)||!!out.prefs.letters,lettersChosen:!!(incoming.prefs&&incoming.prefs.lettersChosen)||!!out.prefs.lettersChosen};
    Object.assign(out.learning.steps,incoming.learning.steps);
    Object.assign(out.learning.notes,incoming.learning.notes);Object.assign(out.learning.completedSteps,incoming.learning.completedSteps);
@@ -219,6 +219,6 @@
    const ids=questions.filter(q=>samePair(q,pair)&&byId.has(q.id)).map(q=>q.id);
    return [...new Set(ids)].slice(0,cfg.session.size);
  }
- const api={empty,migrate,serialize,validate,merge,answerIndex,observeConfusions,pairs,contrastIds,samePair,memoryStats,courseIds:courseProgress.courseIds,ensureCourseProgress:courseProgress.ensure,ensureLessonProgress:courseProgress.ensureLesson,setResumePointer:courseProgress.setResume,markLessonStarted:courseProgress.markStarted,markLessonCompleted:courseProgress.markCompleted,saveLessonPath:courseProgress.savePath,saveLessonPractice:courseProgress.savePractice,clearLessonPractice:courseProgress.clearPractice,normalizePracticeSession:courseProgress.normalizePractice};
+ const api={empty,migrate,serialize,validate,merge,answerIndex,observeConfusions,pairs,contrastIds,samePair,memoryStats,courseIds:courseProgress.courseIds,ensureCourseProgress:courseProgress.ensure,ensureLessonProgress:courseProgress.ensureLesson,setResumePointer:courseProgress.setResume,markLessonStarted:courseProgress.markStarted,markLessonCompleted:courseProgress.markCompleted,saveLessonPath:courseProgress.savePath,saveLessonPractice:courseProgress.savePractice,clearLessonPractice:courseProgress.clearPractice,normalizePracticeSession:courseProgress.normalizePractice,normalizeStageContext:courseProgress.normalizeStageContext,evaluateStage:courseProgress.evaluateStage,lessonStatusAfterStage:courseProgress.lessonStatusAfterStage,pushStageCompletion:courseProgress.pushStageCompletion,registerStages:courseProgress.registerStages,nextRegistered:courseProgress.nextRegistered,unknownQueueIds:courseProgress.unknownQueueIds,STAGE_REVISION:courseProgress.STAGE_REVISION};
  if(node)module.exports=api;else root.ProgressStore=api;
 })(typeof window!=='undefined'?window:globalThis);

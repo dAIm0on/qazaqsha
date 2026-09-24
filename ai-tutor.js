@@ -37,6 +37,8 @@
  }
  let store=load();
  function mapDiag(type,expected,actual){
+  const lesson33=['PERSON_VS_POSS','OWNER_SUBJECT_SWAP','OWNER_WRONG','SUBJECT_WRONG','POSS_PERSON_STACK','PERSON_AFTER_POSS_WRONG','PERSON_AFTER_POSS_MISSING','THIRD_PERSON_EXTRA_PERSONAL','EMES_PERSON_POSITION','EMES_POSS_DROPPED','OTBASY_DOUBLE_POSS','ADJ_ROLE_ORDER','INTERROGATIVE_CHOICE','MULTI_ERROR'];
+  if(lesson33.includes(type))return type;
   if(type==='plural_after_numeral')return 'PLURAL_AFTER_NUMBER';
   if(type==='vowel_harmony')return 'PLURAL_HARMONY_AE';
   if(type==='plural_initial_consonant')return 'PLURAL_INITIAL_LDT';
@@ -51,7 +53,10 @@
   if(type==='poss_suffix_missing'||type==='poss_phrase')return 'POSS_PERSON_SUFFIX';
   if(type==='poss_assim_voice')return 'POSS_ASSIM_VOICE';
   if(type==='poss_plural_order')return 'POSS_PLURAL_ORDER';
-  if(type==='poss_owner_form')return 'POSS_PRONOUN';
+  if(type==='poss_owner_form'||type==='poss_parse')return 'POSS_PRONOUN';
+  if(type==='poss_wrong_person')return 'POSS_PERSON_SUFFIX';
+  if(type==='poss_harmony')return 'POSS_HARMONY';
+  if(type==='poss_edge'||type==='poss_buffer'||type==='poss_glide')return 'POSS_VOWEL_BUFFER';
   if(type==='bar_zhok_choice'||type==='bar_zhok_not_emes')return 'BAR_ZHOK';
   if(type==='POSS_NO_SUFFIX')return 'POSS_PERSON_SUFFIX';
   if(type==='POSS_ASSIM'||type==='POSS_GLIDE')return 'POSS_ASSIM_VOICE';
