@@ -3,7 +3,10 @@
   const H=window.HarmonyLetterTrainer;
   const STORAGE_KEY='qazaqsha-personal-trainers-v1';
   const REGISTRY=Object.freeze([
-    Object.freeze({id:'harmony_letters',order:1,title:'Твёрдые / мягкие звуки',description:'Пары, группы и слова',enabled:true})
+    Object.freeze({id:'harmony_letters',order:1,title:'Буквы · кот',description:'Твёрдые / мягкие сигналы, пары и слова',enabled:true,kind:'cat'}),
+    Object.freeze({id:'numbers',order:2,title:'Числа',description:'Лестница от 0–10 до сотен и тысяч',enabled:true,kind:'numbers'}),
+    Object.freeze({id:'vocab_must',order:3,title:'Новые слова',description:'Слова, которые задали выучить · оба направления вперемешку',enabled:true,kind:'bridge',target:'vocab:must'}),
+    Object.freeze({id:'vocab_used',order:4,title:'Встречавшиеся слова',description:'Узнать и написать вперемешку в одном подходе',enabled:true,kind:'bridge',target:'vocab:used'})
   ]);
   const STAGE_LABELS={0:'Карта пар',1:'Найди пару',2:'К какой группе?',3:'Собери из памяти',4:'Сигнал в слове',5:'Быстрый раунд'};
   let screen='catalog',activeId=null,itemShownAt=0,selection=new Set(),pairSelection={};
@@ -48,8 +51,8 @@
   }
   function openCatalog(){screen='catalog';activeId=null;selection=new Set();pairSelection={};render();}
   function openTrainer(id){
-    if(!REGISTRY.some(x=>x.id===id&&x.enabled))return;
-    activeId=id;screen='trainer';selection=new Set();pairSelection={};render();
+    const item=REGISTRY.find(x=>x.id===id&&x.enabled);if(!item)return;
+    activeId=id;screen=item.kind==='numbers'?'numbers':'trainer';selection=new Set();pairSelection={};render();
   }
   function start(id='harmony_letters',mode='full'){
     activeId=id;screen='trainer';
@@ -62,18 +65,30 @@
     return '<div class="cat-pair-map">'+H.PAIRS.map(p=>'<div class="cat-pair"><strong>'+esc(p.hard)+'</strong><span>↔</span><strong>'+esc(p.soft)+'</strong></div>').join('')+'</div>';
   }
   function catalogMarkup(){
-    const store=load();
+    const store=load(),bridge=window.TrainerCatalogBridge;
     const cards=REGISTRY.filter(x=>x.enabled).map(item=>{
-      const rec=store.trainers[item.id];
-      const hasLive=rec&&rec.session&&!rec.session.complete;
-      const action=hasLive?'Продолжить':'Начать';
+      const rec=item.kind==='cat'?store.trainers[item.id]:null;
+      const live=item.target&&bridge&&bridge.status?bridge.status(item.target):null;
+      const status=item.kind==='cat'?statusLine(rec):(live?('В процессе · осталось '+live.remaining+' из '+live.total):'Можно открыть отдельно');
+      const action=item.kind==='cat'?(rec&&rec.session&&!rec.session.complete?'Продолжить':'Начать'):(live?'Продолжить':'Открыть');
+      const quick=item.kind==='cat'?'<button type="button" class="text-button" data-trainer-quick="'+esc(item.id)+'">Быстро: 12</button>':'';
       return '<article class="personal-trainer-card" data-trainer-card="'+esc(item.id)+'">'+
-        '<div><p class="eyebrow">ТРЕНАЖЁР '+item.order+'</p><h2>'+esc(item.order+'. '+item.title)+'</h2><p>'+esc(item.description)+'</p><p class="small">'+esc(statusLine(rec))+'</p></div>'+
-        '<div class="personal-trainer-actions"><button type="button" class="primary-button" data-trainer-open="'+esc(item.id)+'">'+action+'</button>'+
-        '<button type="button" class="text-button" data-trainer-quick="'+esc(item.id)+'">Быстро: 12</button></div></article>';
+        '<div><p class="eyebrow">ТРЕНАЖЁР '+item.order+'</p><h2>'+esc(item.order+'. '+item.title)+'</h2><p>'+esc(item.description)+'</p><p class="small">'+esc(status)+'</p></div>'+
+        '<div class="personal-trainer-actions"><button type="button" class="primary-button" data-trainer-open="'+esc(item.id)+'">'+action+'</button>'+quick+'</div></article>';
     }).join('');
-    return '<div class="cat-trainer-hero"><div><p class="eyebrow">ЛИЧНАЯ ЗОНА</p><h2>Тренажёр кота</h2><p>Короткие отдельные тренировки для того, что хочется довести до автоматизма.</p></div><img src="assets/tutor/pet-idle.png" alt="" width="120" height="120"></div>'+
+    return '<div class="cat-trainer-hero"><div><p class="eyebrow">ЛИЧНАЯ ЗОНА</p><h2>Тренажёры</h2><p>Отдельные короткие тренировки: буквы, числа и словарь. Они используют те же карточки и прогресс курса.</p></div><img src="assets/tutor/pet-idle.png" alt="" width="120" height="120"></div>'+
       '<div class="personal-trainer-list">'+cards+'</div>';
+  }
+  function numbersMarkup(){
+    const bridge=window.TrainerCatalogBridge;
+    const tracks=bridge&&bridge.numberTracks?bridge.numberTracks():[];
+    const rows=tracks.map((item,i)=>{
+      const live=bridge&&bridge.status?bridge.status('number:'+item.id):null;
+      const hint=live?('В процессе · осталось '+live.remaining+' из '+live.total):(item.open?'Доступно по текущему прогрессу':'Сначала закрепи предыдущую ступень');
+      const label=live?'Продолжить':(item.open?'Открыть':'Пока закрыто');
+      return '<article class="personal-trainer-card"><div><p class="eyebrow">СТУПЕНЬ '+(i+1)+'</p><h2>'+esc(item.title)+'</h2><p class="small">'+esc(hint)+'</p></div><div class="personal-trainer-actions"><button type="button" class="primary-button" data-number-track="'+esc(item.id)+'"'+(item.open?'':' disabled')+'>'+label+'</button></div></article>';
+    }).join('');
+    return '<div class="personal-trainer-head"><button type="button" class="text-button" data-back-catalog>← Все тренажёры</button><div><p class="eyebrow">ЧИСЛА</p><h2>Лестница чисел</h2><p class="small">Используется существующий NumberLadder. Закрытые ступени не обходятся.</p></div></div><div class="personal-trainer-list">'+rows+'</div>';
   }
   function stageIntro(session){
     return '<div class="cat-stage-card"><p class="eyebrow">СТУПЕНЬ 0</p><h2>Карта пар</h2><p>Сначала держим в голове шесть контрастов. Остальные буквы потом сортируем отдельно.</p>'+
@@ -147,6 +162,7 @@
   function render(){
     const root=getRoot();if(!root||!H)return;
     if(screen==='catalog')root.innerHTML=catalogMarkup();
+    else if(screen==='numbers')root.innerHTML=numbersMarkup();
     else root.innerHTML='<div class="personal-trainer-head"><button type="button" class="text-button" data-back-catalog>← Все тренажёры</button><div><p class="eyebrow">ТРЕНАЖЁР КОТА</p><h2>1. Твёрдые / мягкие звуки</h2></div></div>'+trainerMarkup();
     bind(root);
     itemShownAt=Date.now();
@@ -156,7 +172,13 @@
     const next=H.answer(session,response,Date.now()-itemShownAt);writeSession(activeId,next);render();
   }
   function bind(root){
-    root.querySelectorAll('[data-trainer-open]').forEach(b=>b.onclick=()=>{const id=b.dataset.trainerOpen,rec=load().trainers[id];if(rec&&rec.session&&!rec.session.complete)openTrainer(id);else start(id,'full');});
+    root.querySelectorAll('[data-trainer-open]').forEach(b=>b.onclick=()=>{
+      const id=b.dataset.trainerOpen,item=REGISTRY.find(x=>x.id===id);if(!item)return;
+      if(item.kind==='cat'){const rec=load().trainers[id];if(rec&&rec.session&&!rec.session.complete)openTrainer(id);else start(id,'full');return;}
+      if(item.kind==='numbers'){openTrainer(id);return;}
+      if(item.target&&window.TrainerCatalogBridge&&window.TrainerCatalogBridge.launch)window.TrainerCatalogBridge.launch(item.target);
+    });
+    root.querySelectorAll('[data-number-track]').forEach(b=>b.onclick=()=>{if(!b.disabled&&window.TrainerCatalogBridge&&window.TrainerCatalogBridge.launch)window.TrainerCatalogBridge.launch('number:'+b.dataset.numberTrack);});
     root.querySelectorAll('[data-trainer-quick]').forEach(b=>b.onclick=()=>start(b.dataset.trainerQuick,'quick'));
     root.querySelectorAll('[data-back-catalog]').forEach(b=>b.onclick=openCatalog);
     root.querySelectorAll('[data-start-full],[data-restart-full]').forEach(b=>b.onclick=()=>start(activeId||'harmony_letters','full'));

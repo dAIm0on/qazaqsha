@@ -43,7 +43,7 @@
  try{if(window.Lesson32Pack&&P.registerStages)P.registerStages('3-2',window.Lesson32Pack.stagePlans());}catch{}
  try{if(window.Lesson33Pack&&P.registerStages)P.registerStages('3-3',window.Lesson33Pack.stagePlans());}catch{}
  let confusionIndex=P.answerIndex(questions);
- let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null;
+ let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null,trainerReturn=null;
  let reviewReasonMap=Object.create(null),materialsQuery='',materialsLesson='',materialsKind='';
  const COURSE_BLOCKS=(window.ExplainBankUI&&window.ExplainBankUI.COURSE||[]).map(row=>({id:row.id,title:row.label,hint:row.name}));
  function courseJumpMarkup(id){
@@ -394,7 +394,7 @@
  }
  function save(){
    captureDraft();persistLessonPath();persistLessonPractice();if(window.AiTutor&&window.AiTutor.snapshot)state.aiTutor=window.AiTutor.snapshot();state.records=records;state.learning=learningState;
-   state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null};
+   state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null,trainerReturn};
    try{if(storageReadError)throw storageReadError;localStorage.setItem(KEY,JSON.stringify(state));storageAvailable=true;}catch{storageAvailable=false;}
    $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
    if(!cloudApplying)window.QazaqCloud?.pushSoon?.(state);
@@ -1496,6 +1496,13 @@
    const lesson=activeLesson&&window.LEARNING.lessons.find(l=>l.id===activeLesson);
    const complete=!!lesson&&practiceIds.length>0&&practiceIds.every(id=>stepEvidence[id]);
    if(complete)learningState.completedSteps[activeLesson+':'+activeStep]=true;
+   if(trainerReturn){
+     const returnKind=trainerReturn;
+     $('#exercise').innerHTML='<div class="empty-state"><h2>Подход завершён</h2><p>Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё подход</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
+     $('#restart').onclick=()=>startCatalogTrainer(returnKind);
+     $('#back-to-learning').onclick=()=>{trainerReturn=null;showView('personal');if(window.PersonalTrainers&&window.PersonalTrainers.openCatalog)window.PersonalTrainers.openCatalog();};
+     save();return;
+   }
    const waiting=practiceIds.filter(id=>(records[id]?.streak||0)<cfg.schedule.cleanAnswersToConsolidate).length;
    const help=window.LearningSupport.suggestions(state,questions)[0];
    $('#exercise').innerHTML='<div class="empty-state"><h2>Ещё один шаг. Уже твой.</h2><p>'+(complete?'Проверка идеи пройдена. ':'Подход завершён. ')+'Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'. Ошибок: '+(sessionAttempts-sessionCorrect-sessionAssisted)+'.</p><p>'+(waiting?'Ещё закрепляем '+waiting+' карточек. Они сохраняются для повторения.':'Можно остановиться; карточки вернутся по расписанию.')+'</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">'+(lesson?(complete?(activeStep<lesson.chunks.length-1?'Следующая идея':'Выбрать следующий урок'):'Вернуться к объяснению'):'Ещё несколько заданий')+'</button><button type="button" class="secondary-button" id="back-to-learning">Закончить</button></div>'+(help?'<div class="panel"><h3>'+esc(help.title)+'</h3><p>Эта ошибка повторялась. Можно отдельно потренировать трудный шаг.</p><button type="button" class="secondary-button" id="start-remedy">Разобрать и проверить</button></div>':'')+'</div>';
@@ -1514,6 +1521,55 @@
  function startCustom(ids,kind='words'){
    activeLesson=null;activeStep=null;sourceFilter=null;topic='all';mode=kind;
    queue=kind==='remediation'?ids.filter(id=>byId.has(id)):ids.filter(eligible);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;resetCounts();render();showView('practice');
+ }
+ function catalogNumberTracks(){
+   const order=window.NumberLadder&&window.NumberLadder.ORDER||[];
+   const by=new Map((window.LEARNING&&window.LEARNING.lessons||[]).map(l=>[l.id,l]));
+   return order.map(id=>by.get(id)).filter(Boolean).map(l=>{
+     const open=(l.questionIds||[]).some(qid=>{const q=byId.get(qid);return q&&(!window.NumberLadder||window.NumberLadder.allowed(q,state));});
+     return {id:l.id,title:l.title||l.id,open};
+   });
+ }
+ function catalogVocabIds(role){
+   let list=questions.filter(q=>eligible(q)&&q.topic==='vocab'&&q.wordRole===role);
+   list=window.Knowledge&&window.Knowledge.choose?window.Knowledge.choose(shuffled(list),state,Infinity):shuffled(list);
+   const recognize=shuffled(list.filter(q=>/-ru$/.test(q.id)));
+   const produce=shuffled(list.filter(q=>/-kk$/.test(q.id)));
+   const other=shuffled(list.filter(q=>!/-ru$|-kk$/.test(q.id)));
+   const mixed=[];
+   while(recognize.length||produce.length){
+     if(recognize.length&&produce.length)mixed.push((Math.random()<0.5?recognize:produce).shift());
+     else mixed.push((recognize.length?recognize:produce).shift());
+   }
+   mixed.push(...other);
+   const limit=Math.max(2,(cfg.session.size||10)+(cfg.session.newLimit||0));
+   let ids=mixed.map(q=>q.id);
+   if(window.MemoryPolicy&&window.MemoryPolicy.breakRuns)ids=window.MemoryPolicy.breakRuns(ids,questions);
+   return ids.slice(0,limit);
+ }
+ function startCatalogTrainer(kind){
+   trainerReturn=kind;
+   if(String(kind).startsWith('number:')){
+     const id=String(kind).slice(7),lesson=(window.LEARNING&&window.LEARNING.lessons||[]).find(l=>l.id===id);
+     const ids=(lesson&&lesson.questionIds||[]).filter(qid=>{const q=byId.get(qid);return q&&eligible(q)&&(!window.NumberLadder||window.NumberLadder.allowed(q,state));});
+     activeLesson=null;activeStep=null;sourceFilter=null;courseBlock=null;topic='numbers';vocabRole=null;mode='numbers';
+     queue=shuffled(ids);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;resetCounts();
+     if(!queue.length){trainerReturn=null;showView('personal');return;}
+     render();showView('practice');return;
+   }
+   const role=kind==='vocab:used'?'used':'must';
+   activeLesson=null;activeStep=null;sourceFilter=null;courseBlock=null;topic='vocab';vocabRole=role;mode='words';
+   queue=catalogVocabIds(role);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;resetCounts();
+   if(!queue.length){trainerReturn=null;showView('personal');return;}
+   render();showView('practice');
+ }
+ function launchCatalogTrainer(kind){
+   if(trainerReturn===kind&&queue.length>position){showView('practice');return;}
+   startCatalogTrainer(kind);
+ }
+ function catalogTrainerStatus(kind){
+   if(trainerReturn!==kind||!queue.length||position>=queue.length)return null;
+   return {remaining:queue.length-position,total:queue.length,position};
  }
  function practiceWords(ids){
    const wanted=new Set(ids),qs=questions.filter(q=>window.Knowledge.bindings(q).some(b=>wanted.has(b.item_id)&&['production','digit_to_word'].includes(b.skill_type)));
@@ -1861,7 +1917,7 @@
    contrast:startContrast,setAssociation,promote,export:()=>{save();downloadProgress(P.serialize(state));},import:importProgress,
    restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
  });
- $('#pause-session').onclick=()=>showView(mode==='homework'||(mode==='remediation'&&hwReturn)?'homework':mode==='exam'?'exam':'today');
+ $('#pause-session').onclick=()=>showView(trainerReturn?'personal':mode==='homework'||(mode==='remediation'&&hwReturn)?'homework':mode==='exam'?'exam':'today');
  const lettersPref=$('#pref-letters');
  if(lettersPref){lettersPref.checked=!!state.prefs.letters;lettersPref.onchange=()=>{state.prefs.letters=lettersPref.checked;state.prefs.lettersChosen=true;save();if(view==='practice')render();};}
  function issueContext(){
@@ -1915,6 +1971,11 @@
  }
  bindIssueBar();
  window.QazaqShell={show:showView};
+ window.TrainerCatalogBridge={
+   launch:launchCatalogTrainer,
+   numberTracks:catalogNumberTracks,
+   status:catalogTrainerStatus
+ };
  renderRules();renderMaterials();
  const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','course','phrase','transfer','contrast','numbers','remediation','words','exam','homework','chunks'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){
@@ -1924,7 +1985,7 @@
    sessionAttempts=Math.max(0,Number(savedSession.sessionAttempts)||0);sessionCorrect=Math.min(sessionAttempts,Math.max(0,Number(savedSession.sessionCorrect)||0));sessionAssisted=Math.min(sessionAttempts-sessionCorrect,Math.max(0,Number(savedSession.sessionAssisted)||0));
    draft=savedSession.draft&&Array.isArray(savedSession.draft.answers)?savedSession.draft:null;remediation=savedSession.remediation||null;
    stageContext=P.normalizeStageContext?P.normalizeStageContext(savedSession.stageContext):null;
-   topic=savedSession.topic;mode=savedSession.mode;sourceFilter=savedSession.sourceFilter||null;courseBlock=savedSession.courseBlock||null;hwLesson=savedSession.hwLesson||((mode==='homework'||savedSession.view==='homework')?savedSession.courseBlock||null:null);hwPart=savedSession.hwPart||null;hwSection=Math.max(0,Number(savedSession.hwSection)||0);activeLesson=mode==='lesson'?savedSession.activeLesson:null;
+   topic=savedSession.topic;mode=savedSession.mode;sourceFilter=savedSession.sourceFilter||null;courseBlock=savedSession.courseBlock||null;hwLesson=savedSession.hwLesson||((mode==='homework'||savedSession.view==='homework')?savedSession.courseBlock||null:null);hwPart=savedSession.hwPart||null;hwSection=Math.max(0,Number(savedSession.hwSection)||0);trainerReturn=savedSession.trainerReturn||null;activeLesson=mode==='lesson'?savedSession.activeLesson:null;
    activeStep=activeLesson?Math.min(window.LEARNING.lessons.find(l=>l.id===activeLesson).chunks.length-1,Math.max(0,Number(savedSession.activeStep)||0)):null;
    queue=savedSession.queue;practiceIds=Array.isArray(savedSession.practiceIds)?savedSession.practiceIds.filter(id=>byId.has(id)):[...new Set(queue)];
    stepEvidence=savedSession.stepEvidence&&typeof savedSession.stepEvidence==='object'?savedSession.stepEvidence:{};
