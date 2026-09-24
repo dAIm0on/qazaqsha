@@ -9,6 +9,7 @@
   function payload(state){
     const copy=JSON.parse(P.serialize(state));
     copy.session=null;
+    if(copy.morphTrainer)copy.morphTrainer.session=null;
     if(Array.isArray(copy.events)&&copy.events.length>2500)copy.events=copy.events.slice(-2500);
     return copy;
   }

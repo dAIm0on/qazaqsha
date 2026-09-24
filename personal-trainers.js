@@ -3,6 +3,7 @@
   const H=window.HarmonyLetterTrainer;
   const STORAGE_KEY='qazaqsha-personal-trainers-v1';
   const REGISTRY=Object.freeze([
+    Object.freeze({id:'morphophonology',order:5,title:'Форма слова',description:'Выбор формы, цепочки и проверка на новых основах',enabled:true,kind:'morph'}),
     Object.freeze({id:'harmony_letters',order:1,title:'Буквы · кот',description:'Твёрдые / мягкие сигналы, пары и слова',enabled:true,kind:'cat'}),
     Object.freeze({id:'numbers',order:2,title:'Числа',description:'Лестница от 0–10 до сотен и тысяч',enabled:true,kind:'numbers'}),
     Object.freeze({id:'vocab_must',order:3,title:'Новые слова',description:'Слова, которые задали выучить · оба направления вперемешку',enabled:true,kind:'bridge',target:'vocab:must'}),
@@ -66,10 +67,10 @@
   }
   function catalogMarkup(){
     const store=load(),bridge=window.TrainerCatalogBridge;
-    const cards=REGISTRY.filter(x=>x.enabled).map(item=>{
+    const cards=REGISTRY.filter(x=>x.enabled).slice().sort((a,b)=>a.order-b.order).map(item=>{
       const rec=item.kind==='cat'?store.trainers[item.id]:null;
       const live=item.target&&bridge&&bridge.status?bridge.status(item.target):null;
-      const status=item.kind==='cat'?statusLine(rec):(live?('В процессе · осталось '+live.remaining+' из '+live.total):'Можно открыть отдельно');
+      const status=item.kind==='morph'&&window.MorphTrainer?window.MorphTrainer.status():item.kind==='cat'?statusLine(rec):(live?('В процессе · осталось '+live.remaining+' из '+live.total):'Можно открыть отдельно');
       const action=item.kind==='cat'?(rec&&rec.session&&!rec.session.complete?'Продолжить':'Начать'):(live?'Продолжить':'Открыть');
       const quick=item.kind==='cat'?'<button type="button" class="text-button" data-trainer-quick="'+esc(item.id)+'">Быстро: 12</button>':'';
       return '<article class="personal-trainer-card" data-trainer-card="'+esc(item.id)+'">'+
@@ -176,6 +177,7 @@
       const id=b.dataset.trainerOpen,item=REGISTRY.find(x=>x.id===id);if(!item)return;
       if(item.kind==='cat'){const rec=load().trainers[id];if(rec&&rec.session&&!rec.session.complete)openTrainer(id);else start(id,'full');return;}
       if(item.kind==='numbers'){openTrainer(id);return;}
+      if(item.kind==='morph'&&window.MorphTrainer){window.MorphTrainer.open();return;}
       if(item.target&&window.TrainerCatalogBridge&&window.TrainerCatalogBridge.launch)window.TrainerCatalogBridge.launch(item.target);
     });
     root.querySelectorAll('[data-number-track]').forEach(b=>b.onclick=()=>{if(!b.disabled&&window.TrainerCatalogBridge&&window.TrainerCatalogBridge.launch)window.TrainerCatalogBridge.launch('number:'+b.dataset.numberTrack);});

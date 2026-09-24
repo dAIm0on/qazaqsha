@@ -589,7 +589,7 @@
    document.querySelectorAll('main > section').forEach(el=>{el.hidden=el.id!==next+'-view';});
    const tab=shellTab(next);
    $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-   renderStats();if(next==='learn')learning.render();if(next==='personal'&&window.PersonalTrainers)window.PersonalTrainers.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='materials')renderMaterials();if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();
+   renderStats();if(next==='learn')learning.render();if(next==='personal'&&window.PersonalTrainers)window.PersonalTrainers.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='materials')renderMaterials();if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();if(next==='morph'&&window.MorphTrainer)window.MorphTrainer.render();
    if(next==='practice'&&['homework','course','lesson','phrase','transfer','remediation'].includes(mode)){const id=mode==='homework'?hwLesson:(courseBlock||(state.grammarPath&&state.grammarPath.lessonId)||null);if(id)markPlace(mode==='homework'?'homework':'practice',id);}
    if(next==='path'&&state.grammarPath&&state.grammarPath.phase==='beat'&&state.grammarPath.lessonId)markPlace('path',state.grammarPath.lessonId);
    if(window.TutorUI){
@@ -600,7 +600,7 @@
  }
  function shellTab(next){
    if(next==='practice')return mode==='exam'?'review':'today';
-   if(['learn','homework','path','personal'].includes(next))return 'today';
+   if(['learn','homework','path','personal','morph'].includes(next))return 'today';
    if(['rules','vocabulary'].includes(next))return 'materials';
    if(next==='exam')return 'review';
    return next;
@@ -1970,6 +1970,22 @@
    });
  }
  bindIssueBar();
+ window.MorphBridge={
+   read(){
+     const module=window.MorphState.migrate(state.morphTrainer),knownLemmas=window.MorphEngine.data.lemmas.filter(l=>{
+       const v=state.vocabulary['word:'+l.text]||state.vocabulary[l.text],s=state.skills['word:'+l.text];
+       return (v&&v.times_seen>0)||(s&&s.seen>0);
+     }).map(l=>l.id);
+     return {module,records:Object.fromEntries(Object.entries(records).filter(([id])=>id.startsWith('morph:v1:'))),knownLemmas};
+   },
+   session(value){state.morphTrainer=window.MorphState.putSession(state.morphTrainer,value);save();return storageAvailable;},
+   answer(result){
+     const applied=window.MorphState.accept(state.morphTrainer,result);if(!applied.accepted)return false;
+     state.morphTrainer=applied.state;const e=applied.event;
+     if(!e.transfer)records[e.itemId]=window.TrainerCore.updateRecord(records[e.itemId],e.correct,e.hinted,e.at,{responseTime:e.responseTime,recall:e.responseMode==='input'});
+     save();return true;
+   }
+ };
  window.QazaqShell={show:showView};
  window.TrainerCatalogBridge={
    launch:launchCatalogTrainer,
@@ -1992,7 +2008,7 @@
    position=Math.min(queue.length,savedSession.position+(savedSession.answered?1:0));if(savedSession.answered&&!['ordered','shuffle','homework','course','phrase','transfer'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();
    if(!savedSession.answered){hinted=!!savedSession.hinted;elapsedMs=Number.isFinite(savedSession.elapsed_ms)?Math.max(0,savedSession.elapsed_ms):0;}
  }else{queue=[];practiceIds=[];renderStats();}
- const resumeView=validSaved&&['practice','homework','learn','path','review'].includes(savedSession.view)?savedSession.view:'today';
+ const resumeView=savedSession?.view==='morph'&&state.morphTrainer?.session?'morph':validSaved&&['practice','homework','learn','path','review'].includes(savedSession.view)?savedSession.view:'today';
  showView(resumeView);
  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else{renderStats();if(view==='practice')activateCard();if(['today','review','vocabulary'].includes(view))dashboard.render(view);}save();});
  window.addEventListener('qazaq-before-update',e=>{pauseTimer();save();if(!storageAvailable)e.preventDefault();});
@@ -2006,6 +2022,7 @@
    catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);
    confusionIndex=P.answerIndex(questions);save();cloudApplying=false;renderStats();
    if(['today','review','vocabulary'].includes(view))dashboard.render(view);
+   if(view==='morph'&&window.MorphTrainer)window.MorphTrainer.render();
  }
  function paintAccount(){
    const cloud=window.QazaqCloud,toggle=$('#account-toggle'),dlg=$('#account-dialog'),userEl=$('#account-user'),out=$('#account-logout');

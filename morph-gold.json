@@ -1,0 +1,1803 @@
+[
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "PL"
+    ],
+    "expected": "балалар",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-көше",
+    "sequence": [
+      "PL"
+    ],
+    "expected": "көшелер",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-адам",
+    "sequence": [
+      "PL"
+    ],
+    "expected": "адамдар",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-көл",
+    "sequence": [
+      "PL"
+    ],
+    "expected": "көлдер",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "PL"
+    ],
+    "expected": "кітаптар",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "PL"
+    ],
+    "expected": "мектептер",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-қала",
+    "sequence": [
+      "GEN"
+    ],
+    "expected": "қаланың",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-әке",
+    "sequence": [
+      "GEN"
+    ],
+    "expected": "әкенің",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-жол",
+    "sequence": [
+      "GEN"
+    ],
+    "expected": "жолдың",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-көл",
+    "sequence": [
+      "GEN"
+    ],
+    "expected": "көлдің",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "GEN"
+    ],
+    "expected": "кітаптың",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "GEN"
+    ],
+    "expected": "мектептің",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-адам",
+    "sequence": [
+      "GEN"
+    ],
+    "expected": "адамның",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ән",
+    "sequence": [
+      "GEN"
+    ],
+    "expected": "әннің",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-қала",
+    "sequence": [
+      "DAT"
+    ],
+    "expected": "қалаға",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-көше",
+    "sequence": [
+      "DAT"
+    ],
+    "expected": "көшеге",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "DAT"
+    ],
+    "expected": "кітапқа",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "DAT"
+    ],
+    "expected": "мектепке",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "POSS_1SG",
+      "DAT"
+    ],
+    "expected": "кітабыма",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "POSS_1SG",
+      "DAT"
+    ],
+    "expected": "мектебіме",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "POSS_3",
+      "DAT"
+    ],
+    "expected": "кітабына",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "POSS_3",
+      "DAT"
+    ],
+    "expected": "мектебіне",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-қала",
+    "sequence": [
+      "ACC"
+    ],
+    "expected": "қаланы",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-көше",
+    "sequence": [
+      "ACC"
+    ],
+    "expected": "көшені",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-адам",
+    "sequence": [
+      "ACC"
+    ],
+    "expected": "адамды",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ән",
+    "sequence": [
+      "ACC"
+    ],
+    "expected": "әнді",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "ACC"
+    ],
+    "expected": "кітапты",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "ACC"
+    ],
+    "expected": "мектепті",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "POSS_3",
+      "ACC"
+    ],
+    "expected": "кітабын",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "POSS_3",
+      "ACC"
+    ],
+    "expected": "мектебін",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-қала",
+    "sequence": [
+      "LOC"
+    ],
+    "expected": "қалада",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-көше",
+    "sequence": [
+      "LOC"
+    ],
+    "expected": "көшеде",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "LOC"
+    ],
+    "expected": "кітапта",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "LOC"
+    ],
+    "expected": "мектепте",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "POSS_3",
+      "LOC"
+    ],
+    "expected": "кітабында",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "POSS_3",
+      "LOC"
+    ],
+    "expected": "мектебінде",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-қала",
+    "sequence": [
+      "ABL"
+    ],
+    "expected": "қаладан",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-көше",
+    "sequence": [
+      "ABL"
+    ],
+    "expected": "көшеден",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "ABL"
+    ],
+    "expected": "кітаптан",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "ABL"
+    ],
+    "expected": "мектептен",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-адам",
+    "sequence": [
+      "ABL"
+    ],
+    "expected": "адамнан",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ән",
+    "sequence": [
+      "ABL"
+    ],
+    "expected": "әннен",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "POSS_3",
+      "ABL"
+    ],
+    "expected": "кітабынан",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "POSS_3",
+      "ABL"
+    ],
+    "expected": "мектебінен",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-қала",
+    "sequence": [
+      "INS"
+    ],
+    "expected": "қаламен",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-қыз",
+    "sequence": [
+      "INS"
+    ],
+    "expected": "қызбен",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "INS"
+    ],
+    "expected": "кітаппен",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "POSS_1SG"
+    ],
+    "expected": "балам",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ат",
+    "sequence": [
+      "POSS_1SG"
+    ],
+    "expected": "атым",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ит",
+    "sequence": [
+      "POSS_1SG"
+    ],
+    "expected": "итім",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "POSS_2SG"
+    ],
+    "expected": "балаң",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ат",
+    "sequence": [
+      "POSS_2SG"
+    ],
+    "expected": "атың",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ит",
+    "sequence": [
+      "POSS_2SG"
+    ],
+    "expected": "итің",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "POSS_1PL"
+    ],
+    "expected": "баламыз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-әке",
+    "sequence": [
+      "POSS_1PL"
+    ],
+    "expected": "әкеміз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ат",
+    "sequence": [
+      "POSS_1PL"
+    ],
+    "expected": "атымыз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ит",
+    "sequence": [
+      "POSS_1PL"
+    ],
+    "expected": "итіміз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "POSS_2POL"
+    ],
+    "expected": "балаңыз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-әке",
+    "sequence": [
+      "POSS_2POL"
+    ],
+    "expected": "әкеңіз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ат",
+    "sequence": [
+      "POSS_2POL"
+    ],
+    "expected": "атыңыз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ит",
+    "sequence": [
+      "POSS_2POL"
+    ],
+    "expected": "итіңіз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "POSS_3"
+    ],
+    "expected": "баласы",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-әке",
+    "sequence": [
+      "POSS_3"
+    ],
+    "expected": "әкесі",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ат",
+    "sequence": [
+      "POSS_3"
+    ],
+    "expected": "аты",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ит",
+    "sequence": [
+      "POSS_3"
+    ],
+    "expected": "иті",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "POSS_1SG"
+    ],
+    "expected": "кітабым",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-көлік",
+    "sequence": [
+      "POSS_1SG"
+    ],
+    "expected": "көлігім",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-қонақ",
+    "sequence": [
+      "POSS_1SG"
+    ],
+    "expected": "қонағым",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-орын",
+    "sequence": [
+      "POSS_3"
+    ],
+    "expected": "орны",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ерін",
+    "sequence": [
+      "POSS_3"
+    ],
+    "expected": "ерні",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-орын",
+    "sequence": [
+      "LOC"
+    ],
+    "expected": "орында",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-су",
+    "sequence": [
+      "POSS_1SG"
+    ],
+    "expected": "суым",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-үй",
+    "sequence": [
+      "POSS_1SG"
+    ],
+    "expected": "үйім",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-тау",
+    "sequence": [
+      "POSS_3"
+    ],
+    "expected": "тауы",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-адам",
+    "sequence": [
+      "COP_1SG"
+    ],
+    "expected": "адаммын",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мұғалім",
+    "sequence": [
+      "COP_1SG"
+    ],
+    "expected": "мұғаліммін",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-қыз",
+    "sequence": [
+      "COP_1SG"
+    ],
+    "expected": "қызбын",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-егіз",
+    "sequence": [
+      "COP_1SG"
+    ],
+    "expected": "егізбін",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-дос",
+    "sequence": [
+      "COP_1SG"
+    ],
+    "expected": "доспын",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-әріптес",
+    "sequence": [
+      "COP_1SG"
+    ],
+    "expected": "әріптеспін",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "COP_1PL"
+    ],
+    "expected": "баламыз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-әке",
+    "sequence": [
+      "COP_1PL"
+    ],
+    "expected": "әкеміз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-адам",
+    "sequence": [
+      "COP_1PL"
+    ],
+    "expected": "адамбыз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мұғалім",
+    "sequence": [
+      "COP_1PL"
+    ],
+    "expected": "мұғалімбіз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-дос",
+    "sequence": [
+      "COP_1PL"
+    ],
+    "expected": "доспыз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-әріптес",
+    "sequence": [
+      "COP_1PL"
+    ],
+    "expected": "әріптеспіз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "COP_2SG"
+    ],
+    "expected": "баласың",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-әке",
+    "sequence": [
+      "COP_2SG"
+    ],
+    "expected": "әкесің",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "COP_2POL"
+    ],
+    "expected": "баласыз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-әке",
+    "sequence": [
+      "COP_2POL"
+    ],
+    "expected": "әкесіз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "COP_2PL"
+    ],
+    "expected": "баласыңдар",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-әке",
+    "sequence": [
+      "COP_2PL"
+    ],
+    "expected": "әкесіңдер",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "COP_2PL_POL"
+    ],
+    "expected": "баласыздар",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-әке",
+    "sequence": [
+      "COP_2PL_POL"
+    ],
+    "expected": "әкесіздер",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-қала",
+    "sequence": [
+      "Q"
+    ],
+    "expected": "қала ма",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-көше",
+    "sequence": [
+      "Q"
+    ],
+    "expected": "көше ме",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-адам",
+    "sequence": [
+      "Q"
+    ],
+    "expected": "адам ба",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-ән",
+    "sequence": [
+      "Q"
+    ],
+    "expected": "ән бе",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "Q"
+    ],
+    "expected": "кітап па",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "Q"
+    ],
+    "expected": "мектеп пе",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "PL",
+      "POSS_1PL",
+      "ABL"
+    ],
+    "expected": "кітаптарымыздан",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-мектеп",
+    "sequence": [
+      "PL",
+      "POSS_1PL",
+      "ABL"
+    ],
+    "expected": "мектептерімізден",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "PL",
+      "POSS_3",
+      "LOC"
+    ],
+    "expected": "кітаптарында",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "POSS_2SG",
+      "DAT"
+    ],
+    "expected": "кітабыңа",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "POSS_2POL",
+      "DAT"
+    ],
+    "expected": "кітабыңызға",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-кітап",
+    "sequence": [
+      "POSS_1PL",
+      "DAT"
+    ],
+    "expected": "кітабымызға",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-адам",
+    "sequence": [
+      "COP_1PL",
+      "Q"
+    ],
+    "expected": "адамбыз ба",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-дос",
+    "sequence": [
+      "POSS_2SG",
+      "COP_1SG"
+    ],
+    "expected": "досыңмын",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "n-бала",
+    "sequence": [
+      "POSS_1SG",
+      "COP_2SG"
+    ],
+    "expected": "баламсың",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "NEG"
+    ],
+    "expected": "барма",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "NEG"
+    ],
+    "expected": "келме",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-жаз",
+    "sequence": [
+      "NEG"
+    ],
+    "expected": "жазба",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-сез",
+    "sequence": [
+      "NEG"
+    ],
+    "expected": "сезбе",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-айт",
+    "sequence": [
+      "NEG"
+    ],
+    "expected": "айтпа",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кет",
+    "sequence": [
+      "NEG"
+    ],
+    "expected": "кетпе",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "PAST"
+    ],
+    "expected": "барды",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "PAST"
+    ],
+    "expected": "келді",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-айт",
+    "sequence": [
+      "PAST"
+    ],
+    "expected": "айтты",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кет",
+    "sequence": [
+      "PAST"
+    ],
+    "expected": "кетті",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "PTCP_GAN"
+    ],
+    "expected": "барған",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "PTCP_GAN"
+    ],
+    "expected": "келген",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-айт",
+    "sequence": [
+      "PTCP_GAN"
+    ],
+    "expected": "айтқан",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кет",
+    "sequence": [
+      "PTCP_GAN"
+    ],
+    "expected": "кеткен",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "COND"
+    ],
+    "expected": "барса",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "COND"
+    ],
+    "expected": "келсе",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "CVB_IP"
+    ],
+    "expected": "барып",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "CVB_IP"
+    ],
+    "expected": "келіп",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-ойна",
+    "sequence": [
+      "CVB_IP"
+    ],
+    "expected": "ойнап",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-сөйле",
+    "sequence": [
+      "CVB_IP"
+    ],
+    "expected": "сөйлеп",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-жап",
+    "sequence": [
+      "CVB_IP"
+    ],
+    "expected": "жауып",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-сеп",
+    "sequence": [
+      "CVB_IP"
+    ],
+    "expected": "сеуіп",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-жап",
+    "sequence": [
+      "PAST"
+    ],
+    "expected": "жапты",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-сеп",
+    "sequence": [
+      "PAST"
+    ],
+    "expected": "септі",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "PAST",
+      "AGR_SHORT_1SG"
+    ],
+    "expected": "бардым",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "PAST",
+      "AGR_SHORT_1SG"
+    ],
+    "expected": "келдім",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "PAST",
+      "AGR_SHORT_1PL"
+    ],
+    "expected": "бардық",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "PAST",
+      "AGR_SHORT_1PL"
+    ],
+    "expected": "келдік",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "PAST",
+      "AGR_SHORT_2SG"
+    ],
+    "expected": "бардың",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "PAST",
+      "AGR_SHORT_2SG"
+    ],
+    "expected": "келдің",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "PAST",
+      "AGR_SHORT_2POL"
+    ],
+    "expected": "бардыңыз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "PAST",
+      "AGR_SHORT_2POL"
+    ],
+    "expected": "келдіңіз",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "COND",
+      "AGR_SHORT_1SG"
+    ],
+    "expected": "барсам",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "COND",
+      "AGR_SHORT_1PL"
+    ],
+    "expected": "келсек",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "NEG",
+      "PAST"
+    ],
+    "expected": "бармады",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "NEG",
+      "PAST"
+    ],
+    "expected": "келмеді",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-бар",
+    "sequence": [
+      "NEG",
+      "PTCP_GAN"
+    ],
+    "expected": "бармаған",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  },
+  {
+    "lemmaId": "v-кел",
+    "sequence": [
+      "NEG",
+      "COND",
+      "AGR_SHORT_1SG"
+    ],
+    "expected": "келмесем",
+    "sources": [
+      "S10",
+      "S23"
+    ],
+    "provenance": "manually_composed_from_verified_rule_before_engine_comparison"
+  }
+]
