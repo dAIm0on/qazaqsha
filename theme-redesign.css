@@ -812,5 +812,6 @@ html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
   .cat-summary{grid-template-columns:1fr}
   .personal-trainer-head{grid-template-columns:1fr}
   #personal-view .cat-stage-card{padding-bottom:calc(18px + var(--bottom-nav-height,64px))}
+  #personal-view .personal-trainer-list{padding-bottom:calc(12px + var(--bottom-nav-height,64px))}
   #personal-view #personal-content{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
 }
