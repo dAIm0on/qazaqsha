@@ -3,6 +3,7 @@
 const node=typeof module!=='undefined'&&module.exports;
 const E=node?require('./morph-engine'):root.MorphEngine;
 const T=node?require('./morph-teaching-data'):root.MorphTeachingData;
+const S=node?require('./morph-state'):root.MorphState;
 const MODULES=['harmony','voice','plural','nasal'];
 const TARGETS={
  harmony:{guided:['back','front','back','front'],choice:['back','front','back','front','back','front'],input:['front','back','front','back']},
@@ -125,7 +126,7 @@ function evaluate(task,response){return E.norm(response)===E.norm(task.expected)
 function fullStage5Ready(state,moduleId){
  const m=spec(moduleId);
  return m.families.every(f=>{
-  const e=root.MorphState?root.MorphState.teachingEvidence(state,{moduleId,familyId:f}):null;
+  const e=S?.teachingEvidence(state,{moduleId,familyId:f});
   return !!e?.semanticIntroCompleted&&e.featureNotice.correct>0;
  });
 }
