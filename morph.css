@@ -21,3 +21,9 @@
 .morph-feature-option input{width:22px!important;min-height:22px!important;margin:1px 0 0!important;flex:0 0 auto}
 .morph-feature-option span{line-height:1.45}
 @media(max-width:620px){.morph-teach-nav{grid-template-columns:1fr}.morph-teach-nav>.text-button{grid-column:auto}.morph-teach-panel{padding:18px}.morph-teach-lead{font-size:18px}}
+
+.stage5-panel .morph-stem{margin-top:18px}
+.stage5-panel .morph-operation{margin-bottom:16px}
+.stage5-evidence{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin:16px 0}
+.stage5-evidence p{margin:0;padding:10px 12px;border:1px solid var(--line,#ddd);border-radius:10px;background:var(--surface-alt,#f3f3f0)}
+@media(max-width:620px){.stage5-evidence{grid-template-columns:1fr}}
