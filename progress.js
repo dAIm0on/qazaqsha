@@ -4,12 +4,14 @@
  const cfg=node?require('./config.js'):root.TRAINER_CONFIG,core=node?require('./core.js'):root.TrainerCore;
  const packages=node?require('./package-schema.js'):root.LessonPackageSchema;
  const courseProgress=node?require('./course-progress.js'):root.CourseProgress;
+ const morph=node?require('./morph-state.js'):root.MorphState;
+ const morphEngine=node?require('./morph-engine.js'):root.MorphEngine;
  const obj=v=>v&&typeof v==='object'&&!Array.isArray(v);
  const safe=k=>typeof k==='string'&&k.length<=300&&!['__proto__','prototype','constructor'].includes(k);
  function dictionary(value,transform){const out=Object.create(null);if(obj(value))for(const [k,v] of Object.entries(value))if(safe(k)){const next=transform(v,k);if(next!==undefined)out[k]=next;}return out;}
- function empty(){return {schema:7,records:Object.create(null),skills:Object.create(null),errors:[],issueLog:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:false,lettersChosen:false},incidentalWeek:{key:'',added:0},homeworkAttempts:Object.create(null),grammarPath:{topicId:null,step:0,phase:'hub',queue:[],index:0,peeks:Object.create(null),fails:Object.create(null),passed:Object.create(null),blocked:false,completed:[],lessonId:null,chapterId:null,beat:0,completedChapters:Object.create(null),legacyCompleted:[]},courseProgress:courseProgress.empty(),session:null,lesson_packages:[],repair:null,savings:Object.create(null)};}
+ function empty(){return {schema:7,morphTrainer:morph.empty(),records:Object.create(null),skills:Object.create(null),errors:[],issueLog:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:false,lettersChosen:false},incidentalWeek:{key:'',added:0},homeworkAttempts:Object.create(null),grammarPath:{topicId:null,step:0,phase:'hub',queue:[],index:0,peeks:Object.create(null),fails:Object.create(null),passed:Object.create(null),blocked:false,completed:[],lessonId:null,chapterId:null,beat:0,completedChapters:Object.create(null),legacyCompleted:[]},courseProgress:courseProgress.empty(),session:null,lesson_packages:[],repair:null,savings:Object.create(null)};}
  function migrate(raw={},now=Date.now()){
-   const state=empty();state.lesson_packages=packages.merge([],raw.lesson_packages||[]);state.skills=dictionary(raw.skills,r=>obj(r)?core.migrateRecord(r,now):undefined);state.errors=Array.isArray(raw.errors)?raw.errors.filter(e=>obj(e)&&typeof e.error_type==='string'&&Number.isFinite(e.timestamp)):[];state.records=dictionary(raw.records,r=>obj(r)?core.migrateRecord(r,now):undefined);
+   const state=empty();state.morphTrainer=morph.migrate(raw.morphTrainer);state.lesson_packages=packages.merge([],raw.lesson_packages||[]);state.skills=dictionary(raw.skills,r=>obj(r)?core.migrateRecord(r,now):undefined);state.errors=Array.isArray(raw.errors)?raw.errors.filter(e=>obj(e)&&typeof e.error_type==='string'&&Number.isFinite(e.timestamp)):[];state.records=dictionary(raw.records,r=>obj(r)?core.migrateRecord(r,now):undefined);
    state.associations=dictionary(raw.associations,v=>typeof v==='string'?{text:v.slice(0,cfg.storage.maxAssociationLength),updated_at:now}:obj(v)&&typeof v.text==='string'?{text:v.text.slice(0,cfg.storage.maxAssociationLength),updated_at:Number(v.updated_at)||0}:undefined);
    state.confusions=dictionary(raw.confusions,c=>obj(c)&&typeof c.expected_answer==='string'&&typeof c.wrong_answer_given==='string'?{
      expected_item:Array.isArray(c.expected_item)?c.expected_item.filter(safe):[],given_item:Array.isArray(c.given_item)?c.given_item.filter(safe):[],last_confused:Number(c.last_confused||c.last_wrong)||0,expected_answer:c.expected_answer.slice(0,128),wrong_answer_given:c.wrong_answer_given.slice(0,128),confusion_count:Math.max(0,Math.floor(Number(c.confusion_count)||0)),
@@ -99,11 +101,11 @@
        if(r[key]!=null&&(!Number.isFinite(r[key])||r[key]<0))throw Error('Некорректное значение в карточке '+id+'.');
      const seen=r.seen??r.attempts??0;if((r.correct_count??r.correct??0)>seen||(r.wrong_count??0)>seen)throw Error('Счётчики ответов не согласованы: '+id+'.');
    }
-   const state=migrate(raw,now),ids=Object.keys(state.records),unknown=ids.filter(id=>!knownIds.has(id)).length;
+   const state=migrate(raw,now),ids=Object.keys(state.records),morphIds=new Set((morphEngine.bank?.()||[]).map(item=>item.id)),unknown=ids.filter(id=>!knownIds.has(id)&&!morphIds.has(id)).length;
    return {state,summary:{cards:ids.length,unknown,events:state.events.length,associations:Object.keys(state.associations).length},warning:unknown?'Записи отсутствующих в этой версии карточек сохранятся, но не попадут в тренировку.':''};
  }
  function merge(current,incoming){
-   const out=migrate(current);out.session=null;out.lesson_packages=packages.merge(out.lesson_packages,incoming.lesson_packages);
+   const out=migrate(current);out.morphTrainer=morph.merge(current.morphTrainer,incoming.morphTrainer);out.session=null;out.lesson_packages=packages.merge(out.lesson_packages,incoming.lesson_packages);
    for(const [id,r] of Object.entries(incoming.skills)){const old=out.skills[id];if(!old||(r.last_answer||0)>(old.last_answer||0)||((r.last_answer||0)===(old.last_answer||0)&&r.review_count>old.review_count))out.skills[id]=r;}
    out.errors=Array.from(new Map([...out.errors,...incoming.errors].map(e=>[JSON.stringify(e),e])).values());
    for(const [id,r] of Object.entries(incoming.records)){
