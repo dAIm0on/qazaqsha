@@ -91,30 +91,30 @@ function repairFor(moduleId,sourceTask,extraExclude=[]){
  return task(moduleId,candidate,0,'repair');
 }
 function reservedLemmaIds(moduleId){return new Set(guidedPlan(moduleId).map(x=>x.lemmaId));}
-function nasalIndependentRows(responseMode){
- const rows=stableRows('nasal'),families=['GEN','ACC','ABL','INS'],guidedLemma=guidedPlan('nasal')[0].lemmaId;
- const lemmas=[...new Set(rows.map(x=>x.lemmaId))].filter(x=>x!==guidedLemma).sort((a,b)=>a.localeCompare(b,'kk'));
- if(lemmas.length<4)throw Error('Not enough nasal lemmas for separate Stage 5 independent blocks');
- const chosen=responseMode==='choice'?lemmas.slice(0,3):lemmas.slice(3);
- const targets=TARGETS.nasal[responseMode];
+function nasalIndependentRows(responseMode,extraExclude=[]){
+ const rows=stableRows('nasal'),guidedLemma=guidedPlan('nasal')[0].lemmaId,excluded=new Set([guidedLemma,...extraExclude]);
+ const lemmas=[...new Set(rows.map(x=>x.lemmaId))].filter(x=>!excluded.has(x)).sort((a,b)=>a.localeCompare(b,'kk'));
+ if(!lemmas.length)throw Error('No unseen nasal lemma remains for Stage 5 independent block');
+ const take=Math.min(responseMode==='choice'?3:2,lemmas.length),chosen=lemmas.slice(0,take),targets=TARGETS.nasal[responseMode];
  return targets.map((family,i)=>{
   const lemma=chosen[i%chosen.length],row=rows.find(x=>x.lemmaId===lemma&&x.sequence.at(-1)===family);
   if(!row)throw Error('Missing nasal family '+family+' for '+lemma);
   return row;
  });
 }
-function independentPlan(moduleId,responseMode){
+function independentPlan(moduleId,responseMode,extraExclude=[]){
  if(!['choice','input'].includes(responseMode))throw Error('Invalid Stage 5 response mode');
  spec(moduleId);
- if(moduleId==='nasal')return nasalIndependentRows(responseMode).map((x,i)=>task(moduleId,x,i,responseMode));
- const exclude=reservedLemmaIds(moduleId);
+ const extra=[...new Set(extraExclude.filter(Boolean))];
+ if(moduleId==='nasal')return nasalIndependentRows(responseMode,extra).map((x,i)=>task(moduleId,x,i,responseMode));
+ const exclude=reservedLemmaIds(moduleId);for(const lemma of extra)exclude.add(lemma);
  if(responseMode==='input')for(const x of independentPlan(moduleId,'choice'))exclude.add(x.lemmaId);
  const targets=TARGETS[moduleId][responseMode];
  const rows=pickTargets(moduleId,targets,{exclude,offset:responseMode==='input'?2:1});
  return rows.map((x,i)=>task(moduleId,x,i,responseMode));
 }
-function createIndependentSession(moduleId,responseMode,now=Date.now()){
- const plan=independentPlan(moduleId,responseMode),id='morph-stage5-'+moduleId+'-'+responseMode+'-'+now;
+function createIndependentSession(moduleId,responseMode,now=Date.now(),excludeLemmas=[]){
+ const plan=independentPlan(moduleId,responseMode,excludeLemmas),id='morph-stage5-'+moduleId+'-'+responseMode+'-'+now;
  return {
   id,version:1,dataVersion:E.data.version,level:moduleId,mode:'learn',responseMode,modality:'text',
   queue:plan.map(x=>({id:x.itemId,options:x.options.slice()})),cursor:0,phase:'question',draft:'',hinted:false,result:null,
