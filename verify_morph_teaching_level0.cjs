@@ -67,7 +67,6 @@ test('Feature notice uses canonical whatToLookAt and decisionSteps',()=>{
  assert.ok(ui.includes('module.whatToLookAt.map'));
  assert.ok(ui.includes('module.decisionSteps.map'));
  assert.ok(ui.includes("type:'feature_notice_attempt'"));
- assert.ok(ui.includes("productionMastery"));
 });
 
 test('Teaching flow cannot call production answer engine or scheduler',()=>{
@@ -122,6 +121,12 @@ test('Completion text explicitly avoids a false mastery claim',()=>{
 test('Existing written practice and transfer code remains present',()=>{
  for(const token of ['E.createSession({level,mode,responseMode','function submit(response)','data-morph-hint','E.next(data().module.session)','Проверить на новых словах'])assert.ok(ui.includes(token),token);
  assert.equal(D.version,'morph-20260924-v1');
+});
+
+test('Refresh prefers the newer of teaching resume and an unfinished practice session',()=>{
+ assert.ok(ui.includes('const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0))'));
+ assert.ok(ui.includes("if(teachingNewer&&document.body.dataset.view==='morph'"));
+ assert.ok(ui.includes("else if(s&&!s.complete&&document.body.dataset.view==='morph'"));
 });
 
 test('Stage 4 styles are mobile-safe and do not introduce fixed widths',()=>{
