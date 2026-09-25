@@ -47,5 +47,46 @@ test('SW cache contains all module assets and actual existing files',()=>{
  const text=fs.readFileSync('sw.js','utf8'),a=JSON.parse(text.match(/ASSETS=(\[[^;]+\]);/)[1]);for(const f of ['morph-data.js','morph-engine.js','morph-state.js','morph-ui.js','morph.css'])assert.ok(a.includes(f));for(const f of a)assert.ok(fs.existsSync(f),f);
 });
 test('No audio or pseudoword achievement without reviewed data',()=>{assert.equal(E.data.audio.length,0);assert.equal(E.data.pseudowords.length,0);assert.equal(E.createSession().modality,'text');});
-test('Transfer UI hides immediate synthesis and chain prompt does not claim third person',()=>{assert.ok(fs.readFileSync('morph-ui.js','utf8').includes("feedback+(transfer?'':"));assert.ok(!E.itemFor('v-кел',['PAST','AGR_SHORT_1SG']).operation.includes('3-е лицо'));});
+test('Transfer UI hides immediate synthesis and chain prompt does not claim third person',()=>{const ui=fs.readFileSync('morph-ui.js','utf8');assert.ok(ui.includes('view.speech'));assert.ok(ui.includes('view.expected'));assert.ok(ui.includes('E.reveal'));assert.ok(!E.itemFor('v-кел',['PAST','AGR_SHORT_1SG']).operation.includes('3-е лицо'));});
+test('T01 train lemmas stay out of transfer and a later check does not reuse them',()=>{
+ const train=E.data.lemmas.filter(l=>l.split==='train').map(l=>l.id);
+ const first=E.createSession({mode:'transfer',level:'mixed',seed:3,knownLemmas:train});
+ assert.ok(first.queue.every(q=>{const i=E.getItem(q.id);return i.split==='transfer'&&!train.includes(i.lemmaId);}));
+ const seen=first.queue.map(q=>E.getItem(q.id).lemmaId);
+ const second=E.createSession({mode:'transfer',level:'mixed',seed:4,knownLemmas:[...train,...seen]});
+ assert.ok(second.queue.every(q=>!seen.includes(E.getItem(q.id).lemmaId)));
+});
+test('T02 transfer hides the key until the approach ends and refresh keeps it hidden',()=>{
+ let s=E.createSession({mode:'transfer',level:'harmony',seed:7,responseMode:'input'});
+ const item=E.getItem(s.queue[0].id);
+ assert.equal(E.reveal(s).hint,false);assert.equal(E.reveal({...s,hinted:true}).reason,false);assert.equal(E.reveal(s).speech,false);
+ s=E.answer(s,'не-та-форма',900).session;
+ assert.equal(s.phase,'feedback');assert.equal(E.reveal(s).expected,false);assert.equal(E.reveal(s).speech,false);assert.equal(E.reveal(s).correctnessClass,false);
+ const kept=S.session(s);assert.equal(kept.phase,'feedback');assert.equal(E.reveal(kept).expected,false);assert.equal(kept.result.expected,item.expected);
+ const done=E.next({...s,cursor:s.queue.length-1});assert.equal(done.complete,true);assert.equal(E.reveal(done).expected,true);
+ const learn=E.answer(E.createSession({mode:'learn',level:'harmony',seed:7,responseMode:'input'}),'x',900).session;
+ assert.equal(E.reveal(learn).expected,true);assert.equal(E.reveal(learn).speech,true);
+});
+test('T03 question items do not score nominal predicates',()=>{
+ const s=E.createSession({mode:'transfer',level:'person',seed:2});
+ assert.ok(s.queue.length>0);assert.ok(s.queue.every(q=>E.getItem(q.id).sequence.join()==='Q'));
+ assert.equal(s.closesLevel,false);assert.ok(s.unscoredFamilies.includes('COP_1SG')&&s.unscoredFamilies.includes('COP_1PL'));
+ assert.ok(s.transferNote.includes('только вопрос'));
+ const round=S.session(s);assert.deepEqual(round.unscoredFamilies,s.unscoredFamilies);assert.equal(round.transferNote,s.transferNote);
+ const cov=E.coverage();assert.equal(cov.cellClosesLevel,false);
+ assert.equal(cov.cells.filter(c=>c.family.startsWith('COP_')&&c.split==='transfer').length,0);
+ assert.ok(cov.gaps.some(c=>c.family==='COP_1SG'&&c.split==='transfer'));
+ assert.ok(cov.chains.every(c=>c.kind==='chain'));assert.ok(cov.chains.some(c=>c.poss));
+ assert.equal(E.data.pseudowords.length,0);
+});
+test('T04 a short holdout stays short and does not borrow seen stems',()=>{
+ const keep=[...new Set(E.bank().filter(i=>i.split==='transfer'&&i.sequence.length===1&&i.sequence[0]==='Q').map(i=>i.lemmaId))].slice(0,2);
+ const hide=E.data.lemmas.map(l=>l.id).filter(id=>!keep.includes(id));
+ const s=E.createSession({mode:'transfer',level:'person',seed:1,knownLemmas:hide});
+ assert.equal(s.queue.length,2);assert.ok(s.holdoutNote.includes('2'));
+ assert.ok(s.queue.every(q=>keep.includes(E.getItem(q.id).lemmaId)));
+ assert.throws(()=>E.createSession({mode:'transfer',level:'person',knownLemmas:E.data.lemmas.map(l=>l.id)}));
+ const app=fs.readFileSync('app.js','utf8');
+ assert.ok(app.includes('if(!e.transfer)records[e.itemId]=window.TrainerCore.updateRecord'));
+});
 console.log('MORPH_OK',n,'checks;',E.bank().length,'items;',gold.length,'gold pairs');

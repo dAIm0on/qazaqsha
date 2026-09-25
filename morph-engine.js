@@ -125,10 +125,41 @@ const getItem=id=>{bank();return byId.get(id);};
 function seeded(seed){let n=seed>>>0;return ()=>{n=(1664525*n+1013904223)>>>0;return n/4294967296;};}
 function shuffle(a,random){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function eligible(item,level){if(level==='mixed')return true;if(level==='chains')return item.level==='chains';if(level==='verbs')return item.level==='verbs';const spec=D.levels.find(x=>x.id===level);return item.sequence.length===1&&spec?.families.includes(item.sequence[0]);}
+function levelSpec(level){return D.levels.find(x=>x.id===level);}
+const transferPolicy={person:{families:['Q'],note:'Эта проверка оценивает только вопрос. Сказуемые я, мы, ты и вы здесь не оцениваются: среди отложенных основ нет естественных именных предикатов со словарной парой. Одни вопросы этот навык не закрывают.'}};
+function transferRule(level){return transferPolicy[level]||null;}
+function reveal(session){
+ const transfer=session?.mode==='transfer',done=session?.phase==='feedback',complete=!!session?.complete;
+ return {hint:!transfer&&!done&&!complete,reason:!transfer&&!done&&!complete&&!!session?.hinted,expected:complete||(!transfer&&done),speech:!transfer&&done,correctnessClass:!transfer&&done,transferNote:transfer?String(session?.transferNote||''):'',holdoutNote:String(session?.holdoutNote||'')};
+}
+function coverage(){
+ const items=bank(),single=items.filter(i=>i.sequence.length===1),chainItems=items.filter(i=>i.sequence.length>1);
+ const families=[...new Set(single.map(i=>i.sequence[0]))].sort(),edges=['vowel','glide','r','l','nasal','voiced_fricative','voiceless'],cells=[],gaps=[];
+ for(const family of families)for(const harmony of ['back','front'])for(const edgeName of edges)for(const split of ['train','transfer']){
+  const rows=single.filter(i=>i.sequence[0]===family&&i.trace.at(-1).harmony===harmony&&i.trace.at(-1).edge===edgeName&&i.split===split);
+  const stems=new Set(rows.map(i=>i.lemmaId)),cell={kind:'single',family,harmony,edge:edgeName,split,stems:stems.size,items:rows.length,responseModes:['choice','input'],poss:false};
+  if(stems.size)cells.push(cell);else gaps.push(cell);
+ }
+ const chains=[];
+ for(const split of ['train','transfer']){
+  const grouped=new Map();
+  for(const i of chainItems.filter(x=>x.split===split)){
+   const poss=i.trace.some(t=>t.poss),key=i.sequence.join('+')+'|'+(poss?'poss':'plain')+'|'+split;
+   const row=grouped.get(key)||{kind:'chain',sequence:i.sequence.join('+'),poss,split,stems:new Set(),items:0,responseModes:['choice','input']};
+   row.stems.add(i.lemmaId);row.items++;grouped.set(key,row);
+  }
+  for(const row of grouped.values())chains.push({...row,stems:row.stems.size});
+ }
+ const person=levelSpec('person'),rule=transferRule('person');
+ return {cellClosesLevel:false,responsePool:'choice и input берут один банк',cells,gaps,chains,person:{scored:[...rule.families],unscored:person.families.filter(f=>!rule.families.includes(f)),note:rule.note}};
+}
 function createSession({level='harmony',mode='learn',responseMode='choice',seed=Date.now(),events=[],records={},limit=10,knownLemmas=[]}={}){
  if(!D.levels.some(x=>x.id===level)||!['learn','transfer'].includes(mode)||!['choice','input'].includes(responseMode))reject('Invalid session settings');
  const rng=seeded(seed),seen=new Set([...events.map(e=>e.lemmaId),...knownLemmas]);
+ const spec=levelSpec(level);
  let pool=bank().filter(i=>eligible(i,level)&&i.split===(mode==='transfer'?'transfer':'train')&&(mode!=='transfer'||!seen.has(i.lemmaId)));
+ const rule=transferRule(level);
+ if(mode==='transfer'&&rule)pool=pool.filter(i=>i.sequence.length===1&&rule.families.includes(i.sequence[0]));
  pool=shuffle(pool,rng);
  if(mode==='learn'){
   const misses=new Map();for(const e of events.slice(-60))if(!e.correct&&!e.hinted)misses.set(e.sequence?.at(-1)+':'+e.contextClasses?.at(-1),(misses.get(e.sequence?.at(-1)+':'+e.contextClasses?.at(-1))||0)+1);
@@ -140,7 +171,8 @@ function createSession({level='harmony',mode='learn',responseMode='choice',seed=
  const picked=[],used=new Set(),counts={};for(const i of pool){const fam=i.sequence.at(-1);if(used.has(i.lemmaId)||(level==='mixed'&&(counts[fam]||0)>=3))continue;picked.push(i);used.add(i.lemmaId);counts[fam]=(counts[fam]||0)+1;if(picked.length>=limit)break;}
  if(!picked.length)reject(mode==='transfer'?'Нет новых проверочных основ для этого режима.':'Нет допущенных заданий.');
  const sid='morph-'+seed+'-'+Math.floor(Math.random()*1e9);
- return {id:sid,version:1,dataVersion:D.version,level,mode,responseMode,modality:'text',queue:picked.map(i=>({id:i.id,options:shuffle(itemFor(i.lemmaId,i.sequence,level).options,rng)})),cursor:0,phase:'question',draft:'',hinted:false,result:null,startedAt:Date.now(),updatedAt:Date.now(),results:[],complete:false};
+ const unscoredFamilies=mode==='transfer'&&rule?spec.families.filter(f=>!rule.families.includes(f)):[];
+ return {id:sid,version:1,dataVersion:D.version,level,mode,responseMode,modality:'text',queue:picked.map(i=>({id:i.id,options:shuffle(itemFor(i.lemmaId,i.sequence,level).options,rng)})),cursor:0,phase:'question',draft:'',hinted:false,result:null,startedAt:Date.now(),updatedAt:Date.now(),results:[],complete:false,closesLevel:unscoredFamilies.length===0,transferNote:mode==='transfer'&&rule?rule.note:'',holdoutNote:picked.length<limit?'Для этой проверки есть только '+picked.length+' новых основ. Уже показанные слова сюда снова как новые не попадают.':'',unscoredFamilies};
 }
 function answer(session,response,ms=null,at=Date.now()){
  if(!session||session.phase!=='question'||session.complete)return null;
@@ -151,5 +183,5 @@ function answer(session,response,ms=null,at=Date.now()){
 }
 function next(session){if(!session||session.phase!=='feedback')return session;const cursor=session.cursor+1,complete=cursor>=session.queue.length;return {...session,cursor,phase:complete?'complete':'question',complete,draft:'',hinted:false,result:null,updatedAt:Date.now()};}
 function summary(events){const scored=events.filter(e=>!e.hinted),n=scored.length,correct=scored.filter(e=>e.correct).length,times=scored.filter(e=>e.correct&&Number.isFinite(e.responseTime)).map(e=>e.responseTime).sort((a,b)=>a-b);return {n,correct,accuracy:n?Math.round(100*correct/n):null,uniqueLemmas:new Set(scored.map(e=>e.lemmaId)).size,medianMs:times.length?times[Math.floor(times.length/2)]:null};}
-const api={data:D,edge,form,itemFor,bank,getItem,createSession,answer,next,summary,errors,reason,norm,eligible,pattern};if(node)module.exports=api;else root.MorphEngine=api;
+const api={data:D,edge,form,itemFor,bank,getItem,createSession,answer,next,summary,errors,reason,norm,eligible,pattern,reveal,coverage,transferRule};if(node)module.exports=api;else root.MorphEngine=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -9,7 +9,8 @@ function session(v){
  if(!v.queue.every(q=>obj(q)&&E.getItem(q.id)&&Array.isArray(q.options)&&q.options.every(x=>typeof x==='string'&&x.length<=150)&&new Set(q.options).size===q.options.length&&q.options.includes(E.getItem(q.id).expected)))return null;
  if(v.phase==='complete'&&v.cursor!==v.queue.length||v.phase!=='complete'&&v.cursor>=v.queue.length)return null;
  const result=event(v.result);if(v.phase==='feedback'&&(!result||result.eventId!==v.id+':'+v.cursor))return null;
- return {id:v.id,version:1,dataVersion:v.dataVersion,level:E.data.levels.some(x=>x.id===v.level)?v.level:'mixed',mode:v.mode,responseMode:v.responseMode,modality:'text',queue:copy(v.queue),cursor:v.cursor,phase:v.phase,draft:String(v.draft||'').slice(0,200),hinted:!!v.hinted,result,startedAt:stamp(v.startedAt),updatedAt:stamp(v.updatedAt),results:Array.isArray(v.results)?v.results.map(event).filter(Boolean).slice(-40):[],complete:v.phase==='complete'};
+ const note=s=>safe(s)?s:'';
+ return {id:v.id,version:1,dataVersion:v.dataVersion,level:E.data.levels.some(x=>x.id===v.level)?v.level:'mixed',mode:v.mode,responseMode:v.responseMode,modality:'text',queue:copy(v.queue),cursor:v.cursor,phase:v.phase,draft:String(v.draft||'').slice(0,200),hinted:!!v.hinted,result,startedAt:stamp(v.startedAt),updatedAt:stamp(v.updatedAt),results:Array.isArray(v.results)?v.results.map(event).filter(Boolean).slice(-40):[],complete:v.phase==='complete',closesLevel:v.closesLevel!==false,transferNote:note(v.transferNote),holdoutNote:note(v.holdoutNote),unscoredFamilies:Array.isArray(v.unscoredFamilies)?v.unscoredFamilies.filter(x=>E.data.families[x]).slice(0,20):[]};
 }
 function migrate(raw){
  const out=empty();if(raw==null)return out;if(!obj(raw)||raw.version!==1){out.recovery='Состояние тренажёра не удалось прочитать. Прогресс курса сохранён.';return out;}
