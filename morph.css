@@ -5,3 +5,19 @@
 .morph-panel input{font-size:24px}.morph-panel button{min-height:44px;white-space:normal;overflow-wrap:anywhere;max-width:100%}.morph-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:20px 0}.morph-choices button{font-size:21px;padding:14px 8px}
 .morph-stem{font-size:clamp(30px,6vw,48px);margin-bottom:4px}.morph-operation{font-size:18px;line-height:1.65}.morph-rule,.morph-feedback{padding:14px;border-inline-start:3px solid var(--accent,#55745f);background:var(--surface-alt,#f3f3f0);border-radius:8px;margin:16px 0}.morph-feedback.wrong{border-color:#a85336}.morph-panel details{margin-top:18px}.morph-panel summary{cursor:pointer;min-height:32px}.morph-keys{display:flex;flex-wrap:wrap;gap:3px;margin:6px 0 12px}.morph-keys button{min-width:36px}.morph-notice{padding:12px;border:1px solid var(--line,#ddd);border-radius:10px}
 @media(max-width:450px){.morph-actions{align-items:stretch}.morph-actions button{width:100%}.morph-choices button{font-size:18px}.morph-head .small{font-size:10px}}
+
+.morph-teach-panel{scroll-margin-top:12px}
+.morph-teach-nav{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 14px;align-items:end;margin-bottom:20px}
+.morph-teach-nav>.text-button{grid-column:1/-1;justify-self:start}
+.morph-teach-nav label{margin:0}
+.morph-teach-lead{font-size:clamp(18px,2.4vw,22px);line-height:1.65;max-width:68ch}
+.morph-full-explanation{max-width:72ch}
+.morph-full-explanation p{line-height:1.72;margin:0 0 1em}
+.morph-teach-list{padding-left:1.35rem;line-height:1.65}
+.morph-teach-list li+li{margin-top:8px}
+.morph-contrast-list li{padding:10px 12px;border:1px solid var(--line,#ddd);border-radius:10px;list-style-position:inside}
+.morph-feature-grid{display:grid;gap:8px;margin:16px 0 22px}
+.morph-feature-option{display:flex!important;align-items:flex-start;gap:10px;margin:0!important;padding:12px;border:1px solid var(--line,#ddd);border-radius:12px;font-weight:500!important}
+.morph-feature-option input{width:22px!important;min-height:22px!important;margin:1px 0 0!important;flex:0 0 auto}
+.morph-feature-option span{line-height:1.45}
+@media(max-width:620px){.morph-teach-nav{grid-template-columns:1fr}.morph-teach-nav>.text-button{grid-column:auto}.morph-teach-panel{padding:18px}.morph-teach-lead{font-size:18px}}
