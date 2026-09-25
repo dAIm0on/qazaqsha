@@ -90,18 +90,25 @@ function repairFor(moduleId,sourceTask,extraExclude=[]){
  if(!candidate)throw Error('No different repair lemma for '+moduleId+' '+sourceTask.familyId+' '+sourceTask.feature);
  return task(moduleId,candidate,0,'repair');
 }
-function reservedLemmaIds(moduleId){
- const out=new Set(guidedPlan(moduleId).map(x=>x.lemmaId));
- for(const g of guidedPlan(moduleId)){try{out.add(repairFor(moduleId,g,[...out]).lemmaId);}catch{}}
- return out;
+function reservedLemmaIds(moduleId){return new Set(guidedPlan(moduleId).map(x=>x.lemmaId));}
+function nasalIndependentRows(responseMode){
+ const rows=stableRows('nasal'),families=['GEN','ACC','ABL','INS'],guidedLemma=guidedPlan('nasal')[0].lemmaId;
+ const lemmas=[...new Set(rows.map(x=>x.lemmaId))].filter(x=>x!==guidedLemma).sort((a,b)=>a.localeCompare(b,'kk'));
+ if(lemmas.length<4)throw Error('Not enough nasal lemmas for separate Stage 5 independent blocks');
+ const chosen=responseMode==='choice'?lemmas.slice(0,3):lemmas.slice(3);
+ const targets=TARGETS.nasal[responseMode];
+ return targets.map((family,i)=>{
+  const lemma=chosen[i%chosen.length],row=rows.find(x=>x.lemmaId===lemma&&x.sequence.at(-1)===family);
+  if(!row)throw Error('Missing nasal family '+family+' for '+lemma);
+  return row;
+ });
 }
 function independentPlan(moduleId,responseMode){
  if(!['choice','input'].includes(responseMode))throw Error('Invalid Stage 5 response mode');
  spec(moduleId);
+ if(moduleId==='nasal')return nasalIndependentRows(responseMode).map((x,i)=>task(moduleId,x,i,responseMode));
  const exclude=reservedLemmaIds(moduleId);
- if(responseMode==='input'){
-  for(const x of independentPlan(moduleId,'choice'))exclude.add(x.lemmaId);
- }
+ if(responseMode==='input')for(const x of independentPlan(moduleId,'choice'))exclude.add(x.lemmaId);
  const targets=TARGETS[moduleId][responseMode];
  const rows=pickTargets(moduleId,targets,{exclude,offset:responseMode==='input'?2:1});
  return rows.map((x,i)=>task(moduleId,x,i,responseMode));
