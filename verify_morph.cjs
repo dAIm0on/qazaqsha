@@ -50,7 +50,8 @@ test('No audio or pseudoword achievement without reviewed data',()=>{assert.equa
 test('Written module has no system voice',()=>{
  const ui=fs.readFileSync('morph-ui.js','utf8'),css=fs.readFileSync('morph.css','utf8');
  for(const banned of ['speechSynthesis','SpeechSynthesisUtterance','data-morph-speak','audioNote','Проговорить','Озвучить','слухового теста','Слух и произношение','затем звук'])assert.equal(ui.includes(banned),false,banned);
- assert.ok(ui.includes('Тренируй выбор и построение правильной формы слова'));
+ assert.ok(ui.includes('Учиться с нуля'));
+ assert.ok(ui.includes('Самостоятельная практика'));
  assert.ok(ui.includes('Результаты относятся к письменным заданиям'));
  assert.equal(css.includes('morph-audio-note'),false);
  assert.ok(!E.itemFor('v-кел',['PAST','AGR_SHORT_1SG']).operation.includes('3-е лицо'));
