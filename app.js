@@ -1982,7 +1982,7 @@
    answer(result){
      const applied=window.MorphState.accept(state.morphTrainer,result);if(!applied.accepted)return false;
      state.morphTrainer=applied.state;const e=applied.event;
-     if(!e.transfer)records[e.itemId]=window.TrainerCore.updateRecord(records[e.itemId],e.correct,e.hinted,e.at,{responseTime:e.responseTime,recall:e.responseMode==='input'});
+     const sched=window.MorphState.scheduleUpdate(e);if(sched)records[e.itemId]=window.TrainerCore.updateRecord(records[e.itemId],sched.correct,sched.hinted,sched.at,{responseTime:sched.responseTime,recall:sched.recall});
      save();return true;
    }
  };
@@ -2008,7 +2008,7 @@
    position=Math.min(queue.length,savedSession.position+(savedSession.answered?1:0));if(savedSession.answered&&!['ordered','shuffle','homework','course','phrase','transfer'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();
    if(!savedSession.answered){hinted=!!savedSession.hinted;elapsedMs=Number.isFinite(savedSession.elapsed_ms)?Math.max(0,savedSession.elapsed_ms):0;}
  }else{queue=[];practiceIds=[];renderStats();}
- const resumeView=savedSession?.view==='morph'&&state.morphTrainer?.session?'morph':validSaved&&['practice','homework','learn','path','review'].includes(savedSession.view)?savedSession.view:'today';
+ const resumeView=window.MorphState.resumeSurface(savedSession&&savedSession.view,!!(state.morphTrainer&&state.morphTrainer.session),!!validSaved,['practice','homework','learn','path','review']);
  showView(resumeView);
  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else{renderStats();if(view==='practice')activateCard();if(['today','review','vocabulary'].includes(view))dashboard.render(view);}save();});
  window.addEventListener('qazaq-before-update',e=>{pauseTimer();save();if(!storageAvailable)e.preventDefault();});

@@ -87,7 +87,8 @@ test('T04 a short holdout stays short and does not borrow seen stems',()=>{
  assert.ok(s.queue.every(q=>keep.includes(E.getItem(q.id).lemmaId)));
  assert.throws(()=>E.createSession({mode:'transfer',level:'person',knownLemmas:E.data.lemmas.map(l=>l.id)}));
  const app=fs.readFileSync('app.js','utf8');
- assert.ok(app.includes('if(!e.transfer)records[e.itemId]=window.TrainerCore.updateRecord'));
+ assert.ok(app.includes('window.MorphState.scheduleUpdate(e)'));
+ assert.ok(app.includes('window.MorphState.resumeSurface('));
 });
 test('S06 old answers survive a removed item, a changed key and a substituted submit',()=>{
  const live=E.itemFor('n-бала',['PL']);
@@ -109,5 +110,44 @@ test('S06 old answers survive a removed item, a changed key and a substituted su
  const course={records:{legacy:{seen:1,due:1}},courseProgress:{resumePointer:{lessonId:'1-1',surface:'practice'}}};
  const wrapped=P.migrate({schema:7,...course,morphTrainer:once});
  assert.equal(wrapped.records.legacy.seen,1);assert.equal(wrapped.courseProgress.resumePointer.lessonId,'1-1');assert.equal(wrapped.morphTrainer.events.length,2);
+});
+test('S01 old course progress stays beside a morph session',()=>{
+ const now=1700000000000,legacy=Core.updateRecord({},true,false,now),fsrs=JSON.stringify(legacy.fsrs);
+ let state=P.migrate({schema:6,records:{legacy},courseProgress:{}},now);
+ P.setResumePointer(state,'2-1','practice',now);
+ state.morphTrainer=S.putSession(state.morphTrainer,E.createSession({seed:3}));
+ const back=P.validate(P.serialize(state),new Set(['legacy']),now).state;
+ assert.equal(JSON.stringify(back.records.legacy.fsrs),fsrs);
+ assert.equal(back.courseProgress.resumePointer.lessonId,'2-1');
+ assert.equal(back.courseProgress.resumePointer.surface,'practice');
+ assert.equal(back.morphTrainer.session.queue.length,state.morphTrainer.session.queue.length);
+ assert.equal(require('./config.js').fsrs.desired_retention,0.90);
+});
+test('S03 lesson resume wins over a stored morph session, and a draft stays',()=>{
+ assert.equal(S.resumeSurface('practice',true,true),'practice');
+ assert.equal(S.resumeSurface('learn',true,true),'learn');
+ assert.equal(S.resumeSurface('path',true,true),'path');
+ assert.equal(S.resumeSurface('morph',true,true),'morph');
+ assert.equal(S.resumeSurface('morph',false,true),'today');
+ assert.equal(S.resumeSurface('practice',true,false),'today');
+ const session={...E.createSession({seed:8,responseMode:'input'}),draft:'әке'};
+ const saved=S.migrate(S.putSession(S.empty(),session));
+ assert.equal(saved.session.draft,'әке');
+ assert.deepEqual(saved.session.queue.map(q=>q.id),session.queue.map(q=>q.id));
+ const answered=S.accept(saved,E.answer(saved.session,'x',10));
+ assert.equal(answered.accepted,true);assert.equal(S.migrate(answered.state).events.length,1);
+ const learn=S.scheduleUpdate({mode:'learn',correct:true,hinted:false,responseMode:'input',at:1700000000000,responseTime:80});
+ assert.equal(learn.recall,true);assert.equal(learn.hinted,false);
+ assert.equal(S.scheduleUpdate({mode:'learn',correct:true,hinted:true,responseMode:'choice',at:1700000000000}).recall,false);
+ assert.equal(S.scheduleUpdate({transfer:true,mode:'transfer',correct:true,responseMode:'input',at:1700000000000}),null);
+ assert.equal(Core.updateRecord({},true,true,1700000000000,{recall:true}).recall_review_successes,0);
+});
+test('S07 current morph ids pass import and a foreign id still warns',()=>{
+ const now=1700000000000,morphId=E.bank()[0].id,morphRec=Core.updateRecord({},true,false,now,{recall:true}),foreign=Core.updateRecord({},false,false,now);
+ const both=P.validate(P.serialize(P.migrate({schema:7,records:{[morphId]:morphRec,'not-a-card':foreign}},now)),new Set(),now);
+ assert.equal(both.summary.unknown,1);assert.ok(both.warning);assert.ok(both.state.records[morphId]);assert.ok(both.state.records['not-a-card']);
+ const only=P.validate(P.serialize(P.migrate({schema:7,records:{[morphId]:morphRec}},now)),new Set(),now);
+ assert.equal(only.summary.unknown,0);assert.equal(only.warning,'');
+ assert.equal(S.HISTORY_LIMIT,400);assert.ok(S.historyNote.includes('400'));
 });
 console.log('MORPH_OK',n,'checks;',E.bank().length,'items;',gold.length,'gold pairs');

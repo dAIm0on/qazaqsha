@@ -5,6 +5,7 @@
  const packages=node?require('./package-schema.js'):root.LessonPackageSchema;
  const courseProgress=node?require('./course-progress.js'):root.CourseProgress;
  const morph=node?require('./morph-state.js'):root.MorphState;
+ const morphEngine=node?require('./morph-engine.js'):root.MorphEngine;
  const obj=v=>v&&typeof v==='object'&&!Array.isArray(v);
  const safe=k=>typeof k==='string'&&k.length<=300&&!['__proto__','prototype','constructor'].includes(k);
  function dictionary(value,transform){const out=Object.create(null);if(obj(value))for(const [k,v] of Object.entries(value))if(safe(k)){const next=transform(v,k);if(next!==undefined)out[k]=next;}return out;}
@@ -100,7 +101,7 @@
        if(r[key]!=null&&(!Number.isFinite(r[key])||r[key]<0))throw Error('Некорректное значение в карточке '+id+'.');
      const seen=r.seen??r.attempts??0;if((r.correct_count??r.correct??0)>seen||(r.wrong_count??0)>seen)throw Error('Счётчики ответов не согласованы: '+id+'.');
    }
-   const state=migrate(raw,now),ids=Object.keys(state.records),unknown=ids.filter(id=>!knownIds.has(id)).length;
+   const state=migrate(raw,now),ids=Object.keys(state.records),morphIds=new Set((morphEngine.bank?.()||[]).map(item=>item.id)),unknown=ids.filter(id=>!knownIds.has(id)&&!morphIds.has(id)).length;
    return {state,summary:{cards:ids.length,unknown,events:state.events.length,associations:Object.keys(state.associations).length},warning:unknown?'Записи отсутствующих в этой версии карточек сохранятся, но не попадут в тренировку.':''};
  }
  function merge(current,incoming){
