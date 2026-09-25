@@ -172,12 +172,15 @@ test('Progress cloud merge preserves teaching events from both sides',()=>{
  assert.equal(m.morphTrainer.teaching.resume.currentTeachingStep,'FULL_EXPLANATION');
 });
 
-test('Stage 3 remains state-only and has no Level 0 UI wiring',()=>{
+test('Teaching UI wiring preserves the Stage 3 state contract',()=>{
  const ui=fs.readFileSync('morph-ui.js','utf8'),app=fs.readFileSync('app.js','utf8');
- for(const token of ['recordTeaching(','putTeachingResume(','teachingEvidence(']){
-   assert.equal(ui.includes(token),false,token+' in morph-ui');
-   assert.equal(app.includes(token),false,token+' in app');
- }
+ assert.ok(ui.includes('S.teachingEvidence('),'teachingEvidence missing in morph-ui');
+ assert.ok(app.includes('window.MorphState.recordTeaching'),'recordTeaching bridge missing');
+ assert.ok(app.includes('window.MorphState.putTeachingResume'),'putTeachingResume bridge missing');
+ assert.ok(app.includes('window.MorphState.accept'),'production answer bridge missing');
+ assert.ok(app.includes('window.MorphState.scheduleUpdate(e)'),'scheduler bridge missing');
+ assert.equal(ui.includes('scheduleUpdate('),false,'teaching UI must not call scheduler directly');
+ assert.equal(ui.includes('state.morphTrainer='),false,'morph-ui must not mutate persisted trainer state directly');
  assert.equal(E.data.version,'morph-20260924-v1');
 });
 
