@@ -119,7 +119,7 @@ test('Completion text explicitly avoids a false mastery claim',()=>{
 });
 
 test('Existing written practice and transfer code remains present',()=>{
- for(const token of ['E.createSession({level,mode,responseMode','function submit(response)','data-morph-hint','E.next(data().module.session)','Проверить на новых словах'])assert.ok(ui.includes(token),token);
+ for(const token of ['E.createSession({level,mode,responseMode','function submit(response)','data-morph-hint','E.next(s)','Проверить на новых словах'])assert.ok(ui.includes(token),token);
  assert.equal(D.version,'morph-20260924-v1');
 });
 
