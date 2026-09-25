@@ -129,7 +129,7 @@ test('Stage 4 styles are mobile-safe and do not introduce fixed widths',()=>{
  assert.ok(css.includes('.morph-teach-nav'));
  assert.ok(css.includes('@media(max-width:620px)'));
  const teachingCss=css.slice(css.indexOf('.morph-teach-panel'));
- assert.equal(/width:\s*[4-9][0-9]{2}px/.test(teachingCss),false);
+ assert.equal(/(?:^|[;{]\s*)width:\s*[4-9][0-9]{2}px/m.test(teachingCss),false);
 });
 
 test('Teaching events remain non-production in state layer',()=>{
