@@ -159,6 +159,28 @@ test('Stage 5 keeps later modules out of the new guided route',()=>{
  assert.ok(ui.includes('Guided Stage 5 доступен только для первых четырёх модулей.'));
 });
 
+test('Repair teaching events persist the exposed item and lemma identity',()=>{
+ const source=P.guidedPlan('harmony')[0],repair=P.repairFor('harmony',source,P.guidedPlan('harmony').map(x=>x.lemmaId));
+ const r=S.recordTeaching(S.empty(),{eventId:'repair:identity',type:'correction_after_feedback',moduleId:'harmony',familyId:repair.familyId,itemId:repair.itemId,lemmaId:repair.lemmaId,at:1,responseMode:'choice',answer:repair.expected,correct:true,hinted:true});
+ assert.equal(r.accepted,true);assert.equal(r.event.itemId,repair.itemId);assert.equal(r.event.lemmaId,repair.lemmaId);assert.equal(r.event.productionMastery,false);
+});
+
+test('Actual repair-exposed lemmas stay out of later independent blocks',()=>{
+ for(const id of P.MODULES){
+  const guided=P.guidedPlan(id),guidedLemmas=guided.map(x=>x.lemmaId),guidedRepair=P.repairFor(id,guided[0],guidedLemmas);
+  const choice=P.independentPlan(id,'choice',[guidedRepair.lemmaId]);assert.equal(choice.some(x=>x.lemmaId===guidedRepair.lemmaId),false,id+' choice repair leak');
+  const choiceLemmas=[...new Set(choice.map(x=>x.lemmaId))],choiceRepair=P.repairFor(id,choice[0],[...guidedLemmas,...choiceLemmas]);
+  const exclude=[guidedRepair.lemmaId,choiceRepair.lemmaId,...choiceLemmas],input=P.independentPlan(id,'input',exclude);
+  assert.equal(input.some(x=>exclude.includes(x.lemmaId)),false,id+' input exposed-lemma leak');assert.equal(input.length,4,id+' input length');
+ }
+});
+
+test('Service worker caches the existing update.html file without pretty-route 404',()=>{
+ assert.ok(sw.includes("if(asset==='update.html')return new URL('update.html',self.registration.scope).href;"));
+ assert.equal(sw.includes("if(asset==='update.html')return new URL('update',self.registration.scope).href;"),false);
+ assert.ok(fs.existsSync('update.html'));
+});
+
 test('Existing runtime version and written release remain unchanged',()=>{
  assert.equal(E.data.version,'morph-20260924-v1');assert.equal(E.writtenRelease.scopeId,'morph-written-v1');assert.equal(E.writtenRelease.audioPlayback,false);
 });
