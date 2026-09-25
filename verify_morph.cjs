@@ -167,4 +167,17 @@ test('Imported audio event stays audio and leaves the written score',()=>{
  assert.equal(E.writtenRelease.scopeId,'morph-written-v1');assert.equal(E.writtenRelease.audioPlayback,false);assert.equal(E.writtenRelease.speechAssessment,false);
  assert.equal(E.data.version,'morph-20260924-v1');
 });
+test('Written labels count unaided answers and do not turn speed into a grade',()=>{
+ const slow={hinted:false,scored:true,modality:'text',transfer:false,correct:true,responseTime:120000,lemmaId:'n-бала',sequence:['PL']};
+ const hinted={...slow,hinted:true,responseTime:400,eventId:'h'};
+ const fresh={...slow,transfer:true,sequence:['Q'],lemmaId:'n-арна',responseTime:30000};
+ const lines=E.writtenLines([slow,hinted,fresh]);
+ assert.equal(lines.practice.correct,1);assert.equal(lines.practice.n,1);
+ assert.equal(lines.fresh.n,1);assert.deepEqual(lines.families,['Q']);
+ const short=E.createSession({mode:'transfer',level:'person',seed:1,knownLemmas:E.data.lemmas.map(l=>l.id).filter(id=>!['n-арна','n-жыра'].includes(id))});
+ assert.ok(short.holdoutNote.startsWith('Недостаточно новых основ'));
+ const ui=fs.readFileSync('morph-ui.js','utf8');
+ for(const banned of ['медиана','90%','освоено','слух натренирован','произношение освоено','больше не перебираешь'])assert.equal(ui.includes(banned),false,banned);
+ assert.ok(ui.includes('на новых основах'));assert.ok(ui.includes('самостоятельно'));
+});
 console.log('MORPH_OK',n,'checks;',E.bank().length,'items;',gold.length,'gold pairs');

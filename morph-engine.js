@@ -173,7 +173,7 @@ function createSession({level='harmony',mode='learn',responseMode='choice',seed=
  if(!picked.length)reject(mode==='transfer'?'Нет новых проверочных основ для этого режима.':'Нет допущенных заданий.');
  const sid='morph-'+seed+'-'+Math.floor(Math.random()*1e9);
  const unscoredFamilies=mode==='transfer'&&rule?spec.families.filter(f=>!rule.families.includes(f)):[];
- return {id:sid,version:1,dataVersion:D.version,level,mode,responseMode,modality:'text',queue:picked.map(i=>({id:i.id,options:shuffle(itemFor(i.lemmaId,i.sequence,level).options,rng)})),cursor:0,phase:'question',draft:'',hinted:false,result:null,startedAt:Date.now(),updatedAt:Date.now(),results:[],complete:false,closesLevel:unscoredFamilies.length===0,transferNote:mode==='transfer'&&rule?rule.note:'',holdoutNote:picked.length<limit?'Для этой проверки есть только '+picked.length+' новых основ. Уже показанные слова сюда снова как новые не попадают.':'',unscoredFamilies};
+ return {id:sid,version:1,dataVersion:D.version,level,mode,responseMode,modality:'text',queue:picked.map(i=>({id:i.id,options:shuffle(itemFor(i.lemmaId,i.sequence,level).options,rng)})),cursor:0,phase:'question',draft:'',hinted:false,result:null,startedAt:Date.now(),updatedAt:Date.now(),results:[],complete:false,closesLevel:unscoredFamilies.length===0,transferNote:mode==='transfer'&&rule?rule.note:'',holdoutNote:picked.length<limit?'Недостаточно новых основ: для этой проверки есть только '+picked.length+'. Уже показанные слова сюда снова как новые не попадают.':'',unscoredFamilies};
 }
 function answer(session,response,ms=null,at=Date.now()){
  if(!session||session.phase!=='question'||session.complete)return null;
@@ -184,5 +184,10 @@ function answer(session,response,ms=null,at=Date.now()){
 }
 function next(session){if(!session||session.phase!=='feedback')return session;const cursor=session.cursor+1,complete=cursor>=session.queue.length;return {...session,cursor,phase:complete?'complete':'question',complete,draft:'',hinted:false,result:null,updatedAt:Date.now()};}
 function summary(events){const scored=events.filter(e=>!e.hinted&&e.scored!==false&&e.modality!=='audio'),n=scored.length,correct=scored.filter(e=>e.correct).length,times=scored.filter(e=>e.correct&&Number.isFinite(e.responseTime)).map(e=>e.responseTime).sort((a,b)=>a-b);return {n,correct,accuracy:n?Math.round(100*correct/n):null,uniqueLemmas:new Set(scored.map(e=>e.lemmaId)).size,medianMs:times.length?times[Math.floor(times.length/2)]:null};}
-const api={data:D,edge,form,itemFor,bank,getItem,createSession,answer,next,summary,errors,reason,norm,eligible,pattern,reveal,coverage,transferRule,writtenRelease};if(node)module.exports=api;else root.MorphEngine=api;
+function writtenLines(events){
+ const list=events||[],freshEvents=list.filter(e=>e.transfer);
+ const families=[...new Set(freshEvents.filter(e=>!e.hinted&&e.scored!==false&&e.modality!=='audio').map(e=>e.sequence?.at?.(-1)).filter(Boolean))];
+ return {practice:summary(list.filter(e=>!e.transfer)),fresh:summary(freshEvents),families};
+}
+const api={data:D,edge,form,itemFor,bank,getItem,createSession,answer,next,summary,writtenLines,errors,reason,norm,eligible,pattern,reveal,coverage,transferRule,writtenRelease};if(node)module.exports=api;else root.MorphEngine=api;
 })(typeof window!=='undefined'?window:globalThis);
