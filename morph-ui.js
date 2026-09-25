@@ -9,7 +9,10 @@ function data(){return bridge()?.read()||{module:S.empty(),records:{},knownLemma
 function clock(){shownAt=performance.now();interrupted=document.hidden;}
 function saveSession(s){return bridge().session(s);}
 function saveTeachingResume(v){return bridge().teachingResume(v);}
-function teachingModule(id){return T?.modules?.find(x=>x.id===id)||T?.modules?.[0]||null;}
+function teachingModule(id,familyId=null){
+ if(id==='meaning'&&familyId)return T?.modules?.find(x=>x.families.includes(familyId))||null;
+ return T?.modules?.find(x=>x.id===id)||null;
+}
 function teachingFamily(id){return T?.level0?.familySemantics?.[id]||null;}
 function currentTeachingResume(){return data().module.teaching?.resume||null;}
 function staticTeachingId(type,moduleId,familyId){return ['teach',T.version,type,moduleId,familyId||'-'].join(':');}
@@ -94,7 +97,7 @@ function teachingComplete(module,resume){
 }
 function teachingScreen(){
  const d=data(),resume=d.module.teaching?.resume;if(!resume){teachingMode=false;showHub=true;return hub();}
- const module=teachingModule(resume.currentModule);if(!module||!module.families.includes(resume.familyId)){message='Учебная тема обновилась. Выбери раздел заново.';teachingMode=false;showHub=true;return hub();}
+ const module=teachingModule(resume.currentModule,resume.familyId);if(!module||!module.families.includes(resume.familyId)){message='Учебная тема обновилась. Выбери раздел заново.';teachingMode=false;showHub=true;level='harmony';return hub();}
  const semantic=teachingFamily(resume.familyId);if(!semantic){message='Для этой темы нет утверждённой semantic card.';teachingMode=false;showHub=true;return hub();}
  if(resume.currentTeachingStep==='SEMANTIC_INTRO')return semanticIntro(module,resume,semantic);
  if(resume.currentTeachingStep==='FULL_EXPLANATION')return fullExplanation(module,resume);
@@ -121,7 +124,7 @@ function render(){
  const host=root();if(!host||!bridge()||!T)return;
  const m=data().module,s=m.session,tr=m.teaching?.resume;
  const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
- if(teachingNewer&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){teachingMode=true;showHub=false;level=tr.currentModule;host.dataset.first='yes';}
+ if(teachingNewer&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){const rm=teachingModule(tr.currentModule,tr.familyId);teachingMode=true;showHub=false;level=rm?.id||'harmony';host.dataset.first='yes';}
  else if(s&&!s.complete&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){teachingMode=false;showHub=false;host.dataset.first='yes';}
  const body=teachingMode?teachingScreen():(!s||showHub?hub():s.complete?finish(s):question(s));
  host.innerHTML='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>'+(message||m.recovery||m.teaching?.recovery?'<p role="status" class="morph-notice">'+esc(message||m.teaching?.recovery||m.recovery)+'</p>':'')+body;
