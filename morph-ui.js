@@ -30,8 +30,9 @@ function setTeachingResume(moduleId,step,familyId,stepIndex=0,draft=''){
 }
 function status(){
  const d=data(),s=d.module.session,tr=d.module.teaching?.resume;
+ const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
+ if(teachingNewer){const m=teachingModule(tr.currentModule),f=teachingFamily(tr.familyId);return 'Продолжить обучение · '+(f?.title||m?.title||'Форма слова');}
  if(s&&!s.complete)return 'Продолжить практику · '+(s.cursor+1)+' / '+s.queue.length;
- if(tr){const m=teachingModule(tr.currentModule),f=teachingFamily(tr.familyId);return 'Продолжить обучение · '+(f?.title||m?.title||'Форма слова');}
  return 'Короткие подходы и обучение с нуля';
 }
 function open(){window.QazaqShell.show('morph');}
@@ -119,8 +120,9 @@ function question(s){
 function render(){
  const host=root();if(!host||!bridge()||!T)return;
  const m=data().module,s=m.session,tr=m.teaching?.resume;
- if(s&&!s.complete&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){teachingMode=false;showHub=false;host.dataset.first='yes';}
- else if(!s&&tr&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){teachingMode=true;showHub=false;level=tr.currentModule;host.dataset.first='yes';}
+ const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
+ if(teachingNewer&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){teachingMode=true;showHub=false;level=tr.currentModule;host.dataset.first='yes';}
+ else if(s&&!s.complete&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){teachingMode=false;showHub=false;host.dataset.first='yes';}
  const body=teachingMode?teachingScreen():(!s||showHub?hub():s.complete?finish(s):question(s));
  host.innerHTML='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>'+(message||m.recovery||m.teaching?.recovery?'<p role="status" class="morph-notice">'+esc(message||m.teaching?.recovery||m.recovery)+'</p>':'')+body;
  bind(host);clock();
