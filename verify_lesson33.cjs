@@ -211,7 +211,7 @@ assert.ok(html.indexOf('lesson-pack-3-3.js') < html.indexOf('curriculum.js'));
 assert.ok(app.indexOf('Lesson33Pack?.install') < app.indexOf('PhraseDrill?.install'));
 assert.ok(/if\(courseBlock==='3-3'\)return;/.test(app));
 assert.ok(/const CACHE='qazaq-offline-live-20260924-morph-v1'/.test(sw));
-assert.ok(sw.includes("new URL('./',self.registration.scope)") && sw.includes("new URL('update',self.registration.scope)"));
+assert.ok(sw.includes("new URL('./',self.registration.scope)") && sw.includes("new URL('update.html',self.registration.scope)"));
 assert.ok(sw.includes('response.redirected'));
 assert.ok(app.includes('function homeworkOpts()') && app.includes('events:state.events'));
 assert.equal((app.match(/\.packs\(questions,course,homeworkOpts\(\)\)/g) || []).length, 3);
