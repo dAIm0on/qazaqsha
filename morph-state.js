@@ -90,8 +90,8 @@ function recordTeaching(raw,input){
 }
 function putTeachingResume(raw,value){
  const out=migrate(raw);if(value==null){out.teaching.resume=null;out.teaching.updatedAt=Date.now();out.updatedAt=Math.max(out.updatedAt,out.teaching.updatedAt);return out;}
- const clean=teachingResume({...value,contentVersion:TEACHING_CONTENT_VERSION});if(!clean)throw Error('Invalid teaching resume');
- out.teaching.resume=clean;out.teaching.updatedAt=clean.updatedAt||Date.now();out.teaching.recovery=null;out.updatedAt=Math.max(out.updatedAt,out.teaching.updatedAt);return out;
+ const clean=teachingResume({...value,contentVersion:TEACHING_CONTENT_VERSION,updatedAt:Number.isFinite(value.updatedAt)?value.updatedAt:Date.now()});if(!clean)throw Error('Invalid teaching resume');
+ out.teaching.resume=clean;out.teaching.updatedAt=clean.updatedAt;out.teaching.recovery=null;out.updatedAt=Math.max(out.updatedAt,out.teaching.updatedAt);return out;
 }
 function productionChannel(e){
  if(!e||e.scored===false||e.modality==='audio')return 'excluded';
