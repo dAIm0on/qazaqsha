@@ -76,6 +76,11 @@ function guidedPlan(moduleId){
  const rows=moduleId==='nasal'?nasalGuided():pickTargets(moduleId,TARGETS[moduleId].guided);
  return rows.map((x,i)=>task(moduleId,x,i,'guided'));
 }
+function taskForItem(moduleId,itemId,kind='source'){
+ const item=E.getItem(itemId);if(!item||item.split!=='train'||item.sequence.length!==1||!spec(moduleId).families.includes(item.sequence.at(-1)))throw Error('Invalid Stage 5 source item');
+ if(moduleId==='nasal'&&item.trace.at(-1).edge!=='nasal')throw Error('Stage 5 nasal source must have nasal edge');
+ return task(moduleId,item,0,kind);
+}
 function repairFor(moduleId,sourceTask,extraExclude=[]){
  spec(moduleId);
  const rows=stableRows(moduleId);
@@ -124,6 +129,6 @@ function fullStage5Ready(state,moduleId){
   return !!e?.semanticIntroCompleted&&e.featureNotice.correct>0;
  });
 }
-const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,fullStage5Ready};
+const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,fullStage5Ready};
 if(node)module.exports=api;else root.MorphTeachingPractice=api;
 })(typeof window!=='undefined'?window:globalThis);
