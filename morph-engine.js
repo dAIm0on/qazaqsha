@@ -99,7 +99,7 @@ function itemFor(lemmaId,sequence,level='mixed'){
  const matching=candidates.filter(c=>target==='harmony'?pattern(c)===pattern(f.word):target==='onset'?c.slice(-t.suffix.length+1)===f.word.slice(-t.suffix.length+1):true);
  let options=[f.word,...(matching.length?matching:candidates).slice(0,target?1:3)];
  if(t.changed&&!target)options=[f.word,t.before+t.suffix,...options.slice(1,3)];
- const sequenceLabel=sequence.map(x=>op[x]).join(' → ');
+ const sequenceLabel=sequence.map(x=>x==='PAST'&&sequence.some(y=>y.startsWith('AGR_SHORT_'))?'прошедшее время':op[x]).join(' → ');
  return {id,lemmaId,stem:f.lemma.text,gloss:f.lemma.gloss,sequence,operation:sequenceLabel,expected:f.word,trace:f.trace,options:[...new Set(options)],level,split:f.lemma.split,sources:[...new Set(sequence.flatMap(x=>D.families[x].sources))]};
 }
 let cached,byId;
