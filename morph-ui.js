@@ -122,7 +122,8 @@ function startStage5Independent(moduleId,step,responseMode){
  const session=P.createIndependentSession(moduleId,responseMode,now+2);saveSession(session);teachingMode=false;showHub=false;message='';render();
 }
 function stage5Finish(s,resume){
- const module=teachingModule(resume.currentModule),r=E.summary(s.results),input=resume.currentTeachingStep==='FULL_INPUT';
+ const module=teachingModule(resume?.currentModule)||teachingModule(s.level),r=E.summary(s.results),input=resume?.currentTeachingStep==='FULL_INPUT';
+ if(!module)return '<div class="morph-panel"><p role="status">Учебный модуль не удалось восстановить. Ответы сохранены.</p><button class="secondary-button" data-morph-hub>К тренировкам</button></div>';
  const e=stage5Evidence(module.id),next=P.MODULES[P.MODULES.indexOf(module.id)+1]||null;
  if(!input)return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">САМОСТОЯТЕЛЬНО · ВЫБОР</p><h2>'+r.correct+' из '+r.n+'</h2><p>'+r.uniqueLemmas+' разных train-основ. Подсказка в этом блоке была отключена.</p><p class="small">Это independent-choice evidence. Теперь та же логика проверяется вводом полной формы на другом наборе основ.</p><div class="morph-actions"><button class="secondary-button" data-stage5-restart-guided>Вернуться к опоре</button><button class="primary-button" data-stage5-start-input>Самостоятельно · ввод</button></div></div>';
  recordOnce('stage5_module_completed',module.id,null,{responseMode:'view'});
