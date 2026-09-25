@@ -130,6 +130,8 @@ function support(moduleId,task){
  return m.shortSupport;
 }
 function evaluate(task,response){return E.norm(response)===E.norm(task.expected);}
+function previousModule(moduleId){const i=MODULES.indexOf(moduleId);return i>0?MODULES[i-1]:null;}
+function prerequisitesReady(state,moduleId){const prev=previousModule(moduleId);return !prev||!!S?.teachingEvidence(state,{moduleId:prev}).moduleCompleted;}
 function fullStage5Ready(state,moduleId){
  const m=spec(moduleId);
  return m.families.every(f=>{
@@ -137,6 +139,6 @@ function fullStage5Ready(state,moduleId){
   return !!e?.semanticIntroCompleted&&e.featureNotice.correct>0;
  });
 }
-const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,fullStage5Ready};
+const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready};
 if(node)module.exports=api;else root.MorphTeachingPractice=api;
 })(typeof window!=='undefined'?window:globalThis);
