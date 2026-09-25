@@ -1979,6 +1979,11 @@
      return {module,records:Object.fromEntries(Object.entries(records).filter(([id])=>id.startsWith('morph:v1:'))),knownLemmas};
    },
    session(value){state.morphTrainer=window.MorphState.putSession(state.morphTrainer,value);save();return storageAvailable;},
+   teaching(event){
+     const applied=window.MorphState.recordTeaching(state.morphTrainer,event);if(!applied.accepted)return false;
+     state.morphTrainer=applied.state;save();return true;
+   },
+   teachingResume(value){state.morphTrainer=window.MorphState.putTeachingResume(state.morphTrainer,value);save();return storageAvailable;},
    answer(result){
      const applied=window.MorphState.accept(state.morphTrainer,result);if(!applied.accepted)return false;
      state.morphTrainer=applied.state;const e=applied.event;
@@ -2008,7 +2013,8 @@
    position=Math.min(queue.length,savedSession.position+(savedSession.answered?1:0));if(savedSession.answered&&!['ordered','shuffle','homework','course','phrase','transfer'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();
    if(!savedSession.answered){hinted=!!savedSession.hinted;elapsedMs=Number.isFinite(savedSession.elapsed_ms)?Math.max(0,savedSession.elapsed_ms):0;}
  }else{queue=[];practiceIds=[];renderStats();}
- const resumeView=window.MorphState.resumeSurface(savedSession&&savedSession.view,!!(state.morphTrainer&&state.morphTrainer.session),!!validSaved,['practice','homework','learn','path','review']);
+ const hasMorphResume=!!(state.morphTrainer&&(state.morphTrainer.session||(state.morphTrainer.teaching&&state.morphTrainer.teaching.resume)));
+ const resumeView=window.MorphState.resumeSurface(savedSession&&savedSession.view,hasMorphResume,!!validSaved,['practice','homework','learn','path','review']);
  showView(resumeView);
  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else{renderStats();if(view==='practice')activateCard();if(['today','review','vocabulary'].includes(view))dashboard.render(view);}save();});
  window.addEventListener('qazaq-before-update',e=>{pauseTimer();save();if(!storageAvailable)e.preventDefault();});
