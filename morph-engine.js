@@ -156,8 +156,8 @@ function coverage(){
 function createSession({level='harmony',mode='learn',responseMode='choice',seed=Date.now(),events=[],records={},limit=10,knownLemmas=[]}={}){
  if(!D.levels.some(x=>x.id===level)||!['learn','transfer'].includes(mode)||!['choice','input'].includes(responseMode))reject('Invalid session settings');
  const rng=seeded(seed),seen=new Set([...events.map(e=>e.lemmaId),...knownLemmas]);
- const spec=levelSpec(level);
- let pool=bank().filter(i=>eligible(i,level)&&i.split===(mode==='transfer'?'transfer':'train')&&(mode!=='transfer'||!seen.has(i.lemmaId)));
+ const spec=levelSpec(level),currentLemmas=new Set(D.lemmas.map(l=>l.id));
+ let pool=bank().filter(i=>currentLemmas.has(i.lemmaId)&&eligible(i,level)&&i.split===(mode==='transfer'?'transfer':'train')&&(mode!=='transfer'||!seen.has(i.lemmaId)));
  const rule=transferRule(level);
  if(mode==='transfer'&&rule)pool=pool.filter(i=>i.sequence.length===1&&rule.families.includes(i.sequence[0]));
  pool=shuffle(pool,rng);
@@ -182,6 +182,6 @@ function answer(session,response,ms=null,at=Date.now()){
  return {event,session:{...session,phase:'feedback',draft:String(response).slice(0,200),result:event,results:[...session.results,event],updatedAt:at}};
 }
 function next(session){if(!session||session.phase!=='feedback')return session;const cursor=session.cursor+1,complete=cursor>=session.queue.length;return {...session,cursor,phase:complete?'complete':'question',complete,draft:'',hinted:false,result:null,updatedAt:Date.now()};}
-function summary(events){const scored=events.filter(e=>!e.hinted),n=scored.length,correct=scored.filter(e=>e.correct).length,times=scored.filter(e=>e.correct&&Number.isFinite(e.responseTime)).map(e=>e.responseTime).sort((a,b)=>a-b);return {n,correct,accuracy:n?Math.round(100*correct/n):null,uniqueLemmas:new Set(scored.map(e=>e.lemmaId)).size,medianMs:times.length?times[Math.floor(times.length/2)]:null};}
+function summary(events){const scored=events.filter(e=>!e.hinted&&e.scored!==false),n=scored.length,correct=scored.filter(e=>e.correct).length,times=scored.filter(e=>e.correct&&Number.isFinite(e.responseTime)).map(e=>e.responseTime).sort((a,b)=>a-b);return {n,correct,accuracy:n?Math.round(100*correct/n):null,uniqueLemmas:new Set(scored.map(e=>e.lemmaId)).size,medianMs:times.length?times[Math.floor(times.length/2)]:null};}
 const api={data:D,edge,form,itemFor,bank,getItem,createSession,answer,next,summary,errors,reason,norm,eligible,pattern,reveal,coverage,transferRule};if(node)module.exports=api;else root.MorphEngine=api;
 })(typeof window!=='undefined'?window:globalThis);

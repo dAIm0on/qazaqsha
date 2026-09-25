@@ -89,4 +89,25 @@ test('T04 a short holdout stays short and does not borrow seen stems',()=>{
  const app=fs.readFileSync('app.js','utf8');
  assert.ok(app.includes('if(!e.transfer)records[e.itemId]=window.TrainerCore.updateRecord'));
 });
+test('S06 old answers survive a removed item, a changed key and a substituted submit',()=>{
+ const live=E.itemFor('n-бала',['PL']);
+ const archived={eventId:'hist:deleted',itemId:'morph:v1:n-gone:PL',lemmaId:'n-gone',sequence:['PL'],contextClasses:['vowel'],level:'plural',mode:'learn',modality:'text',responseMode:'input',response:'ескі',expected:'ескіформа',correct:true,hinted:false,errorCodes:[],at:1700000000000,dataVersion:'morph-archive-v0'};
+ const revised={eventId:'hist:revised',itemId:live.id,lemmaId:'n-бала',sequence:['PL'],contextClasses:['vowel'],level:'plural',mode:'learn',modality:'text',responseMode:'input',response:'балалер',expected:'балалер',correct:true,hinted:false,errorCodes:[],at:1700000001000,dataVersion:'morph-archive-v0'};
+ const poison={eventId:'bad',itemId:live.id,lemmaId:'n-бала',sequence:['PL'],expected:'<script>',response:{run:true},at:1};
+ const once=S.migrate({version:1,events:[archived,revised,poison],exposed:['n-gone'],session:{version:9,id:'old',queue:[{id:live.id,options:[live.expected]}],cursor:0,phase:'question',mode:'learn',responseMode:'choice',dataVersion:E.data.version}});
+ assert.equal(once.session,null);assert.ok(!once.recovery.includes('История сохранена'));assert.equal(once.events.length,2);
+ const gone=once.events.find(e=>e.eventId==='hist:deleted'),rev=once.events.find(e=>e.eventId==='hist:revised');
+ assert.equal(gone.expected,'ескіформа');assert.equal(gone.correct,true);assert.equal(gone.normRevision,null);
+ assert.equal(rev.expected,'балалер');assert.equal(rev.correct,true);assert.equal(rev.normRevision,live.expected);assert.equal(rev.scored,false);
+ assert.ok(once.exposed.includes('n-gone'));assert.equal(E.summary(once.events).n,1);assert.equal(S.forMastery(once.events).length,1);
+ const twice=S.migrate(once);assert.equal(twice.recovery,once.recovery);assert.equal(twice.events.find(e=>e.eventId==='hist:revised').expected,'балалер');
+ let m=S.putSession(once,E.createSession({seed:11,responseMode:'input'}));assert.equal(m.recovery,null);assert.equal(m.events.length,2);
+ const answer=E.answer(m.session,'x',50),tampered=JSON.parse(JSON.stringify(answer));
+ tampered.event.expected='чужое';assert.equal(S.accept(m,tampered).accepted,false);
+ tampered.event.expected=answer.event.expected;tampered.event.itemId='morph:v1:n-gone:PL';tampered.event.lemmaId='n-gone';assert.equal(S.accept(m,tampered).accepted,false);
+ const ok=S.accept(m,answer);assert.equal(ok.accepted,true);assert.equal(S.accept(ok.state,answer).accepted,false);
+ const course={records:{legacy:{seen:1,due:1}},courseProgress:{resumePointer:{lessonId:'1-1',surface:'practice'}}};
+ const wrapped=P.migrate({schema:7,...course,morphTrainer:once});
+ assert.equal(wrapped.records.legacy.seen,1);assert.equal(wrapped.courseProgress.resumePointer.lessonId,'1-1');assert.equal(wrapped.morphTrainer.events.length,2);
+});
 console.log('MORPH_OK',n,'checks;',E.bank().length,'items;',gold.length,'gold pairs');
