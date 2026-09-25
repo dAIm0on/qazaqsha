@@ -141,6 +141,19 @@ test('Stage 5 completion does not claim mastery or transfer',()=>{
  assert.equal(ui.includes('Stage 5 mastered'),false);
 });
 
+test('Stage 5 prerequisite chain is harmony then voice then plural then nasal',()=>{
+ assert.equal(P.previousModule('harmony'),null);assert.equal(P.previousModule('voice'),'harmony');assert.equal(P.previousModule('plural'),'voice');assert.equal(P.previousModule('nasal'),'plural');
+ let state=S.empty();assert.equal(P.prerequisitesReady(state,'harmony'),true);assert.equal(P.prerequisitesReady(state,'voice'),false);
+ state=S.recordTeaching(state,{eventId:'done:harmony',type:'stage5_module_completed',moduleId:'harmony',familyId:null,at:1,responseMode:'view'}).state;
+ assert.equal(P.prerequisitesReady(state,'voice'),true);assert.equal(P.prerequisitesReady(state,'plural'),false);
+});
+
+test('Stage 5 completion event is routing evidence, not production mastery',()=>{
+ const r=S.recordTeaching(S.empty(),{eventId:'done:plural',type:'stage5_module_completed',moduleId:'plural',familyId:null,at:1,responseMode:'view'});
+ assert.equal(r.accepted,true);assert.equal(r.event.productionMastery,false);assert.equal(S.teachingEvidence(r.state,{moduleId:'plural'}).moduleCompleted,true);
+ assert.ok(ui.includes("recordOnce('stage5_module_completed'"));assert.ok(ui.includes('Перенос и удержание проверяются отдельно'));
+});
+
 test('Stage 5 keeps later modules out of the new guided route',()=>{
  assert.ok(ui.includes("P.MODULES.includes(module.id)"));
  assert.ok(ui.includes('Guided Stage 5 доступен только для первых четырёх модулей.'));
