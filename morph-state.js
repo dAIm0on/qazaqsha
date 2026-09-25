@@ -5,7 +5,7 @@ const copy=x=>JSON.parse(JSON.stringify(x)),stamp=x=>Number.isFinite(x)&&x>=0?x:
 const HISTORY_LIMIT=400,historyNote='В файле прогресса хранятся последние 400 ответов этого тренажёра. Более длинный разбор эта версия не обещает.';
 const TEACHING_CONTENT_VERSION='morph-teaching-20260925-v1',TEACHING_HISTORY_LIMIT=400;
 const TEACHING_STEPS=new Set(['SEMANTIC_INTRO','FULL_EXPLANATION','CONTRAST_EXAMPLES','FEATURE_NOTICE','GUIDED_CHOICE','INDEPENDENT_CHOICE','FULL_INPUT','ERROR_REPAIR','MIXED_PRACTICE','TRANSFER_BLOCK','RETENTION_REVIEW']);
-const TEACHING_EVENTS=new Set(['semantic_intro_seen','semantic_intro_completed','full_explanation_opened','semantic_check_attempt','feature_notice_attempt','guided_attempt','correction_after_feedback']);
+const TEACHING_EVENTS=new Set(['semantic_intro_seen','semantic_intro_completed','full_explanation_opened','semantic_check_attempt','feature_notice_attempt','guided_attempt','correction_after_feedback','stage5_module_completed']);
 const moduleIds=new Set(['meaning',...E.data.levels.map(x=>x.id)]);
 function emptyTeaching(){return {version:1,contentVersion:TEACHING_CONTENT_VERSION,events:[],resume:null,updatedAt:0,recovery:null};}
 function empty(){return {version:1,dataVersion:E.data.version,events:[],exposed:[],session:null,teaching:emptyTeaching(),updatedAt:0,recovery:null};}
@@ -115,7 +115,8 @@ function teachingEvidence(raw,{moduleId=null,familyId=null}={}){
   independentChoice:count(answers,e=>productionChannel(e)==='independent_choice'),
   independentInput:count(answers,e=>productionChannel(e)==='independent_input'),
   mixed:count(answers,e=>productionChannel(e)==='mixed'),
-  transfer:count(answers,e=>productionChannel(e)==='transfer')
+  transfer:count(answers,e=>productionChannel(e)==='transfer'),
+  moduleCompleted:teaching.some(e=>e.type==='stage5_module_completed')
  };
 }
 function forMastery(events){return (events||[]).filter(e=>e&&e.scored!==false&&e.modality!=='audio');}
