@@ -126,6 +126,7 @@ function seeded(seed){let n=seed>>>0;return ()=>{n=(1664525*n+1013904223)>>>0;re
 function shuffle(a,random){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function eligible(item,level){if(level==='mixed')return true;if(level==='chains')return item.level==='chains';if(level==='verbs')return item.level==='verbs';const spec=D.levels.find(x=>x.id===level);return item.sequence.length===1&&spec?.families.includes(item.sequence[0]);}
 function levelSpec(level){return D.levels.find(x=>x.id===level);}
+const writtenRelease={scopeId:'morph-written-v1',textChoice:true,textProduction:true,chains:true,transferOnRealLemmas:true,audioInput:false,audioPlayback:false,speechAssessment:false};
 const transferPolicy={person:{families:['Q'],note:'Эта проверка оценивает только вопрос. Сказуемые я, мы, ты и вы здесь не оцениваются: среди отложенных основ нет естественных именных предикатов со словарной парой. Одни вопросы этот навык не закрывают.'}};
 function transferRule(level){return transferPolicy[level]||null;}
 function reveal(session){
@@ -182,6 +183,6 @@ function answer(session,response,ms=null,at=Date.now()){
  return {event,session:{...session,phase:'feedback',draft:String(response).slice(0,200),result:event,results:[...session.results,event],updatedAt:at}};
 }
 function next(session){if(!session||session.phase!=='feedback')return session;const cursor=session.cursor+1,complete=cursor>=session.queue.length;return {...session,cursor,phase:complete?'complete':'question',complete,draft:'',hinted:false,result:null,updatedAt:Date.now()};}
-function summary(events){const scored=events.filter(e=>!e.hinted&&e.scored!==false),n=scored.length,correct=scored.filter(e=>e.correct).length,times=scored.filter(e=>e.correct&&Number.isFinite(e.responseTime)).map(e=>e.responseTime).sort((a,b)=>a-b);return {n,correct,accuracy:n?Math.round(100*correct/n):null,uniqueLemmas:new Set(scored.map(e=>e.lemmaId)).size,medianMs:times.length?times[Math.floor(times.length/2)]:null};}
-const api={data:D,edge,form,itemFor,bank,getItem,createSession,answer,next,summary,errors,reason,norm,eligible,pattern,reveal,coverage,transferRule};if(node)module.exports=api;else root.MorphEngine=api;
+function summary(events){const scored=events.filter(e=>!e.hinted&&e.scored!==false&&e.modality!=='audio'),n=scored.length,correct=scored.filter(e=>e.correct).length,times=scored.filter(e=>e.correct&&Number.isFinite(e.responseTime)).map(e=>e.responseTime).sort((a,b)=>a-b);return {n,correct,accuracy:n?Math.round(100*correct/n):null,uniqueLemmas:new Set(scored.map(e=>e.lemmaId)).size,medianMs:times.length?times[Math.floor(times.length/2)]:null};}
+const api={data:D,edge,form,itemFor,bank,getItem,createSession,answer,next,summary,errors,reason,norm,eligible,pattern,reveal,coverage,transferRule,writtenRelease};if(node)module.exports=api;else root.MorphEngine=api;
 })(typeof window!=='undefined'?window:globalThis);

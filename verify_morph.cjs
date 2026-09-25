@@ -157,4 +157,14 @@ test('S07 current morph ids pass import and a foreign id still warns',()=>{
  assert.equal(only.summary.unknown,0);assert.equal(only.warning,'');
  assert.equal(S.HISTORY_LIMIT,400);assert.ok(S.historyNote.includes('400'));
 });
+test('Imported audio event stays audio and leaves the written score',()=>{
+ const live=E.itemFor('n-бала',['PL']);
+ const audio={eventId:'hist:audio',itemId:live.id,lemmaId:'n-бала',sequence:['PL'],contextClasses:['vowel'],level:'plural',mode:'learn',modality:'audio',responseMode:'input',response:live.expected,expected:live.expected,correct:true,hinted:false,errorCodes:[],at:1700000002000,dataVersion:'morph-archive-v0',audioAssetId:'old-clip'};
+ const kept=S.migrate({version:1,events:[audio],exposed:[],session:null}).events[0];
+ assert.equal(kept.modality,'audio');assert.equal(kept.audioAssetId,'old-clip');assert.equal(kept.expected,live.expected);assert.equal(kept.correct,true);
+ assert.equal(E.summary([kept]).n,0);assert.equal(S.forMastery([kept]).length,0);
+ const fresh=E.createSession({seed:1});assert.equal(fresh.modality,'text');
+ assert.equal(E.writtenRelease.scopeId,'morph-written-v1');assert.equal(E.writtenRelease.audioPlayback,false);assert.equal(E.writtenRelease.speechAssessment,false);
+ assert.equal(E.data.version,'morph-20260924-v1');
+});
 console.log('MORPH_OK',n,'checks;',E.bank().length,'items;',gold.length,'gold pairs');
