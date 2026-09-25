@@ -47,7 +47,14 @@ test('SW cache contains all module assets and actual existing files',()=>{
  const text=fs.readFileSync('sw.js','utf8'),a=JSON.parse(text.match(/ASSETS=(\[[^;]+\]);/)[1]);for(const f of ['morph-data.js','morph-engine.js','morph-state.js','morph-ui.js','morph.css'])assert.ok(a.includes(f));for(const f of a)assert.ok(fs.existsSync(f),f);
 });
 test('No audio or pseudoword achievement without reviewed data',()=>{assert.equal(E.data.audio.length,0);assert.equal(E.data.pseudowords.length,0);assert.equal(E.createSession().modality,'text');});
-test('Transfer UI hides immediate synthesis and chain prompt does not claim third person',()=>{const ui=fs.readFileSync('morph-ui.js','utf8');assert.ok(ui.includes('view.speech'));assert.ok(ui.includes('view.expected'));assert.ok(ui.includes('E.reveal'));assert.ok(!E.itemFor('v-кел',['PAST','AGR_SHORT_1SG']).operation.includes('3-е лицо'));});
+test('Written module has no system voice',()=>{
+ const ui=fs.readFileSync('morph-ui.js','utf8'),css=fs.readFileSync('morph.css','utf8');
+ for(const banned of ['speechSynthesis','SpeechSynthesisUtterance','data-morph-speak','audioNote','Проговорить','Озвучить','слухового теста','Слух и произношение','затем звук'])assert.equal(ui.includes(banned),false,banned);
+ assert.ok(ui.includes('Тренируй выбор и построение правильной формы слова'));
+ assert.ok(ui.includes('Результаты относятся к письменным заданиям'));
+ assert.equal(css.includes('morph-audio-note'),false);
+ assert.ok(!E.itemFor('v-кел',['PAST','AGR_SHORT_1SG']).operation.includes('3-е лицо'));
+});
 test('T01 train lemmas stay out of transfer and a later check does not reuse them',()=>{
  const train=E.data.lemmas.filter(l=>l.split==='train').map(l=>l.id);
  const first=E.createSession({mode:'transfer',level:'mixed',seed:3,knownLemmas:train});
