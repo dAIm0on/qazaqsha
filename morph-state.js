@@ -16,8 +16,14 @@ function teachingEvent(v){
  const familyId=v.familyId==null?null:(E.data.families[v.familyId]?v.familyId:null);if(v.familyId!=null&&!familyId)return null;
  const responseMode=['view','choice','input'].includes(v.responseMode)?v.responseMode:'view';
  const answer=v.answer==null?'':String(v.answer).slice(0,200);
+ let itemId=null,lemmaId=null;
+ if(v.itemId!=null){
+  const item=safe(v.itemId)?E.getItem(v.itemId):null;if(!item)return null;itemId=item.id;lemmaId=item.lemmaId;
+ }else if(v.lemmaId!=null){
+  if(!safe(v.lemmaId)||!E.data.lemmas.some(x=>x.id===v.lemmaId))return null;lemmaId=v.lemmaId;
+ }
  const contentVersion=typeof v.contentVersion==='string'&&v.contentVersion.length<80?v.contentVersion:TEACHING_CONTENT_VERSION;
- return {eventId:v.eventId,type:v.type,moduleId:v.moduleId,familyId,at:stamp(v.at),contentVersion,responseMode,answer,correct:v.correct==null?null:!!v.correct,hinted:!!v.hinted,productionMastery:false};
+ return {eventId:v.eventId,type:v.type,moduleId:v.moduleId,familyId,itemId,lemmaId,at:stamp(v.at),contentVersion,responseMode,answer,correct:v.correct==null?null:!!v.correct,hinted:!!v.hinted,productionMastery:false};
 }
 function teachingResume(v){
  if(!obj(v)||v.contentVersion!==TEACHING_CONTENT_VERSION||!moduleIds.has(v.currentModule)||!TEACHING_STEPS.has(v.currentTeachingStep))return null;
