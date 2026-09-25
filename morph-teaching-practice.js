@@ -95,7 +95,9 @@ function nasalIndependentRows(responseMode,extraExclude=[]){
  const rows=stableRows('nasal'),guidedLemma=guidedPlan('nasal')[0].lemmaId,excluded=new Set([guidedLemma,...extraExclude]);
  const lemmas=[...new Set(rows.map(x=>x.lemmaId))].filter(x=>!excluded.has(x)).sort((a,b)=>a.localeCompare(b,'kk'));
  if(!lemmas.length)throw Error('No unseen nasal lemma remains for Stage 5 independent block');
- const take=Math.min(responseMode==='choice'?3:2,lemmas.length),chosen=lemmas.slice(0,take),targets=TARGETS.nasal[responseMode];
+ const take=Math.min(responseMode==='choice'?3:2,lemmas.length);
+ const chosen=responseMode==='choice'?lemmas.slice(0,take):lemmas.slice(Math.max(0,lemmas.length-take));
+ const targets=TARGETS.nasal[responseMode];
  return targets.map((family,i)=>{
   const lemma=chosen[i%chosen.length],row=rows.find(x=>x.lemmaId===lemma&&x.sequence.at(-1)===family);
   if(!row)throw Error('Missing nasal family '+family+' for '+lemma);
