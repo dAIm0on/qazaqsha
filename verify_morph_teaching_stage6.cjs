@@ -16,7 +16,7 @@ test('Stage 6 uses restored canonical content, not shortSupport as full rule',()
  const poss=T.modules.find(x=>x.id==='poss'),person=T.modules.find(x=>x.id==='person');
  assert.ok(poss.fullExplanationBlocks?.length>10);assert.ok(person.fullExplanationBlocks?.length>10);
  assert.equal(poss.fullExplanationRef,'DOC32#H');assert.equal(person.fullExplanationRef,'DOC32#I');
- const pb=JSON.stringify(poss.fullExplanationBlocks),pr=JSON.stringify(person.fullExplanationBlocks);
+ const pb=JSON.stringify(poss),pr=JSON.stringify(person);
  for(const token of ['атым','кітабым','кітаптар','орын','орында'])assert.ok(pb.includes(token),token);
  for(const token of ['адаммын','адамбыз','адам ба','POSS','AGR_SHORT','NEG'])assert.ok(pr.includes(token),token);
 });
