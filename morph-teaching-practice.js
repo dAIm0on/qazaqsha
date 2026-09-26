@@ -143,6 +143,20 @@ function fullStage5Ready(state,moduleId){
 }
 
 const STAGE6_MODULES=['poss','person'];
+const STAGE6_SEMANTIC_CHECKS={
+ poss:[
+  {id:'owner-gen',prompt:'В «менің кітабым» что показывает слово «менің»?',options:['GEN','POSS','COP'],expected:'GEN',explanation:'GEN показывает владельца; POSS на слове кітабым показывает отношение предмета к владельцу.'},
+  {id:'item-poss',prompt:'В «менің кітабым» какая категория стоит на самом предмете «кітабым»?',options:['POSS','GEN','AGR_SHORT'],expected:'POSS',explanation:'POSS меняет сам предмет и показывает лицо владельца.'}
+ ],
+ person:[
+  {id:'cop',prompt:'Контекст «я студент»: какая категория отмечает лицо на именном сказуемом?',options:['COP','POSS','AGR_SHORT'],expected:'COP',explanation:'COP — предикативная серия: кто/что я есть.'},
+  {id:'poss',prompt:'Контекст «моя книга»: какая категория отмечает принадлежность на самом предмете?',options:['POSS','COP','AGR_SHORT'],expected:'POSS',explanation:'POSS — чей предмет; это не COP.'},
+  {id:'agr',prompt:'Контекст «я пришёл» после уже построенной PAST-формы: какая серия отмечает лицо субъекта действия?',options:['AGR_SHORT','COP','POSS'],expected:'AGR_SHORT',explanation:'AGR_SHORT лицензируется после PAST/COND и не является POSS или полной COP-серией.'},
+  {id:'q',prompt:'«адам ба?» — что это?',options:['Q','NEG','COP'],expected:'Q',explanation:'Q — отдельная вопросительная частица.'},
+  {id:'neg',prompt:'«жазба» — что это?',options:['NEG','Q','POSS'],expected:'NEG',explanation:'NEG — глагольное отрицание внутри глагольной цепочки; это не Q.'}
+ ]
+};
+function stage6SemanticChecks(moduleId){stage6Spec(moduleId);return STAGE6_SEMANTIC_CHECKS[moduleId].map(x=>({...x,options:x.options.slice()}));}
 const STAGE6_GUIDED={
  poss:[
   ['n-бала','POSS_1SG'],['n-ат','POSS_1SG'],['n-кітап','POSS_1SG'],['n-көлік','POSS_1SG'],['n-қонақ','POSS_1SG'],
@@ -283,6 +297,6 @@ function stage6MissingPrerequisite(state,moduleId){
 }
 function stage6NextModule(moduleId){const i=STAGE6_MODULES.indexOf(moduleId);return i>=0?STAGE6_MODULES[i+1]||null:null;}
 
-const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,stage6Spec,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule};
+const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule};
 if(node)module.exports=api;else root.MorphTeachingPractice=api;
 })(typeof window!=='undefined'?window:globalThis);
