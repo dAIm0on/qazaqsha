@@ -176,9 +176,10 @@ test('Actual repair-exposed lemmas stay out of later independent blocks',()=>{
  }
 });
 
-test('Service worker caches the existing update.html file without pretty-route 404',()=>{
- assert.ok(sw.includes("if(asset==='update.html')return new URL('update.html',self.registration.scope).href;"));
- assert.equal(sw.includes("if(asset==='update.html')return new URL('update',self.registration.scope).href;"),false);
+test('Service worker fetches the update page that is not a redirect',()=>{
+ assert.ok(sw.includes("if(asset==='update.html')return new URL('update',self.registration.scope).href;"));
+ assert.equal(sw.includes("new URL('update.html',self.registration.scope)"),false);
+ assert.ok(sw.includes('response.redirected'));
  assert.ok(fs.existsSync('update.html'));
 });
 
