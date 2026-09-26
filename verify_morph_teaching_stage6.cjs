@@ -35,6 +35,33 @@ test('Canonical stem-change and counterexample forms remain exact in engine',()=
  assert.equal(E.getItem('morph:v1:n-кітап:PL').expected,'кітаптар');
  assert.equal(E.getItem('morph:v1:n-орын:LOC').expected,'орында');
 });
+test('Stage 6 semantic checks teach function before form',()=>{
+ const poss=P.stage6SemanticChecks('poss'),person=P.stage6SemanticChecks('person');
+ assert.deepEqual(poss.map(x=>x.expected),['GEN','POSS']);
+ assert.deepEqual(person.map(x=>x.expected),['COP','POSS','AGR_SHORT','Q','NEG']);
+ assert.ok(poss.some(x=>x.prompt.includes('менің кітабым')));
+ assert.ok(person.some(x=>x.prompt.includes('я студент')));
+ assert.ok(person.some(x=>x.prompt.includes('я пришёл')));
+ assert.ok(person.some(x=>x.prompt.includes('адам ба')));
+ assert.ok(person.some(x=>x.prompt.includes('жазба')));
+});
+
+test('Stage 6 semantic checks are teaching evidence and never production mastery',()=>{
+ let state=S.empty();
+ const r=S.recordTeaching(state,{eventId:'semcheck',type:'semantic_check_attempt',moduleId:'person',familyId:null,at:1,responseMode:'choice',answer:'COP',correct:true,hinted:false});
+ assert.equal(r.accepted,true);assert.equal(r.event.productionMastery,false);
+ const e=S.teachingEvidence(r.state,{moduleId:'person'});assert.equal(e.semanticChecks.attempts,1);assert.equal(e.semanticChecks.correct,1);
+ assert.equal(r.state.events.length,0);
+});
+
+test('Stage 6 UI renders semantic checks before guided morphology',()=>{
+ assert.ok(ui.includes('data-stage6-semantic-answer'));
+ assert.ok(ui.includes('data-stage6-semantic-next'));
+ assert.ok(ui.includes("type:'semantic_check_attempt'"));
+ assert.ok(ui.includes("const checks=P.stage6SemanticChecks(module.id)"));
+ assert.ok(ui.indexOf("if(i<checks.length)")>0);
+});
+
 test('POSS guided plan covers all five families and required lexical contrasts',()=>{
  const p=P.stage6GuidedPlan('poss'),forms=p.map(x=>x.expected);
  for(const f of ['POSS_1SG','POSS_2SG','POSS_1PL','POSS_2POL','POSS_3'])assert.ok(p.some(x=>x.familyId===f),f);
