@@ -210,11 +210,85 @@ function stage6Finish(s,resume){
  return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">STAGE 6 · УЧЕБНЫЙ БЛОК ЗАВЕРШЁН</p><h2>'+esc(module.title)+'</h2><p>Самостоятельный ввод: '+r.correct+' из '+r.n+'.</p><div class="stage5-evidence"><p>Independent choice: '+e.independentChoice.correct+' / '+e.independentChoice.attempts+'</p><p>Independent input: '+e.independentInput.correct+' / '+e.independentInput.attempts+'</p><p>Guided: '+e.guided.correct+' / '+e.guided.attempts+'</p><p>Corrections: '+e.corrections.correct+' / '+e.corrections.attempts+'</p></div><p class="small">Это завершённый учебный блок, не заявление «навык освоен». Перенос и удержание проверяются отдельно. Для person текущий transfer честно ограничен доступным банком.</p><div class="morph-actions"><button class="secondary-button" data-stage6-restart-guided>Повторить этот модуль</button>'+(next?'<button class="primary-button" data-stage6-next-module="'+esc(next)+'">Следующий модуль Stage 6</button>':'<button class="primary-button" data-teach-close>К разделу</button>')+'</div></div>';
 }
 
+function saveChain(v){return bridge().chain(v);}
+function stage7EdgeLabel(edge){return {vowel:'гласный',glide:'й/у',r:'р',l:'л',nasal:'м/н/ң',voiced_fricative:'з/ж',voiceless:'глухой'}[edge]||edge;}
+function stage7StateLabel(view){return (view.poss||'без принадлежности')+', '+(view.kase||'без падежа');}
+function stage7Pending(){return '<div class="morph-panel" data-stage7-pending><p role="status">Шаг цепочки ещё не готов. Прогресс, очередь и учебный шаг не изменены.</p><button type="button" class="secondary-button" data-stage7-retry>Показать шаг</button></div>';}
+function stage7EventId(chain){return chain.id+':'+chain.chainIndex+':'+chain.junction;}
+function stage7ExposedLemmas(){return (data().module.teaching?.events||[]).filter(e=>e.moduleId==='chains'&&e.type==='correction_after_feedback'&&e.lemmaId).map(e=>e.lemmaId);}
+function stage7Advance(chain){
+ const row=chain.chains[chain.chainIndex],total=P.stage7View(row.lemmaId,row.sequence,0).total;
+ let junction=chain.junction+1,chainIndex=chain.chainIndex;
+ if(junction>=total){junction=0;chainIndex++;}
+ const phase=chainIndex>=chain.chains.length?'complete':'question';
+ return {...chain,junction,chainIndex,phase,result:null,repair:null,draft:'',updatedAt:Date.now()};
+}
+function stage7TaskHtml(view,chain,answered){
+ const choices=chain.responseMode==='choice'?view.options.map(o=>'<button type="button" class="secondary-button" lang="kk" data-stage7-answer="'+esc(o)+'"'+(answered?' disabled':'')+'>'+esc(o)+'</button>').join(''):'<form id="stage7-answer-form"><label for="stage7-answer">Форма после этого шага</label><input id="stage7-answer" lang="kk" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="200"'+(answered?' disabled':'')+'><div class="morph-keys">'+[...'әғқңөұүі'].map(c=>'<button type="button" class="text-button" data-stage7-key="'+c+'"'+(answered?' disabled':'')+'>'+c+'</button>').join('')+'</div><button class="primary-button"'+(answered?' disabled':'')+'>Проверить</button></form>';
+ const support=chain.lane==='guided'&&chain.phase==='question'?'<p class="morph-rule">'+esc(P.stage7Support())+'</p>':'';
+ return support+'<p class="eyebrow">Сейчас</p><h2 class="morph-stem" lang="kk">'+esc(view.before)+'</h2><p class="morph-operation">'+esc(view.operation)+'</p><div class="morph-choices">'+choices+'</div>';
+}
+function stage7RepairScreen(chain){
+ const repair=chain.repair,source=P.stage7View(repair.sourceLemmaId,repair.sequence,repair.sequence.length-1),view=P.stage7View(repair.repairLemmaId,repair.sequence,repair.sequence.length-1);
+ const note=P.stage7Feedback(source,repair.errorCodes||[]);
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">STAGE 7 · РАЗБОР СТЫКА</p><h2>Тот же стык — другая основа</h2><div class="morph-feedback wrong"><strong>Форма этого шага: <span lang="kk">'+esc(repair.expected)+'</span></strong>'+(repair.response?'<p>Твой ответ: <span lang="kk">'+esc(repair.response)+'</span></p>':'')+'<p>'+esc(note)+'</p></div><p>Дальше тот же стык на другой train-основе. Это исправление, не самостоятельная цепочка.</p>'+stage7TaskHtml({...view,chainId:repair.sourceChainId},{...chain,lane:'guided',responseMode:'choice',phase:'question'},false)+'</div>';
+}
+function stage7Finish(chain){
+ const e=P.stage7Evidence(data().module);
+ if(chain.lane==='guided')return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">STAGE 7 · С ОПОРОЙ · ГОТОВО</p><h2>Теперь без подсказки</h2><p>Стыки с опорой: '+e.guided.correct+' из '+e.guided.attempts+'. Исправления: '+e.corrections.correct+' из '+e.corrections.attempts+'. Это не одна общая оценка и не самостоятельная цепочка.</p><div class="morph-actions"><button class="secondary-button" data-stage7-start-guided>Повторить с опорой</button><button class="primary-button" data-stage7-start-choice>Самостоятельно · выбор</button></div></div>';
+ if(chain.responseMode==='choice')return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">STAGE 7 · САМОСТОЯТЕЛЬНО · ВЫБОР</p><h2>Выбор без подсказки записан</h2><p>Разных основ: '+e.uniqueLemmas+'. Ошибочные стыки: '+(e.errorJunctions.join(', ')||'нет')+'.</p><div class="morph-actions"><button class="primary-button" data-stage7-start-input>Самостоятельно · ввод</button></div></div>';
+ recordOnce('teaching_module_completed','chains',null,{responseMode:'view'});
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">STAGE 7 · УЧЕБНЫЙ БЛОК ЗАВЕРШЁН</p><h2>Цепочки</h2><div class="stage5-evidence"><p>Guided junctions: '+e.guided.correct+' / '+e.guided.attempts+'</p><p>Independent choice: '+e.independentChoice.correct+' / '+e.independentChoice.attempts+'</p><p>Independent input: '+e.independentInput.correct+' / '+e.independentInput.attempts+'</p><p>Corrections: '+e.corrections.correct+' / '+e.corrections.attempts+'</p><p>Разных основ: '+e.uniqueLemmas+'</p><p>Ошибочные стыки: '+(e.errorJunctions.join(', ')||'нет')+'</p></div><p class="small">Это завершённый учебный блок, не заявление «навык освоен». Перенос проверяется отдельно.</p><button class="secondary-button" data-stage7-start-guided>Повторить с опорой</button></div>';
+}
+function stage7Screen(){
+ const chain=data().module.chain;if(!chain)return stage7Pending();
+ if(chain.phase==='complete'||chain.chainIndex>=chain.chains.length)return stage7Finish(chain);
+ if(chain.phase==='repair'&&chain.repair)return stage7RepairScreen(chain);
+ const view=P.stage7Current(chain);if(!view)return stage7Pending();
+ const answered=chain.phase==='feedback';
+ const revealed=answered?'<div class="morph-feedback correct" role="status"><strong>Теперь форма: <span lang="kk">'+esc(view.after)+'</span></strong><p>Новый край: '+esc(stage7EdgeLabel(view.nextEdge))+'.</p><p>morphState: '+esc(stage7StateLabel(view))+'.</p></div><button class="primary-button" data-stage7-next>Дальше</button>':'';
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><button class="text-button" data-teach-close>← К разделу</button><p class="eyebrow">STAGE 7 · '+(chain.lane==='guided'?'С ОПОРОЙ':'САМОСТОЯТЕЛЬНО')+' · '+esc(view.chainId||'')+' · '+(view.junction+1)+' / '+view.total+'</p>'+stage7TaskHtml(view,chain,answered)+revealed+'<p class="small">Следующий стык не показан, пока не принят этот.</p></div>';
+}
+function startStage7(lane,step,responseMode){
+ const moduleState=data().module;
+ if(!P.stage7PrerequisitesReady(moduleState)){const missing=P.stage7MissingPrerequisite(moduleState);message='Сначала заверши prerequisite: '+(teachingModule(missing)?.title||missing)+'.';if(missing)startTeaching(missing);return;}
+ if(!P.stage7MeaningReady(moduleState)){const family=P.stage7MissingMeaning(moduleState),owner=P.stage7Owner(family);message='Сначала смысл этой операции: '+(family||'')+'.';startTeaching(owner,family);return;}
+ const chain=P.createStage7Run(lane,responseMode,Date.now(),{excludeLemmas:stage7ExposedLemmas()});
+ setTeachingResume('chains',step,null,0,'');saveChain(chain);saveSession(null);teachingMode=true;showHub=false;message='';render();
+}
+function answerStage7Repair(response){
+ const chain=data().module.chain;if(!chain||chain.phase!=='repair'||!chain.repair||!String(response||'').trim())return;
+ const view=P.stage7View(chain.repair.repairLemmaId,chain.repair.sequence,chain.repair.sequence.length-1);
+ const correct=E.norm(response)===E.norm(view.after),id=chain.id+':repair:'+chain.chainIndex+':'+chain.junction+':'+view.lemmaId;
+ if(!(data().module.teaching?.events||[]).some(e=>e.eventId===id))recordTeaching({eventId:id,type:'correction_after_feedback',moduleId:'chains',familyId:view.morpheme,lemmaId:view.lemmaId,at:Date.now(),responseMode:'choice',answer:String(response),correct,hinted:true});
+ const next=stage7Advance(chain);
+ saveChain({...next,acceptedEventIds:chain.acceptedEventIds,exposedRepairLemmas:[...new Set([...chain.exposedRepairLemmas,view.lemmaId])],updatedAt:Date.now()});
+ const step=chain.lane==='guided'?'GUIDED_CHOICE':chain.responseMode==='input'?'FULL_INPUT':'INDEPENDENT_CHOICE';
+ setTeachingResume('chains',step,null,next.junction,'');message=correct?'Исправление верное. Возвращаемся к цепочке.':'Правильная форма: '+view.after+'. Возвращаемся к цепочке.';teachingMode=true;render();
+}
+function answerStage7(response){
+ const chain=data().module.chain;if(chain?.phase==='repair')return answerStage7Repair(response);
+ if(!chain||chain.phase!=='question'||!String(response||'').trim())return;
+ const view=P.stage7Current(chain);if(!view)return;
+ const correct=E.norm(response)===E.norm(view.after),codes=correct?[]:P.stage7Errors(view,response);
+ const id=stage7RecordAnswer(chain,view,response,correct);if(!id){message='Этот шаг уже сохранён.';render();return;}
+ if(!correct){
+  const repairView=P.stage7RepairFor(view,[...chain.exposedRepairLemmas,...stage7ExposedLemmas()]);
+  const repair={sourceChainId:view.chainId||chain.chains[chain.chainIndex].chainId,sourceLemmaId:view.lemmaId,sourceJunction:view.junction,repairLemmaId:repairView.lemmaId,sequence:repairView.sequence,response:String(response),expected:view.after,errorCodes:codes};
+  saveChain({...chain,phase:'repair',repair,result:null,acceptedEventIds:[...chain.acceptedEventIds,id],exposedRepairLemmas:[...new Set([...chain.exposedRepairLemmas,repairView.lemmaId])],updatedAt:Date.now()});
+  setTeachingResume('chains','ERROR_REPAIR',view.morpheme,chain.junction,'');message='Стык разобран на другой основе.';teachingMode=true;render();return;
+ }
+ saveChain({...chain,phase:'feedback',result:{eventId:id,response:String(response),correct:true,errorCodes:[]},repair:null,acceptedEventIds:[...chain.acceptedEventIds,id],updatedAt:Date.now()});
+ setTeachingResume('chains',chain.lane==='guided'?'GUIDED_CHOICE':chain.responseMode==='input'?'FULL_INPUT':'INDEPENDENT_CHOICE',view.morpheme,chain.junction,'');message='';teachingMode=true;render();
+}
 function teachingComplete(module,resume){
  const nextIndex=module.families.indexOf(resume.familyId)+1,next=module.families[nextIndex]||null;
  let route='';
  if(next)route='<button class="primary-button" data-teach-next-family="'+esc(next)+'">Следующее значение · '+esc(teachingFamily(next)?.title||next)+'</button>';
- else if(P?.STAGE6_MODULES?.includes(module.id)){
+ else if(module.id==='chains'){
+  const ready=!!P&&P.stage7Ready(data().module),missing=P?.stage7MissingPrerequisite(data().module),meaning=P?.stage7MissingMeaning(data().module),owner=meaning?P.stage7Owner(meaning):'';
+  route=ready?'<button class="primary-button" data-stage7-start-guided>Цепочки по одному стыку</button>':missing?'<button class="secondary-button" data-stage7-prereq="'+esc(missing)+'">Сначала prerequisite · '+esc(teachingModule(missing)?.title||missing)+'</button>':meaning?'<button class="secondary-button" data-stage7-meaning="'+esc(owner)+'" data-stage7-family="'+esc(meaning)+'">Сначала смысл · '+esc(meaning)+'</button>':'';
+ }else if(P?.STAGE6_MODULES?.includes(module.id)){
   const ownReady=P.fullStage6Ready(data().module,module.id),ready=stage6Ready(module),missing=P.stage6MissingPrerequisite(data().module,module.id);
   route=ready?'<button class="primary-button" data-stage6-start-guided>Тренировка с опорой · Stage 6</button>':ownReady&&missing?'<button class="secondary-button" data-stage6-prereq="'+esc(missing)+'">Сначала prerequisite · '+esc(teachingModule(missing)?.title||missing)+'</button>':'';
  }else{
@@ -228,7 +302,8 @@ function teachingScreen(){
  const practiceStep=['GUIDED_CHOICE','ERROR_REPAIR','INDEPENDENT_CHOICE','FULL_INPUT'].includes(resume.currentTeachingStep);
  const module=teachingModule(resume.currentModule,resume.familyId);if(!module||(!practiceStep&&!module.families.includes(resume.familyId))){message='Учебная тема обновилась. Выбери раздел заново.';teachingMode=false;showHub=true;level='harmony';return hub();}
  if(practiceStep){
-  const is5=!!P?.MODULES.includes(module.id),is6=!!P?.STAGE6_MODULES?.includes(module.id);
+  const is5=!!P?.MODULES.includes(module.id),is6=!!P?.STAGE6_MODULES?.includes(module.id),is7=module.id==='chains';
+  if(is7)return stage7Screen();
   if(!is5&&!is6){message='Guided-практика для этого модуля ещё не подключена.';teachingMode=false;showHub=true;return hub();}
   if(resume.currentTeachingStep==='GUIDED_CHOICE')return is6?stage6Guided(module,resume):stage5Guided(module,resume);
   if(resume.currentTeachingStep==='ERROR_REPAIR')return is6?stage6Repair(module,resume):stage5Repair(module,resume);
@@ -254,6 +329,18 @@ function finish(s){
  if(tr&&P?.MODULES.includes(tr.currentModule)&&['INDEPENDENT_CHOICE','FULL_INPUT'].includes(tr.currentTeachingStep)&&s.level===tr.currentModule&&s.mode==='learn')return stage5Finish(s,tr);
  const r=E.summary(s.results),transfer=s.mode==='transfer',view=E.reveal(s);
  return '<div class="morph-panel"><p class="eyebrow">ПОДХОД ЗАВЕРШЁН</p><h2>'+r.correct+' из '+r.n+(transfer?' самостоятельно, на новых основах':' самостоятельно')+'</h2><p>'+r.uniqueLemmas+' разных основ</p><p>'+(transfer?'Это короткая проверка новых здесь основ. Для вывода об устойчивом переносе нужны другие слова и отсроченная проверка.':'Теперь можно повторить трудный контраст или смешать правила.')+'</p>'+(view.transferNote?'<p>'+esc(view.transferNote)+'</p>':'')+(view.holdoutNote?'<p>'+esc(view.holdoutNote)+'</p>':'')+'<div class="morph-actions"><button class="primary-button" data-morph-hub>К тренировкам</button></div>'+s.results.filter(e=>!e.correct).map(e=>{const i=E.getItem(e.itemId);return '<details><summary>'+esc(i.stem)+' → '+esc(i.expected)+'</summary><p>'+esc(E.reason(i,e.errorCodes))+'</p></details>';}).join('')+'</div>';
+}
+function stage7RecordAnswer(chain,view,response,correct){
+ const bank=E.getItem('morph:v1:'+view.lemmaId+':'+view.sequence.slice(0,view.junction+1).join('.'));
+ const id=stage7EventId(chain)+(chain.lane==='independent'&&bank?':0':'');
+ if(chain.acceptedEventIds.includes(id)||(data().module.events||[]).some(e=>e.eventId===id))return id;
+ if(chain.lane==='independent'&&bank){
+  const session={id:stage7EventId(chain),version:1,dataVersion:E.data.version,level:'chains',mode:'learn',responseMode:chain.responseMode,modality:'text',queue:[{id:bank.id,options:bank.options.slice()}],cursor:0,phase:'question',draft:'',hinted:false,result:null,startedAt:chain.startedAt,updatedAt:Date.now(),results:[],complete:false,closesLevel:false,transferNote:'',holdoutNote:'',unscoredFamilies:[]};
+  saveSession(session);const answered=E.answer(data().module.session,response,interrupted||shownAt===null?null:performance.now()-shownAt);const ok=answered&&bridge().answer(answered);saveSession(null);if(!ok)return null;return id;
+ }
+ const type=chain.lane==='guided'?'guided_attempt':'chain_junction_attempt';
+ const ok=recordTeaching({eventId:id,type,moduleId:'chains',familyId:view.morpheme,lemmaId:view.lemmaId,at:Date.now(),responseMode:chain.responseMode,answer:response,correct,hinted:chain.lane==='guided'});
+ return ok||(data().module.teaching?.events||[]).some(e=>e.eventId===id)?id:null;
 }
 function questionReady(s){
  if(!s||!Array.isArray(s.queue)||!s.queue.length)return null;
@@ -329,6 +416,16 @@ function bind(host){
  host.querySelector('[data-stage6-restart-guided]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(r)startStage6Guided(r.currentModule);});
  host.querySelector('[data-stage6-start-choice]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(r)startStage6Independent(r.currentModule,'INDEPENDENT_CHOICE','choice');});
  host.querySelector('[data-stage6-start-input]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(r)startStage6Independent(r.currentModule,'FULL_INPUT','input');});
+ host.querySelector('[data-stage7-retry]')?.addEventListener('click',()=>{render();});
+ host.querySelector('[data-stage7-start-guided]')?.addEventListener('click',()=>startStage7('guided','GUIDED_CHOICE','choice'));
+ host.querySelector('[data-stage7-start-choice]')?.addEventListener('click',()=>startStage7('independent','INDEPENDENT_CHOICE','choice'));
+ host.querySelector('[data-stage7-start-input]')?.addEventListener('click',()=>startStage7('independent','FULL_INPUT','input'));
+ for(const b of host.querySelectorAll('[data-stage7-prereq]'))b.onclick=()=>startTeaching(b.dataset.stage7Prereq);
+ for(const b of host.querySelectorAll('[data-stage7-meaning]'))b.onclick=()=>startTeaching(b.dataset.stage7Meaning,b.dataset.stage7Family);
+ for(const b of host.querySelectorAll('[data-stage7-answer]'))b.onclick=()=>answerStage7(b.dataset.stage7Answer);
+ host.querySelector('#stage7-answer-form')?.addEventListener('submit',e=>{e.preventDefault();answerStage7(host.querySelector('#stage7-answer').value);});
+ const stage7Input=host.querySelector('#stage7-answer');if(stage7Input){for(const b of host.querySelectorAll('[data-stage7-key]'))b.onclick=()=>{const a=stage7Input.selectionStart,z=stage7Input.selectionEnd;stage7Input.value=stage7Input.value.slice(0,a)+b.dataset.stage7Key+stage7Input.value.slice(z);stage7Input.focus();stage7Input.setSelectionRange(a+1,a+1);};}
+ host.querySelector('[data-stage7-next]')?.addEventListener('click',()=>{const chain=data().module.chain;if(!chain||chain.phase!=='feedback')return;const next=stage7Advance(chain);saveChain({...next,acceptedEventIds:chain.acceptedEventIds,exposedRepairLemmas:chain.exposedRepairLemmas});const step=chain.lane==='guided'?'GUIDED_CHOICE':chain.responseMode==='input'?'FULL_INPUT':'INDEPENDENT_CHOICE';setTeachingResume('chains',step,null,next.junction,'');teachingMode=true;message='';render();});
  for(const b of host.querySelectorAll('[data-stage6-next-module]'))b.onclick=()=>startTeaching(b.dataset.stage6NextModule);
  for(const b of host.querySelectorAll('[data-stage6-prereq]'))b.onclick=()=>startTeaching(b.dataset.stage6Prereq);
  for(const b of host.querySelectorAll('[data-stage6-semantic-answer]'))b.onclick=()=>{const r=currentTeachingResume();if(!r)return;const checks=P.stage6SemanticChecks(r.currentModule),check=checks[r.stepIndex];if(!check)return;const response=b.dataset.stage6SemanticAnswer,correct=response===check.expected;recordTeaching({eventId:attemptTeachingId('semantic_check_attempt',r.currentModule,null),type:'semantic_check_attempt',moduleId:r.currentModule,familyId:null,at:Date.now(),responseMode:'choice',answer:response,correct,hinted:false});setTeachingResume(r.currentModule,'GUIDED_CHOICE',null,r.stepIndex,JSON.stringify({semanticId:check.id,response,correct}));message='';render();};

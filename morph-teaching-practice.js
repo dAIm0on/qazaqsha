@@ -305,6 +305,110 @@ function stage6MissingPrerequisite(state,moduleId){
 }
 function stage6NextModule(moduleId){const i=STAGE6_MODULES.indexOf(moduleId);return i>=0?STAGE6_MODULES[i+1]||null:null;}
 
-const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6RewriteHint,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule};
+const STAGE7_MODULE='chains';
+const STAGE7_MEANING=['PL','POSS_1SG','POSS_1PL','POSS_3','DAT','ACC','LOC','ABL'];
+const STAGE7_GUIDED=[
+ {chainId:'A',lemmaId:'n-үй',sequence:['PL','POSS_1PL','ABL']},
+ {chainId:'B',lemmaId:'n-кітап',sequence:['POSS_3','DAT']},
+ {chainId:'C',lemmaId:'n-кітап',sequence:['PL','POSS_1PL','ABL']},
+ {chainId:'plain-DAT',lemmaId:'n-кітап',sequence:['DAT']},
+ {chainId:'plain-ACC',lemmaId:'n-кітап',sequence:['ACC']},
+ {chainId:'poss3-ACC',lemmaId:'n-кітап',sequence:['POSS_3','ACC']},
+ {chainId:'plain-LOC',lemmaId:'n-кітап',sequence:['LOC']},
+ {chainId:'poss3-LOC',lemmaId:'n-кітап',sequence:['POSS_3','LOC']},
+ {chainId:'plain-ABL',lemmaId:'n-кітап',sequence:['ABL']},
+ {chainId:'poss3-ABL',lemmaId:'n-кітап',sequence:['POSS_3','ABL']},
+ {chainId:'poss1-DAT',lemmaId:'n-кітап',sequence:['POSS_1SG','DAT']},
+ {chainId:'poss1pl-DAT',lemmaId:'n-кітап',sequence:['POSS_1PL','DAT']}
+];
+function stage7Spec(){const row=T.modules.find(x=>x.id===STAGE7_MODULE);if(!row)throw Error('Unknown Stage 7 module');return row;}
+function stage7MeaningReady(state){return STAGE7_MEANING.every(f=>!!S?.teachingEvidence(state,{familyId:f}).semanticIntroCompleted);}
+function stage7MissingMeaning(state){return STAGE7_MEANING.find(f=>!S?.teachingEvidence(state,{familyId:f}).semanticIntroCompleted)||null;}
+function stage7Owner(familyId){if(familyId==='PL')return 'plural';if(String(familyId).startsWith('POSS_'))return 'poss';if(familyId==='DAT'||familyId==='LOC')return 'harmony';if(familyId==='ACC'||familyId==='ABL')return 'nasal';return STAGE7_MODULE;}
+function stage7PrerequisitesReady(state){return stage7Spec().prerequisites.every(id=>!!S?.teachingEvidence(state,{moduleId:id}).moduleCompleted);}
+function stage7MissingPrerequisite(state){return stage7Spec().prerequisites.find(id=>!S?.teachingEvidence(state,{moduleId:id}).moduleCompleted)||null;}
+function stage7Ready(state){return stage7PrerequisitesReady(state)&&stage7MeaningReady(state);}
+function stage7Trace(lemmaId,sequence){return E.form(lemmaId,sequence).trace;}
+function stage7Options(step,laterAfter){
+ const variants=E.data.families[step.morpheme].variants,expected=step.after,blocked=new Set(laterAfter||[]);
+ const raw=variants.map(v=>step.stem+(step.space?' ':'')+v);
+ if(step.changed)raw.unshift(step.before+(step.space?' ':'')+step.suffix);
+ const pool=[...new Set(raw)].filter(f=>f!==expected&&!blocked.has(f));
+ const ranked=pool.map(f=>({f,codes:E.errors({expected,trace:[step]},f)}));
+ const picked=[expected];
+ for(const code of ['MORPH_STATE','STEM_CHANGE','HARMONY','ONSET_CLASS']){const hit=ranked.find(x=>x.codes.includes(code)&&!picked.includes(x.f));if(hit)picked.push(hit.f);if(picked.length===4)break;}
+ for(const row of ranked){if(picked.length===4)break;if(!picked.includes(row.f))picked.push(row.f);}
+ return picked;
+}
+function stage7View(lemmaId,sequence,junction){
+ const trace=stage7Trace(lemmaId,sequence),step=trace[junction];if(!step)throw Error('Stage 7 junction is outside the chain');
+ const later=trace.slice(junction+1),lemma=E.data.lemmas.find(l=>l.id===lemmaId);
+ let operation='';try{operation=E.itemFor(lemmaId,[step.morpheme]).operation;}catch{operation=E.data.families[step.morpheme].label;}
+ const options=stage7Options(step,later.map(t=>t.after));
+ return {lemmaId,lemma:lemma.text,gloss:lemma.gloss,sequence:sequence.slice(),junction,total:trace.length,morpheme:step.morpheme,before:step.before,after:step.after,stem:step.stem,suffix:step.suffix,seenEdge:step.edge,nextEdge:E.edge(step.after),poss:step.poss,kase:step.kase,changed:step.changed,operation,options,laterSuffixes:later.map(t=>t.suffix),laterAfter:later.map(t=>t.after)};
+}
+function stage7Errors(view,response){
+ const codes=E.errors({expected:view.after,trace:[{...view,before:view.before,stem:view.stem,suffix:view.suffix,space:false,morpheme:view.morpheme,poss:view.poss,edge:view.seenEdge}]},response);
+ const answer=E.norm(response);
+ if(E.norm(view.before)!==E.norm(view.lemma)&&answer.startsWith(E.norm(view.lemma))&&!answer.startsWith(E.norm(view.before))&&!codes.includes('MORPHEME_BOUNDARY'))codes.unshift('MORPHEME_BOUNDARY');
+ if(codes.length>1&&!codes.includes('MULTIPLE_FEATURES'))codes.push('MULTIPLE_FEATURES');
+ return codes;
+}
+function stage7Feedback(view,codes){
+ const row=stage7Spec();
+ if(codes.includes('MORPH_STATE'))return row.feedbackTemplates.MORPH_STATE;
+ if(codes.includes('MORPHEME_BOUNDARY'))return row.feedbackTemplates.MORPHEME_BOUNDARY;
+ if(codes.includes('STEM_CHANGE'))return 'Перед этим шагом словарь разрешает изменение основы. Следующий стык считается уже от новой формы.';
+ return E.reason({expected:view.after,trace:[{before:view.before,stem:view.stem,suffix:view.suffix,space:false,morpheme:view.morpheme,poss:view.poss,edge:view.seenEdge,changed:view.changed,harmony:E.data.lemmas.find(l=>l.id===view.lemmaId).harmony}]},codes);
+}
+function stage7Support(){return stage7Spec().shortSupport;}
+function stage7Works(lemmaId,sequence){try{E.form(lemmaId,sequence);return E.data.lemmas.find(l=>l.id===lemmaId)?.split==='train';}catch{return false;}}
+function stage7RepairFor(view,exclude=[]){
+ const blocked=new Set([view.lemmaId,...exclude]);
+ const prefix=view.sequence.slice(0,view.junction+1);
+ const same=E.data.lemmas.filter(l=>l.pos==='noun'&&l.split==='train'&&!blocked.has(l.id)&&l.harmony===E.data.lemmas.find(x=>x.id===view.lemmaId).harmony&&stage7Works(l.id,prefix));
+ const any=E.data.lemmas.filter(l=>l.pos==='noun'&&l.split==='train'&&!blocked.has(l.id)&&stage7Works(l.id,prefix));
+ const lemma=(same[0]||any[0]);if(!lemma)throw Error('No Stage 7 repair lemma');
+ const repair=stage7View(lemma.id,prefix,prefix.length-1);
+ if(repair.lemmaId===view.lemmaId)throw Error('Stage 7 repair reused the source lemma');
+ return repair;
+}
+function stage7GuidedPlan(){STAGE7_GUIDED.forEach(c=>{if(!stage7Works(c.lemmaId,c.sequence))throw Error('Mandatory chain is not a train chain');});return STAGE7_GUIDED.map(c=>({chainId:c.chainId,lemmaId:c.lemmaId,sequence:c.sequence.slice()}));}
+function stage7IndependentPlan({excludeLemmas=[]}={}){
+ const shapes=[{chainId:'A',sequence:['PL','POSS_1PL','ABL']},{chainId:'B',sequence:['POSS_3','DAT']},{chainId:'C',sequence:['PL','POSS_1PL','ABL']}];
+ const used=new Set(['n-үй','n-кітап',...excludeLemmas]);
+ return shapes.map(shape=>{
+  const lemma=E.data.lemmas.find(l=>l.pos==='noun'&&l.split==='train'&&!used.has(l.id)&&stage7Works(l.id,shape.sequence));
+  if(!lemma)throw Error('No independent Stage 7 lemma for '+shape.chainId);
+  used.add(lemma.id);return {chainId:shape.chainId,lemmaId:lemma.id,sequence:shape.sequence.slice()};
+ });
+}
+function createStage7Run(lane,responseMode,now=Date.now(),opts={}){
+ if(!['guided','independent'].includes(lane)||!['choice','input'].includes(responseMode))throw Error('Invalid Stage 7 run');
+ const chains=lane==='guided'?stage7GuidedPlan():stage7IndependentPlan(opts);
+ return {id:'morph-stage7-'+lane+'-'+responseMode+'-'+now,version:1,dataVersion:E.data.version,contentVersion:T.version,lane,responseMode,chains,chainIndex:0,junction:0,phase:'question',draft:'',result:null,repair:null,acceptedEventIds:[],exposedRepairLemmas:[...(opts.excludeLemmas||[])],startedAt:now,updatedAt:now};
+}
+function stage7Current(chain){
+ if(!chain||chain.phase==='complete')return null;
+ if(chain.phase==='repair')return stage7View(chain.repair.repairLemmaId,chain.repair.sequence,chain.repair.sequence.length-1);
+ const row=chain.chains[chain.chainIndex];if(!row)return null;
+ return {...stage7View(row.lemmaId,row.sequence,chain.junction),chainId:row.chainId};
+}
+function stage7Evidence(state){
+ const teaching=(state?.teaching?.events||[]).filter(e=>e.moduleId==='chains');
+ const answers=(state?.events||[]).filter(e=>e.level==='chains');
+ const count=(list,pred)=>{const rows=list.filter(pred);return {attempts:rows.length,correct:rows.filter(x=>x.correct===true).length};};
+ const guided=count(teaching,e=>e.type==='guided_attempt');
+ const corrections=count(teaching,e=>e.type==='correction_after_feedback');
+ const independentChoice=count(answers,e=>e.responseMode!=='input'&&!e.hinted);
+ const independentInput=count(answers,e=>e.responseMode==='input'&&!e.hinted);
+ const extra=count(teaching,e=>e.type==='chain_junction_attempt'&&e.hinted!==true);
+ independentChoice.attempts+=extra.attempts;independentChoice.correct+=extra.correct;
+ const lemmas=new Set([...teaching.map(e=>e.lemmaId),...answers.map(e=>e.lemmaId)].filter(Boolean));
+ const wrong=[...teaching.filter(e=>e.correct===false),...answers.filter(e=>e.correct===false)];
+ return {guided,corrections,independentChoice,independentInput,moduleCompleted:teaching.some(e=>e.type==='teaching_module_completed'),uniqueLemmas:lemmas.size,errorJunctions:wrong.map(e=>e.familyId).filter(Boolean)};
+}
+
+const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6RewriteHint,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule,STAGE7_MODULE,STAGE7_GUIDED,stage7Spec,stage7MeaningReady,stage7MissingMeaning,stage7Owner,stage7PrerequisitesReady,stage7MissingPrerequisite,stage7Ready,stage7View,stage7Errors,stage7Feedback,stage7Support,stage7RepairFor,stage7GuidedPlan,stage7IndependentPlan,createStage7Run,stage7Current,stage7Evidence,stage7Works};
 if(node)module.exports=api;else root.MorphTeachingPractice=api;
 })(typeof window!=='undefined'?window:globalThis);

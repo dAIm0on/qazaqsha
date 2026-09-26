@@ -5,10 +5,33 @@ const copy=x=>JSON.parse(JSON.stringify(x)),stamp=x=>Number.isFinite(x)&&x>=0?x:
 const HISTORY_LIMIT=400,historyNote='В файле прогресса хранятся последние 400 ответов этого тренажёра. Более длинный разбор эта версия не обещает.';
 const TEACHING_CONTENT_VERSION='morph-teaching-20260926-v3',TEACHING_HISTORY_LIMIT=400;
 const TEACHING_STEPS=new Set(['SEMANTIC_INTRO','FULL_EXPLANATION','CONTRAST_EXAMPLES','FEATURE_NOTICE','GUIDED_CHOICE','INDEPENDENT_CHOICE','FULL_INPUT','ERROR_REPAIR','MIXED_PRACTICE','TRANSFER_BLOCK','RETENTION_REVIEW']);
-const TEACHING_EVENTS=new Set(['semantic_intro_seen','semantic_intro_completed','full_explanation_opened','semantic_check_attempt','feature_notice_attempt','guided_attempt','correction_after_feedback','stage5_module_completed','teaching_module_completed']);
+const TEACHING_EVENTS=new Set(['semantic_intro_seen','semantic_intro_completed','full_explanation_opened','semantic_check_attempt','feature_notice_attempt','guided_attempt','correction_after_feedback','chain_junction_attempt','stage5_module_completed','teaching_module_completed']);
 const moduleIds=new Set(['meaning',...E.data.levels.map(x=>x.id)]);
 function emptyTeaching(){return {version:1,contentVersion:TEACHING_CONTENT_VERSION,events:[],resume:null,updatedAt:0,recovery:null};}
-function empty(){return {version:1,dataVersion:E.data.version,events:[],exposed:[],session:null,teaching:emptyTeaching(),updatedAt:0,recovery:null};}
+function empty(){return {version:1,dataVersion:E.data.version,events:[],exposed:[],session:null,teaching:emptyTeaching(),chain:null,updatedAt:0,recovery:null};}
+function chainSession(v){
+ if(!obj(v)||v.version!==1||v.dataVersion!==E.data.version||v.contentVersion!==TEACHING_CONTENT_VERSION||!safe(v.id))return null;
+ if(!['guided','independent'].includes(v.lane)||!['choice','input'].includes(v.responseMode))return null;
+ if(!Array.isArray(v.chains)||!v.chains.length||v.chains.length>12)return null;
+ const lemmaOk=id=>E.data.lemmas.some(l=>l.id===id&&l.split==='train'&&l.pos==='noun');
+ if(!v.chains.every(c=>obj(c)&&safe(c.chainId)&&lemmaOk(c.lemmaId)&&Array.isArray(c.sequence)&&c.sequence.length<=5&&c.sequence.every(x=>E.data.families[x])))return null;
+ try{for(const c of v.chains)E.form(c.lemmaId,c.sequence);}catch{return null;}
+ if(!Number.isInteger(v.chainIndex)||v.chainIndex<0||v.chainIndex>v.chains.length)return null;
+ if(!Number.isInteger(v.junction)||v.junction<0||v.junction>5)return null;
+ if(!['question','feedback','repair','complete'].includes(v.phase))return null;
+ const ids=Array.isArray(v.acceptedEventIds)?v.acceptedEventIds.filter(safe).slice(0,80):[];
+ const exposed=Array.isArray(v.exposedRepairLemmas)?v.exposedRepairLemmas.filter(lemmaOk).slice(0,40):[];
+ const result=obj(v.result)&&safe(v.result.eventId)?{eventId:v.result.eventId,response:String(v.result.response||'').slice(0,200),correct:!!v.result.correct,errorCodes:Array.isArray(v.result.errorCodes)?v.result.errorCodes.filter(safe).slice(0,5):[]}:null;
+ if(v.phase==='feedback'&&!result)return null;
+ let repair=null;
+ if(v.phase==='repair'){
+  if(!obj(v.repair)||!lemmaOk(v.repair.repairLemmaId)||!lemmaOk(v.repair.sourceLemmaId)||!safe(v.repair.sourceChainId))return null;
+  if(!Array.isArray(v.repair.sequence)||!v.repair.sequence.every(x=>E.data.families[x]))return null;
+  try{E.form(v.repair.repairLemmaId,v.repair.sequence);}catch{return null;}
+  repair={sourceChainId:v.repair.sourceChainId,sourceLemmaId:v.repair.sourceLemmaId,sourceJunction:Math.max(0,Math.min(5,v.repair.sourceJunction|0)),repairLemmaId:v.repair.repairLemmaId,sequence:v.repair.sequence.slice(),response:String(v.repair.response||'').slice(0,200),expected:String(v.repair.expected||'').slice(0,200),errorCodes:Array.isArray(v.repair.errorCodes)?v.repair.errorCodes.filter(safe).slice(0,5):[]};
+ }
+ return {id:v.id,version:1,dataVersion:v.dataVersion,contentVersion:TEACHING_CONTENT_VERSION,lane:v.lane,responseMode:v.responseMode,chains:v.chains.map(c=>({chainId:c.chainId,lemmaId:c.lemmaId,sequence:c.sequence.slice()})),chainIndex:v.chainIndex,junction:v.junction,phase:v.phase,draft:String(v.draft||'').slice(0,200),result,repair,acceptedEventIds:ids,exposedRepairLemmas:exposed,startedAt:stamp(v.startedAt),updatedAt:stamp(v.updatedAt)};
+}
 function text(v,max){return typeof v==='string'&&v.length>0&&v.length<=max&&!['__proto__','constructor','prototype'].includes(v);}
 function strings(v,max){return Array.isArray(v)&&v.length<=max&&v.every(x=>safe(x));}
 function teachingEvent(v){
@@ -79,13 +102,15 @@ function migrate(raw){
  const map=new Map(),incoming=Array.isArray(raw.events)?raw.events:[];let dropped=0;
  for(const v of incoming){const e=event(v,false);if(!e){dropped++;continue;}if(!map.has(e.eventId))map.set(e.eventId,e);}
  out.events=[...map.values()].sort((a,b)=>a.at-b.at).slice(-HISTORY_LIMIT);
- out.exposed=[...new Set([...(Array.isArray(raw.exposed)?raw.exposed:[]),...out.events.map(e=>e.lemmaId)])].filter(safe);out.updatedAt=stamp(raw.updatedAt);out.session=session(raw.session);out.teaching=teachingMigrate(raw.teaching);
+ out.exposed=[...new Set([...(Array.isArray(raw.exposed)?raw.exposed:[]),...out.events.map(e=>e.lemmaId)])].filter(safe);out.updatedAt=stamp(raw.updatedAt);out.session=session(raw.session);out.teaching=teachingMigrate(raw.teaching);out.chain=chainSession(raw.chain);
  const prior=typeof raw.recovery==='string'&&raw.recovery.length<400?raw.recovery:'';
  if(raw.session&&!out.session)out.recovery=incoming.length&&!map.size?'История ответа не перенесена: записи не прошли проверку. Начни новый подход.':dropped?'Часть истории не прошла проверку. Сохранённые ответы на месте. Начни новый подход.':'Банк заданий обновился или сессия повреждена. История сохранена; начни новый подход.';
+ else if(raw.chain&&!out.chain)out.recovery='Цепочка закрыта: банк или учебная версия изменились. История ответов и курс сохранены.';
  else out.recovery=!out.session&&prior?prior:null;
  return out;
 }
-function merge(a,b){const x=migrate(a),y=migrate(b),m=new Map();for(const e of [...x.events,...y.events]){const old=m.get(e.eventId);if(!old||JSON.stringify(e)<JSON.stringify(old))m.set(e.eventId,e);}return {...x,events:[...m.values()].sort((a,b)=>a.at-b.at).slice(-HISTORY_LIMIT),exposed:[...new Set([...x.exposed,...y.exposed])],session:x.session||y.session,teaching:teachingMerge(x.teaching,y.teaching),updatedAt:Math.max(x.updatedAt,y.updatedAt)};}
+function merge(a,b){const x=migrate(a),y=migrate(b),m=new Map();for(const e of [...x.events,...y.events]){const old=m.get(e.eventId);if(!old||JSON.stringify(e)<JSON.stringify(old))m.set(e.eventId,e);}const chain=!x.chain?y.chain:!y.chain?x.chain:(y.chain.updatedAt||0)>=(x.chain.updatedAt||0)?y.chain:x.chain;return {...x,events:[...m.values()].sort((a,b)=>a.at-b.at).slice(-HISTORY_LIMIT),exposed:[...new Set([...x.exposed,...y.exposed])],session:x.session||y.session,chain,teaching:teachingMerge(x.teaching,y.teaching),updatedAt:Math.max(x.updatedAt,y.updatedAt)};}
+function putChain(raw,value){const out=migrate(raw);if(value==null){out.chain=null;out.updatedAt=Date.now();return out;}const clean=chainSession(value);if(!clean)throw Error('Invalid morph chain');out.chain=clean;out.updatedAt=Math.max(out.updatedAt,clean.updatedAt||Date.now());return out;}
 function putSession(raw,s){const out=migrate(raw),clean=session(s);if(s&&!clean)throw Error('Invalid morph session');out.session=clean;out.updatedAt=Date.now();if(clean){out.recovery=null;out.exposed=[...new Set([...out.exposed,...clean.queue.map(q=>E.getItem(q.id).lemmaId)])];}return out;}
 function accept(raw,result){const out=migrate(raw),e=event(result?.event,true),s=session(result?.session);if(!e||!s||!out.session||out.session.id!==s.id||out.session.cursor!==s.cursor)return {state:out,accepted:false};const card=out.session.queue[out.session.cursor];if(!card||card.id!==e.itemId||e.eventId!==out.session.id+':'+out.session.cursor)return {state:out,accepted:false};if(out.events.some(x=>x.eventId===e.eventId)||out.session.phase!=='question')return {state:out,accepted:false};out.events=[...out.events,e].slice(-HISTORY_LIMIT);out.session=s;out.updatedAt=e.at;return {state:out,accepted:true,event:e};}
 function recordTeaching(raw,input){
@@ -128,5 +153,5 @@ function teachingEvidence(raw,{moduleId=null,familyId=null}={}){
 function forMastery(events){return (events||[]).filter(e=>e&&e.scored!==false&&e.modality!=='audio');}
 function scheduleUpdate(e){if(!e||e.transfer||e.mode==='transfer')return null;return {correct:!!e.correct,hinted:!!e.hinted,recall:e.responseMode==='input',at:e.at,responseTime:e.responseTime};}
 function resumeSurface(view,hasMorphSession,lessonOpen,lessonViews=['practice','homework','learn','path','review']){if(view==='morph'&&hasMorphSession)return 'morph';if(lessonOpen&&lessonViews.includes(view))return view;return 'today';}
-const api={empty,migrate,merge,putSession,accept,session,emptyTeaching,teachingMigrate,recordTeaching,putTeachingResume,productionChannel,teachingEvidence,forMastery,scheduleUpdate,resumeSurface,HISTORY_LIMIT,historyNote,TEACHING_CONTENT_VERSION,TEACHING_HISTORY_LIMIT};if(node)module.exports=api;else root.MorphState=api;
+const api={empty,migrate,merge,putSession,accept,session,emptyTeaching,teachingMigrate,recordTeaching,putTeachingResume,putChain,chainSession,productionChannel,teachingEvidence,forMastery,scheduleUpdate,resumeSurface,HISTORY_LIMIT,historyNote,TEACHING_CONTENT_VERSION,TEACHING_HISTORY_LIMIT};if(node)module.exports=api;else root.MorphState=api;
 })(typeof window!=='undefined'?window:globalThis);

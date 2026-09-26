@@ -1984,6 +1984,7 @@
      state.morphTrainer=applied.state;save();return true;
    },
    teachingResume(value){state.morphTrainer=window.MorphState.putTeachingResume(state.morphTrainer,value);save();return storageAvailable;},
+   chain(value){state.morphTrainer=window.MorphState.putChain(state.morphTrainer,value);save();return storageAvailable;},
    answer(result){
      const applied=window.MorphState.accept(state.morphTrainer,result);if(!applied.accepted)return false;
      state.morphTrainer=applied.state;const e=applied.event;
