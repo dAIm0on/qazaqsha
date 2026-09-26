@@ -322,7 +322,9 @@ function teachingComplete(module,resume){
  const nextIndex=module.families.indexOf(resume.familyId)+1,next=module.families[nextIndex]||null;
  let route='';
  if(next)route='<button class="primary-button" data-teach-next-family="'+esc(next)+'">Следующее значение · '+esc(teachingFamily(next)?.title||next)+'</button>';
- else if(module.id==='verbs'){
+ else if(module.id==='mixed'){
+  route='<button class="primary-button" data-stage9-start>Смешать уже знакомое</button>';
+ }else if(module.id==='verbs'){
   const ready=!!P&&P.stage8PrerequisitesReady(data().module),missing=P?.stage8MissingPrerequisite(data().module);
   route=ready?'<button class="primary-button" data-stage8-start>Глаголы: сначала смысл</button>':missing?'<button class="secondary-button" data-stage8-prereq="'+esc(missing)+'">Сначала prerequisite · '+esc(teachingModule(missing)?.title||missing)+'</button>':'';
  }else if(module.id==='chains'){
@@ -339,10 +341,12 @@ function teachingComplete(module,resume){
 }
 function teachingScreen(){
  const d=data(),resume=d.module.teaching?.resume;if(!resume){teachingMode=false;showHub=true;return hub();}
+ if(resume.currentModule==='mixed'&&['MIXED_PRACTICE','ERROR_REPAIR'].includes(resume.currentTeachingStep))return stage9Screen();
  const practiceStep=['GUIDED_CHOICE','ERROR_REPAIR','INDEPENDENT_CHOICE','FULL_INPUT'].includes(resume.currentTeachingStep);
  const module=teachingModule(resume.currentModule,resume.familyId);if(!module||(!practiceStep&&!module.families.includes(resume.familyId))){message='Учебная тема обновилась. Выбери раздел заново.';teachingMode=false;showHub=true;level='harmony';return hub();}
  if(practiceStep){
-  const is5=!!P?.MODULES.includes(module.id),is6=!!P?.STAGE6_MODULES?.includes(module.id),is7=module.id==='chains',is8=module.id==='verbs';
+  const is5=!!P?.MODULES.includes(module.id),is6=!!P?.STAGE6_MODULES?.includes(module.id),is7=module.id==='chains',is8=module.id==='verbs',is9=module.id==='mixed';
+  if(is9)return stage9Screen();
   if(is8)return stage8Screen();
   if(is7)return stage7Screen();
   if(!is5&&!is6){message='Guided-практика для этого модуля ещё не подключена.';teachingMode=false;showHub=true;return hub();}
@@ -399,7 +403,7 @@ function question(s){
  const entry=s.queue[s.cursor],done=s.phase==='feedback',view=E.reveal(s),choices=entry.options;
  const controls=s.responseMode==='choice'?'<div class="morph-choices">'+choices.map(o=>'<button type="button" class="secondary-button" lang="kk" data-morph-answer="'+esc(o)+'"'+(done?' disabled':'')+'>'+esc(o)+'</button>').join('')+'</div>':'<form id="morph-answer-form"><label for="morph-answer">Полная форма'+(item.sequence.at(-1)==='Q'?' вместе с частицей':'')+'</label><input id="morph-answer" lang="kk" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="200" value="'+esc(s.draft)+'"'+(done?' disabled':'')+'><div class="morph-keys">'+[...'әғқңөұүі'].map(c=>'<button type="button" class="text-button" data-morph-key="'+c+'"'+(done?' disabled':'')+'>'+c+'</button>').join('')+'</div><button class="primary-button"'+(done?' disabled':'')+'>Проверить</button></form>';
  const feedback=done?(view.expected?'<div class="morph-feedback '+(view.correctnessClass?(s.result.correct?'correct':'wrong'):'')+'" role="status"><strong>'+(s.result.correct?'Верно':'Правильная форма: '+esc(item.expected))+'</strong><p>'+esc(E.reason(item,s.result.errorCodes))+'</p><p class="small" lang="kk">'+item.trace.map(t=>esc(t.stem)+' + '+esc(t.suffix)).join(' → ')+'</p></div>':'<p role="status">Ответ сохранён. Разбор будет в конце проверки.</p>')+'<button class="primary-button" data-morph-next>'+(s.cursor===s.queue.length-1?'Завершить':'Следующее')+'</button>':'';
- return '<div class="morph-panel"><button class="text-button" data-morph-hub>Выбрать другой режим</button><div class="morph-progress"><span>'+(teachingIndependent?(tr.currentTeachingStep==='FULL_INPUT'?'Самостоятельно · ввод':'Самостоятельно · выбор'):(s.mode==='transfer'?'Проверка новых основ':'Практика'))+'</span><strong>'+(s.cursor+1)+' / '+s.queue.length+'</strong></div>'+(view.transferNote?'<p class="small">'+esc(view.transferNote)+'</p>':'')+(view.holdoutNote?'<p class="small">'+esc(view.holdoutNote)+'</p>':'')+'<h2 class="morph-stem" lang="kk">'+esc(item.stem)+'</h2><p>'+esc(item.gloss)+'</p><p class="morph-operation">'+esc(item.operation)+'</p>'+controls+(!teachingIndependent&&view.hint?'<button class="text-button" data-morph-hint>Подсказка</button>':'')+(view.reason?'<p class="morph-rule">'+esc(E.reason(item))+'</p>':'')+feedback+'</div>';
+ return '<div class="morph-panel"><button class="text-button" data-morph-hub>Выбрать другой режим</button><div class="morph-progress"><span>'+(teachingIndependent?(tr.currentTeachingStep==='FULL_INPUT'?'Самостоятельно · ввод':'Самостоятельно · выбор'):(s.mode==='transfer'?'Проверка новых основ':s.level==='mixed'?'Смешанная практика':'Практика'))+'</span><strong>'+(s.cursor+1)+' / '+s.queue.length+'</strong></div>'+(s.queue[s.cursor].reason?'<p class="small">'+esc(s.queue[s.cursor].reason)+'</p>':'')+(view.transferNote?'<p class="small">'+esc(view.transferNote)+'</p>':'')+(view.holdoutNote?'<p class="small">'+esc(view.holdoutNote)+'</p>':'')+'<h2 class="morph-stem" lang="kk">'+esc(item.stem)+'</h2><p>'+esc(item.gloss)+'</p><p class="morph-operation">'+esc(item.operation)+'</p>'+controls+(!teachingIndependent&&view.hint?'<button class="text-button" data-morph-hint>Подсказка</button>':'')+(view.reason?'<p class="morph-rule">'+esc(E.reason(item))+'</p>':'')+feedback+'</div>';
 }
 function render(){
  const host=root();if(!host||!bridge()||!T)return;
@@ -411,8 +415,29 @@ function render(){
  host.innerHTML='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>'+(message||m.recovery||m.teaching?.recovery?'<p role="status" class="morph-notice">'+esc(message||m.teaching?.recovery||m.recovery)+'</p>':'')+body;
  bind(host);clock();
 }
+function startMixed(){
+ const built=P.stage9Queue(data().module,20260926);
+ if(!built.items.length){saveSession(null);setTeachingResume('mixed','MIXED_PRACTICE',null,0,'');teachingMode=true;showHub=false;message='';render();return;}
+ const now=Date.now();
+ const session={id:'morph-stage9-'+built.seed+'-'+now,version:1,dataVersion:E.data.version,level:'mixed',mode:'learn',responseMode:'choice',modality:'text',queue:built.items.map(i=>({id:i.id,options:i.options,reason:i.reason})),cursor:0,phase:'question',draft:'',hinted:false,result:null,startedAt:now,updatedAt:now,results:[],complete:false,closesLevel:false,transferNote:'',holdoutNote:'',unscoredFamilies:[]};
+ saveSession(session);setTeachingResume('mixed','MIXED_PRACTICE',null,0,'');teachingMode=false;showHub=false;message='';render();
+}
+function stage9RepairScreen(){
+ const r=currentTeachingResume();let payload=null;try{payload=JSON.parse(r.draft||'null');}catch{}
+ if(!payload)return '<div class="morph-panel"><p role="status">Разбор не сохранился.</p></div>';
+ const task=E.getItem(payload.repairItemId),choices=task.options.map(o=>'<button type="button" class="secondary-button" lang="kk" data-stage9-repair="'+esc(o)+'">'+esc(o)+'</button>').join('');
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">СМЕШИВАНИЕ · РАЗБОР</p><h2>Тот же контраст, другая основа</h2><p>'+esc(payload.reason)+'</p><p class="morph-stem" lang="kk">'+esc(task.stem)+'</p><p>'+esc(task.operation)+'</p><div class="morph-choices">'+choices+'</div><p class="small">Это исправление. Оно не считается самостоятельным ответом и не двигает FSRS.</p><button class="text-button" data-stage9-full>Открыть полное объяснение</button></div>';
+}
+function stage9Screen(){
+ const s=data().module.session,r=currentTeachingResume();
+ if(r&&r.currentTeachingStep==='ERROR_REPAIR')return stage9RepairScreen();
+ if(s&&!s.complete)return question(s);
+ const built=P.stage9Queue(data().module,20260926);
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">СМЕШАННАЯ ПРАКТИКА</p><h2>'+esc(built.status)+'</h2><p>'+esc(built.reason)+'</p><p class="small">Это маршрутный порог продукта, не научный сертификат. Перенос и удержание остаются отдельными.</p><button class="secondary-button" data-stage9-full>Открыть полное объяснение</button><button class="text-button" data-morph-hub>К тренировкам</button></div>';
+}
 function start(mode){
  const d=data();teachingMode=false;
+ if(level==='mixed'&&mode==='learn'){startMixed();return;}
  try{const s=E.createSession({level,mode,responseMode,events:d.module.events,records:d.records,knownLemmas:[...d.module.exposed,...d.knownLemmas]});saveSession(s);showHub=false;message='';render();}catch(e){message=e.message;render();}
 }
 function submit(response){
@@ -436,7 +461,7 @@ function bind(host){
  host.querySelector('#morph-answer-form')?.addEventListener('submit',e=>{e.preventDefault();submit(host.querySelector('#morph-answer').value);});
  const input=host.querySelector('#morph-answer');if(input){input.oninput=()=>{const s=data().module.session;if(s?.phase==='question')saveSession({...s,draft:input.value,updatedAt:Date.now()});};for(const b of host.querySelectorAll('[data-morph-key]'))b.onclick=()=>{const a=input.selectionStart,z=input.selectionEnd;input.value=input.value.slice(0,a)+b.dataset.morphKey+input.value.slice(z);input.focus();input.setSelectionRange(a+1,a+1);input.oninput();};}
  host.querySelector('[data-morph-hint]')?.addEventListener('click',()=>{const s=data().module.session;saveSession({...s,hinted:true});render();});
- host.querySelector('[data-morph-next]')?.addEventListener('click',()=>{const s=data().module.session,r=currentTeachingResume(),teachingModuleActive=r&&(P?.MODULES.includes(r.currentModule)||P?.STAGE6_MODULES?.includes(r.currentModule));if(teachingModuleActive&&['INDEPENDENT_CHOICE','FULL_INPUT'].includes(r.currentTeachingStep)&&s?.mode==='learn'&&s.level===r.currentModule&&s.result&&!s.result.correct){setTeachingResume(r.currentModule,'ERROR_REPAIR',s.result.sequence.at(-1),s.cursor,JSON.stringify({sourceItemId:s.result.itemId,response:s.result.response,returnStep:r.currentTeachingStep,returnIndex:s.cursor}));message='Ответ разобран. Теперь тот же контраст на другой основе.';teachingMode=true;render();return;}saveSession(E.next(s));render();host.querySelector('#morph-answer')?.focus();});
+ host.querySelector('[data-morph-next]')?.addEventListener('click',()=>{const s=data().module.session,r=currentTeachingResume(),teachingModuleActive=r&&(P?.MODULES.includes(r.currentModule)||P?.STAGE6_MODULES?.includes(r.currentModule));if(s&&s.level==='mixed'&&s.mode==='learn'&&s.result&&!s.result.correct){const source=E.getItem(s.result.itemId),repair=P.stage9Repair(source,[source.lemmaId]);setTeachingResume('mixed','ERROR_REPAIR',source.sequence.at(-1),s.cursor,JSON.stringify({sourceItemId:source.id,repairItemId:repair.id,reason:'Повторяем эту функцию, потому что здесь была ошибка.'}));message='Тот же контраст на другой основе. Это не самостоятельный ответ.';teachingMode=true;render();return;}if(teachingModuleActive&&['INDEPENDENT_CHOICE','FULL_INPUT'].includes(r.currentTeachingStep)&&s?.mode==='learn'&&s.level===r.currentModule&&s.result&&!s.result.correct){setTeachingResume(r.currentModule,'ERROR_REPAIR',s.result.sequence.at(-1),s.cursor,JSON.stringify({sourceItemId:s.result.itemId,response:s.result.response,returnStep:r.currentTeachingStep,returnIndex:s.cursor}));message='Ответ разобран. Теперь тот же контраст на другой основе.';teachingMode=true;render();return;}saveSession(E.next(s));render();host.querySelector('#morph-answer')?.focus();});
 
  for(const b of host.querySelectorAll('[data-teach-close]'))b.onclick=()=>{teachingMode=false;showHub=true;render();};
  host.querySelector('[data-teach-module]')?.addEventListener('change',e=>startTeaching(e.target.value));
@@ -460,6 +485,9 @@ function bind(host){
  host.querySelector('[data-stage6-start-input]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(r)startStage6Independent(r.currentModule,'FULL_INPUT','input');});
  host.querySelector('[data-stage7-retry]')?.addEventListener('click',()=>{render();});
  host.querySelector('[data-stage8-start]')?.addEventListener('click',()=>startStage8());
+ host.querySelector('[data-stage9-start]')?.addEventListener('click',()=>{level='mixed';responseMode='choice';startMixed();});
+ host.querySelector('[data-stage9-full]')?.addEventListener('click',()=>{setTeachingResume('mixed','FULL_EXPLANATION','DAT',0,'');teachingMode=true;render();});
+ for(const b of host.querySelectorAll('[data-stage9-repair]'))b.onclick=()=>{const r=currentTeachingResume();if(!r)return;let payload=null;try{payload=JSON.parse(r.draft||'null');}catch{return;}const task=E.getItem(payload.repairItemId),correct=E.norm(b.dataset.stage9Repair)===E.norm(task.expected),id='stage9-repair:'+payload.sourceItemId+':'+task.lemmaId;if(!(data().module.teaching?.events||[]).some(e=>e.eventId===id))recordTeaching({eventId:id,type:'correction_after_feedback',moduleId:'mixed',familyId:task.sequence.at(-1),lemmaId:task.lemmaId,itemId:task.id,at:Date.now(),responseMode:'choice',answer:b.dataset.stage9Repair,correct,hinted:true});const s=data().module.session;if(s)saveSession(E.next(s));setTeachingResume('mixed','MIXED_PRACTICE',null,0,'');teachingMode=false;message=correct?'Исправление верное. Возвращаемся в смешивание.':'Правильная форма: '+task.expected+'. Возвращаемся в смешивание.';render();};
  host.querySelector('[data-stage8-start-choice]')?.addEventListener('click',()=>startStage8Forms('independent','INDEPENDENT_CHOICE','choice'));
  host.querySelector('[data-stage8-start-input]')?.addEventListener('click',()=>startStage8Forms('independent','FULL_INPUT','input'));
  for(const b of host.querySelectorAll('[data-stage8-prereq]'))b.onclick=()=>startTeaching(b.dataset.stage8Prereq);

@@ -439,6 +439,77 @@ function createStage8Run(lane,responseMode,now=Date.now(),opts={}){
  run.chains.forEach(c=>{if(!stage7Works(c.lemmaId,c.sequence))throw Error('Stage 8 chain is not train-licensed');});
  return run;
 }
+const STAGE9_THRESHOLD={attempts:8,correct:7,lemmas:4};
+const STAGE9_CONTRASTS=[
+ {id:'dat-loc-abl',families:['DAT','LOC','ABL']},
+ {id:'gen-poss',families:['GEN','POSS_3']},
+ {id:'cop-agr',families:['COP_1SG','AGR_SHORT_1SG']},
+ {id:'q-neg',families:['Q','NEG']},
+ {id:'past-ptcp',families:['PAST','PTCP_GAN']},
+ {id:'ptcp-cvb',families:['PTCP_GAN','CVB_IP']},
+ {id:'pl-groups',families:['PL'],side:e=>e.contextClasses?.[0]||e.sequence.at(-1)}
+];
+function stage9First(events){
+ const seen=new Set(),out=[];
+ for(const e of [...(events||[])].filter(e=>e&&e.hinted!==true&&e.transfer!==true&&e.mode!=='transfer'&&e.modality!=='audio'&&e.scored!==false).sort((a,b)=>(a.at||0)-(b.at||0)||String(a.eventId).localeCompare(String(b.eventId)))){
+  const key=e.itemId||e.eventId;if(seen.has(key))continue;seen.add(key);out.push(e);
+ }
+ return out;
+}
+function stage9Assess(events,{families,side}={}){
+ const rows=stage9First(events).filter(e=>!families||families.includes(e.sequence&&e.sequence.at(-1)));
+ const sideOf=side||(e=>e.sequence.at(-1));
+ const lemmas=new Set(rows.map(e=>e.lemmaId).filter(Boolean));
+ const sides=new Set(rows.map(sideOf).filter(Boolean));
+ const correct=rows.filter(e=>e.correct===true).length;
+ const needSides=families&&families.length===1?2:2;
+ return {attempts:rows.length,correct,lemmas:lemmas.size,sides:[...sides],eligible:rows.length>=STAGE9_THRESHOLD.attempts&&correct>=STAGE9_THRESHOLD.correct&&lemmas.size>=STAGE9_THRESHOLD.lemmas&&sides.size>=needSides};
+}
+function stage9Status(state,contrast){
+ const assess=stage9Assess(state?.events,contrast||{});
+ const transfer=(state?.events||[]).some(e=>(e.transfer||e.mode==='transfer')&&e.correct===true&&(!contrast||contrast.families.includes(e.sequence.at(-1))));
+ if(transfer)return 'перенос проверен';
+ const hinted=(state?.events||[]).some(e=>e.hinted&&contrast&&contrast.families.includes(e.sequence.at(-1)));
+ const intro=(state?.teaching?.events||[]).some(e=>e.type==='semantic_intro_completed'&&contrast&&contrast.families.includes(e.familyId));
+ if(!assess.eligible&&(assess.attempts<STAGE9_THRESHOLD.attempts||assess.lemmas<STAGE9_THRESHOLD.lemmas||assess.sides.length<2))return 'мало данных';
+ if(!assess.eligible)return 'нужно повторить';
+ const mixed=(state?.events||[]).some(e=>e.level==='mixed'&&!e.hinted&&contrast&&contrast.families.includes(e.sequence.at(-1)));
+ if(mixed)return 'в смешивании';
+ if(assess.eligible)return 'самостоятельно';
+ if(hinted)return 'с подсказкой';
+ if(intro)return 'знакомство';
+ return 'мало данных';
+}
+function stage9Eligible(state){return STAGE9_CONTRASTS.filter(c=>stage9Assess(state?.events,c).eligible);}
+function stage9Repeated(state,family){return (state?.events||[]).filter(e=>e.correct===false&&e.hinted!==true&&e.sequence?.at(-1)===family).length>=3;}
+function stage9Pool(family){return E.bank().filter(i=>i.split==='train'&&i.sequence.length===1&&i.sequence[0]===family).slice().sort((a,b)=>a.lemmaId.localeCompare(b.lemmaId,'kk')||a.id.localeCompare(b.id));}
+function stage9RaisesAllAxes(item,responseMode){return !!(item&&item.sequence.length>1&&responseMode==='input'&&item.trace?.some(t=>t.changed));}
+function stage9Queue(state,seed=1){
+ const eligible=stage9Eligible(state);
+ if(!eligible.length)return {items:[],status:'мало данных',reason:'Мало данных: смешивание ещё не предлагается. Нужны 8 самостоятельных ответов, 7 верных и 4 разные основы с обоими значениями контраста.',seed};
+ const recent=[...(state.events||[])].filter(e=>e.correct===false&&e.hinted!==true&&e.mode!=='transfer').sort((a,b)=>(b.at||0)-(a.at||0))[0];
+ const order=eligible.slice().sort((a,b)=>a.id.localeCompare(b.id));
+ const start=Math.abs(seed|0)%order.length;
+ const ranked=order.slice(start).concat(order.slice(0,start));
+ if(recent&&eligible.some(c=>c.families.includes(recent.sequence.at(-1))))ranked.sort((a,b)=>Number(b.families.includes(recent.sequence.at(-1)))-Number(a.families.includes(recent.sequence.at(-1))));
+ const items=[],used=new Set(),counts={};
+ function take(family,reason){
+  if(items.length>=8||counts[family]>=2||stage9Repeated(state,family))return;
+  const row=stage9Pool(family).find(i=>!used.has(i.lemmaId)&&!stage9RaisesAllAxes(i,'choice'));
+  if(!row)return;
+  used.add(row.lemmaId);counts[family]=(counts[family]||0)+1;
+  items.push({id:row.id,lemmaId:row.lemmaId,sequence:row.sequence.slice(),options:row.options.slice(),reason,family});
+ }
+ if(recent&&eligible.some(c=>c.families.includes(recent.sequence.at(-1)))&&!stage9Repeated(state,recent.sequence.at(-1)))take(recent.sequence.at(-1),'Повторяем эту функцию, потому что здесь была ошибка.');
+ for(const contrast of ranked)for(const family of contrast.families)take(family,stage9Repeated(state,family)?'Эту функцию лучше открыть в полном объяснении: одна и та же ошибка уже повторялась.':'Смешиваем уже знакомую функцию «'+family+'».');
+ const repeated=STAGE9_CONTRASTS.some(c=>c.families.some(f=>stage9Repeated(state,f)));
+ return {items,status:items.length?'в смешивании':repeated?'нужно повторить':'мало данных',reason:items[0]?.reason||(repeated?'Эту функцию лучше открыть в полном объяснении: одна и та же ошибка уже повторялась.':'Мало данных.'),seed,repeated};
+}
+function stage9Repair(item,exclude=[]){
+ const key=item.sequence.join('.'),pool=E.bank().filter(i=>i.split==='train'&&i.sequence.join('.')===key&&i.lemmaId!==item.lemmaId&&!exclude.includes(i.lemmaId)).sort((a,b)=>a.lemmaId.localeCompare(b.lemmaId,'kk'));
+ if(!pool.length)throw Error('No mixed repair lemma');
+ return pool[0];
+}
 function stage7Evidence(state){
  const teaching=(state?.teaching?.events||[]).filter(e=>e.moduleId==='chains');
  const answers=(state?.events||[]).filter(e=>e.level==='chains');
@@ -454,6 +525,6 @@ function stage7Evidence(state){
  return {guided,corrections,independentChoice,independentInput,moduleCompleted:teaching.some(e=>e.type==='teaching_module_completed'),uniqueLemmas:lemmas.size,errorJunctions:wrong.map(e=>e.familyId).filter(Boolean)};
 }
 
-const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6RewriteHint,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule,STAGE7_MODULE,STAGE7_GUIDED,stage7Spec,stage7MeaningReady,stage7MissingMeaning,stage7Owner,stage7PrerequisitesReady,stage7MissingPrerequisite,stage7Ready,stage7View,stage7Errors,stage7Feedback,stage7Support,stage7RepairFor,stage7GuidedPlan,stage7IndependentPlan,createStage7Run,stage7Current,stage7Evidence,stage7Works,STAGE8_SEMANTIC,stage8Spec,stage8PrerequisitesReady,stage8MissingPrerequisite,stage8Context,stage8GuidedPlan,stage8IndependentPlan,createStage8Run};
+const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6RewriteHint,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule,STAGE7_MODULE,STAGE7_GUIDED,stage7Spec,stage7MeaningReady,stage7MissingMeaning,stage7Owner,stage7PrerequisitesReady,stage7MissingPrerequisite,stage7Ready,stage7View,stage7Errors,stage7Feedback,stage7Support,stage7RepairFor,stage7GuidedPlan,stage7IndependentPlan,createStage7Run,stage7Current,stage7Evidence,stage7Works,STAGE8_SEMANTIC,stage8Spec,stage8PrerequisitesReady,stage8MissingPrerequisite,stage8Context,stage8GuidedPlan,stage8IndependentPlan,createStage8Run,STAGE9_THRESHOLD,STAGE9_CONTRASTS,stage9Assess,stage9Status,stage9Eligible,stage9Queue,stage9Repair,stage9RaisesAllAxes,stage9Pool};
 if(node)module.exports=api;else root.MorphTeachingPractice=api;
 })(typeof window!=='undefined'?window:globalThis);
