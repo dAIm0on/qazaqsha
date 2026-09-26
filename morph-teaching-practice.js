@@ -276,12 +276,20 @@ function createStage6IndependentSession(moduleId,responseMode,now=Date.now(),opt
   startedAt:now,updatedAt:now,results:[],complete:false,closesLevel:false,transferNote:'',holdoutNote:'',unscoredFamilies:[]
  };
 }
+function stage6RewriteHint(task){
+ if(!task.changed)return 'Не придумывай изменение основы: здесь оно не лицензировано.';
+ const a=task.trace.before,b=task.trace.stem;
+ if(a.endsWith('қ')&&b.endsWith('ғ'))return 'Для этой словарно разрешённой леммы перед данным POSS действует қ→ғ.';
+ if(a.endsWith('к')&&b.endsWith('г'))return 'Для этой словарно разрешённой леммы перед данным POSS действует к→г.';
+ if(a.endsWith('п')&&b.endsWith('б'))return 'Для этой словарно разрешённой леммы перед данным POSS действует п→б.';
+ if(a.length===b.length+1)return 'Для этой словарно разрешённой леммы действует синкопа ы/і; не переноси её на другие слова автоматически.';
+ return 'У этой леммы словарь разрешает изменение основы перед данным POSS.';
+}
 function stage6Support(moduleId,task){
  const m=stage6Spec(moduleId);
  if(moduleId==='poss'){
   const edge=task.edge==='vowel'?'гласный край':'согласный/негласный фонологический край';
-  const change=task.changed?'У этой леммы словарь разрешает изменение основы перед этим POSS.':'Не придумывай изменение основы: здесь оно не лицензировано.';
-  return m.shortSupport+' Сейчас: '+edge+', ряд '+(task.harmony==='front'?'передний':'задний')+'. '+change;
+  return m.shortSupport+' Сейчас: '+edge+', ряд '+(task.harmony==='front'?'передний':'задний')+'. '+stage6RewriteHint(task);
  }
  return m.shortSupport+' Сейчас выбрана функция '+task.familyId+'. Сначала держи в голове лицо/вопрос, затем форму; не переноси окончание из POSS или AGR_SHORT.';
 }
@@ -297,6 +305,6 @@ function stage6MissingPrerequisite(state,moduleId){
 }
 function stage6NextModule(moduleId){const i=STAGE6_MODULES.indexOf(moduleId);return i>=0?STAGE6_MODULES[i+1]||null:null;}
 
-const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule};
+const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6RewriteHint,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule};
 if(node)module.exports=api;else root.MorphTeachingPractice=api;
 })(typeof window!=='undefined'?window:globalThis);
