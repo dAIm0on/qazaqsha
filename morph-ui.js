@@ -159,6 +159,51 @@ function stage5Finish(s,resume){
  recordOnce('stage5_module_completed',module.id,null,{responseMode:'view'});
  return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">МОДУЛЬ 1–4 · БЛОК ЗАВЕРШЁН</p><h2>'+esc(module.title)+'</h2><p>Самостоятельный ввод: '+r.correct+' из '+r.n+'.</p><div class="stage5-evidence"><p>Independent choice: '+e.independentChoice.correct+' / '+e.independentChoice.attempts+'</p><p>Independent input: '+e.independentInput.correct+' / '+e.independentInput.attempts+'</p><p>Guided: '+e.guided.correct+' / '+e.guided.attempts+'</p><p>Corrections: '+e.corrections.correct+' / '+e.corrections.attempts+'</p></div><p class="small">Это завершённый учебный блок, а не заявление «навык освоен». Перенос и удержание проверяются отдельно.</p><div class="morph-actions"><button class="secondary-button" data-stage5-restart-guided>Повторить этот модуль</button>'+(next?'<button class="primary-button" data-stage5-next-module="'+esc(next)+'">Следующий модуль</button>':'<button class="primary-button" data-teach-close>К разделу</button>')+'</div></div>';
 }
+
+function stage6Ready(module){return !!P&&P.STAGE6_MODULES?.includes(module.id)&&P.fullStage6Ready(data().module,module.id)&&P.stage6PrerequisitesReady(data().module,module.id);}
+function stage6Evidence(moduleId){return S.teachingEvidence(data().module,{moduleId});}
+function stage6Guided(module,resume){
+ const plan=P.stage6GuidedPlan(module.id),i=Math.max(0,resume.stepIndex||0);
+ if(i>=plan.length)return stage6GuidedComplete(module,resume,plan);
+ const task=plan[i],support=P.stage6Support(module.id,task),choices=task.options.map(o=>'<button type="button" class="secondary-button" lang="kk" data-stage6-guided-answer="'+esc(o)+'">'+esc(o)+'</button>').join('');
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><button class="text-button" data-teach-close>← К разделу</button><p class="eyebrow">STAGE 6 · С ОПОРОЙ · '+(i+1)+' / '+plan.length+'</p><h2>'+esc(module.title)+'</h2><p class="morph-rule">'+esc(support)+'</p><h3 class="morph-stem" lang="kk">'+esc(task.stem)+'</h3><p>'+esc(task.gloss)+'</p><p class="morph-operation">'+esc(task.operation)+'</p><div class="morph-choices">'+choices+'</div><p class="small">Это guided evidence: подсказка разрешена, FSRS и самостоятельное владение не обновляются.</p><button class="text-button" data-teach-go-full>Разобрать правило полностью</button></div>';
+}
+function stage6GuidedComplete(module,resume,plan=P.stage6GuidedPlan(module.id)){
+ const e=stage6Evidence(module.id);
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><button class="text-button" data-teach-close>← К разделу</button><p class="eyebrow">STAGE 6 · С ОПОРОЙ · ГОТОВО</p><h2>Теперь без подсказки</h2><p>Guided: '+e.guided.correct+' из '+e.guided.attempts+'. Исправления после раскрытого ответа не считаются independent evidence.</p><p class="small">Следующий блок использует train-items без подсказки. Repair-леммы исключаются из последующего independent.</p><div class="morph-actions"><button class="secondary-button" data-stage6-restart-guided>Повторить с опорой</button><button class="primary-button" data-stage6-start-choice>Самостоятельно · выбор</button></div></div>';
+}
+function stage6Repair(module,resume){
+ const payload=parseRepair(resume),source=P.stage6TaskForItem(module.id,payload.sourceItemId,'source');
+ const session=data().module.session,exclude=[...P.stage6GuidedPlan(module.id).map(x=>x.lemmaId),...(session?.queue||[]).map(q=>E.getItem(q.id)?.lemmaId).filter(Boolean)];
+ const task=P.stage6RepairFor(module.id,source,exclude),choices=task.options.map(o=>'<button type="button" class="secondary-button" lang="kk" data-stage6-repair-answer="'+esc(o)+'">'+esc(o)+'</button>').join(''),wrong=String(payload.response||''),codes=wrong?E.errors(E.getItem(source.itemId),wrong):[];
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">STAGE 6 · РАЗБОР ОШИБКИ</p><h2>Тот же механизм — другая основа</h2><div class="morph-feedback wrong"><strong>Правильная форма: <span lang="kk">'+esc(source.expected)+'</span></strong>'+(wrong?'<p>Твой ответ: <span lang="kk">'+esc(wrong)+'</span></p>':'')+'<p>'+esc(E.reason(E.getItem(source.itemId),codes))+'</p></div><p>Теперь тот же family/contrast на другой train-лемме. Этот ответ — correction evidence, не independent.</p><p class="morph-rule">'+esc(P.stage6Support(module.id,task))+'</p><h3 class="morph-stem" lang="kk">'+esc(task.stem)+'</h3><p>'+esc(task.gloss)+'</p><p class="morph-operation">'+esc(task.operation)+'</p><div class="morph-choices">'+choices+'</div><button class="text-button" data-teach-go-full>Разобрать правило полностью</button></div>';
+}
+function startStage6Guided(moduleId){
+ const module=teachingModule(moduleId);if(!module||!P?.STAGE6_MODULES?.includes(moduleId)){message='Stage 6 guided доступен только для POSS/person.';render();return;}
+ if(!P.fullStage6Ready(data().module,moduleId)){message='Сначала заверши Level 0 для всех значений этого раздела.';startTeaching(moduleId);return;}
+ if(!P.stage6PrerequisitesReady(data().module,moduleId)){const missing=P.stage6MissingPrerequisite(data().module,moduleId);message='Сначала заверши prerequisite: '+(teachingModule(missing)?.title||missing||'предыдущий модуль')+'.';if(missing)startTeaching(missing);return;}
+ saveSession(null);setTeachingResume(moduleId,'GUIDED_CHOICE',null,0,'');teachingMode=true;showHub=false;message='';render();
+}
+function stage6Exposed(moduleId,responseMode){
+ const m=data().module,lemmas=new Set(),items=new Set();
+ for(const e of m.teaching?.events||[])if(e.moduleId===moduleId&&e.type==='correction_after_feedback'&&e.lemmaId)lemmas.add(e.lemmaId);
+ if(responseMode==='input')for(const e of m.events||[])if(e.level===moduleId&&typeof e.eventId==='string'&&e.eventId.startsWith('morph-stage6-'+moduleId+'-choice-')&&e.itemId)items.add(e.itemId);
+ return {excludeLemmas:[...lemmas],excludeItemIds:[...items]};
+}
+function startStage6Independent(moduleId,step,responseMode){
+ const module=teachingModule(moduleId);if(!module||!P?.STAGE6_MODULES?.includes(moduleId))return;
+ const opts=stage6Exposed(moduleId,responseMode),now=Date.now();setTeachingResume(moduleId,step,null,0,'');
+ const session=P.createStage6IndependentSession(moduleId,responseMode,now+2,opts);saveSession(session);teachingMode=false;showHub=false;message='';render();
+}
+function stage6Finish(s,resume){
+ const module=teachingModule(resume?.currentModule)||teachingModule(s.level),r=E.summary(s.results),input=resume?.currentTeachingStep==='FULL_INPUT';
+ if(!module)return '<div class="morph-panel"><p role="status">Учебный модуль не удалось восстановить. Ответы сохранены.</p><button class="secondary-button" data-morph-hub>К тренировкам</button></div>';
+ const e=stage6Evidence(module.id),next=P.stage6NextModule(module.id);
+ if(!input)return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">STAGE 6 · САМОСТОЯТЕЛЬНО · ВЫБОР</p><h2>'+r.correct+' из '+r.n+'</h2><p>'+r.uniqueLemmas+' разных train-основ. Подсказка отключена.</p><p class="small">Теперь та же система проверяется вводом полной формы. Exact item choice-блока повторно не используется.</p><div class="morph-actions"><button class="secondary-button" data-stage6-restart-guided>Вернуться к опоре</button><button class="primary-button" data-stage6-start-input>Самостоятельно · ввод</button></div></div>';
+ recordOnce('teaching_module_completed',module.id,null,{responseMode:'view'});
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">STAGE 6 · УЧЕБНЫЙ БЛОК ЗАВЕРШЁН</p><h2>'+esc(module.title)+'</h2><p>Самостоятельный ввод: '+r.correct+' из '+r.n+'.</p><div class="stage5-evidence"><p>Independent choice: '+e.independentChoice.correct+' / '+e.independentChoice.attempts+'</p><p>Independent input: '+e.independentInput.correct+' / '+e.independentInput.attempts+'</p><p>Guided: '+e.guided.correct+' / '+e.guided.attempts+'</p><p>Corrections: '+e.corrections.correct+' / '+e.corrections.attempts+'</p></div><p class="small">Это завершённый учебный блок, не заявление «навык освоен». Перенос и удержание проверяются отдельно. Для person текущий transfer честно ограничен доступным банком.</p><div class="morph-actions"><button class="secondary-button" data-stage6-restart-guided>Повторить этот модуль</button>'+(next?'<button class="primary-button" data-stage6-next-module="'+esc(next)+'">Следующий модуль Stage 6</button>':'<button class="primary-button" data-teach-close>К разделу</button>')+'</div></div>';
+}
+
 function teachingComplete(module,resume){
  const nextIndex=module.families.indexOf(resume.familyId)+1,next=module.families[nextIndex]||null,ownReady=!!P&&P.MODULES.includes(module.id)&&P.fullStage5Ready(data().module,module.id),ready=stage5Ready(module),prev=P?.previousModule(module.id),prevTitle=prev?teachingModule(prev)?.title:'';
  const route=next?'<button class="primary-button" data-teach-next-family="'+esc(next)+'">Следующее значение · '+esc(teachingFamily(next)?.title||next)+'</button>':ready?'<button class="primary-button" data-stage5-start-guided>Тренировка с опорой</button>':ownReady&&prev?'<button class="secondary-button" data-stage5-prereq="'+esc(prev)+'">Сначала предыдущий модуль · '+esc(prevTitle||prev)+'</button>':'';
