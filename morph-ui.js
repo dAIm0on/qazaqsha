@@ -67,17 +67,41 @@ function teachingNav(module,resume){
  const families=module.families.map(id=>'<option value="'+esc(id)+'"'+(id===resume.familyId?' selected':'')+'>'+esc(teachingFamily(id)?.title||id)+'</option>').join('');
  return '<div class="morph-teach-nav"><button class="text-button" data-teach-close>← К разделу</button><label>Тема<select data-teach-module>'+modules+'</select></label><label>Значение<select data-teach-family>'+families+'</select></label></div>';
 }
+let showFullSemantic=false;
+function renderBlocks(blocks){
+ return (blocks||[]).map(b=>{
+  if(b.type==='subheading')return '<h3>'+esc(b.text)+'</h3>';
+  if(b.type==='paragraph')return '<p>'+esc(b.text)+'</p>';
+  if(b.type==='list')return '<ul class="morph-teach-list">'+b.items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+  if(b.type==='ordered_list')return '<ol class="morph-teach-list">'+b.items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ol>';
+  if(b.type==='matrix')return '<div class="morph-matrix" role="region" aria-label="Таблица начальных согласных. На узком экране её можно листать вбок."><table><tbody>'+b.rows.map(row=>'<tr><td>'+esc(row)+'</td></tr>').join('')+'</tbody></table></div>';
+  return '';
+ }).join('');
+}
+function semanticGroupsFor(familyId){
+ const groups=(T.level0.semanticGroups)||[];
+ if(familyId==='INS')return groups.filter(g=>g.id==='INS');
+ if(familyId==='DAT')return groups.filter(g=>g.id==='DAT');
+ if(familyId==='Q'||familyId==='NEG')return groups.filter(g=>g.id==='Q');
+ return groups.filter(g=>g.id===familyId||(familyId||'').startsWith(g.id));
+}
 function semanticIntro(module,resume,semantic){
  recordOnce('semantic_intro_seen',module.id,resume.familyId);
  const examples=(semantic.examples||[]).map(x=>'<li lang="kk">'+esc(x.text)+'</li>').join('');
- return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 1 · СМЫСЛ</p><h2>'+esc(semantic.title)+'</h2><p class="morph-teach-lead">'+esc(semantic.meaning)+'</p><div class="morph-rule"><strong>Не перепутать</strong><p>'+esc(semantic.contrast)+'</p></div>'+(examples?'<h3>Примеры</h3><ul class="morph-teach-list">'+examples+'</ul>':'')+'<p class="small">Пока ты только разбираешь значение. Этот экран не считается самостоятельным ответом.</p><div class="morph-actions"><button class="primary-button" data-teach-semantic-done>Понятно, разобрать правило</button></div></div>';
+ const split=resume.familyId==='INS'?'<h2>Чем? С помощью чего?</h2><p>Инструмент или средство действия. Это первая отдельная карточка.</p><h2>С кем? С чем вместе?</h2><p>Совместность. Вторая карточка. Сначала эти значения учатся отдельно и смешиваются позже.</p>':resume.familyId==='DAT'?'<h2>Куда?</h2><p>Направление к месту. Первая карточка.</p><h2>Кому?</h2><p>Адресат. Вторая карточка. В первом блоке направление и адресат не смешиваются.</p>':'';
+ if(showFullSemantic){
+  recordOnce('semantic_full_opened',module.id,resume.familyId);
+  const full=semanticGroupsFor(resume.familyId).map(g=>'<section><h2>'+esc(g.title)+'</h2>'+renderBlocks(g.blocks)+'</section>').join('')||renderBlocks([{type:'paragraph',text:semantic.meaning}]);
+  return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">СМЫСЛ ПОЛНОСТЬЮ</p>'+full+'<p class="small">Это знакомство со смыслом, не самостоятельный ответ и не оценка произношения.</p><div class="morph-actions"><button class="secondary-button" data-teach-semantic-short>Короткая опора</button><button class="primary-button" data-teach-semantic-done>Понятно, разобрать правило</button></div></div>';
+ }
+ return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 1 · СМЫСЛ</p><h2>'+esc(semantic.title)+'</h2>'+split+'<p class="morph-teach-lead">'+esc(semantic.meaning)+'</p><div class="morph-rule"><strong>Не перепутать</strong><p>'+esc(semantic.contrast)+'</p></div>'+(examples?'<h3>Примеры</h3><ul class="morph-teach-list">'+examples+'</ul>':'')+'<p class="small">Пока ты только разбираешь значение. Этот экран не считается самостоятельным ответом.</p><div class="morph-actions"><button class="secondary-button" data-teach-semantic-full>Разобрать смысл полностью</button><button class="primary-button" data-teach-semantic-done>Понятно, разобрать правило</button></div></div>';
 }
 function fullExplanation(module,resume){
  recordOnce('full_explanation_opened',module.id,resume.familyId);
- const paragraphs=module.fullExplanation.map(p=>'<p>'+esc(p)+'</p>').join('');
+ const body=module.fullExplanationBlocks?renderBlocks(module.fullExplanationBlocks):module.fullExplanation.map(p=>'<p>'+esc(p)+'</p>').join('');
  const counters=(module.counterExamples||[]).map(x=>'<li>'+esc(x)+'</li>').join('');
  const limits=(module.limitations||[]).map(x=>'<li>'+esc(x)+'</li>').join('');
- return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 2 · ПОЛНОЕ ОБЪЯСНЕНИЕ</p><h2>'+esc(module.title)+'</h2><div class="morph-full-explanation">'+paragraphs+'</div>'+(counters?'<h3>Контрпримеры</h3><ul class="morph-teach-list">'+counters+'</ul>':'')+(limits?'<h3>Границы правила</h3><ul class="morph-teach-list">'+limits+'</ul>':'')+'<p class="small">Полное объяснение не заменяется короткой подсказкой и остаётся доступным из раздела.</p><div class="morph-actions"><button class="primary-button" data-teach-next-step="CONTRAST_EXAMPLES">Посмотреть контрасты</button></div></div>';
+ return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 2 · ПОЛНОЕ ОБЪЯСНЕНИЕ</p><h2>'+esc(module.title)+'</h2><div class="morph-full-explanation">'+body+'</div>'+(counters?'<h3>Контрпримеры</h3><ul class="morph-teach-list">'+counters+'</ul>':'')+(limits?'<h3>Границы правила</h3><ul class="morph-teach-list">'+limits+'</ul>':'')+'<p class="small">Полное объяснение не заменяется короткой подсказкой и остаётся доступным из раздела.</p><div class="morph-actions"><button class="primary-button" data-teach-next-step="CONTRAST_EXAMPLES">Посмотреть контрасты</button></div></div>';
 }
 function contrastExamples(module,resume,semantic){
  const examples=[...(semantic.examples||[]).map(x=>x.text),...(module.examples||[]).map(x=>x.text)].filter((x,i,a)=>a.indexOf(x)===i);
@@ -213,7 +237,9 @@ function bind(host){
  for(const b of host.querySelectorAll('[data-teach-close]'))b.onclick=()=>{teachingMode=false;showHub=true;render();};
  host.querySelector('[data-teach-module]')?.addEventListener('change',e=>startTeaching(e.target.value));
  host.querySelector('[data-teach-family]')?.addEventListener('change',e=>{const r=currentTeachingResume();if(r)startTeaching(r.currentModule,e.target.value);});
- host.querySelector('[data-teach-semantic-done]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(!r)return;recordOnce('semantic_intro_completed',r.currentModule,r.familyId);setTeachingResume(r.currentModule,'FULL_EXPLANATION',r.familyId,0,'');message='';render();});
+ host.querySelector('[data-teach-semantic-full]')?.addEventListener('click',()=>{showFullSemantic=true;message='';render();});
+ host.querySelector('[data-teach-semantic-short]')?.addEventListener('click',()=>{showFullSemantic=false;message='';render();});
+ host.querySelector('[data-teach-semantic-done]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(!r)return;showFullSemantic=false;recordOnce('semantic_intro_completed',r.currentModule,r.familyId);setTeachingResume(r.currentModule,'FULL_EXPLANATION',r.familyId,0,'');message='';render();});
  for(const b of host.querySelectorAll('[data-teach-next-step]'))b.onclick=()=>{const r=currentTeachingResume();if(!r)return;setTeachingResume(r.currentModule,b.dataset.teachNextStep,r.familyId,0,'');message='';render();};
  for(const b of host.querySelectorAll('[data-teach-go-full]'))b.onclick=()=>{const r=currentTeachingResume();if(!r)return;setTeachingResume(r.currentModule,'FULL_EXPLANATION',r.familyId,0,'');message='';render();};
  host.querySelector('[data-teach-feature-submit]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(!r)return;const all=[...host.querySelectorAll('[data-teach-feature]')],selected=all.filter(x=>x.checked);const correct=all.length>0&&selected.length===all.length;recordTeaching({eventId:attemptTeachingId('feature_notice_attempt',r.currentModule,r.familyId),type:'feature_notice_attempt',moduleId:r.currentModule,familyId:r.familyId,at:Date.now(),responseMode:'choice',answer:selected.map(x=>x.value).join(','),correct,hinted:false});if(!correct){message='Отметь все признаки, которые этот раздел просит проверить. Это опора, а не экзамен.';render();return;}setTeachingResume(r.currentModule,'FEATURE_NOTICE',r.familyId,1,'');message='';render();});

@@ -60,16 +60,17 @@ test('Full explanations are substantive and never replaced by short support',()=
 });
 
 test('Canonical preservation locks remain visible in full explanations',()=>{
+  // 2026-09-26: tokens follow verbatim DOC32, not the previous shortened paraphrase.
   const must={
-    harmony:['Кириллические и/у','INS','currentForm','последнюю написанную гласную'],
-    voice:['қ/к','ғ/г','д или т','Фиксированные'],
-    plural:['именно PL','м/н/ң','глухого','GEN'],
-    nasal:['GEN — н','ACC — д','ABL — н','Q — б'],
-    poss:['қ→ғ','к→г','п→б','кітаптар','орында'],
-    person:['адаммын','адамбыз','адам ба','Transfer'],
-    chains:['currentForm','currentEdge','morphState','кітабына'],
-    verbs:['келген кісі','CVB_IP','не самостоятельное время','AGR_SHORT'],
-    mixed:['случайно перемешивать','другой train-основе','holdout','FSRS']
+    harmony:['кириллические и/у','INS','currentForm','последнюю написанную гласную'],
+    voice:['қ/к','ғ/г','д после','фиксированное'],
+    plural:['лар, лер','қол','GEN'],
+    nasal:['GEN н','ACC н','ABL д','Q м'],
+    poss:['қонақ','кітап','орын','атым'],
+    person:['адаммын','адамбыз','адам ба','transfer'],
+    chains:['currentForm','currentEdge','morphState','на/не'],
+    verbs:['келмедік','CVB','AGR'],
+    mixed:['holdout','8','освоен']
   };
   for(const m of T.modules){
     const full=m.fullExplanation.join('\n');
