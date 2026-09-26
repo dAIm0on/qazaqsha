@@ -158,8 +158,8 @@ const STAGE6_TARGETS={
  poss:{
   choice:[
    {family:'POSS_1SG',feature:'rewrite'},{family:'POSS_2SG',feature:'plain'},{family:'POSS_1PL',feature:'plain'},
-   {family:'POSS_2POL',feature:'plain'},{family:'POSS_3',feature:'rewrite'},{family:'POSS_1SG',feature:'plain'},
-   {family:'POSS_2SG',feature:'rewrite'},{family:'POSS_3',feature:'plain'}
+   {family:'POSS_2POL',feature:'plain'},{family:'POSS_3',feature:'plain'},{family:'POSS_1SG',feature:'plain'},
+   {family:'POSS_2SG',feature:'plain'},{family:'POSS_3',feature:'plain'}
   ],
   input:[
    {family:'POSS_1SG',feature:'plain'},{family:'POSS_2SG',feature:'plain'},{family:'POSS_1PL',feature:'plain'},
