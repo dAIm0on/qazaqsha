@@ -13,7 +13,7 @@ function chainSession(v){
  if(!obj(v)||v.version!==1||v.dataVersion!==E.data.version||v.contentVersion!==TEACHING_CONTENT_VERSION||!safe(v.id))return null;
  if(!['guided','independent'].includes(v.lane)||!['choice','input'].includes(v.responseMode))return null;
  if(!Array.isArray(v.chains)||!v.chains.length||v.chains.length>12)return null;
- const lemmaOk=id=>E.data.lemmas.some(l=>l.id===id&&l.split==='train'&&l.pos==='noun');
+ const lemmaOk=id=>E.data.lemmas.some(l=>l.id===id&&l.split==='train'&&(l.pos==='noun'||l.pos==='verb'));
  if(!v.chains.every(c=>obj(c)&&safe(c.chainId)&&lemmaOk(c.lemmaId)&&Array.isArray(c.sequence)&&c.sequence.length<=5&&c.sequence.every(x=>E.data.families[x])))return null;
  try{for(const c of v.chains)E.form(c.lemmaId,c.sequence);}catch{return null;}
  if(!Number.isInteger(v.chainIndex)||v.chainIndex<0||v.chainIndex>v.chains.length)return null;
@@ -30,7 +30,8 @@ function chainSession(v){
   try{E.form(v.repair.repairLemmaId,v.repair.sequence);}catch{return null;}
   repair={sourceChainId:v.repair.sourceChainId,sourceLemmaId:v.repair.sourceLemmaId,sourceJunction:Math.max(0,Math.min(5,v.repair.sourceJunction|0)),repairLemmaId:v.repair.repairLemmaId,sequence:v.repair.sequence.slice(),response:String(v.repair.response||'').slice(0,200),expected:String(v.repair.expected||'').slice(0,200),errorCodes:Array.isArray(v.repair.errorCodes)?v.repair.errorCodes.filter(safe).slice(0,5):[]};
  }
- return {id:v.id,version:1,dataVersion:v.dataVersion,contentVersion:TEACHING_CONTENT_VERSION,lane:v.lane,responseMode:v.responseMode,chains:v.chains.map(c=>({chainId:c.chainId,lemmaId:c.lemmaId,sequence:c.sequence.slice()})),chainIndex:v.chainIndex,junction:v.junction,phase:v.phase,draft:String(v.draft||'').slice(0,200),result,repair,acceptedEventIds:ids,exposedRepairLemmas:exposed,startedAt:stamp(v.startedAt),updatedAt:stamp(v.updatedAt)};
+ const moduleId=v.moduleId==='verbs'?'verbs':'chains';
+ return {id:v.id,version:1,dataVersion:v.dataVersion,contentVersion:TEACHING_CONTENT_VERSION,moduleId,lane:v.lane,responseMode:v.responseMode,chains:v.chains.map(c=>({chainId:c.chainId,lemmaId:c.lemmaId,sequence:c.sequence.slice()})),chainIndex:v.chainIndex,junction:v.junction,phase:v.phase,draft:String(v.draft||'').slice(0,200),result,repair,acceptedEventIds:ids,exposedRepairLemmas:exposed,startedAt:stamp(v.startedAt),updatedAt:stamp(v.updatedAt)};
 }
 function text(v,max){return typeof v==='string'&&v.length>0&&v.length<=max&&!['__proto__','constructor','prototype'].includes(v);}
 function strings(v,max){return Array.isArray(v)&&v.length<=max&&v.every(x=>safe(x));}

@@ -363,11 +363,11 @@ function stage7Feedback(view,codes){
 }
 function stage7Support(){return stage7Spec().shortSupport;}
 function stage7Works(lemmaId,sequence){try{E.form(lemmaId,sequence);return E.data.lemmas.find(l=>l.id===lemmaId)?.split==='train';}catch{return false;}}
-function stage7RepairFor(view,exclude=[]){
+function stage7RepairFor(view,exclude=[],pos='noun'){
  const blocked=new Set([view.lemmaId,...exclude]);
  const prefix=view.sequence.slice(0,view.junction+1);
- const same=E.data.lemmas.filter(l=>l.pos==='noun'&&l.split==='train'&&!blocked.has(l.id)&&l.harmony===E.data.lemmas.find(x=>x.id===view.lemmaId).harmony&&stage7Works(l.id,prefix));
- const any=E.data.lemmas.filter(l=>l.pos==='noun'&&l.split==='train'&&!blocked.has(l.id)&&stage7Works(l.id,prefix));
+ const same=E.data.lemmas.filter(l=>l.pos===pos&&l.split==='train'&&!blocked.has(l.id)&&l.harmony===E.data.lemmas.find(x=>x.id===view.lemmaId).harmony&&stage7Works(l.id,prefix));
+ const any=E.data.lemmas.filter(l=>l.pos===pos&&l.split==='train'&&!blocked.has(l.id)&&stage7Works(l.id,prefix));
  const lemma=(same[0]||any[0]);if(!lemma)throw Error('No Stage 7 repair lemma');
  const repair=stage7View(lemma.id,prefix,prefix.length-1);
  if(repair.lemmaId===view.lemmaId)throw Error('Stage 7 repair reused the source lemma');
@@ -394,6 +394,51 @@ function stage7Current(chain){
  const row=chain.chains[chain.chainIndex];if(!row)return null;
  return {...stage7View(row.lemmaId,row.sequence,chain.junction),chainId:row.chainId};
 }
+const STAGE8_SEMANTIC=[
+ {id:'q-neg',prompt:'Где глагольное отрицание, а не вопрос?',options:['адам ба?','жазба'],expected:'жазба',explain:'адам ба? — вопрос Q. жазба — отрицание действия NEG. Похожий ряд ма/ба/па их не объединяет.'},
+ {id:'past-ptcp',prompt:'Где форма описывает человека через действие, а не просто говорит о прошлом?',options:['келді','келген кісі'],expected:'келген кісі',explain:'келді — простое прошедшее. келген кісі — пришедший человек. Это не одно и то же.'},
+ {id:'ptcp-cvb',prompt:'Где дополнительное действие связано с главным, а не описывает существительное?',options:['келген кісі','киініп, шықты'],expected:'киініп, шықты',explain:'келген кісі описывает человека. киініп, шықты связывает дополнительное действие с выходом.'},
+ {id:'cop-agr',prompt:'Где лицо добавлено после прошедшего глагола, а не после имени?',options:['адаммын','келдім'],expected:'келдім',explain:'адаммын — сказуемое при имени, COP. келдім — лицо после прошедшей формы, AGR_SHORT. Это не POSS и не полная COP-серия.'}
+];
+const STAGE8_GUIDED=[
+ {chainId:'NEG',lemmaId:'v-жаз',sequence:['NEG'],context:'Не писать.'},
+ {chainId:'PAST',lemmaId:'v-кел',sequence:['PAST'],context:'Простое прошедшее: действие уже произошло.'},
+ {chainId:'PAST-AGR',lemmaId:'v-кел',sequence:['PAST','AGR_SHORT_1SG'],context:'Сначала прошедшее. Лицо добавляется только после него.'},
+ {chainId:'COND',lemmaId:'v-кел',sequence:['COND'],context:'Если это произойдёт, тогда произойдёт другое.'},
+ {chainId:'COND-AGR',lemmaId:'v-кел',sequence:['COND','AGR_SHORT_1SG'],context:'Условие уже есть. Теперь лицо этого условия.'},
+ {chainId:'NEG-PAST-AGR',lemmaId:'v-кел',sequence:['NEG','PAST','AGR_SHORT_1PL'],context:'Сначала отрицание, потом прошедшее, и только затем лицо.'},
+ {chainId:'PTCP',lemmaId:'v-кел',sequence:['PTCP_GAN'],context:'Пришедший человек. Собери форму глагола для этого описания.'},
+ {chainId:'CVB',lemmaId:'v-сөйле',sequence:['CVB_IP'],context:'Дополнительное действие при главном, не законченное время.'},
+ {chainId:'CVB-REWRITE',lemmaId:'v-жап',sequence:['CVB_IP'],context:'У этой основы словарь разрешает перестройку. Не переноси её на все глаголы.'}
+];
+function stage8Spec(){const row=T.modules.find(x=>x.id==='verbs');if(!row)throw Error('Unknown Stage 8 module');return row;}
+function stage8PrerequisitesReady(state){return stage8Spec().prerequisites.every(id=>!!S?.teachingEvidence(state,{moduleId:id}).moduleCompleted);}
+function stage8MissingPrerequisite(state){return stage8Spec().prerequisites.find(id=>!S?.teachingEvidence(state,{moduleId:id}).moduleCompleted)||null;}
+function stage8Context(chainId){return (STAGE8_GUIDED.find(x=>x.chainId===chainId)||{}).context||'Сначала функция, затем форма этого стыка.';}
+function stage8GuidedPlan(){return STAGE8_GUIDED.map(c=>({chainId:c.chainId,lemmaId:c.lemmaId,sequence:c.sequence.slice()}));}
+function stage8IndependentPlan({excludeLemmas=[]}={}){
+ const shapes=[
+  {chainId:'NEG',sequence:['NEG']},
+  {chainId:'PAST-AGR',sequence:['PAST','AGR_SHORT_1SG']},
+  {chainId:'COND-AGR',sequence:['COND','AGR_SHORT_1SG']},
+  {chainId:'PTCP',sequence:['PTCP_GAN']},
+  {chainId:'CVB',sequence:['CVB_IP']}
+ ];
+ const used=new Set(['v-жаз','v-кел','v-сөйле','v-жап',...excludeLemmas]);
+ return shapes.map(shape=>{
+  const lemma=E.data.lemmas.find(l=>l.pos==='verb'&&l.split==='train'&&!used.has(l.id)&&stage7Works(l.id,shape.sequence));
+  if(!lemma)throw Error('No independent Stage 8 verb for '+shape.chainId);
+  used.add(lemma.id);return {chainId:shape.chainId,lemmaId:lemma.id,sequence:shape.sequence.slice()};
+ });
+}
+function createStage8Run(lane,responseMode,now=Date.now(),opts={}){
+ const run=createStage7Run(lane,responseMode,now,{excludeLemmas:opts.excludeLemmas||[]});
+ run.id='morph-stage8-'+lane+'-'+responseMode+'-'+now;
+ run.moduleId='verbs';
+ run.chains=lane==='guided'?stage8GuidedPlan():stage8IndependentPlan(opts);
+ run.chains.forEach(c=>{if(!stage7Works(c.lemmaId,c.sequence))throw Error('Stage 8 chain is not train-licensed');});
+ return run;
+}
 function stage7Evidence(state){
  const teaching=(state?.teaching?.events||[]).filter(e=>e.moduleId==='chains');
  const answers=(state?.events||[]).filter(e=>e.level==='chains');
@@ -409,6 +454,6 @@ function stage7Evidence(state){
  return {guided,corrections,independentChoice,independentInput,moduleCompleted:teaching.some(e=>e.type==='teaching_module_completed'),uniqueLemmas:lemmas.size,errorJunctions:wrong.map(e=>e.familyId).filter(Boolean)};
 }
 
-const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6RewriteHint,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule,STAGE7_MODULE,STAGE7_GUIDED,stage7Spec,stage7MeaningReady,stage7MissingMeaning,stage7Owner,stage7PrerequisitesReady,stage7MissingPrerequisite,stage7Ready,stage7View,stage7Errors,stage7Feedback,stage7Support,stage7RepairFor,stage7GuidedPlan,stage7IndependentPlan,createStage7Run,stage7Current,stage7Evidence,stage7Works};
+const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6RewriteHint,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule,STAGE7_MODULE,STAGE7_GUIDED,stage7Spec,stage7MeaningReady,stage7MissingMeaning,stage7Owner,stage7PrerequisitesReady,stage7MissingPrerequisite,stage7Ready,stage7View,stage7Errors,stage7Feedback,stage7Support,stage7RepairFor,stage7GuidedPlan,stage7IndependentPlan,createStage7Run,stage7Current,stage7Evidence,stage7Works,STAGE8_SEMANTIC,stage8Spec,stage8PrerequisitesReady,stage8MissingPrerequisite,stage8Context,stage8GuidedPlan,stage8IndependentPlan,createStage8Run};
 if(node)module.exports=api;else root.MorphTeachingPractice=api;
 })(typeof window!=='undefined'?window:globalThis);

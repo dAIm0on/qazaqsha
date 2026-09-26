@@ -215,7 +215,7 @@ function stage7EdgeLabel(edge){return {vowel:'гласный',glide:'й/у',r:'�
 function stage7StateLabel(view){return (view.poss||'без принадлежности')+', '+(view.kase||'без падежа');}
 function stage7Pending(){return '<div class="morph-panel" data-stage7-pending><p role="status">Шаг цепочки ещё не готов. Прогресс, очередь и учебный шаг не изменены.</p><button type="button" class="secondary-button" data-stage7-retry>Показать шаг</button></div>';}
 function stage7EventId(chain){return chain.id+':'+chain.chainIndex+':'+chain.junction;}
-function stage7ExposedLemmas(){return (data().module.teaching?.events||[]).filter(e=>e.moduleId==='chains'&&e.type==='correction_after_feedback'&&e.lemmaId).map(e=>e.lemmaId);}
+function stage7ExposedLemmas(){const moduleId=data().module.chain?.moduleId==='verbs'?'verbs':'chains';return (data().module.teaching?.events||[]).filter(e=>e.moduleId===moduleId&&e.type==='correction_after_feedback'&&e.lemmaId).map(e=>e.lemmaId);}
 function stage7Advance(chain){
  const row=chain.chains[chain.chainIndex],total=P.stage7View(row.lemmaId,row.sequence,0).total;
  let junction=chain.junction+1,chainIndex=chain.chainIndex;
@@ -260,11 +260,11 @@ function answerStage7Repair(response){
  const chain=data().module.chain;if(!chain||chain.phase!=='repair'||!chain.repair||!String(response||'').trim())return;
  const view=P.stage7View(chain.repair.repairLemmaId,chain.repair.sequence,chain.repair.sequence.length-1);
  const correct=E.norm(response)===E.norm(view.after),id=chain.id+':repair:'+chain.chainIndex+':'+chain.junction+':'+view.lemmaId;
- if(!(data().module.teaching?.events||[]).some(e=>e.eventId===id))recordTeaching({eventId:id,type:'correction_after_feedback',moduleId:'chains',familyId:view.morpheme,lemmaId:view.lemmaId,at:Date.now(),responseMode:'choice',answer:String(response),correct,hinted:true});
+ if(!(data().module.teaching?.events||[]).some(e=>e.eventId===id))recordTeaching({eventId:id,type:'correction_after_feedback',moduleId:chain.moduleId==='verbs'?'verbs':'chains',familyId:view.morpheme,lemmaId:view.lemmaId,at:Date.now(),responseMode:'choice',answer:String(response),correct,hinted:true});
  const next=stage7Advance(chain);
  saveChain({...next,acceptedEventIds:chain.acceptedEventIds,exposedRepairLemmas:[...new Set([...chain.exposedRepairLemmas,view.lemmaId])],updatedAt:Date.now()});
  const step=chain.lane==='guided'?'GUIDED_CHOICE':chain.responseMode==='input'?'FULL_INPUT':'INDEPENDENT_CHOICE';
- setTeachingResume('chains',step,null,next.junction,'');message=correct?'Исправление верное. Возвращаемся к цепочке.':'Правильная форма: '+view.after+'. Возвращаемся к цепочке.';teachingMode=true;render();
+ setTeachingResume(chain.moduleId==='verbs'?'verbs':'chains',step,null,next.junction,'');message=correct?'Исправление верное. Возвращаемся к цепочке.':'Правильная форма: '+view.after+'. Возвращаемся к цепочке.';teachingMode=true;render();
 }
 function answerStage7(response){
  const chain=data().module.chain;if(chain?.phase==='repair')return answerStage7Repair(response);
@@ -273,19 +273,59 @@ function answerStage7(response){
  const correct=E.norm(response)===E.norm(view.after),codes=correct?[]:P.stage7Errors(view,response);
  const id=stage7RecordAnswer(chain,view,response,correct);if(!id){message='Этот шаг уже сохранён.';render();return;}
  if(!correct){
-  const repairView=P.stage7RepairFor(view,[...chain.exposedRepairLemmas,...stage7ExposedLemmas()]);
+  const repairView=P.stage7RepairFor(view,[...chain.exposedRepairLemmas,...stage7ExposedLemmas()],chain.moduleId==='verbs'?'verb':'noun');
   const repair={sourceChainId:view.chainId||chain.chains[chain.chainIndex].chainId,sourceLemmaId:view.lemmaId,sourceJunction:view.junction,repairLemmaId:repairView.lemmaId,sequence:repairView.sequence,response:String(response),expected:view.after,errorCodes:codes};
   saveChain({...chain,phase:'repair',repair,result:null,acceptedEventIds:[...chain.acceptedEventIds,id],exposedRepairLemmas:[...new Set([...chain.exposedRepairLemmas,repairView.lemmaId])],updatedAt:Date.now()});
-  setTeachingResume('chains','ERROR_REPAIR',view.morpheme,chain.junction,'');message='Стык разобран на другой основе.';teachingMode=true;render();return;
+  setTeachingResume(chain.moduleId==='verbs'?'verbs':'chains','ERROR_REPAIR',view.morpheme,chain.junction,'');message='Стык разобран на другой основе.';teachingMode=true;render();return;
  }
  saveChain({...chain,phase:'feedback',result:{eventId:id,response:String(response),correct:true,errorCodes:[]},repair:null,acceptedEventIds:[...chain.acceptedEventIds,id],updatedAt:Date.now()});
- setTeachingResume('chains',chain.lane==='guided'?'GUIDED_CHOICE':chain.responseMode==='input'?'FULL_INPUT':'INDEPENDENT_CHOICE',view.morpheme,chain.junction,'');message='';teachingMode=true;render();
+ setTeachingResume(chain.moduleId==='verbs'?'verbs':'chains',chain.lane==='guided'?'GUIDED_CHOICE':chain.responseMode==='input'?'FULL_INPUT':'INDEPENDENT_CHOICE',view.morpheme,chain.junction,'');message='';teachingMode=true;render();
+}
+function stage8Semantic(check,resume){
+ let feedback=null;try{feedback=JSON.parse(resume.draft||'null');}catch{}
+ const answered=feedback&&feedback.id===check.id;
+ const choices=check.options.map(o=>'<button type="button" class="secondary-button" data-stage8-semantic="'+esc(o)+'"'+(answered?' disabled':'')+'>'+esc(o)+'</button>').join('');
+ const note=answered?'<div class="morph-feedback '+(feedback.correct?'correct':'wrong')+'" role="status"><strong>'+(feedback.correct?'Верно':'Это другая функция')+'</strong><p>'+esc(check.explain)+'</p></div><button class="primary-button" data-stage8-semantic-next>Дальше</button>':'';
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><button class="text-button" data-teach-close>← К разделу</button><p class="eyebrow">STAGE 8 · СМЫСЛ · '+(resume.stepIndex+1)+' / '+P.STAGE8_SEMANTIC.length+'</p><h2>Сначала функция</h2><p class="morph-operation">'+esc(check.prompt)+'</p><div class="morph-choices">'+choices+'</div>'+note+'<p class="small">Это смысловой выбор. Он не двигает FSRS и не является самостоятельной формой.</p></div>';
+}
+function stage8FormScreen(chain){
+ if(chain.phase==='complete'||chain.chainIndex>=chain.chains.length){
+  const rows=(data().module.teaching?.events||[]).filter(e=>e.moduleId==='verbs');
+  const e={guided:{correct:rows.filter(x=>x.type==='guided_attempt'&&x.correct).length,attempts:rows.filter(x=>x.type==='guided_attempt').length},corrections:{correct:rows.filter(x=>x.type==='correction_after_feedback'&&x.correct).length,attempts:rows.filter(x=>x.type==='correction_after_feedback').length}};
+  if(chain.lane==='guided')return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">STAGE 8 · С ОПОРОЙ · ГОТОВО</p><h2>Теперь без подсказки</h2><p>С опорой: '+e.guided.correct+' из '+e.guided.attempts+'. Исправления: '+e.corrections.correct+' из '+e.corrections.attempts+'. Смысл и форма здесь не сведены в одну оценку.</p><div class="morph-actions"><button class="secondary-button" data-stage8-start>Повторить смысл</button><button class="primary-button" data-stage8-start-choice>Самостоятельно · выбор</button></div></div>';
+  if(chain.responseMode==='choice')return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">STAGE 8 · САМОСТОЯТЕЛЬНО · ВЫБОР</p><h2>Выбор записан</h2><div class="morph-actions"><button class="primary-button" data-stage8-start-input>Самостоятельно · ввод</button></div></div>';
+  recordOnce('teaching_module_completed','verbs',null,{responseMode:'view'});
+  return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">STAGE 8 · УЧЕБНЫЙ БЛОК ЗАВЕРШЁН</p><h2>Глагольные стыки</h2><p class="small">Это завершённый учебный блок, не заявление «навык освоен». Каузатив, пассив и возвратность сюда не добавлялись.</p><button class="secondary-button" data-stage8-start>К смыслу</button></div>';
+ }
+ if(chain.phase==='repair'&&chain.repair)return stage7RepairScreen(chain).replace('STAGE 7','STAGE 8');
+ const view=P.stage7Current(chain);if(!view)return '<div class="morph-panel" data-stage8-pending><p role="status">Шаг глагола ещё не готов. Прогресс и учебный шаг не изменены.</p><button type="button" class="secondary-button" data-stage7-retry>Показать шаг</button></div>';
+ const answered=chain.phase==='feedback';
+ const revealed=answered?'<div class="morph-feedback correct" role="status"><strong>Теперь форма: <span lang="kk">'+esc(view.after)+'</span></strong><p>Новый край: '+esc(stage7EdgeLabel(view.nextEdge))+'.</p></div><button class="primary-button" data-stage7-next>Дальше</button>':'';
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><button class="text-button" data-teach-close>← К разделу</button><p class="eyebrow">STAGE 8 · '+(chain.lane==='guided'?'С ОПОРОЙ':'САМОСТОЯТЕЛЬНО')+' · '+esc(view.chainId||'')+' · '+(view.junction+1)+' / '+view.total+'</p><p>'+esc(P.stage8Context(view.chainId))+'</p>'+stage7TaskHtml(view,chain,answered)+revealed+'<p class="small">Следующий стык не показан, пока не принят этот.</p></div>';
+}
+function stage8Screen(){
+ const resume=currentTeachingResume(),chain=data().module.chain;
+ if(chain&&chain.moduleId==='verbs')return stage8FormScreen(chain);
+ if(resume&&resume.currentTeachingStep==='GUIDED_CHOICE'&&(resume.stepIndex||0)<P.STAGE8_SEMANTIC.length)return stage8Semantic(P.STAGE8_SEMANTIC[resume.stepIndex],resume);
+ return stage8FormScreen({lane:'guided',phase:'complete',chainIndex:0,chains:[],responseMode:'choice',moduleId:'verbs'});
+}
+function startStage8Forms(lane,step,responseMode){
+ const chain=P.createStage8Run(lane,responseMode,Date.now(),{excludeLemmas:stage7ExposedLemmas()});
+ setTeachingResume('verbs',step,null,P.STAGE8_SEMANTIC.length,'');saveChain(chain);saveSession(null);teachingMode=true;showHub=false;message='';render();
+}
+function startStage8(){
+ const moduleState=data().module;
+ if(!P.stage8PrerequisitesReady(moduleState)){const missing=P.stage8MissingPrerequisite(moduleState);message='Сначала заверши prerequisite: '+(teachingModule(missing)?.title||missing)+'.';if(missing)startTeaching(missing);return;}
+ saveChain(null);setTeachingResume('verbs','GUIDED_CHOICE',null,0,'');teachingMode=true;showHub=false;message='';render();
 }
 function teachingComplete(module,resume){
  const nextIndex=module.families.indexOf(resume.familyId)+1,next=module.families[nextIndex]||null;
  let route='';
  if(next)route='<button class="primary-button" data-teach-next-family="'+esc(next)+'">Следующее значение · '+esc(teachingFamily(next)?.title||next)+'</button>';
- else if(module.id==='chains'){
+ else if(module.id==='verbs'){
+  const ready=!!P&&P.stage8PrerequisitesReady(data().module),missing=P?.stage8MissingPrerequisite(data().module);
+  route=ready?'<button class="primary-button" data-stage8-start>Глаголы: сначала смысл</button>':missing?'<button class="secondary-button" data-stage8-prereq="'+esc(missing)+'">Сначала prerequisite · '+esc(teachingModule(missing)?.title||missing)+'</button>':'';
+ }else if(module.id==='chains'){
   const ready=!!P&&P.stage7Ready(data().module),missing=P?.stage7MissingPrerequisite(data().module),meaning=P?.stage7MissingMeaning(data().module),owner=meaning?P.stage7Owner(meaning):'';
   route=ready?'<button class="primary-button" data-stage7-start-guided>Цепочки по одному стыку</button>':missing?'<button class="secondary-button" data-stage7-prereq="'+esc(missing)+'">Сначала prerequisite · '+esc(teachingModule(missing)?.title||missing)+'</button>':meaning?'<button class="secondary-button" data-stage7-meaning="'+esc(owner)+'" data-stage7-family="'+esc(meaning)+'">Сначала смысл · '+esc(meaning)+'</button>':'';
  }else if(P?.STAGE6_MODULES?.includes(module.id)){
@@ -302,7 +342,8 @@ function teachingScreen(){
  const practiceStep=['GUIDED_CHOICE','ERROR_REPAIR','INDEPENDENT_CHOICE','FULL_INPUT'].includes(resume.currentTeachingStep);
  const module=teachingModule(resume.currentModule,resume.familyId);if(!module||(!practiceStep&&!module.families.includes(resume.familyId))){message='Учебная тема обновилась. Выбери раздел заново.';teachingMode=false;showHub=true;level='harmony';return hub();}
  if(practiceStep){
-  const is5=!!P?.MODULES.includes(module.id),is6=!!P?.STAGE6_MODULES?.includes(module.id),is7=module.id==='chains';
+  const is5=!!P?.MODULES.includes(module.id),is6=!!P?.STAGE6_MODULES?.includes(module.id),is7=module.id==='chains',is8=module.id==='verbs';
+  if(is8)return stage8Screen();
   if(is7)return stage7Screen();
   if(!is5&&!is6){message='Guided-практика для этого модуля ещё не подключена.';teachingMode=false;showHub=true;return hub();}
   if(resume.currentTeachingStep==='GUIDED_CHOICE')return is6?stage6Guided(module,resume):stage5Guided(module,resume);
@@ -333,13 +374,14 @@ function finish(s){
 function stage7RecordAnswer(chain,view,response,correct){
  const bank=E.getItem('morph:v1:'+view.lemmaId+':'+view.sequence.slice(0,view.junction+1).join('.'));
  const id=stage7EventId(chain)+(chain.lane==='independent'&&bank?':0':'');
+ const moduleId=chain.moduleId==='verbs'?'verbs':'chains';
  if(chain.acceptedEventIds.includes(id)||(data().module.events||[]).some(e=>e.eventId===id))return id;
  if(chain.lane==='independent'&&bank){
-  const session={id:stage7EventId(chain),version:1,dataVersion:E.data.version,level:'chains',mode:'learn',responseMode:chain.responseMode,modality:'text',queue:[{id:bank.id,options:bank.options.slice()}],cursor:0,phase:'question',draft:'',hinted:false,result:null,startedAt:chain.startedAt,updatedAt:Date.now(),results:[],complete:false,closesLevel:false,transferNote:'',holdoutNote:'',unscoredFamilies:[]};
+  const session={id:stage7EventId(chain),version:1,dataVersion:E.data.version,level:moduleId,mode:'learn',responseMode:chain.responseMode,modality:'text',queue:[{id:bank.id,options:bank.options.slice()}],cursor:0,phase:'question',draft:'',hinted:false,result:null,startedAt:chain.startedAt,updatedAt:Date.now(),results:[],complete:false,closesLevel:false,transferNote:'',holdoutNote:'',unscoredFamilies:[]};
   saveSession(session);const answered=E.answer(data().module.session,response,interrupted||shownAt===null?null:performance.now()-shownAt);const ok=answered&&bridge().answer(answered);saveSession(null);if(!ok)return null;return id;
  }
  const type=chain.lane==='guided'?'guided_attempt':'chain_junction_attempt';
- const ok=recordTeaching({eventId:id,type,moduleId:'chains',familyId:view.morpheme,lemmaId:view.lemmaId,at:Date.now(),responseMode:chain.responseMode,answer:response,correct,hinted:chain.lane==='guided'});
+ const ok=recordTeaching({eventId:id,type,moduleId,familyId:view.morpheme,lemmaId:view.lemmaId,at:Date.now(),responseMode:chain.responseMode,answer:response,correct,hinted:chain.lane==='guided'});
  return ok||(data().module.teaching?.events||[]).some(e=>e.eventId===id)?id:null;
 }
 function questionReady(s){
@@ -417,6 +459,12 @@ function bind(host){
  host.querySelector('[data-stage6-start-choice]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(r)startStage6Independent(r.currentModule,'INDEPENDENT_CHOICE','choice');});
  host.querySelector('[data-stage6-start-input]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(r)startStage6Independent(r.currentModule,'FULL_INPUT','input');});
  host.querySelector('[data-stage7-retry]')?.addEventListener('click',()=>{render();});
+ host.querySelector('[data-stage8-start]')?.addEventListener('click',()=>startStage8());
+ host.querySelector('[data-stage8-start-choice]')?.addEventListener('click',()=>startStage8Forms('independent','INDEPENDENT_CHOICE','choice'));
+ host.querySelector('[data-stage8-start-input]')?.addEventListener('click',()=>startStage8Forms('independent','FULL_INPUT','input'));
+ for(const b of host.querySelectorAll('[data-stage8-prereq]'))b.onclick=()=>startTeaching(b.dataset.stage8Prereq);
+ for(const b of host.querySelectorAll('[data-stage8-semantic]'))b.onclick=()=>{const r=currentTeachingResume();if(!r)return;const check=P.STAGE8_SEMANTIC[r.stepIndex];if(!check)return;const response=b.dataset.stage8Semantic,correct=response===check.expected;recordTeaching({eventId:'stage8-sem:'+check.id,type:'semantic_check_attempt',moduleId:'verbs',familyId:null,at:Date.now(),responseMode:'choice',answer:response,correct,hinted:false});setTeachingResume('verbs','GUIDED_CHOICE',null,r.stepIndex,JSON.stringify({id:check.id,response,correct}));message=correct?'':'Сначала различаем функцию.';render();};
+ host.querySelector('[data-stage8-semantic-next]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(!r)return;if((r.stepIndex||0)+1>=P.STAGE8_SEMANTIC.length){startStage8Forms('guided','GUIDED_CHOICE','choice');return;}setTeachingResume('verbs','GUIDED_CHOICE',null,r.stepIndex+1,'');message='';render();});
  host.querySelector('[data-stage7-start-guided]')?.addEventListener('click',()=>startStage7('guided','GUIDED_CHOICE','choice'));
  host.querySelector('[data-stage7-start-choice]')?.addEventListener('click',()=>startStage7('independent','INDEPENDENT_CHOICE','choice'));
  host.querySelector('[data-stage7-start-input]')?.addEventListener('click',()=>startStage7('independent','FULL_INPUT','input'));
@@ -425,7 +473,7 @@ function bind(host){
  for(const b of host.querySelectorAll('[data-stage7-answer]'))b.onclick=()=>answerStage7(b.dataset.stage7Answer);
  host.querySelector('#stage7-answer-form')?.addEventListener('submit',e=>{e.preventDefault();answerStage7(host.querySelector('#stage7-answer').value);});
  const stage7Input=host.querySelector('#stage7-answer');if(stage7Input){for(const b of host.querySelectorAll('[data-stage7-key]'))b.onclick=()=>{const a=stage7Input.selectionStart,z=stage7Input.selectionEnd;stage7Input.value=stage7Input.value.slice(0,a)+b.dataset.stage7Key+stage7Input.value.slice(z);stage7Input.focus();stage7Input.setSelectionRange(a+1,a+1);};}
- host.querySelector('[data-stage7-next]')?.addEventListener('click',()=>{const chain=data().module.chain;if(!chain||chain.phase!=='feedback')return;const next=stage7Advance(chain);saveChain({...next,acceptedEventIds:chain.acceptedEventIds,exposedRepairLemmas:chain.exposedRepairLemmas});const step=chain.lane==='guided'?'GUIDED_CHOICE':chain.responseMode==='input'?'FULL_INPUT':'INDEPENDENT_CHOICE';setTeachingResume('chains',step,null,next.junction,'');teachingMode=true;message='';render();});
+ host.querySelector('[data-stage7-next]')?.addEventListener('click',()=>{const chain=data().module.chain;if(!chain||chain.phase!=='feedback')return;const next=stage7Advance(chain);saveChain({...next,acceptedEventIds:chain.acceptedEventIds,exposedRepairLemmas:chain.exposedRepairLemmas});const step=chain.lane==='guided'?'GUIDED_CHOICE':chain.responseMode==='input'?'FULL_INPUT':'INDEPENDENT_CHOICE';setTeachingResume(chain.moduleId==='verbs'?'verbs':'chains',step,null,next.junction,'');teachingMode=true;message='';render();});
  for(const b of host.querySelectorAll('[data-stage6-next-module]'))b.onclick=()=>startTeaching(b.dataset.stage6NextModule);
  for(const b of host.querySelectorAll('[data-stage6-prereq]'))b.onclick=()=>startTeaching(b.dataset.stage6Prereq);
  for(const b of host.querySelectorAll('[data-stage6-semantic-answer]'))b.onclick=()=>{const r=currentTeachingResume();if(!r)return;const checks=P.stage6SemanticChecks(r.currentModule),check=checks[r.stepIndex];if(!check)return;const response=b.dataset.stage6SemanticAnswer,correct=response===check.expected;recordTeaching({eventId:attemptTeachingId('semantic_check_attempt',r.currentModule,null),type:'semantic_check_attempt',moduleId:r.currentModule,familyId:null,at:Date.now(),responseMode:'choice',answer:response,correct,hinted:false});setTeachingResume(r.currentModule,'GUIDED_CHOICE',null,r.stepIndex,JSON.stringify({semanticId:check.id,response,correct}));message='';render();};
