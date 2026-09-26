@@ -76,6 +76,15 @@ test('Person guided plan covers every COP family plus Q and same-base nasal cont
 test('All Stage 6 guided tasks are admitted train items',()=>{
  for(const id of P.STAGE6_MODULES)for(const x of P.stage6GuidedPlan(id)){const i=E.getItem(x.itemId);assert.equal(i.split,'train');assert.equal(i.sequence.length,1);}
 });
+test('POSS guided support names only the licensed lexical rewrite class',()=>{
+ const p=P.stage6GuidedPlan('poss'),by=x=>P.stage6Support('poss',p.find(t=>t.expected===x));
+ assert.ok(by('кітабым').includes('п→б'));
+ assert.ok(by('көлігім').includes('к→г'));
+ assert.ok(by('қонағым').includes('қ→ғ'));
+ assert.ok(by('орны').includes('синкопа'));
+ assert.ok(by('атым').includes('не лицензировано'));
+});
+
 test('Stage 6 support never contains the full expected answer',()=>{
  for(const id of P.STAGE6_MODULES)for(const x of P.stage6GuidedPlan(id)){const z=P.stage6Support(id,x);assert.ok(z.length>25);assert.equal(z.includes(x.expected),false,id+' '+x.expected);}
 });
