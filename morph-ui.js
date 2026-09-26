@@ -3,7 +3,7 @@
 const E=window.MorphEngine,S=window.MorphState,T=window.MorphTeachingData,P=window.MorphTeachingPractice;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let shownAt=null,interrupted=false,level='harmony',responseMode='choice',message='',attemptSeq=0;
-let showHub=true,teachingMode=false;
+let showHub=true,teachingMode=false,topicOpen=false;
 const bridge=()=>window.MorphBridge,root=()=>document.getElementById('morph-content');
 function data(){return bridge()?.read()||{module:S.empty(),records:{},knownLemmas:[]};}
 function clock(){shownAt=performance.now();interrupted=document.hidden;}
@@ -28,7 +28,7 @@ function recordOnce(type,moduleId,familyId,extra={}){
  return recordTeaching({eventId,type,moduleId,familyId,at:Date.now(),responseMode:'view',...extra});
 }
 function setTeachingResume(moduleId,step,familyId,stepIndex=0,draft=''){
- teachingMode=true;showHub=false;level=moduleId;
+ teachingMode=true;showHub=false;topicOpen=false;level=moduleId;
  return saveTeachingResume({currentModule:moduleId,currentTeachingStep:step,familyId,stepIndex,draft,updatedAt:Date.now()});
 }
 function status(){
@@ -46,20 +46,85 @@ function teachingProgress(m){
  const noticed=new Set((m.teaching?.events||[]).filter(e=>e.type==='feature_notice_attempt'&&e.correct===true&&e.familyId).map(e=>e.familyId)).size;
  return {semantic,noticed,total:families.length};
 }
+function weakTarget(events){
+ const counts={};
+ for(const e of events||[]){
+  if(!e||e.correct!==false||e.transfer||e.mode==='transfer'||e.hinted||e.scored===false)continue;
+  const family=e.sequence&&e.sequence.at(-1);if(!family)continue;counts[family]=(counts[family]||0)+1;
+ }
+ const top=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];if(!top)return null;
+ const module=T.modules.find(m=>(m.families||[]).includes(top[0]));
+ return module?{familyId:top[0],count:top[1],moduleId:module.id,title:module.title}:null;
+}
+function routeStatus(moduleId){
+ const ev=S.teachingEvidence(data().module,{moduleId}),rows=(data().module.events||[]).filter(e=>e.level===moduleId);
+ const fresh=rows.filter(e=>e.transfer||e.mode==='transfer'),own=rows.filter(e=>!(e.transfer||e.mode==='transfer')&&!e.hinted);
+ const claim=fresh.length?P.stage10StrongFromEvents(fresh):null,bits=[];
+ if(ev.semanticIntroSeen)bits.push('Знакомство');
+ if(ev.guided.attempts)bits.push('с подсказкой');
+ if(own.length)bits.push('самостоятельно');
+ if(rows.some(e=>e.level==='mixed'))bits.push('в смешивании');
+ if(claim&&claim.pass)bits.push('перенос проверен');
+ else if(fresh.length)bits.push('мало данных');
+ else if(!own.length&&ev.guided.attempts)bits.push('нужно повторить');
+ if(!bits.length)bits.push('мало данных');
+ return {text:bits.join(' · '),retention:P.stage10Retention(data().module.events||[]).label};
+}
+function seenEnough(moduleId){
+ const ev=S.teachingEvidence(data().module,{moduleId});
+ return {meaning:!!ev.semanticIntroSeen,full:!!ev.fullExplanationOpened,feature:ev.featureNotice.attempts>0};
+}
+function continueLearning(){
+ const d=data(),s=d.module.session,tr=d.module.teaching&&d.module.teaching.resume;
+ const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
+ topicOpen=false;
+ if(teachingNewer){teachingMode=true;showHub=false;level=tr.currentModule;message='';render();return;}
+ if(s&&!s.complete){teachingMode=false;showHub=false;level=s.level||level;message='';render();return;}
+ message='Пока нечего продолжать. Начни с «Учиться с нуля» или открой тему раздела.';showHub=true;teachingMode=false;render();
+}
+function learnFromZero(){
+ const tr=currentTeachingResume();
+ if(tr&&tr.currentModule===level){teachingMode=true;showHub=false;topicOpen=false;message='';render();return;}
+ startTeaching(level);
+}
+function repeatWeak(){
+ const hit=weakTarget(data().module.events);
+ if(!hit){message='мало данных. Пока нет ошибки на учебной основе, которую можно повторить.';showHub=true;teachingMode=false;topicOpen=false;render();return;}
+ message='Повторяем «'+hit.familyId+'»: здесь была ошибка. Это учебная основа, не перенос и не новая проверка.';
+ startTeaching(hit.moduleId,hit.familyId,'FULL_EXPLANATION');
+}
+function openTopicStep(step){
+ const module=teachingModule(level);if(!module){message='Для этого раздела нет учебной темы.';render();return;}
+ const seen=seenEnough(module.id);
+ if(step==='CONTRAST_EXAMPLES'&&!seen.meaning){message='Сначала смысл: примеры идут после знакомства.';startTeaching(module.id,null,'SEMANTIC_INTRO');return;}
+ if(step==='FEATURE_NOTICE'&&!seen.full){message='Сначала полное объяснение, потом признаки.';startTeaching(module.id,null,'FULL_EXPLANATION');return;}
+ if(step==='GUIDED_CHOICE'){if(!seen.meaning||!seen.full){message='С опорой можно пробовать после смысла и полного объяснения.';startTeaching(module.id,null,seen.meaning?'FULL_EXPLANATION':'SEMANTIC_INTRO');return;}if(P?.MODULES?.includes(module.id)&&P.fullStage5Ready(data().module,module.id)){setTeachingResume(module.id,'GUIDED_CHOICE',null,0,'');message='';render();return;}message='Сначала отметь признаки этого раздела.';startTeaching(module.id,null,'FEATURE_NOTICE');return;}
+ if(step==='INDEPENDENT'){if(!seen.meaning||!seen.full||!seen.feature){message='Самостоятельное задание не первое знакомство с механизмом.';startTeaching(module.id,null,!seen.meaning?'SEMANTIC_INTRO':!seen.full?'FULL_EXPLANATION':'FEATURE_NOTICE');return;}const s=data().module.session;if(s&&!s.complete&&s.mode==='learn'&&s.level===module.id){topicOpen=false;teachingMode=false;showHub=false;message='';render();return;}start('learn');return;}
+ startTeaching(module.id,null,step);
+}
+function topicScreen(){
+ const module=teachingModule(level)||T.modules[0];
+ const status=routeStatus(module.id);
+ const item=(step,label)=>'<button type="button" class="secondary-button" data-topic-step="'+step+'">'+label+'</button>';
+ return '<div class="morph-panel morph-teach-panel"><button class="text-button" data-morph-hub>← К разделу</button><p class="eyebrow">ТЕМА</p><h2>'+esc(module.title)+'</h2><div class="morph-routes">'+
+  item('SEMANTIC_INTRO','Что изучаем')+item('FULL_EXPLANATION','Полное объяснение')+item('CONTRAST_EXAMPLES','Примеры')+item('FEATURE_NOTICE','На что смотреть')+item('GUIDED_CHOICE','Попробовать с опорой')+item('INDEPENDENT','Самостоятельно')+'</div><h3>Мой прогресс</h3><p>'+esc(status.text)+'</p><p class="small">Удержание: '+esc(status.retention)+'. Перенос и удержание не сведены в одну оценку.</p><button class="text-button" data-morph-full-rule>Разобрать правило полностью</button></div>';
+}
 function hub(){
  const d=data(),m=d.module,s=m.session,tr=m.teaching?.resume,lines=E.writtenLines(m.events),r=lines.practice,p=teachingProgress(m);
  const rows=E.data.levels.map(l=>{const stats=E.summary(m.events.filter(e=>e.level===l.id&&!e.transfer));return '<option value="'+l.id+'"'+(l.id===level?' selected':'')+'>'+l.title+(stats.n?' · '+stats.correct+'/'+stats.n:'')+'</option>';}).join('');
  const misses={};for(const e of m.events.slice(-40))for(const c of e.errorCodes||[])misses[c]=(misses[c]||0)+1;
  const labels={HARMONY:'ряд гласного',ONSET_CLASS:'начальный согласный',STEM_CHANGE:'изменение основы',MORPH_STATE:'форма после притяжательности',OTHER_FORM:'полная форма'};
- const resumeTeach=tr?'<button class="primary-button" data-morph-teach-resume>Продолжить обучение · '+esc(teachingFamily(tr.familyId)?.title||teachingModule(tr.currentModule)?.title||'тема')+'</button>':'';
+ const canContinue=!!(tr||(s&&!s.complete));
+ const where=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0))?esc(teachingFamily(tr.familyId)?.title||teachingModule(tr.currentModule)?.title||'тема'):(s&&!s.complete?'практика '+(s.cursor+1)+' из '+s.queue.length:'пока не начато');
+ const status=routeStatus(level);
  return '<div class="morph-panel"><p class="eyebrow">ФОРМА СЛОВА</p><h2>Сначала понять, потом строить форму</h2><p>Режим «Учиться с нуля» сначала объясняет значение формы, полное правило, контрасты и признаки. Эти шаги не засчитываются как самостоятельное владение.</p>'+
- resumeTeach+
- (s&&!s.complete?'<button class="secondary-button" data-morph-resume>Продолжить практику '+(s.cursor+1)+' из '+s.queue.length+'</button>':'')+
  '<label for="morph-level">Раздел</label><select id="morph-level">'+rows+'</select><p class="morph-rule">'+esc(rule(level))+'</p>'+
- '<div class="morph-actions"><button class="primary-button" data-morph-learn-zero>Учиться с нуля</button><button class="secondary-button" data-morph-full-rule>Разобрать правило полностью</button></div>'+
- '<p class="small">Level 0: смысл разобран для '+p.semantic+' из '+p.total+' семей; признаки отмечены для '+p.noticed+' из '+p.total+'. Просмотр теории и работа с опорой не двигают FSRS.</p></div>'+
- '<div class="morph-panel"><h2>Самостоятельная практика</h2><p>Этот режим остаётся отдельным: здесь уже нужно строить форму. Если тема новая, сначала пройди «Учиться с нуля».</p>'+
- '<label for="morph-response">Как отвечать</label><select id="morph-response"><option value="choice"'+(responseMode==='choice'?' selected':'')+'>Выбрать форму</option><option value="input"'+(responseMode==='input'?' selected':'')+'>Написать самостоятельно</option></select><div class="morph-actions"><button class="secondary-button" data-morph-start>Новый подход · 10</button><button class="secondary-button" data-morph-transfer>Проверить на новых словах</button></div><p class="small">Проверка берёт основы из отложенной половины банка, которые здесь ещё не показывали. Новое для тренажёра не значит незнакомое тебе в жизни.</p>'+(E.transferRule(level)?.note?'<p class="small">'+esc(E.transferRule(level).note)+'</p>':'')+'</div>'+
+ '<div class="morph-routes"><button class="'+(canContinue?'primary-button':'secondary-button')+'" data-morph-continue>Продолжить обучение</button><button class="primary-button" data-morph-learn-zero>Учиться с нуля</button><button class="secondary-button" data-morph-weak>Повторить слабое место</button><button class="secondary-button" data-morph-start>Самостоятельная практика</button><button class="secondary-button" data-morph-transfer>Проверить на новых основах</button></div>'+
+ '<p class="small">Сейчас продолжится: '+where+'.</p>'+
+ '<div class="morph-actions"><button class="secondary-button" data-morph-topic>Тема раздела</button><button class="secondary-button" data-morph-full-rule>Разобрать правило полностью</button><button class="text-button" data-morph-restart>Начать раздел сначала</button></div>'+
+ '<p class="small">Level 0: смысл разобран для '+p.semantic+' из '+p.total+' семей; признаки отмечены для '+p.noticed+' из '+p.total+'. Просмотр теории и работа с опорой не двигают FSRS. Прогресс раздела: '+esc(status.text)+'. Удержание: '+esc(status.retention)+'.</p></div>'+
+ '<div class="morph-panel"><h2>Самостоятельная практика</h2><p>Этот режим остаётся отдельным: здесь уже нужно строить форму. Если тема новая, сначала пройди «Учиться с нуля». Новый подход · 10 не стоит первым, пока смысл и правило не разобраны.</p>'+
+ '<label for="morph-response">Как отвечать</label><select id="morph-response"><option value="choice"'+(responseMode==='choice'?' selected':'')+'>Выбрать форму</option><option value="input"'+(responseMode==='input'?' selected':'')+'>Написать самостоятельно</option></select><p class="small">«Проверить на новых словах» — это маршрут «Проверить на новых основах»: без подсказки, с разбором в конце и без записи FSRS. Проверка берёт основы из отложенной половины банка, которые здесь ещё не показывали. Новое для тренажёра не значит незнакомое тебе в жизни.</p>'+(E.transferRule(level)?.note?'<p class="small">'+esc(E.transferRule(level).note)+'</p>':'')+'</div>'+
  '<div class="morph-panel"><h2>Наблюдения</h2><p>'+(r.n?r.correct+' из '+r.n+' самостоятельно · '+r.uniqueLemmas+' основ':'Пока нет самостоятельных ответов.')+'</p><p>'+(lines.fresh.n?lines.fresh.correct+' из '+lines.fresh.n+' на новых основах'+(lines.families.length?' · '+esc(lines.families.join(', ')):'') :'На новых основах пока нет самостоятельных ответов.')+'</p><p class="small">'+Object.entries(misses).map(([k,n])=>esc(labels[k]||k)+': '+n).join(' · ')+'</p><p class="small">Процент на знакомых заданиях ещё не доказывает перенос.</p><p class="small">'+esc(S.historyNote)+'</p><details><summary>Как это устроено</summary><p>Результаты относятся к письменным заданиям.</p><p>У каждого семейства свои условия: например, адаммын, адамбыз, адам ба. Следующая форма зависит от уже собранного слова. Изменения основы допускаются только для проверенных слов.</p><p>Правила: <a href="https://qazcorpus.kz/_oqu-ishorpus/Dengeilyk/pdf/Қазақ_грамматикасы.pdf" target="_blank" rel="noopener">Қазақ грамматикасы (2002)</a>; <a href="https://slaviccenters.duke.edu/sites/slaviccenters.duke.edu/files/file-attachments/kazakh-grammar.pdf" target="_blank" rel="noopener">грамматика Duke</a>.</p></details></div>';
 }
 function teachingNav(module,resume){
@@ -414,9 +479,9 @@ function render(){
  const host=root();if(!host||!bridge()||!T)return;
  const m=data().module,s=m.session,tr=m.teaching?.resume;
  const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
- if(teachingNewer&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){const rm=teachingModule(tr.currentModule,tr.familyId);teachingMode=true;showHub=false;level=rm?.id||'harmony';host.dataset.first='yes';}
- else if(s&&!s.complete&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){teachingMode=false;showHub=false;host.dataset.first='yes';}
- const body=teachingMode?teachingScreen():(!s||showHub?hub():s.complete?finish(s):question(s));
+ if(teachingNewer&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){const rm=teachingModule(tr.currentModule,tr.familyId);teachingMode=true;showHub=false;topicOpen=false;level=rm?.id||'harmony';host.dataset.first='yes';}
+ else if(s&&!s.complete&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){teachingMode=false;showHub=false;topicOpen=false;host.dataset.first='yes';}
+ const body=teachingMode?teachingScreen():topicOpen?topicScreen():(!s||showHub?hub():s.complete?finish(s):question(s));
  host.innerHTML='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>'+(message||m.recovery||m.teaching?.recovery?'<p role="status" class="morph-notice">'+esc(message||m.teaching?.recovery||m.recovery)+'</p>':'')+body;
  bind(host);clock();
 }
@@ -441,7 +506,7 @@ function stage9Screen(){
  return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">СМЕШАННАЯ ПРАКТИКА</p><h2>'+esc(built.status)+'</h2><p>'+esc(built.reason)+'</p><p class="small">Это маршрутный порог продукта, не научный сертификат. Перенос и удержание остаются отдельными.</p><button class="secondary-button" data-stage9-full>Открыть полное объяснение</button><button class="text-button" data-morph-hub>К тренировкам</button></div>';
 }
 function start(mode){
- const d=data();teachingMode=false;
+ const d=data();teachingMode=false;topicOpen=false;
  if(level==='mixed'&&mode==='learn'){startMixed();return;}
  try{const s=E.createSession({level,mode,responseMode,events:d.module.events,records:d.records,knownLemmas:[...d.module.exposed,...d.knownLemmas,...(mode==='transfer'?P.stage10ContaminatedLemmas():[])]});saveSession(s);showHub=false;message=mode==='transfer'&&s.holdoutNote?P.STAGE10_SHORT_BANK:'';render();}catch(e){message=e.message&&String(e.message).includes('новых')?P.STAGE10_SHORT_BANK:e.message;render();}
 }
@@ -472,12 +537,17 @@ function bind(host){
  host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>{window.QazaqShell.show('personal');window.PersonalTrainers.openCatalog();});
  host.querySelector('[data-morph-start]')?.addEventListener('click',()=>start('learn'));
  host.querySelector('[data-morph-transfer]')?.addEventListener('click',()=>start('transfer'));
- host.querySelector('[data-morph-learn-zero]')?.addEventListener('click',()=>startTeaching(level));
+ host.querySelector('[data-morph-learn-zero]')?.addEventListener('click',()=>learnFromZero());
+ host.querySelector('[data-morph-continue]')?.addEventListener('click',()=>continueLearning());
+ host.querySelector('[data-morph-weak]')?.addEventListener('click',()=>repeatWeak());
+ host.querySelector('[data-morph-topic]')?.addEventListener('click',()=>{topicOpen=true;teachingMode=false;showHub=false;message='';render();});
+ host.querySelector('[data-morph-restart]')?.addEventListener('click',()=>{message='Раздел начинается сначала. Уже сохранённые ответы и проверка не стираются.';startTeaching(level,null,'SEMANTIC_INTRO');});
+ for(const b of host.querySelectorAll('[data-topic-step]'))b.onclick=()=>openTopicStep(b.dataset.topicStep);
  host.querySelector('[data-morph-full-rule]')?.addEventListener('click',()=>startTeaching(level,null,'FULL_EXPLANATION'));
  host.querySelector('[data-morph-teach-resume]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(r){teachingMode=true;showHub=false;level=r.currentModule;render();}});
  host.querySelector('#morph-level')?.addEventListener('change',e=>{level=e.target.value;render();});
  host.querySelector('#morph-response')?.addEventListener('change',e=>{responseMode=e.target.value;});
- for(const b of host.querySelectorAll('[data-morph-hub]'))b.onclick=()=>{teachingMode=false;showHub=true;render();};
+ for(const b of host.querySelectorAll('[data-morph-hub]'))b.onclick=()=>{teachingMode=false;showHub=true;topicOpen=false;render();};
  host.querySelector('[data-morph-resume]')?.addEventListener('click',()=>{teachingMode=false;showHub=false;render();});
  host.querySelector('[data-morph-question-retry]')?.addEventListener('click',()=>{render();});
  for(const b of host.querySelectorAll('[data-morph-answer]'))b.onclick=()=>submit(b.dataset.morphAnswer);

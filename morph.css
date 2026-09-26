@@ -1,5 +1,6 @@
 #morph-view{max-width:860px;margin-inline:auto;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
 .morph-head,.morph-progress,.morph-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.morph-routes{display:flex;flex-direction:column;gap:8px;margin:16px 0}.morph-routes button{width:100%;text-align:left}
 .morph-panel{background:var(--surface,#fff);border:1px solid var(--line,#d8d8d8);border-radius:20px;padding:clamp(18px,4vw,30px);margin:16px 0;min-width:0;overflow-wrap:anywhere}
 .morph-panel h2{line-height:1.2}.morph-panel label{display:block;font-weight:600;margin:16px 0 6px}.morph-panel select,.morph-panel input{width:100%;max-width:100%;box-sizing:border-box;font:inherit;padding:12px;border:1px solid var(--line,#bbb);border-radius:10px;background:var(--surface,#fff);color:inherit;min-height:48px}
 .morph-panel input{font-size:24px}.morph-panel button{min-height:44px;white-space:normal;overflow-wrap:anywhere;max-width:100%}.morph-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:20px 0}.morph-choices button{font-size:21px;padding:14px 8px}
