@@ -117,8 +117,9 @@ test('Guided and correction events are explicitly teaching evidence',()=>{
 
 test('Independent Stage 5 practice uses the existing answer bridge and disables hints',()=>{
  assert.ok(ui.includes("['INDEPENDENT_CHOICE','FULL_INPUT']"));
- assert.ok(ui.includes('stage5Independent'));
- assert.ok(ui.includes('!stage5Independent&&view.hint'));
+ assert.ok(ui.includes('teachingIndependent'));
+ assert.ok(ui.includes("P?.MODULES.includes(tr.currentModule)"));
+ assert.ok(ui.includes('!teachingIndependent&&view.hint'));
  assert.ok(ui.includes('bridge().answer(result)'));
  assert.ok(ui.includes("P.createIndependentSession(moduleId,responseMode"));
 });
