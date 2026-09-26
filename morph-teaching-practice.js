@@ -505,6 +505,52 @@ function stage9Queue(state,seed=1){
  const repeated=STAGE9_CONTRASTS.some(c=>c.families.some(f=>stage9Repeated(state,f)));
  return {items,status:items.length?'в смешивании':repeated?'нужно повторить':'мало данных',reason:items[0]?.reason||(repeated?'Эту функцию лучше открыть в полном объяснении: одна и та же ошибка уже повторялась.':'Мало данных.'),seed,repeated};
 }
+const STAGE10_DELAY=86400000;
+const STAGE10_SHORT_BANK='Недостаточно новых основ для полной проверки этого поднавыка.';
+function stage10WilsonLower(correct,total,z=1.96){
+ if(!total)return 0;
+ const p=correct/total,z2=z*z,denom=1+z2/total,center=p+z2/(2*total),margin=z*Math.sqrt(p*(1-p)/total+z2/(4*total*total));
+ return (center-margin)/denom;
+}
+function stage10StrongClaim({correct=0,total=0,approaches=0,sides=0}={}){
+ const lower=stage10WilsonLower(correct,total),rate=total?correct/total:0;
+ const ready=total>=40&&approaches>=2&&sides>=2;
+ const pass=ready&&rate>=0.9&&lower>=0.8;
+ return {pass,lower,rate,total,correct,approaches,sides,status:!ready?'мало данных':pass?'перенос проверен':'нужно повторить'};
+}
+function stage10Approach(event){const id=String(event?.eventId||'');const cut=id.lastIndexOf(':');return cut>0?id.slice(0,cut):id||'one';}
+function stage10StrongFromEvents(events){
+ const rows=(events||[]).filter(e=>e&&(e.transfer||e.mode==='transfer')&&e.hinted!==true&&e.modality!=='audio');
+ const seen=new Set(),fresh=[];
+ for(const e of rows){if(seen.has(e.lemmaId))continue;seen.add(e.lemmaId);fresh.push(e);}
+ const sides=new Set(fresh.map(e=>e.sequence?.at(-1)).filter(Boolean));
+ const approaches=new Set(fresh.map(stage10Approach));
+ return stage10StrongClaim({correct:fresh.filter(e=>e.correct).length,total:fresh.length,approaches:approaches.size,sides:sides.size});
+}
+function stage10Retention(events){
+ const rows=[...(events||[])].filter(e=>e&&e.hinted!==true&&e.modality!=='audio'&&e.scored!==false).sort((a,b)=>(a.at||0)-(b.at||0));
+ const first=new Map(),kept=[];
+ for(const e of rows){
+  const key=e.itemId||e.lemmaId;
+  const prev=first.get(key);
+  if(prev&&stage10Approach(prev)!==stage10Approach(e)&&e.mode!=='transfer'&&!e.transfer&&(e.at||0)-(prev.at||0)>=STAGE10_DELAY)kept.push(e);
+  if(!prev)first.set(key,e);
+ }
+ return {count:kept.length,label:kept.length?'есть отложенная проверка':'нет отложенной проверки'};
+}
+function stage10ContaminatedLemmas(){
+ const ids=new Set();
+ try{for(const row of stage7GuidedPlan())ids.add(row.lemmaId);}catch{}
+ try{for(const row of stage8GuidedPlan())ids.add(row.lemmaId);}catch{}
+ for(const module of T.modules||[])for(const example of module.examples||[])for(const id of example.lemmaIds||[])ids.add(id);
+ const blob=(T.modules||[]).map(m=>[...(m.fullExplanation||[]),m.shortSupport||'',JSON.stringify(m.examples||[])].join('\n')).join('\n');
+ for(const lemma of E.data.lemmas){
+  if(lemma.split!=='transfer'||!lemma.text)continue;
+  const escaped=lemma.text.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  if(new RegExp('(?:^|[^\\p{L}])'+escaped+'(?:[^\\p{L}]|$)','u').test(blob))ids.add(lemma.id);
+ }
+ return [...ids];
+}
 function stage9Repair(item,exclude=[]){
  const key=item.sequence.join('.'),pool=E.bank().filter(i=>i.split==='train'&&i.sequence.join('.')===key&&i.lemmaId!==item.lemmaId&&!exclude.includes(i.lemmaId)).sort((a,b)=>a.lemmaId.localeCompare(b.lemmaId,'kk'));
  if(!pool.length)throw Error('No mixed repair lemma');
@@ -525,6 +571,6 @@ function stage7Evidence(state){
  return {guided,corrections,independentChoice,independentInput,moduleCompleted:teaching.some(e=>e.type==='teaching_module_completed'),uniqueLemmas:lemmas.size,errorJunctions:wrong.map(e=>e.familyId).filter(Boolean)};
 }
 
-const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6RewriteHint,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule,STAGE7_MODULE,STAGE7_GUIDED,stage7Spec,stage7MeaningReady,stage7MissingMeaning,stage7Owner,stage7PrerequisitesReady,stage7MissingPrerequisite,stage7Ready,stage7View,stage7Errors,stage7Feedback,stage7Support,stage7RepairFor,stage7GuidedPlan,stage7IndependentPlan,createStage7Run,stage7Current,stage7Evidence,stage7Works,STAGE8_SEMANTIC,stage8Spec,stage8PrerequisitesReady,stage8MissingPrerequisite,stage8Context,stage8GuidedPlan,stage8IndependentPlan,createStage8Run,STAGE9_THRESHOLD,STAGE9_CONTRASTS,stage9Assess,stage9Status,stage9Eligible,stage9Queue,stage9Repair,stage9RaisesAllAxes,stage9Pool};
+const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6RewriteHint,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule,STAGE7_MODULE,STAGE7_GUIDED,stage7Spec,stage7MeaningReady,stage7MissingMeaning,stage7Owner,stage7PrerequisitesReady,stage7MissingPrerequisite,stage7Ready,stage7View,stage7Errors,stage7Feedback,stage7Support,stage7RepairFor,stage7GuidedPlan,stage7IndependentPlan,createStage7Run,stage7Current,stage7Evidence,stage7Works,STAGE8_SEMANTIC,stage8Spec,stage8PrerequisitesReady,stage8MissingPrerequisite,stage8Context,stage8GuidedPlan,stage8IndependentPlan,createStage8Run,STAGE9_THRESHOLD,STAGE9_CONTRASTS,stage9Assess,stage9Status,stage9Eligible,stage9Queue,stage9Repair,stage9RaisesAllAxes,stage9Pool,STAGE10_DELAY,STAGE10_SHORT_BANK,stage10WilsonLower,stage10StrongClaim,stage10StrongFromEvents,stage10Retention,stage10ContaminatedLemmas};
 if(node)module.exports=api;else root.MorphTeachingPractice=api;
 })(typeof window!=='undefined'?window:globalThis);
