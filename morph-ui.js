@@ -258,7 +258,8 @@ function startStage7(lane,step,responseMode){
 }
 function answerStage7Repair(response){
  const chain=data().module.chain;if(!chain||chain.phase!=='repair'||!chain.repair||!String(response||'').trim())return;
- const view=P.stage7View(chain.repair.repairLemmaId,chain.repair.sequence,chain.repair.sequence.length-1);
+ let view=null;try{view=P.stage7View(chain.repair.repairLemmaId,chain.repair.sequence,chain.repair.sequence.length-1);}catch(e){view=null;}
+ if(!view||!chain.id||!view.lemmaId){message='Шаг цепочки ещё не готов. Прогресс, очередь и учебный шаг не изменены.';render();return;}
  const correct=E.norm(response)===E.norm(view.after),id=chain.id+':repair:'+chain.chainIndex+':'+chain.junction+':'+view.lemmaId;
  if(!(data().module.teaching?.events||[]).some(e=>e.eventId===id))recordTeaching({eventId:id,type:'correction_after_feedback',moduleId:chain.moduleId==='verbs'?'verbs':'chains',familyId:view.morpheme,lemmaId:view.lemmaId,at:Date.now(),responseMode:'choice',answer:String(response),correct,hinted:true});
  const next=stage7Advance(chain);
@@ -375,7 +376,7 @@ function finish(s){
  const r=E.summary(s.results),transfer=s.mode==='transfer',view=E.reveal(s);
  const claim=transfer?P.stage10StrongFromEvents(s.results):null,retention=P.stage10Retention(data().module.events||[]),families=[...new Set(s.results.map(e=>e.sequence.at(-1)).filter(Boolean))];
  const claimText=claim?'<div class="stage5-evidence"><p>Перенос, только проверенные семьи: '+(families.join(', ')||'нет')+'.</p><p>'+claim.correct+' из '+claim.total+', разных основ: '+r.uniqueLemmas+'.</p><p>'+esc(claim.status)+'. Проверены новые реальные основы. Это не максимальное обобщение и не удержание.</p>'+(s.holdoutNote?'<p>'+esc(P.STAGE10_SHORT_BANK)+'</p>':'')+'<p>Удержание: '+esc(retention.label)+'.</p></div>':'';
- return '<div class="morph-panel"><p class="eyebrow">ПОДХОД ЗАВЕРШЁН</p><h2>'+r.correct+' из '+r.n+(transfer?' самостоятельно, на новых основах':' самостоятельно')+'</h2><p>'+r.uniqueLemmas+' разных основ</p><p>'+(transfer?'Это короткая проверка новых здесь основ. Для вывода об устойчивом переносе нужны другие слова и отсроченная проверка.':'Теперь можно повторить трудный контраст или смешать правила.')+'</p>'+claimText+(view.transferNote?'<p>'+esc(view.transferNote)+'</p>':'')+(view.holdoutNote?'<p>'+esc(view.holdoutNote)+'</p>':'')+'<div class="morph-actions"><button class="primary-button" data-morph-hub>К тренировкам</button>'+(!transfer&&s.level==='mixed'&&P.stage9Eligible(data().module).length?'<button class="secondary-button" data-morph-transfer>Проверить на новых основах</button>':'')+'</div>'+s.results.filter(e=>!e.correct).map(e=>{const i=E.getItem(e.itemId);return '<details><summary>'+esc(i.stem)+' → '+esc(i.expected)+'</summary><p>'+esc(E.reason(i,e.errorCodes))+'</p></details>';}).join('')+'</div>';
+ return '<div class="morph-panel"><p class="eyebrow">ПОДХОД ЗАВЕРШЁН</p><h2>'+r.correct+' из '+r.n+(transfer?' самостоятельно, на новых основах':' самостоятельно')+'</h2><p>'+r.uniqueLemmas+' разных основ</p><p>'+(transfer?'Это короткая проверка новых здесь основ. Для вывода об устойчивом переносе нужны другие слова и отсроченная проверка.':'Теперь можно повторить трудный контраст или смешать правила.')+'</p>'+claimText+(view.transferNote?'<p>'+esc(view.transferNote)+'</p>':'')+(view.holdoutNote?'<p>'+esc(view.holdoutNote)+'</p>':'')+'<div class="morph-actions"><button class="primary-button" data-morph-hub>К тренировкам</button>'+(!transfer&&s.level==='mixed'&&P.stage9Eligible(data().module).length?'<button class="secondary-button" data-morph-transfer>Проверить на новых основах</button>':'')+'</div>'+s.results.filter(e=>!e.correct).map(e=>{const i=E.getItem(e.itemId);return i?'<details><summary>'+esc(i.stem)+' → '+esc(i.expected)+'</summary><p>'+esc(E.reason(i,e.errorCodes))+'</p></details>':'';}).join('')+'</div>';
 }
 function stage7RecordAnswer(chain,view,response,correct){
  const bank=E.getItem('morph:v1:'+view.lemmaId+':'+view.sequence.slice(0,view.junction+1).join('.'));
@@ -402,7 +403,9 @@ function question(s){
  const item=questionReady(s);
  if(!item)return '<div class="morph-panel" data-morph-question-pending><p role="status">Вопрос ещё не готов. Прогресс, очередь и учебный шаг не изменены.</p><button type="button" class="secondary-button" data-morph-question-retry>Показать вопрос</button></div>';
  const tr=currentTeachingResume(),teachingIndependent=tr&&(P?.MODULES.includes(tr.currentModule)||P?.STAGE6_MODULES?.includes(tr.currentModule))&&['INDEPENDENT_CHOICE','FULL_INPUT'].includes(tr.currentTeachingStep)&&s.level===tr.currentModule&&s.mode==='learn';
- const entry=s.queue[s.cursor],done=s.phase==='feedback',view=E.reveal(s),choices=entry.options;
+ const entry=s.queue[s.cursor];
+ if(!entry||!Array.isArray(entry.options))return '<div class="morph-panel" data-morph-question-pending><p role="status">Вопрос ещё не готов. Прогресс, очередь и учебный шаг не изменены.</p><button type="button" class="secondary-button" data-morph-question-retry>Показать вопрос</button></div>';
+ const done=s.phase==='feedback',view=E.reveal(s),choices=entry.options;
  const controls=s.responseMode==='choice'?'<div class="morph-choices">'+choices.map(o=>'<button type="button" class="secondary-button" lang="kk" data-morph-answer="'+esc(o)+'"'+(done?' disabled':'')+'>'+esc(o)+'</button>').join('')+'</div>':'<form id="morph-answer-form"><label for="morph-answer">Полная форма'+(item.sequence.at(-1)==='Q'?' вместе с частицей':'')+'</label><input id="morph-answer" lang="kk" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="200" value="'+esc(s.draft)+'"'+(done?' disabled':'')+'><div class="morph-keys">'+[...'әғқңөұүі'].map(c=>'<button type="button" class="text-button" data-morph-key="'+c+'"'+(done?' disabled':'')+'>'+c+'</button>').join('')+'</div><button class="primary-button"'+(done?' disabled':'')+'>Проверить</button></form>';
  const feedback=done?(view.expected?'<div class="morph-feedback '+(view.correctnessClass?(s.result.correct?'correct':'wrong'):'')+'" role="status"><strong>'+(s.result.correct?'Верно':'Правильная форма: '+esc(item.expected))+'</strong><p>'+esc(E.reason(item,s.result.errorCodes))+'</p><p class="small" lang="kk">'+item.trace.map(t=>esc(t.stem)+' + '+esc(t.suffix)).join(' → ')+'</p></div>':'<p role="status">Ответ сохранён. Разбор будет в конце проверки.</p>')+'<button class="primary-button" data-morph-next>'+(s.cursor===s.queue.length-1?'Завершить':'Следующее')+'</button>':'';
  return '<div class="morph-panel"><button class="text-button" data-morph-hub>Выбрать другой режим</button><div class="morph-progress"><span>'+(teachingIndependent?(tr.currentTeachingStep==='FULL_INPUT'?'Самостоятельно · ввод':'Самостоятельно · выбор'):(s.mode==='transfer'?'Проверка новых основ':s.level==='mixed'?'Смешанная практика':'Практика'))+'</span><strong>'+(s.cursor+1)+' / '+s.queue.length+'</strong></div>'+(s.queue[s.cursor].reason?'<p class="small">'+esc(s.queue[s.cursor].reason)+'</p>':'')+(view.transferNote?'<p class="small">'+esc(view.transferNote)+'</p>':'')+(view.holdoutNote?'<p class="small">'+esc(view.holdoutNote)+'</p>':'')+(s.mode==='transfer'&&s.holdoutNote?'<p class="small">'+esc(P.STAGE10_SHORT_BANK)+'</p>':'')+'<h2 class="morph-stem" lang="kk">'+esc(item.stem)+'</h2><p>'+esc(item.gloss)+'</p><p class="morph-operation">'+esc(item.operation)+'</p>'+controls+(!teachingIndependent&&view.hint?'<button class="text-button" data-morph-hint>Подсказка</button>':'')+(view.reason?'<p class="morph-rule">'+esc(E.reason(item))+'</p>':'')+feedback+'</div>';
@@ -447,6 +450,24 @@ function submit(response){
  const result=E.answer(s,response,interrupted||shownAt===null?null:performance.now()-shownAt);if(!result)return;
  const ok=bridge().answer(result);if(!ok)message='Ответ уже сохранён или сессия изменилась.';render();
 }
+function practiceNotReady(){message='Вопрос ещё не готов. Прогресс, очередь и учебный шаг не изменены.';render();}
+function onPracticeNext(){
+ const s=data().module.session;if(!s||s.phase!=='feedback')return;
+ const r=currentTeachingResume(),teachingModuleActive=r&&(P?.MODULES.includes(r.currentModule)||P?.STAGE6_MODULES?.includes(r.currentModule));
+ if(s.level==='mixed'&&s.mode==='learn'&&s.result&&!s.result.correct){
+  const source=s.result.itemId?E.getItem(s.result.itemId):null;let repair=null;try{repair=source?P.stage9Repair(source,[source.lemmaId]):null;}catch(e){repair=null;}
+  if(!source||!repair||!source.id||!repair.id||!Array.isArray(source.sequence)){practiceNotReady();return;}
+  setTeachingResume('mixed','ERROR_REPAIR',source.sequence.at(-1),s.cursor,JSON.stringify({sourceItemId:source.id,repairItemId:repair.id,reason:'Повторяем эту функцию, потому что здесь была ошибка.'}));message='Тот же контраст на другой основе. Это не самостоятельный ответ.';teachingMode=true;render();return;
+ }
+ if(teachingModuleActive&&['INDEPENDENT_CHOICE','FULL_INPUT'].includes(r.currentTeachingStep)&&s.mode==='learn'&&s.level===r.currentModule&&s.result&&!s.result.correct){
+  if(!s.result.itemId||!Array.isArray(s.result.sequence)){practiceNotReady();return;}
+  setTeachingResume(r.currentModule,'ERROR_REPAIR',s.result.sequence.at(-1),s.cursor,JSON.stringify({sourceItemId:s.result.itemId,response:s.result.response,returnStep:r.currentTeachingStep,returnIndex:s.cursor}));message='Ответ разобран. Теперь тот же контраст на другой основе.';teachingMode=true;render();return;
+ }
+ let next=null;try{next=E.next(s);}catch(e){next=null;}
+ if(!next){practiceNotReady();return;}
+ try{saveSession(next);}catch(e){practiceNotReady();return;}
+ render();root()?.querySelector('#morph-answer')?.focus();
+}
 function bind(host){
  host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>{window.QazaqShell.show('personal');window.PersonalTrainers.openCatalog();});
  host.querySelector('[data-morph-start]')?.addEventListener('click',()=>start('learn'));
@@ -463,7 +484,7 @@ function bind(host){
  host.querySelector('#morph-answer-form')?.addEventListener('submit',e=>{e.preventDefault();submit(host.querySelector('#morph-answer').value);});
  const input=host.querySelector('#morph-answer');if(input){input.oninput=()=>{const s=data().module.session;if(s?.phase==='question')saveSession({...s,draft:input.value,updatedAt:Date.now()});};for(const b of host.querySelectorAll('[data-morph-key]'))b.onclick=()=>{const a=input.selectionStart,z=input.selectionEnd;input.value=input.value.slice(0,a)+b.dataset.morphKey+input.value.slice(z);input.focus();input.setSelectionRange(a+1,a+1);input.oninput();};}
  host.querySelector('[data-morph-hint]')?.addEventListener('click',()=>{const s=data().module.session;saveSession({...s,hinted:true});render();});
- host.querySelector('[data-morph-next]')?.addEventListener('click',()=>{const s=data().module.session,r=currentTeachingResume(),teachingModuleActive=r&&(P?.MODULES.includes(r.currentModule)||P?.STAGE6_MODULES?.includes(r.currentModule));if(s&&s.level==='mixed'&&s.mode==='learn'&&s.result&&!s.result.correct){const source=E.getItem(s.result.itemId),repair=P.stage9Repair(source,[source.lemmaId]);setTeachingResume('mixed','ERROR_REPAIR',source.sequence.at(-1),s.cursor,JSON.stringify({sourceItemId:source.id,repairItemId:repair.id,reason:'Повторяем эту функцию, потому что здесь была ошибка.'}));message='Тот же контраст на другой основе. Это не самостоятельный ответ.';teachingMode=true;render();return;}if(teachingModuleActive&&['INDEPENDENT_CHOICE','FULL_INPUT'].includes(r.currentTeachingStep)&&s?.mode==='learn'&&s.level===r.currentModule&&s.result&&!s.result.correct){setTeachingResume(r.currentModule,'ERROR_REPAIR',s.result.sequence.at(-1),s.cursor,JSON.stringify({sourceItemId:s.result.itemId,response:s.result.response,returnStep:r.currentTeachingStep,returnIndex:s.cursor}));message='Ответ разобран. Теперь тот же контраст на другой основе.';teachingMode=true;render();return;}saveSession(E.next(s));render();host.querySelector('#morph-answer')?.focus();});
+ host.querySelector('[data-morph-next]')?.addEventListener('click',onPracticeNext);
 
  for(const b of host.querySelectorAll('[data-teach-close]'))b.onclick=()=>{teachingMode=false;showHub=true;render();};
  host.querySelector('[data-teach-module]')?.addEventListener('change',e=>startTeaching(e.target.value));
