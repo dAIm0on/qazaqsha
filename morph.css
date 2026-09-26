@@ -27,3 +27,5 @@
 .stage5-evidence{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin:16px 0}
 .stage5-evidence p{margin:0;padding:10px 12px;border:1px solid var(--line,#ddd);border-radius:10px;background:var(--surface-alt,#f3f3f0)}
 @media(max-width:620px){.stage5-evidence{grid-template-columns:1fr}}
+
+@media(max-width:690px){#morph-view{padding-bottom:calc(var(--bottom-nav-height,64px) + 48px);scroll-padding-bottom:calc(var(--bottom-nav-height,64px) + 48px)}}
