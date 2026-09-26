@@ -37,6 +37,12 @@ test('Level 0 semantic groups keep INS and DAT apart',()=>{
   const cvb=T.level0.familySemantics.CVB_IP.examples.map(x=>x.text).join('\n');
   assert.equal(cvb.includes('кел → келіп'),false);
 });
+test('Verb full rule no longer leaves participle and converb unmarked',()=>{
+  const s=blob('verbs');
+  assert.equal(s.includes('MISSING_TEACHING_CONTENT'),false);
+  assert.equal(s.includes('кел → келіп'),false);
+  assert.ok(s.includes('келген кісі')&&s.includes('айтқан сөз')&&s.includes('киініп, шықты')&&s.includes('күліп сөйледі'));
+});
 test('Removing one nasal row or the mixed threshold would fail this lock',()=>{
   const rows=T.modules.find(x=>x.id==='nasal').fullExplanationBlocks.find(b=>b.type==='matrix').rows;
   assert.equal(rows.filter(r=>r.includes('з/ж')).length,1);
