@@ -9,7 +9,7 @@ const ui=fs.readFileSync('morph-ui.js','utf8');
 const sw=fs.readFileSync('sw.js','utf8');
 let n=0;
 function test(name,fn){fn();n++;console.log('PASS',name);}
-const TEACHING_TYPES=new Set(['semantic_intro_seen','semantic_intro_completed','full_explanation_opened','semantic_check_attempt','feature_notice_attempt','guided_attempt','correction_after_feedback','chain_junction_attempt']);
+const TEACHING_TYPES=new Set(['semantic_intro_seen','semantic_intro_completed','semantic_full_opened','full_explanation_opened','semantic_check_attempt','feature_notice_attempt','guided_attempt','correction_after_feedback','chain_junction_attempt']);
 function wouldMoveFsrs(event){return !!S.scheduleUpdate(event);}
 function assertForm(lemmaId,sequence,expected){
  const word=E.form(lemmaId,sequence).word;

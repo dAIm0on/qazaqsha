@@ -28,13 +28,13 @@ test('Old morph state migrates additively with empty teaching state',()=>{
 
 test('Theory and scaffolding events are non-production evidence and dedupe by eventId',()=>{
  let m=S.empty();
- for(const [i,type] of ['semantic_intro_seen','semantic_intro_completed','full_explanation_opened','semantic_check_attempt','feature_notice_attempt','guided_attempt','correction_after_feedback'].entries()){
+ for(const [i,type] of ['semantic_intro_seen','semantic_intro_completed','semantic_full_opened','full_explanation_opened','semantic_check_attempt','feature_notice_attempt','guided_attempt','correction_after_feedback'].entries()){
    const r=S.recordTeaching(m,teach({eventId:'t:'+i,type,correct:type.includes('attempt')?true:null,at:1700000000000+i}));
    assert.equal(r.accepted,true,type);assert.equal(r.event.productionMastery,false,type);m=r.state;
  }
- assert.equal(m.teaching.events.length,7);
+ assert.equal(m.teaching.events.length,8);
  const dup=S.recordTeaching(m,teach({eventId:'t:0',type:'semantic_intro_seen',at:1800000000000}));
- assert.equal(dup.accepted,false);assert.equal(dup.state.teaching.events.length,7);
+ assert.equal(dup.accepted,false);assert.equal(dup.state.teaching.events.length,8);
 });
 
 test('Invalid teaching module or family cannot enter saved state',()=>{
