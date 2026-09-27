@@ -204,6 +204,9 @@ const ANCHORS={
  'SRC32-0114':{lesson:'learner.pl.several',needles:['глухой: п, к, қ, т, с'],missing:['Клетка «несколько → т» после глухого есть. Остальные столбцы строки глухого одной матрицей 7×9 не собраны. По вопросу и «я» глухой конец показан отдельно: қонақ па, қонақпын.'],decision:'SPLIT',partial:true},
  'SRC32-0126':{lesson:'learner.nasal.senses',needles:['адамның','адамды','адамнан'],decision:'SPLIT'},
  'SRC32-0128':{file:'morph-learner-v2.js',needles:['Похожая форма отвечает на другой вопрос'],decision:'REPHRASED'},
+ 'SRC32-0129':{file:'morph-learner-v2.js',needles:['Край слова тот же, но у этого вопроса своя группа'],decision:'REPHRASED'},
+ 'SRC34-0008':{file:'morph-ui.js',needles:['какой смысл мы сейчас выражаем','что не надо путать с этой операцией'],decision:'REPHRASED'},
+ 'SRC34-0212':{file:'morph-ui.js',needles:['нельзя объединять в одно правило'],decision:'REPHRASED'},
  'SRC32-0153':{file:'morph-learner-v2.js',needles:['Буква а/е или ы/і в добавке не совпала'],decision:'REPHRASED'},
  'SRC32-0168':{lesson:'learner.nasal.senses',needles:['Нельзя сказать «после м, н или ң всегда н»'],decision:'REPHRASED'},
  'SRC32-0177':{file:'morph-engine.js',needles:['Сказуемые я, мы, ты и вы здесь не оцениваются'],decision:'REPHRASED',partial:true,missing:['Оговорка лежит в служебной заметке движка. Отдельной ученической карточкой на экране она не повторена.']},
@@ -598,8 +601,9 @@ function main(){
  const unitsPath=path.join(opt.pack,'16_SOURCE_UNITS.json');
  const matrixPath=path.join(opt.pack,'17_SCOPE_MATRIX.json');
  const outDir=opt.out;
+ const round3=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','28_INDEPENDENT_REVIEW.json');
  const round2=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','26_INDEPENDENT_REVIEW.json');
- const reviewPath=fs.existsSync(round2)?round2:path.join(outDir,'INDEPENDENT_REVIEW.json');
+ const reviewPath=fs.existsSync(round3)?round3:(fs.existsSync(round2)?round2:path.join(outDir,'INDEPENDENT_REVIEW.json'));
  if(!fs.existsSync(unitsPath)){
   if(process.env.QAZAQSHA_V2_PACK||process.argv.includes('--pack')){
    console.error('MORPH_SOURCE_CHECK_FAIL');
