@@ -42,4 +42,4 @@ assert.equal(L.forFamily('nasal','INS').id,'learner.nasal.senses');
 assert.equal(L.forFamily('harmony','DAT').id,'learner.dat.kuda');
 assert.ok(dat.renderTargets.includes('practice.feedback'));
 assert.ok(poss.renderTargets.includes('chains.step'));
-console.log('MORPH_LEARNER_COVERAGE_OK');
+console.log('MORPH_LEARNER_STRUCTURE_OK');

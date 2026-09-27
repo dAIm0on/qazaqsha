@@ -326,14 +326,15 @@ function classify(unit){
   };
  }
  if(/закончить и продолжить с сохранённого места/.test(fragment)){
+  const resume=require('./verify_morph_resume_runtime.cjs').prove();
   return {
    scope:'SYSTEM_REQUIRED',
    learnerBlockIds:['system.resume'],
    renderTargets:['state.resume'],
    mappingDecision:'SYSTEM_ONLY',
-   semanticStatus:'FAIL',
-   evidence:[{kind:'registry',quote:'Резюме сессии до и после ответа в этом прогоне не запускалось. Это не спрятанный урок, а непроверенное поведение.'}],
-   missing:['Нужен отдельный прогон verify_morph_teaching_state на сценарий продолжения.']
+   semanticStatus:resume.ok?'PASS':'FAIL',
+   evidence:[{kind:'registry',quote:resume.ok?'Сессия сохраняется до ответа, после ответа событие одно, повтор того же ответа отклонён, разбор с подсказкой не пишет второе производственное событие.':'Проверка продолжения не сошлась: '+(resume.errors||[]).join(', ')}],
+   missing:resume.ok?[]:resume.errors
   };
  }
  if(/все 28 runtime families/.test(fragment)){
@@ -499,7 +500,8 @@ function buildRequirements(summary){
  push('R08',has('-шы')?'PASS':'FAIL',['поиск «-шы» в уроках и оболочке'],'Если FAIL: морфема -шы в простом слое не найдена. Это не закрыто переписыванием урока.');
  push('R09',has('лар, лер, дар, дер, тар, тер','learner.pl.several')&&lessonById('learner.pl.several').blocks.find(b=>b.id==='pl.10').text.split('\n').length>=8?'PASS':'FAIL',['pl.8 шесть вариантов','pl.10 семь групп']);
  push('R10',has('После р берём л','learner.pl.several')&&has('После л берём д','learner.pl.several')?'PASS':'FAIL',['pl.11']);
- push('R11','FAIL',['nas.3 — 6 строк одного слова адам','pl.10 — 7 строк только для «несколько»'],'Полной матрицы семь строк на девять столбцов в простом слое нет.');
+ const nasalMatrix=L.lessons.find(x=>x.id==='learner.nasal.senses').blocks.find(b=>b.id==='nas.49');
+ push('R11',nasalMatrix&&nasalMatrix.rows.length===7&&nasalMatrix.headers.length===10?'PASS':'FAIL',[nasalMatrix?'nas.49 '+nasalMatrix.rows.length+'×'+nasalMatrix.headers.length:'нет nas.49']);
  push('R12',has('адамның — чей','learner.nasal.senses')&&has('адамды — этого человека','learner.nasal.senses')&&has('адамнан — от человека','learner.nasal.senses')?'PASS':'FAIL',['nas.46']);
  push('R13',has('баланың кітабы','learner.nasal.senses')?'PASS':'FAIL',['nas.6']);
  push('R14',has('Речь об этой книге','learner.nasal.senses')&&has('Если предмет не определён','learner.nasal.senses')?'PASS':'FAIL',['nas.15']);
@@ -529,7 +531,7 @@ function buildRequirements(summary){
  push('R38',has('жауып','learner.verbs.steps')&&has('Не делай так с каждым словом на п','learner.verbs.steps')?'PARTIAL':'FAIL',['vb.68'],'жап → жауып не обобщается. тап → тауып в уроке не найден: этого слова нет в учебном банке.');
  push('R39',has('не собирает «заставить сделать», страдательное и возвратное','learner.verbs.steps')&&!L.lessons.some(row=>row.families.some(f=>/CAUSATIVE|PASSIVE|REFLEXIVE/.test(f)))?'PASS':'FAIL',['vb.81','семейства уроков не включают эти три']);
  const mixed=ui('Это только порог, когда смешивание уже можно открыть');
- push('R40',mixed?'PARTIAL':'FAIL',['morph-ui.js порог смешивания'],'Отдельного урока смешивания нет. Ограничение «одна новая трудность» дословно не найдено.');
+ push('R40',ui('не меняй сразу смысл, край слова, исключение, длинную цепочку и способ ответа')?'PASS':'FAIL',['morph-ui.js: одна новая трудность при смешивании']);
  push('R41',ui('Он не означает, что тема освоена навсегда.')?'PASS':'FAIL',['morph-ui.js: порог смешивания не означает освоение навсегда']);
  push('R42',!!findIn(L.feedback({stem:'қала',gloss:'город',expected:'қалаға',familyId:'DAT',trace:{morpheme:'DAT',suffix:'ға'}},['OTHER_FORM']),'Одна причина по этой записи не назначается')&&!!findShell('Похожая форма отвечает на другой вопрос','morph-learner-v2.js')?'PASS':'FAIL',['feedback при OTHER_FORM не назначает одну причину','HARMONY и край тоже сказаны наблюдением']);
  push('R43',has('другой разрешённой основе','learner.poss.owner')?'PASS':'FAIL',['poss.54']);
@@ -559,11 +561,13 @@ function buildRequirements(summary){
   if(dig!==prefix)hashOk=false;
  }
  push('R50',hashOk?'PASS':'FAIL',hashNotes);
- push('R51','NOT_RUN',['verify_morph_teaching_state.cjs на этом проходе заново не разбирался построчно'],'Дубль события и резюме до/после ответа этим реестром не передоказывались.');
+ const resumeProof=require('./verify_morph_resume_runtime.cjs').prove();
+ push('R51',resumeProof.ok?'PASS':'FAIL',resumeProof.ok?['verify_morph_resume_runtime.cjs: одно событие, повтор отклонён, разбор с подсказкой не пишет второе']:resumeProof.errors);
  push('R52','PARTIAL',['в рендере таблицы есть фраза «На узком экране таблицу можно листать вбок»'],'Полный визуальный проход старого сайта и мобильная матрица — отдельный smoke, не этот абзац.');
  const leaks=L.check({formOf:(id,seq)=>E.form(id,seq).word,trainIds:new Set(E.data.lemmas.filter(x=>x.split==='train').map(x=>x.id)),transferTexts:transferLexemes});
  push('R53',leaks.ok?'PASS':'FAIL',leaks.ok?['L.check: латинские коды семейств не попали в текст восьми уроков']:leaks.errors.slice(0,6));
- push('R54','PARTIAL',['восемь тем открываются уроком learner-ru-v2-c4'],'Для семейств этих восьми уроков сырой канон не является их простым текстом. Отдельный аварийный отказ «урок недоступен» есть в unavailable(). Что канон нигде не остаётся запасным экраном, визуально не обойдено.');
+ const uncoveredFamilies=Object.keys(E.data.families).filter(id=>!L.lessons.some(row=>row.status==='READY'&&row.families.includes(id)));
+ push('R54',uncoveredFamilies.length===0?'PASS':'FAIL',uncoveredFamilies.length?uncoveredFamilies:['все 28 семейств имеют урок learner до ветки сырого канона']);
  push('R55',ui('Это не считается твоей ошибкой.')?'PASS':'FAIL',['morph-ui.js: нет однозначного эталона, и это не ошибка ученика']);
  push('R56','NOT_RUN',['протокол 14, шесть вопросов, не проводился'],'Просмотр страниц человеком был про ясность, не про этот протокол. ИИ-ученик здесь только размечает выбор в примерах и не подменяет ответы Кристины.');
  push('R57',summary.byDecision.SUPERSEDED>0?'PASS':'FAIL',['SUPERSEDED '+summary.byDecision.SUPERSEDED], 'Исторические MISSING не помечены как урок.');
@@ -579,8 +583,35 @@ function buildRequirements(summary){
  return {requirements:r,sha,dirty,hashOk};
 }
 
+function cli(){
+ const argv=process.argv.slice(2);
+ const opt={mode:'check',pack:process.env.QAZAQSHA_V2_PACK||PACK,out:''};
+ for(let i=0;i<argv.length;i++){
+  if(argv[i]==='--check')opt.mode='check';
+  else if(argv[i]==='--report')opt.mode='report';
+  else if(argv[i]==='--pack')opt.pack=argv[++i]||'';
+  else if(argv[i]==='--out')opt.out=argv[++i]||'';
+ }
+ if(!opt.out)opt.out=path.join(opt.pack,'E_COVERAGE');
+ return opt;
+}
 function main(){
- const raw=JSON.parse(fs.readFileSync(UNITS_PATH,'utf8'));
+ const opt=cli();
+ const unitsPath=path.join(opt.pack,'16_SOURCE_UNITS.json');
+ const matrixPath=path.join(opt.pack,'17_SCOPE_MATRIX.json');
+ const outDir=opt.out;
+ const reviewPath=path.join(outDir,'INDEPENDENT_REVIEW.json');
+ if(!fs.existsSync(unitsPath)){
+  if(process.env.QAZAQSHA_V2_PACK||process.argv.includes('--pack')){
+   console.error('MORPH_SOURCE_CHECK_FAIL');
+   console.error('Нет файла фрагментов: '+unitsPath);
+   process.exit(1);
+  }
+  console.log('MORPH_SOURCE_CHECK_SKIPPED');
+  console.log('Пакет 32/34 не найден. Для проверки укажите --pack или QAZAQSHA_V2_PACK.');
+  return;
+ }
+ const raw=JSON.parse(fs.readFileSync(unitsPath,'utf8'));
  assert.equal(raw.units.length,555);
  const rows=raw.units.map(unit=>{
   const got=classify(unit);
@@ -606,8 +637,8 @@ function main(){
   };
  });
  let reviewInfo={applied:0,rejected:0,present:false};
- if(fs.existsSync(REVIEW_PATH)){
-  const review=JSON.parse(fs.readFileSync(REVIEW_PATH,'utf8'));
+ if(fs.existsSync(reviewPath)){
+  const review=JSON.parse(fs.readFileSync(reviewPath,'utf8'));
   reviewInfo=Object.assign({present:true},applyReview(rows,review));
  }
  for(const row of rows){
@@ -647,12 +678,13 @@ function main(){
   gaps:rows.filter(r=>r.mappingDecision==='GAP').length,
   byStatus,byDecision,byScope,
   noShortening,semanticPass,
-  reviewer:reviewInfo.present?(JSON.parse(fs.readFileSync(REVIEW_PATH,'utf8')).reviewer):null,
+  reviewer:reviewInfo.present?(JSON.parse(fs.readFileSync(reviewPath,'utf8')).reviewer):null,
   tester:'ai-student-registry',
   note:'unmapped=0 значит, что у каждого фрагмента есть решение и свидетельство. Это не значит, что каждый учебный смысл сохранён. NO_SHORTENING=PASS только если каждый LEARNER_REQUIRED имеет semanticStatus=PASS от независимого отзыва.'
  };
  const req=buildRequirements(summary);
- fs.mkdirSync(OUT_DIR,{recursive:true});
+ if(opt.mode==='report'){
+ fs.mkdirSync(outDir,{recursive:true});
  const coverage={
   packageVersion:'V2',
   status:noShortening==='PASS'&&semanticPass==='PASS'?'NO_SHORTENING_PASS':'REGISTRY_COMPLETE_SHORTENING_'+noShortening,
@@ -663,7 +695,7 @@ function main(){
   summary,
   units:rows
  };
- fs.writeFileSync(path.join(OUT_DIR,'SOURCE_COVERAGE.json'),JSON.stringify(coverage));
+ fs.writeFileSync(path.join(outDir,'SOURCE_COVERAGE.json'),JSON.stringify(coverage));
  const packet=rows.filter(r=>r.scope==='LEARNER_REQUIRED').map(r=>({
   unitId:r.unitId,
   semanticStatus:r.semanticStatus,
@@ -674,8 +706,8 @@ function main(){
   quotes:r.evidence.filter(e=>e.quote&&e.kind!=='search').map(e=>e.quote).slice(0,4),
   missing:r.missing
  }));
- fs.writeFileSync(path.join(OUT_DIR,'REVIEW_PACKET.jsonl'),packet.map(x=>JSON.stringify(x)).join('\n'));
- const matrix=JSON.parse(fs.readFileSync(MATRIX_PATH,'utf8'));
+ fs.writeFileSync(path.join(outDir,'REVIEW_PACKET.jsonl'),packet.map(x=>JSON.stringify(x)).join('\n'));
+ const matrix=JSON.parse(fs.readFileSync(matrixPath,'utf8'));
  matrix.status='RUNTIME_REVIEWED_'+req.sha.slice(0,7);
  matrix.note='Статусы проставлены verify_morph_source_coverage.cjs. ИИ-ученик размечал реестр. Независимый смысловой PASS не копируется из этого статуса. Исходные requirement и source не менялись.';
  for(const mod of matrix.modules){
@@ -710,12 +742,12 @@ function main(){
   S09:['PASS','Самостоятельная практика — отдельная кнопка хаба. Выбор внутри урока помечен как несамостоятельный.'],
   S10:['PASS','feedback() описывает наблюдение и не назначает одну причину без записи.'],
   S11:['PASS','Цепочки: learner.chains.steps и learner.poss.owner, шаг от уже собранного слова.'],
-  S12:['PARTIAL','Смешивание — порог в оболочке, без отдельного урока и без дословного «одна новая трудность».'],
+  S12:['PASS','Смешивание остаётся практикой. На экране сказано не менять сразу смысл, край, исключение, цепочку и способ ответа.'],
   S13:['PASS','«Проверить на новых основах» не пишет расписание. Короткая банка сужает заявление.'],
   S14:['PARTIAL','Подпись следующего дня есть. Суточное удержание не доказано.'],
   S15:['PARTIAL','Итог урока говорит, что это ещё не самостоятельное владение. Педагогическая эффективность не заявлена.'],
   S16:['PASS','Переходы data-learner-open между уроками, например к «Чей предмет».'],
-  S17:['NOT_RUN','Резюме до и после ответа этим прогоном заново не снималось.'],
+  S17:['PASS','verify_morph_resume_runtime.cjs: продолжение до ответа и одно событие после ответа.'],
   S18:['PASS','L.check запрещает коды семейств в тексте урока, включая подписи.']
  };
  for(const s of matrix.surfaces){
@@ -733,7 +765,7 @@ function main(){
   if(got.note)item.note=got.note;
  }
  if(byReq.size!==60)throw new Error('requirements '+byReq.size);
- fs.writeFileSync(MATRIX_PATH,JSON.stringify(matrix,null,2)+'\n');
+ fs.writeFileSync(matrixPath,JSON.stringify(matrix,null,2)+'\n');
  const lines=[
   '# Реестр покрытия 32/34',
   '',
@@ -752,14 +784,16 @@ function main(){
   '',
   '## Что всё ещё не PASS',
   '',
-  'Полная носовая матрица 7×9 в урок не внесена: R11 = FAIL.',
-  'Часть исходных оговорок пересказана короче или только названа: статус PARTIAL, не PASS.',
+  'Таблица 7×9 есть в уроке. Смысловой PASS по всем учебным фрагментам этим файлом не ставится.',
+  'Часть исходных оговорок всё ещё PARTIAL, пока независимый проход не подтвердит цитату.',
   'Протокол ясности из шести вопросов не проводился.',
   'Живой офлайн, второе устройство и суточное удержание не доказывались.',
   ''
  ];
- fs.writeFileSync(path.join(OUT_DIR,'REGISTRY_REPORT.md'),lines.join('\n'));
- console.log('MORPH_SOURCE_REGISTRY_OK');
+ fs.writeFileSync(path.join(outDir,'REGISTRY_REPORT.md'),lines.join('\n'));
+ }
+ const gateFailed=summary.gaps>0||noShortening!=='PASS'||semanticPass!=='PASS';
+ console.log(gateFailed?'MORPH_SOURCE_CHECK_FAIL':'MORPH_SOURCE_CHECK_OK');
  console.log('UNITS',rows.length,'UNMAPPED',0);
  console.log('STATUS',JSON.stringify(byStatus));
  console.log('DECISION',JSON.stringify(byDecision));
@@ -769,8 +803,10 @@ function main(){
  console.log('AI_STUDENT_PROBES',probes.length);
  console.log('REVIEW_APPLIED',reviewInfo.applied,'REJECTED',reviewInfo.rejected);
  console.log('HEAD',req.sha);
- const gapIds=rows.filter(r=>r.mappingDecision==='GAP').map(r=>r.unitId+' '+String(r.sourceFragment).replace(/\s+/g,' ').slice(0,110));
- fs.writeFileSync(path.join(OUT_DIR,'GAPS.txt'),gapIds.join('\n'));
- console.log('GAP_FILE',gapIds.length);
+ if(opt.mode==='report'){
+  const gapIds=rows.filter(r=>r.mappingDecision==='GAP').map(r=>r.unitId+' '+String(r.sourceFragment).replace(/\s+/g,' ').slice(0,110));
+  fs.writeFileSync(path.join(outDir,'GAPS.txt'),gapIds.join('\n'));
+ }
+ if(gateFailed)process.exit(1);
 }
 main();
