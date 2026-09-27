@@ -209,6 +209,9 @@ const ANCHORS={
  'SRC34-0212':{file:'morph-ui.js',needles:['нельзя объединять в одно правило'],decision:'REPHRASED'},
  'SRC32-0049':{lesson:'learner.nasal.senses',needles:['адаммен не превращается в форму с а'],decision:'REPHRASED'},
  'SRC32-0258':{file:'morph-ui.js',needles:['разбор появляется после первой попытки','разбор идёт после блока'],decision:'REPHRASED'},
+ 'SRC32-0284':{file:'morph-ui.js',needles:['без обязательного секундомера'],decision:'REPHRASED'},
+ 'SRC34-0027':{lesson:'learner.poss.owner',needles:['оно стоит концом на самой вещи'],decision:'REPHRASED'},
+ 'SRC34-0181':{lesson:'learner.verbs.steps',needles:['стоит в цепочке перед главным действием'],decision:'REPHRASED'},
  'SRC32-0153':{file:'morph-learner-v2.js',needles:['Буква а/е или ы/і в добавке не совпала'],decision:'REPHRASED'},
  'SRC32-0168':{lesson:'learner.nasal.senses',needles:['Нельзя сказать «после м, н или ң всегда н»'],decision:'REPHRASED'},
  'SRC32-0177':{file:'morph-engine.js',needles:['Сказуемые я, мы, ты и вы здесь не оцениваются'],decision:'REPHRASED',partial:true,missing:['Оговорка лежит в служебной заметке движка. Отдельной ученической карточкой на экране она не повторена.']},
@@ -603,10 +606,11 @@ function main(){
  const unitsPath=path.join(opt.pack,'16_SOURCE_UNITS.json');
  const matrixPath=path.join(opt.pack,'17_SCOPE_MATRIX.json');
  const outDir=opt.out;
+ const round5=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','30_INDEPENDENT_REVIEW.json');
  const round4=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','29_INDEPENDENT_REVIEW.json');
  const round3=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','28_INDEPENDENT_REVIEW.json');
  const round2=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','26_INDEPENDENT_REVIEW.json');
- const reviewPath=fs.existsSync(round4)?round4:(fs.existsSync(round3)?round3:(fs.existsSync(round2)?round2:path.join(outDir,'INDEPENDENT_REVIEW.json')));
+ const reviewPath=fs.existsSync(round5)?round5:(fs.existsSync(round4)?round4:(fs.existsSync(round3)?round3:(fs.existsSync(round2)?round2:path.join(outDir,'INDEPENDENT_REVIEW.json'))));
  if(!fs.existsSync(unitsPath)){
   if(process.env.QAZAQSHA_V2_PACK||process.argv.includes('--pack')){
    console.error('MORPH_SOURCE_CHECK_FAIL');
