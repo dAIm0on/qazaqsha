@@ -14,7 +14,8 @@ for(const text of [L.feedback(dat,['ONSET_CLASS']),L.feedback(poss,['STEM_CHANGE
   assert.equal(forbidden.test(text),false,text);
   assert.equal(text.includes('POSS'),false);
 }
-assert.equal(L.feedback(E.itemFor('n-қала',['LOC']),[]),null);
+assert.equal(typeof L.feedback(E.itemFor('n-қала',['LOC']),[]),'string');
+assert.equal(L.feedback(E.itemFor('v-кел',['PAST']),[]),null);
 assert.ok(L.unavailable().includes('временно недоступен'));
 assert.equal(L.unavailable().includes('MODULE'),false);
 const missing=L.render({id:'x',title:'Нет',blocks:[]},'full');

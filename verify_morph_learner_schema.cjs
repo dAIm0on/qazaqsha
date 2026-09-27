@@ -7,7 +7,8 @@ const transferTexts=E.data.lemmas.filter(l=>l.split==='transfer').map(l=>l.text)
 const opts={formOf:(id,seq)=>E.form(id,seq).word,trainIds,transferTexts};
 const report=L.check(opts);
 assert.equal(report.ok,true,report.errors.join('\n'));
-assert.equal(L.version,'learner-ru-v2-b');
+assert.equal(L.version,'learner-ru-v2-c1');
+assert.equal(L.lessons.length,5);
 for(const row of L.lessons){
   assert.equal(row.status,'READY');
   assert.ok(row.blocks.every(b=>b.id&&b.type&&b.slot));

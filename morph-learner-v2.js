@@ -1,12 +1,15 @@
 (function(root){
 'use strict';
-const VERSION='learner-ru-v2-b';
+const VERSION='learner-ru-v2-c1';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABELS={
  PL:'несколько',
  DAT:'куда или кому',
  LOC:'где',
  ABL:'откуда',
+ GEN:'чей или чего',
+ ACC:'кого или что именно',
+ INS:'чем или с кем',
  POSS_1SG:'мой, моя',
  POSS_2SG:'твой, твоя',
  POSS_1PL:'наш, наша',
@@ -28,8 +31,9 @@ function openTarget(item){
  const seq=Array.isArray(item.sequence)?item.sequence:[];
  const id=item.morpheme||item.familyId||seq.at(-1);
  if(seq.some(x=>String(x).startsWith('POSS_'))||String(id||'').startsWith('POSS_'))return lessonTarget('learner.poss.owner');
- if(seq.includes('DAT')||id==='DAT')return lessonTarget('learner.dat.kuda');
- return null;
+ const byFamily={DAT:'learner.dat.kuda',LOC:'learner.loc.where',PL:'learner.pl.several',GEN:'learner.nasal.senses',ACC:'learner.nasal.senses',ABL:'learner.nasal.senses',INS:'learner.nasal.senses'};
+ const lessonId=byFamily[id]||seq.map(x=>byFamily[x]).find(Boolean);
+ return lessonId?lessonTarget(lessonId):null;
 }
 function operation(item){
  if(!item)return null;
@@ -41,6 +45,9 @@ function operation(item){
 }
 function supportLine(id){
  if(id==='DAT')return 'Сначала реши: куда или кому. Потом подбери конец слова. Это опора, не самостоятельный ответ.';
+ if(id==='LOC')return 'Сначала реши: где уже находится. Потом подбери конец. Это опора, не самостоятельный ответ.';
+ if(id==='PL')return 'Сначала реши: несколько предметов. Потом выбери л, д или т и букву а или е. Это опора, не самостоятельный ответ.';
+ if(id==='GEN'||id==='ACC'||id==='ABL'||id==='INS')return 'Сначала реши, что хочешь сказать. Одинаковый конец слова не даёт одно окончание на все вопросы. Это опора, не самостоятельный ответ.';
  if(String(id||'').startsWith('POSS_'))return 'Сначала реши, чей это предмет. Потом посмотри на конец слова. Это опора, не самостоятельный ответ.';
  return null;
 }
@@ -52,7 +59,7 @@ function traceOf(item){
 function feedback(item,codes){
  const step=traceOf(item);if(!step)return null;
  const id=step.morpheme||item.familyId||item.morpheme;
- if(id!=='DAT'&&!String(id||'').startsWith('POSS_'))return null;
+ if(!label(id))return null;
  const name=label(id)||'это значение';
  const bits=['Для значения «'+name+'» у слова '+item.stem+' («'+item.gloss+'») здесь получается '+item.expected+'.'];
  if(step.changed&&step.before&&step.stem)bits.push('Перед добавкой слово меняется: '+step.before+' → '+step.stem+'.');
@@ -61,6 +68,7 @@ function feedback(item,codes){
  if(list.includes('HARMONY'))bits.push('Буква а/е или ы/і в добавке не совпала с этим словом.');
  if(list.includes('ONSET_CLASS'))bits.push('Первая буква добавки не подходит к концу этого слова.');
  if(list.includes('MORPH_STATE'))bits.push('Форма уже показывает, чья это вещь. Здесь не обычное окончание от первого слова.');
+ if(list.includes('CATEGORY'))bits.push('Похожая форма отвечает на другой вопрос. Сначала реши, что нужно сказать.');
  if(list.includes('OTHER_FORM'))bits.push('Ответ не совпал с нужной формой. Одна причина по этой записи не назначается.');
  return bits.join(' ');
 }
@@ -109,7 +117,7 @@ const TYPES=new Set(['paragraph','subheading','list','ordered-list','example','c
 function check(opts){
  const errors=[],formOf=opts&&opts.formOf,trainIds=opts&&opts.trainIds,transferTexts=opts&&opts.transferTexts||[],rows=opts&&opts.lessons||LESSONS;
  const seen=new Set();
- if(!opts||!opts.lessons){if(rows.length!==2)errors.push('expected two ready lessons');}
+ if(!opts||!opts.lessons){if(rows.length!==5)errors.push('expected five ready lessons');}
  for(const row of rows){
   if(row.status!=='READY')errors.push(row.id+' not ready');
   if(seen.has(row.id))errors.push('duplicate '+row.id);seen.add(row.id);
@@ -269,6 +277,103 @@ const possBlocks=[
  {id:'poss.77',slot:'contrast',type:'subheading',text:'Что не перепутать'},
  {id:'poss.78',slot:'contrast',type:'list',items:['үйім — мой дом, үйің — твой дом','кітабым — моя книга, кітабы — его или её книга','кітапқа — к книге, кітабына — к его или её книге','орын → орны, но орын → орында']}
 ];
+const locBlocks=[
+ {id:'loc.1',slot:'opening',type:'subheading',text:'Где он уже'},
+ {id:'loc.2',slot:'opening',type:'paragraph',text:'Человек уже в городе, не в дороге. Мы говорим, где он находится.'},
+ {id:'loc.3',slot:'opening',type:'example',lemmaId:'n-қала',sequence:['LOC'],before:'қала',beforeRu:'город',added:'-да',after:'қалада',afterRu:'в городе'},
+ {id:'loc.4',slot:'opening',type:'paragraph',text:'В русском «город» стало «в городе». В казахском к қала добавили -да. Это место, где он уже есть.'},
+ {id:'loc.5',slot:'opening',type:'warning',text:'Русское «в» здесь не равно добавке «куда». «В городе» — қалада. «В город», когда человек ещё идёт, — қалаға.'},
+ {id:'loc.6',slot:'opening',type:'subheading',text:'Три места'},
+ {id:'loc.7',slot:'opening',type:'table',caption:'Где уже находится',headers:['Было','Что добавили','Получилось','По-русски'],rows:[['қала — город','-да','қалада','в городе'],['үй — дом','-де','үйде','в доме'],['мектеп — школа','-те','мектепте','в школе']]},
+ {id:'loc.8',slot:'contrast',type:'table',caption:'Сначала вопрос, потом конец',headers:['Вопрос','Форма','Смысл'],rows:[['Где?','қалада','в городе'],['Куда?','қалаға','в город'],['Откуда?','қаладан','из города']]},
+ {id:'loc.9',slot:'contrast',type:'example',lemmaId:'n-қала',sequence:['DAT'],before:'қала',beforeRu:'город',added:'-ға',after:'қалаға',afterRu:'в город'},
+ {id:'loc.10',slot:'contrast',type:'example',lemmaId:'n-қала',sequence:['ABL'],before:'қала',beforeRu:'город',added:'-дан',after:'қаладан',afterRu:'из города'},
+ {id:'loc.11',slot:'full',type:'subheading',text:'Два выбора'},
+ {id:'loc.12',slot:'full',type:'paragraph',text:'Для обычных слов этого урока конец бывает -да, -де, -та, -те. Сначала а или е. Потом д или т.'},
+ {id:'loc.13',slot:'full',type:'paragraph',text:'а, о, ұ, ы → в добавке а. ә, ө, ү, і, е → в добавке е. қалада: в слове а. үйде: в слове ү. мектепте: в слове е.'},
+ {id:'loc.14',slot:'full',type:'paragraph',text:'Если слово заканчивается на гласный, на й или на обычный неглухой звук, первая буква добавки д: қалада, үйде, адамда. Если конец глухой, первая буква т.'},
+ {id:'loc.15',slot:'full',type:'table',caption:'В этом наборе т после таких концов',headers:['Конец','Пример','Добавка','Получилось'],rows:[['п','кітап — книга','-та','кітапта'],['п','мектеп — школа','-те','мектепте'],['т','ат — имя','-та','атта']]},
+ {id:'loc.16',slot:'full',type:'paragraph',text:'Ат в карточке тренажёра значит «имя», поэтому атта — «в имени». Буквы к, қ и с у обычных слов этой группы тоже берут вариант с т. Буквы б, в, г, д сами по себе не дают это правило: у части заимствованных слов класс записан отдельно.'},
+ {id:'loc.17',slot:'full',type:'warning',text:'Буквы и и у не решают ряд сами. В этом наборе су — вода и тау — гора уже имеют проверенный класс. Другие такие слова по одной последней букве не угадываем.'},
+ {id:'loc.18',slot:'full',type:'subheading',text:'Вместе'},
+ {id:'loc.19',slot:'full',type:'paragraph',text:'Человек уже в школе. 1. Вопрос «где?». 2. Слово мектеп, «школа». 3. В слове е. 4. Конец п, поэтому т. 5. мектеп + те → мектепте.'},
+ {id:'loc.20',slot:'full',type:'try',prompt:'Человек уже в школе. Что выбрать?',options:['мектепте','мектепке'],answer:'мектепте',good:'мектепте — в школе.',bad:'мектепке — в школу, когда туда идут. Сейчас он уже там: мектепте.'},
+ {id:'loc.21',slot:'full',type:'subheading',text:'Когда форма уже «его или её»'},
+ {id:'loc.22',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['POSS_3','LOC'],before:'кітап',beforeRu:'книга',added:'-нда после кітабы',after:'кітабында',afterRu:'в его или её книге'},
+ {id:'loc.23',slot:'full',type:'paragraph',text:'кітапта — в книге. кітабында — в его или её книге. После формы «его или её» здесь -нда или -нде, не обычное -да. Подробный разбор принадлежности в теме «Чей предмет».'},
+ {id:'loc.24',slot:'full',type:'link',lessonId:'learner.poss.owner',text:'Открыть разбор «Чей предмет»'},
+ {id:'loc.25',slot:'full',type:'warning',text:'В полном описании у этого вопроса есть и значение «когда». В заданиях этого урока спрашиваем, где уже находится человек или предмет. Время сюда само не подставляем.'},
+ {id:'loc.26',slot:'full',type:'term',text:'В учебниках это местный падеж. Название для первого ответа не нужно.'}
+];
+const plBlocks=[
+ {id:'pl.1',slot:'opening',type:'subheading',text:'Несколько, не один'},
+ {id:'pl.2',slot:'opening',type:'paragraph',text:'Один ребёнок — бала. Несколько детей — балалар. Сначала решаем, что предметов несколько. Потом выбираем конец.'},
+ {id:'pl.3',slot:'opening',type:'example',lemmaId:'n-бала',sequence:['PL'],before:'бала',beforeRu:'ребёнок',added:'-лар',after:'балалар',afterRu:'дети'},
+ {id:'pl.4',slot:'opening',type:'example',lemmaId:'n-кітап',sequence:['PL'],before:'кітап',beforeRu:'книга',added:'-тар',after:'кітаптар',afterRu:'книги'},
+ {id:'pl.5',slot:'opening',type:'example',lemmaId:'n-адам',sequence:['PL'],before:'адам',beforeRu:'человек',added:'-дар',after:'адамдар',afterRu:'люди'},
+ {id:'pl.6',slot:'opening',type:'paragraph',text:'Смысл один: несколько. Концы разные: -лар, -тар, -дар. Таблица ниже относится только к этому смыслу. Её нельзя переносить на «чей», «кого» или «откуда».'},
+ {id:'pl.7',slot:'full',type:'subheading',text:'Шесть концов, два выбора'},
+ {id:'pl.8',slot:'full',type:'paragraph',text:'Письменных вариантов шесть: лар, лер, дар, дер, тар, тер. Сначала л, д или т. Потом а или е.'},
+ {id:'pl.9',slot:'full',type:'paragraph',text:'а, о, ұ, ы → а. ә, ө, ү, і, е → е. балалар с а. әкелер с е: әке — отец.'},
+ {id:'pl.10',slot:'full',type:'table',caption:'Семь групп конца. Р и л здесь не одно и то же',headers:['Чем кончается слово','Задний ряд, буква а','Передний ряд, буква е'],rows:[['гласный','балалар — дети','әкелер — отцы'],['й или у','таулар — горы','үйлер — дома'],['р','қарлар — снега','жерлер — земли'],['л','жолдар — дороги','көлдер — озёра'],['м, н или ң','адамдар — люди','әндер — песни'],['з или ж','қыздар — девушки','сөздер — слова'],['глухой: п, к, қ, т, с','кітаптар — книги','мектептер — школы']]},
+ {id:'pl.11',slot:'full',type:'warning',text:'После р берём л: қарлар, жерлер. После л берём д: жолдар, көлдер. Не меняй эти две строки местами.'},
+ {id:'pl.12',slot:'full',type:'paragraph',text:'Глухой конец в этом наборе: п, к, қ, т, с. Поэтому кітаптар и мектептер. У кітап перед -тар буква п остаётся п. Это не то изменение, которое бывает в «моя книга».'},
+ {id:'pl.13',slot:'full',type:'subheading',text:'Эта таблица только про «несколько»'},
+ {id:'pl.14',slot:'full',type:'paragraph',text:'Одно и то же слово адам после м даёт разные концы, потому что вопросы разные. Несколько людей — адамдар. Чей, от человека как владельца — адамның. От человека, откуда — адамнан. Не говори «после м всегда д» и не говори «после м всегда н».'},
+ {id:'pl.15',slot:'full',type:'example',lemmaId:'n-адам',sequence:['GEN'],before:'адам',beforeRu:'человек',added:'-ның',after:'адамның',afterRu:'человека, чей'},
+ {id:'pl.16',slot:'full',type:'example',lemmaId:'n-адам',sequence:['ABL'],before:'адам',beforeRu:'человек',added:'-нан',after:'адамнан',afterRu:'от человека'},
+ {id:'pl.17',slot:'full',type:'try',prompt:'Нужно сказать «дети», несколько. Что выбрать?',options:['балалар','балаға'],answer:'балалар',good:'балалар — дети.',bad:'балаға — ребёнку или к ребёнку. Для нескольких детей нужно балалар.'},
+ {id:'pl.18',slot:'full',type:'term',text:'В учебниках это множественное число. Название для первого ответа не нужно.'},
+ {id:'pl.19',slot:'contrast',type:'list',items:['балалар — несколько детей','балаға — ребёнку','адамдар — несколько людей','адамның — человека, когда он владелец','қарлар — после р буква л','жолдар — после л буква д']}
+];
+const nasalBlocks=[
+ {id:'nas.1',slot:'opening',type:'subheading',text:'Сначала вопрос'},
+ {id:'nas.2',slot:'opening',type:'paragraph',text:'Слово адам кончается на м. От этого м не появляется одно окончание на все случаи. Сначала решаем, что хотим сказать.'},
+ {id:'nas.3',slot:'opening',type:'table',caption:'Один человек, разные вопросы',headers:['Что хотим сказать','Форма','По-русски'],rows:[['несколько','адамдар','люди'],['чей, от кого как владельца','адамның','человека'],['кого именно','адамды','этого человека'],['где','адамда','у человека'],['откуда, от кого','адамнан','от человека'],['с кем','адаммен','с человеком']]},
+ {id:'nas.4',slot:'opening',type:'warning',text:'Нельзя сказать «после м, н или ң всегда н» или «всегда д». Ответ зависит от вопроса.'},
+ {id:'nas.5',slot:'full',type:'subheading',text:'Чей или чего'},
+ {id:'nas.6',slot:'full',type:'paragraph',text:'Здесь называем владельца или то, к чему относится вещь. баланың — ребёнка. Вместе с формой вещи: баланың кітабы — книга ребёнка. Кітабы здесь значит «его или её книга». Это не то же самое, что баласы — «его или её ребёнок», и не то же самое, что балам — «мой ребёнок».'},
+ {id:'nas.7',slot:'full',type:'example',lemmaId:'n-бала',sequence:['GEN'],before:'бала',beforeRu:'ребёнок',added:'-ның',after:'баланың',afterRu:'ребёнка'},
+ {id:'nas.8',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['POSS_3'],before:'кітап',beforeRu:'книга',added:'-ы, п меняется на б',after:'кітабы',afterRu:'его или её книга'},
+ {id:'nas.9',slot:'full',type:'example',lemmaId:'n-бала',sequence:['POSS_3'],before:'бала',beforeRu:'ребёнок',added:'-сы',after:'баласы',afterRu:'его или её ребёнок'},
+ {id:'nas.10',slot:'full',type:'paragraph',text:'Другие обычные концы этого вопроса: үйдің — дома, мектептің — школы, қаланың — города. Гласная а или е и первая буква н, д или т выбираются по слову. Сначала всё равно вопрос «чей или чего», не таблица «несколько».'},
+ {id:'nas.11',slot:'full',type:'example',lemmaId:'n-үй',sequence:['GEN'],before:'үй',beforeRu:'дом',added:'-дің',after:'үйдің',afterRu:'дома'},
+ {id:'nas.12',slot:'full',type:'example',lemmaId:'n-мектеп',sequence:['GEN'],before:'мектеп',beforeRu:'школа',added:'-тің',after:'мектептің',afterRu:'школы'},
+ {id:'nas.13',slot:'full',type:'example',lemmaId:'n-қала',sequence:['GEN'],before:'қала',beforeRu:'город',added:'-ның',after:'қаланың',afterRu:'города'},
+ {id:'nas.14',slot:'full',type:'subheading',text:'Кого или что именно'},
+ {id:'nas.15',slot:'full',type:'paragraph',text:'Речь об этой книге, не о книге вообще. кітапты — эту книгу. әнді — эту песню. Если предмет не определён, это окончание само не ставится. В задании этого урока всегда ясно: «эту» или «этого».'},
+ {id:'nas.16',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['ACC'],before:'кітап',beforeRu:'книга',added:'-ты',after:'кітапты',afterRu:'эту книгу'},
+ {id:'nas.17',slot:'full',type:'example',lemmaId:'n-ән',sequence:['ACC'],before:'ән',beforeRu:'песня',added:'-ді',after:'әнді',afterRu:'эту песню'},
+ {id:'nas.18',slot:'full',type:'example',lemmaId:'n-бала',sequence:['ACC'],before:'бала',beforeRu:'ребёнок',added:'-ны',after:'баланы',afterRu:'этого ребёнка'},
+ {id:'nas.19',slot:'full',type:'example',lemmaId:'n-адам',sequence:['ACC'],before:'адам',beforeRu:'человек',added:'-ды',after:'адамды',afterRu:'этого человека'},
+ {id:'nas.20',slot:'full',type:'warning',text:'адамның и адамды оба могут стоять рядом с человеком, но вопросы разные: «чей, кого как владельца» и «кого именно, этого».'},
+ {id:'nas.21',slot:'full',type:'subheading',text:'Откуда или от кого'},
+ {id:'nas.22',slot:'full',type:'paragraph',text:'Человек выходит из дома или получает вещь от кого-то. Первый слой: откуда, от кого, от чего. үйден — из дома. адамнан — от человека. қаладан — из города. мектептен — из школы.'},
+ {id:'nas.23',slot:'full',type:'example',lemmaId:'n-үй',sequence:['ABL'],before:'үй',beforeRu:'дом',added:'-ден',after:'үйден',afterRu:'из дома'},
+ {id:'nas.24',slot:'full',type:'example',lemmaId:'n-адам',sequence:['ABL'],before:'адам',beforeRu:'человек',added:'-нан',after:'адамнан',afterRu:'от человека'},
+ {id:'nas.25',slot:'full',type:'example',lemmaId:'n-қала',sequence:['ABL'],before:'қала',beforeRu:'город',added:'-дан',after:'қаладан',afterRu:'из города'},
+ {id:'nas.26',slot:'full',type:'example',lemmaId:'n-мектеп',sequence:['ABL'],before:'мектеп',beforeRu:'школа',added:'-тен',after:'мектептен',afterRu:'из школы'},
+ {id:'nas.27',slot:'full',type:'paragraph',text:'После м, н или ң в этом вопросе первая буква н: адамнан. Это не адамдар и не адамның.'},
+ {id:'nas.28',slot:'full',type:'subheading',text:'С кем'},
+ {id:'nas.29',slot:'full',type:'paragraph',text:'Человек идёт не один. адаммен — с человеком. Это совместность. Сначала учим её отдельно от средства.'},
+ {id:'nas.30',slot:'full',type:'example',lemmaId:'n-адам',sequence:['INS'],before:'адам',beforeRu:'человек',added:'-мен',after:'адаммен',afterRu:'с человеком'},
+ {id:'nas.31',slot:'full',type:'subheading',text:'Чем, с помощью чего'},
+ {id:'nas.32',slot:'full',type:'paragraph',text:'Другая ситуация: называем средство. сумен — водой, когда вода и есть средство. кітаппен — книгой. Окончание то же по виду, но задание должно прямо сказать «чем» или «с кем». По одной добавке эти два смысла не угадываем.'},
+ {id:'nas.33',slot:'full',type:'example',lemmaId:'n-су',sequence:['INS'],before:'су',beforeRu:'вода',added:'-мен',after:'сумен',afterRu:'водой'},
+ {id:'nas.34',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['INS'],before:'кітап',beforeRu:'книга',added:'-пен',after:'кітаппен',afterRu:'книгой'},
+ {id:'nas.35',slot:'full',type:'example',lemmaId:'n-мектеп',sequence:['INS'],before:'мектеп',beforeRu:'школа',added:'-пен',after:'мектеппен',afterRu:'школой'},
+ {id:'nas.36',slot:'full',type:'example',lemmaId:'n-қыз',sequence:['INS'],before:'қыз',beforeRu:'девушка',added:'-бен',after:'қызбен',afterRu:'с девушкой'},
+ {id:'nas.37',slot:'full',type:'warning',text:'В -мен, -бен и -пен буква е остаётся. адаммен не превращается в форму с а. После глухого конца п: кітаппен, мектеппен. После з буква б: қызбен. В остальных обычных случаях этого набора м: адаммен, сумен.'},
+ {id:'nas.38',slot:'full',type:'subheading',text:'Похожие слова, другой вопрос'},
+ {id:'nas.39',slot:'full',type:'paragraph',text:'Рядом с адам есть ещё три формы. адаммын — я человек. адамбыз — мы люди. адам ба — это вопрос «человек ли». Они не отвечают на «чей», «откуда» или «с кем». Пробел в адам ба обязателен: частица пишется отдельно.'},
+ {id:'nas.40',slot:'full',type:'example',lemmaId:'n-адам',sequence:['COP_1SG'],before:'адам',beforeRu:'человек',added:'-мын',after:'адаммын',afterRu:'я человек'},
+ {id:'nas.41',slot:'full',type:'example',lemmaId:'n-адам',sequence:['COP_1PL'],before:'адам',beforeRu:'человек',added:'-быз',after:'адамбыз',afterRu:'мы люди'},
+ {id:'nas.42',slot:'full',type:'example',lemmaId:'n-адам',sequence:['Q'],before:'адам',beforeRu:'человек',added:' ба',after:'адам ба',afterRu:'человек ли'},
+ {id:'nas.43',slot:'full',type:'try',prompt:'Нужно сказать «от человека». Что выбрать?',options:['адамнан','адамның','адамдар'],answer:'адамнан',good:'адамнан — от человека.',bad:'адамның — человека как владельца. адамдар — несколько людей. От человека: адамнан.'},
+ {id:'nas.44',slot:'full',type:'try',prompt:'Нужно сказать «с человеком», вместе. Что выбрать?',options:['адаммен','адам ба'],answer:'адаммен',good:'адаммен — с человеком.',bad:'адам ба — вопрос «человек ли». Вместе с человеком: адаммен.'},
+ {id:'nas.45',slot:'full',type:'term',text:'В учебниках у этих вопросов разные названия. Для первого ответа достаточно самого вопроса: чей, кого именно, откуда, с кем или чем.'},
+ {id:'nas.46',slot:'contrast',type:'list',items:['адамның — чей, владелец','адамды — этого человека','адамнан — от человека','адаммен — с человеком','адамдар — несколько людей','адаммын — я человек','адам ба — человек ли']}
+];
 const LESSONS=[
  {
   id:'learner.dat.kuda',
@@ -299,6 +404,51 @@ const LESSONS=[
   steps:['реши, чей предмет','посмотри на конец слова','выбери добавку','если внутри слова есть записанное изменение, примени только его','следующий шаг считай от уже получившейся формы'],
   requiredBlockIds:['poss.3','poss.28','poss.44','poss.49','poss.51','poss.60','poss.65','poss.73'],
   blocks:possBlocks
+ },
+ {
+  id:'learner.loc.where',
+  title:'Где он уже',
+  status:'READY',
+  contentVersion:VERSION,
+  modules:['harmony','voice'],
+  families:['LOC'],
+  home:{moduleId:'harmony',familyId:'LOC'},
+  sourceNotes:['32 D','32 E','34 место'],
+  renderTargets:['teaching.meaning','teaching.full','teaching.contrast','practice.feedback','practice.operation'],
+  lookAt:['вопрос «где», человек или предмет уже там','какая гласная группа','глухой ли конец','не форма ли это уже «его или её»'],
+  steps:['реши, где уже находится','возьми слово и перевод','выбери а или е','выбери д или т','если форма уже «его или её», открой отдельный разбор'],
+  requiredBlockIds:['loc.3','loc.7','loc.8','loc.15','loc.20','loc.22','loc.25'],
+  blocks:locBlocks
+ },
+ {
+  id:'learner.pl.several',
+  title:'Несколько предметов',
+  status:'READY',
+  contentVersion:VERSION,
+  modules:['plural'],
+  families:['PL'],
+  home:{moduleId:'plural',familyId:'PL'},
+  sourceNotes:['32 F','34 множественное'],
+  renderTargets:['teaching.meaning','teaching.full','teaching.contrast','practice.feedback','practice.operation'],
+  lookAt:['нужно несколько предметов','группа конца: гласный, й или у, р, л, м н ң, з ж, глухой','буква а или е','эта таблица только для «несколько»'],
+  steps:['убедись, что предметов несколько','выбери л, д или т','выбери а или е','собери слово'],
+  requiredBlockIds:['pl.3','pl.10','pl.11','pl.14','pl.17'],
+  blocks:plBlocks
+ },
+ {
+  id:'learner.nasal.senses',
+  title:'Похожий конец, другой вопрос',
+  status:'READY',
+  contentVersion:VERSION,
+  modules:['nasal'],
+  families:['GEN','ACC','ABL','INS'],
+  home:{moduleId:'nasal',familyId:'GEN'},
+  sourceNotes:['32 G','34 §§3–6'],
+  renderTargets:['teaching.meaning','teaching.full','teaching.contrast','practice.feedback','practice.operation'],
+  lookAt:['какой вопрос: чей, кого именно, откуда, с кем или чем','конец слова','таблица именно этого вопроса','не таблица «несколько»'],
+  steps:['назови вопрос','возьми слово и перевод','выбери добавку этой группы','не переноси правило соседнего вопроса'],
+  requiredBlockIds:['nas.3','nas.6','nas.16','nas.24','nas.30','nas.32','nas.37','nas.39','nas.43'],
+  blocks:nasalBlocks
  }
 ];
 const api={version:VERSION,lessons:LESSONS,label,forFamily,lessonTarget,openTarget,operation,supportLine,feedback,chainNote,render,unavailable,visibleText,check};
