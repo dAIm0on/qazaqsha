@@ -571,6 +571,43 @@ function stage7Evidence(state){
  return {guided,corrections,independentChoice,independentInput,moduleCompleted:teaching.some(e=>e.type==='teaching_module_completed'),uniqueLemmas:lemmas.size,errorJunctions:wrong.map(e=>e.familyId).filter(Boolean)};
 }
 
-const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6RewriteHint,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule,STAGE7_MODULE,STAGE7_GUIDED,stage7Spec,stage7MeaningReady,stage7MissingMeaning,stage7Owner,stage7PrerequisitesReady,stage7MissingPrerequisite,stage7Ready,stage7View,stage7Errors,stage7Feedback,stage7Support,stage7RepairFor,stage7GuidedPlan,stage7IndependentPlan,createStage7Run,stage7Current,stage7Evidence,stage7Works,STAGE8_SEMANTIC,stage8Spec,stage8PrerequisitesReady,stage8MissingPrerequisite,stage8Context,stage8GuidedPlan,stage8IndependentPlan,createStage8Run,STAGE9_THRESHOLD,STAGE9_CONTRASTS,stage9Assess,stage9Status,stage9Eligible,stage9Queue,stage9Repair,stage9RaisesAllAxes,stage9Pool,STAGE10_DELAY,STAGE10_SHORT_BANK,stage10WilsonLower,stage10StrongClaim,stage10StrongFromEvents,stage10Retention,stage10ContaminatedLemmas};
+function pilotAnswerRows(state){return (state?.events||[]).filter(e=>e&&e.modality!=='audio'&&e.scored!==false);}
+function pilotFirstIndependent(rows){
+ const seen=new Set(),out=[];
+ for(const e of rows.filter(e=>e.mode!=='transfer'&&!e.transfer&&e.hinted!==true)){
+  const key=e.itemId||e.eventId;if(!key||seen.has(key))continue;seen.add(key);out.push(e);
+ }
+ return out;
+}
+function pilotErrorCounts(rows){
+ const counts={};
+ for(const e of rows)if(e.correct===false)for(const code of e.errorCodes||[])counts[code]=(counts[code]||0)+1;
+ return counts;
+}
+function pilotRepeatedError(rows){
+ const seen=new Map();let n=0;
+ for(const e of [...rows].filter(e=>e.correct===false).sort((a,b)=>(a.at||0)-(b.at||0))){
+  for(const code of e.errorCodes||[]){
+   const prev=seen.get(code);
+   if(prev&&prev!==e.lemmaId)n++;
+   if(!prev&&e.lemmaId)seen.set(code,e.lemmaId);
+  }
+ }
+ return n;
+}
+function pilotPublicEvent(e){
+ return {eventId:e.eventId||'',at:e.at||0,type:e.type||'',itemId:e.itemId||'',lemmaId:e.lemmaId||'',familyId:e.familyId||'',sequence:e.sequence||[],level:e.level||'',mode:e.mode||'',responseMode:e.responseMode||'',correct:e.correct===true,hinted:e.hinted===true,errorCodes:e.errorCodes||[],transfer:!!(e.transfer||e.mode==='transfer')};
+}
+function pilotSummary(state){
+ const rows=pilotAnswerRows(state),first=pilotFirstIndependent(rows),transfer=rows.filter(e=>e.transfer||e.mode==='transfer'),hinted=rows.filter(e=>e.hinted===true);
+ const claim=stage10StrongFromEvents(transfer),retention=stage10Retention(rows);
+ const narrow=first.length<8?'мало данных':'описательный итог, не доказательство метода';
+ return {n:first.length,correct:first.filter(e=>e.correct===true).length,uniqueLemmas:new Set(first.map(e=>e.lemmaId).filter(Boolean)).size,families:[...new Set(first.map(e=>e.sequence&&e.sequence.at(-1)).filter(Boolean))],hintedAnswers:hinted.length,hintRate:rows.length?hinted.length/rows.length:0,errorCounts:pilotErrorCounts(rows),repeatedErrorOnOtherLemma:pilotRepeatedError(rows),transfer:{n:transfer.length,status:claim.status,pass:false},retention:{count:retention.count,label:retention.label},claim:narrow,audioRecordings:0};
+}
+function pilotExport(state){
+ const teaching=(state?.teaching?.events||[]).filter(e=>e&&e.modality!=='audio');
+ return {kind:'qazaqsha-morph-pilot',privacy:'без имени, без микрофона и без аудиозаписи',dataVersion:state?.dataVersion||'',contentVersion:state?.teaching?.contentVersion||'',events:pilotAnswerRows(state).map(pilotPublicEvent),teaching:teaching.map(pilotPublicEvent),summary:pilotSummary(state)};
+}
+const api={MODULES,TARGETS,spec,featureKey,basePool,guidedPlan,taskForItem,repairFor,reservedLemmaIds,independentPlan,createIndependentSession,support,evaluate,previousModule,prerequisitesReady,fullStage5Ready,STAGE6_MODULES,STAGE6_TARGETS,STAGE6_SEMANTIC_CHECKS,stage6Spec,stage6SemanticChecks,stage6FeatureKey,stage6BasePool,stage6GuidedPlan,stage6TaskForItem,stage6RepairFor,stage6ReservedLemmaIds,stage6IndependentPlan,createStage6IndependentSession,stage6RewriteHint,stage6Support,fullStage6Ready,stage6PrerequisitesReady,stage6MissingPrerequisite,stage6NextModule,STAGE7_MODULE,STAGE7_GUIDED,stage7Spec,stage7MeaningReady,stage7MissingMeaning,stage7Owner,stage7PrerequisitesReady,stage7MissingPrerequisite,stage7Ready,stage7View,stage7Errors,stage7Feedback,stage7Support,stage7RepairFor,stage7GuidedPlan,stage7IndependentPlan,createStage7Run,stage7Current,stage7Evidence,stage7Works,STAGE8_SEMANTIC,stage8Spec,stage8PrerequisitesReady,stage8MissingPrerequisite,stage8Context,stage8GuidedPlan,stage8IndependentPlan,createStage8Run,STAGE9_THRESHOLD,STAGE9_CONTRASTS,stage9Assess,stage9Status,stage9Eligible,stage9Queue,stage9Repair,stage9RaisesAllAxes,stage9Pool,STAGE10_DELAY,STAGE10_SHORT_BANK,stage10WilsonLower,stage10StrongClaim,stage10StrongFromEvents,stage10Retention,stage10ContaminatedLemmas,pilotAnswerRows,pilotFirstIndependent,pilotErrorCounts,pilotRepeatedError,pilotSummary,pilotExport};
 if(node)module.exports=api;else root.MorphTeachingPractice=api;
 })(typeof window!=='undefined'?window:globalThis);
