@@ -606,12 +606,13 @@ function main(){
  const unitsPath=path.join(opt.pack,'16_SOURCE_UNITS.json');
  const matrixPath=path.join(opt.pack,'17_SCOPE_MATRIX.json');
  const outDir=opt.out;
+ const round7=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','32_INDEPENDENT_REVIEW.json');
  const round6=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','31_INDEPENDENT_REVIEW.json');
  const round5=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','30_INDEPENDENT_REVIEW.json');
  const round4=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','29_INDEPENDENT_REVIEW.json');
  const round3=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','28_INDEPENDENT_REVIEW.json');
  const round2=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','26_INDEPENDENT_REVIEW.json');
- const reviewPath=fs.existsSync(round6)?round6:(fs.existsSync(round5)?round5:(fs.existsSync(round4)?round4:(fs.existsSync(round3)?round3:(fs.existsSync(round2)?round2:path.join(outDir,'INDEPENDENT_REVIEW.json')))));
+ const reviewPath=fs.existsSync(round7)?round7:(fs.existsSync(round6)?round6:(fs.existsSync(round5)?round5:(fs.existsSync(round4)?round4:(fs.existsSync(round3)?round3:(fs.existsSync(round2)?round2:path.join(outDir,'INDEPENDENT_REVIEW.json'))))));
  if(!fs.existsSync(unitsPath)){
   if(process.env.QAZAQSHA_V2_PACK||process.argv.includes('--pack')){
    console.error('MORPH_SOURCE_CHECK_FAIL');
