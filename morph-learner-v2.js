@@ -1,6 +1,6 @@
 (function(root){
 'use strict';
-const VERSION='learner-ru-v2-c1';
+const VERSION='learner-ru-v2-c2';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABELS={
  PL:'несколько',
@@ -10,6 +10,13 @@ const LABELS={
  GEN:'чей или чего',
  ACC:'кого или что именно',
  INS:'чем или с кем',
+ COP_1SG:'я — кто',
+ COP_1PL:'мы — кто',
+ COP_2SG:'ты — кто',
+ COP_2POL:'Вы — кто',
+ COP_2PL:'вы — кто',
+ COP_2PL_POL:'Вы, несколько — кто',
+ Q:'вопрос ли',
  POSS_1SG:'мой, моя',
  POSS_2SG:'твой, твоя',
  POSS_1PL:'наш, наша',
@@ -31,7 +38,7 @@ function openTarget(item){
  const seq=Array.isArray(item.sequence)?item.sequence:[];
  const id=item.morpheme||item.familyId||seq.at(-1);
  if(seq.some(x=>String(x).startsWith('POSS_'))||String(id||'').startsWith('POSS_'))return lessonTarget('learner.poss.owner');
- const byFamily={DAT:'learner.dat.kuda',LOC:'learner.loc.where',PL:'learner.pl.several',GEN:'learner.nasal.senses',ACC:'learner.nasal.senses',ABL:'learner.nasal.senses',INS:'learner.nasal.senses'};
+ const byFamily={DAT:'learner.dat.kuda',LOC:'learner.loc.where',PL:'learner.pl.several',GEN:'learner.nasal.senses',ACC:'learner.nasal.senses',ABL:'learner.nasal.senses',INS:'learner.nasal.senses',COP_1SG:'learner.person.roles',COP_1PL:'learner.person.roles',COP_2SG:'learner.person.roles',COP_2POL:'learner.person.roles',COP_2PL:'learner.person.roles',COP_2PL_POL:'learner.person.roles',Q:'learner.person.roles'};
  const lessonId=byFamily[id]||seq.map(x=>byFamily[x]).find(Boolean);
  return lessonId?lessonTarget(lessonId):null;
 }
@@ -48,6 +55,8 @@ function supportLine(id){
  if(id==='LOC')return 'Сначала реши: где уже находится. Потом подбери конец. Это опора, не самостоятельный ответ.';
  if(id==='PL')return 'Сначала реши: несколько предметов. Потом выбери л, д или т и букву а или е. Это опора, не самостоятельный ответ.';
  if(id==='GEN'||id==='ACC'||id==='ABL'||id==='INS')return 'Сначала реши, что хочешь сказать. Одинаковый конец слова не даёт одно окончание на все вопросы. Это опора, не самостоятельный ответ.';
+ if(String(id||'').startsWith('COP_'))return 'Сначала реши, кто это говорит о себе: я, мы, ты или Вы. Это не «моя вещь». Это опора, не самостоятельный ответ.';
+ if(id==='Q')return 'Сначала реши, что это вопрос. Частица пишется отдельно. Это не «не делать». Это опора, не самостоятельный ответ.';
  if(String(id||'').startsWith('POSS_'))return 'Сначала реши, чей это предмет. Потом посмотри на конец слова. Это опора, не самостоятельный ответ.';
  return null;
 }
@@ -117,7 +126,7 @@ const TYPES=new Set(['paragraph','subheading','list','ordered-list','example','c
 function check(opts){
  const errors=[],formOf=opts&&opts.formOf,trainIds=opts&&opts.trainIds,transferTexts=opts&&opts.transferTexts||[],rows=opts&&opts.lessons||LESSONS;
  const seen=new Set();
- if(!opts||!opts.lessons){if(rows.length!==5)errors.push('expected five ready lessons');}
+ if(!opts||!opts.lessons){if(rows.length!==6)errors.push('expected six ready lessons');}
  for(const row of rows){
   if(row.status!=='READY')errors.push(row.id+' not ready');
   if(seen.has(row.id))errors.push('duplicate '+row.id);seen.add(row.id);
@@ -164,6 +173,17 @@ const datBlocks=[
  {id:'dat.18',slot:'full',type:'example',lemmaId:'n-қала',sequence:['DAT'],before:'қала',beforeRu:'город',added:'-ға',after:'қалаға',afterRu:'в город'},
  {id:'dat.19',slot:'full',type:'example',lemmaId:'n-үй',sequence:['DAT'],before:'үй',beforeRu:'дом',added:'-ге',after:'үйге',afterRu:'к дому'},
  {id:'dat.20',slot:'full',type:'example',lemmaId:'n-мектеп',sequence:['DAT'],before:'мектеп',beforeRu:'школа',added:'-ке',after:'мектепке',afterRu:'в школу'},
+ {id:'dat.20b',slot:'full',type:'example',lemmaId:'n-әке',sequence:['DAT'],before:'әке',beforeRu:'отец',added:'-ге',after:'әкеге',afterRu:'отцу'},
+ {id:'dat.20c',slot:'full',type:'example',lemmaId:'n-көше',sequence:['DAT'],before:'көше',beforeRu:'улица',added:'-ге',after:'көшеге',afterRu:'на улицу'},
+ {id:'dat.20d',slot:'full',type:'example',lemmaId:'n-мұғалім',sequence:['DAT'],before:'мұғалім',beforeRu:'учитель',added:'-ге',after:'мұғалімге',afterRu:'учителю'},
+ {id:'dat.20e',slot:'full',type:'example',lemmaId:'n-қыз',sequence:['DAT'],before:'қыз',beforeRu:'девушка',added:'-ға',after:'қызға',afterRu:'девушке'},
+ {id:'dat.20f',slot:'full',type:'example',lemmaId:'n-ит',sequence:['DAT'],before:'ит',beforeRu:'собака',added:'-ке',after:'итке',afterRu:'собаке'},
+ {id:'dat.20g',slot:'full',type:'example',lemmaId:'n-тау',sequence:['DAT'],before:'тау',beforeRu:'гора',added:'-ға',after:'тауға',afterRu:'к горе'},
+ {id:'dat.20h',slot:'full',type:'example',lemmaId:'n-су',sequence:['DAT'],before:'су',beforeRu:'вода',added:'-ға',after:'суға',afterRu:'к воде'},
+ {id:'dat.20i',slot:'full',type:'example',lemmaId:'n-аға',sequence:['DAT'],before:'аға',beforeRu:'старший брат',added:'-ға',after:'ағаға',afterRu:'старшему брату'},
+ {id:'dat.20j',slot:'full',type:'example',lemmaId:'n-жол',sequence:['DAT'],before:'жол',beforeRu:'дорога',added:'-ға',after:'жолға',afterRu:'на дорогу'},
+ {id:'dat.20k',slot:'full',type:'example',lemmaId:'n-аң',sequence:['DAT'],before:'аң',beforeRu:'зверь',added:'-ға',after:'аңға',afterRu:'зверю'},
+ {id:'dat.20l',slot:'full',type:'example',lemmaId:'n-ерін',sequence:['DAT'],before:'ерін',beforeRu:'губа',added:'-ге',after:'ерінге',afterRu:'к губе'},
  {id:'dat.21',slot:'full',type:'warning',text:'Это наблюдение работает в выбранных регулярных словах. Его нельзя превращать в правило «ищи любую такую букву в любом слове». Буквы и и у, некоторые заимствованные слова и некоторые слова с ә требуют отдельного разбора. Для них тренажёр показывает уже проверенный вариант, а не просит угадать. В этом наборе су — вода даёт суға, тау — гора даёт тауға: класс этих двух слов уже записан. Другие слова на и или у по одной последней букве не угадываем.'},
  {id:'dat.22',slot:'full',type:'subheading',text:'Почему ғ/г или қ/к'},
  {id:'dat.23',slot:'full',type:'paragraph',text:'Теперь смотрим, как заканчивается обычное слово. Сравним два случая с а.'},
@@ -209,6 +229,23 @@ const possBlocks=[
  {id:'poss.9',slot:'opening',type:'paragraph',text:'Видим один и тот же предмет — дом. Меняется, чей он: мой или твой. В этих формах -ім показывает «мой», -ің — «твой».'},
  {id:'poss.10',slot:'opening',type:'example',lemmaId:'n-дос',sequence:['POSS_1SG'],before:'дос',beforeRu:'друг',added:'-ым',after:'досым',afterRu:'мой друг'},
  {id:'poss.11',slot:'opening',type:'example',lemmaId:'n-дос',sequence:['POSS_2SG'],before:'дос',beforeRu:'друг',added:'-ың',after:'досың',afterRu:'твой друг'},
+ {id:'poss.11b',slot:'full',type:'example',lemmaId:'n-аға',sequence:['POSS_1SG'],before:'аға',beforeRu:'старший брат',added:'-м',after:'ағам',afterRu:'мой старший брат'},
+ {id:'poss.11c',slot:'full',type:'example',lemmaId:'n-аға',sequence:['POSS_2SG'],before:'аға',beforeRu:'старший брат',added:'-ң',after:'ағаң',afterRu:'твой старший брат'},
+ {id:'poss.11d',slot:'full',type:'example',lemmaId:'n-аға',sequence:['POSS_3'],before:'аға',beforeRu:'старший брат',added:'-сы',after:'ағасы',afterRu:'его или её старший брат'},
+ {id:'poss.11e',slot:'full',type:'example',lemmaId:'n-сіңлі',sequence:['POSS_1SG'],before:'сіңлі',beforeRu:'младшая сестра',added:'-м',after:'сіңлім',afterRu:'моя младшая сестра'},
+ {id:'poss.11f',slot:'full',type:'example',lemmaId:'n-сіңлі',sequence:['POSS_2SG'],before:'сіңлі',beforeRu:'младшая сестра',added:'-ң',after:'сіңлің',afterRu:'твоя младшая сестра'},
+ {id:'poss.11g',slot:'full',type:'example',lemmaId:'n-сіңлі',sequence:['POSS_1PL'],before:'сіңлі',beforeRu:'младшая сестра',added:'-міз',after:'сіңліміз',afterRu:'наша младшая сестра'},
+ {id:'poss.11h',slot:'full',type:'example',lemmaId:'n-ит',sequence:['POSS_1SG'],before:'ит',beforeRu:'собака',added:'-ім',after:'итім',afterRu:'моя собака'},
+ {id:'poss.11i',slot:'full',type:'example',lemmaId:'n-ит',sequence:['POSS_2SG'],before:'ит',beforeRu:'собака',added:'-ің',after:'итің',afterRu:'твоя собака'},
+ {id:'poss.11j',slot:'full',type:'example',lemmaId:'n-ит',sequence:['POSS_3'],before:'ит',beforeRu:'собака',added:'-і',after:'иті',afterRu:'его или её собака'},
+ {id:'poss.11k',slot:'full',type:'example',lemmaId:'n-тау',sequence:['POSS_1SG'],before:'тау',beforeRu:'гора',added:'-ым',after:'тауым',afterRu:'моя гора'},
+ {id:'poss.11l',slot:'full',type:'example',lemmaId:'n-тау',sequence:['POSS_2POL'],before:'тау',beforeRu:'гора',added:'-ыңыз',after:'тауыңыз',afterRu:'ваша гора'},
+ {id:'poss.11m',slot:'full',type:'example',lemmaId:'n-қыз',sequence:['POSS_1SG'],before:'қыз',beforeRu:'девушка',added:'-ым',after:'қызым',afterRu:'моя девушка, близкая'},
+ {id:'poss.11n',slot:'full',type:'example',lemmaId:'n-қыз',sequence:['POSS_1PL'],before:'қыз',beforeRu:'девушка',added:'-ымыз',after:'қызымыз',afterRu:'наша девушка, близкая'},
+ {id:'poss.11o',slot:'full',type:'example',lemmaId:'n-әке',sequence:['POSS_1SG'],before:'әке',beforeRu:'отец',added:'-м',after:'әкем',afterRu:'мой отец'},
+ {id:'poss.11p',slot:'full',type:'example',lemmaId:'n-әке',sequence:['POSS_2POL'],before:'әке',beforeRu:'отец',added:'-ңіз',after:'әкеңіз',afterRu:'ваш отец'},
+ {id:'poss.11q',slot:'full',type:'example',lemmaId:'n-мұғалім',sequence:['POSS_1SG'],before:'мұғалім',beforeRu:'учитель',added:'-ім, к меняется на г',after:'мұғалімім',afterRu:'мой учитель'},
+ {id:'poss.11r',slot:'full',type:'example',lemmaId:'n-мұғалім',sequence:['POSS_3'],before:'мұғалім',beforeRu:'учитель',added:'-і, к меняется на г',after:'мұғалімі',afterRu:'его или её учитель'},
  {id:'poss.12',slot:'opening',type:'paragraph',text:'Здесь говорим о близкой связи, а не о владении человеком как вещью. Начальная опора «чей предмет» помогает, но не исчерпывает все употребления.'},
  {id:'poss.13',slot:'opening',type:'warning',text:'Русские «мой» и «моя» различаются в зависимости от слова: мой дом, моя книга. В казахском выбор букв в этих формах устроен по правилам казахского слова, а не по русскому «мой/моя».'},
  {id:'poss.14',slot:'opening',type:'subheading',text:'Его или её'},
@@ -285,6 +322,15 @@ const locBlocks=[
  {id:'loc.5',slot:'opening',type:'warning',text:'Русское «в» здесь не равно добавке «куда». «В городе» — қалада. «В город», когда человек ещё идёт, — қалаға.'},
  {id:'loc.6',slot:'opening',type:'subheading',text:'Три места'},
  {id:'loc.7',slot:'opening',type:'table',caption:'Где уже находится',headers:['Было','Что добавили','Получилось','По-русски'],rows:[['қала — город','-да','қалада','в городе'],['үй — дом','-де','үйде','в доме'],['мектеп — школа','-те','мектепте','в школе']]},
+ {id:'loc.7b',slot:'opening',type:'example',lemmaId:'n-көше',sequence:['LOC'],before:'көше',beforeRu:'улица',added:'-де',after:'көшеде',afterRu:'на улице'},
+ {id:'loc.7c',slot:'opening',type:'example',lemmaId:'n-мұғалім',sequence:['LOC'],before:'мұғалім',beforeRu:'учитель',added:'-де',after:'мұғалімде',afterRu:'у учителя'},
+ {id:'loc.7d',slot:'opening',type:'example',lemmaId:'n-қыз',sequence:['LOC'],before:'қыз',beforeRu:'девушка',added:'-да',after:'қызда',afterRu:'у девушки'},
+ {id:'loc.7e',slot:'opening',type:'example',lemmaId:'n-ит',sequence:['LOC'],before:'ит',beforeRu:'собака',added:'-те',after:'итте',afterRu:'у собаки'},
+ {id:'loc.7f',slot:'opening',type:'example',lemmaId:'n-тау',sequence:['LOC'],before:'тау',beforeRu:'гора',added:'-да',after:'тауда',afterRu:'на горе'},
+ {id:'loc.7g',slot:'opening',type:'example',lemmaId:'n-ән',sequence:['LOC'],before:'ән',beforeRu:'песня',added:'-де',after:'әнде',afterRu:'в песне'},
+ {id:'loc.7h',slot:'opening',type:'example',lemmaId:'n-жол',sequence:['LOC'],before:'жол',beforeRu:'дорога',added:'-да',after:'жолда',afterRu:'на дороге'},
+ {id:'loc.7i',slot:'opening',type:'example',lemmaId:'n-аға',sequence:['LOC'],before:'аға',beforeRu:'старший брат',added:'-да',after:'ағада',afterRu:'у старшего брата'},
+ {id:'loc.7j',slot:'opening',type:'example',lemmaId:'n-сіңлі',sequence:['LOC'],before:'сіңлі',beforeRu:'младшая сестра',added:'-де',after:'сіңліде',afterRu:'у младшей сестры'},
  {id:'loc.8',slot:'contrast',type:'table',caption:'Сначала вопрос, потом конец',headers:['Вопрос','Форма','Смысл'],rows:[['Где?','қалада','в городе'],['Куда?','қалаға','в город'],['Откуда?','қаладан','из города']]},
  {id:'loc.9',slot:'contrast',type:'example',lemmaId:'n-қала',sequence:['DAT'],before:'қала',beforeRu:'город',added:'-ға',after:'қалаға',afterRu:'в город'},
  {id:'loc.10',slot:'contrast',type:'example',lemmaId:'n-қала',sequence:['ABL'],before:'қала',beforeRu:'город',added:'-дан',after:'қаладан',afterRu:'из города'},
@@ -311,6 +357,17 @@ const plBlocks=[
  {id:'pl.3',slot:'opening',type:'example',lemmaId:'n-бала',sequence:['PL'],before:'бала',beforeRu:'ребёнок',added:'-лар',after:'балалар',afterRu:'дети'},
  {id:'pl.4',slot:'opening',type:'example',lemmaId:'n-кітап',sequence:['PL'],before:'кітап',beforeRu:'книга',added:'-тар',after:'кітаптар',afterRu:'книги'},
  {id:'pl.5',slot:'opening',type:'example',lemmaId:'n-адам',sequence:['PL'],before:'адам',beforeRu:'человек',added:'-дар',after:'адамдар',afterRu:'люди'},
+ {id:'pl.5b',slot:'opening',type:'example',lemmaId:'n-әке',sequence:['PL'],before:'әке',beforeRu:'отец',added:'-лер',after:'әкелер',afterRu:'отцы'},
+ {id:'pl.5c',slot:'opening',type:'example',lemmaId:'n-ит',sequence:['PL'],before:'ит',beforeRu:'собака',added:'-тер',after:'иттер',afterRu:'собаки'},
+ {id:'pl.5d',slot:'opening',type:'example',lemmaId:'n-аң',sequence:['PL'],before:'аң',beforeRu:'зверь',added:'-дар',after:'аңдар',afterRu:'звери'},
+ {id:'pl.5e',slot:'opening',type:'example',lemmaId:'n-ерін',sequence:['PL'],before:'ерін',beforeRu:'губа',added:'-дер',after:'еріндер',afterRu:'губы'},
+ {id:'pl.5f',slot:'opening',type:'example',lemmaId:'n-орын',sequence:['PL'],before:'орын',beforeRu:'место',added:'-дар',after:'орындар',afterRu:'места'},
+ {id:'pl.5g',slot:'opening',type:'example',lemmaId:'n-аға',sequence:['PL'],before:'аға',beforeRu:'старший брат',added:'-лар',after:'ағалар',afterRu:'старшие братья'},
+ {id:'pl.5h',slot:'opening',type:'example',lemmaId:'n-сіңлі',sequence:['PL'],before:'сіңлі',beforeRu:'младшая сестра',added:'-лер',after:'сіңлілер',afterRu:'младшие сёстры'},
+ {id:'pl.5i',slot:'opening',type:'example',lemmaId:'n-қонақ',sequence:['PL'],before:'қонақ',beforeRu:'гость',added:'-тар',after:'қонақтар',afterRu:'гости'},
+ {id:'pl.5j',slot:'opening',type:'example',lemmaId:'n-көлік',sequence:['PL'],before:'көлік',beforeRu:'транспорт',added:'-тер',after:'көліктер',afterRu:'транспорт, несколько'},
+ {id:'pl.5k',slot:'opening',type:'example',lemmaId:'n-дос',sequence:['PL'],before:'дос',beforeRu:'друг',added:'-тар',after:'достар',afterRu:'друзья'},
+ {id:'pl.5l',slot:'opening',type:'example',lemmaId:'n-су',sequence:['PL'],before:'су',beforeRu:'вода',added:'-лар',after:'сулар',afterRu:'воды'},
  {id:'pl.6',slot:'opening',type:'paragraph',text:'Смысл один: несколько. Концы разные: -лар, -тар, -дар. Таблица ниже относится только к этому смыслу. Её нельзя переносить на «чей», «кого» или «откуда».'},
  {id:'pl.7',slot:'full',type:'subheading',text:'Шесть концов, два выбора'},
  {id:'pl.8',slot:'full',type:'paragraph',text:'Письменных вариантов шесть: лар, лер, дар, дер, тар, тер. Сначала л, д или т. Потом а или е.'},
@@ -331,6 +388,20 @@ const nasalBlocks=[
  {id:'nas.2',slot:'opening',type:'paragraph',text:'Слово адам кончается на м. От этого м не появляется одно окончание на все случаи. Сначала решаем, что хотим сказать.'},
  {id:'nas.3',slot:'opening',type:'table',caption:'Один человек, разные вопросы',headers:['Что хотим сказать','Форма','По-русски'],rows:[['несколько','адамдар','люди'],['чей, от кого как владельца','адамның','человека'],['кого именно','адамды','этого человека'],['где','адамда','у человека'],['откуда, от кого','адамнан','от человека'],['с кем','адаммен','с человеком']]},
  {id:'nas.4',slot:'opening',type:'warning',text:'Нельзя сказать «после м, н или ң всегда н» или «всегда д». Ответ зависит от вопроса.'},
+ {id:'nas.4b',slot:'opening',type:'example',lemmaId:'n-қыз',sequence:['GEN'],before:'қыз',beforeRu:'девушка',added:'-дың',after:'қыздың',afterRu:'девушки'},
+ {id:'nas.4c',slot:'opening',type:'example',lemmaId:'n-қыз',sequence:['ACC'],before:'қыз',beforeRu:'девушка',added:'-ды',after:'қызды',afterRu:'эту девушку'},
+ {id:'nas.4d',slot:'opening',type:'example',lemmaId:'n-қыз',sequence:['ABL'],before:'қыз',beforeRu:'девушка',added:'-дан',after:'қыздан',afterRu:'от девушки'},
+ {id:'nas.4e',slot:'opening',type:'example',lemmaId:'n-қыз',sequence:['INS'],before:'қыз',beforeRu:'девушка',added:'-бен',after:'қызбен',afterRu:'с девушкой'},
+ {id:'nas.4f',slot:'opening',type:'example',lemmaId:'n-мектеп',sequence:['GEN'],before:'мектеп',beforeRu:'школа',added:'-тің',after:'мектептің',afterRu:'школы'},
+ {id:'nas.4g',slot:'opening',type:'example',lemmaId:'n-мектеп',sequence:['ACC'],before:'мектеп',beforeRu:'школа',added:'-ті',after:'мектепті',afterRu:'эту школу'},
+ {id:'nas.4h',slot:'opening',type:'example',lemmaId:'n-мектеп',sequence:['ABL'],before:'мектеп',beforeRu:'школа',added:'-тен',after:'мектептен',afterRu:'из школы'},
+ {id:'nas.4i',slot:'opening',type:'example',lemmaId:'n-мектеп',sequence:['INS'],before:'мектеп',beforeRu:'школа',added:'-пен',after:'мектеппен',afterRu:'школой'},
+ {id:'nas.4j',slot:'opening',type:'example',lemmaId:'n-әке',sequence:['GEN'],before:'әке',beforeRu:'отец',added:'-нің',after:'әкенің',afterRu:'отца'},
+ {id:'nas.4k',slot:'opening',type:'example',lemmaId:'n-әке',sequence:['ACC'],before:'әке',beforeRu:'отец',added:'-ні',after:'әкені',afterRu:'этого отца'},
+ {id:'nas.4l',slot:'opening',type:'example',lemmaId:'n-әке',sequence:['ABL'],before:'әке',beforeRu:'отец',added:'-ден',after:'әкеден',afterRu:'от отца'},
+ {id:'nas.4m',slot:'opening',type:'example',lemmaId:'n-мұғалім',sequence:['GEN'],before:'мұғалім',beforeRu:'учитель',added:'-нің',after:'мұғалімнің',afterRu:'учителя'},
+ {id:'nas.4n',slot:'opening',type:'example',lemmaId:'n-мұғалім',sequence:['ACC'],before:'мұғалім',beforeRu:'учитель',added:'-ді',after:'мұғалімді',afterRu:'этого учителя'},
+ {id:'nas.4o',slot:'opening',type:'example',lemmaId:'n-мұғалім',sequence:['ABL'],before:'мұғалім',beforeRu:'учитель',added:'-нен',after:'мұғалімнен',afterRu:'от учителя'},
  {id:'nas.5',slot:'full',type:'subheading',text:'Чей или чего'},
  {id:'nas.6',slot:'full',type:'paragraph',text:'Здесь называем владельца или то, к чему относится вещь. баланың — ребёнка. Вместе с формой вещи: баланың кітабы — книга ребёнка. Кітабы здесь значит «его или её книга». Это не то же самое, что баласы — «его или её ребёнок», и не то же самое, что балам — «мой ребёнок».'},
  {id:'nas.7',slot:'full',type:'example',lemmaId:'n-бала',sequence:['GEN'],before:'бала',beforeRu:'ребёнок',added:'-ның',after:'баланың',afterRu:'ребёнка'},
@@ -373,6 +444,70 @@ const nasalBlocks=[
  {id:'nas.44',slot:'full',type:'try',prompt:'Нужно сказать «с человеком», вместе. Что выбрать?',options:['адаммен','адам ба'],answer:'адаммен',good:'адаммен — с человеком.',bad:'адам ба — вопрос «человек ли». Вместе с человеком: адаммен.'},
  {id:'nas.45',slot:'full',type:'term',text:'В учебниках у этих вопросов разные названия. Для первого ответа достаточно самого вопроса: чей, кого именно, откуда, с кем или чем.'},
  {id:'nas.46',slot:'contrast',type:'list',items:['адамның — чей, владелец','адамды — этого человека','адамнан — от человека','адаммен — с человеком','адамдар — несколько людей','адаммын — я человек','адам ба — человек ли']}
+];
+const personBlocks=[
+ {id:'per.1',slot:'opening',type:'subheading',text:'Кто я, не чья вещь'},
+ {id:'per.2',slot:'opening',type:'paragraph',text:'Человек говорит, кто он сам. адаммын — я человек. Это не «мой человек» и не «моя книга».'},
+ {id:'per.3',slot:'opening',type:'example',lemmaId:'n-адам',sequence:['COP_1SG'],before:'адам',beforeRu:'человек',added:'-мын',after:'адаммын',afterRu:'я человек'},
+ {id:'per.4',slot:'opening',type:'example',lemmaId:'n-бала',sequence:['COP_1SG'],before:'бала',beforeRu:'ребёнок',added:'-мын',after:'баламын',afterRu:'я ребёнок'},
+ {id:'per.5',slot:'opening',type:'example',lemmaId:'n-бала',sequence:['POSS_1SG'],before:'бала',beforeRu:'ребёнок',added:'-м',after:'балам',afterRu:'мой ребёнок'},
+ {id:'per.6',slot:'opening',type:'warning',text:'баламын — я ребёнок. балам — мой ребёнок. Одинаковое «я» в русском не делает эти формы одной.'},
+ {id:'per.7',slot:'opening',type:'example',lemmaId:'n-мұғалім',sequence:['COP_1SG'],before:'мұғалім',beforeRu:'учитель',added:'-мін',after:'мұғаліммін',afterRu:'я учитель'},
+ {id:'per.8',slot:'opening',type:'example',lemmaId:'n-мұғалім',sequence:['POSS_1SG'],before:'мұғалім',beforeRu:'учитель',added:'-ім, к меняется на г',after:'мұғалімім',afterRu:'мой учитель'},
+ {id:'per.9',slot:'full',type:'subheading',text:'Я'},
+ {id:'per.10',slot:'full',type:'paragraph',text:'Для «я» конец бывает -мын, -мін, -бын, -бін, -пын, -пін. Буква ы или і идёт по гласным слова. Первая буква м, б или п идёт по концу слова. После м, н или ң у «я» остаётся м: адаммын, мұғаліммін. После з буква б: қызбын. После глухого п: қонақпын.'},
+ {id:'per.11',slot:'full',type:'example',lemmaId:'n-әке',sequence:['COP_1SG'],before:'әке',beforeRu:'отец',added:'-мін',after:'әкемін',afterRu:'я отец'},
+ {id:'per.12',slot:'full',type:'example',lemmaId:'n-қыз',sequence:['COP_1SG'],before:'қыз',beforeRu:'девушка',added:'-бын',after:'қызбын',afterRu:'я девушка'},
+ {id:'per.13',slot:'full',type:'example',lemmaId:'n-егіз',sequence:['COP_1SG'],before:'егіз',beforeRu:'близнец',added:'-бін',after:'егізбін',afterRu:'я близнец'},
+ {id:'per.14',slot:'full',type:'example',lemmaId:'n-қонақ',sequence:['COP_1SG'],before:'қонақ',beforeRu:'гость',added:'-пын',after:'қонақпын',afterRu:'я гость'},
+ {id:'per.15',slot:'full',type:'example',lemmaId:'n-әріптес',sequence:['COP_1SG'],before:'әріптес',beforeRu:'коллега',added:'-пін',after:'әріптеспін',afterRu:'я коллега'},
+ {id:'per.16',slot:'full',type:'example',lemmaId:'n-дос',sequence:['COP_1SG'],before:'дос',beforeRu:'друг',added:'-пын',after:'доспын',afterRu:'я друг'},
+ {id:'per.17',slot:'full',type:'example',lemmaId:'n-ұл',sequence:['COP_1SG'],before:'ұл',beforeRu:'сын',added:'-мын',after:'ұлмын',afterRu:'я сын'},
+ {id:'per.18',slot:'full',type:'example',lemmaId:'n-сіңлі',sequence:['COP_1SG'],before:'сіңлі',beforeRu:'младшая сестра',added:'-мін',after:'сіңлімін',afterRu:'я младшая сестра'},
+ {id:'per.19',slot:'full',type:'example',lemmaId:'n-аға',sequence:['COP_1SG'],before:'аға',beforeRu:'старший брат',added:'-мын',after:'ағамын',afterRu:'я старший брат'},
+ {id:'per.20',slot:'full',type:'subheading',text:'Мы'},
+ {id:'per.21',slot:'full',type:'paragraph',text:'Для «мы» похожий конец, но другая буква в начале. После м, н или ң у «мы» уже б, не м: адамбыз, мұғалімбіз. Поэтому адаммын и адамбыз нельзя выбрать одной привычкой «после м всегда м».'},
+ {id:'per.22',slot:'full',type:'example',lemmaId:'n-адам',sequence:['COP_1PL'],before:'адам',beforeRu:'человек',added:'-быз',after:'адамбыз',afterRu:'мы люди'},
+ {id:'per.23',slot:'full',type:'example',lemmaId:'n-мұғалім',sequence:['COP_1PL'],before:'мұғалім',beforeRu:'учитель',added:'-біз',after:'мұғалімбіз',afterRu:'мы учителя'},
+ {id:'per.24',slot:'full',type:'example',lemmaId:'n-бала',sequence:['COP_1PL'],before:'бала',beforeRu:'ребёнок',added:'-мыз',after:'баламыз',afterRu:'мы дети'},
+ {id:'per.25',slot:'full',type:'example',lemmaId:'n-әке',sequence:['COP_1PL'],before:'әке',beforeRu:'отец',added:'-міз',after:'әкеміз',afterRu:'мы отцы'},
+ {id:'per.26',slot:'full',type:'example',lemmaId:'n-қыз',sequence:['COP_1PL'],before:'қыз',beforeRu:'девушка',added:'-быз',after:'қызбыз',afterRu:'мы девушки'},
+ {id:'per.27',slot:'full',type:'example',lemmaId:'n-қонақ',sequence:['COP_1PL'],before:'қонақ',beforeRu:'гость',added:'-пыз',after:'қонақпыз',afterRu:'мы гости'},
+ {id:'per.28',slot:'full',type:'example',lemmaId:'n-дос',sequence:['COP_1PL'],before:'дос',beforeRu:'друг',added:'-пыз',after:'доспыз',afterRu:'мы друзья'},
+ {id:'per.29',slot:'full',type:'subheading',text:'Ты и Вы'},
+ {id:'per.30',slot:'full',type:'paragraph',text:'«Ты» здесь -сың или -сің. Вежливое «Вы» — -сыз или -сіз. Несколько людей на «ты» — -сыңдар или -сіңдер. Вежливое «Вы» о нескольких — -сыздар или -сіздер.'},
+ {id:'per.31',slot:'full',type:'example',lemmaId:'n-бала',sequence:['COP_2SG'],before:'бала',beforeRu:'ребёнок',added:'-сың',after:'баласың',afterRu:'ты ребёнок'},
+ {id:'per.32',slot:'full',type:'example',lemmaId:'n-бала',sequence:['COP_2POL'],before:'бала',beforeRu:'ребёнок',added:'-сыз',after:'баласыз',afterRu:'Вы ребёнок'},
+ {id:'per.33',slot:'full',type:'example',lemmaId:'n-бала',sequence:['COP_2PL'],before:'бала',beforeRu:'ребёнок',added:'-сыңдар',after:'баласыңдар',afterRu:'вы дети'},
+ {id:'per.34',slot:'full',type:'example',lemmaId:'n-бала',sequence:['COP_2PL_POL'],before:'бала',beforeRu:'ребёнок',added:'-сыздар',after:'баласыздар',afterRu:'Вы дети'},
+ {id:'per.35',slot:'full',type:'example',lemmaId:'n-мұғалім',sequence:['COP_2SG'],before:'мұғалім',beforeRu:'учитель',added:'-сің',after:'мұғалімсің',afterRu:'ты учитель'},
+ {id:'per.36',slot:'full',type:'example',lemmaId:'n-мұғалім',sequence:['COP_2POL'],before:'мұғалім',beforeRu:'учитель',added:'-сіз',after:'мұғалімсіз',afterRu:'Вы учитель'},
+ {id:'per.37',slot:'full',type:'example',lemmaId:'n-мұғалім',sequence:['COP_2PL'],before:'мұғалім',beforeRu:'учитель',added:'-сіңдер',after:'мұғалімсіңдер',afterRu:'вы учителя'},
+ {id:'per.38',slot:'full',type:'example',lemmaId:'n-мұғалім',sequence:['COP_2PL_POL'],before:'мұғалім',beforeRu:'учитель',added:'-сіздер',after:'мұғалімсіздер',afterRu:'Вы учителя'},
+ {id:'per.39',slot:'full',type:'example',lemmaId:'n-әке',sequence:['COP_2SG'],before:'әке',beforeRu:'отец',added:'-сің',after:'әкесің',afterRu:'ты отец'},
+ {id:'per.40',slot:'full',type:'example',lemmaId:'n-әке',sequence:['COP_2POL'],before:'әке',beforeRu:'отец',added:'-сіз',after:'әкесіз',afterRu:'Вы отец'},
+ {id:'per.41',slot:'full',type:'example',lemmaId:'n-адам',sequence:['COP_2SG'],before:'адам',beforeRu:'человек',added:'-сың',after:'адамсың',afterRu:'ты человек'},
+ {id:'per.42',slot:'full',type:'example',lemmaId:'n-дос',sequence:['COP_2POL'],before:'дос',beforeRu:'друг',added:'-сыз',after:'доссыз',afterRu:'Вы друг'},
+ {id:'per.43',slot:'full',type:'subheading',text:'Это вопрос'},
+ {id:'per.44',slot:'full',type:'paragraph',text:'Вопрос «ли» пишется отдельно: адам ба, бала ма, мұғалім бе, қонақ па. Буквы ма, ме, ба, бе, па, пе похожи на другие добавки, но здесь есть пробел и это вопрос, не имя вещи и не «не делать».'},
+ {id:'per.45',slot:'full',type:'example',lemmaId:'n-адам',sequence:['Q'],before:'адам',beforeRu:'человек',added:' ба',after:'адам ба',afterRu:'человек ли'},
+ {id:'per.46',slot:'full',type:'example',lemmaId:'n-бала',sequence:['Q'],before:'бала',beforeRu:'ребёнок',added:' ма',after:'бала ма',afterRu:'ребёнок ли'},
+ {id:'per.47',slot:'full',type:'example',lemmaId:'n-әке',sequence:['Q'],before:'әке',beforeRu:'отец',added:' ме',after:'әке ме',afterRu:'отец ли'},
+ {id:'per.48',slot:'full',type:'example',lemmaId:'n-мұғалім',sequence:['Q'],before:'мұғалім',beforeRu:'учитель',added:' бе',after:'мұғалім бе',afterRu:'учитель ли'},
+ {id:'per.49',slot:'full',type:'example',lemmaId:'n-қыз',sequence:['Q'],before:'қыз',beforeRu:'девушка',added:' ба',after:'қыз ба',afterRu:'девушка ли'},
+ {id:'per.50',slot:'full',type:'example',lemmaId:'n-қонақ',sequence:['Q'],before:'қонақ',beforeRu:'гость',added:' па',after:'қонақ па',afterRu:'гость ли'},
+ {id:'per.51',slot:'full',type:'example',lemmaId:'n-әріптес',sequence:['Q'],before:'әріптес',beforeRu:'коллега',added:' пе',after:'әріптес пе',afterRu:'коллега ли'},
+ {id:'per.52',slot:'full',type:'example',lemmaId:'n-егіз',sequence:['Q'],before:'егіз',beforeRu:'близнец',added:' бе',after:'егіз бе',afterRu:'близнец ли'},
+ {id:'per.53',slot:'full',type:'example',lemmaId:'n-аға',sequence:['Q'],before:'аға',beforeRu:'старший брат',added:' ма',after:'аға ма',afterRu:'старший брат ли'},
+ {id:'per.54',slot:'full',type:'example',lemmaId:'n-сіңлі',sequence:['Q'],before:'сіңлі',beforeRu:'младшая сестра',added:' ме',after:'сіңлі ме',afterRu:'младшая сестра ли'},
+ {id:'per.55',slot:'full',type:'warning',text:'После м, н или ң три разных ответа: адаммын — я человек, адамбыз — мы люди, адам ба — человек ли. Одна привычка «после м» их не выбирает.'},
+ {id:'per.56',slot:'full',type:'subheading',text:'Не «не делать»'},
+ {id:'per.57',slot:'full',type:'paragraph',text:'У глагола «не делать» буквы тоже бывают ба, бе, па, пе, ма, ме, но это другое действие и другое слово. жазба — не пиши. Это не вопрос «пишешь ли» и не «я человек».'},
+ {id:'per.58',slot:'full',type:'example',lemmaId:'v-жаз',sequence:['NEG'],before:'жаз',beforeRu:'писать',added:'-ба',after:'жазба',afterRu:'не пиши'},
+ {id:'per.59',slot:'full',type:'try',prompt:'Нужно сказать «я человек». Что выбрать?',options:['адаммын','адамбыз','адам ба'],answer:'адаммын',good:'адаммын — я человек.',bad:'адамбыз — мы люди. адам ба — вопрос «человек ли». Я человек: адаммын.'},
+ {id:'per.60',slot:'full',type:'try',prompt:'Нужно сказать «мой ребёнок», не «я ребёнок». Что выбрать?',options:['балам','баламын'],answer:'балам',good:'балам — мой ребёнок.',bad:'баламын — я ребёнок. Мой ребёнок: балам.'},
+ {id:'per.61',slot:'contrast',type:'list',items:['баламын — я ребёнок','балам — мой ребёнок','мұғаліммін — я учитель','мұғалімім — мой учитель','адаммын — я','адамбыз — мы','адам ба — вопрос','жазба — не пиши']},
+ {id:'per.62',slot:'full',type:'term',text:'В учебниках это личные окончания при имени и отдельная вопросительная частица. Для первого ответа достаточно: я, мы, ты, Вы или вопрос.'}
 ];
 const LESSONS=[
  {
@@ -449,6 +584,21 @@ const LESSONS=[
   steps:['назови вопрос','возьми слово и перевод','выбери добавку этой группы','не переноси правило соседнего вопроса'],
   requiredBlockIds:['nas.3','nas.6','nas.16','nas.24','nas.30','nas.32','nas.37','nas.39','nas.43'],
   blocks:nasalBlocks
+ },
+ {
+  id:'learner.person.roles',
+  title:'Я, мы и вопрос',
+  status:'READY',
+  contentVersion:VERSION,
+  modules:['person'],
+  families:['COP_1SG','COP_1PL','COP_2SG','COP_2POL','COP_2PL','COP_2PL_POL','Q'],
+  home:{moduleId:'person',familyId:'COP_1SG'},
+  sourceNotes:['32 I','34 лицо и вопрос'],
+  renderTargets:['teaching.meaning','teaching.full','teaching.contrast','practice.feedback','practice.operation'],
+  lookAt:['я, мы, ты, Вы или вопрос','это не «моя вещь»','после м, н, ң у «я», «мы» и вопроса разные буквы','вопрос пишется отдельно'],
+  steps:['реши, кто говорит о себе или это вопрос','возьми слово и перевод','выбери конец этой роли','не путай с «мой» и с «не делать»'],
+  requiredBlockIds:['per.3','per.5','per.21','per.33','per.45','per.55','per.58','per.59'],
+  blocks:personBlocks
  }
 ];
 const api={version:VERSION,lessons:LESSONS,label,forFamily,lessonTarget,openTarget,operation,supportLine,feedback,chainNote,render,unavailable,visibleText,check};
