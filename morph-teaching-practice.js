@@ -501,7 +501,7 @@ function stage9Queue(state,seed=1){
   items.push({id:row.id,lemmaId:row.lemmaId,sequence:row.sequence.slice(),options:row.options.slice(),reason,family});
  }
  if(recent&&eligible.some(c=>c.families.includes(recent.sequence.at(-1)))&&!stage9Repeated(state,recent.sequence.at(-1)))take(recent.sequence.at(-1),'Повторяем эту функцию, потому что здесь была ошибка.');
- for(const contrast of ranked)for(const family of contrast.families)take(family,stage9Repeated(state,family)?'Эту функцию лучше открыть в полном объяснении: одна и та же ошибка уже повторялась.':'Смешиваем уже знакомую функцию «'+family+'».');
+ for(const contrast of ranked)for(const family of contrast.families)take(family,stage9Repeated(state,family)?'Эту функцию лучше открыть в полном объяснении: одна и та же ошибка уже повторялась.':'Смешиваем уже знакомую функцию.');
  const repeated=STAGE9_CONTRASTS.some(c=>c.families.some(f=>stage9Repeated(state,f)));
  return {items,status:items.length?'в смешивании':repeated?'нужно повторить':'мало данных',reason:items[0]?.reason||(repeated?'Эту функцию лучше открыть в полном объяснении: одна и та же ошибка уже повторялась.':'Мало данных.'),seed,repeated};
 }
