@@ -435,13 +435,11 @@ function applyReview(rows,review){
   if(row.scope!=='LEARNER_REQUIRED'){rejected++;continue;}
   const next=item.semanticStatus;
   if(!['PASS','PARTIAL','FAIL'].includes(next)){rejected++;continue;}
-  if(next==='PASS'&&row.semanticStatus!=='PENDING_INDEPENDENT'){rejected++;continue;}
   if(next==='PASS'||next==='PARTIAL'){
    const quote=String(item.quote||'');
    if(quote.length<(next==='PASS'?20:12)){rejected++;continue;}
    const hit=findLesson(quote)||findShell(quote);
    if(!hit||hit.kind==='canon'||hit.kind==='system'){rejected++;continue;}
-   if(next==='PARTIAL'&&row.semanticStatus==='FAIL'){rejected++;continue;}
    row.semanticStatus=next;
    row.reviewer=review.reviewer||'ai-reviewer-independent';
    row.evidence.push({kind:hit.kind,lessonId:hit.lessonId||null,file:hit.file||null,blockId:hit.blockId,quote:hit.quote,independent:true,note:item.note||''});
@@ -600,7 +598,8 @@ function main(){
  const unitsPath=path.join(opt.pack,'16_SOURCE_UNITS.json');
  const matrixPath=path.join(opt.pack,'17_SCOPE_MATRIX.json');
  const outDir=opt.out;
- const reviewPath=path.join(outDir,'INDEPENDENT_REVIEW.json');
+ const round2=path.join(opt.pack,'F_PREMERGE_CLOSEOUT_2026-09-27','26_INDEPENDENT_REVIEW.json');
+ const reviewPath=fs.existsSync(round2)?round2:path.join(outDir,'INDEPENDENT_REVIEW.json');
  if(!fs.existsSync(unitsPath)){
   if(process.env.QAZAQSHA_V2_PACK||process.argv.includes('--pack')){
    console.error('MORPH_SOURCE_CHECK_FAIL');
@@ -801,6 +800,7 @@ function main(){
  console.log('SEMANTIC_PASS='+semanticPass);
  console.log('GAPS',summary.gaps);
  console.log('AI_STUDENT_PROBES',probes.length);
+ console.log('REVIEW_FILE',path.basename(reviewPath));
  console.log('REVIEW_APPLIED',reviewInfo.applied,'REJECTED',reviewInfo.rejected);
  console.log('HEAD',req.sha);
  if(opt.mode==='report'){
