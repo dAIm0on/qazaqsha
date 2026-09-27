@@ -639,7 +639,9 @@ body.keyboard-open #account-dialog{
 .learn-lessons .lesson{display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center;text-align:left;width:100%;padding:12px 14px;min-height:56px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .learn-lessons .lesson[aria-current=true]{background:var(--oil,#F3E18A);border-color:transparent}
 .learn-lessons h3{margin:0;font-size:1rem}
-.path-paper{max-width:44rem;margin:0 auto}
+.path-paper{max-width:44rem;margin:0 auto;min-width:0}
+.path-block,.path-canon,.path-paper p,.path-paper li,.path-paper pre,.path-paper code{max-width:100%;min-width:0;overflow-wrap:anywhere}
+.path-paper pre,.path-block pre{white-space:pre-wrap}
 .path-canon .path-block{margin:16px 0}
 .path-canon h3{font-size:1.05rem;margin:0 0 8px}
 .path-canon p{margin:0 0 10px;line-height:1.55}
