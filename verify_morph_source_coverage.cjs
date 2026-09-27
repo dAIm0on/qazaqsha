@@ -86,11 +86,11 @@ const SHELL_RULES=[
  {re:/Проверить на новых основах/,needle:'Проверить на новых основах',file:'morph-ui.js',id:'shell.hub.transfer'},
  {re:/расписани[еяю] повторен|FSRS не обновля/,needle:'не меняют расписание повторений',file:'morph-ui.js',id:'shell.schedule'},
  {re:/мало данных|пока мало ответов/,needle:'пока мало ответов',file:'morph-ui.js',id:'shell.little-data'},
- {re:/не сертификат|освоено навсегда|не доказательство метода/,needle:'Это не доказательство метода',file:'morph-ui.js',id:'shell.not-certificate'},
+ {re:/не сертификат|освоено навсегда|освоена навсегда|не доказательство метода/,needle:'Он не означает, что тема освоена навсегда.',file:'morph-ui.js',id:'shell.not-certificate'},
  {re:/следующ\w* дн|отложенн\w* проверк|удержан/,needle:'повтора на следующий день ещё не было',file:'morph-ui.js',id:'shell.retention'},
  {re:/Недостаточно новых основ|банк этого не позволяет|claim сужается/,needle:'Недостаточно новых основ для полной проверки этого поднавыка.',file:'morph-teaching-practice.js',id:'shell.short-bank'},
  {re:/не записывается как самостоятельный|hinted\/guided|Событие после hint/,needle:'Он не записывается как самостоятельный ответ.',file:'morph-learner-v2.js',id:'shell.unscored-try'},
- {re:/без оценки|нет однозначно допущенного эталона|не учитывается как ошибка ученика/,needle:'без оценки',file:'morph-ui.js',id:'shell.unscorable-label'}
+ {re:/без оценки|нет однозначного проверенного эталона|не считается твоей ошибкой|не учитывается как ошибка ученика/,needle:'Это не считается твоей ошибкой.',file:'morph-ui.js',id:'shell.unscorable-label'}
 ];
 
 function obligations(fragment){
@@ -168,8 +168,8 @@ const ANCHORS={
  'SRC32-0211':{lesson:'learner.person.roles',needles:['жазба — не пиши','Это не вопрос'],decision:'REPHRASED'},
  'SRC32-0220':{lesson:'learner.verbs.steps',needles:['жазған','ойнаған'],missing:['Четыре куска ған/ген/қан/кен одной строкой не выписаны.'],decision:'SPLIT',partial:true},
  'SRC32-0250':{needles:['Это только порог, когда смешивание уже можно открыть'],file:'morph-ui.js',decision:'REPHRASED',partial:true,missing:['Фраза запрещает считать порог доказательством. Поштучный запрет «не добавлять сразу функцию, край, исключение, длинную цепь и новый способ ответа» отдельным списком в оболочке не найден.']},
- 'SRC32-0255':{needles:['Это не доказательство метода'],file:'morph-ui.js',decision:'REPHRASED'},
- 'SRC32-0280':{needles:['без оценки'],file:'morph-ui.js',decision:'REPHRASED',partial:true,missing:['На экране короткая подпись «без оценки». Полная фраза «ответ не учитывается как ошибка ученика» остаётся в morph-teaching-data.js и в простой урок целиком не перенесена.']},
+ 'SRC32-0255':{needles:['Этот порог только открывает смешанную практику.','Он не означает, что тема освоена навсегда.'],file:'morph-ui.js',decision:'REPHRASED'},
+ 'SRC32-0280':{needles:['Для этого ответа сейчас нет однозначного проверенного эталона. Это не считается твоей ошибкой.'],file:'morph-ui.js',decision:'REPHRASED'},
  'SRC32-0285':{lesson:'learner.dat.kuda',needles:['Что скажем','Посмотрим ещё'],decision:'SPLIT',partial:true,missing:['Девять шагов сессии исходника не пронумерованы тем же списком. В уроке есть смысл, примеры, выбор и отдельная самостоятельная практика.']},
  'SRC32-0290':{needles:['Он не записывается как самостоятельный ответ.'],file:'morph-learner-v2.js',decision:'REPHRASED',partial:true,missing:['Ученику сказано, что выбор в разборе не пишется как самостоятельный ответ. Служебное имя hinted/guided остаётся в morph-state.js.']},
  'SRC32-0298':{needles:['Недостаточно новых основ для полной проверки этого поднавыка.'],file:'morph-teaching-practice.js',decision:'REPHRASED'},
@@ -184,9 +184,14 @@ const ANCHORS={
  'SRC34-0081':{lesson:'learner.nasal.senses',needles:['В -мен, -бен и -пен буква е остаётся','После глухого конца п','После з буква б'],decision:'REPHRASED'},
  'SRC34-0109':{lesson:'learner.person.roles',needles:['Кто я, не чья вещь'],decision:'REPHRASED',partial:true,missing:['Слово «предикация» в простом уроке не используется. Это и есть запрет делать его единственным объяснением, но самого запрета строкой нет.']},
  'SRC34-0111':{lesson:'learner.person.roles',needles:['Кто я, не чья вещь'],decision:'REPHRASED'},
- 'SRC34-0130':{lesson:'learner.verbs.steps',needles:['«Если» — са или се'],decision:'REPHRASED'},
- 'SRC34-0134':{lesson:'learner.verbs.steps',needles:['«Если» — са или се'],decision:'REPHRASED'},
- 'SRC34-0135':{lesson:'learner.verbs.steps',needles:['Начало не прыгает между д и т'],decision:'REPHRASED'},
+ 'SRC34-0130':{lesson:'learner.verbs.steps',needles:['«Если» — удобный первый мостик'],decision:'REPHRASED'},
+ 'SRC34-0134':{lesson:'learner.verbs.steps',needles:['Задний ряд берёт са, передний се.'],decision:'REPHRASED'},
+ 'SRC34-0135':{lesson:'learner.verbs.steps',needles:['Начальная с здесь не прыгает на д, т, м, б или п.'],decision:'REPHRASED'},
+ 'SRC32-0084':{lesson:'learner.pl.several',needles:['Сначала л, д или т','Потом а или е'],decision:'REPHRASED'},
+ 'SRC32-0108':{lesson:'learner.nasal.senses',needles:['гласный | л | н | н | д | д | м | м | м | м'],decision:'REPHRASED'},
+ 'SRC32-0109':{lesson:'learner.nasal.senses',needles:['й или согласный у | л | д | д | д | д | м | м | м | м'],decision:'REPHRASED'},
+ 'SRC32-0249':{lesson:'learner.poss.owner',needles:['Следующий тренировочный пример берётся на другой разрешённой основе'],decision:'REPHRASED',partial:true,missing:['Короткий контраст на другой основе есть. Ограничение «не повторять одну тему без конца, потом смешать» отдельным списком не выписано.']},
+ 'SRC34-0113':{lesson:'learner.person.roles',needles:['Для «я» конец бывает','Для «мы»','«Ты» здесь'],decision:'SPLIT'},
  'SRC34-0168':{lesson:'learner.verbs.steps',needles:['Это описание предмета, не сообщение'],decision:'REPHRASED',partial:true,missing:['Контекст примеров однозначный. Запрет проверять тонкость «подлежащее или дополнение» отдельной фразой не найден.']},
  'SRC34-0170':{lesson:'learner.verbs.steps',needles:['жазған','Келген адам'],missing:['Куски ған и ген есть в примерах. Строка қан/кен целиком не выписана.'],decision:'SPLIT',partial:true},
  'SRC34-0188':{lesson:'learner.verbs.steps',needles:['келіп'],missing:['После согласного показан келіп. Пара ып/іп как полное правило одной строкой не выписана.'],decision:'REPHRASED',partial:true},
@@ -205,14 +210,14 @@ const ANCHORS={
  'SRC32-0185':{lesson:'learner.poss.owner',needles:['После первого шага работаем с үйлер'],decision:'REPHRASED'},
  'SRC32-0209':{lesson:'learner.verbs.steps',needles:['жазба','ма, ме, ба, бе, па, пе'],decision:'REPHRASED'},
  'SRC32-0224':{lesson:'learner.verbs.steps',needles:['келсе','са или се'],decision:'REPHRASED'},
- 'SRC32-0225':{lesson:'learner.verbs.steps',needles:['Начало не прыгает между д и т'],decision:'REPHRASED'},
+ 'SRC32-0225':{lesson:'learner.verbs.steps',needles:['Начальная с здесь не прыгает на д, т, м, б или п.'],decision:'REPHRASED'},
  'SRC32-0240':{lesson:'learner.verbs.steps',needles:['Каждый шаг видит предыдущее слово'],decision:'REPHRASED'},
  'SRC32-0253':{file:'morph-ui.js',needles:['стоит повторить'],decision:'REPHRASED'},
  'SRC32-0264':{file:'morph-learner-v2.js',needles:['Первая буква добавки не подходит к концу этого слова.'],decision:'REPHRASED'},
  'SRC32-0278':{file:'morph-learner-v2.js',needles:['Одна причина по этой записи не назначается.'],decision:'REPHRASED'},
  'SRC32-0292':{file:'morph-ui.js',needles:['Проверить на новых основах'],decision:'REPHRASED',partial:true,missing:['Кнопка проверки на новых основах есть. Формулировка «новое внутри модуля на уровне леммы» ученику так не сказано.']},
  'SRC32-0296':{lesson:'learner.poss.owner',needles:['Следующий тренировочный пример берётся на другой разрешённой основе'],decision:'REPHRASED',partial:true,missing:['Дословного запрета «не заменять знакомыми карточками» в оболочке нет. В уроке сказано, что следующий пример берётся на другой разрешённой основе.']},
- 'SRC32-0308':{file:'morph-ui.js',needles:['без оценки'],decision:'REPHRASED',partial:true,missing:['Подпись «без оценки» короче фразы «третий вариант не является ошибкой ученика».']},
+ 'SRC32-0308':{file:'morph-ui.js',needles:['Это не считается твоей ошибкой.'],decision:'REPHRASED'},
  'SRC34-0035':{lesson:'learner.nasal.senses',needles:['Речь об этой книге, не о книге вообще'],decision:'REPHRASED'},
  'SRC34-0036':{lesson:'learner.nasal.senses',needles:['Речь об этой книге'],decision:'REPHRASED',partial:true,missing:['Казахская формулировка источника «тура объект» и отдельное противопоставление немаркированного неопределённого объекта в урок дословно не перенесены.']},
  'SRC34-0038':{lesson:'learner.nasal.senses',needles:['Кого или что именно'],decision:'REPHRASED'},
@@ -222,7 +227,7 @@ const ANCHORS={
  'SRC34-0077':{lesson:'learner.nasal.senses',needles:['С кем'],decision:'REPHRASED',partial:true,missing:['Заголовок урока разбирает «с кем» отдельно от «чем». Точная вывеска «С кем? С чем вместе?» одной строкой не скопирована.']},
  'SRC34-0093':{file:'morph-learner-v2.js',needles:['чей это предмет'],decision:'REPHRASED'},
  'SRC34-0117':{lesson:'learner.verbs.steps',needles:['В этом уроке не разбираем тонкость'],decision:'REPHRASED',partial:true,missing:['Сказано, что без ясного примера тонкость не разбирается. Общая фраза «runtime проверяет словоформу, смысл задаёт контекст» так не вынесена.']},
- 'SRC34-0128':{lesson:'learner.verbs.steps',needles:['«Если» — са или се'],decision:'REPHRASED',partial:true,missing:['Предупреждение источника, что у са/се бывают и другие оттенки, в урок не перенесено.']},
+ 'SRC34-0128':{lesson:'learner.verbs.steps',needles:['форма не равна одному русскому слову «если» во всех случаях'],decision:'REPHRASED'},
  'SRC34-0145':{lesson:'learner.verbs.steps',needles:['Это не то же самое, что адаммын'],decision:'REPHRASED'},
  'SRC34-0147':{lesson:'learner.verbs.steps',needles:['Кто сделал','келсем'],decision:'SPLIT'},
  'SRC34-0150':{lesson:'learner.verbs.steps',needles:['келсем','айтсаң'],missing:['келсек как отдельный пример «мы» при условии в этом абзаце не выписан. Есть жазсақ — если мы напишем.'],decision:'SPLIT',partial:true},
@@ -525,7 +530,7 @@ function buildRequirements(summary){
  push('R39',has('не собирает «заставить сделать», страдательное и возвратное','learner.verbs.steps')&&!L.lessons.some(row=>row.families.some(f=>/CAUSATIVE|PASSIVE|REFLEXIVE/.test(f)))?'PASS':'FAIL',['vb.81','семейства уроков не включают эти три']);
  const mixed=ui('Это только порог, когда смешивание уже можно открыть');
  push('R40',mixed?'PARTIAL':'FAIL',['morph-ui.js порог смешивания'],'Отдельного урока смешивания нет. Ограничение «одна новая трудность» дословно не найдено.');
- push('R41',ui('Это не доказательство метода')?'PASS':'FAIL',['morph-ui.js stage 9']);
+ push('R41',ui('Он не означает, что тема освоена навсегда.')?'PASS':'FAIL',['morph-ui.js: порог смешивания не означает освоение навсегда']);
  push('R42',!!findIn(L.feedback({stem:'қала',gloss:'город',expected:'қалаға',familyId:'DAT',trace:{morpheme:'DAT',suffix:'ға'}},['OTHER_FORM']),'Одна причина по этой записи не назначается')&&!!findShell('Похожая форма отвечает на другой вопрос','morph-learner-v2.js')?'PASS':'FAIL',['feedback при OTHER_FORM не назначает одну причину','HARMONY и край тоже сказаны наблюдением']);
  push('R43',has('другой разрешённой основе','learner.poss.owner')?'PASS':'FAIL',['poss.54']);
  const transferLexemes=E.data.lemmas.filter(x=>x.split==='transfer').map(x=>x.text);
@@ -559,7 +564,7 @@ function buildRequirements(summary){
  const leaks=L.check({formOf:(id,seq)=>E.form(id,seq).word,trainIds:new Set(E.data.lemmas.filter(x=>x.split==='train').map(x=>x.id)),transferTexts:transferLexemes});
  push('R53',leaks.ok?'PASS':'FAIL',leaks.ok?['L.check: латинские коды семейств не попали в текст восьми уроков']:leaks.errors.slice(0,6));
  push('R54','PARTIAL',['восемь тем открываются уроком learner-ru-v2-c4'],'Для семейств этих восьми уроков сырой канон не является их простым текстом. Отдельный аварийный отказ «урок недоступен» есть в unavailable(). Что канон нигде не остаётся запасным экраном, визуально не обойдено.');
- push('R55',ui('без оценки')?'PARTIAL':'FAIL',['morph-ui.js UNSCORABLE → «без оценки»','полная фраза остаётся в morph-teaching-data.js'],'Короткая подпись не договаривает «это не ошибка ученика».');
+ push('R55',ui('Это не считается твоей ошибкой.')?'PASS':'FAIL',['morph-ui.js: нет однозначного эталона, и это не ошибка ученика']);
  push('R56','NOT_RUN',['протокол 14, шесть вопросов, не проводился'],'Просмотр страниц человеком был про ясность, не про этот протокол. ИИ-ученик здесь только размечает выбор в примерах и не подменяет ответы Кристины.');
  push('R57',summary.byDecision.SUPERSEDED>0?'PASS':'FAIL',['SUPERSEDED '+summary.byDecision.SUPERSEDED], 'Исторические MISSING не помечены как урок.');
  push('R58','PASS',['S01–S18 заполняются этим же прогоном, у каждого есть статус и evidence']);
@@ -697,7 +702,7 @@ function main(){
   S01:['PASS','Хаб: пять кнопок в morph-ui.js, включая «Учиться с нуля» и «Проверить на новых основах».'],
   S02:['N/A','Свободный ввод калькулятора не является экраном этого выпуска. В morph-ui.js слова «калькулятор» нет.'],
   S03:['PARTIAL','Результат формы показывается в практике и в feedback(), не на отдельном экране калькулятора.'],
-  S04:['PARTIAL','Неподдержанная форма подписана «без оценки». Полное «это не ошибка ученика» на простом экране не собрано.'],
+  S04:['PASS','Отказ говорит: нет однозначного проверенного эталона, и это не ошибка ученика. Отдельный калькулятор ещё в следующем пакете.'],
   S05:['PASS','Вход в тему: forFamily и openTarget ведут в один из восьми уроков.'],
   S06:['PASS','Смысл в opening каждого урока, до кнопок try.'],
   S07:['PASS','Полный разбор — slot full, длиннее opening.'],

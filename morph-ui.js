@@ -138,7 +138,7 @@ function hub(){
  const d=data(),m=d.module,s=m.session,tr=m.teaching?.resume,lines=E.writtenLines(m.events),r=lines.practice,p=teachingProgress(m);
  const rows=E.data.levels.map(l=>{const stats=E.summary(m.events.filter(e=>e.level===l.id&&!e.transfer));return '<option value="'+l.id+'"'+(l.id===level?' selected':'')+'>'+l.title+(stats.n?' · '+stats.correct+'/'+stats.n:'')+'</option>';}).join('');
  const misses={};for(const e of m.events.slice(-40))for(const c of e.errorCodes||[])misses[c]=(misses[c]||0)+1;
- const labels={HARMONY:'ряд гласного',ONSET_CLASS:'начальный согласный',STEM_CHANGE:'изменение основы',MORPH_STATE:'форма после «мой / его»',OTHER_FORM:'другая форма',MULTIPLE_FEATURES:'несколько отличий',LEXICAL_EXCEPTION:'особое слово',CATEGORY:'другое значение',MORPHEME_BOUNDARY:'другой шаг',UNSCORABLE:'без оценки'};
+ const labels={HARMONY:'ряд гласного',ONSET_CLASS:'начальный согласный',STEM_CHANGE:'изменение основы',MORPH_STATE:'форма после «мой / его»',OTHER_FORM:'другая форма',MULTIPLE_FEATURES:'несколько отличий',LEXICAL_EXCEPTION:'особое слово',CATEGORY:'другое значение',MORPHEME_BOUNDARY:'другой шаг',UNSCORABLE:'Для этого ответа сейчас нет однозначного проверенного эталона. Это не считается твоей ошибкой.'};
  const canContinue=!!(tr||(s&&!s.complete));
  const where=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0))?esc(teachingFamily(tr.familyId)?.title||teachingModule(tr.currentModule)?.title||'тема'):(s&&!s.complete?'практика '+(s.cursor+1)+' из '+s.queue.length:'пока не начато');
  const status=routeStatus(level);
@@ -547,7 +547,7 @@ function stage9Screen(){
  if(r&&r.currentTeachingStep==='ERROR_REPAIR')return stage9RepairScreen();
  if(s&&!s.complete)return question(s);
  const built=P.stage9Queue(data().module,20260926);
- return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">СМЕШАННАЯ ПРАКТИКА</p><h2>'+esc(shellPhrase(built.status))+'</h2><p>'+esc(built.reason)+'</p><p class="small">Это только порог, когда смешивание уже можно открыть. Это не доказательство метода. Проверка на новых словах и повтор на следующий день считаются отдельно.</p><button class="secondary-button" data-stage9-full>Открыть полное объяснение</button><button class="text-button" data-morph-hub>К тренировкам</button></div>';
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">СМЕШАННАЯ ПРАКТИКА</p><h2>'+esc(shellPhrase(built.status))+'</h2><p>'+esc(built.reason)+'</p><p class="small">Этот порог только открывает смешанную практику. Он не означает, что тема освоена навсегда. Сложность поднимай постепенно: не меняй сразу смысл, край слова, исключение, длинную цепочку и способ ответа. Проверка на новых словах и повтор на следующий день считаются отдельно.</p><button class="secondary-button" data-stage9-full>Открыть полное объяснение</button><button class="text-button" data-morph-hub>К тренировкам</button></div>';
 }
 function start(mode){
  const d=data();teachingMode=false;topicOpen=false;
