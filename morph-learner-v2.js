@@ -1,6 +1,6 @@
 (function(root){
 'use strict';
-const VERSION='learner-ru-v2-c2';
+const VERSION='learner-ru-v2-c3';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABELS={
  PL:'несколько',
@@ -17,6 +17,15 @@ const LABELS={
  COP_2PL:'вы — кто',
  COP_2PL_POL:'Вы, несколько — кто',
  Q:'вопрос ли',
+ NEG:'не делать',
+ PAST:'уже сделал',
+ PTCP_GAN:'предмет через действие',
+ COND:'если',
+ CVB_IP:'добавочное действие',
+ AGR_SHORT_1SG:'я, к уже сказанному действию',
+ AGR_SHORT_1PL:'мы, к уже сказанному действию',
+ AGR_SHORT_2SG:'ты, к уже сказанному действию',
+ AGR_SHORT_2POL:'Вы, к уже сказанному действию',
  POSS_1SG:'мой, моя',
  POSS_2SG:'твой, твоя',
  POSS_1PL:'наш, наша',
@@ -37,7 +46,10 @@ function openTarget(item){
  if(!item)return null;
  const seq=Array.isArray(item.sequence)?item.sequence:[];
  const id=item.morpheme||item.familyId||seq.at(-1);
- if(seq.some(x=>String(x).startsWith('POSS_'))||String(id||'').startsWith('POSS_'))return lessonTarget('learner.poss.owner');
+ const verbFamily={'NEG':1,'PAST':1,'PTCP_GAN':1,'COND':1,'CVB_IP':1,'AGR_SHORT_1SG':1,'AGR_SHORT_1PL':1,'AGR_SHORT_2SG':1,'AGR_SHORT_2POL':1};
+ if(verbFamily[id]||seq.some(x=>verbFamily[x]))return lessonTarget('learner.verbs.steps');
+ if(seq.length>1)return lessonTarget('learner.chains.steps');
+ if(String(id||'').startsWith('POSS_'))return lessonTarget('learner.poss.owner');
  const byFamily={DAT:'learner.dat.kuda',LOC:'learner.loc.where',PL:'learner.pl.several',GEN:'learner.nasal.senses',ACC:'learner.nasal.senses',ABL:'learner.nasal.senses',INS:'learner.nasal.senses',COP_1SG:'learner.person.roles',COP_1PL:'learner.person.roles',COP_2SG:'learner.person.roles',COP_2POL:'learner.person.roles',COP_2PL:'learner.person.roles',COP_2PL_POL:'learner.person.roles',Q:'learner.person.roles'};
  const lessonId=byFamily[id]||seq.map(x=>byFamily[x]).find(Boolean);
  return lessonId?lessonTarget(lessonId):null;
@@ -57,6 +69,12 @@ function supportLine(id){
  if(id==='GEN'||id==='ACC'||id==='ABL'||id==='INS')return 'Сначала реши, что хочешь сказать. Одинаковый конец слова не даёт одно окончание на все вопросы. Это опора, не самостоятельный ответ.';
  if(String(id||'').startsWith('COP_'))return 'Сначала реши, кто это говорит о себе: я, мы, ты или Вы. Это не «моя вещь». Это опора, не самостоятельный ответ.';
  if(id==='Q')return 'Сначала реши, что это вопрос. Частица пишется отдельно. Это не «не делать». Это опора, не самостоятельный ответ.';
+ if(id==='NEG')return 'Сначала реши: не делать. Это не вопрос. Это опора, не самостоятельный ответ.';
+ if(id==='PAST')return 'Сначала реши: действие уже произошло. Потом выбери ды, ді, ты или ті. Это опора, не самостоятельный ответ.';
+ if(id==='PTCP_GAN')return 'Эта форма описывает предмет через действие. Это не «он сделал». Это опора, не самостоятельный ответ.';
+ if(id==='COND')return 'Сначала реши: если так будет. Конец са или се. Это опора, не самостоятельный ответ.';
+ if(id==='CVB_IP')return 'Это добавочное действие рядом с главным. Само по себе оно не значит «он сделал». Это опора, не самостоятельный ответ.';
+ if(String(id||'').startsWith('AGR_SHORT_'))return 'Лицо добавляется к уже собранной форме. Это не «я человек». Это опора, не самостоятельный ответ.';
  if(String(id||'').startsWith('POSS_'))return 'Сначала реши, чей это предмет. Потом посмотри на конец слова. Это опора, не самостоятельный ответ.';
  return null;
 }
@@ -126,7 +144,7 @@ const TYPES=new Set(['paragraph','subheading','list','ordered-list','example','c
 function check(opts){
  const errors=[],formOf=opts&&opts.formOf,trainIds=opts&&opts.trainIds,transferTexts=opts&&opts.transferTexts||[],rows=opts&&opts.lessons||LESSONS;
  const seen=new Set();
- if(!opts||!opts.lessons){if(rows.length!==6)errors.push('expected six ready lessons');}
+ if(!opts||!opts.lessons){if(rows.length!==8)errors.push('expected eight ready lessons');}
  for(const row of rows){
   if(row.status!=='READY')errors.push(row.id+' not ready');
   if(seen.has(row.id))errors.push('duplicate '+row.id);seen.add(row.id);
@@ -509,6 +527,135 @@ const personBlocks=[
  {id:'per.61',slot:'contrast',type:'list',items:['баламын — я ребёнок','балам — мой ребёнок','мұғаліммін — я учитель','мұғалімім — мой учитель','адаммын — я','адамбыз — мы','адам ба — вопрос','жазба — не пиши']},
  {id:'per.62',slot:'full',type:'term',text:'В учебниках это личные окончания при имени и отдельная вопросительная частица. Для первого ответа достаточно: я, мы, ты, Вы или вопрос.'}
 ];
+const chainBlocks=[
+ {id:'ch.1',slot:'opening',type:'subheading',text:'Шаг за шагом'},
+ {id:'ch.2',slot:'opening',type:'paragraph',text:'Длинное слово собирается не от первого слова сразу. После каждого шага работаем уже с тем, что получилось.'},
+ {id:'ch.3',slot:'opening',type:'example',lemmaId:'n-үй',sequence:['PL'],before:'үй',beforeRu:'дом',added:'-лер',after:'үйлер',afterRu:'дома'},
+ {id:'ch.4',slot:'opening',type:'example',lemmaId:'n-үй',sequence:['PL','POSS_1PL'],before:'үй',beforeRu:'дом',added:'-іміз после үйлер',after:'үйлеріміз',afterRu:'наши дома'},
+ {id:'ch.5',slot:'opening',type:'example',lemmaId:'n-үй',sequence:['PL','POSS_1PL','ABL'],before:'үй',beforeRu:'дом',added:'-ден после үйлеріміз',after:'үйлерімізден',afterRu:'из наших домов'},
+ {id:'ch.6',slot:'opening',type:'paragraph',text:'Перед последним шагом слово үйлеріміз кончается на з. Отсюда -ден, не от голого үй.'},
+ {id:'ch.7',slot:'full',type:'subheading',text:'Его или её, потом вопрос'},
+ {id:'ch.8',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['POSS_3'],before:'кітап',beforeRu:'книга',added:'-ы, п меняется на б',after:'кітабы',afterRu:'его или её книга'},
+ {id:'ch.9',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['POSS_3','DAT'],before:'кітап',beforeRu:'книга',added:'-на',after:'кітабына',afterRu:'к его или её книге'},
+ {id:'ch.10',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['POSS_3','ACC'],before:'кітап',beforeRu:'книга',added:'-н',after:'кітабын',afterRu:'его или её книгу'},
+ {id:'ch.11',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['POSS_3','LOC'],before:'кітап',beforeRu:'книга',added:'-нда',after:'кітабында',afterRu:'в его или её книге'},
+ {id:'ch.12',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['POSS_3','ABL'],before:'кітап',beforeRu:'книга',added:'-нан',after:'кітабынан',afterRu:'от его или её книги'},
+ {id:'ch.13',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['POSS_1SG','DAT'],before:'кітап',beforeRu:'книга',added:'-а после кітабым',after:'кітабыма',afterRu:'к моей книге'},
+ {id:'ch.14',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['PL','LOC'],before:'кітап',beforeRu:'книга',added:'-да после кітаптар',after:'кітаптарда',afterRu:'в книгах'},
+ {id:'ch.15',slot:'full',type:'example',lemmaId:'n-кітап',sequence:['PL','POSS_1PL','ABL'],before:'кітап',beforeRu:'книга',added:'-дан после кітаптарымыз',after:'кітаптарымыздан',afterRu:'из наших книг'},
+ {id:'ch.16',slot:'full',type:'subheading',text:'Где внутри слова меняется буква'},
+ {id:'ch.17',slot:'full',type:'paragraph',text:'У мектеп перед гласной добавкой п становится б. Сначала мектебі — его или её школа. Уже от мектебі идём дальше.'},
+ {id:'ch.18',slot:'full',type:'example',lemmaId:'n-мектеп',sequence:['POSS_3'],before:'мектеп',beforeRu:'школа',added:'-і, п меняется на б',after:'мектебі',afterRu:'его или её школа'},
+ {id:'ch.19',slot:'full',type:'example',lemmaId:'n-мектеп',sequence:['POSS_3','DAT'],before:'мектеп',beforeRu:'школа',added:'-не',after:'мектебіне',afterRu:'к его или её школе'},
+ {id:'ch.20',slot:'full',type:'example',lemmaId:'n-мектеп',sequence:['POSS_1SG','DAT'],before:'мектеп',beforeRu:'школа',added:'-е после мектебім',after:'мектебіме',afterRu:'к моей школе'},
+ {id:'ch.21',slot:'full',type:'example',lemmaId:'n-мектеп',sequence:['PL','LOC'],before:'мектеп',beforeRu:'школа',added:'-де после мектептер',after:'мектептерде',afterRu:'в школах'},
+ {id:'ch.22',slot:'full',type:'example',lemmaId:'n-мектеп',sequence:['PL','POSS_3','DAT'],before:'мектеп',beforeRu:'школа',added:'-не после мектептері',after:'мектептеріне',afterRu:'к его или её школам'},
+ {id:'ch.23',slot:'full',type:'subheading',text:'Ещё несколько цепочек'},
+ {id:'ch.24',slot:'full',type:'example',lemmaId:'n-бала',sequence:['POSS_1SG','DAT'],before:'бала',beforeRu:'ребёнок',added:'-а',after:'балама',afterRu:'моему ребёнку'},
+ {id:'ch.25',slot:'full',type:'example',lemmaId:'n-бала',sequence:['POSS_3','DAT'],before:'бала',beforeRu:'ребёнок',added:'-на после баласы',after:'баласына',afterRu:'к его или её ребёнку'},
+ {id:'ch.26',slot:'full',type:'example',lemmaId:'n-бала',sequence:['POSS_3','LOC'],before:'бала',beforeRu:'ребёнок',added:'-нда',after:'баласында',afterRu:'у его или её ребёнка'},
+ {id:'ch.27',slot:'full',type:'example',lemmaId:'n-бала',sequence:['PL','LOC'],before:'бала',beforeRu:'ребёнок',added:'-да после балалар',after:'балаларда',afterRu:'у детей'},
+ {id:'ch.28',slot:'full',type:'example',lemmaId:'n-бала',sequence:['PL','POSS_1PL','ABL'],before:'бала',beforeRu:'ребёнок',added:'-дан',after:'балаларымыздан',afterRu:'от наших детей'},
+ {id:'ch.29',slot:'full',type:'example',lemmaId:'n-дос',sequence:['POSS_3','DAT'],before:'дос',beforeRu:'друг',added:'-на после досы',after:'досына',afterRu:'к его или её другу'},
+ {id:'ch.30',slot:'full',type:'example',lemmaId:'n-дос',sequence:['POSS_2SG','ABL'],before:'дос',beforeRu:'друг',added:'-нан после досың',after:'досыңнан',afterRu:'от твоего друга'},
+ {id:'ch.31',slot:'full',type:'example',lemmaId:'n-дос',sequence:['PL','POSS_1PL','ABL'],before:'дос',beforeRu:'друг',added:'-дан',after:'достарымыздан',afterRu:'от наших друзей'},
+ {id:'ch.32',slot:'full',type:'example',lemmaId:'n-қала',sequence:['POSS_3','DAT'],before:'қала',beforeRu:'город',added:'-на после қаласы',after:'қаласына',afterRu:'в его или её город'},
+ {id:'ch.33',slot:'full',type:'example',lemmaId:'n-қала',sequence:['PL','LOC'],before:'қала',beforeRu:'город',added:'-да после қалалар',after:'қалаларда',afterRu:'в городах'},
+ {id:'ch.34',slot:'full',type:'example',lemmaId:'n-қала',sequence:['PL','POSS_1PL','ABL'],before:'қала',beforeRu:'город',added:'-дан',after:'қалаларымыздан',afterRu:'из наших городов'},
+ {id:'ch.35',slot:'full',type:'example',lemmaId:'n-ат',sequence:['POSS_3','DAT'],before:'ат',beforeRu:'имя',added:'-на после аты',after:'атына',afterRu:'к его или её имени'},
+ {id:'ch.36',slot:'full',type:'example',lemmaId:'n-ат',sequence:['PL','LOC'],before:'ат',beforeRu:'имя',added:'-да после аттар',after:'аттарда',afterRu:'в именах'},
+ {id:'ch.37',slot:'full',type:'example',lemmaId:'n-үй',sequence:['POSS_3','DAT'],before:'үй',beforeRu:'дом',added:'-не после үйі',after:'үйіне',afterRu:'к его или её дому'},
+ {id:'ch.38',slot:'full',type:'example',lemmaId:'n-үй',sequence:['POSS_1SG','DAT'],before:'үй',beforeRu:'дом',added:'-е после үйім',after:'үйіме',afterRu:'к моему дому'},
+ {id:'ch.39',slot:'full',type:'example',lemmaId:'n-үй',sequence:['POSS_2SG','ABL'],before:'үй',beforeRu:'дом',added:'-нен после үйің',after:'үйіңнен',afterRu:'из твоего дома'},
+ {id:'ch.40',slot:'full',type:'example',lemmaId:'n-үй',sequence:['PL','LOC'],before:'үй',beforeRu:'дом',added:'-де после үйлер',after:'үйлерде',afterRu:'в домах'},
+ {id:'ch.41',slot:'full',type:'try',prompt:'Нужно «из наших домов». Последний шаг от үйлеріміз. Что получится?',options:['үйлерімізден','үйден'],answer:'үйлерімізден',good:'үйлерімізден — из наших домов.',bad:'үйден — из дома, ещё без «наши». Здесь уже үйлеріміз, поэтому үйлерімізден.'},
+ {id:'ch.42',slot:'full',type:'warning',text:'В самостоятельном задании следующий конец заранее не показывают. Смотри на слово, которое уже есть на экране, и делай один шаг.'},
+ {id:'ch.43',slot:'contrast',type:'list',items:['үйден — из дома','үйлерімізден — из наших домов','кітапқа — к книге','кітабына — к его или её книге','мектепке — в школу','мектебіне — к его или её школе']}
+];
+const verbBlocks=[
+ {id:'vb.1',slot:'opening',type:'subheading',text:'Сначала какое действие'},
+ {id:'vb.2',slot:'opening',type:'paragraph',text:'У глагола тоже сначала смысл, потом буквы. «Не делать», «уже сделал», «если», «предмет через действие» и добавочное действие — разные задачи.'},
+ {id:'vb.3',slot:'opening',type:'example',lemmaId:'v-жаз',sequence:['NEG'],before:'жаз',beforeRu:'писать',added:'-ба',after:'жазба',afterRu:'не пиши'},
+ {id:'vb.4',slot:'opening',type:'example',lemmaId:'v-жаз',sequence:['PAST'],before:'жаз',beforeRu:'писать',added:'-ды',after:'жазды',afterRu:'написал'},
+ {id:'vb.5',slot:'opening',type:'example',lemmaId:'v-кел',sequence:['PAST'],before:'кел',beforeRu:'приходить',added:'-ді',after:'келді',afterRu:'пришёл'},
+ {id:'vb.6',slot:'opening',type:'example',lemmaId:'v-кел',sequence:['NEG'],before:'кел',beforeRu:'приходить',added:'-ме',after:'келме',afterRu:'не приходи'},
+ {id:'vb.7',slot:'full',type:'subheading',text:'Не делать'},
+ {id:'vb.8',slot:'full',type:'paragraph',text:'Концы: ма, ме, ба, бе, па, пе. После з или ж буква б: жазба, сезбе. После глухого п: кетпе, айтпа, жаппа. В остальных обычных случаях этого набора м: келме, барма, көрме, алма, ойнама, сөйлеме. Это не вопрос «делаешь ли»: вопрос пишется отдельно и про другое слово.'},
+ {id:'vb.9',slot:'full',type:'example',lemmaId:'v-бар',sequence:['NEG'],before:'бар',beforeRu:'идти',added:'-ма',after:'барма',afterRu:'не иди'},
+ {id:'vb.10',slot:'full',type:'example',lemmaId:'v-көр',sequence:['NEG'],before:'көр',beforeRu:'видеть',added:'-ме',after:'көрме',afterRu:'не смотри'},
+ {id:'vb.11',slot:'full',type:'example',lemmaId:'v-кет',sequence:['NEG'],before:'кет',beforeRu:'уходить',added:'-пе',after:'кетпе',afterRu:'не уходи'},
+ {id:'vb.12',slot:'full',type:'example',lemmaId:'v-айт',sequence:['NEG'],before:'айт',beforeRu:'сказать',added:'-па',after:'айтпа',afterRu:'не говори'},
+ {id:'vb.13',slot:'full',type:'example',lemmaId:'v-ал',sequence:['NEG'],before:'ал',beforeRu:'брать',added:'-ма',after:'алма',afterRu:'не бери'},
+ {id:'vb.14',slot:'full',type:'example',lemmaId:'v-ойна',sequence:['NEG'],before:'ойна',beforeRu:'играть',added:'-ма',after:'ойнама',afterRu:'не играй'},
+ {id:'vb.15',slot:'full',type:'example',lemmaId:'v-сөйле',sequence:['NEG'],before:'сөйле',beforeRu:'говорить',added:'-ме',after:'сөйлеме',afterRu:'не говори'},
+ {id:'vb.16',slot:'full',type:'example',lemmaId:'v-сез',sequence:['NEG'],before:'сез',beforeRu:'чувствовать',added:'-бе',after:'сезбе',afterRu:'не чувствуй'},
+ {id:'vb.17',slot:'full',type:'subheading',text:'Уже сделал'},
+ {id:'vb.18',slot:'full',type:'paragraph',text:'Концы: ды, ді, ты, ті. После глухого т: кетті, айтты, жапты. В остальных обычных случаях д: келді, жазды, барды, алды, ойнады, сөйледі. Это сообщение, что действие произошло. Не путай с формой, которая описывает предмет.'},
+ {id:'vb.19',slot:'full',type:'example',lemmaId:'v-бар',sequence:['PAST'],before:'бар',beforeRu:'идти',added:'-ды',after:'барды',afterRu:'пошёл'},
+ {id:'vb.20',slot:'full',type:'example',lemmaId:'v-ал',sequence:['PAST'],before:'ал',beforeRu:'брать',added:'-ды',after:'алды',afterRu:'взял'},
+ {id:'vb.21',slot:'full',type:'example',lemmaId:'v-көр',sequence:['PAST'],before:'көр',beforeRu:'видеть',added:'-ді',after:'көрді',afterRu:'увидел'},
+ {id:'vb.22',slot:'full',type:'example',lemmaId:'v-кет',sequence:['PAST'],before:'кет',beforeRu:'уходить',added:'-ті',after:'кетті',afterRu:'ушёл'},
+ {id:'vb.23',slot:'full',type:'example',lemmaId:'v-айт',sequence:['PAST'],before:'айт',beforeRu:'сказать',added:'-ты',after:'айтты',afterRu:'сказал'},
+ {id:'vb.24',slot:'full',type:'example',lemmaId:'v-ойна',sequence:['PAST'],before:'ойна',beforeRu:'играть',added:'-ды',after:'ойнады',afterRu:'играл'},
+ {id:'vb.25',slot:'full',type:'example',lemmaId:'v-сөйле',sequence:['PAST'],before:'сөйле',beforeRu:'говорить',added:'-ді',after:'сөйледі',afterRu:'говорил'},
+ {id:'vb.26',slot:'full',type:'example',lemmaId:'v-жап',sequence:['PAST'],before:'жап',beforeRu:'закрывать',added:'-ты',after:'жапты',afterRu:'закрыл'},
+ {id:'vb.27',slot:'full',type:'subheading',text:'Кто сделал'},
+ {id:'vb.28',slot:'full',type:'paragraph',text:'К уже готовому «сделал» или «если» можно добавить, кто. Это не то же самое, что адаммын — «я человек». келдім — я пришёл. келдік — мы пришли. келдің — ты пришёл. келдіңіз — Вы пришли.'},
+ {id:'vb.29',slot:'full',type:'example',lemmaId:'v-кел',sequence:['PAST','AGR_SHORT_1SG'],before:'кел',beforeRu:'приходить',added:'-м после келді',after:'келдім',afterRu:'я пришёл'},
+ {id:'vb.30',slot:'full',type:'example',lemmaId:'v-кел',sequence:['PAST','AGR_SHORT_1PL'],before:'кел',beforeRu:'приходить',added:'-к после келді',after:'келдік',afterRu:'мы пришли'},
+ {id:'vb.31',slot:'full',type:'example',lemmaId:'v-кел',sequence:['PAST','AGR_SHORT_2SG'],before:'кел',beforeRu:'приходить',added:'-ң после келді',after:'келдің',afterRu:'ты пришёл'},
+ {id:'vb.32',slot:'full',type:'example',lemmaId:'v-кел',sequence:['PAST','AGR_SHORT_2POL'],before:'кел',beforeRu:'приходить',added:'-ңіз после келдің',after:'келдіңіз',afterRu:'Вы пришли'},
+ {id:'vb.33',slot:'full',type:'example',lemmaId:'v-жаз',sequence:['PAST','AGR_SHORT_1SG'],before:'жаз',beforeRu:'писать',added:'-м',after:'жаздым',afterRu:'я написал'},
+ {id:'vb.34',slot:'full',type:'example',lemmaId:'v-жаз',sequence:['PAST','AGR_SHORT_1PL'],before:'жаз',beforeRu:'писать',added:'-қ',after:'жаздық',afterRu:'мы написали'},
+ {id:'vb.35',slot:'full',type:'example',lemmaId:'v-айт',sequence:['PAST','AGR_SHORT_1SG'],before:'айт',beforeRu:'сказать',added:'-м',after:'айттым',afterRu:'я сказал'},
+ {id:'vb.36',slot:'full',type:'example',lemmaId:'v-айт',sequence:['PAST','AGR_SHORT_2POL'],before:'айт',beforeRu:'сказать',added:'-ңыз',after:'айттыңыз',afterRu:'Вы сказали'},
+ {id:'vb.37',slot:'full',type:'example',lemmaId:'v-бар',sequence:['PAST','AGR_SHORT_1PL'],before:'бар',beforeRu:'идти',added:'-қ',after:'бардық',afterRu:'мы пошли'},
+ {id:'vb.38',slot:'full',type:'example',lemmaId:'v-көр',sequence:['PAST','AGR_SHORT_2SG'],before:'көр',beforeRu:'видеть',added:'-ң',after:'көрдің',afterRu:'ты увидел'},
+ {id:'vb.39',slot:'full',type:'subheading',text:'Если'},
+ {id:'vb.40',slot:'full',type:'paragraph',text:'«Если» — са или се. Начало не прыгает между д и т. келсе — если придёт. жазса — если напишет. Дальше можно добавить, кто: келсем — если я приду, айтсаң — если ты скажешь.'},
+ {id:'vb.41',slot:'full',type:'example',lemmaId:'v-кел',sequence:['COND'],before:'кел',beforeRu:'приходить',added:'-се',after:'келсе',afterRu:'если придёт'},
+ {id:'vb.42',slot:'full',type:'example',lemmaId:'v-жаз',sequence:['COND'],before:'жаз',beforeRu:'писать',added:'-са',after:'жазса',afterRu:'если напишет'},
+ {id:'vb.43',slot:'full',type:'example',lemmaId:'v-бар',sequence:['COND'],before:'бар',beforeRu:'идти',added:'-са',after:'барса',afterRu:'если пойдёт'},
+ {id:'vb.44',slot:'full',type:'example',lemmaId:'v-айт',sequence:['COND'],before:'айт',beforeRu:'сказать',added:'-са',after:'айтса',afterRu:'если скажет'},
+ {id:'vb.45',slot:'full',type:'example',lemmaId:'v-кел',sequence:['COND','AGR_SHORT_1SG'],before:'кел',beforeRu:'приходить',added:'-м после келсе',after:'келсем',afterRu:'если я приду'},
+ {id:'vb.46',slot:'full',type:'example',lemmaId:'v-жаз',sequence:['COND','AGR_SHORT_1PL'],before:'жаз',beforeRu:'писать',added:'-қ',after:'жазсақ',afterRu:'если мы напишем'},
+ {id:'vb.47',slot:'full',type:'example',lemmaId:'v-айт',sequence:['COND','AGR_SHORT_2SG'],before:'айт',beforeRu:'сказать',added:'-ң',after:'айтсаң',afterRu:'если ты скажешь'},
+ {id:'vb.48',slot:'full',type:'example',lemmaId:'v-сөйле',sequence:['COND'],before:'сөйле',beforeRu:'говорить',added:'-се',after:'сөйлесе',afterRu:'если будет говорить'},
+ {id:'vb.49',slot:'full',type:'subheading',text:'Предмет через действие'},
+ {id:'vb.50',slot:'full',type:'paragraph',text:'Келген адам — пришедший человек. Жазған сөз — написанное слово. Айтқан сөз — сказанное слово. Ойнаған бала — ребёнок, который играл. Это описание предмета, не сообщение «он пришёл» или «он написал».'},
+ {id:'vb.51',slot:'full',type:'example',lemmaId:'v-кел',sequence:['PTCP_GAN'],before:'кел',beforeRu:'приходить',added:'-ген',after:'келген',afterRu:'пришедший'},
+ {id:'vb.52',slot:'full',type:'example',lemmaId:'v-жаз',sequence:['PTCP_GAN'],before:'жаз',beforeRu:'писать',added:'-ған',after:'жазған',afterRu:'написавший или написанное'},
+ {id:'vb.53',slot:'full',type:'example',lemmaId:'v-айт',sequence:['PTCP_GAN'],before:'айт',beforeRu:'сказать',added:'-қан',after:'айтқан',afterRu:'сказавший или сказанное'},
+ {id:'vb.54',slot:'full',type:'example',lemmaId:'v-ойна',sequence:['PTCP_GAN'],before:'ойна',beforeRu:'играть',added:'-ған',after:'ойнаған',afterRu:'игравший'},
+ {id:'vb.55',slot:'full',type:'example',lemmaId:'v-көр',sequence:['PTCP_GAN'],before:'көр',beforeRu:'видеть',added:'-ген',after:'көрген',afterRu:'видевший или виденное'},
+ {id:'vb.56',slot:'full',type:'example',lemmaId:'v-бар',sequence:['PTCP_GAN'],before:'бар',beforeRu:'идти',added:'-ған',after:'барған',afterRu:'ходивший'},
+ {id:'vb.57',slot:'full',type:'warning',text:'Келді — пришёл. Келген — пришедший, когда рядом есть человек или предмет. В этом уроке не разбираем тонкость «кто сделал» и «что сделано» сверх ясного примера.'},
+ {id:'vb.58',slot:'full',type:'subheading',text:'Добавочное действие'},
+ {id:'vb.59',slot:'full',type:'paragraph',text:'Келіп само не значит «он пришёл». Это добавка к другому, главному действию: способ, обстоятельство или шаг перед ним. После согласного обычно ып или іп. После гласного п: алып, ойнап, сөйлеп.'},
+ {id:'vb.60',slot:'full',type:'example',lemmaId:'v-кел',sequence:['CVB_IP'],before:'кел',beforeRu:'приходить',added:'-іп',after:'келіп',afterRu:'придя, как добавка'},
+ {id:'vb.61',slot:'full',type:'example',lemmaId:'v-жаз',sequence:['CVB_IP'],before:'жаз',beforeRu:'писать',added:'-ып',after:'жазып',afterRu:'написав, как добавка'},
+ {id:'vb.62',slot:'full',type:'example',lemmaId:'v-ал',sequence:['CVB_IP'],before:'ал',beforeRu:'брать',added:'-п',after:'алып',afterRu:'взяв, как добавка'},
+ {id:'vb.63',slot:'full',type:'example',lemmaId:'v-ойна',sequence:['CVB_IP'],before:'ойна',beforeRu:'играть',added:'-п',after:'ойнап',afterRu:'играя, как добавка'},
+ {id:'vb.64',slot:'full',type:'example',lemmaId:'v-сөйле',sequence:['CVB_IP'],before:'сөйле',beforeRu:'говорить',added:'-п',after:'сөйлеп',afterRu:'говоря, как добавка'},
+ {id:'vb.65',slot:'full',type:'example',lemmaId:'v-көр',sequence:['CVB_IP'],before:'көр',beforeRu:'видеть',added:'-іп',after:'көріп',afterRu:'видя, как добавка'},
+ {id:'vb.66',slot:'full',type:'example',lemmaId:'v-бар',sequence:['CVB_IP'],before:'бар',beforeRu:'идти',added:'-ып',after:'барып',afterRu:'сходив, как добавка'},
+ {id:'vb.67',slot:'full',type:'subheading',text:'Два особых слова'},
+ {id:'vb.68',slot:'full',type:'paragraph',text:'Жап в «уже закрыл» остаётся жапты. В добавочном действии основа меняется: жауып. Сеп в «уже посеял» — септі, а в добавке — сеуіп. Это записано у этих слов. Не делай так с каждым словом на п.'},
+ {id:'vb.69',slot:'full',type:'example',lemmaId:'v-жап',sequence:['CVB_IP'],before:'жап',beforeRu:'закрывать',added:'-ып, внутри жау',after:'жауып',afterRu:'закрыв, как добавка'},
+ {id:'vb.70',slot:'full',type:'example',lemmaId:'v-сеп',sequence:['CVB_IP'],before:'сеп',beforeRu:'сеять',added:'-іп, внутри сеу',after:'сеуіп',afterRu:'посеяв, как добавка'},
+ {id:'vb.71',slot:'full',type:'example',lemmaId:'v-сеп',sequence:['PAST'],before:'сеп',beforeRu:'сеять',added:'-ті',after:'септі',afterRu:'посеял'},
+ {id:'vb.72',slot:'full',type:'subheading',text:'Сначала «не», потом остальное'},
+ {id:'vb.73',slot:'full',type:'paragraph',text:'Кел → келме → келмеді → келмедік. Каждый шаг видит предыдущее слово. «Мы не пришли» не собирается одной догадкой от кел.'},
+ {id:'vb.74',slot:'full',type:'example',lemmaId:'v-кел',sequence:['NEG','PAST'],before:'кел',beforeRu:'приходить',added:'-ді после келме',after:'келмеді',afterRu:'не пришёл'},
+ {id:'vb.75',slot:'full',type:'example',lemmaId:'v-кел',sequence:['NEG','PAST','AGR_SHORT_1PL'],before:'кел',beforeRu:'приходить',added:'-к после келмеді',after:'келмедік',afterRu:'мы не пришли'},
+ {id:'vb.76',slot:'full',type:'example',lemmaId:'v-кел',sequence:['NEG','PAST','AGR_SHORT_1SG'],before:'кел',beforeRu:'приходить',added:'-м',after:'келмедім',afterRu:'я не пришёл'},
+ {id:'vb.77',slot:'full',type:'example',lemmaId:'v-жаз',sequence:['NEG','PAST'],before:'жаз',beforeRu:'писать',added:'-ды после жазба',after:'жазбады',afterRu:'не написал'},
+ {id:'vb.78',slot:'full',type:'example',lemmaId:'v-жаз',sequence:['NEG','PAST','AGR_SHORT_1SG'],before:'жаз',beforeRu:'писать',added:'-м',after:'жазбадым',afterRu:'я не написал'},
+ {id:'vb.79',slot:'full',type:'example',lemmaId:'v-айт',sequence:['NEG','COND','AGR_SHORT_2SG'],before:'айт',beforeRu:'сказать',added:'-ң после айтпаса',after:'айтпасаң',afterRu:'если ты не скажешь'},
+ {id:'vb.80',slot:'full',type:'try',prompt:'Нужно «мы не пришли». Последний шаг от келмеді. Что выбрать?',options:['келмедік','келдік'],answer:'келмедік',good:'келмедік — мы не пришли.',bad:'келдік — мы пришли, без «не». Здесь уже келмеді, поэтому келмедік.'},
+ {id:'vb.81',slot:'full',type:'warning',text:'Тренажёр не собирает «заставить сделать», страдательное и возвратное. Эти значения сюда не подставляем и форм для них не выдумываем.'},
+ {id:'vb.82',slot:'contrast',type:'list',items:['келді — пришёл','келген адам — пришедший человек','келіп — придя, как добавка','келме — не приходи','келдім — я пришёл','келмедік — мы не пришли','жапты — закрыл','жауып — закрыв']}
+];
 const LESSONS=[
  {
   id:'learner.dat.kuda',
@@ -599,6 +746,36 @@ const LESSONS=[
   steps:['реши, кто говорит о себе или это вопрос','возьми слово и перевод','выбери конец этой роли','не путай с «мой» и с «не делать»'],
   requiredBlockIds:['per.3','per.5','per.21','per.33','per.45','per.55','per.58','per.59'],
   blocks:personBlocks
+ },
+ {
+  id:'learner.chains.steps',
+  title:'Шаг за шагом',
+  status:'READY',
+  contentVersion:VERSION,
+  modules:['chains'],
+  families:['PL','POSS_1SG','POSS_2SG','POSS_1PL','POSS_2POL','POSS_3','DAT','ACC','LOC','ABL'],
+  home:{moduleId:'chains',familyId:'PL'},
+  sourceNotes:['32 J','34 цепочки'],
+  renderTargets:['teaching.meaning','teaching.full','teaching.contrast','practice.feedback','practice.operation','chains.step'],
+  lookAt:['какое слово уже есть на экране','один следующий вопрос','не первое слово, если шаг не первый','записанное изменение внутри слова'],
+  steps:['посмотри на слово, которое уже получилось','реши, что добавить на этом шаге','сделай один конец','не собирай всю цепочку от первого слова'],
+  requiredBlockIds:['ch.5','ch.9','ch.19','ch.24','ch.41'],
+  blocks:chainBlocks
+ },
+ {
+  id:'learner.verbs.steps',
+  title:'Не делать, уже сделал, если',
+  status:'READY',
+  contentVersion:VERSION,
+  modules:['verbs'],
+  families:['NEG','PAST','PTCP_GAN','COND','CVB_IP','AGR_SHORT_1SG','AGR_SHORT_1PL','AGR_SHORT_2SG','AGR_SHORT_2POL'],
+  home:{moduleId:'verbs',familyId:'NEG'},
+  sourceNotes:['32 K','34 глагол'],
+  renderTargets:['teaching.meaning','teaching.full','teaching.contrast','practice.feedback','practice.operation'],
+  lookAt:['не делать, уже сделал, если, предмет через действие или добавка','какой шаг уже сделан','кто добавляется только к готовой форме','не «я человек» и не вопрос'],
+  steps:['назови действие','если это не первый шаг, смотри на уже собранное слово','выбери конец этого шага','не выдумывай заставить, страдательное и возвратное'],
+  requiredBlockIds:['vb.3','vb.29','vb.51','vb.60','vb.69','vb.75','vb.80','vb.81'],
+  blocks:verbBlocks
  }
 ];
 const api={version:VERSION,lessons:LESSONS,label,forFamily,lessonTarget,openTarget,operation,supportLine,feedback,chainNote,render,unavailable,visibleText,check};
