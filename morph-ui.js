@@ -3,7 +3,11 @@
 const E=window.MorphEngine,S=window.MorphState,T=window.MorphTeachingData,P=window.MorphTeachingPractice;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let shownAt=null,interrupted=false,level='harmony',responseMode='choice',message='',attemptSeq=0;
-let showHub=true,teachingMode=false,topicOpen=false;
+let showHub=true,teachingMode=false,topicOpen=false,calcOpen=false,calcQuery='',calcLemmaId='',calcSequence=[];
+const CALC_KEY='qazaqsha-calc-v1';
+function persistCalc(){try{sessionStorage.setItem(CALC_KEY,JSON.stringify({open:calcOpen,query:calcQuery,lemmaId:calcLemmaId,sequence:calcSequence}));}catch(e){}}
+function restoreCalc(){try{const v=JSON.parse(sessionStorage.getItem(CALC_KEY)||'null');if(!v)return;calcOpen=!!v.open;calcQuery=String(v.query||'');calcLemmaId=String(v.lemmaId||'');calcSequence=Array.isArray(v.sequence)?v.sequence.slice(0,5):[];}catch(e){}}
+restoreCalc();
 const bridge=()=>window.MorphBridge,root=()=>document.getElementById('morph-content');
 function learner(){return window.MorphLearner||null;}
 function shownReason(item,codes){
@@ -144,7 +148,7 @@ function hub(){
  const status=routeStatus(level);
  return '<div class="morph-panel"><p class="eyebrow">ФОРМА СЛОВА</p><h2>Сначала понять, потом строить форму</h2><p>Режим «Учиться с нуля» сначала объясняет значение формы, полное правило, контрасты и признаки. Эти шаги не засчитываются как самостоятельное владение.</p>'+
  '<label for="morph-level">Раздел</label><select id="morph-level">'+rows+'</select><p class="morph-rule">'+esc(rule(level))+'</p>'+
- '<div class="morph-routes"><button class="'+(canContinue?'primary-button':'secondary-button')+'" data-morph-continue>Продолжить обучение</button><button class="primary-button" data-morph-learn-zero>Учиться с нуля</button><button class="secondary-button" data-morph-weak>Повторить слабое место</button><button class="secondary-button" data-morph-start>Самостоятельная практика</button><button class="secondary-button" data-morph-transfer>Проверить на новых основах</button></div>'+
+ '<div class="morph-routes"><button class="'+(canContinue?'primary-button':'secondary-button')+'" data-morph-continue>Продолжить обучение</button><button class="primary-button" data-morph-learn-zero>Учиться с нуля</button><button class="secondary-button" data-morph-weak>Повторить слабое место</button><button class="secondary-button" data-morph-start>Самостоятельная практика</button><button class="secondary-button" data-morph-transfer>Проверить на новых основах</button><button class="secondary-button" data-morph-calc>Разобрать форму</button></div>'+
  '<p class="small">Сейчас продолжится: '+where+'.</p>'+
  '<div class="morph-actions"><button class="secondary-button" data-morph-topic>Тема раздела</button><button class="secondary-button" data-morph-full-rule>Разобрать правило полностью</button><button class="text-button" data-morph-restart>Начать раздел сначала</button><button class="text-button" data-morph-pilot>Скачать учебный журнал</button></div>'+
  '<p class="small">Смысл разобран для '+p.semantic+' из '+p.total+' значений; признаки отмечены для '+p.noticed+' из '+p.total+'. Просмотр объяснения и ответы с подсказкой не меняют расписание повторений. Прогресс раздела: '+esc(status.text)+'. Удержание: '+esc(status.retention)+'.</p></div>'+
@@ -519,13 +523,52 @@ function question(s){
  const feedback=done?(view.expected?'<div class="morph-feedback '+(view.correctnessClass?(s.result.correct?'correct':'wrong'):'')+'" role="status"><strong>'+(s.result.correct?'Верно':'Правильная форма: '+esc(item.expected))+'</strong><p>'+esc(shownReason(item,s.result.errorCodes))+'</p><p class="small" lang="kk">'+item.trace.map(t=>esc(t.stem)+' + '+esc(t.suffix)).join(' → ')+'</p>'+learnerOpenButton(item)+'</div>':'<p role="status">Ответ сохранён. Разбор будет в конце проверки.</p>')+'<button class="primary-button" data-morph-next>'+(s.cursor===s.queue.length-1?'Завершить':'Следующее')+'</button>':'';
  return '<div class="morph-panel"><button class="text-button" data-morph-hub>Выбрать другой режим</button><div class="morph-progress"><span>'+(teachingIndependent?(tr.currentTeachingStep==='FULL_INPUT'?'Самостоятельно · ввод':'Самостоятельно · выбор'):(s.mode==='transfer'?'Проверка новых основ':s.level==='mixed'?'Смешанная практика':'Практика'))+'</span><strong>'+(s.cursor+1)+' / '+s.queue.length+'</strong></div>'+(s.queue[s.cursor].reason?'<p class="small">'+esc(s.queue[s.cursor].reason)+'</p>':'')+(view.transferNote?'<p class="small">'+esc(view.transferNote)+'</p>':'')+(view.holdoutNote?'<p class="small">'+esc(view.holdoutNote)+'</p>':'')+(s.mode==='transfer'&&s.holdoutNote?'<p class="small">'+esc(P.STAGE10_SHORT_BANK)+'</p>':'')+'<h2 class="morph-stem" lang="kk">'+esc(item.stem)+'</h2><p>'+esc(item.gloss)+'</p><p class="morph-operation">'+esc(shownOperation(item))+'</p>'+controls+(!teachingIndependent&&view.hint?'<button class="text-button" data-morph-hint>Подсказка</button>':'')+(view.reason?'<p class="morph-rule">'+esc(shownReason(item))+'</p>':'')+feedback+'</div>';
 }
+function trainLemmas(){return E.data.lemmas.filter(l=>l.split==='train').slice().sort((a,b)=>a.text.localeCompare(b.text,'kk'));}
+function calculatorScreen(){
+ const api=learner();
+ const lemmas=trainLemmas();
+ const list=lemmas.map(l=>'<option value="'+esc(l.text)+'"></option>').join('');
+ const resolved=api?api.resolveLemma(calcQuery,E.data.lemmas):{kind:'empty'};
+ const lemma=lemmas.find(l=>l.id===calcLemmaId)||null;
+ let body='';
+ if(resolved.kind==='unknown'&&calcQuery.trim())body+='<p role="status">'+esc(resolved.message)+'</p>';
+ if(resolved.kind==='ambiguous')body+='<p role="status">Для этого написания есть несколько проверенных слов. Выбери одно. Это не ошибка.</p>'+resolved.options.map(o=>'<button type="button" class="secondary-button" data-calc-lemma="'+esc(o.id)+'">'+esc(o.text)+' — '+esc(o.gloss)+'</button>').join('');
+ if(lemma&&api){
+  const formOf=(id,seq)=>E.form(id,seq);
+  const choices=api.nextMeanings(lemma,calcSequence,formOf);
+  const explained=calcSequence.length?api.explain(lemma,calcSequence,formOf):null;
+  const base=calcSequence.slice(0,-1);
+  const replace=calcSequence.length?api.nextMeanings(lemma,base,formOf).filter(c=>c.id!==calcSequence.at(-1)):[];
+  body+='<p lang="kk">'+esc(lemma.text)+'</p><p>'+esc(lemma.gloss)+'</p><p>Что сказать дальше</p><div class="morph-choices">'+choices.map(c=>'<button type="button" class="secondary-button" data-calc-add="'+esc(c.id)+'">'+esc(c.label)+'</button>').join('')+'</div>';
+  if(replace.length)body+='<p>Заменить последний смысл</p><div class="morph-choices">'+replace.map(c=>'<button type="button" class="secondary-button" data-calc-replace="'+esc(c.id)+'">'+esc(c.label)+'</button>').join('')+'</div>';
+  if(calcSequence.length)body+='<button type="button" class="text-button" data-calc-pop>Убрать последний шаг</button>';
+  if(explained&&explained.ok){
+   body+='<h3>Получилось</h3><p lang="kk">'+esc(explained.word)+'</p>'+explained.steps.map((s,i)=>'<p>Шаг '+(i+1)+'. «'+esc(s.meaning)+'». Было <span lang="kk">'+esc(s.before)+'</span>. Добавили '+esc(s.added)+'. Получилось <span lang="kk">'+esc(s.after)+'</span>. '+esc(s.why)+'</p>').join('');
+   if(explained.lessonId)body+='<button type="button" class="text-button" data-learner-open="'+esc(explained.lessonId)+'">Открыть полный разбор</button>';
+   body+='<p class="small">'+esc(explained.note)+'</p>';
+  }else if(explained)body+='<p role="status">'+esc(explained.message)+'</p><p class="small">Это не считается твоей ошибкой. Расписание повторений не меняется.</p>';
+ }
+ return '<div class="morph-panel"><button class="text-button" data-calc-close>← К разделу</button><p class="eyebrow">РАЗБОР ФОРМЫ</p><h2>Разобрать форму</h2><p>Выбери проверенное слово и смысл. Здесь видно, как собралась форма. Это не задание и не оценка.</p><label for="calc-word">Слово</label><input id="calc-word" list="calc-words" value="'+esc(calcQuery)+'" autocomplete="off" enterkeyhint="search"><datalist id="calc-words">'+list+'</datalist><button type="button" class="secondary-button" data-calc-lookup>Найти слово</button>'+body+'</div>';
+}
+function bindCalculator(host){
+ host.querySelector('[data-morph-calc]')?.addEventListener('click',()=>{calcOpen=true;teachingMode=false;showHub=false;topicOpen=false;message='';persistCalc();render();});
+ host.querySelector('[data-calc-close]')?.addEventListener('click',()=>{calcOpen=false;showHub=true;persistCalc();render();});
+ const lookup=()=>{const input=host.querySelector('#calc-word');calcQuery=input?input.value:'';const found=learner()&&learner().resolveLemma(calcQuery,E.data.lemmas);calcLemmaId=found&&found.kind==='train'?found.lemma.id:'';calcSequence=[];persistCalc();render();};
+ host.querySelector('[data-calc-lookup]')?.addEventListener('click',lookup);
+ host.querySelector('#calc-word')?.addEventListener('change',lookup);
+ for(const b of host.querySelectorAll('[data-calc-lemma]'))b.onclick=()=>{const lemma=trainLemmas().find(l=>l.id===b.dataset.calcLemma);if(!lemma)return;calcLemmaId=lemma.id;calcQuery=lemma.text;calcSequence=[];persistCalc();render();};
+ for(const b of host.querySelectorAll('[data-calc-add]'))b.onclick=()=>{if(calcSequence.length>=5)return;calcSequence=calcSequence.concat(b.dataset.calcAdd);persistCalc();render();};
+ for(const b of host.querySelectorAll('[data-calc-replace]'))b.onclick=()=>{if(!calcSequence.length)return;calcSequence=calcSequence.slice(0,-1).concat(b.dataset.calcReplace);persistCalc();render();};
+ host.querySelector('[data-calc-pop]')?.addEventListener('click',()=>{calcSequence=calcSequence.slice(0,-1);persistCalc();render();});
+}
 function render(){
  const host=root();if(!host||!bridge()||!T)return;
  const m=data().module,s=m.session,tr=m.teaching?.resume;
  const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
  if(teachingNewer&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){const rm=teachingModule(tr.currentModule,tr.familyId);teachingMode=true;showHub=false;topicOpen=false;level=rm?.id||'harmony';host.dataset.first='yes';}
  else if(s&&!s.complete&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){teachingMode=false;showHub=false;topicOpen=false;host.dataset.first='yes';}
- const body=teachingMode?teachingScreen():topicOpen?topicScreen():(!s||showHub?hub():s.complete?finish(s):question(s));
+ if(calcOpen){teachingMode=false;showHub=false;topicOpen=false;}
+ const body=calcOpen?calculatorScreen():teachingMode?teachingScreen():topicOpen?topicScreen():(!s||showHub?hub():s.complete?finish(s):question(s));
  host.innerHTML='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>'+(message||m.recovery||m.teaching?.recovery?'<p role="status" class="morph-notice">'+esc(message||m.teaching?.recovery||m.recovery)+'</p>':'')+body;
  bind(host);clock();
 }
@@ -578,6 +621,7 @@ function onPracticeNext(){
  render();root()?.querySelector('#morph-answer')?.focus();
 }
 function bind(host){
+ bindCalculator(host);
  host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>{window.QazaqShell.show('personal');window.PersonalTrainers.openCatalog();});
  host.querySelector('[data-morph-start]')?.addEventListener('click',()=>start('learn'));
  host.querySelector('[data-morph-transfer]')?.addEventListener('click',()=>start('transfer'));

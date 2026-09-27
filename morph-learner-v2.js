@@ -791,6 +791,38 @@ const LESSONS=[
   blocks:verbBlocks
  }
 ];
-const api={version:VERSION,lessons:LESSONS,label,forFamily,lessonTarget,openTarget,operation,supportLine,feedback,chainNote,render,unavailable,visibleText,check};
+const CALC_ORDER=['PL','POSS_1SG','POSS_2SG','POSS_1PL','POSS_2POL','POSS_3','GEN','ACC','DAT','LOC','ABL','INS','COP_1SG','COP_1PL','COP_2SG','COP_2POL','COP_2PL','COP_2PL_POL','Q','NEG','PAST','PTCP_GAN','COND','CVB_IP','AGR_SHORT_1SG','AGR_SHORT_1PL','AGR_SHORT_2SG','AGR_SHORT_2POL'];
+function resolveLemma(text,lemmas){
+ const n=String(text||'').trim().toLocaleLowerCase('kk');
+ if(!n)return {kind:'empty'};
+ const train=(lemmas||[]).filter(l=>l.split==='train'&&String(l.text).toLocaleLowerCase('kk')===n);
+ if(train.length===1)return {kind:'train',lemma:train[0]};
+ if(train.length>1)return {kind:'ambiguous',options:train.map(l=>({id:l.id,text:l.text,gloss:l.gloss}))};
+ return {kind:'unknown',message:'Для этого слова пока нет проверенного разбора. Выбери слово из списка или другое проверенное слово.'};
+}
+function tryForm(formOf,lemmaId,sequence){
+ try{const built=formOf(lemmaId,sequence);return built&&built.word?built:null;}catch(e){return null;}
+}
+function nextMeanings(lemma,sequence,formOf){
+ if(!lemma||lemma.split!=='train'||!formOf)return [];
+ const base=Array.isArray(sequence)?sequence:[];
+ return CALC_ORDER.filter(id=>label(id)&&tryForm(formOf,lemma.id,base.concat(id))).map(id=>({id,label:label(id)}));
+}
+function explain(lemma,sequence,formOf){
+ if(!lemma||lemma.split!=='train')return {ok:false,kind:'unknown',message:'Для этого слова пока нет проверенного разбора. Выбери слово из списка или другое проверенное слово.'};
+ const seq=Array.isArray(sequence)?sequence.slice(0,5):[];
+ if(!seq.length)return {ok:false,kind:'need-meaning',message:'Выбери, что хочешь сказать.',choices:nextMeanings(lemma,[],formOf)};
+ const built=tryForm(formOf,lemma.id,seq);
+ if(!built)return {ok:false,kind:'chain',message:'Такая цепочка пока не поддерживается в тренажёре.',choices:nextMeanings(lemma,seq.slice(0,-1),formOf)};
+ const steps=built.trace.map((step,i)=>{
+  const name=label(step.morpheme)||'этот смысл';
+  const added=step.space?'отдельно «'+step.suffix+'»':'-'+step.suffix;
+  const why=step.changed?'Перед добавкой в этом слове есть записанная замена: '+step.before+' → '+step.stem+'.':(i?'Этот шаг считается от уже собранного слова, не от первого.':'Конец выбран по этому слову.');
+  return {meaning:name,before:step.before,added,after:step.after,why};
+ });
+ const target=openTarget({sequence:seq,morpheme:seq.at(-1)});
+ return {ok:true,stem:lemma.text,gloss:lemma.gloss,word:built.word,steps,lessonId:target&&target.lessonId,choices:nextMeanings(lemma,seq,formOf),note:'Это только разбор. Он не записывается как ответ и не меняет расписание повторений.'};
+}
+const api={version:VERSION,lessons:LESSONS,label,forFamily,lessonTarget,openTarget,operation,supportLine,feedback,chainNote,render,unavailable,visibleText,check,resolveLemma,nextMeanings,explain};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.MorphLearner=api;
 })(typeof window!=='undefined'?window:globalThis);
