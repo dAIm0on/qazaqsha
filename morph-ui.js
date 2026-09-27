@@ -23,9 +23,14 @@ function shownSupport(task,fallback){
  const line=learner()&&learner().supportLine(id);
  return line||fallback;
 }
+function moduleOwned(module){return !!module&&(module.id==='harmony'||module.id==='voice'||module.id==='mixed');}
 function learnerLesson(module,familyId){
  const api=learner();
- return api&&module?api.forFamily(module.id,familyId):null;
+ if(!api||!module||moduleOwned(module))return null;
+ return api.forFamily(module.id,familyId);
+}
+function backToSection(){
+ teachingMode=false;topicOpen=false;calcOpen=false;showHub=true;showFullSemantic=false;message='';persistCalc();render();
 }
 function shellPhrase(s){
  return ({'мало данных':'пока мало ответов','перенос проверен':'порог на новых словах пройден','нужно повторить':'стоит повторить','в смешивании':'смешиваем знакомое','нет отложенной проверки':'повтора на следующий день ещё не было','есть отложенная проверка':'есть повтор не в тот же день'})[s]||s;
@@ -112,6 +117,7 @@ function continueLearning(){
  message='Пока нечего продолжать. Начни с «Учиться с нуля» или открой тему раздела.';showHub=true;teachingMode=false;render();
 }
 function learnFromZero(){
+ if(level==='mixed'){openMixedEntry();return;}
  const tr=currentTeachingResume();
  if(tr&&tr.currentModule===level){teachingMode=true;showHub=false;topicOpen=false;message='';render();return;}
  startTeaching(level);
@@ -190,8 +196,9 @@ function hub(){
 }
 function teachingNav(module,resume){
  const modules=T.modules.map(m=>'<option value="'+esc(m.id)+'"'+(m.id===module.id?' selected':'')+'>'+esc(m.title)+'</option>').join('');
- const families=module.families.map(id=>'<option value="'+esc(id)+'"'+(id===resume.familyId?' selected':'')+'>'+esc(teachingFamily(id)?.title||'значение')+'</option>').join('');
- return '<div class="morph-teach-nav"><button class="text-button" data-teach-close>← К разделу</button><label>Тема<select data-teach-module>'+modules+'</select></label><label>Значение<select data-teach-family>'+families+'</select></label></div>';
+ const families=moduleOwned(module)?'':module.families.map(id=>'<option value="'+esc(id)+'"'+(id===resume.familyId?' selected':'')+'>'+esc(teachingFamily(id)?.title||'значение')+'</option>').join('');
+ const familyLabel=families?'<label>Значение<select data-teach-family>'+families+'</select></label>':'';
+ return '<div class="morph-teach-nav"><button type="button" class="text-button" data-teach-close>← К разделу</button><label>Тема<select data-teach-module>'+modules+'</select></label>'+familyLabel+'</div>';
 }
 let showFullSemantic=false;
 function renderBlocks(blocks){
@@ -220,8 +227,15 @@ function learnerPanel(module,resume,row,mode){
     :'<button class="primary-button" data-teach-next-step="CONTRAST_EXAMPLES">Посмотреть контрасты</button>');
  return '<div class="morph-panel morph-teach-panel morph-learner" data-learner-lesson="'+esc(row.id)+'">'+teachingNav(module,resume)+body+'<p class="small">Полное объяснение не заменяется короткой подсказкой и остаётся доступным из раздела.</p><div class="morph-actions">'+actions+'</div></div>';
 }
+function moduleIntro(module,resume){
+ if(showFullSemantic){recordOnce('semantic_full_opened',module.id,resume.familyId);return fullExplanation(module,resume);}
+ const examples=(module.examples||[]).map(x=>'<li lang="kk">'+esc(x.text)+'</li>').join('');
+ const contrasts=(module.contrastSets||[]).map(set=>'<li>'+set.map(x=>'<span lang="kk">'+esc(x)+'</span>').join(' ↔ ')+'</li>').join('');
+ return '<div class="morph-panel morph-teach-panel" data-module-lesson="'+esc(module.id)+'">'+teachingNav(module,resume)+'<p class="eyebrow">ПРОСТОЙ РАЗБОР</p><h2>'+esc(module.title)+'</h2><p class="morph-teach-lead">'+esc(module.shortSupport||'')+'</p>'+(examples?'<h3>Примеры</h3><ul class="morph-teach-list">'+examples+'</ul>':'')+(contrasts?'<h3>Что различать</h3><ul class="morph-teach-list">'+contrasts+'</ul>':'')+'<p class="small">Полное объяснение не заменяется короткой подсказкой и остаётся доступным из раздела.</p><div class="morph-actions"><button type="button" class="secondary-button" data-teach-semantic-full>Разобрать смысл полностью</button><button type="button" class="primary-button" data-teach-semantic-done>Понятно, разобрать правило</button></div></div>';
+}
 function semanticIntro(module,resume,semantic){
  recordOnce('semantic_intro_seen',module.id,resume.familyId);
+ if(moduleOwned(module))return moduleIntro(module,resume);
  const lessonRow=learnerLesson(module,resume.familyId);
  if(lessonRow){
   if(showFullSemantic){recordOnce('semantic_full_opened',module.id,resume.familyId);return learnerPanel(module,resume,lessonRow,'full');}
@@ -243,22 +257,25 @@ function fullExplanation(module,resume){
  const body=module.fullExplanationBlocks?renderBlocks(module.fullExplanationBlocks):module.fullExplanation.map(p=>'<p>'+esc(p)+'</p>').join('');
  const counters=(module.counterExamples||[]).map(x=>'<li>'+esc(x)+'</li>').join('');
  const limits=(module.limitations||[]).map(x=>'<li>'+esc(x)+'</li>').join('');
- return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 2 · ПОЛНОЕ ОБЪЯСНЕНИЕ</p><h2>'+esc(module.title)+'</h2><div class="morph-full-explanation">'+body+'</div>'+(counters?'<h3>Контрпримеры</h3><ul class="morph-teach-list">'+counters+'</ul>':'')+(limits?'<h3>Границы правила</h3><ul class="morph-teach-list">'+limits+'</ul>':'')+'<p class="small">Полное объяснение не заменяется короткой подсказкой и остаётся доступным из раздела.</p><div class="morph-actions"><button class="primary-button" data-teach-next-step="CONTRAST_EXAMPLES">Посмотреть контрасты</button></div></div>';
+ return '<div class="morph-panel morph-teach-panel"'+(moduleOwned(module)?' data-module-lesson="'+esc(module.id)+'"':'')+'>'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 2 · ПОЛНОЕ ОБЪЯСНЕНИЕ</p><h2>'+esc(module.title)+'</h2><div class="morph-full-explanation">'+body+'</div>'+(counters?'<h3>Контрпримеры</h3><ul class="morph-teach-list">'+counters+'</ul>':'')+(limits?'<h3>Границы правила</h3><ul class="morph-teach-list">'+limits+'</ul>':'')+'<p class="small">Полное объяснение не заменяется короткой подсказкой и остаётся доступным из раздела.</p><div class="morph-actions"><button class="primary-button" data-teach-next-step="CONTRAST_EXAMPLES">Посмотреть контрасты</button></div></div>';
 }
 function contrastExamples(module,resume,semantic){
  const lessonRow=learnerLesson(module,resume.familyId);
  if(lessonRow)return '<div class="morph-panel morph-teach-panel morph-learner" data-learner-lesson="'+esc(lessonRow.id)+'">'+teachingNav(module,resume)+learner().render(lessonRow,'contrast')+'<div class="morph-actions"><button class="secondary-button" data-teach-go-full>Разобрать правило полностью</button><button class="primary-button" data-teach-next-step="FEATURE_NOTICE">На что смотреть</button></div></div>';
- const examples=[...(semantic.examples||[]).map(x=>x.text),...(module.examples||[]).map(x=>x.text)].filter((x,i,a)=>a.indexOf(x)===i);
+ const pool=moduleOwned(module)?(module.examples||[]):[...(semantic.examples||[]),...(module.examples||[])];
+ const examples=pool.map(x=>x.text).filter((x,i,a)=>a.indexOf(x)===i);
  const ex=examples.map(x=>'<li lang="kk">'+esc(x)+'</li>').join('');
  const contrasts=(module.contrastSets||[]).map(set=>'<li>'+set.map(x=>'<span lang="kk">'+esc(x)+'</span>').join(' ↔ ')+'</li>').join('');
- return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 3 · КОНТРАСТЫ</p><h2>Сравни похожие случаи</h2>'+(ex?'<h3>Сопоставимые примеры</h3><ul class="morph-teach-list">'+ex+'</ul>':'')+(contrasts?'<h3>Что различать</h3><ul class="morph-teach-list morph-contrast-list">'+contrasts+'</ul>':'')+'<div class="morph-actions"><button class="secondary-button" data-teach-go-full>Разобрать правило полностью</button><button class="primary-button" data-teach-next-step="FEATURE_NOTICE">На что смотреть</button></div></div>';
+ return '<div class="morph-panel morph-teach-panel" data-module-lesson="'+esc(module.id)+'">'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 3 · КОНТРАСТЫ</p><h2>'+esc(module.title)+'</h2><h3>Сравни похожие случаи</h3>'+(ex?'<h3>Сопоставимые примеры</h3><ul class="morph-teach-list">'+ex+'</ul>':'')+(contrasts?'<h3>Что различать</h3><ul class="morph-teach-list morph-contrast-list">'+contrasts+'</ul>':'')+'<div class="morph-actions"><button class="secondary-button" data-teach-go-full>Разобрать правило полностью</button><button class="primary-button" data-teach-next-step="FEATURE_NOTICE">На что смотреть</button></div></div>';
 }
 function featureNotice(module,resume){
  if(resume.stepIndex>0)return teachingComplete(module,resume);
  const lessonRow=learnerLesson(module,resume.familyId);
  const checks=lessonRow?lessonRow.lookAt.map((x,i)=>'<label class="morph-feature-option"><input type="checkbox" data-teach-feature value="'+i+'"><span>'+esc(x)+'</span></label>').join(''):module.whatToLookAt.map((x,i)=>'<label class="morph-feature-option"><input type="checkbox" data-teach-feature value="'+i+'"><span>'+esc(x)+'</span></label>').join('');
  const steps=lessonRow?lessonRow.steps.map((x,i)=>'<li><strong>'+(i+1)+'.</strong> '+esc(x)+'</li>').join(''):module.decisionSteps.map((x,i)=>'<li><strong>'+(i+1)+'.</strong> '+esc(x)+'</li>').join('');
- return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 4 · НА ЧТО СМОТРЕТЬ</p><h2>Перед формой назови признаки</h2><p>Отметь всё, что нужно проверить в этом разделе. Это активная опора, а не тест на mastery.</p><div class="morph-feature-grid">'+checks+'</div><h3>Порядок решения</h3><ol class="morph-teach-list">'+steps+'</ol><div class="morph-actions"><button class="secondary-button" data-teach-go-full>Разобрать правило полностью</button><button class="primary-button" data-teach-feature-submit>Я отметил(а) признаки</button></div></div>';
+ const heading=moduleOwned(module)?module.title:'Перед формой назови признаки';
+ const lead=moduleOwned(module)?'Перед формой назови признаки. Отметь всё, что нужно проверить в этом разделе. Это активная опора, а не тест на mastery.':'Отметь всё, что нужно проверить в этом разделе. Это активная опора, а не тест на mastery.';
+ return '<div class="morph-panel morph-teach-panel"'+(moduleOwned(module)?' data-module-lesson="'+esc(module.id)+'"':'')+'>'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 4 · НА ЧТО СМОТРЕТЬ</p><h2>'+esc(heading)+'</h2><p>'+lead+'</p><div class="morph-feature-grid">'+checks+'</div><h3>Порядок решения</h3><ol class="morph-teach-list">'+steps+'</ol><div class="morph-actions"><button class="secondary-button" data-teach-go-full>Разобрать правило полностью</button><button class="primary-button" data-teach-feature-submit>Я отметил(а) признаки</button></div></div>';
 }
 function stage5Ready(module){return !!P&&P.MODULES.includes(module.id)&&P.fullStage5Ready(data().module,module.id)&&P.prerequisitesReady(data().module,module.id);}
 function stage5Evidence(moduleId){return S.teachingEvidence(data().module,{moduleId});}
@@ -277,7 +294,7 @@ function stage5Repair(module,resume){
  const payload=parseRepair(resume),source=P.taskForItem(module.id,payload.sourceItemId,'source');
  const session=data().module.session,exclude=[...P.guidedPlan(module.id).map(x=>x.lemmaId),...(session?.queue||[]).map(q=>E.getItem(q.id)?.lemmaId).filter(Boolean)];
  const task=P.repairFor(module.id,source,exclude),choices=task.options.map(o=>'<button type="button" class="secondary-button" lang="kk" data-stage5-repair-answer="'+esc(o)+'">'+esc(o)+'</button>').join(''),wrong=String(payload.response||''),codes=wrong?E.errors(E.getItem(source.itemId),wrong):[];
- return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">РАЗБОР ОШИБКИ</p><h2>Тот же контраст — другое слово</h2><div class="morph-feedback wrong"><strong>Правильная форма: <span lang="kk">'+esc(source.expected)+'</span></strong>'+(wrong?'<p>Твой ответ: <span lang="kk">'+esc(wrong)+'</span></p>':'')+'<p>'+esc(shownReason(E.getItem(source.itemId),codes))+'</p></div><p>Теперь проверь тот же признак на другой основе. Этот ответ — correction evidence, не independent.</p><p class="morph-rule">'+esc(shownSupport(task,P.support(module.id,task)))+'</p><h3 class="morph-stem" lang="kk">'+esc(task.stem)+'</h3><p>'+esc(task.gloss)+'</p><p class="morph-operation">'+esc(shownOperation(task))+'</p><div class="morph-choices">'+choices+'</div><button class="text-button" data-teach-go-full>Разобрать правило полностью</button></div>';
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><button type="button" class="text-button" data-teach-close>← К разделу</button><p class="eyebrow">РАЗБОР ОШИБКИ</p><h2>Тот же контраст — другое слово</h2><div class="morph-feedback wrong"><strong>Правильная форма: <span lang="kk">'+esc(source.expected)+'</span></strong>'+(wrong?'<p>Твой ответ: <span lang="kk">'+esc(wrong)+'</span></p>':'')+'<p>'+esc(shownReason(E.getItem(source.itemId),codes))+'</p></div><p>Теперь проверь тот же признак на другой основе. Этот ответ — correction evidence, не independent.</p><p class="morph-rule">'+esc(shownSupport(task,P.support(module.id,task)))+'</p><h3 class="morph-stem" lang="kk">'+esc(task.stem)+'</h3><p>'+esc(task.gloss)+'</p><p class="morph-operation">'+esc(shownOperation(task))+'</p><div class="morph-choices">'+choices+'</div><button class="text-button" data-teach-go-full>Разобрать правило полностью</button></div>';
 }
 function startStage5Guided(moduleId){
  const module=teachingModule(moduleId);if(!module||!P?.MODULES.includes(moduleId)){message='Практика с опорой здесь открывается для первых четырёх разделов.';render();return;}
@@ -327,7 +344,7 @@ function stage6Repair(module,resume){
  const payload=parseRepair(resume),source=P.stage6TaskForItem(module.id,payload.sourceItemId,'source');
  const session=data().module.session,exclude=[...P.stage6GuidedPlan(module.id).map(x=>x.lemmaId),...(session?.queue||[]).map(q=>E.getItem(q.id)?.lemmaId).filter(Boolean)];
  const task=P.stage6RepairFor(module.id,source,exclude),choices=task.options.map(o=>'<button type="button" class="secondary-button" lang="kk" data-stage6-repair-answer="'+esc(o)+'">'+esc(o)+'</button>').join(''),wrong=String(payload.response||''),codes=wrong?E.errors(E.getItem(source.itemId),wrong):[];
- return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">РАЗБОР ОШИБКИ</p><h2>Тот же механизм — другая основа</h2><div class="morph-feedback wrong"><strong>Правильная форма: <span lang="kk">'+esc(source.expected)+'</span></strong>'+(wrong?'<p>Твой ответ: <span lang="kk">'+esc(wrong)+'</span></p>':'')+'<p>'+esc(shownReason(E.getItem(source.itemId),codes))+'</p></div><p>Теперь тот же признак на другом учебном слове. Этот ответ — исправление, не самостоятельный результат.</p><p class="morph-rule">'+esc(shownSupport(task,P.stage6Support(module.id,task)))+'</p><h3 class="morph-stem" lang="kk">'+esc(task.stem)+'</h3><p>'+esc(task.gloss)+'</p><p class="morph-operation">'+esc(shownOperation(task))+'</p><div class="morph-choices">'+choices+'</div><button class="text-button" data-teach-go-full>Разобрать правило полностью</button></div>';
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><button type="button" class="text-button" data-teach-close>← К разделу</button><p class="eyebrow">РАЗБОР ОШИБКИ</p><h2>Тот же механизм — другая основа</h2><div class="morph-feedback wrong"><strong>Правильная форма: <span lang="kk">'+esc(source.expected)+'</span></strong>'+(wrong?'<p>Твой ответ: <span lang="kk">'+esc(wrong)+'</span></p>':'')+'<p>'+esc(shownReason(E.getItem(source.itemId),codes))+'</p></div><p>Теперь тот же признак на другом учебном слове. Этот ответ — исправление, не самостоятельный результат.</p><p class="morph-rule">'+esc(shownSupport(task,P.stage6Support(module.id,task)))+'</p><h3 class="morph-stem" lang="kk">'+esc(task.stem)+'</h3><p>'+esc(task.gloss)+'</p><p class="morph-operation">'+esc(shownOperation(task))+'</p><div class="morph-choices">'+choices+'</div><button class="text-button" data-teach-go-full>Разобрать правило полностью</button></div>';
 }
 function startStage6Guided(moduleId){
  const module=teachingModule(moduleId);if(!module||!P?.STAGE6_MODULES?.includes(moduleId)){message='Практика с опорой здесь открывается для «чей предмет» и «я, мы и вопрос».';render();return;}
@@ -376,7 +393,7 @@ function stage7TaskHtml(view,chain,answered){
 function stage7RepairScreen(chain){
  const repair=chain.repair,source=P.stage7View(repair.sourceLemmaId,repair.sequence,repair.sequence.length-1),view=P.stage7View(repair.repairLemmaId,repair.sequence,repair.sequence.length-1);
  const note=(learner()&&learner().chainNote(source,repair.errorCodes||[]))||P.stage7Feedback(source,repair.errorCodes||[]);
- return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">РАЗБОР СТЫКА</p><h2>Тот же стык — другая основа</h2><div class="morph-feedback wrong"><strong>Форма этого шага: <span lang="kk">'+esc(repair.expected)+'</span></strong>'+(repair.response?'<p>Твой ответ: <span lang="kk">'+esc(repair.response)+'</span></p>':'')+'<p>'+esc(note)+'</p></div><p>Дальше тот же стык на другой учебной основе. Это исправление, не самостоятельная цепочка.</p>'+stage7TaskHtml({...view,chainId:repair.sourceChainId},{...chain,lane:'guided',responseMode:'choice',phase:'question'},false)+'</div>';
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><button type="button" class="text-button" data-teach-close>← К разделу</button><p class="eyebrow">РАЗБОР СТЫКА</p><h2>Тот же стык — другая основа</h2><div class="morph-feedback wrong"><strong>Форма этого шага: <span lang="kk">'+esc(repair.expected)+'</span></strong>'+(repair.response?'<p>Твой ответ: <span lang="kk">'+esc(repair.response)+'</span></p>':'')+'<p>'+esc(note)+'</p></div><p>Дальше тот же стык на другой учебной основе. Это исправление, не самостоятельная цепочка.</p>'+stage7TaskHtml({...view,chainId:repair.sourceChainId},{...chain,lane:'guided',responseMode:'choice',phase:'question'},false)+'</div>';
 }
 function stage7Finish(chain){
  const e=P.stage7Evidence(data().module);
@@ -483,11 +500,12 @@ function teachingComplete(module,resume){
   const ownReady=!!P&&P.MODULES.includes(module.id)&&P.fullStage5Ready(data().module,module.id),ready=stage5Ready(module),prev=P?.previousModule(module.id),prevTitle=prev?teachingModule(prev)?.title:'';
   route=ready?'<button class="primary-button" data-stage5-start-guided>Тренировка с опорой</button>':ownReady&&prev?'<button class="secondary-button" data-stage5-prereq="'+esc(prev)+'">Сначала предыдущий модуль · '+esc(prevTitle||prev)+'</button>':'';
  }
- return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">LEVEL 0 · ГОТОВО</p><h2>Смысл и признаки разобраны</h2><p>Ты прошёл(а) вводную часть для «'+esc(teachingFamily(resume.familyId)?.title||resume.familyId)+'». Это ещё не самостоятельное владение формой. Практика с подсказкой и практика без подсказки идут отдельно.</p><div class="morph-actions">'+route+'<button class="secondary-button" data-teach-close>К разделу</button></div></div>';
+ return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">LEVEL 0 · ГОТОВО</p><h2>Смысл и признаки разобраны</h2><p>Ты прошёл(а) вводную часть для «'+esc(moduleOwned(module)?module.title:(teachingFamily(resume.familyId)?.title||resume.familyId))+'». Это ещё не самостоятельное владение формой. Практика с подсказкой и практика без подсказки идут отдельно.</p><div class="morph-actions">'+route+'<button class="secondary-button" data-teach-close>К разделу</button></div></div>';
 }
 function teachingScreen(){
  const d=data(),resume=d.module.teaching?.resume;if(!resume){teachingMode=false;showHub=true;return hub();}
- if(resume.currentModule==='mixed'&&['MIXED_PRACTICE','ERROR_REPAIR'].includes(resume.currentTeachingStep))return stage9Screen();
+ if(resume.currentModule==='mixed'&&resume.currentTeachingStep==='FULL_EXPLANATION')return fullExplanation(teachingModule('mixed'),resume);
+ if(resume.currentModule==='mixed'&&['MIXED_PRACTICE','ERROR_REPAIR','SEMANTIC_INTRO','CONTRAST_EXAMPLES','FEATURE_NOTICE'].includes(resume.currentTeachingStep))return stage9Screen();
  const practiceStep=['GUIDED_CHOICE','ERROR_REPAIR','INDEPENDENT_CHOICE','FULL_INPUT'].includes(resume.currentTeachingStep);
  const module=teachingModule(resume.currentModule,resume.familyId);if(!module||(!practiceStep&&!module.families.includes(resume.familyId))){message='Учебная тема обновилась. Выбери раздел заново.';teachingMode=false;showHub=true;level='harmony';return hub();}
  if(practiceStep){
@@ -509,8 +527,14 @@ function teachingScreen(){
  if(resume.currentTeachingStep==='FEATURE_NOTICE')return featureNotice(module,resume);
  message='Этот этап обучения ещё не подключён.';return teachingComplete(module,{...resume,stepIndex:1});
 }
+function openMixedEntry(){
+ showFullSemantic=false;calcOpen=false;persistCalc();
+ setTeachingResume('mixed','MIXED_PRACTICE',null,0,'');message='';render();
+}
 function startTeaching(moduleId=level,familyId=null,step='SEMANTIC_INTRO'){
  const module=teachingModule(moduleId);if(!module){message='Teaching data не загрузились.';render();return;}
+ if(module.id==='mixed'&&step==='FULL_EXPLANATION'){showFullSemantic=false;setTeachingResume('mixed','FULL_EXPLANATION',null,0,'');message='';render();return;}
+ if(module.id==='mixed'){openMixedEntry();return;}
  const family=familyId&&module.families.includes(familyId)?familyId:module.families[0];
  setTeachingResume(module.id,step,family,0,'');message='';render();
 }
@@ -546,14 +570,14 @@ function questionReady(s){
 }
 function question(s){
  const item=questionReady(s);
- if(!item)return '<div class="morph-panel" data-morph-question-pending><p role="status">Вопрос ещё не готов. Прогресс, очередь и учебный шаг не изменены.</p><button type="button" class="secondary-button" data-morph-question-retry>Показать вопрос</button></div>';
+ if(!item)return '<div class="morph-panel" data-morph-question-pending><button type="button" class="text-button" data-teach-close>← К разделу</button><p role="status">Вопрос ещё не готов. Прогресс, очередь и учебный шаг не изменены.</p><button type="button" class="secondary-button" data-morph-question-retry>Показать вопрос</button></div>';
  const tr=currentTeachingResume(),teachingIndependent=tr&&(P?.MODULES.includes(tr.currentModule)||P?.STAGE6_MODULES?.includes(tr.currentModule))&&['INDEPENDENT_CHOICE','FULL_INPUT'].includes(tr.currentTeachingStep)&&s.level===tr.currentModule&&s.mode==='learn';
  const entry=s.queue[s.cursor];
- if(!entry||!Array.isArray(entry.options))return '<div class="morph-panel" data-morph-question-pending><p role="status">Вопрос ещё не готов. Прогресс, очередь и учебный шаг не изменены.</p><button type="button" class="secondary-button" data-morph-question-retry>Показать вопрос</button></div>';
+ if(!entry||!Array.isArray(entry.options))return '<div class="morph-panel" data-morph-question-pending><button type="button" class="text-button" data-teach-close>← К разделу</button><p role="status">Вопрос ещё не готов. Прогресс, очередь и учебный шаг не изменены.</p><button type="button" class="secondary-button" data-morph-question-retry>Показать вопрос</button></div>';
  const done=s.phase==='feedback',view=E.reveal(s),choices=entry.options;
  const controls=s.responseMode==='choice'?'<div class="morph-choices">'+choices.map(o=>'<button type="button" class="secondary-button" lang="kk" data-morph-answer="'+esc(o)+'"'+(done?' disabled':'')+'>'+esc(o)+'</button>').join('')+'</div>':'<form id="morph-answer-form"><label for="morph-answer">Полная форма'+(item.sequence.at(-1)==='Q'?' вместе с частицей':'')+'</label><input id="morph-answer" lang="kk" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="200" value="'+esc(s.draft)+'"'+(done?' disabled':'')+'><div class="morph-keys">'+[...'әғқңөұүі'].map(c=>'<button type="button" class="text-button" data-morph-key="'+c+'"'+(done?' disabled':'')+'>'+c+'</button>').join('')+'</div><button class="primary-button"'+(done?' disabled':'')+'>Проверить</button></form>';
  const feedback=done?(view.expected?'<div class="morph-feedback '+(view.correctnessClass?(s.result.correct?'correct':'wrong'):'')+'" role="status"><strong>'+(s.result.correct?'Верно':'Правильная форма: '+esc(item.expected))+'</strong><p>'+esc(shownReason(item,s.result.errorCodes))+'</p><p class="small" lang="kk">'+item.trace.map(t=>esc(t.stem)+' + '+esc(t.suffix)).join(' → ')+'</p>'+learnerOpenButton(item)+'</div>':'<p role="status">Ответ сохранён. Разбор будет в конце проверки.</p>')+'<button class="primary-button" data-morph-next>'+(s.cursor===s.queue.length-1?'Завершить':'Следующее')+'</button>':'';
- return '<div class="morph-panel"><button class="text-button" data-morph-hub>Выбрать другой режим</button><div class="morph-progress"><span>'+(teachingIndependent?(tr.currentTeachingStep==='FULL_INPUT'?'Самостоятельно · ввод':'Самостоятельно · выбор'):(s.mode==='transfer'?'Проверка новых основ':s.level==='mixed'?'Смешанная практика':'Практика'))+'</span><strong>'+(s.cursor+1)+' / '+s.queue.length+'</strong></div>'+(s.queue[s.cursor].reason?'<p class="small">'+esc(s.queue[s.cursor].reason)+'</p>':'')+(view.transferNote?'<p class="small">'+esc(view.transferNote)+'</p>':'')+(view.holdoutNote?'<p class="small">'+esc(view.holdoutNote)+'</p>':'')+(s.mode==='transfer'&&s.holdoutNote?'<p class="small">'+esc(P.STAGE10_SHORT_BANK)+'</p>':'')+'<h2 class="morph-stem" lang="kk">'+esc(item.stem)+'</h2><p>'+esc(item.gloss)+'</p><p class="morph-operation">'+esc(shownOperation(item))+'</p>'+controls+(!teachingIndependent&&view.hint?'<p class="small">Подсказка может напомнить, что искать, показать класс текущего края или открыть нужный кусок правила. Она не раскрывает точный ответ на проверке новых слов. Ответ после подсказки хранится как ответ с опорой и не считается ответом без подсказки.</p><button class="text-button" data-morph-hint>Подсказка</button>':'')+(view.reason?'<p class="morph-rule">'+esc(shownReason(item))+'</p>':'')+feedback+'</div>';
+ return '<div class="morph-panel"><button type="button" class="text-button" data-teach-close>← К разделу</button><div class="morph-progress"><span>'+(teachingIndependent?(tr.currentTeachingStep==='FULL_INPUT'?'Самостоятельно · ввод':'Самостоятельно · выбор'):(s.mode==='transfer'?'Проверка новых основ':s.level==='mixed'?'Смешанная практика':'Практика'))+'</span><strong>'+(s.cursor+1)+' / '+s.queue.length+'</strong></div>'+(s.queue[s.cursor].reason?'<p class="small">'+esc(s.queue[s.cursor].reason)+'</p>':'')+(view.transferNote?'<p class="small">'+esc(view.transferNote)+'</p>':'')+(view.holdoutNote?'<p class="small">'+esc(view.holdoutNote)+'</p>':'')+(s.mode==='transfer'&&s.holdoutNote?'<p class="small">'+esc(P.STAGE10_SHORT_BANK)+'</p>':'')+'<h2 class="morph-stem" lang="kk">'+esc(item.stem)+'</h2><p>'+esc(item.gloss)+'</p><p class="morph-operation">'+esc(shownOperation(item))+'</p>'+controls+(!teachingIndependent&&view.hint?'<p class="small">Подсказка может напомнить, что искать, показать класс текущего края или открыть нужный кусок правила. Она не раскрывает точный ответ на проверке новых слов. Ответ после подсказки хранится как ответ с опорой и не считается ответом без подсказки.</p><button class="text-button" data-morph-hint>Подсказка</button>':'')+(view.reason?'<p class="morph-rule">'+esc(shownReason(item))+'</p>':'')+feedback+'</div>';
 }
 function trainLemmas(){return E.data.lemmas.filter(l=>l.split==='train').slice().sort((a,b)=>a.text.localeCompare(b.text,'kk'));}
 function calculatorScreen(){
@@ -584,7 +608,7 @@ function calculatorScreen(){
 }
 function bindCalculator(host){
  host.querySelector('[data-morph-calc]')?.addEventListener('click',()=>{calcOpen=true;teachingMode=false;showHub=false;topicOpen=false;message='';persistCalc();render();});
- host.querySelector('[data-calc-close]')?.addEventListener('click',()=>{calcOpen=false;showHub=true;persistCalc();render();});
+ host.querySelector('[data-calc-close]')?.addEventListener('click',()=>backToSection());
  const lookup=()=>{const input=host.querySelector('#calc-word');calcQuery=input?input.value:'';const found=learner()&&learner().resolveLemma(calcQuery,E.data.lemmas);calcLemmaId=found&&found.kind==='train'?found.lemma.id:'';calcSequence=[];persistCalc();render();};
  host.querySelector('[data-calc-lookup]')?.addEventListener('click',lookup);
  host.querySelector('#calc-word')?.addEventListener('change',lookup);
@@ -615,14 +639,14 @@ function stage9RepairScreen(){
  const r=currentTeachingResume();let payload=null;try{payload=JSON.parse(r.draft||'null');}catch{}
  if(!payload)return '<div class="morph-panel"><p role="status">Разбор не сохранился.</p></div>';
  const task=E.getItem(payload.repairItemId),choices=task.options.map(o=>'<button type="button" class="secondary-button" lang="kk" data-stage9-repair="'+esc(o)+'">'+esc(o)+'</button>').join('');
- return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">СМЕШИВАНИЕ · РАЗБОР</p><h2>Тот же контраст, другая основа</h2><p>'+esc(payload.reason)+'</p><p class="morph-stem" lang="kk">'+esc(task.stem)+'</p><p>'+esc(shownOperation(task))+'</p><div class="morph-choices">'+choices+'</div><p class="small">Это исправление. Оно не считается самостоятельным ответом и не меняет расписание повторений.</p><button class="text-button" data-stage9-full>Открыть полное объяснение</button></div>';
+ return '<div class="morph-panel morph-teach-panel stage5-panel"><button type="button" class="text-button" data-teach-close>← К разделу</button><p class="eyebrow">СМЕШИВАНИЕ · РАЗБОР</p><h2>Тот же контраст, другая основа</h2><p>'+esc(payload.reason)+'</p><p class="morph-stem" lang="kk">'+esc(task.stem)+'</p><p>'+esc(shownOperation(task))+'</p><div class="morph-choices">'+choices+'</div><p class="small">Это исправление. Оно не считается самостоятельным ответом и не меняет расписание повторений.</p><button class="text-button" data-stage9-full>Открыть полное объяснение</button></div>';
 }
 function stage9Screen(){
  const s=data().module.session,r=currentTeachingResume();
  if(r&&r.currentTeachingStep==='ERROR_REPAIR')return stage9RepairScreen();
  if(s&&!s.complete)return question(s);
  const built=P.stage9Queue(data().module,20260926);
- return '<div class="morph-panel morph-teach-panel stage5-panel"><p class="eyebrow">СМЕШАННАЯ ПРАКТИКА</p><h2>'+esc(shellPhrase(built.status))+'</h2><p>'+esc(built.reason)+'</p><p class="small">Этот порог только открывает смешанную практику. Он не означает, что тема освоена навсегда. Сложность поднимай постепенно: не меняй сразу смысл, край слова, исключение, длинную цепочку и способ ответа. Проверка на новых словах и повтор на следующий день считаются отдельно.</p><button class="secondary-button" data-stage9-full>Открыть полное объяснение</button><button class="text-button" data-morph-hub>К тренировкам</button></div>';
+ return '<div class="morph-panel morph-teach-panel stage5-panel" data-module-lesson="mixed"><button type="button" class="text-button" data-teach-close>← К разделу</button><p class="eyebrow">СМЕШАННАЯ ПРАКТИКА</p><h2>'+esc(shellPhrase(built.status))+'</h2><p>'+esc(built.reason)+'</p><p class="small">Этот порог только открывает смешанную практику. Он не означает, что тема освоена навсегда. Сложность поднимай постепенно: не меняй сразу смысл, край слова, исключение, длинную цепочку и способ ответа. Проверка на новых словах и повтор на следующий день считаются отдельно.</p><button class="secondary-button" data-stage9-full>Открыть полное объяснение</button></div>';
 }
 function start(mode){
  const d=data();teachingMode=false;topicOpen=false;
@@ -670,7 +694,7 @@ function bind(host){
  host.querySelector('[data-morph-teach-resume]')?.addEventListener('click',()=>{const r=currentTeachingResume();if(r){teachingMode=true;showHub=false;level=r.currentModule;render();}});
  host.querySelector('#morph-level')?.addEventListener('change',e=>{level=e.target.value;render();});
  host.querySelector('#morph-response')?.addEventListener('change',e=>{responseMode=e.target.value;});
- for(const b of host.querySelectorAll('[data-morph-hub]'))b.onclick=()=>{teachingMode=false;showHub=true;topicOpen=false;render();};
+ for(const b of host.querySelectorAll('[data-morph-hub],[data-teach-close]'))b.onclick=()=>backToSection();
  host.querySelector('[data-morph-resume]')?.addEventListener('click',()=>{teachingMode=false;showHub=false;render();});
  host.querySelector('[data-morph-question-retry]')?.addEventListener('click',()=>{render();});
  for(const b of host.querySelectorAll('[data-morph-answer]'))b.onclick=()=>submit(b.dataset.morphAnswer);
@@ -679,7 +703,7 @@ function bind(host){
  host.querySelector('[data-morph-hint]')?.addEventListener('click',()=>{const s=data().module.session;saveSession({...s,hinted:true});render();});
  host.querySelector('[data-morph-next]')?.addEventListener('click',onPracticeNext);
 
- for(const b of host.querySelectorAll('[data-teach-close]'))b.onclick=()=>{teachingMode=false;showHub=true;render();};
+
  host.querySelector('[data-teach-module]')?.addEventListener('change',e=>startTeaching(e.target.value));
  host.querySelector('[data-teach-family]')?.addEventListener('change',e=>{const r=currentTeachingResume();if(r)startTeaching(r.currentModule,e.target.value);});
  host.querySelector('[data-teach-semantic-full]')?.addEventListener('click',()=>{showFullSemantic=true;message='';render();});
@@ -702,7 +726,7 @@ function bind(host){
  host.querySelector('[data-stage7-retry]')?.addEventListener('click',()=>{render();});
  host.querySelector('[data-stage8-start]')?.addEventListener('click',()=>startStage8());
  host.querySelector('[data-stage9-start]')?.addEventListener('click',()=>{level='mixed';responseMode='choice';startMixed();});
- host.querySelector('[data-stage9-full]')?.addEventListener('click',()=>{setTeachingResume('mixed','FULL_EXPLANATION','DAT',0,'');teachingMode=true;render();});
+ host.querySelector('[data-stage9-full]')?.addEventListener('click',()=>startTeaching('mixed',null,'FULL_EXPLANATION'));
  for(const b of host.querySelectorAll('[data-stage9-repair]'))b.onclick=()=>{const r=currentTeachingResume();if(!r)return;let payload=null;try{payload=JSON.parse(r.draft||'null');}catch{return;}const task=E.getItem(payload.repairItemId),correct=E.norm(b.dataset.stage9Repair)===E.norm(task.expected),id='stage9-repair:'+payload.sourceItemId+':'+task.lemmaId;if(!(data().module.teaching?.events||[]).some(e=>e.eventId===id))recordTeaching({eventId:id,type:'correction_after_feedback',moduleId:'mixed',familyId:task.sequence.at(-1),lemmaId:task.lemmaId,itemId:task.id,at:Date.now(),responseMode:'choice',answer:b.dataset.stage9Repair,correct,hinted:true});const s=data().module.session;if(s)saveSession(E.next(s));setTeachingResume('mixed','MIXED_PRACTICE',null,0,'');teachingMode=false;message=correct?'Исправление верное. Возвращаемся в смешивание.':'Правильная форма: '+task.expected+'. Возвращаемся в смешивание.';render();};
  host.querySelector('[data-stage8-start-choice]')?.addEventListener('click',()=>startStage8Forms('independent','INDEPENDENT_CHOICE','choice'));
  host.querySelector('[data-stage8-start-input]')?.addEventListener('click',()=>startStage8Forms('independent','FULL_INPUT','input'));

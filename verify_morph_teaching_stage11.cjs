@@ -28,6 +28,21 @@ test('Continue and weak-spot routes do not open a scored session',()=>{
  assert.ok(weak.includes('FULL_EXPLANATION'));
  assert.ok(ui.includes('Самостоятельное задание не первое знакомство'));
 });
+test('Voice, harmony and mixed keep their own route and a way back',()=>{
+ const owned=ui.slice(ui.indexOf('function moduleOwned'),ui.indexOf('function learnerLesson'));
+ assert.ok(owned.includes("module.id==='harmony'"));
+ assert.ok(owned.includes("module.id==='voice'"));
+ assert.ok(owned.includes("module.id==='mixed'"));
+ const lesson=ui.slice(ui.indexOf('function learnerLesson'),ui.indexOf('function backToSection'));
+ assert.ok(lesson.includes('moduleOwned(module)'));
+ assert.ok(ui.includes('function backToSection'));
+ assert.ok(ui.includes('function openMixedEntry'));
+ const learn=ui.slice(ui.indexOf('function learnFromZero'),ui.indexOf('function repeatWeak'));
+ assert.ok(learn.includes("level==='mixed'"));
+ const question=ui.slice(ui.indexOf('function question('),ui.indexOf('function trainLemmas'));
+ assert.ok(question.includes('← К разделу'));
+ assert.equal(question.includes('Выбрать другой режим'),false);
+});
 test('Old practice hint and transfer honesty stay',()=>{
  assert.ok(ui.includes('data-morph-hint'));
  assert.ok(ui.includes('STAGE10_SHORT_BANK'));
