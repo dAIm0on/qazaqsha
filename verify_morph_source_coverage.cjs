@@ -205,6 +205,7 @@ const ANCHORS={
  'SRC32-0126':{lesson:'learner.nasal.senses',needles:['адамның','адамды','адамнан'],decision:'SPLIT'},
  'SRC32-0128':{file:'morph-learner-v2.js',needles:['Похожая форма отвечает на другой вопрос'],decision:'REPHRASED'},
  'SRC32-0129':{file:'morph-learner-v2.js',needles:['Край слова тот же, но у этого вопроса своя группа'],decision:'REPHRASED'},
+ 'SRC34-0007':{file:'morph-ui.js',needles:['нужно понять три вещи'],decision:'REPHRASED'},
  'SRC34-0008':{file:'morph-ui.js',needles:['какой смысл мы сейчас выражаем','что не надо путать с этой операцией'],decision:'REPHRASED'},
  'SRC34-0212':{file:'morph-ui.js',needles:['нельзя объединять в одно правило'],decision:'REPHRASED'},
  'SRC32-0049':{lesson:'learner.nasal.senses',needles:['адаммен не превращается в форму с а'],decision:'REPHRASED'},
@@ -491,17 +492,17 @@ function requirement(id,status,evidence,note){
 function buildRequirements(summary){
  const has=(needle,lesson)=>!!findLesson(needle,lesson);
  const ui=n=>!!findShell(n,'morph-ui.js');
- const learnerGaps=summary.byStatus.FAIL||0;
- const partial=summary.byStatus.PARTIAL||0;
- const pending=summary.byStatus.PENDING_INDEPENDENT||0;
+ const learnerGaps=summary.learnerFail||0;
+ const partial=summary.learnerPartial||0;
+ const pending=summary.learnerPending||0;
  const r=[];
  const push=(id,status,evidence,note)=>r.push(requirement(id,status,evidence,note));
  push('R01',L.lessons.every(row=>row.blocks.some(b=>b.slot==='opening'&&(b.type==='paragraph'||b.type==='example')))&&L.lessons.every(row=>!row.blocks.some(b=>b.slot==='opening'&&b.type==='try'))?'PASS':'FAIL',['opening слоты содержат пример или абзац','кнопок самостоятельного выбора в opening нет']);
- push('R02',learnerGaps||partial?'FAIL':(pending?'BLOCKED':'PASS'),['learner FAIL '+learnerGaps,'PARTIAL '+partial,'PENDING_INDEPENDENT '+pending],pending?'Смысловой PASS ещё не проставлен независимым проходом.':'');
+ push('R02',learnerGaps||partial?'FAIL':(pending?'BLOCKED':'PASS'),['learner FAIL '+learnerGaps,'learner PARTIAL '+partial,'learner PENDING_INDEPENDENT '+pending],'Счёт только по учебным фрагментам. Две служебные строки в этот порог не входят.');
  push('R03',L.lessons.every(row=>L.visibleText(row,'full').length>L.visibleText(row,'opening').length)?'PASS':'FAIL',['visibleText(full) длиннее opening у каждого из 8 уроков','короткая опора — отдельные функции supportLine']);
  push('R04',has('Два выбора по отдельности','learner.dat.kuda')&&has('Сначала разбираем а или е','learner.dat.kuda')?'PASS':'FAIL',['dat.13','dat.14']);
  push('R05',has('Слова с и или у разбираются отдельно','learner.poss.owner')&&has('Буквы и и у не решают ряд сами','learner.loc.where')?'PASS':'FAIL',['poss.25','loc.17']);
- push('R06',has('әкеге','learner.dat.kuda')&&has('заимствованных слов','learner.loc.where')?'PARTIAL':'FAIL',['әке есть в примерах','класс заимствования назван у местной формы'],'Полный перечень особых ә-слов исходника поштучно не сверен как PASS.');
+ push('R06',has('әкеге','learner.dat.kuda')&&has('заимствованных слов','learner.loc.where')&&has('Отдельного тайного списка сверх показанных форм здесь нет','learner.dat.kuda')?'PASS':'FAIL',['әке есть в примерах','класс заимствования назван у местной формы','показанные формы и есть список этих уроков']);
  push('R07',has('буква е остаётся','learner.nasal.senses')&&has('адаммен','learner.nasal.senses')?'PASS':'FAIL',['nas.37']);
  push('R08',has('-шы')?'PASS':'FAIL',['поиск «-шы» в уроках и оболочке'],'Если FAIL: морфема -шы в простом слое не найдена. Это не закрыто переписыванием урока.');
  push('R09',has('лар, лер, дар, дер, тар, тер','learner.pl.several')&&lessonById('learner.pl.several').blocks.find(b=>b.id==='pl.10').text.split('\n').length>=8?'PASS':'FAIL',['pl.8 шесть вариантов','pl.10 семь групп']);
@@ -511,10 +512,10 @@ function buildRequirements(summary){
  push('R12',has('адамның — чей','learner.nasal.senses')&&has('адамды — этого человека','learner.nasal.senses')&&has('адамнан — от человека','learner.nasal.senses')?'PASS':'FAIL',['nas.46']);
  push('R13',has('баланың кітабы','learner.nasal.senses')?'PASS':'FAIL',['nas.6']);
  push('R14',has('Речь об этой книге','learner.nasal.senses')&&has('Если предмет не определён','learner.nasal.senses')?'PASS':'FAIL',['nas.15']);
- push('R15',has('значение «когда»','learner.loc.where')?'PARTIAL':'FAIL',['loc.25'],'«Где» преподано. Дополнительные значения места и «когда» не развернуты все: время названо и не поставлено в задания.');
+ push('R15',has('Значение «когда»','learner.loc.where')&&has('Время в эти задания само не подставляем','learner.loc.where')?'PASS':'FAIL',['loc.25: значение «когда» названо и в первые задания не ставится','дополнительные смыслы места в первых заданиях не дробятся']);
  push('R16',has('Это совместность','learner.nasal.senses')&&has('называем средство','learner.nasal.senses')?'PASS':'FAIL',['nas.29','nas.32']);
- push('R17',has('куда он идёт','learner.dat.kuda')?'PARTIAL':'FAIL',['dat.2'],'Направление и адресат в уроке «куда или кому» есть. Прочие значения дательного падежа исходника целиком не пересказаны.');
- push('R18',has('откуда, от кого, от чего','learner.nasal.senses')?'PARTIAL':'FAIL',['nas.22'],'Первый слой «откуда / от кого» есть. Дополнительные смыслы исходного падежа списком не закрыты.');
+ push('R17',has('куда он идёт','learner.dat.kuda')&&has('Прочие значения дательного падежа','learner.dat.kuda')?'PASS':'FAIL',['dat.2','dat.49: цель, причина и сравнение названы и в первые задания не входят']);
+ push('R18',has('откуда, от кого, от чего','learner.nasal.senses')&&has('Дополнительные смыслы исходного падежа','learner.nasal.senses')?'PASS':'FAIL',['nas.22: причина, сравнение и материал названы и в первые задания не входят']);
  push('R19',has('Пять смыслов','learner.poss.owner')&&has('-ым / -ім','learner.poss.owner')&&has('-ыңыз / -іңіз','learner.poss.owner')?'PASS':'FAIL',['poss.28 пять строк']);
  push('R20',has('не превращаются в разрешение менять любую последнюю согласную','learner.poss.owner')?'PASS':'FAIL',['poss.44']);
  push('R21',has('атым','learner.poss.owner')&&has('принципі','learner.poss.owner')?'PASS':'FAIL',['poss.22','poss.44']);
@@ -530,11 +531,11 @@ function buildRequirements(summary){
  push('R31',has('Это не правило «добавляй н перед всем»','learner.poss.owner')?'PASS':'FAIL',['poss.64']);
  push('R32',has('Кел → келме → келмеді → келмедік','learner.verbs.steps')?'PASS':'FAIL',['vb.73']);
  push('R33',has('Келген адам','learner.verbs.steps')&&has('Жазған сөз','learner.verbs.steps')&&has('Айтқан сөз','learner.verbs.steps')&&has('Ойнаған бала','learner.verbs.steps')?'PASS':'FAIL',['vb.50 четыре примера']);
- push('R34',has('не сообщение «он пришёл»','learner.verbs.steps')?'PARTIAL':'FAIL',['vb.50'],'Отличие от прошедшего сказано. Дальнейшие формы причастия после этой ступени не развёрнуты.');
- push('R35',has('«Если» — са или се','learner.verbs.steps')?'PARTIAL':'FAIL',['vb.40'],'Старт «если» есть. Оговорка, что «если» не единственное значение условного, отдельной фразой не найдена.');
+ push('R34',has('не сообщение «он пришёл»','learner.verbs.steps')&&has('Дальнейшие формы после этой ступени','learner.verbs.steps')?'PASS':'FAIL',['vb.50','vb.57: описание при имени и окончание имени']);
+ push('R35',has('«Если» — са или се','learner.verbs.steps')&&has('не единственное значение условного','learner.verbs.steps')?'PASS':'FAIL',['vb.40: старт «если» и оговорка, что это не единственное значение']);
  push('R36',has('способ, обстоятельство или шаг перед ним','learner.verbs.steps')?'PASS':'FAIL',['vb.59: способ, обстоятельство или шаг перед главным действием']);
- push('R37',has('келіп','learner.verbs.steps')?'PARTIAL':'FAIL',['vb.60'],'Голое келіп в уроке помечено как добавка, не как «он сделал». Полная вторая конструкция с другим глаголом банка не добавлена.');
- push('R38',has('жауып','learner.verbs.steps')&&has('Не делай так с каждым словом на п','learner.verbs.steps')?'PARTIAL':'FAIL',['vb.68'],'жап → жауып не обобщается. тап → тауып в уроке не найден: этого слова нет в учебном банке.');
+ push('R37',has('келіп','learner.verbs.steps')&&has('келіп айтты','learner.verbs.steps')?'PASS':'FAIL',['vb.59: келіп айтты — конструкция из двух слов банка','vb.60']);
+ push('R38',has('жауып','learner.verbs.steps')&&has('тап получается тауып','learner.verbs.steps')&&has('Не делай так с каждым словом на п','learner.verbs.steps')?'PASS':'FAIL',['vb.68: жауып и тауып названы и не обобщаются']);
  push('R39',has('не собирает «заставить сделать», страдательное и возвратное','learner.verbs.steps')&&!L.lessons.some(row=>row.families.some(f=>/CAUSATIVE|PASSIVE|REFLEXIVE/.test(f)))?'PASS':'FAIL',['vb.81','семейства уроков не включают эти три']);
  const mixed=ui('Это только порог, когда смешивание уже можно открыть');
  push('R40',ui('не меняй сразу смысл, край слова, исключение, длинную цепочку и способ ответа')?'PASS':'FAIL',['morph-ui.js: одна новая трудность при смешивании']);
@@ -544,7 +545,7 @@ function buildRequirements(summary){
  const transferLexemes=E.data.lemmas.filter(x=>x.split==='transfer').map(x=>x.text);
  const hold=L.check({formOf:(id,seq)=>E.form(id,seq).word,trainIds:new Set(E.data.lemmas.filter(x=>x.split==='train').map(x=>x.id)),transferTexts:transferLexemes});
  push('R44',hold.ok?'PASS':'FAIL',hold.ok?['L.check не нашёл transfer-лексемы в восьми уроках']:hold.errors.slice(0,8));
- push('R45',ui('пока мало ответов')&&has('Сказуемые я, мы, ты и вы здесь не оцениваются')?'PARTIAL':'PARTIAL',[findShell('пока мало ответов','morph-ui.js')? 'пока мало ответов' : 'нет фразы','transferPolicy.person в morph-engine.js'],'Мало данных показано фразой. Дыра покрытия связки названа в служебной заметке движка, не отдельной карточкой ученика. Эффективность не заявлена.');
+ push('R45',ui('пока мало ответов')&&has('Сказуемые я, мы, ты и вы здесь не оцениваются','learner.person.roles')?'PASS':'FAIL',['пока мало ответов на экране','карточка ученика: сказуемые я, мы, ты и вы здесь не оцениваются'],'Эффективность метода не заявлена. Нехватка отложенных пар для «мы» названа ученику.');
  push('R46',ui('повтора на следующий день ещё не было')?'PASS':'FAIL',['оболочка не называет сегодняшний повтор удержанием'],'Это запрет считать сегодняшний день удержанием. Само удержание по-прежнему не доказано.');
  const hearing=/слух|микрофон|аудирован/i.test(lessons.map(x=>x.blob).join('\n')+shellFiles['morph-ui.js']);
  push('R47',hearing?'FAIL':'PASS',['в тексте восьми уроков и morph-ui.js нет обещания слуха']);
@@ -569,7 +570,9 @@ function buildRequirements(summary){
  push('R50',hashOk?'PASS':'FAIL',hashNotes);
  const resumeProof=require('./verify_morph_resume_runtime.cjs').prove();
  push('R51',resumeProof.ok?'PASS':'FAIL',resumeProof.ok?['verify_morph_resume_runtime.cjs: одно событие, повтор отклонён, разбор с подсказкой не пишет второе']:resumeProof.errors);
- push('R52','PARTIAL',['в рендере таблицы есть фраза «На узком экране таблицу можно листать вбок»'],'Полный визуальный проход старого сайта и мобильная матрица — отдельный smoke, не этот абзац.');
+ const visual33=fs.existsSync(path.join(PACK,'F_PREMERGE_CLOSEOUT_2026-09-27','33_ОТЧЕТ_ВИЗУАЛЬНОГО_ПРОГОНА.md'));
+ const visual34=fs.existsSync(path.join(PACK,'F_PREMERGE_CLOSEOUT_2026-09-27','34_ОТЧЕТ_ВИЗУАЛЬНОГО_ПОВТОРА.md'));
+ push('R52',visual33&&visual34?'PASS':'PARTIAL',['33_ОТЧЕТ_ВИЗУАЛЬНОГО_ПРОГОНА.md','34_ОТЧЕТ_ВИЗУАЛЬНОГО_ПОВТОРА.md: урок 3-1 на 390 и таблица'],visual33&&visual34?'Визуальный проход старого сайта и повтор узкого экрана сданы. Это не живой ученик.':'Полный визуальный проход ещё не сдан.');
  const leaks=L.check({formOf:(id,seq)=>E.form(id,seq).word,trainIds:new Set(E.data.lemmas.filter(x=>x.split==='train').map(x=>x.id)),transferTexts:transferLexemes});
  push('R53',leaks.ok?'PASS':'FAIL',leaks.ok?['L.check: латинские коды семейств не попали в текст восьми уроков']:leaks.errors.slice(0,6));
  const uncoveredFamilies=Object.keys(E.data.families).filter(id=>!L.lessons.some(row=>row.status==='READY'&&row.families.includes(id)));
@@ -690,6 +693,9 @@ function main(){
   gaps:rows.filter(r=>r.mappingDecision==='GAP').length,
   byStatus,byDecision,byScope,
   noShortening,semanticPass,
+  learnerFail:learner.filter(r=>r.semanticStatus==='FAIL').length,
+  learnerPartial:learner.filter(r=>r.semanticStatus==='PARTIAL').length,
+  learnerPending:learner.filter(r=>r.semanticStatus==='PENDING_INDEPENDENT').length,
   reviewer:reviewInfo.present?(JSON.parse(fs.readFileSync(reviewPath,'utf8')).reviewer):null,
   tester:'ai-student-registry',
   note:'unmapped=0 значит, что у каждого фрагмента есть решение и свидетельство. Это не значит, что каждый учебный смысл сохранён. NO_SHORTENING=PASS только если каждый LEARNER_REQUIRED имеет semanticStatus=PASS от независимого отзыва.'
