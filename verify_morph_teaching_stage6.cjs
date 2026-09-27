@@ -78,11 +78,11 @@ test('All Stage 6 guided tasks are admitted train items',()=>{
 });
 test('POSS guided support names only the licensed lexical rewrite class',()=>{
  const p=P.stage6GuidedPlan('poss'),by=x=>P.stage6Support('poss',p.find(t=>t.expected===x));
- assert.ok(by('кітабым').includes('п→б'));
- assert.ok(by('көлігім').includes('к→г'));
- assert.ok(by('қонағым').includes('қ→ғ'));
- assert.ok(by('орны').includes('синкопа'));
- assert.ok(by('атым').includes('не лицензировано'));
+ assert.ok(by('кітабым').includes('п становится б'));
+ assert.ok(by('көлігім').includes('к становится г'));
+ assert.ok(by('қонағым').includes('қ становится ғ'));
+ assert.ok(by('орны').includes('пропадает ы или і'));
+ assert.ok(by('атым').includes('не меняется'));
 });
 
 test('Stage 6 support never contains the full expected answer',()=>{
@@ -141,7 +141,7 @@ test('Full rule remains reachable from guided even when guided resume has no fam
 test('Stage 6 completion is honest about mastery transfer and COP transfer limits',()=>{
  assert.ok(ui.includes("recordOnce('teaching_module_completed'"));
  assert.ok(ui.includes('не заявление «навык освоен»'));
- assert.ok(ui.includes('Для person текущий transfer честно ограничен доступным банком.'));
+ assert.ok(ui.includes('Для «я, мы и вопрос» проверка на новых словах ограничена тем, сколько новых основ есть в банке.'));
 });
 test('Stage 6 does not expand runtime families or audio scope',()=>{
  assert.equal(E.data.version,'morph-20260924-v1');assert.equal(E.writtenRelease.scopeId,'morph-written-v1');assert.equal(E.writtenRelease.audioPlayback,false);

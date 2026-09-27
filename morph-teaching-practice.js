@@ -277,21 +277,21 @@ function createStage6IndependentSession(moduleId,responseMode,now=Date.now(),opt
  };
 }
 function stage6RewriteHint(task){
- if(!task.changed)return 'Не придумывай изменение основы: здесь оно не лицензировано.';
+ if(!task.changed)return 'Здесь слово внутри не меняется. Не придумывай замену буквы.';
  const a=task.trace.before,b=task.trace.stem;
- if(a.endsWith('қ')&&b.endsWith('ғ'))return 'Для этой словарно разрешённой леммы перед данным POSS действует қ→ғ.';
- if(a.endsWith('к')&&b.endsWith('г'))return 'Для этой словарно разрешённой леммы перед данным POSS действует к→г.';
- if(a.endsWith('п')&&b.endsWith('б'))return 'Для этой словарно разрешённой леммы перед данным POSS действует п→б.';
- if(a.length===b.length+1)return 'Для этой словарно разрешённой леммы действует синкопа ы/і; не переноси её на другие слова автоматически.';
- return 'У этой леммы словарь разрешает изменение основы перед данным POSS.';
+ if(a.endsWith('қ')&&b.endsWith('ғ'))return 'У этого слова перед гласной добавкой қ становится ғ. На другие слова это само не переносится.';
+ if(a.endsWith('к')&&b.endsWith('г'))return 'У этого слова перед гласной добавкой к становится г. На другие слова это само не переносится.';
+ if(a.endsWith('п')&&b.endsWith('б'))return 'У этого слова перед гласной добавкой п становится б. На другие слова это само не переносится.';
+ if(a.length===b.length+1)return 'У этого слова в записанном случае пропадает ы или і. На другие слова это само не переносится.';
+ return 'У этого слова разрешено изменение внутри. На другие слова это само не переносится.';
 }
 function stage6Support(moduleId,task){
  const m=stage6Spec(moduleId);
  if(moduleId==='poss'){
-  const edge=task.edge==='vowel'?'гласный край':'согласный/негласный фонологический край';
-  return m.shortSupport+' Сейчас: '+edge+', ряд '+(task.harmony==='front'?'передний':'задний')+'. '+stage6RewriteHint(task);
+  const edge=task.edge==='vowel'?'слово кончается на гласный':'слово кончается на согласный';
+  return 'Сначала реши, чей это предмет. Сейчас: '+edge+', '+(task.harmony==='front'?'передние гласные':'задние гласные')+'. '+stage6RewriteHint(task);
  }
- return m.shortSupport+' Сейчас выбрана функция '+task.familyId+'. Сначала держи в голове лицо/вопрос, затем форму; не переноси окончание из POSS или AGR_SHORT.';
+ return 'Сначала реши, кто говорит о себе или это вопрос. Потом форму. Не бери окончание от «мой» и не от «я сделал».';
 }
 function fullStage6Ready(state,moduleId){
  const m=stage6Spec(moduleId);

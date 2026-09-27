@@ -32,7 +32,7 @@ test('Old practice hint and transfer honesty stay',()=>{
  assert.ok(ui.includes('data-morph-hint'));
  assert.ok(ui.includes('STAGE10_SHORT_BANK'));
  assert.ok(ui.includes('Проверены новые реальные основы'));
- assert.ok(ui.includes('без записи FSRS'));
+ assert.ok(ui.includes('без записи в расписание повторений'));
  assert.equal(ui.includes('слух позже'),false);
  assert.equal(ui.includes('аудио недоступно'),false);
  assert.ok(css.includes('min-height:44px'));

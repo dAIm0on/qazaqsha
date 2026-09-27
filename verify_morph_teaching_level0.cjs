@@ -30,7 +30,7 @@ test('Level 0 source remains complete for all current runtime families',()=>{
 });
 
 test('Hub exposes zero-knowledge route and keeps independent practice separate',()=>{
- for(const token of ['Учиться с нуля','Самостоятельная практика','Если тема новая, сначала пройди','Просмотр теории и работа с опорой не двигают FSRS'])assert.ok(ui.includes(token),token);
+ for(const token of ['Учиться с нуля','Самостоятельная практика','Если тема новая, сначала пройди','Просмотр объяснения и ответы с подсказкой не меняют расписание повторений'])assert.ok(ui.includes(token),token);
  assert.ok(ui.includes('data-morph-learn-zero'));
  assert.ok(ui.includes('data-morph-start'));
  assert.ok(ui.includes('data-morph-transfer'));
@@ -115,7 +115,7 @@ test('Feature notice is scaffolding and incomplete selection stays in Level 0',(
 
 test('Completion text explicitly avoids a false mastery claim',()=>{
  assert.ok(ui.includes('Это ещё не самостоятельное владение формой'));
- assert.ok(ui.includes('guided и production-практика остаются отдельными этапами'));
+ assert.ok(ui.includes('Практика с подсказкой и практика без подсказки идут отдельно'));
 });
 
 test('Existing written practice and transfer code remains present',()=>{

@@ -157,7 +157,7 @@ test('Stage 5 completion event is routing evidence, not production mastery',()=>
 
 test('Stage 5 keeps later modules out of the new guided route',()=>{
  assert.ok(ui.includes("P.MODULES.includes(module.id)"));
- assert.ok(ui.includes('Guided Stage 5 доступен только для первых четырёх модулей.'));
+ assert.ok(ui.includes('Практика с опорой здесь открывается для первых четырёх разделов.'));
 });
 
 test('Repair teaching events persist the exposed item and lemma identity',()=>{
