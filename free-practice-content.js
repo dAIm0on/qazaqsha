@@ -280,6 +280,91 @@ function capacity(){
  });
 }
 function anchorsFor(headingId){return ANCHORS[headingId]||[];}
-const api={ANCHORS,anchorsFor,forBlock,capacity,all};
+function edgeOf(word){
+ const ch=String(word||'').slice(-1);
+ if('аәеёоөұүуыіэ'.includes(ch))return 'vowel';
+ if(ch==='й'||ch==='у')return 'glide';
+ if(ch==='р')return 'r';
+ if(ch==='л')return 'l';
+ if('мнң'.includes(ch))return 'nasal';
+ if(ch==='з'||ch==='ж')return 'z';
+ if('пкқтсшфхцчщ'.includes(ch))return 'voiceless';
+ return '';
+}
+function matches(row, sample, plain){
+ const seq=(sample&&sample.sequence)||[];
+ const id=row.blockId, sub=row.subcase||'';
+ if(sample&&seq.length){
+  if(id==='free.chains.poss_dat')return seq.includes('POSS_3')&&seq.includes('DAT');
+  if(id==='free.chains.third_acc')return seq.includes('POSS_3')&&seq.includes('ACC');
+  if(id==='free.chains.third_loc')return seq.includes('POSS_3')&&seq.includes('LOC');
+  if(id==='free.chains.third_abl')return seq.includes('POSS_3')&&seq.includes('ABL');
+  if(id==='free.chains.plural_poss')return seq.includes('PL')&&seq.some(x=>String(x).startsWith('POSS'));
+  if(id==='free.chains.full')return seq.length>=3;
+  if(id==='free.poss.my')return seq.includes('POSS_1SG');
+  if(id==='free.poss.your')return seq.includes('POSS_2SG');
+  if(id==='free.poss.our')return seq.includes('POSS_1PL');
+  if(id==='free.poss.polite')return seq.includes('POSS_2POL');
+  if(id==='free.poss.third')return seq.includes('POSS_3');
+  if(id==='free.person.i_we'&&sub==='i')return seq.includes('COP_1SG');
+  if(id==='free.person.i_we'&&sub==='we')return seq.includes('COP_1PL');
+  if(id==='free.person.you')return seq.includes('COP_2SG')||seq.includes('COP_2POL');
+  if(id==='free.person.you_many')return seq.includes('COP_2PL')||seq.includes('COP_2PL_POL');
+  if(id.startsWith('free.plural.group_'))return edgeOf(sample.before)===sub;
+  if(id==='free.plural.vowel')return edgeOf(sample.before)==='vowel';
+ }
+ const text=String(plain||'').toLocaleLowerCase('ru');
+ const keys={
+  'free.plural.vowel':['а, о','в добавке а','→ а'],
+  'free.plural.group_r':['после р'],
+  'free.plural.group_l':['после л'],
+  'free.plural.group_nasal':['м, н','после м'],
+  'free.plural.group_z':['з или ж','после з'],
+  'free.plural.group_voiceless':['глухой конец','кітаптар'],
+  'free.plural.group_vowel':['после глас'],
+  'free.plural.group_yw':['й или у','после й'],
+  'free.harmony.vowel_loc':['в добавке а','а, о, ұ'],
+  'free.voice.loc_onset':['-да, -де','неглухой','т после'],
+  'free.poss.my':['мой'],
+  'free.poss.your':['твой'],
+  'free.poss.our':['наш'],
+  'free.poss.polite':['ваш'],
+  'free.person.you':['«ты»'],
+  'free.person.you_many':['несколько людей','сыңдар'],
+  'free.chains.poss_dat':['к его'],
+  'free.chains.third_acc':['его или её книгу'],
+  'free.chains.third_loc':['в его или её'],
+  'free.chains.third_abl':['от его']
+ };
+ return (keys[id]||[]).some(k=>text.includes(k));
+}
+function uniqueRows(rows){
+ const out=[], seen=new Set();
+ for(const row of rows){
+  const key=row.blockId+'|'+(row.subcase||'');
+  if(seen.has(key))continue;
+  seen.add(key);
+  out.push(row);
+ }
+ return out;
+}
+function forPart(headingId, sample, plain){
+ const rows=anchorsFor(headingId);
+ if(rows.length===1)return {primary:rows[0], extra:[]};
+ if(rows.length>1){
+  const hits=rows.filter(row=>matches(row, sample, plain));
+  if(hits.length===1)return {primary:hits[0], extra:[]};
+  if(hits.length>1)return {primary:null, extra:hits};
+  return {primary:null, extra:[]};
+ }
+ const seq=(sample&&sample.sequence)||[];
+ if(seq.length>=2){
+  const hits=uniqueRows(Object.values(ANCHORS).flat()).filter(row=>matches(row, sample, ''));
+  if(hits.length===1)return {primary:hits[0], extra:[]};
+  if(hits.length>1)return {primary:null, extra:hits};
+ }
+ return {primary:null, extra:[]};
+}
+const api={ANCHORS,anchorsFor,forPart,forBlock,capacity,all};
 if(node)module.exports=api;else root.FreePracticeContent=api;
 })(typeof window!=='undefined'?window:globalThis);

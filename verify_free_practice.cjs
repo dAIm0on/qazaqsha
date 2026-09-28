@@ -106,6 +106,18 @@ const L=require('./morph-learner-v2.js');
 const dat=L.lessons.find(x=>x.id==='learner.dat.kuda');
 const poss=L.lessons.find(x=>x.id==='learner.poss.owner');
 assert.ok(L.pieces(dat,'opening').some(p=>p.id==='dat.1'));
+const possBeats=L.beats(poss);
+const myBeat=possBeats.find(b=>b.headingId==='poss.6'&&b.sample&&(b.sample.sequence||[]).includes('POSS_1SG'));
+const yourBeat=possBeats.find(b=>b.headingId==='poss.6'&&b.sample&&(b.sample.sequence||[]).includes('POSS_2SG'));
+assert.equal(content.forPart(myBeat.headingId, myBeat.sample, '').primary.blockId,'free.poss.my');
+assert.equal(content.forPart(yourBeat.headingId, yourBeat.sample, '').primary.blockId,'free.poss.your');
+const chain=L.beats(L.lessons.find(x=>x.id==='learner.chains.steps')).find(b=>b.headingId==='ch.7'&&b.sample&&(b.sample.sequence||[]).includes('DAT'));
+assert.equal(content.forPart(chain.headingId, chain.sample, '').primary.blockId,'free.chains.poss_dat');
+const plural=L.beats(L.lessons.find(x=>x.id==='learner.pl.several')).find(b=>/после р/i.test(b.html));
+const pluralChoice=content.forPart(plural.headingId, plural.sample, plural.html.replace(/<[^>]+>/g,' '));
+assert.equal(pluralChoice.primary,null);
+assert.ok(pluralChoice.extra.some(row=>row.blockId==='free.plural.group_r'));
+assert.ok(pluralChoice.extra.some(row=>row.blockId==='free.plural.group_l'));
 assert.ok(L.pieces(poss,'full').some(p=>p.id==='poss.26'));
 const C=require('./free-practice-content.js');
 for(const [heading,rows] of Object.entries(C.ANCHORS)){

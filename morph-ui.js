@@ -727,8 +727,17 @@ function exemplarScreen(){
  readPart=i;
  const part=parts[i];
  if(!part)return '<div class="morph-panel"><h2>Не удалось открыть объяснение</h2><p>Вернуться к теме.</p><div class="morph-actions"><button type="button" class="primary-button" data-exemplar-close>К разделу</button></div></div>';
- const practice=window.FreePracticeContent&&part.headingId?window.FreePracticeContent.anchorsFor(part.headingId):[];
- const practiceBtn=practice&&practice.length?'<button type="button" class="secondary-button" data-fs2-practice="'+esc(practice[0].blockId)+'" data-fs2-sub="'+esc(practice[0].subcase||'')+'">Потренироваться</button>':'';
+ const api=window.FreePracticeContent;
+ let choice=api&&api.forPart?api.forPart(part.headingId, part.sample, part.html.replace(/<[^>]+>/g,' ')):{primary:null, extra:[]};
+ if(api&&!choice.primary&&!(choice.extra||[]).length&&(part.kind==='table'||part.kind==='more')){
+  for(let j=i-1;j>=0;j--){
+   const rows=api.anchorsFor(parts[j].headingId);
+   if(rows.length===1){choice={primary:rows[0], extra:[]}; break;}
+   if(rows.length>1)break;
+  }
+ }
+ const practiceLabel=row=>row.title&&row.title!=='Потренироваться'?row.title:'Потренироваться';
+ const practiceBtn=(choice.primary?'<button type="button" class="secondary-button" data-fs2-practice="'+esc(choice.primary.blockId)+'" data-fs2-sub="'+esc(choice.primary.subcase||'')+'">'+esc(practiceLabel(choice.primary))+'</button>':'')+(choice.extra||[]).map(row=>'<button type="button" class="text-button" data-fs2-practice="'+esc(row.blockId)+'" data-fs2-sub="'+esc(row.subcase||'')+'">'+esc(practiceLabel(row))+'</button>').join('');
  const more=parts[i+1]&&parts[i+1].kind==='more'?'<button type="button" class="secondary-button" data-fs2-more>Ещё примеры</button>':'';
  const next=i<parts.length-1?'<button type="button" class="primary-button" data-fs2-next>Следующее объяснение</button>':'<button type="button" class="primary-button" data-fs2-done>К списку уроков</button>';
  const body=part.html.includes('<h3>')?part.html:'<h3>'+esc(part.title)+'</h3>'+part.html;

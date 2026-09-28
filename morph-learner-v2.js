@@ -165,7 +165,9 @@ function beats(row){
  const emit=(blocks,kind)=>{
   if(!blocks.length)return;
   const id=(blocks.find(b=>b.type!=='subheading')||blocks[0]).id;
-  out.push({id,headingId,title,kind,html:blocks.map(renderBlock).join('')});
+  const sampleBlock=blocks.find(b=>b.type==='example'||b.type==='try');
+  const sample=sampleBlock?{sequence:sampleBlock.sequence||[],before:sampleBlock.before||'',after:sampleBlock.after||'',afterRu:sampleBlock.afterRu||'',added:sampleBlock.added||''}:null;
+  out.push({id,headingId,title,kind,ids:blocks.map(b=>b.id),sample,html:blocks.map(renderBlock).join('')});
  };
  const flush=kind=>{emit(buf,kind||'text');buf=[];};
  for(const raw of row.blocks||[]){
