@@ -118,7 +118,9 @@ function searchHits(q){
  const extra=[
   {words:['моя книга','мой'],id:'nav2.3.1'},
   {words:['несколько'],id:'nav2.2.1'},
-  {words:['в школе'],id:'nav2.4.3'},
+  {words:['в школе','где'],id:'nav2.4.3'},
+  {words:['кому'],id:'nav2.4.2'},
+  {words:['из школы'],id:'nav2.4.4'},
   {words:['не пришел','не пришёл'],id:'nav2.7.3'}
  ];
  const rows=[];
@@ -187,7 +189,8 @@ function partHtml(){
  const prev=p.number>1?part(p.number-1):null;
  const next=p.number<7?part(p.number+1):null;
  const hops=(prev?'<button type="button" class="secondary-button" data-nav2-part="'+prev.number+'">Предыдущая часть: '+esc(prev.title)+'</button>':'')+(next?'<button type="button" class="secondary-button" data-nav2-part="'+next.number+'">Следующая часть: '+esc(next.title)+'</button>':'');
- return '<div class="morph-panel morph-nav2"><button type="button" class="text-button" data-nav2="map">← Все темы</button><p class="eyebrow">Часть '+p.number+'</p><h2>'+esc(p.title)+'</h2><p>'+esc(p.example)+'</p>'+body+'<div class="morph-actions">'+hops+'</div></div>';
+ const gen=p.number===4?'<p>Родительный падеж — урок 3.6. <button type="button" class="text-button" data-nav2-lesson="nav2.3.6">Книга ребёнка</button></p>':'';
+ return '<div class="morph-panel morph-nav2"><button type="button" class="text-button" data-nav2="map">← Все темы</button><p class="eyebrow">Часть '+p.number+'</p><h2>'+esc(p.title)+'</h2><p>'+esc(p.example)+'</p>'+gen+body+'<div class="morph-actions">'+hops+'</div></div>';
 }
 function slice(headingId){
  const learner=root.MorphLearner;
