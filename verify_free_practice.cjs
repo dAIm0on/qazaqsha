@@ -59,6 +59,15 @@ for(const seed of [1,2,3,4,7,8,9,11,20,40]){
 }
 const eight=exhaust(8,1,1);
 assert.equal(questions(eight).length,8);
+assert.equal(eight.currentCard,null);
+assert.equal(eight.exhaustReason,'cycle');
+const cycled=S.newCycle(eight);
+assert.equal(cycled.ok,true);
+assert.equal(cycled.state.preferences.repeatNotice,true);
+assert.equal(cycled.state.history.length,questions(eight).length);
+const emptyPool=S.present(S.prepare(S.empty(1),['block.a']).state,[]);
+assert.equal(emptyPool.state.exhaustReason,'empty');
+assert.equal(emptyPool.state.currentCard,null);
 const four=exhaust(4,10,1);
 assert.equal(new Set(questions(four).map(h=>h.normalizedLemmaKey)).size,4);
 assert.equal(questions(four).length,4);

@@ -4,7 +4,7 @@
 const Q=typeof module!=='undefined'&&module.exports?require('./free-practice-queue.js'):root.FreePracticeQueue;
 const cfg=typeof module!=='undefined'&&module.exports?require('./free-practice-config.js'):root.FreePracticeConfig;
 function empty(seed){
- return {schemaVersion:1,contentVersion:cfg.config.version,revision:0,currentCycle:1,selectedBlockIds:[],explainedBlockIds:[],theoryCursor:null,preferences:{supportLevel:'supported',introSeen:false},seed:(seed>>>0)||1,seedStep:0,currentCard:null,history:[],recentError:null,ownerId:null,lastUpdated:0};
+ return {schemaVersion:1,contentVersion:cfg.config.version,revision:0,currentCycle:1,selectedBlockIds:[],explainedBlockIds:[],theoryCursor:null,preferences:{supportLevel:'supported',introSeen:false,repeatNotice:false},seed:(seed>>>0)||1,seedStep:0,currentCard:null,exhaustReason:'',history:[],recentError:null,ownerId:null,lastUpdated:0};
 }
 function migrate(raw){
  if(!raw||raw.schemaVersion!==1)return empty();
@@ -14,7 +14,8 @@ function migrate(raw){
  out.selectedBlockIds=Array.isArray(raw.selectedBlockIds)?raw.selectedBlockIds.slice():[];
  out.explainedBlockIds=Array.isArray(raw.explainedBlockIds)?raw.explainedBlockIds.slice():[];
  out.theoryCursor=raw.theoryCursor||null;
- out.preferences={supportLevel:raw.preferences&&raw.preferences.supportLevel==='try_myself'?'try_myself':'supported',introSeen:!!(raw.preferences&&raw.preferences.introSeen),mixedPick:!!(raw.preferences&&raw.preferences.mixedPick),screenOpen:!!(raw.preferences&&raw.preferences.screenOpen)};
+ out.preferences={supportLevel:raw.preferences&&raw.preferences.supportLevel==='try_myself'?'try_myself':'supported',introSeen:!!(raw.preferences&&raw.preferences.introSeen),repeatNotice:!!(raw.preferences&&raw.preferences.repeatNotice),mixedPick:!!(raw.preferences&&raw.preferences.mixedPick),screenOpen:!!(raw.preferences&&raw.preferences.screenOpen)};
+ out.exhaustReason=raw.exhaustReason==='empty'||raw.exhaustReason==='cycle'||raw.exhaustReason==='error'?raw.exhaustReason:'';
  out.seedStep=Math.max(0,Math.floor(Number(raw.seedStep)||0));
  out.currentCard=raw.currentCard||null;
  out.history=Array.isArray(raw.history)?raw.history.slice():[];
@@ -43,14 +44,24 @@ function prepare(base,blockIds){
  return cas(base,base.revision,state=>{state.selectedBlockIds=ids;state.explainedBlockIds=ids;return state;});
 }
 function present(base,pool){
- const picked=Q.nextCard(pool,base);
- if(picked.status!=='CARD')return {ok:true,state:migrate(base),picked};
+ let picked;
+ try{picked=Q.nextCard(pool,base);}catch(e){picked={status:'EXHAUSTED',reason:'ERROR'};}
+ if(picked.status!=='CARD'){
+  const reason=picked.reason==='ERROR'?'error':(pool&&pool.length?'cycle':'empty');
+  const next=cas(base,base.revision,state=>{state.currentCard=null;state.exhaustReason=reason;return state;});
+  if(!next.ok)return next;
+  next.picked=picked;
+  return next;
+ }
  const occurrenceId='occ:'+base.currentCycle+':'+base.history.length+':'+picked.card.cardId;
  if((base.history||[]).some(h=>h.occurrenceId===occurrenceId)||(base.currentCard&&base.currentCard.occurrenceId===occurrenceId&&base.currentCard.presentationCommitted))return {ok:false,reason:'duplicate',state:migrate(base),picked};
  return cas(base,base.revision,state=>{
   const lemma=Q.keyOf(picked.card);
   const n=Q.countQuestions(state.history,lemma,state.currentCycle)+1;
   state.history=state.history.concat([{occurrenceId,normalizedLemmaKey:lemma,lemmaId:picked.card.lemmaId,blockId:picked.card.blockId,cardId:picked.card.cardId,subcase:picked.card.subcase||'',exerciseType:picked.card.exerciseType||'',presentedAtStep:state.history.length,presentationCountInCycle:n,exposureKind:'question',answered:false,revealed:false,supportLevel:state.preferences.supportLevel,createdAt:state.lastUpdated,cycle:state.currentCycle}]);
+  const asked=state.history.some(h=>h.exposureKind==='question'&&h.cycle===state.currentCycle);
+  if(asked)state.preferences.repeatNotice=false;
+  state.exhaustReason='';
   state.currentCard={occurrenceId,cardId:picked.card.cardId,contentRevision:picked.card.contentRevision||cfg.config.version,blockId:picked.card.blockId,renderedOptions:picked.optionOrder.slice(),seedStateBefore:base.seedStep||0,seedStateAfter:picked.seedStep,rawInput:'',supportLevel:state.preferences.supportLevel,revealed:false,answered:false,feedback:null,presentationCommitted:true,card:picked.card};
   state.seedStep=picked.seedStep;
   state.preferences.introSeen=true;
@@ -82,7 +93,7 @@ function setSupport(base,level){
   return state;
  });
 }
-function newCycle(base){return cas(base,base.revision,state=>{state.currentCycle+=1;state.currentCard=null;state.recentError=null;return state;});}
+function newCycle(base){return cas(base,base.revision,state=>{state.currentCycle+=1;state.currentCard=null;state.exhaustReason='';state.recentError=null;state.preferences.repeatNotice=true;return state;});}
 function roundtrip(state){return migrate(JSON.parse(JSON.stringify(state)));}
 function commit(disk,expectedRevision,next){
  const current=disk?migrate(disk):empty();

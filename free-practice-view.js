@@ -83,13 +83,27 @@ function html(){
  const c=card();
  const shown=state.history.filter(h=>h.exposureKind==='question').length;
  const intro=shown>1?'':'<p>Можно попробовать один пример или заниматься дольше. Оценок нет. Когда захотите, переходите дальше.</p>';
- if(!c)return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p><h2>'+esc(topicHeading())+'</h2>'+intro+'<p>Для этого шага подходящие примеры закончились. Можно повторить знакомые, выбрать другую тему или идти дальше.</p><div class="morph-actions"><button type="button" class="secondary-button" data-free-cycle>Повторить знакомые</button><button type="button" class="primary-button" data-free-close>Дальше</button></div></div>';
+ if(!c){
+  const empty=state.exhaustReason==='empty'||!pool.length;
+  const broken=state.exhaustReason==='error';
+  const line=broken?'Не удалось загрузить примеры. Попробовать ещё раз.':empty?'Для этого шага пока нет проверенных заданий. Можно посмотреть разобранные примеры или выбрать другую тему.':'Для этого шага подходящие примеры закончились.';
+  const again=empty||broken?'':'<button type="button" class="secondary-button" data-free-cycle>Повторить знакомые</button>';
+  const retry=broken?'<button type="button" class="secondary-button" data-free-retry>Попробовать ещё раз</button>':'';
+  return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p><h2>'+esc(topicHeading())+'</h2><p role="status">'+line+'</p><div class="morph-actions">'+again+retry+'<button type="button" class="secondary-button" data-free-topics>Выбрать тему</button><button type="button" class="primary-button" data-free-close>К разделу</button></div></div>';
+ }
  const tr=c.translationSpec||{};
  const hint=state.preferences.supportLevel==='try_myself'?'':('<p class="morph-rule">'+esc(c.promptSpec&&c.promptSpec.hint||'Смотри на уже объяснённый шаг.')+'</p>');
  const options=(state.currentCard.renderedOptions||[]).map(o=>'<button type="button" class="secondary-button" data-free-answer="'+esc(o)+'">'+esc(o)+'</button>').join('');
- const note=state.currentCard.revealed||state.currentCard.answered?'<p role="status">'+esc(c.feedbackRu||'')+'</p>':'';
- const visible=c.showExpectedBeforeAnswer&&c.expected?'<p lang="kk">'+esc(c.expected)+'</p>':'';
- return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+intro+'<h2>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</h2><p lang="kk">'+esc(tr.lemma||'')+'</p><p>'+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+visible+hint+'<div class="morph-choices">'+options+'</div>'+note+'<div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="secondary-button" data-free-another>Ещё пример</button><button type="button" class="primary-button" data-free-close>Дальше по уроку</button></div></div>';
+ const done=!!(state.currentCard.revealed||state.currentCard.answered);
+ const ok=state.currentCard.feedback==='yes';
+ const wrong=state.currentCard.feedback==='no';
+ const result=done?('<div role="status"><p>'+(state.currentCard.revealed&&!wrong&&!ok?'Разбор. Это не ошибка.':ok?'Верно для этого шага.':'Пока не то.')+'</p>'+(state.currentCard.rawInput?'<p>Твой ответ: '+esc(state.currentCard.rawInput)+'</p>':'')+(c.answer||c.expected?'<p lang="kk">'+esc(c.expected||c.answer)+'</p><p>'+esc(tr.target||'')+'</p>':'')+'<p>'+esc(c.feedbackRu||'')+'</p>'+(wrong?'<p>Дальше можно то же на другом слове.</p>':'')+'</div>'):'';
+ const visible=!done&&c.showExpectedBeforeAnswer&&c.expected?'<p lang="kk">'+esc(c.expected)+'</p>':'';
+ const repeat=state.preferences.repeatNotice?'<p>Повторяем знакомые примеры.</p>':'';
+ const moreLabel=done?'Ещё пример':'Другой пример';
+ const moreClass=done?'primary-button':'secondary-button';
+ const leaveClass=done?'secondary-button':'primary-button';
+ return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+intro+repeat+'<h2>'+esc(topicHeading())+'</h2><p>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</p><p lang="kk">'+esc(tr.lemma||'')+'</p><p>'+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+visible+hint+'<div class="morph-choices">'+options+'</div>'+result+'<div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="'+moreClass+'" data-free-another>'+moreLabel+'</button><button type="button" class="'+leaveClass+'" data-free-close>Дальше по уроку</button></div></div>';
 }
 function anchorsHtml(headingId){
  if(!enabled())return '';
@@ -139,7 +153,12 @@ function resumeIfOpen(){
  if(!state.preferences||!state.preferences.screenOpen)return false;
  if(state.preferences.mixedPick){pool=[];open=true;return true;}
  const saved=state.currentCard&&state.currentCard.card;
- if(!saved)return false;
+ if(!saved){
+  if(!state.exhaustReason)return false;
+  try{pool=(state.selectedBlockIds||[]).flatMap(id=>C.forBlock(id,''));}catch(e){pool=[];}
+  open=true;
+  return true;
+ }
  try{pool=C.forBlock(saved.blockId,saved.subcase||'');}catch(e){pool=[];}
  open=true;
  return true;
@@ -150,7 +169,9 @@ function bind(host,redraw){
  host.querySelector('[data-free-another]')?.addEventListener('click',()=>go(()=>S.present(state,pool)));
  host.querySelector('[data-free-reveal]')?.addEventListener('click',()=>go(()=>S.reveal(state)));
  host.querySelector('[data-free-support]')?.addEventListener('click',()=>go(()=>S.setSupport(state,state.preferences.supportLevel==='try_myself'?'supported':'try_myself')));
- host.querySelector('[data-free-cycle]')?.addEventListener('click',()=>go(()=>{const next=S.newCycle(state);if(!next.ok)return next;next.state.preferences.mixedPick=false;return pool.length?S.present(next.state,pool):next;}));
+ host.querySelector('[data-free-cycle]')?.addEventListener('click',()=>go(()=>{const next=S.newCycle(state);if(!next.ok)return next;next.state.preferences.mixedPick=false;if(!pool.length){next.state.exhaustReason='empty';return next;}return S.present(next.state,pool);}));
+ host.querySelector('[data-free-topics]')?.addEventListener('click',()=>{openMixed();redraw();});
+ host.querySelector('[data-free-retry]')?.addEventListener('click',()=>{const ids=state.selectedBlockIds||[];pool=ids.flatMap(id=>{try{return C.forBlock(id,'');}catch(e){return [];}});const shown=S.present(state,pool);if(shown.ok)save(shown.state);redraw();});
  const paintChosen=()=>{const names=[...host.querySelectorAll('[data-free-mix]:checked')].map(el=>el.dataset.fs2Name||el.dataset.freeMix);const slot=host.querySelector('[data-fs2-chosen]');if(slot)slot.textContent=names.length?('Выбрано: '+names.join(', ')):'Пока ничего не выбрано.';};
  for(const box of host.querySelectorAll('[data-free-mix]'))box.addEventListener('change',paintChosen);
  for(const b of host.querySelectorAll('[data-fs2-explained]'))b.addEventListener('click',()=>{
