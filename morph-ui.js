@@ -26,8 +26,12 @@ function shownSupport(task,fallback){
 function moduleOwned(module){return !!module&&(module.id==='harmony'||module.id==='voice'||module.id==='mixed');}
 function learnerLesson(module,familyId){
  const api=learner();
- if(!api||!module||moduleOwned(module))return null;
+ if(!api||!module)return null;
+ if(moduleOwned(module)&&module.id==='mixed')return null;
  return api.forFamily(module.id,familyId);
+}
+function missingExplanation(module,resume){
+ return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<h2>Не удалось открыть объяснение</h2><p>Вернуться к теме.</p><div class="morph-actions"><button type="button" class="primary-button" data-morph-hub>К разделу</button></div></div>';
 }
 function backToSection(){
  teachingMode=false;topicOpen=false;calcOpen=false;showHub=true;showFullSemantic=false;message='';persistCalc();render();
@@ -156,7 +160,7 @@ function hub(){
  '<label for="morph-level">Раздел</label><select id="morph-level">'+rows+'</select><p class="morph-rule">'+esc(rule(level))+'</p>'+
  '<div class="morph-routes"><button class="'+(canContinue?'primary-button':'secondary-button')+'" data-morph-continue>Продолжить обучение</button><button class="primary-button" data-morph-learn-zero>Учиться с нуля</button><button class="secondary-button" data-morph-weak>Повторить слабое место</button><button class="secondary-button" data-morph-start>Самостоятельная практика</button><button class="secondary-button" data-morph-transfer>Проверить на новых основах</button><button class="secondary-button" data-morph-calc>Разобрать форму</button></div>'+freePracticeEntry()+
  '<p class="small">Сейчас продолжится: '+where+'.</p>'+
- '<details open><summary>Как устроены урок и проверка</summary>'+
+ '<details><summary>Как устроены урок и проверка</summary>'+
  '<p>Короткая фраза возле шага помогает сделать ход, но это не вся теория. Полное объяснение открывается по «Разобрать правило полностью» и не исчезает. На узком экране его можно разбить, спрятать под «Подробнее» или оставить короткую опору сверху. Нельзя выкинуть контрпримеры, ограничения и переписать полное правило одной фразой.</p>'+
  '<p>Перед вопросом «какое окончание?» нужно понять три вещи: какой смысл мы сейчас выражаем; по какому признаку нужна именно эта операция; что не надо путать с этой операцией. Ещё: какая сейчас основа и какой участок будет стыком. Карточка новичка не обязана сразу дать все оттенки. Для первого шага берётся один ясный смысл. Более широкие значения остаются в полном объяснении. Два или три контраста идут до самостоятельной оценки. Заметить признак — не то же самое, что самостоятельно построить форму.</p>'+
  '<p>Сначала значение, потом уже получившееся слово, не первая догадка по последней букве. У отдельных вопросов есть свой приоритет поверх общего порядка. Угадать любую правильную форму любого неизвестного слова по одной последней букве — не задача. Не склеивай разные вопросы только потому, что концы похожи. Вопрос и «не делать» нельзя объединять в одно правило только потому, что буквы ма, ме, ба, бе, па, пе похожи.</p>'+
@@ -241,46 +245,33 @@ function moduleIntro(module,resume){
 }
 function semanticIntro(module,resume,semantic){
  recordOnce('semantic_intro_seen',module.id,resume.familyId);
- if(moduleOwned(module))return moduleIntro(module,resume);
  const lessonRow=learnerLesson(module,resume.familyId);
  if(lessonRow){
   if(showFullSemantic){recordOnce('semantic_full_opened',module.id,resume.familyId);return learnerPanel(module,resume,lessonRow,'full');}
   return learnerPanel(module,resume,lessonRow,'opening');
  }
- const examples=(semantic.examples||[]).map(x=>'<li lang="kk">'+esc(x.text)+'</li>').join('');
- const split=resume.familyId==='INS'?'<h2>Чем? С помощью чего?</h2><p>Инструмент или средство действия. Это первая отдельная карточка.</p><h2>С кем? С чем вместе?</h2><p>Совместность. Вторая карточка. Сначала эти значения учатся отдельно и смешиваются позже.</p>':resume.familyId==='DAT'?'<h2>Куда?</h2><p>Направление к месту. Первая карточка.</p><h2>Кому?</h2><p>Адресат. Вторая карточка. В первом блоке направление и адресат не смешиваются.</p>':'';
- if(showFullSemantic){
-  recordOnce('semantic_full_opened',module.id,resume.familyId);
-  const full=semanticGroupsFor(resume.familyId).map(g=>'<section><h2>'+esc(g.title)+'</h2>'+renderBlocks(g.blocks)+'</section>').join('')||renderBlocks([{type:'paragraph',text:semantic.meaning}]);
-  return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">СМЫСЛ ПОЛНОСТЬЮ</p>'+full+'<p class="small">Это знакомство со смыслом, не самостоятельный ответ и не оценка произношения.</p><div class="morph-actions"><button class="secondary-button" data-teach-semantic-short>Короткая опора</button><button class="primary-button" data-teach-semantic-done>Понятно, разобрать правило</button></div></div>';
- }
- return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 1 · СМЫСЛ</p><h2>'+esc(semantic.title)+'</h2>'+split+'<p class="morph-teach-lead">'+esc(semantic.meaning)+'</p><div class="morph-rule"><strong>Не перепутать</strong><p>'+esc(semantic.contrast)+'</p></div>'+(examples?'<h3>Примеры</h3><ul class="morph-teach-list">'+examples+'</ul>':'')+'<p class="small">Пока ты только разбираешь значение. Этот экран не считается самостоятельным ответом.</p><div class="morph-actions"><button class="secondary-button" data-teach-semantic-full>Разобрать смысл полностью</button><button class="primary-button" data-teach-semantic-done>Понятно, разобрать правило</button></div></div>';
+ if(module.id==='mixed')return '<div class="morph-panel morph-teach-panel" data-module-lesson="mixed">'+teachingNav(module,resume)+'<h2>Смешать знакомое</h2><p>Это практика уже открытых тем. Она не ставит оценку. Старая проверка «смешанная практика» в списке разделов — другое дело.</p><div class="morph-actions"><button type="button" class="primary-button" data-free-mixed>Смешать знакомое</button><button type="button" class="secondary-button" data-morph-hub>К разделу</button></div></div>';
+ return missingExplanation(module,resume);
 }
 function fullExplanation(module,resume){
  recordOnce('full_explanation_opened',module.id,resume.familyId);
  const lessonRow=learnerLesson(module,resume.familyId);
  if(lessonRow)return learnerPanel(module,resume,lessonRow,'full');
- const body=module.fullExplanationBlocks?renderBlocks(module.fullExplanationBlocks):module.fullExplanation.map(p=>'<p>'+esc(p)+'</p>').join('');
- const counters=(module.counterExamples||[]).map(x=>'<li>'+esc(x)+'</li>').join('');
- const limits=(module.limitations||[]).map(x=>'<li>'+esc(x)+'</li>').join('');
- return '<div class="morph-panel morph-teach-panel"'+(moduleOwned(module)?' data-module-lesson="'+esc(module.id)+'"':'')+'>'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 2 · ПОЛНОЕ ОБЪЯСНЕНИЕ</p><h2>'+esc(module.title)+'</h2><div class="morph-full-explanation">'+body+'</div>'+(counters?'<h3>Контрпримеры</h3><ul class="morph-teach-list">'+counters+'</ul>':'')+(limits?'<h3>Границы правила</h3><ul class="morph-teach-list">'+limits+'</ul>':'')+'<p class="small">Полное объяснение не заменяется короткой подсказкой и остаётся доступным из раздела.</p><div class="morph-actions"><button class="primary-button" data-teach-next-step="CONTRAST_EXAMPLES">Посмотреть контрасты</button></div></div>';
+ return missingExplanation(module,resume);
 }
 function contrastExamples(module,resume,semantic){
  const lessonRow=learnerLesson(module,resume.familyId);
  if(lessonRow)return '<div class="morph-panel morph-teach-panel morph-learner" data-learner-lesson="'+esc(lessonRow.id)+'">'+teachingNav(module,resume)+learner().render(lessonRow,'contrast')+'<div class="morph-actions"><button class="secondary-button" data-teach-go-full>Разобрать правило полностью</button><button class="primary-button" data-teach-next-step="FEATURE_NOTICE">На что смотреть</button></div></div>';
- const pool=moduleOwned(module)?(module.examples||[]):[...(semantic.examples||[]),...(module.examples||[])];
- const examples=pool.map(x=>x.text).filter((x,i,a)=>a.indexOf(x)===i);
- const ex=examples.map(x=>'<li lang="kk">'+esc(x)+'</li>').join('');
- const contrasts=(module.contrastSets||[]).map(set=>'<li>'+set.map(x=>'<span lang="kk">'+esc(x)+'</span>').join(' ↔ ')+'</li>').join('');
- return '<div class="morph-panel morph-teach-panel" data-module-lesson="'+esc(module.id)+'">'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 3 · КОНТРАСТЫ</p><h2>'+esc(module.title)+'</h2><h3>Сравни похожие случаи</h3>'+(ex?'<h3>Сопоставимые примеры</h3><ul class="morph-teach-list">'+ex+'</ul>':'')+(contrasts?'<h3>Что различать</h3><ul class="morph-teach-list morph-contrast-list">'+contrasts+'</ul>':'')+'<div class="morph-actions"><button class="secondary-button" data-teach-go-full>Разобрать правило полностью</button><button class="primary-button" data-teach-next-step="FEATURE_NOTICE">На что смотреть</button></div></div>';
+ return missingExplanation(module,resume);
 }
 function featureNotice(module,resume){
  if(resume.stepIndex>0)return teachingComplete(module,resume);
  const lessonRow=learnerLesson(module,resume.familyId);
- const checks=lessonRow?lessonRow.lookAt.map((x,i)=>'<label class="morph-feature-option"><input type="checkbox" data-teach-feature value="'+i+'"><span>'+esc(x)+'</span></label>').join(''):module.whatToLookAt.map((x,i)=>'<label class="morph-feature-option"><input type="checkbox" data-teach-feature value="'+i+'"><span>'+esc(x)+'</span></label>').join('');
- const steps=lessonRow?lessonRow.steps.map((x,i)=>'<li><strong>'+(i+1)+'.</strong> '+esc(x)+'</li>').join(''):module.decisionSteps.map((x,i)=>'<li><strong>'+(i+1)+'.</strong> '+esc(x)+'</li>').join('');
- const heading=moduleOwned(module)?module.title:'Перед формой назови признаки';
- const lead=moduleOwned(module)?'Перед формой назови признаки. Отметь всё, что нужно проверить в этом разделе. Это активная опора, а не тест на mastery.':'Отметь всё, что нужно проверить в этом разделе. Это активная опора, а не тест на mastery.';
+ if(!lessonRow)return missingExplanation(module,resume);
+ const checks=lessonRow.lookAt.map((x,i)=>'<label class="morph-feature-option"><input type="checkbox" data-teach-feature value="'+i+'"><span>'+esc(x)+'</span></label>').join('');
+ const steps=lessonRow.steps.map((x,i)=>'<li><strong>'+(i+1)+'.</strong> '+esc(x)+'</li>').join('');
+ const heading='Перед формой назови признаки';
+ const lead='Отметь всё, что нужно проверить в этом разделе. Это опора, не проверка на оценку.';
  return '<div class="morph-panel morph-teach-panel"'+(moduleOwned(module)?' data-module-lesson="'+esc(module.id)+'"':'')+'>'+teachingNav(module,resume)+'<p class="eyebrow">ШАГ 4 · НА ЧТО СМОТРЕТЬ</p><h2>'+esc(heading)+'</h2><p>'+lead+'</p><div class="morph-feature-grid">'+checks+'</div><h3>Порядок решения</h3><ol class="morph-teach-list">'+steps+'</ol><div class="morph-actions"><button class="secondary-button" data-teach-go-full>Разобрать правило полностью</button><button class="primary-button" data-teach-feature-submit>Я отметил(а) признаки</button></div></div>';
 }
 function stage5Ready(module){return !!P&&P.MODULES.includes(module.id)&&P.fullStage5Ready(data().module,module.id)&&P.prerequisitesReady(data().module,module.id);}
@@ -506,7 +497,7 @@ function teachingComplete(module,resume){
   const ownReady=!!P&&P.MODULES.includes(module.id)&&P.fullStage5Ready(data().module,module.id),ready=stage5Ready(module),prev=P?.previousModule(module.id),prevTitle=prev?teachingModule(prev)?.title:'';
   route=ready?'<button class="primary-button" data-stage5-start-guided>Тренировка с опорой</button>':ownReady&&prev?'<button class="secondary-button" data-stage5-prereq="'+esc(prev)+'">Сначала предыдущий модуль · '+esc(prevTitle||prev)+'</button>':'';
  }
- return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">LEVEL 0 · ГОТОВО</p><h2>Смысл и признаки разобраны</h2><p>Ты прошёл(а) вводную часть для «'+esc(moduleOwned(module)?module.title:(teachingFamily(resume.familyId)?.title||resume.familyId))+'». Это ещё не самостоятельное владение формой. Практика с подсказкой и практика без подсказки идут отдельно.</p><div class="morph-actions">'+route+'<button class="secondary-button" data-teach-close>К разделу</button></div></div>';
+ return '<div class="morph-panel morph-teach-panel">'+teachingNav(module,resume)+'<p class="eyebrow">Вводная часть</p><h2>Смысл и признаки разобраны</h2><p>Ты прошёл(а) вводную часть для «'+esc(teachingFamily(resume.familyId)?.title||module.title)+'». Это ещё не самостоятельное владение формой. Практика с подсказкой и практика без подсказки идут отдельно.</p><div class="morph-actions">'+route+'<button class="secondary-button" data-teach-close>К разделу</button></div></div>';
 }
 function teachingScreen(){
  const d=data(),resume=d.module.teaching?.resume;if(!resume){teachingMode=false;showHub=true;return hub();}
@@ -538,7 +529,7 @@ function openMixedEntry(){
  setTeachingResume('mixed','MIXED_PRACTICE',null,0,'');message='';render();
 }
 function startTeaching(moduleId=level,familyId=null,step='SEMANTIC_INTRO'){
- const module=teachingModule(moduleId);if(!module){message='Teaching data не загрузились.';render();return;}
+ const module=teachingModule(moduleId);if(!module){message='Не удалось открыть объяснение. Вернуться к теме.';render();return;}
  if(module.id==='mixed'&&step==='FULL_EXPLANATION'){showFullSemantic=false;setTeachingResume('mixed','FULL_EXPLANATION',null,0,'');message='';render();return;}
  if(module.id==='mixed'){openMixedEntry();return;}
  const family=familyId&&module.families.includes(familyId)?familyId:module.families[0];

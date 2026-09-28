@@ -38,34 +38,32 @@ test('Hub exposes zero-knowledge route and keeps independent practice separate',
 
 test('Level 0 implements the four approved Stage 4 steps',()=>{
  for(const step of ['SEMANTIC_INTRO','FULL_EXPLANATION','CONTRAST_EXAMPLES','FEATURE_NOTICE'])assert.ok(ui.includes(step),step);
- for(const label of ['ШАГ 1 · СМЫСЛ','ШАГ 2 · ПОЛНОЕ ОБЪЯСНЕНИЕ','ШАГ 3 · КОНТРАСТЫ','ШАГ 4 · НА ЧТО СМОТРЕТЬ'])assert.ok(ui.includes(label),label);
+ assert.ok(ui.includes('ШАГ 4 · НА ЧТО СМОТРЕТЬ'));
 });
 
-test('Semantic intro uses canonical meaning, contrast and examples rather than generated text',()=>{
- assert.ok(ui.includes('semantic.meaning'));
- assert.ok(ui.includes('semantic.contrast'));
- assert.ok(ui.includes('semantic.examples'));
+test('Semantic intro uses the learner lesson and does not print the technical canon',()=>{
  assert.ok(ui.includes("recordOnce('semantic_intro_seen'"));
  assert.ok(ui.includes("recordOnce('semantic_intro_completed'"));
+ assert.ok(ui.includes('Не удалось открыть объяснение'));
+ assert.equal(ui.includes('semantic.meaning'),false);
 });
 
-test('Full explanation renders canonical paragraphs, counterexamples and limitations',()=>{
- assert.ok(ui.includes('module.fullExplanation.map'));
- assert.ok(ui.includes('module.counterExamples'));
- assert.ok(ui.includes('module.limitations'));
+test('Full explanation uses the learner lesson, not the technical canon',()=>{
+ assert.equal(ui.includes('module.fullExplanation.map'),false);
  assert.ok(ui.includes("recordOnce('full_explanation_opened'"));
  assert.ok(ui.includes('Полное объяснение не заменяется короткой подсказкой'));
+ assert.ok(ui.includes('Не удалось открыть объяснение'));
 });
 
-test('Contrast screen uses canonical examples and contrastSets',()=>{
- assert.ok(ui.includes('module.examples'));
- assert.ok(ui.includes('module.contrastSets'));
- assert.ok(ui.includes('Сравни похожие случаи'));
+test('Contrast screen stays on the learner lesson',()=>{
+ assert.ok(ui.includes("learner().render(lessonRow,'contrast')"));
+ assert.ok(ui.includes('Разобрать правило полностью'));
 });
 
-test('Feature notice uses canonical whatToLookAt and decisionSteps',()=>{
- assert.ok(ui.includes('module.whatToLookAt.map'));
- assert.ok(ui.includes('module.decisionSteps.map'));
+test('Feature notice uses the learner checklist, not the technical canon',()=>{
+ assert.ok(ui.includes('lessonRow.lookAt.map'));
+ assert.ok(ui.includes('lessonRow.steps.map'));
+ assert.equal(ui.includes('module.whatToLookAt.map'),false);
  assert.ok(ui.includes("type:'feature_notice_attempt'"));
 });
 
