@@ -6,7 +6,16 @@ const cfg=node?require('./free-practice-config.js'):root.FreePracticeConfig;
 const S=node?require('./free-practice-state.js'):root.FreePracticeState;
 const C=node?require('./free-practice-content.js'):root.FreePracticeContent;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let open=false,pool=[],state=S.empty(1),mixNotice='';
+let open=false,pool=[],state=S.empty(1),mixNotice='',saveWarning='',corruptRaw=null,foreign=false,cardNotice='';
+const TAB_KEY='qazaqsha-fp-tab';
+const CORRUPT_KEY='qazaqsha.freePractice.v1.corrupt';
+function tabId(){
+ try{
+  let id=sessionStorage.getItem(TAB_KEY);
+  if(!id){id='tab-'+Date.now().toString(36)+Math.random().toString(36).slice(2);sessionStorage.setItem(TAB_KEY,id);}
+  return id;
+ }catch(e){return 'tab-local';}
+}
 const THEMES=[
  {lesson:'learner.dat.kuda',title:'Куда или кому?',test:id=>/^free\.(harmony\.(meaning_dat|vowel_dat|limits)|voice\.(dat_|direction_place))/.test(id)},
  {lesson:'learner.loc.where',title:'Где находится?',test:id=>/^free\.(harmony\.(meaning_loc|vowel_loc)|voice\.loc_)/.test(id)},
@@ -43,12 +52,44 @@ function isOpen(){return enabled()&&open;}
 function entryHtml(){return enabled()?'<button type="button" class="secondary-button" data-free-practice-open>Потренироваться</button>':'';}
 function load(){
  if(typeof localStorage==='undefined')return;
- try{const raw=JSON.parse(localStorage.getItem(S.KEY)||'null');if(raw)state=S.migrate(raw);}catch(e){}
+ let raw=null;
+ try{raw=localStorage.getItem(S.KEY);}catch(e){saveWarning='Сейчас не получается сохранить место. Пока страница открыта, можно продолжать.';return;}
+ if(!raw)return;
+ try{
+  const parsed=JSON.parse(raw);
+  if(!parsed||typeof parsed!=='object'||parsed.schemaVersion!==1){corruptRaw=raw;state=S.empty(1);return;}
+  state=S.migrate(parsed);
+  corruptRaw=null;
+ }catch(e){corruptRaw=raw;state=S.empty(1);}
+ foreign=!!(state.ownerId&&state.ownerId!==tabId());
 }
 function save(next){
  state=next;
+ if(corruptRaw||foreign)return;
  if(typeof localStorage==='undefined')return;
- try{localStorage.setItem(S.KEY,JSON.stringify(state));}catch(e){}
+ try{localStorage.setItem(S.KEY,JSON.stringify(state));saveWarning='';}
+ catch(e){saveWarning='Сейчас не получается сохранить место. Пока страница открыта, можно продолжать.';}
+}
+function own(){
+ if(corruptRaw)return false;
+ if(foreign)return false;
+ if(!state.ownerId){
+  const got=S.claim(state,tabId());
+  if(!got.ok){foreign=true;return false;}
+  save(got.state);
+ }
+ else if(state.ownerId!==tabId()){foreign=true;return false;}
+ return true;
+}
+function resetCorrupt(){
+ if(!corruptRaw||typeof localStorage==='undefined')return;
+ try{if(!localStorage.getItem(CORRUPT_KEY))localStorage.setItem(CORRUPT_KEY,corruptRaw);}
+ catch(e){saveWarning='Сейчас не получается сохранить место. Пока страница открыта, можно продолжать.';return;}
+ corruptRaw=null;
+ foreign=false;
+ save(S.empty(1));
+ const got=S.claim(state,tabId());
+ if(got.ok)save(got.state);
 }
 function synthetic(n){
  const cards=[];
@@ -59,6 +100,8 @@ function card(){return state.currentCard&&state.currentCard.card;}
 function openMixed(){
  if(!enabled())return;
  load();
+ open=true;
+ if(!own())return;
  pool=[];
  const next=S.cas(state,state.revision,s=>{s.currentCard=null;s.preferences.mixedPick=true;s.preferences.screenOpen=true;s.selectedBlockIds=[];return s;});
  state=next.ok?next.state:Object.assign(state,{currentCard:null});
@@ -77,8 +120,13 @@ function mixedPickHtml(){
  const note=mixNotice?'<p role="status">'+esc(mixNotice)+'</p>':'';
  return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p><h2>Что потренировать?</h2><p>Выбери знакомые темы. Можно смешать несколько.</p>'+note+'<p data-fs2-chosen>Пока ничего не выбрано.</p><div class="morph-routes">'+groups+'</div><div class="morph-actions"><button type="button" class="primary-button" data-free-mix-start>Ещё пример</button><button type="button" class="secondary-button" data-free-cycle>Повторить знакомые</button><button type="button" class="secondary-button" data-free-close>Дальше</button></div></div>';
 }
+function notes(){
+ return (saveWarning?'<p role="status">'+esc(saveWarning)+'</p>':'')+(cardNotice?'<p role="status">'+esc(cardNotice)+'</p>':'');
+}
 function html(){
  if(!isOpen())return '';
+ if(corruptRaw)return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><h2>Свободная практика</h2><p role="status">Запись свободной практики не читается. Курс не меняется. Можно начать её заново, прежняя запись останется копией.</p>'+notes()+'<div class="morph-actions"><button type="button" class="primary-button" data-free-reset>Начать свободную практику заново</button></div></div>';
+ if(foreign)return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><h2>Свободная практика</h2><p role="status">Практика уже открыта в другой вкладке. Продолжить здесь.</p>'+notes()+'<div class="morph-actions"><button type="button" class="primary-button" data-free-takeover>Продолжить здесь</button></div></div>';
  if(state.preferences.mixedPick)return mixedPickHtml();
  const c=card();
  const shown=state.history.filter(h=>h.exposureKind==='question').length;
@@ -103,7 +151,7 @@ function html(){
  const moreLabel=done?'Ещё пример':'Другой пример';
  const moreClass=done?'primary-button':'secondary-button';
  const leaveClass=done?'secondary-button':'primary-button';
- return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+intro+repeat+'<h2>'+esc(topicHeading())+'</h2><p>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</p><p lang="kk">'+esc(tr.lemma||'')+'</p><p>'+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+visible+hint+'<div class="morph-choices">'+options+'</div>'+result+'<div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="'+moreClass+'" data-free-another>'+moreLabel+'</button><button type="button" class="'+leaveClass+'" data-free-close>Дальше по уроку</button></div></div>';
+ return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+notes()+intro+repeat+'<h2>'+esc(topicHeading())+'</h2><p>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</p><p lang="kk">'+esc(tr.lemma||'')+'</p><p>'+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+visible+hint+'<div class="morph-choices">'+options+'</div>'+result+'<div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="'+moreClass+'" data-free-another>'+moreLabel+'</button><button type="button" class="'+leaveClass+'" data-free-close>Дальше по уроку</button></div></div>';
 }
 function anchorsHtml(headingId){
  if(!enabled())return '';
@@ -114,6 +162,8 @@ function anchorsHtml(headingId){
 function openBlock(blockId,subcase){
  if(!enabled()||!allowlist().includes(blockId))return;
  load();
+ open=true;
+ if(!own())return;
  pool=C.forBlock(blockId,subcase);
  const switched=S.cas(state,state.revision,s=>{s.selectedBlockIds=[blockId];if(!s.explainedBlockIds.includes(blockId))s.explainedBlockIds=s.explainedBlockIds.concat([blockId]);s.currentCard=null;return s;});
  if(switched.ok)state=switched.state;
@@ -127,6 +177,8 @@ function openBlock(blockId,subcase){
 function openPractice(items,seed){
  if(!enabled())return;
  load();
+ open=true;
+ if(!own())return;
  pool=(items||[]).slice();
  if(seed)state.seed=seed>>>0;
  if(!state.selectedBlockIds.length){
@@ -160,11 +212,20 @@ function resumeIfOpen(){
   return true;
  }
  try{pool=C.forBlock(saved.blockId,saved.subcase||'');}catch(e){pool=[];}
+ if(own()){
+  const fresh=S.replaceStaleCard(state,pool);
+  if(fresh&&fresh.ok){
+   if(fresh.replaced)cardNotice='Пример обновился. Откроем другой';
+   save(fresh.state);
+  }
+ }
  open=true;
  return true;
 }
 function bind(host,redraw){
- const go=fn=>{const next=fn();if(next&&next.ok)save(next.state);else if(next&&next.state)state=next.state;redraw();};
+ const go=fn=>{if(!own()){redraw();return;}const next=fn();if(next&&next.ok)save(next.state);else if(next&&next.state)state=next.state;redraw();};
+ host.querySelector('[data-free-reset]')?.addEventListener('click',()=>{resetCorrupt();redraw();});
+ host.querySelector('[data-free-takeover]')?.addEventListener('click',()=>{load();const got=S.takeOver(state,tabId());if(got.ok){foreign=false;save(got.state);}else saveWarning='Сейчас не получается сохранить место. Пока страница открыта, можно продолжать.';redraw();});
  for(const b of host.querySelectorAll('[data-free-close]'))b.addEventListener('click',()=>{dismiss();redraw();});
  host.querySelector('[data-free-another]')?.addEventListener('click',()=>go(()=>S.present(state,pool)));
  host.querySelector('[data-free-reveal]')?.addEventListener('click',()=>go(()=>S.reveal(state)));

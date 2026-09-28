@@ -94,13 +94,24 @@ function setSupport(base,level){
  });
 }
 function newCycle(base){return cas(base,base.revision,state=>{state.currentCycle+=1;state.currentCard=null;state.exhaustReason='';state.recentError=null;state.preferences.repeatNotice=true;return state;});}
+function replaceStaleCard(base,pool){
+ const cur=base.currentCard&&base.currentCard.card;
+ if(!cur)return {ok:true,replaced:false,state:migrate(base)};
+ const live=(pool||[]).find(c=>c.cardId===cur.cardId);
+ if(live&&live.answer===cur.answer)return {ok:true,replaced:false,state:migrate(base)};
+ const cleared=cas(base,base.revision,state=>{state.currentCard=null;return state;});
+ if(!cleared.ok)return cleared;
+ const shown=present(cleared.state,pool||[]);
+ shown.replaced=true;
+ return shown;
+}
 function roundtrip(state){return migrate(JSON.parse(JSON.stringify(state)));}
 function commit(disk,expectedRevision,next){
  const current=disk?migrate(disk):empty();
  if(current.revision!==expectedRevision)return {ok:false,reason:'conflict',state:current};
  return {ok:true,state:migrate(next)};
 }
-const api={empty,migrate,clone,cas,claim,takeOver,prepare,present,answer,reveal,setSupport,newCycle,roundtrip,commit,KEY:cfg.config.namespace};
+const api={empty,migrate,clone,cas,claim,takeOver,prepare,present,answer,reveal,setSupport,newCycle,replaceStaleCard,roundtrip,commit,KEY:cfg.config.namespace};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 else root.FreePracticeState=api;
 })(typeof window!=='undefined'?window:globalThis);

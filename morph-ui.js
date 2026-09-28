@@ -184,7 +184,7 @@ function saveCursor(open){
    return;
   }
   sessionStorage.setItem(READ_KEY,JSON.stringify(Object.assign({},prev,{open:false,at:Date.now(),seen})));
- }catch(e){}
+ }catch(e){message='Сейчас не получается сохранить место. Пока страница открыта, можно продолжать.';}
 }
 function lessonSeen(id){
  const row=readCursor()&&readCursor().seen&&readCursor().seen[id];
@@ -215,8 +215,8 @@ function showSectionHome(){
 }
 function openLesson(id,part,toc){
  if(!doorById(id)){message='Это объяснение не найдено. Вернуться к теме.';showSectionHome();render();return;}
- exemplarId=id;readPart=part||0;readToc=!!toc;teachingMode=false;showHub=false;topicOpen=false;calcOpen=false;message='';
- saveCursor(true);saveSurface('read');
+ exemplarId=id;readPart=part||0;readToc=!!toc;teachingMode=false;showHub=false;topicOpen=false;calcOpen=false;
+ saveCursor(true);saveSurface('read');persistCalc();
 }
 function restoreReading(){
  const c=readCursor();
@@ -915,7 +915,7 @@ function bind(host){
  host.querySelector('[data-morph-weak]')?.addEventListener('click',()=>repeatWeak());
  host.querySelector('[data-morph-topic]')?.addEventListener('click',()=>{topicOpen=true;teachingMode=false;showHub=false;message='';render();});
  host.querySelector('[data-morph-restart]')?.addEventListener('click',()=>{message='Раздел начинается сначала. Уже сохранённые ответы и проверка не стираются.';startTeaching(level,null,'SEMANTIC_INTRO');});
- host.querySelector('[data-morph-pilot]')?.addEventListener('click',()=>{const doc=P.pilotExport(data().module),blob=new Blob([JSON.stringify(doc,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='qazaqsha-morph-pilot.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+ host.querySelector('[data-morph-pilot]')?.addEventListener('click',()=>{const doc=P.pilotExport(data().module);try{const raw=localStorage.getItem('qazaqsha.freePractice.v1');const parsed=raw?JSON.parse(raw):null;if(parsed&&parsed.schemaVersion===1)doc.freePractice={version:1,record:parsed};}catch(e){}const blob=new Blob([JSON.stringify(doc,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='qazaqsha-morph-pilot.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
  for(const b of host.querySelectorAll('[data-learner-open]'))b.onclick=()=>{const id=b.dataset.learnerOpen;if(!doorById(id)){message=learner()?learner().unavailable():'Этот разбор временно недоступен. Можно вернуться к разделу.';render();return;}openLesson(id,0,false);focusHeading();remember();render();};
  for(const b of host.querySelectorAll('[data-learner-try]'))b.onclick=()=>{const box=b.closest('.morph-learner-trybox'),note=box&&box.querySelector('[data-learner-note]');if(!note)return;note.textContent=b.dataset.learnerTry===b.dataset.learnerOk?b.dataset.learnerGood:b.dataset.learnerBad;};
  for(const b of host.querySelectorAll('[data-topic-step]'))b.onclick=()=>openTopicStep(b.dataset.topicStep);

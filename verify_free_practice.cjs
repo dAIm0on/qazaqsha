@@ -68,6 +68,15 @@ assert.equal(cycled.state.history.length,questions(eight).length);
 const emptyPool=S.present(S.prepare(S.empty(1),['block.a']).state,[]);
 assert.equal(emptyPool.state.exhaustReason,'empty');
 assert.equal(emptyPool.state.currentCard,null);
+const held=S.present(S.prepare(S.empty(5),['block.a']).state,pool(2,1)).state;
+const retuned=pool(2,1).map(c=>c.cardId===held.currentCard.card.cardId?Object.assign({},c,{answer:'е'}):c);
+const swapped=S.replaceStaleCard(held,retuned);
+assert.equal(swapped.replaced,true);
+assert.equal(swapped.state.history[0].occurrenceId,held.history[0].occurrenceId);
+assert.equal(swapped.state.history.length,held.history.length+1);
+const sameCard=S.replaceStaleCard(held,pool(2,1));
+assert.equal(sameCard.replaced,false);
+assert.equal(sameCard.state.currentCard.card.answer,held.currentCard.card.answer);
 const four=exhaust(4,10,1);
 assert.equal(new Set(questions(four).map(h=>h.normalizedLemmaKey)).size,4);
 assert.equal(questions(four).length,4);
@@ -136,6 +145,14 @@ for(const [heading,rows] of Object.entries(C.ANCHORS)){
  }
 }
 assert.ok(L.visibleText(dat,'full').includes('қалаға'));
+const book=require('./morph-engine.js').data.lemmas.find(l=>l.text==='кітап'&&l.split==='train');
+const explained=L.explain(book,['POSS_3','DAT'],(id,seq)=>require('./morph-engine.js').form(id,seq));
+assert.equal(explained.word,'кітабына');
+assert.ok(explained.steps[0].why.includes('п меняется на б'));
+assert.ok(explained.steps[0].added.includes('ы'));
+assert.ok(explained.steps[1].added.includes('на'));
+assert.ok(fs.readFileSync('free-practice-view.js','utf8').includes('Сейчас не получается сохранить место'));
+assert.ok(fs.readFileSync('free-practice-view.js','utf8').includes('Практика уже открыта в другой вкладке'));
 assert.ok(L.visibleText(poss,'full').includes('кітабым'));
 assert.ok(fs.readFileSync('free-practice-view.js','utf8').includes("querySelectorAll('[data-free-close]')"));
 assert.ok(ui.includes("querySelectorAll('[data-exemplar-close]')"));

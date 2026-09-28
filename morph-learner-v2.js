@@ -907,7 +907,13 @@ function explain(lemma,sequence,formOf){
  const steps=built.trace.map((step,i)=>{
   const name=label(step.morpheme)||'этот смысл';
   const added=step.space?'отдельно «'+step.suffix+'»':'-'+step.suffix;
-  const why=step.changed?'Перед добавкой в этом слове есть записанная замена: '+step.before+' → '+step.stem+'.':(i?'Этот шаг считается от уже собранного слова, не от первого.':'Конец выбран по этому слову.');
+  let change='';
+  if(step.changed&&step.before&&step.stem&&step.before.length===step.stem.length){
+   const diff=[];
+   for(let n=0;n<step.before.length;n++)if(step.before[n]!==step.stem[n])diff.push(step.before[n]+' меняется на '+step.stem[n]);
+   if(diff.length===1)change=' '+diff[0]+'.';
+  }
+  const why=step.changed?'Перед добавкой в этом слове есть записанная замена: '+step.before+' → '+step.stem+'.'+change:(i?'Этот шаг считается от уже собранного слова, не от первого.':'Конец выбран по этому слову.');
   return {meaning:name,before:step.before,added,after:step.after,why};
  });
  const target=openTarget({sequence:seq,morpheme:seq.at(-1)});
