@@ -154,7 +154,7 @@ function hub(){
  const status=routeStatus(level);
  return '<div class="morph-panel"><p class="eyebrow">ФОРМА СЛОВА</p><h2>Сначала понять, потом строить форму</h2><p>Режим «Учиться с нуля» сначала объясняет значение формы, полное правило, контрасты и признаки. Эти шаги не засчитываются как самостоятельное владение.</p>'+
  '<label for="morph-level">Раздел</label><select id="morph-level">'+rows+'</select><p class="morph-rule">'+esc(rule(level))+'</p>'+
- '<div class="morph-routes"><button class="'+(canContinue?'primary-button':'secondary-button')+'" data-morph-continue>Продолжить обучение</button><button class="primary-button" data-morph-learn-zero>Учиться с нуля</button><button class="secondary-button" data-morph-weak>Повторить слабое место</button><button class="secondary-button" data-morph-start>Самостоятельная практика</button><button class="secondary-button" data-morph-transfer>Проверить на новых основах</button><button class="secondary-button" data-morph-calc>Разобрать форму</button></div>'+
+ '<div class="morph-routes"><button class="'+(canContinue?'primary-button':'secondary-button')+'" data-morph-continue>Продолжить обучение</button><button class="primary-button" data-morph-learn-zero>Учиться с нуля</button><button class="secondary-button" data-morph-weak>Повторить слабое место</button><button class="secondary-button" data-morph-start>Самостоятельная практика</button><button class="secondary-button" data-morph-transfer>Проверить на новых основах</button><button class="secondary-button" data-morph-calc>Разобрать форму</button></div>'+freePracticeEntry()+
  '<p class="small">Сейчас продолжится: '+where+'.</p>'+
  '<details open><summary>Как устроены урок и проверка</summary>'+
  '<p>Короткая фраза возле шага помогает сделать ход, но это не вся теория. Полное объяснение открывается по «Разобрать правило полностью» и не исчезает. На узком экране его можно разбить, спрятать под «Подробнее» или оставить короткую опору сверху. Нельзя выкинуть контрпримеры, ограничения и переписать полное правило одной фразой.</p>'+
@@ -617,8 +617,19 @@ function bindCalculator(host){
  for(const b of host.querySelectorAll('[data-calc-replace]'))b.onclick=()=>{if(!calcSequence.length)return;calcSequence=calcSequence.slice(0,-1).concat(b.dataset.calcReplace);persistCalc();render();};
  host.querySelector('[data-calc-pop]')?.addEventListener('click',()=>{calcSequence=calcSequence.slice(0,-1);persistCalc();render();});
 }
+function freePracticeEntry(){
+ const fp=window.FreePractice;
+ if(!fp||!fp.enabled())return '';
+ return fp.entryHtml();
+}
 function render(){
  const host=root();if(!host||!bridge()||!T)return;
+ if(window.FreePractice&&window.FreePractice.isOpen()){
+  host.innerHTML='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>'+window.FreePractice.html();
+  window.FreePractice.bind(host,()=>render());
+  host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>{window.QazaqShell.show('personal');window.PersonalTrainers.openCatalog();});
+  clock();return;
+ }
  const m=data().module,s=m.session,tr=m.teaching?.resume;
  const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
  if(teachingNewer&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){const rm=teachingModule(tr.currentModule,tr.familyId);teachingMode=true;showHub=false;topicOpen=false;level=rm?.id||'harmony';host.dataset.first='yes';}
@@ -682,6 +693,7 @@ function bind(host){
  host.querySelector('[data-morph-start]')?.addEventListener('click',()=>start('learn'));
  host.querySelector('[data-morph-transfer]')?.addEventListener('click',()=>start('transfer'));
  host.querySelector('[data-morph-learn-zero]')?.addEventListener('click',()=>learnFromZero());
+ host.querySelector('[data-free-practice-open]')?.addEventListener('click',()=>{const fp=window.FreePractice;if(!fp||!fp.enabled())return;fp.open(fp.synthetic(8),1);render();});
  host.querySelector('[data-morph-continue]')?.addEventListener('click',()=>continueLearning());
  host.querySelector('[data-morph-weak]')?.addEventListener('click',()=>repeatWeak());
  host.querySelector('[data-morph-topic]')?.addEventListener('click',()=>{topicOpen=true;teachingMode=false;showHub=false;message='';render();});

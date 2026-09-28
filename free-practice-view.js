@@ -1,0 +1,66 @@
+/* One free-practice screen for every topic. Flag off: nothing is drawn. */
+(function(root){
+'use strict';
+const node=typeof module!=='undefined'&&module.exports;
+const cfg=node?require('./free-practice-config.js'):root.FreePracticeConfig;
+const S=node?require('./free-practice-state.js'):root.FreePracticeState;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let open=false,pool=[],state=S.empty(1);
+function enabled(){return cfg.enabled();}
+function isOpen(){return enabled()&&open;}
+function entryHtml(){return enabled()?'<button type="button" class="secondary-button" data-free-practice-open>Потренироваться</button>':'';}
+function load(){
+ if(typeof localStorage==='undefined')return;
+ try{const raw=JSON.parse(localStorage.getItem(S.KEY)||'null');if(raw)state=S.migrate(raw);}catch(e){}
+}
+function save(next){
+ state=next;
+ if(typeof localStorage==='undefined')return;
+ try{localStorage.setItem(S.KEY,JSON.stringify(state));}catch(e){}
+}
+function synthetic(n){
+ const cards=[];
+ for(let i=0;i<n;i++)cards.push({cardId:'p1-'+i,blockId:'p1.synthetic',targetSkillIds:['p1.skill'],lemmaId:'p1-'+i,normalizedLemmaKey:'сөз'+i,subcase:'a',promptSpec:{ru:'Собери форму',hint:'Один уже объяснённый шаг.'},translationSpec:{lemma:'сөз'+i,lemmaRu:'слово '+i,target:'куда',context:'сөз'+i,contextRu:'слово '+i},split:'train',holdout:false,admissionStatus:'synthetic',exerciseType:'choose',options:['а','е'],answer:'а'});
+ return cards;
+}
+function card(){return state.currentCard&&state.currentCard.card;}
+function html(){
+ if(!isOpen())return '';
+ const c=card();
+ const shown=state.history.filter(h=>h.exposureKind==='question').length;
+ const intro=shown>1?'':'<p>Можно попробовать один пример или заниматься дольше. Оценок нет. Когда захотите, переходите дальше.</p>';
+ if(!c)return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p><h2>Пока без урока</h2>'+intro+'<p>Новые подходящие примеры для этого шага закончились. Можно повторить знакомые или идти дальше.</p><div class="morph-actions"><button type="button" class="secondary-button" data-free-cycle>Повторить знакомые</button><button type="button" class="primary-button" data-free-close>Дальше</button></div></div>';
+ const tr=c.translationSpec||{};
+ const hint=state.preferences.supportLevel==='try_myself'?'':('<p class="morph-rule">'+esc(c.promptSpec&&c.promptSpec.hint||'Смотри на уже объяснённый шаг.')+'</p>');
+ const options=(state.currentCard.renderedOptions||[]).map(o=>'<button type="button" class="secondary-button" data-free-answer="'+esc(o)+'">'+esc(o)+'</button>').join('');
+ return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+intro+'<h2>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</h2><p>'+esc(tr.lemma||'')+' — '+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.context||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+hint+'<div class="morph-choices">'+options+'</div><div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="secondary-button" data-free-another>Ещё пример</button><button type="button" class="primary-button" data-free-close>Дальше по уроку</button></div></div>';
+}
+function openPractice(items,seed){
+ if(!enabled())return;
+ load();
+ pool=(items||[]).slice();
+ if(seed)state.seed=seed>>>0;
+ if(!state.selectedBlockIds.length){
+  const ready=S.prepare(state,[...new Set(pool.map(c=>c.blockId))]);
+  if(ready.ok)state=ready.state;
+ }
+ if(!state.currentCard){
+  const shown=S.present(state,pool);
+  if(shown.ok)state=shown.state;
+ }
+ save(state);
+ open=true;
+}
+function bind(host,redraw){
+ const go=fn=>{const next=fn();if(next&&next.ok)save(next.state);else if(next&&next.state)state=next.state;redraw();};
+ host.querySelector('[data-free-close]')?.addEventListener('click',()=>{open=false;redraw();});
+ host.querySelector('[data-free-another]')?.addEventListener('click',()=>go(()=>S.present(state,pool)));
+ host.querySelector('[data-free-reveal]')?.addEventListener('click',()=>go(()=>S.reveal(state)));
+ host.querySelector('[data-free-support]')?.addEventListener('click',()=>go(()=>S.setSupport(state,state.preferences.supportLevel==='try_myself'?'supported':'try_myself')));
+ host.querySelector('[data-free-cycle]')?.addEventListener('click',()=>go(()=>{const next=S.newCycle(state);return next.ok?S.present(next.state,pool):next;}));
+ for(const b of host.querySelectorAll('[data-free-answer]'))b.addEventListener('click',()=>{const value=b.dataset.freeAnswer;const ok=card()&&value===card().answer;go(()=>S.answer(state,value,!!ok));});
+}
+const api={enabled,isOpen,entryHtml,html,open:openPractice,bind,synthetic,debug(){return {state,pool,open};}};
+if(node)module.exports=api;
+else{root.FreePractice=api;root.FreePractice.enabled=enabled;}
+})(typeof window!=='undefined'?window:globalThis);
