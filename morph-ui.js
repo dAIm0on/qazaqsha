@@ -1021,4 +1021,11 @@ window.addEventListener('popstate',()=>{
  showSectionHome();render();
 });
 window.MorphTrainer={open,render,status,restoreReading};
+if(window.MutationObserver){
+ new MutationObserver(()=>{
+  const root=document.documentElement;
+  if(!(document.body&&document.body.dataset.view==='morph'&&root.style.zoom))return;
+  setTimeout(()=>{document.body.style.overflowX='hidden';root.style.overflowX='hidden';},0);
+ }).observe(document.documentElement,{attributes:true,attributeFilter:['style']});
+}
 })();

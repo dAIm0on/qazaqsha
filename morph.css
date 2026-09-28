@@ -43,8 +43,11 @@
 .morph-nav2-ok{background:#E8F2EA;color:#1E6B3A;border-radius:16px;padding:14px}
 .morph-nav2-note{background:var(--paper2,#F3EDE3);border-radius:12px;padding:12px}
 .morph-nav2-lesson [lang="kk"]{font-family:"Segoe UI",sans-serif}
+html:has(body[data-view=morph]){overflow-x:hidden}
 body[data-morph-immersive="1"] .bottom-nav{display:none}
+body[data-morph-immersive="1"] .issue-toggle{bottom:10px}
 body[data-morph-immersive="1"] #morph-view{padding-bottom:24px}
+.morph-calc [data-learner-open]{display:block;width:100%;text-align:left;scroll-margin-bottom:96px}
 .morph-calc{padding-bottom:160px}
 .morph-nav2 input{width:100%;max-width:100%;box-sizing:border-box;min-height:48px;font:inherit;padding:12px;border:1px solid var(--line,#e4d8c8);border-radius:12px;background:var(--surface,#FFFAF4)}
 
