@@ -3,8 +3,8 @@
 'use strict';
 const config={
  version:'free-practice-v3-p1',
- enabled:false,
- enabledBlockIds:[],
+ enabled:true,
+ enabledBlockIds:['free.harmony.meaning_dat','free.harmony.vowel_dat','free.voice.dat_onset','free.voice.dat_build','free.voice.direction_place','free.poss.my','free.poss.your','free.poss.our','free.poss.polite','free.poss.third','free.poss.stem','free.poss.compare'],
  namespace:'qazaqsha.freePractice.v1',
  maxQuestionPresentationsPerLemma:2,
  minDistinctOtherLemmasBetween:8,

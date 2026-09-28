@@ -135,9 +135,21 @@ function renderBlock(b){
  }
  return '';
 }
-function render(row,mode){
+function pieces(row,mode){
  const blocks=(row.blocks||[]).filter(b=>mode==='full'||b.slot===mode||(mode==='opening'&&b.slot==='opening')||(mode==='contrast'&&b.slot==='contrast'));
- const body=blocks.map(renderBlock).join('')||'<p role="status">'+esc(unavailable())+'</p>';
+ const out=[];
+ let bucket=[];
+ let id=null;
+ const flush=()=>{if(!bucket.length)return;out.push({id,html:bucket.map(renderBlock).join('')});bucket=[];};
+ for(const b of blocks){
+  if(b.type==='subheading'){flush();id=b.id;}
+  bucket.push(b);
+ }
+ flush();
+ return out;
+}
+function render(row,mode){
+ const body=pieces(row,mode).map(p=>p.html).join('')||'<p role="status">'+esc(unavailable())+'</p>';
  return '<p class="eyebrow">ПРОСТОЙ РАЗБОР</p><h2>'+esc(row.title)+'</h2>'+body;
 }
 function unavailable(){return 'Этот разбор временно недоступен. Можно вернуться к разделу. Уже введённый ответ сохранён.';}
@@ -852,6 +864,6 @@ function explain(lemma,sequence,formOf){
  const target=openTarget({sequence:seq,morpheme:seq.at(-1)});
  return {ok:true,stem:lemma.text,gloss:lemma.gloss,word:built.word,steps,lessonId:target&&target.lessonId,choices:nextMeanings(lemma,seq,formOf),note:'Это только разбор. Он не записывается как ответ и не меняет расписание повторений.'};
 }
-const api={version:VERSION,lessons:LESSONS,label,forFamily,lessonTarget,openTarget,operation,supportLine,feedback,chainNote,render,unavailable,visibleText,check,resolveLemma,nextMeanings,explain};
+const api={version:VERSION,lessons:LESSONS,label,forFamily,lessonTarget,openTarget,operation,supportLine,feedback,chainNote,render,pieces,unavailable,visibleText,check,resolveLemma,nextMeanings,explain};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.MorphLearner=api;
 })(typeof window!=='undefined'?window:globalThis);

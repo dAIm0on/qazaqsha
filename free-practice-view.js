@@ -4,9 +4,11 @@
 const node=typeof module!=='undefined'&&module.exports;
 const cfg=node?require('./free-practice-config.js'):root.FreePracticeConfig;
 const S=node?require('./free-practice-state.js'):root.FreePracticeState;
+const C=node?require('./free-practice-content.js'):root.FreePracticeContent;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let open=false,pool=[],state=S.empty(1);
 function enabled(){return cfg.enabled();}
+function allowlist(){return cfg.config.enabledBlockIds||[];}
 function isOpen(){return enabled()&&open;}
 function entryHtml(){return enabled()?'<button type="button" class="secondary-button" data-free-practice-open>Потренироваться</button>':'';}
 function load(){
@@ -33,7 +35,26 @@ function html(){
  const tr=c.translationSpec||{};
  const hint=state.preferences.supportLevel==='try_myself'?'':('<p class="morph-rule">'+esc(c.promptSpec&&c.promptSpec.hint||'Смотри на уже объяснённый шаг.')+'</p>');
  const options=(state.currentCard.renderedOptions||[]).map(o=>'<button type="button" class="secondary-button" data-free-answer="'+esc(o)+'">'+esc(o)+'</button>').join('');
- return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+intro+'<h2>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</h2><p>'+esc(tr.lemma||'')+' — '+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.context||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+hint+'<div class="morph-choices">'+options+'</div><div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="secondary-button" data-free-another>Ещё пример</button><button type="button" class="primary-button" data-free-close>Дальше по уроку</button></div></div>';
+ const note=state.currentCard.revealed||state.currentCard.answered?'<p role="status">'+esc(c.feedbackRu||'')+'</p>':'';
+ const visible=c.showExpectedBeforeAnswer&&c.expected?'<p lang="kk">'+esc(c.expected)+'</p>':'';
+ return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+intro+'<h2>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</h2><p lang="kk">'+esc(tr.lemma||'')+'</p><p>'+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+visible+hint+'<div class="morph-choices">'+options+'</div>'+note+'<div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="secondary-button" data-free-another>Ещё пример</button><button type="button" class="primary-button" data-free-close>Дальше по уроку</button></div></div>';
+}
+function anchorsHtml(headingId){
+ if(!enabled())return '';
+ const rows=C.anchorsFor(headingId).filter(row=>allowlist().includes(row.blockId));
+ if(!rows.length)return '';
+ return '<div class="morph-actions" data-free-anchor="'+esc(headingId)+'">'+rows.map(row=>'<button type="button" class="secondary-button" data-free-block="'+esc(row.blockId)+'" data-free-subcase="'+esc(row.subcase)+'">'+esc(row.title)+'</button>').join('')+'<button type="button" class="primary-button" data-free-skip>Дальше</button></div>';
+}
+function openBlock(blockId,subcase){
+ if(!enabled()||!allowlist().includes(blockId))return;
+ load();
+ pool=C.forBlock(blockId,subcase);
+ const switched=S.cas(state,state.revision,s=>{s.selectedBlockIds=[blockId];if(!s.explainedBlockIds.includes(blockId))s.explainedBlockIds=s.explainedBlockIds.concat([blockId]);s.currentCard=null;return s;});
+ if(switched.ok)state=switched.state;
+ const shown=S.present(state,pool);
+ if(shown.ok)state=shown.state;
+ save(state);
+ open=true;
 }
 function openPractice(items,seed){
  if(!enabled())return;
@@ -60,7 +81,7 @@ function bind(host,redraw){
  host.querySelector('[data-free-cycle]')?.addEventListener('click',()=>go(()=>{const next=S.newCycle(state);return next.ok?S.present(next.state,pool):next;}));
  for(const b of host.querySelectorAll('[data-free-answer]'))b.addEventListener('click',()=>{const value=b.dataset.freeAnswer;const ok=card()&&value===card().answer;go(()=>S.answer(state,value,!!ok));});
 }
-const api={enabled,isOpen,entryHtml,html,open:openPractice,bind,synthetic,debug(){return {state,pool,open};}};
+const api={enabled,allowlist,isOpen,entryHtml,html,anchorsHtml,open:openPractice,openBlock,bind,synthetic,debug(){return {state,pool,open};}};
 if(node)module.exports=api;
 else{root.FreePractice=api;root.FreePractice.enabled=enabled;}
 })(typeof window!=='undefined'?window:globalThis);

@@ -40,7 +40,9 @@ function assertRules(state){
   }
  }
 }
-assert.equal(cfg.config.enabled,false);
+assert.equal(cfg.config.enabled,true);
+assert.ok(cfg.config.enabledBlockIds.includes('free.poss.my'));
+assert.ok(cfg.config.enabledBlockIds.includes('free.harmony.meaning_dat'));
 assert.equal(cfg.config.namespace,'qazaqsha.freePractice.v1');
 for(const name of ['free-practice-config.js','free-practice-queue.js','free-practice-state.js','free-practice-view.js']){
  const text=fs.readFileSync(name,'utf8');
@@ -87,9 +89,9 @@ assert.equal(S.claim(fresh,'tab-b').ok,false);
 assert.equal(S.takeOver(fresh,'tab-b').state.ownerId,'tab-b');
 const ui=fs.readFileSync('morph-ui.js','utf8');
 assert.ok(ui.includes('function freePracticeEntry'));
-assert.equal(fs.readFileSync('free-practice-config.js','utf8').includes('enabled:false'),true);
-cfg.config.enabled=true;
+assert.equal(fs.readFileSync('free-practice-config.js','utf8').includes('enabled:true'),true);
 const view=require('./free-practice-view.js');
+const content=require('./free-practice-content.js');
 view.open(view.synthetic(2),1);
 const html=view.html();
 assert.ok(html.includes('слово'));
@@ -97,6 +99,14 @@ assert.ok(html.includes('Оценок нет'));
 assert.ok(html.includes('Дальше по уроку'));
 assert.equal(html.includes('освоено'),false);
 assert.equal(html.includes('%'),false);
-cfg.config.enabled=false;
-assert.equal(view.entryHtml(),'');
-console.log('FREE_PRACTICE_P1_OK');
+const cap=content.capacity();
+assert.ok(cap.find(x=>x.blockId==='free.poss.my'&&x.cards>0));
+assert.ok(cap.find(x=>x.blockId==='free.voice.dat_build'&&x.cards>0));
+const L=require('./morph-learner-v2.js');
+const dat=L.lessons.find(x=>x.id==='learner.dat.kuda');
+const poss=L.lessons.find(x=>x.id==='learner.poss.owner');
+assert.ok(L.pieces(dat,'opening').some(p=>p.id==='dat.1'));
+assert.ok(L.pieces(poss,'full').some(p=>p.id==='poss.26'));
+assert.ok(L.visibleText(dat,'full').includes('қалаға'));
+assert.ok(L.visibleText(poss,'full').includes('кітабым'));
+console.log('FREE_PRACTICE_P2_OK',JSON.stringify(cap));

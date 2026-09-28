@@ -218,8 +218,14 @@ function semanticGroupsFor(familyId){
  if(familyId==='Q'||familyId==='NEG')return groups.filter(g=>g.id==='Q');
  return groups.filter(g=>g.id===familyId||(familyId||'').startsWith(g.id));
 }
+function learnerBody(row,mode){
+ const pieces=learner().pieces?learner().pieces(row,mode):null;
+ if(!pieces)return learner().render(row,mode);
+ const extra=p=>window.FreePractice?window.FreePractice.anchorsHtml(p.id):'';
+ return '<p class="eyebrow">ПРОСТОЙ РАЗБОР</p><h2>'+esc(row.title)+'</h2>'+pieces.map(p=>p.html+extra(p)).join('');
+}
 function learnerPanel(module,resume,row,mode){
- const body=learner().render(row,mode);
+ const body=learnerBody(row,mode);
  const actions=mode==='opening'
   ?'<button class="secondary-button" data-teach-semantic-full>Разобрать смысл полностью</button><button class="primary-button" data-teach-semantic-done>Понятно, разобрать правило</button>'
   :(resume.currentTeachingStep==='SEMANTIC_INTRO'
@@ -617,18 +623,30 @@ function bindCalculator(host){
  for(const b of host.querySelectorAll('[data-calc-replace]'))b.onclick=()=>{if(!calcSequence.length)return;calcSequence=calcSequence.slice(0,-1).concat(b.dataset.calcReplace);persistCalc();render();};
  host.querySelector('[data-calc-pop]')?.addEventListener('click',()=>{calcSequence=calcSequence.slice(0,-1);persistCalc();render();});
 }
+let exemplarId=null,exemplarMode='opening';
+function exemplarScreen(){
+ const row=(learner()&&learner().lessons||[]).find(x=>x.id===exemplarId);
+ if(!row){exemplarId=null;return '';}
+ const actions=exemplarMode==='opening'?'<button type="button" class="secondary-button" data-exemplar-full>Разобрать смысл полностью</button><button type="button" class="primary-button" data-exemplar-close>Дальше</button>':'<button type="button" class="secondary-button" data-exemplar-short>Короткая опора</button><button type="button" class="primary-button" data-exemplar-close>Дальше</button>';
+ return '<div class="morph-panel morph-learner" data-learner-lesson="'+esc(row.id)+'"><button type="button" class="text-button" data-exemplar-close>← К разделу</button>'+learnerBody(row,exemplarMode)+'<p class="small">Полное объяснение не заменяется короткой подсказкой и остаётся доступным из раздела.</p><div class="morph-actions">'+actions+'</div></div>';
+}
 function freePracticeEntry(){
  const fp=window.FreePractice;
- if(!fp||!fp.enabled())return '';
- return fp.entryHtml();
+ if(!fp||!fp.enabled()||!fp.allowlist().length)return '';
+ return '<button type="button" class="secondary-button" data-exemplar="learner.dat.kuda">Куда или кому</button><button type="button" class="secondary-button" data-exemplar="learner.poss.owner">Чей предмет</button>';
 }
 function render(){
  const host=root();if(!host||!bridge()||!T)return;
+ const head='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>';
  if(window.FreePractice&&window.FreePractice.isOpen()){
-  host.innerHTML='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>'+window.FreePractice.html();
+  host.innerHTML=head+window.FreePractice.html();
   window.FreePractice.bind(host,()=>render());
   host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>{window.QazaqShell.show('personal');window.PersonalTrainers.openCatalog();});
   clock();return;
+ }
+ if(exemplarId){
+  host.innerHTML=head+exemplarScreen();
+  bind(host);clock();return;
  }
  const m=data().module,s=m.session,tr=m.teaching?.resume;
  const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
@@ -693,7 +711,12 @@ function bind(host){
  host.querySelector('[data-morph-start]')?.addEventListener('click',()=>start('learn'));
  host.querySelector('[data-morph-transfer]')?.addEventListener('click',()=>start('transfer'));
  host.querySelector('[data-morph-learn-zero]')?.addEventListener('click',()=>learnFromZero());
- host.querySelector('[data-free-practice-open]')?.addEventListener('click',()=>{const fp=window.FreePractice;if(!fp||!fp.enabled())return;fp.open(fp.synthetic(8),1);render();});
+ for(const b of host.querySelectorAll('[data-exemplar]'))b.onclick=()=>{exemplarId=b.dataset.exemplar;exemplarMode='opening';teachingMode=false;showHub=false;topicOpen=false;render();};
+ host.querySelector('[data-exemplar-full]')?.addEventListener('click',()=>{exemplarMode='full';render();});
+ host.querySelector('[data-exemplar-short]')?.addEventListener('click',()=>{exemplarMode='opening';render();});
+ host.querySelector('[data-exemplar-close]')?.addEventListener('click',()=>{exemplarId=null;showHub=true;render();});
+ for(const b of host.querySelectorAll('[data-free-block]'))b.onclick=()=>{const fp=window.FreePractice;if(!fp)return;fp.openBlock(b.dataset.freeBlock,b.dataset.freeSubcase||'');render();};
+ for(const b of host.querySelectorAll('[data-free-skip]'))b.onclick=()=>{const anchors=[...host.querySelectorAll('[data-free-anchor]')];const mine=b.closest('[data-free-anchor]');const next=anchors[anchors.indexOf(mine)+1];if(next&&next.scrollIntoView)next.scrollIntoView({block:'start'});else host.querySelector('[data-exemplar-close]')?.click();};
  host.querySelector('[data-morph-continue]')?.addEventListener('click',()=>continueLearning());
  host.querySelector('[data-morph-weak]')?.addEventListener('click',()=>repeatWeak());
  host.querySelector('[data-morph-topic]')?.addEventListener('click',()=>{topicOpen=true;teachingMode=false;showHub=false;message='';render();});
