@@ -2017,6 +2017,7 @@
  const hasMorphResume=!!(state.morphTrainer&&(state.morphTrainer.session||(state.morphTrainer.teaching&&state.morphTrainer.teaching.resume)));
  const resumeView=window.MorphState.resumeSurface(savedSession&&savedSession.view,hasMorphResume,!!validSaved,['practice','homework','learn','path','review']);
  showView(resumeView);
+ if(window.FreePractice&&window.FreePractice.resumeIfOpen())showView('morph');
  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else{renderStats();if(view==='practice')activateCard();if(['today','review','vocabulary'].includes(view))dashboard.render(view);}save();});
  window.addEventListener('qazaq-before-update',e=>{pauseTimer();save();if(!storageAvailable)e.preventDefault();});
  window.addEventListener('blur',pauseTimer);window.addEventListener('focus',startTimer);window.addEventListener('pagehide',()=>{pauseTimer();save();});

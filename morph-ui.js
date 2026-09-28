@@ -715,7 +715,7 @@ function bind(host){
  host.querySelector('[data-free-mixed]')?.addEventListener('click',()=>{const fp=window.FreePractice;if(!fp)return;exemplarId=null;fp.openMixed();render();});
  host.querySelector('[data-exemplar-full]')?.addEventListener('click',()=>{exemplarMode='full';render();});
  host.querySelector('[data-exemplar-short]')?.addEventListener('click',()=>{exemplarMode='opening';render();});
- host.querySelector('[data-exemplar-close]')?.addEventListener('click',()=>{exemplarId=null;showHub=true;render();});
+ for(const b of host.querySelectorAll('[data-exemplar-close]'))b.addEventListener('click',()=>{exemplarId=null;showHub=true;render();});
  for(const b of host.querySelectorAll('[data-free-block]'))b.onclick=()=>{const fp=window.FreePractice;if(!fp)return;fp.openBlock(b.dataset.freeBlock,b.dataset.freeSubcase||'');render();};
  for(const b of host.querySelectorAll('[data-free-skip]'))b.onclick=()=>{const anchors=[...host.querySelectorAll('[data-free-anchor]')];const mine=b.closest('[data-free-anchor]');const next=anchors[anchors.indexOf(mine)+1];if(next&&next.scrollIntoView)next.scrollIntoView({block:'start'});else host.querySelector('[data-exemplar-close]')?.click();};
  host.querySelector('[data-morph-continue]')?.addEventListener('click',()=>continueLearning());

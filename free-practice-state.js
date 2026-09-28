@@ -14,7 +14,7 @@ function migrate(raw){
  out.selectedBlockIds=Array.isArray(raw.selectedBlockIds)?raw.selectedBlockIds.slice():[];
  out.explainedBlockIds=Array.isArray(raw.explainedBlockIds)?raw.explainedBlockIds.slice():[];
  out.theoryCursor=raw.theoryCursor||null;
- out.preferences={supportLevel:raw.preferences&&raw.preferences.supportLevel==='try_myself'?'try_myself':'supported',introSeen:!!(raw.preferences&&raw.preferences.introSeen),mixedPick:!!(raw.preferences&&raw.preferences.mixedPick)};
+ out.preferences={supportLevel:raw.preferences&&raw.preferences.supportLevel==='try_myself'?'try_myself':'supported',introSeen:!!(raw.preferences&&raw.preferences.introSeen),mixedPick:!!(raw.preferences&&raw.preferences.mixedPick),screenOpen:!!(raw.preferences&&raw.preferences.screenOpen)};
  out.seedStep=Math.max(0,Math.floor(Number(raw.seedStep)||0));
  out.currentCard=raw.currentCard||null;
  out.history=Array.isArray(raw.history)?raw.history.slice():[];

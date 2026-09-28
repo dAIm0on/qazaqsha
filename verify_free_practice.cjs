@@ -116,4 +116,10 @@ for(const [heading,rows] of Object.entries(C.ANCHORS)){
 }
 assert.ok(L.visibleText(dat,'full').includes('қалаға'));
 assert.ok(L.visibleText(poss,'full').includes('кітабым'));
+assert.ok(fs.readFileSync('free-practice-view.js','utf8').includes("querySelectorAll('[data-free-close]')"));
+assert.ok(ui.includes("querySelectorAll('[data-exemplar-close]')"));
+assert.ok(fs.readFileSync('app.js','utf8').includes('resumeIfOpen()'));
+const kept=S.migrate({schemaVersion:1,seed:2,preferences:{screenOpen:true},currentCard:{card:{translationSpec:{lemma:'қала'}}}});
+assert.equal(kept.preferences.screenOpen,true);
+assert.equal(kept.currentCard.card.translationSpec.lemma,'қала');
 console.log('FREE_PRACTICE_P3P4_OK',JSON.stringify(cap));

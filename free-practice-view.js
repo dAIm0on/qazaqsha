@@ -30,7 +30,7 @@ function openMixed(){
  if(!enabled())return;
  load();
  pool=[];
- const next=S.cas(state,state.revision,s=>{s.currentCard=null;s.preferences.mixedPick=true;s.selectedBlockIds=[];return s;});
+ const next=S.cas(state,state.revision,s=>{s.currentCard=null;s.preferences.mixedPick=true;s.preferences.screenOpen=true;s.selectedBlockIds=[];return s;});
  state=next.ok?next.state:Object.assign(state,{currentCard:null});
  state.preferences.mixedPick=true;
  save(state);
@@ -68,6 +68,7 @@ function openBlock(blockId,subcase){
  const switched=S.cas(state,state.revision,s=>{s.selectedBlockIds=[blockId];if(!s.explainedBlockIds.includes(blockId))s.explainedBlockIds=s.explainedBlockIds.concat([blockId]);s.currentCard=null;return s;});
  if(switched.ok)state=switched.state;
  state.preferences.mixedPick=false;
+ state.preferences.screenOpen=true;
  const shown=S.present(state,pool);
  if(shown.ok)state=shown.state;
  save(state);
@@ -86,12 +87,30 @@ function openPractice(items,seed){
   const shown=S.present(state,pool);
   if(shown.ok)state=shown.state;
  }
+ state.preferences.screenOpen=true;
  save(state);
  open=true;
 }
+function dismiss(){
+ const next=S.cas(state,state.revision,s=>{s.preferences.screenOpen=false;return s;});
+ if(next.ok)save(next.state);
+ else{state.preferences.screenOpen=false;save(state);}
+ open=false;
+}
+function resumeIfOpen(){
+ if(!enabled())return false;
+ load();
+ if(!state.preferences||!state.preferences.screenOpen)return false;
+ if(state.preferences.mixedPick){pool=[];open=true;return true;}
+ const saved=state.currentCard&&state.currentCard.card;
+ if(!saved)return false;
+ try{pool=C.forBlock(saved.blockId,saved.subcase||'');}catch(e){pool=[];}
+ open=true;
+ return true;
+}
 function bind(host,redraw){
  const go=fn=>{const next=fn();if(next&&next.ok)save(next.state);else if(next&&next.state)state=next.state;redraw();};
- host.querySelector('[data-free-close]')?.addEventListener('click',()=>{open=false;redraw();});
+ for(const b of host.querySelectorAll('[data-free-close]'))b.addEventListener('click',()=>{dismiss();redraw();});
  host.querySelector('[data-free-another]')?.addEventListener('click',()=>go(()=>S.present(state,pool)));
  host.querySelector('[data-free-reveal]')?.addEventListener('click',()=>go(()=>S.reveal(state)));
  host.querySelector('[data-free-support]')?.addEventListener('click',()=>go(()=>S.setSupport(state,state.preferences.supportLevel==='try_myself'?'supported':'try_myself')));
@@ -107,7 +126,7 @@ function bind(host,redraw){
  });
  for(const b of host.querySelectorAll('[data-free-answer]'))b.addEventListener('click',()=>{const value=b.dataset.freeAnswer;const ok=card()&&value===card().answer;go(()=>S.answer(state,value,!!ok));});
 }
-const api={enabled,allowlist,isOpen,entryHtml,html,anchorsHtml,open:openPractice,openBlock,openMixed,bind,synthetic,debug(){return {state,pool,open};}};
+const api={enabled,allowlist,isOpen,entryHtml,html,anchorsHtml,open:openPractice,openBlock,openMixed,bind,dismiss,resumeIfOpen,synthetic,debug(){return {state,pool,open};}};
 if(node)module.exports=api;
 else{root.FreePractice=api;root.FreePractice.enabled=enabled;}
 })(typeof window!=='undefined'?window:globalThis);
