@@ -2019,6 +2019,12 @@
  showView(resumeView);
  if(window.FreePractice&&window.FreePractice.resumeIfOpen())showView('morph');
  if(window.MorphTrainer&&window.MorphTrainer.restoreReading&&window.MorphTrainer.restoreReading())showView('morph');
+ if(view!=='morph'&&savedSession&&savedSession.view==='morph'){
+  let navScreen='',surface='';
+  try{navScreen=(JSON.parse(sessionStorage.getItem('qazaqsha-nav2-v1')||'null')||{}).screen||'';}catch(e){}
+  try{surface=sessionStorage.getItem('qazaqsha-fs2-surface')||'';}catch(e){}
+  if(navScreen||surface==='calc')showView('morph');
+ }
  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else{renderStats();if(view==='practice')activateCard();if(['today','review','vocabulary'].includes(view))dashboard.render(view);}save();});
  window.addEventListener('qazaq-before-update',e=>{pauseTimer();save();if(!storageAvailable)e.preventDefault();});
  window.addEventListener('blur',pauseTimer);window.addEventListener('focus',startTimer);window.addEventListener('pagehide',()=>{pauseTimer();save();});

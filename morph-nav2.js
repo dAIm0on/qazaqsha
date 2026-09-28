@@ -24,7 +24,7 @@ const ARTICLES=[
  {id:'ref.dat.after-poss',title:'После «его» или «мой»',heading:'dat.46'},
  {id:'ref.poss.five',title:'Пять смыслов рядом',heading:'poss.26'}
 ];
-function blank(){return {schemaVersion:2,catalogVersion:'NAV-2.2-CHERNILA',migrated:true,bookmarkApplied:false,screen:null,part:1,lessonId:'nav2.1.1',step:0,tab:'learn',pick:'',outcome:'',fromLesson:false,viewed:{},log:{},explained:{},perLessonCursors:{},draftAnswers:{},navBack:[],excursionOrigin:null,find:'',aliasId:'',aliasChoices:[],pendingAlias:'',aliasDismissed:false,oldViews:{},activeMode:'learn'};}
+function blank(){return {schemaVersion:2,catalogVersion:'NAV-2.2-CHERNILA',migrated:true,bookmarkApplied:false,screen:null,part:1,lessonId:'nav2.1.1',homeLessonId:'nav2.1.1',step:0,tab:'learn',pick:'',outcome:'',fromLesson:false,viewed:{},log:{},explained:{},perLessonCursors:{},draftAnswers:{},navBack:[],excursionOrigin:null,find:'',aliasId:'',aliasChoices:[],pendingAlias:'',aliasDismissed:false,oldViews:{},activeMode:'learn'};}
 function readFs2(){
  try{return JSON.parse(sessionStorage.getItem('qazaqsha-fs2-read')||'null');}catch(e){return null;}
 }
@@ -50,6 +50,7 @@ function load(){
  x.navBack=x.navBack||[];
  x.oldViews=x.oldViews||{};
  x.find=x.find||'';
+ if(!x.homeLessonId){x.homeLessonId=x.lessonId||'nav2.1.1';changed=true;}
  if(!x.bookmarkApplied){
   x.bookmarkApplied=true;
   changed=true;
@@ -134,8 +135,9 @@ function searchHits(q){
 }
 function current(){return lesson(st().lessonId)||lesson('nav2.1.1');}
 function nextOf(row){return row&&row.nextLessonId?lesson(row.nextLessonId):null;}
+function homeRow(){return lesson(st().homeLessonId)||current();}
 function homeHtml(){
- const row=current();
+ const row=homeRow();
  const nxt=nextOf(row);
  const fresh=!st().viewed[row.id];
  const cta=fresh&&row.id==='nav2.1.1'?'Начать первый урок':'Продолжить урок';
@@ -314,7 +316,7 @@ function html(){
 function bind(host,rerender){
  host.querySelectorAll('[data-nav2]').forEach(b=>b.addEventListener('click',()=>{
   const name=b.dataset.nav2;
-  if(name==='home')go({screen:null,fromLesson:false,nav:true});
+  if(name==='home'){const id=st().homeLessonId||st().lessonId;const saved=(st().perLessonCursors||{})[id]||{};go({screen:null,fromLesson:false,lessonId:id,step:saved.step||0,tab:saved.tab||'learn',pick:saved.pick||'',outcome:saved.outcome||'',nav:true});}
   else if(name==='map')go({screen:'map',fromLesson:false,find:'',nav:true});
   else if(name==='activities')go({screen:'activities',nav:true});
   rerender();
@@ -324,9 +326,12 @@ function bind(host,rerender){
   const id=b.dataset.nav2Lesson;
   const saved=(st().perLessonCursors||{})[id]||{};
   const fromSide=st().screen==='map'||st().screen==='alias'||st().screen==='activities'||st().screen==='reference';
+  const fromBrowse=st().screen==='map'||st().screen==='part'||st().screen==='reference'||st().screen==='alias';
   const origin=fromSide?(st().excursionOrigin||null):null;
   const seen=Object.assign({},st().viewed);
-  go({screen:'lesson',lessonId:id,step:saved.step||0,tab:saved.tab||'learn',pick:saved.pick||'',outcome:saved.outcome||'',fromLesson:false,excursionOrigin:origin,viewed:seen,aliasDismissed:true,nav:true});
+  const patch={screen:'lesson',lessonId:id,step:saved.step||0,tab:saved.tab||'learn',pick:saved.pick||'',outcome:saved.outcome||'',fromLesson:false,excursionOrigin:origin,viewed:seen,aliasDismissed:true,nav:true};
+  if(!fromBrowse)patch.homeLessonId=id;
+  go(patch);
   rerender();
  }));
  host.querySelectorAll('[data-nav2-maplesson]').forEach(b=>b.addEventListener('click',()=>{go({screen:'map',fromLesson:true,part:current().part,find:'',excursionOrigin:st().excursionOrigin||snapshot(),nav:true});rerender();}));
