@@ -76,7 +76,11 @@ function status(){
  if(s&&!s.complete)return 'Продолжить практику · '+(s.cursor+1)+' / '+s.queue.length;
  return 'Короткие подходы и обучение с нуля';
 }
-function open(){window.QazaqShell.show('morph');}
+function open(){
+ exemplarId=null;readToc=false;showHub=true;teachingMode=false;topicOpen=false;calcOpen=false;message='';
+ saveCursor(false);saveSurface('hub');persistCalc();
+ window.QazaqShell.show('morph');
+}
 function rule(l){return E.data.levels.find(x=>x.id===l)?.rule||'';}
 function teachingProgress(m){
  const families=Object.keys(T?.level0?.familySemantics||{});
@@ -148,6 +152,81 @@ function topicScreen(){
  return '<div class="morph-panel morph-teach-panel"><button class="text-button" data-morph-hub>← К разделу</button><p class="eyebrow">ТЕМА</p><h2>'+esc(module.title)+'</h2><div class="morph-routes">'+
   item('SEMANTIC_INTRO','Что изучаем')+item('FULL_EXPLANATION','Полное объяснение')+item('CONTRAST_EXAMPLES','Примеры')+item('FEATURE_NOTICE','На что смотреть')+item('GUIDED_CHOICE','Попробовать с опорой')+item('INDEPENDENT','Самостоятельно')+'</div><h3>Мой прогресс</h3><p>'+esc(status.text)+'</p><p class="small">Удержание: '+esc(status.retention)+'. Перенос и удержание не сведены в одну оценку.</p><button class="text-button" data-morph-full-rule>Разобрать правило полностью</button></div>';
 }
+const DOORS=[
+ {id:'learner.dat.kuda',label:'Куда или кому?',goal:'Сравним «в школу» и «кому дать книгу».'},
+ {id:'learner.loc.where',label:'Где находится?',goal:'Сравним «в школу» и «в школе».'},
+ {id:'learner.pl.several',label:'Один и несколько',goal:'Скажем, что предметов несколько.'},
+ {id:'learner.nasal.senses',label:'Похожие окончания — разный смысл',goal:'Одинаковый конец слова отвечает на разные вопросы.'},
+ {id:'learner.poss.owner',label:'Мой, твой, его или её',goal:'Моя книга и его книга — не одно и то же.'},
+ {id:'learner.person.roles',label:'Я, мы и вопрос',goal:'«Я человек» и «мой предмет» — разные дела.'},
+ {id:'learner.chains.steps',label:'Собираем слово по шагам',goal:'Один шаг от уже собранного слова.'},
+ {id:'learner.verbs.steps',label:'Действия: не сделал, сделал, если…',goal:'Не делать, уже сделал и если — по очереди.'}
+];
+const READ_KEY='qazaqsha-fs2-read';
+const SURFACE_KEY='qazaqsha-fs2-surface';
+const PLAIN={harmony:'как выбрать гласную',voice:'первая буква',plural:'Один и несколько',nasal:'Похожие окончания — разный смысл',poss:'Мой, твой, его или её',person:'Я, мы и вопрос',chains:'Собираем слово по шагам',verbs:'Действия: не сделал, сделал, если…',mixed:'Смешать знакомое'};
+let wantFocus=false,fs2Depth=0;
+function readCursor(){try{return JSON.parse(sessionStorage.getItem(READ_KEY)||'null');}catch(e){return null;}}
+function saveSurface(name){try{sessionStorage.setItem(SURFACE_KEY,name);}catch(e){}}
+function loadSurface(){try{return sessionStorage.getItem(SURFACE_KEY)||'';}catch(e){return '';}}
+function doorById(id){return DOORS.find(d=>d.id===id)||null;}
+function currentLesson(){return (learner()&&learner().lessons||[]).find(x=>x.id===exemplarId)||null;}
+function lessonParts(row){return (learner()&&learner().beats&&learner().beats(row))||[];}
+function saveCursor(open){
+ try{
+  const prev=readCursor()||{};
+  const seen=Object.assign({},prev.seen);
+  if(exemplarId){
+   const total=lessonParts(currentLesson()).length;
+   const was=seen[exemplarId]||{};
+   seen[exemplarId]={part:readPart,done:!!was.done||(total>0&&readPart>=total-1)};
+   sessionStorage.setItem(READ_KEY,JSON.stringify({id:exemplarId,part:readPart,toc:!!readToc,open:open!==false,at:Date.now(),seen}));
+   return;
+  }
+  sessionStorage.setItem(READ_KEY,JSON.stringify(Object.assign({},prev,{open:false,at:Date.now(),seen})));
+ }catch(e){}
+}
+function lessonSeen(id){
+ const row=readCursor()&&readCursor().seen&&readCursor().seen[id];
+ if(!row)return 'Ещё не открывали';
+ return row.done?'Объяснения просмотрены':'Остановились здесь';
+}
+function continueTarget(){
+ const d=data(),s=d.module.session,tr=d.module.teaching&&d.module.teaching.resume;
+ const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
+ const c=readCursor();
+ const readAt=c&&c.id?(c.at||0):0;
+ const practiceAt=teachingNewer?(tr&&tr.updatedAt||0):(s&&!s.complete?(s.updatedAt||0):0);
+ if(practiceAt&&practiceAt>=readAt){
+  if(teachingNewer)return {kind:'session',label:'Продолжить урок: '+(teachingFamily(tr.familyId)?.title||PLAIN[tr.currentModule]||'тема')};
+  return {kind:'session',label:'Продолжить практику: '+(PLAIN[s.level]||'тема')};
+ }
+ if(c&&doorById(c.id))return {kind:'read',label:'Продолжить урок: '+doorById(c.id).label};
+ return {kind:'first',label:'Начать с первого объяснения'};
+}
+function continueLabel(){return continueTarget().label;}
+function remember(){
+ try{history.pushState({fs2:1,id:exemplarId,part:readPart,toc:!!readToc,calc:!!calcOpen},'');fs2Depth++;}catch(e){}
+}
+function focusHeading(){wantFocus=true;}
+function showSectionHome(){
+ exemplarId=null;readToc=false;showHub=true;teachingMode=false;topicOpen=false;calcOpen=false;
+ saveCursor(false);saveSurface('hub');persistCalc();
+}
+function openLesson(id,part,toc){
+ if(!doorById(id)){message='Это объяснение не найдено. Вернуться к теме.';showSectionHome();render();return;}
+ exemplarId=id;readPart=part||0;readToc=!!toc;teachingMode=false;showHub=false;topicOpen=false;calcOpen=false;message='';
+ saveCursor(true);saveSurface('read');
+}
+function restoreReading(){
+ const c=readCursor();
+ if(!(c&&c.open&&c.id&&doorById(c.id)))return false;
+ const d=data(),s=d.module.session,tr=d.module.teaching&&d.module.teaching.resume;
+ const teachAt=tr?(tr.updatedAt||0):0,sessAt=s&&!s.complete?(s.updatedAt||0):0;
+ if(Math.max(teachAt,sessAt)>(c.at||0))return false;
+ exemplarId=c.id;readPart=c.part|0;readToc=!!c.toc;teachingMode=false;showHub=false;topicOpen=false;calcOpen=false;
+ return true;
+}
 function hub(){
  const d=data(),m=d.module,s=m.session,tr=m.teaching?.resume,lines=E.writtenLines(m.events),r=lines.practice,p=teachingProgress(m);
  const rows=E.data.levels.map(l=>{const stats=E.summary(m.events.filter(e=>e.level===l.id&&!e.transfer));return '<option value="'+l.id+'"'+(l.id===level?' selected':'')+'>'+l.title+(stats.n?' · '+stats.correct+'/'+stats.n:'')+'</option>';}).join('');
@@ -157,8 +236,11 @@ function hub(){
  const where=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0))?esc(teachingFamily(tr.familyId)?.title||teachingModule(tr.currentModule)?.title||'тема'):(s&&!s.complete?'практика '+(s.cursor+1)+' из '+s.queue.length:'пока не начато');
  const status=routeStatus(level);
  return '<div class="morph-panel"><p class="eyebrow">ФОРМА СЛОВА</p><h2>Сначала понять, потом строить форму</h2><p>Режим «Учиться с нуля» сначала объясняет значение формы, полное правило, контрасты и признаки. Эти шаги не засчитываются как самостоятельное владение.</p>'+
- '<label for="morph-level">Раздел</label><select id="morph-level">'+rows+'</select><p class="morph-rule">'+esc(rule(level))+'</p>'+
- '<div class="morph-routes"><button class="'+(canContinue?'primary-button':'secondary-button')+'" data-morph-continue>Продолжить обучение</button><button class="primary-button" data-morph-learn-zero>Учиться с нуля</button><button class="secondary-button" data-morph-weak>Повторить слабое место</button><button class="secondary-button" data-morph-start>Самостоятельная практика</button><button class="secondary-button" data-morph-transfer>Проверить на новых основах</button><button class="secondary-button" data-morph-calc>Разобрать форму</button></div>'+freePracticeEntry()+
+ '<p>Разберём, как меняется казахское слово, когда мы хотим сказать «в школу», «моя книга» или «мы пришли». Сначала посмотрим на примеры, затем можно потренироваться.</p>'+
+ '<div class="morph-actions"><button type="button" class="primary-button" data-fs2-start>'+esc(continueLabel())+'</button></div>'+
+ '<h3>Все уроки</h3><div class="morph-routes">'+DOORS.map((d,i)=>{const seen=lessonSeen(d.id);return '<button type="button" class="secondary-button" data-exemplar="'+d.id+'"><span>'+esc(d.label)+'</span><span class="small">'+esc(d.goal)+'</span><span class="small">'+esc(seen)+'</span></button>';}).join('')+'</div>'+
+ '<div class="morph-actions"><button type="button" class="secondary-button" data-fs2-practice>Потренироваться</button><button type="button" class="secondary-button" data-morph-calc>Разобрать форму</button><button type="button" class="secondary-button" data-fs2-rules>Все правила и примеры</button></div>'+
+ '<details><summary>Проверить себя</summary><p class="small">В этом режиме ответы учитываются отдельно. Можно вернуться к обучению в любой момент.</p><label for="morph-level">Раздел</label><select id="morph-level">'+rows+'</select><p class="morph-rule">'+esc(rule(level))+'</p><div class="morph-routes"><button class="'+(canContinue?'primary-button':'secondary-button')+'" data-morph-continue>Продолжить обучение</button><button class="secondary-button" data-morph-learn-zero>Учиться с нуля</button><button class="secondary-button" data-morph-weak>Повторить слабое место</button><button class="secondary-button" data-morph-start>Самостоятельная практика</button><button class="secondary-button" data-morph-transfer>Проверить на новых основах</button></div></details>'+
  '<p class="small">Сейчас продолжится: '+where+'.</p>'+
  '<details><summary>Как устроены урок и проверка</summary>'+
  '<p>Короткая фраза возле шага помогает сделать ход, но это не вся теория. Полное объяснение открывается по «Разобрать правило полностью» и не исчезает. На узком экране его можно разбить, спрятать под «Подробнее» или оставить короткую опору сверху. Нельзя выкинуть контрпримеры, ограничения и переписать полное правило одной фразой.</p>'+
@@ -614,12 +696,43 @@ function bindCalculator(host){
  for(const b of host.querySelectorAll('[data-calc-replace]'))b.onclick=()=>{if(!calcSequence.length)return;calcSequence=calcSequence.slice(0,-1).concat(b.dataset.calcReplace);persistCalc();render();};
  host.querySelector('[data-calc-pop]')?.addEventListener('click',()=>{calcSequence=calcSequence.slice(0,-1);persistCalc();render();});
 }
-let exemplarId=null,exemplarMode='opening';
+let exemplarId=null,exemplarMode='opening',readPart=0,readToc=false;
+function tocGroups(parts){
+ const groups=[];
+ for(let i=0;i<parts.length;i++){
+  const last=groups[groups.length-1];
+  if(last&&last.title===parts[i].title)last.items.push(i);
+  else groups.push({title:parts[i].title,items:[i]});
+ }
+ return groups.map(g=>{
+  if(g.items.length===1)return '<button type="button" class="secondary-button" data-fs2-part="'+g.items[0]+'">'+esc(g.title)+'</button>';
+  const inner=g.items.map((i,n)=>{
+   const kind=parts[i].kind;
+   const name=kind==='table'?'Таблица целиком':kind==='more'?'Ещё пример '+(n+1):g.title;
+   return '<button type="button" class="text-button" data-fs2-part="'+i+'">'+esc(name)+'</button>';
+  }).join('');
+  return '<details><summary>'+esc(g.title)+'</summary><div class="morph-routes">'+inner+'</div></details>';
+ }).join('');
+}
 function exemplarScreen(){
- const row=(learner()&&learner().lessons||[]).find(x=>x.id===exemplarId);
+ const row=currentLesson();
  if(!row){exemplarId=null;return '';}
- const actions=exemplarMode==='opening'?'<button type="button" class="secondary-button" data-exemplar-full>Разобрать смысл полностью</button><button type="button" class="primary-button" data-exemplar-close>Дальше</button>':'<button type="button" class="secondary-button" data-exemplar-short>Короткая опора</button><button type="button" class="primary-button" data-exemplar-close>Дальше</button>';
- return '<div class="morph-panel morph-learner" data-learner-lesson="'+esc(row.id)+'"><button type="button" class="text-button" data-exemplar-close>← К разделу</button>'+learnerBody(row,exemplarMode)+'<p class="small">Полное объяснение не заменяется короткой подсказкой и остаётся доступным из раздела.</p><div class="morph-actions">'+actions+'</div></div>';
+ const parts=lessonParts(row);
+ const n=DOORS.findIndex(d=>d.id===row.id)+1;
+ const door=doorById(row.id)?.label||row.title;
+ if(readToc){
+  return '<div class="morph-panel morph-learner" data-learner-lesson="'+esc(row.id)+'"><button type="button" class="text-button" data-fs2-back>Назад</button><button type="button" class="text-button" data-exemplar-close>← К разделу</button><p class="eyebrow">Все части темы</p><h2>'+esc(door)+'</h2><div class="morph-routes">'+tocGroups(parts)+'</div><div class="morph-actions"><button type="button" class="primary-button" data-fs2-back>Вернуться к объяснению</button></div></div>';
+ }
+ const i=Math.max(0,Math.min(readPart,Math.max(0,parts.length-1)));
+ readPart=i;
+ const part=parts[i];
+ if(!part)return '<div class="morph-panel"><h2>Не удалось открыть объяснение</h2><p>Вернуться к теме.</p><div class="morph-actions"><button type="button" class="primary-button" data-exemplar-close>К разделу</button></div></div>';
+ const practice=window.FreePracticeContent&&part.headingId?window.FreePracticeContent.anchorsFor(part.headingId):[];
+ const practiceBtn=practice&&practice.length?'<button type="button" class="secondary-button" data-fs2-practice="'+esc(practice[0].blockId)+'" data-fs2-sub="'+esc(practice[0].subcase||'')+'">Потренироваться</button>':'';
+ const more=parts[i+1]&&parts[i+1].kind==='more'?'<button type="button" class="secondary-button" data-fs2-more>Ещё примеры</button>':'';
+ const next=i<parts.length-1?'<button type="button" class="primary-button" data-fs2-next>Следующее объяснение</button>':'<button type="button" class="primary-button" data-fs2-done>К списку уроков</button>';
+ const body=part.html.includes('<h3>')?part.html:'<h3>'+esc(part.title)+'</h3>'+part.html;
+ return '<div class="morph-panel morph-learner" data-learner-lesson="'+esc(row.id)+'"><button type="button" class="text-button" data-fs2-back>Назад</button><button type="button" class="text-button" data-exemplar-close>← К разделу</button><p class="eyebrow">Урок '+n+' · часть '+(i+1)+' из '+parts.length+'</p><h2>'+esc(door)+'</h2>'+body+'<div class="morph-actions">'+practiceBtn+more+next+'<button type="button" class="text-button" data-fs2-toc>Все правила и примеры</button></div><p class="small">Полное объяснение не заменяется короткой подсказкой и остаётся доступным из раздела.</p></div>';
 }
 function freePracticeEntry(){
  const fp=window.FreePractice;
@@ -629,24 +742,68 @@ function freePracticeEntry(){
 function render(){
  const host=root();if(!host||!bridge()||!T)return;
  const head='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>';
+ if(host.dataset.fs2boot!=='yes'){
+  host.dataset.fs2boot='yes';
+  const surface=loadSurface();
+  const boot=data().module,s=boot.session,tr=boot.teaching?.resume;
+  const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
+  if(teachingNewer&&document.body.dataset.view==='morph'&&surface==='teach'){const rm=teachingModule(tr.currentModule,tr.familyId);teachingMode=true;showHub=false;topicOpen=false;level=rm?.id||'harmony';}
+  else if(s&&!s.complete&&document.body.dataset.view==='morph'&&surface==='card'){teachingMode=false;showHub=false;topicOpen=false;}
+  else if(!exemplarId&&surface==='calc'){calcOpen=true;}
+ }
  if(window.FreePractice&&window.FreePractice.isOpen()){
   host.innerHTML=head+window.FreePractice.html();
+  if(exemplarId){
+   const actions=host.querySelector('[data-free-practice] .morph-actions');
+   if(actions&&!host.querySelector('[data-fs2-next]')){
+    const b=document.createElement('button');
+    b.type='button';b.className='secondary-button';b.dataset.fs2Next='1';b.textContent='Следующее объяснение';
+    actions.insertBefore(b,actions.firstChild);
+   }
+  }
   window.FreePractice.bind(host,()=>render());
+  for(const b of host.querySelectorAll('[data-free-home]'))b.addEventListener('click',()=>{exemplarId=null;showHub=true;saveCursor(false);saveSurface('hub');},true);
+  for(const b of host.querySelectorAll('[data-fs2-open-lesson]'))b.addEventListener('click',()=>{window.FreePractice.dismiss();openLesson(b.dataset.fs2OpenLesson,0,false);focusHeading();remember();render();});
+  host.querySelector('[data-fs2-next]')?.addEventListener('click',()=>{window.FreePractice.dismiss();stepLesson(1,true);});
   host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>{window.QazaqShell.show('personal');window.PersonalTrainers.openCatalog();});
   clock();return;
  }
  if(exemplarId){
   host.innerHTML=head+exemplarScreen();
-  bind(host);clock();return;
+  saveSurface(readToc?'read':'read');
+  bind(host);clock();
+  if(wantFocus){wantFocus=false;const h=host.querySelector('h2');if(h){h.tabIndex=-1;h.focus();}}
+  return;
  }
- const m=data().module,s=m.session,tr=m.teaching?.resume;
- const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
- if(teachingNewer&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){const rm=teachingModule(tr.currentModule,tr.familyId);teachingMode=true;showHub=false;topicOpen=false;level=rm?.id||'harmony';host.dataset.first='yes';}
- else if(s&&!s.complete&&document.body.dataset.view==='morph'&&host.dataset.first!=='yes'){teachingMode=false;showHub=false;topicOpen=false;host.dataset.first='yes';}
+ const m=data().module,s=m.session;
  if(calcOpen){teachingMode=false;showHub=false;topicOpen=false;}
  const body=calcOpen?calculatorScreen():teachingMode?teachingScreen():topicOpen?topicScreen():(!s||showHub?hub():s.complete?finish(s):question(s));
  host.innerHTML='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>'+(message||m.recovery||m.teaching?.recovery?'<p role="status" class="morph-notice">'+esc(message||m.teaching?.recovery||m.recovery)+'</p>':'')+body;
+ if(calcOpen)saveSurface('calc');
+ else if(teachingMode)saveSurface('teach');
+ else if(s&&!showHub&&!s.complete)saveSurface('card');
+ else saveSurface('hub');
  bind(host);clock();
+ if(wantFocus){wantFocus=false;const h=host.querySelector('h2');if(h){h.tabIndex=-1;h.focus();}}
+}
+function markLessonDone(){
+ const id=exemplarId;if(!id)return;
+ const prev=readCursor()||{},seen=Object.assign({},prev.seen);
+ seen[id]={part:readPart,done:true};
+ try{sessionStorage.setItem(READ_KEY,JSON.stringify(Object.assign({},prev,{id,part:readPart,toc:!!readToc,seen,open:false,at:Date.now()})));}catch(e){}
+}
+function stepLesson(skipMore){
+ const row=currentLesson(),parts=row?lessonParts(row):[];
+ if(!parts.length){showSectionHome();focusHeading();remember();render();return;}
+ let j=readPart+1;
+ if(skipMore)while(j<parts.length&&parts[j].kind==='more')j++;
+ if(j>=parts.length){
+  markLessonDone();
+  const idx=DOORS.findIndex(d=>d.id===exemplarId),nxt=DOORS[idx+1];
+  message=nxt?('Дальше можно открыть: '+nxt.label):'';
+  showSectionHome();focusHeading();remember();render();return;
+ }
+ readPart=j;readToc=false;saveCursor(true);focusHeading();remember();render();
 }
 function startMixed(){
  const built=P.stage9Queue(data().module,20260926);
@@ -696,17 +853,53 @@ function onPracticeNext(){
  try{saveSession(next);}catch(e){practiceNotReady();return;}
  render();root()?.querySelector('#morph-answer')?.focus();
 }
+function bindFs2(host){
+ host.querySelector('[data-fs2-start]')?.addEventListener('click',()=>{
+  const t=continueTarget();
+  if(t.kind==='session'){continueLearning();return;}
+  if(t.kind==='read'){const c=readCursor();openLesson(c.id,c.part|0,!!c.toc);focusHeading();remember();render();return;}
+  openLesson(DOORS[0].id,0,false);focusHeading();remember();render();
+ });
+ host.querySelector('[data-fs2-rules]')?.addEventListener('click',()=>{
+  const c=readCursor();
+  const id=exemplarId||(c&&doorById(c.id)&&c.id)||DOORS[0].id;
+  const part=id===exemplarId?readPart:(c&&c.id===id?(c.part|0):0);
+  openLesson(id,part,true);focusHeading();remember();render();
+ });
+ host.querySelector('[data-fs2-toc]')?.addEventListener('click',()=>{readToc=true;saveCursor(true);focusHeading();remember();render();});
+ host.querySelector('[data-fs2-more]')?.addEventListener('click',()=>{readPart+=1;readToc=false;saveCursor(true);focusHeading();remember();render();});
+ host.querySelector('[data-fs2-next]')?.addEventListener('click',()=>stepLesson(true));
+ host.querySelector('[data-fs2-done]')?.addEventListener('click',()=>{
+  markLessonDone();
+  const idx=DOORS.findIndex(d=>d.id===exemplarId),nxt=DOORS[idx+1];
+  message=nxt?('Дальше можно открыть: '+nxt.label):'';
+  showSectionHome();focusHeading();remember();render();
+ });
+ for(const b of host.querySelectorAll('[data-fs2-back]'))b.addEventListener('click',()=>{
+  if(readToc){readToc=false;saveCursor(true);focusHeading();remember();render();return;}
+  if(readPart>0){readPart-=1;saveCursor(true);focusHeading();remember();render();return;}
+  showSectionHome();focusHeading();remember();render();
+ });
+ for(const b of host.querySelectorAll('[data-fs2-part]'))b.addEventListener('click',()=>{readPart=Number(b.dataset.fs2Part)||0;readToc=false;saveCursor(true);focusHeading();remember();render();});
+ for(const b of host.querySelectorAll('[data-fs2-practice]'))b.addEventListener('click',()=>{
+  const fp=window.FreePractice;if(!fp)return;
+  const block=b.dataset.fs2Practice;
+  if(block){saveCursor(true);fp.openBlock(block,b.dataset.fs2Sub||'');remember();render();return;}
+  fp.openMixed();remember();render();
+ });
+}
 function bind(host){
  bindCalculator(host);
+ bindFs2(host);
  host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>{window.QazaqShell.show('personal');window.PersonalTrainers.openCatalog();});
  host.querySelector('[data-morph-start]')?.addEventListener('click',()=>start('learn'));
  host.querySelector('[data-morph-transfer]')?.addEventListener('click',()=>start('transfer'));
  host.querySelector('[data-morph-learn-zero]')?.addEventListener('click',()=>learnFromZero());
- for(const b of host.querySelectorAll('[data-exemplar]'))b.onclick=()=>{exemplarId=b.dataset.exemplar;exemplarMode='opening';teachingMode=false;showHub=false;topicOpen=false;render();};
+ for(const b of host.querySelectorAll('[data-exemplar]'))b.onclick=()=>{openLesson(b.dataset.exemplar,0,false);focusHeading();remember();render();};
  host.querySelector('[data-free-mixed]')?.addEventListener('click',()=>{const fp=window.FreePractice;if(!fp)return;exemplarId=null;fp.openMixed();render();});
  host.querySelector('[data-exemplar-full]')?.addEventListener('click',()=>{exemplarMode='full';render();});
  host.querySelector('[data-exemplar-short]')?.addEventListener('click',()=>{exemplarMode='opening';render();});
- for(const b of host.querySelectorAll('[data-exemplar-close]'))b.addEventListener('click',()=>{exemplarId=null;showHub=true;render();});
+ for(const b of host.querySelectorAll('[data-exemplar-close]'))b.addEventListener('click',()=>{showSectionHome();focusHeading();remember();render();});
  for(const b of host.querySelectorAll('[data-free-block]'))b.onclick=()=>{const fp=window.FreePractice;if(!fp)return;fp.openBlock(b.dataset.freeBlock,b.dataset.freeSubcase||'');render();};
  for(const b of host.querySelectorAll('[data-free-skip]'))b.onclick=()=>{const anchors=[...host.querySelectorAll('[data-free-anchor]')];const mine=b.closest('[data-free-anchor]');const next=anchors[anchors.indexOf(mine)+1];if(next&&next.scrollIntoView)next.scrollIntoView({block:'start'});else host.querySelector('[data-exemplar-close]')?.click();};
  host.querySelector('[data-morph-continue]')?.addEventListener('click',()=>continueLearning());
@@ -714,7 +907,7 @@ function bind(host){
  host.querySelector('[data-morph-topic]')?.addEventListener('click',()=>{topicOpen=true;teachingMode=false;showHub=false;message='';render();});
  host.querySelector('[data-morph-restart]')?.addEventListener('click',()=>{message='Раздел начинается сначала. Уже сохранённые ответы и проверка не стираются.';startTeaching(level,null,'SEMANTIC_INTRO');});
  host.querySelector('[data-morph-pilot]')?.addEventListener('click',()=>{const doc=P.pilotExport(data().module),blob=new Blob([JSON.stringify(doc,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='qazaqsha-morph-pilot.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
- for(const b of host.querySelectorAll('[data-learner-open]'))b.onclick=()=>{const dest=learner()&&learner().lessonTarget(b.dataset.learnerOpen);if(!dest){message=learner()?learner().unavailable():'Этот разбор временно недоступен. Можно вернуться к разделу.';render();return;}showFullSemantic=true;startTeaching(dest.moduleId,dest.familyId,'FULL_EXPLANATION');};
+ for(const b of host.querySelectorAll('[data-learner-open]'))b.onclick=()=>{const id=b.dataset.learnerOpen;if(!doorById(id)){message=learner()?learner().unavailable():'Этот разбор временно недоступен. Можно вернуться к разделу.';render();return;}openLesson(id,0,false);focusHeading();remember();render();};
  for(const b of host.querySelectorAll('[data-learner-try]'))b.onclick=()=>{const box=b.closest('.morph-learner-trybox'),note=box&&box.querySelector('[data-learner-note]');if(!note)return;note.textContent=b.dataset.learnerTry===b.dataset.learnerOk?b.dataset.learnerGood:b.dataset.learnerBad;};
  for(const b of host.querySelectorAll('[data-topic-step]'))b.onclick=()=>openTopicStep(b.dataset.topicStep);
  host.querySelector('[data-morph-full-rule]')?.addEventListener('click',()=>startTeaching(level,null,'FULL_EXPLANATION'));
@@ -781,5 +974,17 @@ function bind(host){
 }
 document.addEventListener('visibilitychange',()=>{if(document.hidden)interrupted=true;});
 window.addEventListener('blur',()=>{interrupted=true;});
-window.MorphTrainer={open,render,status};
+window.addEventListener('popstate',()=>{
+ if(!fs2Depth)return;
+ fs2Depth--;
+ const st=history.state;
+ if(st&&st.fs2){
+  exemplarId=st.id||null;readPart=st.part|0;readToc=!!st.toc;calcOpen=!!st.calc;
+  showHub=!exemplarId&&!calcOpen;teachingMode=false;topicOpen=false;
+  if(exemplarId)saveCursor(true);else saveCursor(false);
+  render();return;
+ }
+ showSectionHome();render();
+});
+window.MorphTrainer={open,render,status,restoreReading};
 })();

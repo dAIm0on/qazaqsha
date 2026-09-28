@@ -140,12 +140,59 @@ function pieces(row,mode){
  const out=[];
  let bucket=[];
  let id=null;
- const flush=()=>{if(!bucket.length)return;out.push({id,html:bucket.map(renderBlock).join('')});bucket=[];};
+ let title='';
+ const flush=()=>{if(!bucket.length)return;out.push({id,title,html:bucket.map(renderBlock).join('')});bucket=[];};
  for(const b of blocks){
-  if(b.type==='subheading'){flush();id=b.id;}
+  if(b.type==='subheading'){flush();id=b.id;title=b.text||'';}
   bucket.push(b);
  }
  flush();
+ return out;
+}
+function sentenceBlocks(b){
+ if(b.type!=='paragraph'&&b.type!=='warning')return [b];
+ const text=String(b.text||'');
+ if(text.length<650)return [b];
+ const parts=text.split(/(?<=[.!?])\s+(?=[А-ЯЁA-Z«])/).map(s=>s.trim()).filter(Boolean);
+ if(parts.length<2)return [b];
+ return parts.map((piece,i)=>({type:b.type,id:b.id+'#'+i,text:piece}));
+}
+function beats(row){
+ const out=[];
+ let title='Часть';
+ let headingId=null;
+ let buf=[];
+ const emit=(blocks,kind)=>{
+  if(!blocks.length)return;
+  const id=(blocks.find(b=>b.type!=='subheading')||blocks[0]).id;
+  out.push({id,headingId,title,kind,html:blocks.map(renderBlock).join('')});
+ };
+ const flush=kind=>{emit(buf,kind||'text');buf=[];};
+ for(const raw of row.blocks||[]){
+  if(raw.type==='subheading'){
+   flush('text');
+   title=raw.text||'Часть';
+   headingId=raw.id;
+   buf=[raw];
+   continue;
+  }
+  if(raw.type==='table'){
+   flush('text');
+   emit([raw],'table');
+   continue;
+  }
+  if(raw.type==='example'||raw.type==='try'){
+   const kind=buf.some(b=>b.type!=='subheading')?'thought':'more';
+   buf.push(raw);
+   flush(kind);
+   continue;
+  }
+  for(const bit of sentenceBlocks(raw)){
+   if(buf.some(b=>b.type!=='subheading'))flush('text');
+   buf.push(bit);
+  }
+ }
+ flush('text');
  return out;
 }
 function render(row,mode){
@@ -864,6 +911,6 @@ function explain(lemma,sequence,formOf){
  const target=openTarget({sequence:seq,morpheme:seq.at(-1)});
  return {ok:true,stem:lemma.text,gloss:lemma.gloss,word:built.word,steps,lessonId:target&&target.lessonId,choices:nextMeanings(lemma,seq,formOf),note:'Это только разбор. Он не записывается как ответ и не меняет расписание повторений.'};
 }
-const api={version:VERSION,lessons:LESSONS,label,forFamily,lessonTarget,openTarget,operation,supportLine,feedback,chainNote,render,pieces,unavailable,visibleText,check,resolveLemma,nextMeanings,explain};
+const api={version:VERSION,lessons:LESSONS,label,forFamily,lessonTarget,openTarget,operation,supportLine,feedback,chainNote,render,pieces,beats,unavailable,visibleText,check,resolveLemma,nextMeanings,explain};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.MorphLearner=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -6,7 +6,37 @@ const cfg=node?require('./free-practice-config.js'):root.FreePracticeConfig;
 const S=node?require('./free-practice-state.js'):root.FreePracticeState;
 const C=node?require('./free-practice-content.js'):root.FreePracticeContent;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let open=false,pool=[],state=S.empty(1);
+let open=false,pool=[],state=S.empty(1),mixNotice='';
+const THEMES=[
+ {lesson:'learner.dat.kuda',title:'Куда или кому?',test:id=>/^free\.(harmony\.(meaning_dat|vowel_dat|limits)|voice\.(dat_|direction_place))/.test(id)},
+ {lesson:'learner.loc.where',title:'Где находится?',test:id=>/^free\.(harmony\.(meaning_loc|vowel_loc)|voice\.loc_)/.test(id)},
+ {lesson:'learner.pl.several',title:'Один и несколько',test:id=>id.startsWith('free.plural.')},
+ {lesson:'learner.nasal.senses',title:'Похожие окончания — разный смысл',test:id=>id.startsWith('free.nasal.')},
+ {lesson:'learner.poss.owner',title:'Мой, твой, его или её',test:id=>id.startsWith('free.poss.')},
+ {lesson:'learner.person.roles',title:'Я, мы и вопрос',test:id=>id.startsWith('free.person.')},
+ {lesson:'learner.chains.steps',title:'Собираем слово по шагам',test:id=>id.startsWith('free.chains.')},
+ {lesson:'learner.verbs.steps',title:'Действия: не сделал, сделал, если…',test:id=>id.startsWith('free.verbs.')}
+];
+function skillName(id){
+ if(id==='free.poss.stem')return 'Почему меняется буква';
+ if(id==='free.verbs.stem')return 'Особые слова';
+ if(id==='free.chains.full')return 'Целая цепочка';
+ if(id==='free.plural.compare')return 'Сравнить несколько';
+ if(id==='free.poss.compare')return 'Сравнить, чья вещь';
+ if(id==='free.person.compare')return 'Не перепутать лицо и вещь';
+ if(id==='free.person.i_we')return 'Я и мы';
+ const tail=id.split('.').pop();
+ const names={meaning_dat:'Смысл: куда или кому',meaning_loc:'Смысл: где',vowel_dat:'Гласная: куда или кому',vowel_loc:'Гласная: где',limits:'Когда правило не подходит',dat_onset:'Первая буква: куда',loc_onset:'Первая буква: где',dat_build:'Собрать: куда',loc_build:'Собрать: где',direction_place:'Куда, где и откуда',meaning:'Несколько предметов',vowel:'Гласная',group_vowel:'После гласного',group_yw:'После й или у',group_r:'После р',group_l:'После л',group_nasal:'После м, н, ң',group_z:'После з или ж',group_voiceless:'После глухого',gen:'Чей или чего',acc:'Кого или что именно',abl:'Откуда',ins_with:'С кем',ins_tool:'Чем',groups:'Одинаковый край, разный вопрос',contrast:'Похожие формы',my:'Мой',your:'Твой',our:'Наш',polite:'Ваш',third:'Его или её',you:'Ты и Вы',you_many:'Вы, несколько',question:'Вопрос',plural_poss:'Несколько, потом чьё',poss_dat:'Куда после «его»',third_acc:'Кого после «его»',third_loc:'Где после «его»',third_abl:'Откуда после «его»',negative:'Не делать',past:'Уже сделал',participle:'Предмет через действие',condition:'Если',connected:'Добавочное действие',short_person:'Кто сделал',combined:'Несколько шагов',full:'Целиком'};
+ return names[tail]||tail;
+}
+function lessonOpened(lesson){
+ try{const c=JSON.parse(sessionStorage.getItem('qazaqsha-fs2-read')||'null');return !!(c&&c.seen&&c.seen[lesson]);}catch(e){return false;}
+}
+function topicHeading(){
+ const ids=state.selectedBlockIds||[];
+ if(ids.length===1)return skillName(ids[0]);
+ return 'Знакомые темы вперемешку';
+}
 function enabled(){return cfg.enabled();}
 function allowlist(){return cfg.config.enabledBlockIds||[];}
 function isOpen(){return enabled()&&open;}
@@ -38,8 +68,14 @@ function openMixed(){
 }
 function mixedPickHtml(){
  const ids=allowlist().filter(id=>C.forBlock(id,'').length&&!id.startsWith('free.mixed.'));
- const boxes=ids.map(id=>'<label class="morph-feature-option"><input type="checkbox" data-free-mix="'+esc(id)+'">'+esc(id.replace('free.','').replace(/\./g,' · '))+'</label>').join('');
- return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close>← К разделу</button><p class="eyebrow">СМЕШАТЬ ЗНАКОМОЕ</p><h2>Только уже открытые темы</h2><p>Можно попробовать один пример или заниматься дольше. Оценок нет. Когда захотите, переходите дальше.</p><div class="morph-feature-grid">'+boxes+'</div><div class="morph-actions"><button type="button" class="secondary-button" data-free-mix-start>Ещё пример</button><button type="button" class="secondary-button" data-free-cycle>Повторить знакомые</button><button type="button" class="primary-button" data-free-close>Дальше</button></div></div>';
+ const groups=THEMES.map(theme=>{
+  const rows=ids.filter(theme.test);
+  if(!rows.length)return '';
+  const boxes=rows.map(id=>'<label class="morph-feature-option"><input type="checkbox" data-free-mix="'+esc(id)+'" data-fs2-lesson="'+esc(theme.lesson)+'" data-fs2-name="'+esc(skillName(id))+'">'+esc(skillName(id))+'</label>').join('');
+  return '<details><summary>'+esc(theme.title)+'</summary><div class="morph-feature-grid">'+boxes+'</div><div class="morph-actions"><button type="button" class="secondary-button" data-fs2-explained="'+esc(theme.lesson)+'">Выбрать уже открытое</button><button type="button" class="text-button" data-fs2-open-lesson="'+esc(theme.lesson)+'">Открыть объяснение</button></div></details>';
+ }).join('');
+ const note=mixNotice?'<p role="status">'+esc(mixNotice)+'</p>':'';
+ return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p><h2>Что потренировать?</h2><p>Выбери знакомые темы. Можно смешать несколько.</p>'+note+'<p data-fs2-chosen>Пока ничего не выбрано.</p><div class="morph-routes">'+groups+'</div><div class="morph-actions"><button type="button" class="primary-button" data-free-mix-start>Ещё пример</button><button type="button" class="secondary-button" data-free-cycle>Повторить знакомые</button><button type="button" class="secondary-button" data-free-close>Дальше</button></div></div>';
 }
 function html(){
  if(!isOpen())return '';
@@ -47,13 +83,13 @@ function html(){
  const c=card();
  const shown=state.history.filter(h=>h.exposureKind==='question').length;
  const intro=shown>1?'':'<p>Можно попробовать один пример или заниматься дольше. Оценок нет. Когда захотите, переходите дальше.</p>';
- if(!c)return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p><h2>Пока без урока</h2>'+intro+'<p>Новые подходящие примеры для этого шага закончились. Можно повторить знакомые или идти дальше.</p><div class="morph-actions"><button type="button" class="secondary-button" data-free-cycle>Повторить знакомые</button><button type="button" class="primary-button" data-free-close>Дальше</button></div></div>';
+ if(!c)return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p><h2>'+esc(topicHeading())+'</h2>'+intro+'<p>Для этого шага подходящие примеры закончились. Можно повторить знакомые, выбрать другую тему или идти дальше.</p><div class="morph-actions"><button type="button" class="secondary-button" data-free-cycle>Повторить знакомые</button><button type="button" class="primary-button" data-free-close>Дальше</button></div></div>';
  const tr=c.translationSpec||{};
  const hint=state.preferences.supportLevel==='try_myself'?'':('<p class="morph-rule">'+esc(c.promptSpec&&c.promptSpec.hint||'Смотри на уже объяснённый шаг.')+'</p>');
  const options=(state.currentCard.renderedOptions||[]).map(o=>'<button type="button" class="secondary-button" data-free-answer="'+esc(o)+'">'+esc(o)+'</button>').join('');
  const note=state.currentCard.revealed||state.currentCard.answered?'<p role="status">'+esc(c.feedbackRu||'')+'</p>':'';
  const visible=c.showExpectedBeforeAnswer&&c.expected?'<p lang="kk">'+esc(c.expected)+'</p>':'';
- return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+intro+'<h2>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</h2><p lang="kk">'+esc(tr.lemma||'')+'</p><p>'+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+visible+hint+'<div class="morph-choices">'+options+'</div>'+note+'<div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="secondary-button" data-free-another>Ещё пример</button><button type="button" class="primary-button" data-free-close>Дальше по уроку</button></div></div>';
+ return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+intro+'<h2>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</h2><p lang="kk">'+esc(tr.lemma||'')+'</p><p>'+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+visible+hint+'<div class="morph-choices">'+options+'</div>'+note+'<div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="secondary-button" data-free-another>Ещё пример</button><button type="button" class="primary-button" data-free-close>Дальше по уроку</button></div></div>';
 }
 function anchorsHtml(headingId){
  if(!enabled())return '';
@@ -115,9 +151,29 @@ function bind(host,redraw){
  host.querySelector('[data-free-reveal]')?.addEventListener('click',()=>go(()=>S.reveal(state)));
  host.querySelector('[data-free-support]')?.addEventListener('click',()=>go(()=>S.setSupport(state,state.preferences.supportLevel==='try_myself'?'supported':'try_myself')));
  host.querySelector('[data-free-cycle]')?.addEventListener('click',()=>go(()=>{const next=S.newCycle(state);if(!next.ok)return next;next.state.preferences.mixedPick=false;return pool.length?S.present(next.state,pool):next;}));
+ const paintChosen=()=>{const names=[...host.querySelectorAll('[data-free-mix]:checked')].map(el=>el.dataset.fs2Name||el.dataset.freeMix);const slot=host.querySelector('[data-fs2-chosen]');if(slot)slot.textContent=names.length?('Выбрано: '+names.join(', ')):'Пока ничего не выбрано.';};
+ for(const box of host.querySelectorAll('[data-free-mix]'))box.addEventListener('change',paintChosen);
+ for(const b of host.querySelectorAll('[data-fs2-explained]'))b.addEventListener('click',()=>{
+  const lesson=b.dataset.fs2Explained;
+  const opened=lessonOpened(lesson);
+  let any=false;
+  for(const box of host.querySelectorAll('[data-free-mix]')){
+   if(box.dataset.fs2Lesson!==lesson)continue;
+   const known=opened||(state.explainedBlockIds||[]).includes(box.dataset.freeMix);
+   box.checked=known;
+   if(known)any=true;
+  }
+  if(!any)mixNotice='Выбери хотя бы одну знакомую тему';
+  paintChosen();
+  const note=host.querySelector('[role="status"]');
+  if(!any&&note)note.textContent=mixNotice;
+ });
  host.querySelector('[data-free-mix-start]')?.addEventListener('click',()=>{
   const ids=[...host.querySelectorAll('[data-free-mix]:checked')].map(el=>el.dataset.freeMix);
+  if(!ids.length){mixNotice='Выбери хотя бы одну знакомую тему';redraw();return;}
   pool=ids.flatMap(id=>C.forBlock(id,''));
+  if(!pool.length){mixNotice='Для этого шага пока нет проверенных заданий. Можно посмотреть разобранные примеры или выбрать другую тему.';redraw();return;}
+  mixNotice='';
   const switched=S.cas(state,state.revision,s=>{s.selectedBlockIds=ids;s.explainedBlockIds=[...new Set(s.explainedBlockIds.concat(ids))];s.preferences.mixedPick=false;s.currentCard=null;return s;});
   if(switched.ok)state=switched.state;
   const shown=pool.length?S.present(state,pool):{ok:true,state};
