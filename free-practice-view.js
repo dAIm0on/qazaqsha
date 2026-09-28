@@ -6,7 +6,7 @@ const cfg=node?require('./free-practice-config.js'):root.FreePracticeConfig;
 const S=node?require('./free-practice-state.js'):root.FreePracticeState;
 const C=node?require('./free-practice-content.js'):root.FreePracticeContent;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let open=false,pool=[],state=S.empty(1),mixNotice='',saveWarning='',corruptRaw=null,foreign=false,cardNotice='';
+let open=false,pool=[],state=S.empty(1),mixNotice='',saveWarning='',corruptRaw=null,foreign=false,cardNotice='',writeOpen=false;
 const TAB_KEY='qazaqsha-fp-tab';
 const CORRUPT_KEY='qazaqsha.freePractice.v1.corrupt';
 function tabId(){
@@ -143,6 +143,8 @@ function html(){
  const hint=state.preferences.supportLevel==='try_myself'?'':('<p class="morph-rule">'+esc(c.promptSpec&&c.promptSpec.hint||'Смотри на уже объяснённый шаг.')+'</p>');
  const options=(state.currentCard.renderedOptions||[]).map(o=>'<button type="button" class="secondary-button" data-free-answer="'+esc(o)+'">'+esc(o)+'</button>').join('');
  const done=!!(state.currentCard.revealed||state.currentCard.answered);
+ const letters=[...'әғқңөұүһі'].map(ch=>'<button type="button" class="text-button" data-free-key="'+ch+'">'+ch+'</button>').join('');
+ const writer=done?'':(writeOpen?'<form data-free-write-form><label for="free-write">Напишите форму</label><input id="free-write" lang="kk" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80"><div class="morph-keys">'+letters+'</div><button type="submit" class="primary-button">Проверить написанное</button></form>':'<button type="button" class="secondary-button" data-free-write>Написать самому</button>');
  const ok=state.currentCard.feedback==='yes';
  const wrong=state.currentCard.feedback==='no';
  const result=done?('<div role="status"><p>'+(state.currentCard.revealed&&!wrong&&!ok?'Разбор. Это не ошибка.':ok?'Верно для этого шага.':'Пока не то.')+'</p>'+(state.currentCard.rawInput?'<p>Твой ответ: '+esc(state.currentCard.rawInput)+'</p>':'')+(c.answer||c.expected?'<p lang="kk">'+esc(c.expected||c.answer)+'</p><p>'+esc(tr.target||'')+'</p>':'')+'<p>'+esc(c.feedbackRu||'')+'</p>'+(wrong?'<p>Дальше можно то же на другом слове.</p>':'')+'</div>'):'';
@@ -151,7 +153,7 @@ function html(){
  const moreLabel=done?'Ещё пример':'Другой пример';
  const moreClass=done?'primary-button':'secondary-button';
  const leaveClass=done?'secondary-button':'primary-button';
- return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+notes()+intro+repeat+'<h2>'+esc(topicHeading())+'</h2><p>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</p><p lang="kk">'+esc(tr.lemma||'')+'</p><p>'+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+visible+hint+'<div class="morph-choices">'+options+'</div>'+result+'<div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="'+moreClass+'" data-free-another>'+moreLabel+'</button><button type="button" class="'+leaveClass+'" data-free-close>Дальше по уроку</button></div></div>';
+ return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+notes()+intro+repeat+'<h2>'+esc(topicHeading())+'</h2><p>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</p><p lang="kk">'+esc(tr.lemma||'')+'</p><p>'+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+visible+hint+'<div class="morph-choices">'+options+'</div>'+writer+result+'<div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="'+moreClass+'" data-free-another>'+moreLabel+'</button><button type="button" class="'+leaveClass+'" data-free-close>Дальше по уроку</button></div></div>';
 }
 function anchorsHtml(headingId){
  if(!enabled())return '';
@@ -227,8 +229,11 @@ function bind(host,redraw){
  host.querySelector('[data-free-reset]')?.addEventListener('click',()=>{resetCorrupt();redraw();});
  host.querySelector('[data-free-takeover]')?.addEventListener('click',()=>{load();const got=S.takeOver(state,tabId());if(got.ok){foreign=false;save(got.state);}else saveWarning='Сейчас не получается сохранить место. Пока страница открыта, можно продолжать.';redraw();});
  for(const b of host.querySelectorAll('[data-free-close]'))b.addEventListener('click',()=>{dismiss();redraw();});
- host.querySelector('[data-free-another]')?.addEventListener('click',()=>go(()=>S.present(state,pool)));
- host.querySelector('[data-free-reveal]')?.addEventListener('click',()=>go(()=>S.reveal(state)));
+ host.querySelector('[data-free-another]')?.addEventListener('click',()=>{writeOpen=false;go(()=>S.present(state,pool));});
+ host.querySelector('[data-free-reveal]')?.addEventListener('click',()=>{writeOpen=false;go(()=>S.reveal(state));});
+ host.querySelector('[data-free-write]')?.addEventListener('click',()=>{writeOpen=true;redraw();});
+ host.querySelectorAll('[data-free-key]').forEach(b=>b.addEventListener('click',()=>{const input=host.querySelector('#free-write');if(!input)return;input.value+=b.dataset.freeKey;input.focus();}));
+ host.querySelector('[data-free-write-form]')?.addEventListener('submit',ev=>{ev.preventDefault();const input=host.querySelector('#free-write');const value=input?input.value.trim():'';const ok=card()&&value===card().answer;writeOpen=false;go(()=>S.answer(state,value,!!ok));});
  host.querySelector('[data-free-support]')?.addEventListener('click',()=>go(()=>S.setSupport(state,state.preferences.supportLevel==='try_myself'?'supported':'try_myself')));
  host.querySelector('[data-free-cycle]')?.addEventListener('click',()=>go(()=>{const next=S.newCycle(state);if(!next.ok)return next;next.state.preferences.mixedPick=false;if(!pool.length){next.state.exhaustReason='empty';return next;}return S.present(next.state,pool);}));
  host.querySelector('[data-free-topics]')?.addEventListener('click',()=>{openMixed();redraw();});

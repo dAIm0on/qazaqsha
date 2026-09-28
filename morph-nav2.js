@@ -7,10 +7,25 @@ function cat(){return root.MorphNav2Catalog;}
 function lesson(id){return (cat().lessons||[]).find(x=>x.id===id)||null;}
 function part(n){return (cat().parts||[]).find(x=>x.number===n)||null;}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function blank(){return {schemaVersion:1,screen:null,part:1,lessonId:'nav2.1.1',step:0,tab:'learn',pick:'',outcome:'',fromLesson:false,viewed:{},log:{},explained:{}};}
 function load(){
- try{const x=JSON.parse(sessionStorage.getItem(KEY)||'null');if(x&&x.schemaVersion===1)return x;}catch(e){}
- return {schemaVersion:1,screen:null,part:1,lessonId:'nav2.1.1',step:0,tab:'learn',pick:'',outcome:'',fromLesson:false,viewed:{}};
+ try{
+  const x=JSON.parse(sessionStorage.getItem(KEY)||'null');
+  if(x&&x.schemaVersion===1){x.log=x.log||{};x.explained=x.explained||{};return x;}
+ }catch(e){}
+ return blank();
 }
+function lessonLog(id){
+ const row=(st().log||{})[id]||{};
+ return {seen:row.seen||[],unaided:row.unaided||[],helped:row.helped||[],skipped:row.skipped||[],attempted:row.attempted||[]};
+}
+function putLog(id,row){
+ const log=Object.assign({},st().log);
+ log[id]=row;
+ return log;
+}
+function addOnly(list,id){return list.includes(id)?list:list.concat([id]);}
+function drop(list,id){return list.filter(x=>x!==id);}
 function save(s){try{sessionStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
 let state=null;
 function st(){if(!state)state=load();return state;}
@@ -87,13 +102,20 @@ function lesson11(row){
  const actions=step.taskKind==='recognition'&&!s.outcome
   ?'<button type="button" class="text-button" data-nav2-skip>Пропустить</button>'
   :(step.taskKind==='recognition'&&s.outcome==='wrong'?'':(last?'<button type="button" class="primary-button" data-nav2-finish>Закончить урок</button>':'<button type="button" class="primary-button" data-nav2-next>Дальше</button>'));
- if(s.outcome==='done'){
-  const nxt=nextOf(row);
-  return '<p>Вы увидели, что к слову добавили часть и значение стало «несколько».</p>'+(nxt?'<button type="button" class="primary-button" data-nav2-lesson="'+esc(nxt.id)+'">Следующий урок: '+esc(nxt.number)+' '+esc(nxt.title)+'</button>':'');
- }
  return body+'<div class="morph-actions">'+actions+'</div><p class="small">Шаг '+(s.step+1)+' из '+row.steps.length+' · '+esc(step.title)+'</p>';
 }
+function summaryHtml(row){
+ const log=lessonLog(row.id);
+ const nxt=nextOf(row);
+ const back=log.skipped.length?'<button type="button" class="secondary-button" data-nav2-unskip>Вернуться к пропущенному</button>':'';
+ const nextBtn=nxt?'<button type="button" class="primary-button" data-nav2-lesson="'+esc(nxt.id)+'">Следующий урок: '+esc(nxt.number)+' '+esc(nxt.title)+'</button>':'<button type="button" class="primary-button" data-nav2="home">К разделу</button>';
+ return '<p>Урок '+esc(row.number)+' на этом шаге закончен. Это не оценка знания.</p><ul class="morph-teach-list"><li>Шагов просмотрено: '+log.seen.length+'</li><li>Верно без помощи: '+log.unaided.length+'</li><li>С помощью: '+log.helped.length+'</li><li>Пропущено: '+log.skipped.length+'</li></ul><div class="morph-actions">'+back+nextBtn+'</div>';
+}
+function practiceReady(row){
+ return row.id!=='nav2.1.1'&&row.sourceMappingStatus!=='BOUND_FILTER_GAP'&&!!row.practiceOpen;
+}
 function learnBody(row){
+ if(st().outcome==='summary')return summaryHtml(row);
  if(row.id==='nav2.1.1')return lesson11(row);
  const step=row.steps[st().step]||row.steps[0];
  if(!step)return '<p>В этом уроке пока нет шага.</p>';
@@ -101,11 +123,13 @@ function learnBody(row){
  const body=blocks.length?blocks.map(blockHtml).join(''):'<h3>'+esc(step.title)+'</h3><p>'+esc(row.goal)+'</p>';
  const last=st().step>=row.steps.length-1;
  const btn=last?'<button type="button" class="primary-button" data-nav2-finish>Закончить урок</button>':'<button type="button" class="primary-button" data-nav2-next>Дальше</button>';
- return body+'<div class="morph-actions">'+btn+'</div><p class="small">Шаг '+(st().step+1)+' из '+row.steps.length+'</p>';
+ const toPractice=practiceReady(row)&&!st().explained[row.id]?'<button type="button" class="secondary-button" data-nav2-explained>К практике</button>':'';
+ return body+'<div class="morph-actions">'+btn+toPractice+'</div><p class="small">Шаг '+(st().step+1)+' из '+row.steps.length+'</p>';
 }
 function practiceBody(row){
  if(row.id==='nav2.1.1')return '<p>Для этого урока отдельной очереди нет. Это наблюдение, не проверка.</p>';
  if(row.sourceMappingStatus==='BOUND_FILTER_GAP'||!row.practiceOpen)return '<p>Практику этой темы пока не открываем: в одном наборе карточек два разных смысла, и фильтр ещё не проверен.</p>';
+ if(!st().explained[row.id])return '<p>Сначала посмотрите объяснение. Задание откроется после него.</p><button type="button" class="primary-button" data-nav2-tab="learn">К объяснению</button>';
  const bits=row.practiceOpen.split(':');
  return '<p>Можно потренироваться на словах этой темы. Это не оценка и не меняет расписание повторений.</p><button type="button" class="primary-button" data-nav2-practice="'+esc(bits[0])+'" data-nav2-sub="'+esc(bits[1]||'')+'">Потренироваться</button>';
 }
@@ -148,22 +172,65 @@ function bind(host,rerender){
  }));
  host.querySelectorAll('[data-nav2-maplesson]').forEach(b=>b.addEventListener('click',()=>{go({screen:'map',fromLesson:true,part:current().part});rerender();}));
  host.querySelectorAll('[data-nav2-tab]').forEach(b=>b.addEventListener('click',()=>{go({tab:b.dataset.nav2Tab});rerender();}));
- host.querySelectorAll('[data-nav2-next]').forEach(b=>b.addEventListener('click',()=>{go({step:st().step+1,pick:'',outcome:''});rerender();}));
+ host.querySelectorAll('[data-nav2-next]').forEach(b=>b.addEventListener('click',()=>{
+  const row=current(),step=row.steps[st().step];
+  const log=lessonLog(row.id);
+  log.seen=addOnly(log.seen,step?step.id:String(st().step));
+  const explained=Object.assign({},st().explained);explained[row.id]=true;
+  go({step:st().step+1,pick:'',outcome:'',log:putLog(row.id,log),explained:explained});
+  rerender();
+ }));
  host.querySelectorAll('[data-nav2-pick]').forEach(b=>b.addEventListener('click',()=>{
   const row=current(),step=row.steps[st().step];
   const pick=b.dataset.nav2Pick;
-  go({pick:pick,outcome:pick===step.answer?'right':'wrong'});
+  const ok=pick===step.answer;
+  const log=lessonLog(row.id);
+  log.attempted=addOnly(log.attempted,step.id);
+  log.skipped=drop(log.skipped,step.id);
+  if(ok){log.unaided=addOnly(log.unaided,step.id);log.helped=drop(log.helped,step.id);}
+  go({pick:pick,outcome:ok?'right':'wrong',log:putLog(row.id,log)});
   rerender();
  }));
  host.querySelector('[data-nav2-retry]')?.addEventListener('click',()=>{go({pick:'',outcome:''});rerender();});
- host.querySelector('[data-nav2-show]')?.addEventListener('click',()=>{go({outcome:'helped'});rerender();});
- host.querySelector('[data-nav2-skip]')?.addEventListener('click',()=>{go({outcome:'skip'});rerender();});
+ host.querySelector('[data-nav2-show]')?.addEventListener('click',()=>{
+  const row=current(),step=row.steps[st().step];
+  const log=lessonLog(row.id);
+  log.helped=addOnly(log.helped,step.id);
+  log.unaided=drop(log.unaided,step.id);
+  log.skipped=drop(log.skipped,step.id);
+  go({outcome:'helped',log:putLog(row.id,log)});
+  rerender();
+ });
+ host.querySelector('[data-nav2-skip]')?.addEventListener('click',()=>{
+  const row=current(),step=row.steps[st().step];
+  const log=lessonLog(row.id);
+  log.skipped=addOnly(log.skipped,step.id);
+  log.unaided=drop(log.unaided,step.id);
+  go({outcome:'skip',log:putLog(row.id,log)});
+  rerender();
+ });
  host.querySelector('[data-nav2-finish]')?.addEventListener('click',()=>{
-  const row=current();
+  const row=current(),step=row.steps[st().step];
+  const log=lessonLog(row.id);
+  if(step)log.seen=addOnly(log.seen,step.id);
   const seen=Object.assign({},st().viewed);seen[row.id]=true;
-  const nxt=nextOf(row);
-  if(row.id==='nav2.1.1'){go({outcome:'done',viewed:seen});rerender();return;}
-  go({lessonId:nxt?nxt.id:row.id,step:0,tab:'learn',pick:'',outcome:'',viewed:seen,screen:nxt?'lesson':'map'});
+  const explained=Object.assign({},st().explained);explained[row.id]=true;
+  go({outcome:'summary',viewed:seen,log:putLog(row.id,log),explained:explained,tab:'learn'});
+  rerender();
+ });
+ host.querySelector('[data-nav2-unskip]')?.addEventListener('click',()=>{
+  const row=current();
+  const id=lessonLog(row.id).skipped[0];
+  const idx=row.steps.findIndex(s=>s.id===id);
+  go({step:idx<0?0:idx,tab:'learn',pick:'',outcome:''});
+  rerender();
+ });
+ host.querySelector('[data-nav2-explained]')?.addEventListener('click',()=>{
+  const row=current(),step=row.steps[st().step];
+  const log=lessonLog(row.id);
+  if(step)log.seen=addOnly(log.seen,step.id);
+  const explained=Object.assign({},st().explained);explained[row.id]=true;
+  go({explained:explained,tab:'practice',log:putLog(row.id,log)});
   rerender();
  });
  host.querySelectorAll('[data-nav2-practice]').forEach(b=>b.addEventListener('click',()=>{
