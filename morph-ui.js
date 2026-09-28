@@ -686,7 +686,8 @@ function calculatorScreen(){
    body+='<p class="small">'+esc(explained.note)+'</p>';
   }else if(explained)body+='<p role="status">'+esc(explained.message)+'</p><p class="small">Это не считается твоей ошибкой. Расписание повторений не меняется.</p>';
  }
- return '<div class="morph-panel"><button class="text-button" data-calc-close>← К разделу</button><p class="eyebrow">РАЗБОР ФОРМЫ</p><h2>Разобрать форму</h2><p>Выбери проверенное слово и смысл. Здесь видно, как собралась форма. Это не задание и не оценка.</p><label for="calc-word">Слово</label><input id="calc-word" list="calc-words" value="'+esc(calcQuery)+'" autocomplete="off" enterkeyhint="search"><datalist id="calc-words">'+list+'</datalist><button type="button" class="secondary-button" data-calc-lookup>Найти слово</button>'+body+'</div>';
+ const letters=[...'әғқңөұүһі'].map(ch=>'<button type="button" class="text-button" data-calc-key="'+ch+'">'+ch+'</button>').join('');
+ return '<div class="morph-panel morph-calc"><button class="text-button" data-calc-close>← К разделу</button><p class="eyebrow">РАЗБОР ФОРМЫ</p><h2>Разобрать слово</h2><p>Выбери проверенное слово и смысл. Здесь видно, как собралась форма. Это не задание и не оценка.</p><label for="calc-word">Слово</label><input id="calc-word" lang="kk" list="calc-words" value="'+esc(calcQuery)+'" autocomplete="off" enterkeyhint="search"><div class="morph-keys">'+letters+'</div><datalist id="calc-words">'+list+'</datalist><button type="button" class="secondary-button" data-calc-lookup>Найти слово</button>'+body+'</div>';
 }
 function bindCalculator(host){
  host.querySelector('[data-morph-calc]')?.addEventListener('click',()=>{calcOpen=true;teachingMode=false;showHub=false;topicOpen=false;message='';persistCalc();render();});
@@ -694,6 +695,7 @@ function bindCalculator(host){
  const lookup=()=>{const input=host.querySelector('#calc-word');calcQuery=input?input.value:'';const found=learner()&&learner().resolveLemma(calcQuery,E.data.lemmas);calcLemmaId=found&&found.kind==='train'?found.lemma.id:'';calcSequence=[];persistCalc();render();};
  host.querySelector('[data-calc-lookup]')?.addEventListener('click',lookup);
  host.querySelector('#calc-word')?.addEventListener('change',lookup);
+ host.querySelectorAll('[data-calc-key]').forEach(b=>b.addEventListener('click',()=>{const input=host.querySelector('#calc-word');if(!input)return;input.value+=b.dataset.calcKey;input.focus();}));
  for(const b of host.querySelectorAll('[data-calc-lemma]'))b.onclick=()=>{const lemma=trainLemmas().find(l=>l.id===b.dataset.calcLemma);if(!lemma)return;calcLemmaId=lemma.id;calcQuery=lemma.text;calcSequence=[];persistCalc();render();};
  for(const b of host.querySelectorAll('[data-calc-add]'))b.onclick=()=>{if(calcSequence.length>=5)return;calcSequence=calcSequence.concat(b.dataset.calcAdd);persistCalc();render();};
  for(const b of host.querySelectorAll('[data-calc-replace]'))b.onclick=()=>{if(!calcSequence.length)return;calcSequence=calcSequence.slice(0,-1).concat(b.dataset.calcReplace);persistCalc();render();};
@@ -789,6 +791,14 @@ function render(){
   if(wantFocus){wantFocus=false;const h=host.querySelector('h2');if(h){h.tabIndex=-1;h.focus();}}
   return;
  }
+ if(calcOpen){
+  document.body.dataset.morphImmersive='1';
+  host.innerHTML=head+calculatorScreen();
+  saveSurface('calc');
+  bind(host);clock();
+  if(wantFocus){wantFocus=false;const h=host.querySelector('h2');if(h){h.tabIndex=-1;h.focus();}}
+  return;
+ }
  if(window.MorphNav2&&window.MorphNav2.takeover()){
   document.body.dataset.morphImmersive=window.MorphNav2.immersive()?'1':'';
   host.innerHTML=head+window.MorphNav2.html();
@@ -796,7 +806,7 @@ function render(){
   if(wantFocus){wantFocus=false;const h=host.querySelector('h2');if(h){h.tabIndex=-1;h.focus();}}
   return;
  }
- document.body.dataset.morphImmersive='';
+ document.body.dataset.morphImmersive=calcOpen?'1':'';
  const m=data().module,s=m.session;
  if(calcOpen){teachingMode=false;showHub=false;topicOpen=false;}
  const body=calcOpen?calculatorScreen():teachingMode?teachingScreen():topicOpen?topicScreen():(!s||showHub?hub():s.complete?finish(s):question(s));
@@ -918,7 +928,7 @@ function bind(host){
  host.querySelector('[data-morph-start]')?.addEventListener('click',()=>start('learn'));
  host.querySelector('[data-morph-transfer]')?.addEventListener('click',()=>start('transfer'));
  host.querySelector('[data-morph-learn-zero]')?.addEventListener('click',()=>learnFromZero());
- for(const b of host.querySelectorAll('[data-exemplar]'))b.onclick=()=>{openLesson(b.dataset.exemplar,0,false);focusHeading();remember();render();};
+ for(const b of host.querySelectorAll('[data-exemplar]'))b.onclick=()=>{if(window.MorphNav2&&window.MorphNav2.openBookmark(b.dataset.exemplar)){render();return;}openLesson(b.dataset.exemplar,0,false);focusHeading();remember();render();};
  host.querySelector('[data-free-mixed]')?.addEventListener('click',()=>{const fp=window.FreePractice;if(!fp)return;exemplarId=null;fp.openMixed();render();});
  host.querySelector('[data-exemplar-full]')?.addEventListener('click',()=>{exemplarMode='full';render();});
  host.querySelector('[data-exemplar-short]')?.addEventListener('click',()=>{exemplarMode='opening';render();});
@@ -930,7 +940,7 @@ function bind(host){
  host.querySelector('[data-morph-topic]')?.addEventListener('click',()=>{topicOpen=true;teachingMode=false;showHub=false;message='';render();});
  host.querySelector('[data-morph-restart]')?.addEventListener('click',()=>{message='Раздел начинается сначала. Уже сохранённые ответы и проверка не стираются.';startTeaching(level,null,'SEMANTIC_INTRO');});
  host.querySelector('[data-morph-pilot]')?.addEventListener('click',()=>{const doc=P.pilotExport(data().module);try{const raw=localStorage.getItem('qazaqsha.freePractice.v1');const parsed=raw?JSON.parse(raw):null;if(parsed&&parsed.schemaVersion===1)doc.freePractice={version:1,record:parsed};}catch(e){}const blob=new Blob([JSON.stringify(doc,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='qazaqsha-morph-pilot.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
- for(const b of host.querySelectorAll('[data-learner-open]'))b.onclick=()=>{const id=b.dataset.learnerOpen;if(!doorById(id)){message=learner()?learner().unavailable():'Этот разбор временно недоступен. Можно вернуться к разделу.';render();return;}openLesson(id,0,false);focusHeading();remember();render();};
+ for(const b of host.querySelectorAll('[data-learner-open]'))b.onclick=()=>{const id=b.dataset.learnerOpen;if(window.MorphNav2&&window.MorphNav2.openBookmark(id)){calcOpen=false;persistCalc();render();return;}if(!doorById(id)){message=learner()?learner().unavailable():'Этот разбор временно недоступен. Можно вернуться к разделу.';render();return;}openLesson(id,0,false);focusHeading();remember();render();};
  for(const b of host.querySelectorAll('[data-learner-try]'))b.onclick=()=>{const box=b.closest('.morph-learner-trybox'),note=box&&box.querySelector('[data-learner-note]');if(!note)return;note.textContent=b.dataset.learnerTry===b.dataset.learnerOk?b.dataset.learnerGood:b.dataset.learnerBad;};
  for(const b of host.querySelectorAll('[data-topic-step]'))b.onclick=()=>openTopicStep(b.dataset.topicStep);
  host.querySelector('[data-morph-full-rule]')?.addEventListener('click',()=>startTeaching(level,null,'FULL_EXPLANATION'));
@@ -998,6 +1008,7 @@ function bind(host){
 document.addEventListener('visibilitychange',()=>{if(document.hidden)interrupted=true;});
 window.addEventListener('blur',()=>{interrupted=true;});
 window.addEventListener('popstate',()=>{
+ if(window.MorphNav2&&window.MorphNav2.back()){render();return;}
  if(!fs2Depth)return;
  fs2Depth--;
  const st=history.state;

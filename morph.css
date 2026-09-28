@@ -45,6 +45,8 @@
 .morph-nav2-lesson [lang="kk"]{font-family:"Segoe UI",sans-serif}
 body[data-morph-immersive="1"] .bottom-nav{display:none}
 body[data-morph-immersive="1"] #morph-view{padding-bottom:24px}
+.morph-calc{padding-bottom:160px}
+.morph-nav2 input{width:100%;max-width:100%;box-sizing:border-box;min-height:48px;font:inherit;padding:12px;border:1px solid var(--line,#e4d8c8);border-radius:12px;background:var(--surface,#FFFAF4)}
 
 .morph-learner-table{overflow-x:auto;max-width:100%}
 .morph-learner-table table{min-width:880px}
