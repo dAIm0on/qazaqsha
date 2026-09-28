@@ -1,4 +1,4 @@
-#morph-view{max-width:860px;margin-inline:auto;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+#morph-view{max-width:860px;margin-inline:auto;padding-bottom:calc(140px + env(safe-area-inset-bottom,0px))}
 .morph-head,.morph-progress,.morph-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .morph-routes{display:flex;flex-direction:column;gap:8px;margin:16px 0}.morph-routes button{width:100%;text-align:left}
 .morph-panel{background:var(--surface,#fff);border:1px solid var(--line,#d8d8d8);border-radius:20px;padding:clamp(18px,4vw,30px);margin:16px 0;min-width:0;overflow-wrap:anywhere}
@@ -28,6 +28,23 @@
 .stage5-evidence{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin:16px 0}
 .stage5-evidence p{margin:0;padding:10px 12px;border:1px solid var(--line,#ddd);border-radius:10px;background:var(--surface-alt,#f3f3f0)}
 @media(max-width:620px){.stage5-evidence{grid-template-columns:1fr}}
+
+.morph-nav2-current{background:var(--lilac,#DDD0F6);border-radius:28px;padding:20px;margin:0 0 16px}
+.morph-nav2-next{background:var(--surface,#FFFAF4);border:1px solid var(--line,#e4d8c8);border-radius:20px;padding:16px;margin:0 0 16px}
+.morph-nav2-num{font-family:"IBM Plex Serif",serif;font-size:28px;line-height:1}
+.morph-nav2-tiles{display:flex;flex-direction:column;gap:10px}
+.morph-nav2-tile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;text-align:left;min-height:72px;padding:14px 16px;border-radius:20px;border:1px solid var(--line,#e4d8c8);background:var(--surface,#FFFAF4);color:var(--ink,#161412)}
+.morph-nav2-on{background:var(--lilac,#DDD0F6)}
+.morph-nav2-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.morph-nav2-sun{background:var(--sun,#F3E18A);border-radius:16px;padding:14px;margin:12px 0}
+.morph-nav2-sun p{margin:0}
+.morph-nav2-error{background:#FFF0E9;border-radius:16px;padding:14px;margin:12px 0}
+.morph-nav2-spot{display:inline-block;background:#FF5A1F;color:#161412;border-radius:999px;padding:4px 12px;font-weight:600}
+.morph-nav2-ok{background:#E8F2EA;color:#1E6B3A;border-radius:16px;padding:14px}
+.morph-nav2-note{background:var(--paper2,#F3EDE3);border-radius:12px;padding:12px}
+.morph-nav2-lesson [lang="kk"]{font-family:"Segoe UI",sans-serif}
+body[data-morph-immersive="1"] .bottom-nav{display:none}
+body[data-morph-immersive="1"] #morph-view{padding-bottom:24px}
 
 .morph-learner-table{overflow-x:auto;max-width:100%}
 .morph-learner-table table{min-width:880px}

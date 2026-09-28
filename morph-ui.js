@@ -235,12 +235,15 @@ function hub(){
  const canContinue=!!(tr||(s&&!s.complete));
  const where=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0))?esc(teachingFamily(tr.familyId)?.title||teachingModule(tr.currentModule)?.title||'тема'):(s&&!s.complete?'практика '+(s.cursor+1)+' из '+s.queue.length:'пока не начато');
  const status=routeStatus(level);
- return '<div class="morph-panel"><p class="eyebrow">ФОРМА СЛОВА</p><h2>Сначала понять, потом строить форму</h2><p>Режим «Учиться с нуля» сначала объясняет значение формы, полное правило, контрасты и признаки. Эти шаги не засчитываются как самостоятельное владение.</p>'+
+ const legacyHome='<p class="eyebrow">ФОРМА СЛОВА</p><h2>Сначала понять, потом строить форму</h2><p>Режим «Учиться с нуля» сначала объясняет значение формы, полное правило, контрасты и признаки. Эти шаги не засчитываются как самостоятельное владение.</p>'+
  '<p>Разберём, как меняется казахское слово, когда мы хотим сказать «в школу», «моя книга» или «мы пришли». Сначала посмотрим на примеры, затем можно потренироваться.</p>'+
  '<div class="morph-actions"><button type="button" class="primary-button" data-fs2-start>'+esc(continueLabel())+'</button></div>'+
  '<h3>Все уроки</h3><div class="morph-routes">'+DOORS.map((d,i)=>{const seen=lessonSeen(d.id);return '<button type="button" class="secondary-button" data-exemplar="'+d.id+'"><span>'+esc(d.label)+'</span><span class="small">'+esc(d.goal)+'</span><span class="small">'+esc(seen)+'</span></button>';}).join('')+'</div>'+
- '<div class="morph-actions"><button type="button" class="secondary-button" data-fs2-practice>Потренироваться</button><button type="button" class="secondary-button" data-morph-calc>Разобрать форму</button><button type="button" class="secondary-button" data-fs2-rules>Все правила и примеры</button></div>'+
- '<details><summary>Проверить себя</summary><p class="small">В этом режиме ответы учитываются отдельно. Можно вернуться к обучению в любой момент.</p><label for="morph-level">Раздел</label><select id="morph-level">'+rows+'</select><p class="morph-rule">'+esc(rule(level))+'</p><div class="morph-routes"><button class="'+(canContinue?'primary-button':'secondary-button')+'" data-morph-continue>Продолжить обучение</button><button class="secondary-button" data-morph-learn-zero>Учиться с нуля</button><button class="secondary-button" data-morph-weak>Повторить слабое место</button><button class="secondary-button" data-morph-start>Самостоятельная практика</button><button class="secondary-button" data-morph-transfer>Проверить на новых основах</button></div></details>'+
+ '<div class="morph-actions"><button type="button" class="secondary-button" data-fs2-practice>Потренироваться</button><button type="button" class="secondary-button" data-morph-calc>Разобрать форму</button><button type="button" class="secondary-button" data-fs2-rules>Все правила и примеры</button></div>';
+ const top=window.MorphNav2?window.MorphNav2.homeHtml():'<div class="morph-panel">'+legacyHome+'</div>';
+ const tucked=window.MorphNav2?'<details class="morph-panel"><summary>Прежние уроки и разбор формы</summary>'+legacyHome+'</details>':'';
+ return top+tucked+
+ '<div class="morph-panel"><details><summary>Проверить себя</summary><p class="small">В этом режиме ответы учитываются отдельно. Можно вернуться к обучению в любой момент.</p><label for="morph-level">Раздел</label><select id="morph-level">'+rows+'</select><p class="morph-rule">'+esc(rule(level))+'</p><div class="morph-routes"><button class="'+(canContinue?'primary-button':'secondary-button')+'" data-morph-continue>Продолжить обучение</button><button class="secondary-button" data-morph-learn-zero>Учиться с нуля</button><button class="secondary-button" data-morph-weak>Повторить слабое место</button><button class="secondary-button" data-morph-start>Самостоятельная практика</button><button class="secondary-button" data-morph-transfer>Проверить на новых основах</button></div></details>'+
  '<p class="small">Сейчас продолжится: '+where+'.</p>'+
  '<details><summary>Как устроены урок и проверка</summary>'+
  '<p>Короткая фраза возле шага помогает сделать ход, но это не вся теория. Полное объяснение открывается по «Разобрать правило полностью» и не исчезает. На узком экране его можно разбить, спрятать под «Подробнее» или оставить короткую опору сверху. Нельзя выкинуть контрпримеры, ограничения и переписать полное правило одной фразой.</p>'+
@@ -761,6 +764,7 @@ function render(){
   else if(!exemplarId&&surface==='calc'){calcOpen=true;}
  }
  if(window.FreePractice&&window.FreePractice.isOpen()){
+  document.body.dataset.morphImmersive=(window.MorphNav2&&window.MorphNav2.immersive())?'1':'';
   host.innerHTML=head+window.FreePractice.html();
   if(exemplarId){
    const actions=host.querySelector('[data-free-practice] .morph-actions');
@@ -778,12 +782,21 @@ function render(){
   clock();return;
  }
  if(exemplarId){
+  document.body.dataset.morphImmersive='';
   host.innerHTML=head+exemplarScreen();
   saveSurface(readToc?'read':'read');
   bind(host);clock();
   if(wantFocus){wantFocus=false;const h=host.querySelector('h2');if(h){h.tabIndex=-1;h.focus();}}
   return;
  }
+ if(window.MorphNav2&&window.MorphNav2.takeover()){
+  document.body.dataset.morphImmersive=window.MorphNav2.immersive()?'1':'';
+  host.innerHTML=head+window.MorphNav2.html();
+  bind(host);clock();
+  if(wantFocus){wantFocus=false;const h=host.querySelector('h2');if(h){h.tabIndex=-1;h.focus();}}
+  return;
+ }
+ document.body.dataset.morphImmersive='';
  const m=data().module,s=m.session;
  if(calcOpen){teachingMode=false;showHub=false;topicOpen=false;}
  const body=calcOpen?calculatorScreen():teachingMode?teachingScreen():topicOpen?topicScreen():(!s||showHub?hub():s.complete?finish(s):question(s));
@@ -898,6 +911,7 @@ function bindFs2(host){
  });
 }
 function bind(host){
+ if(window.MorphNav2)window.MorphNav2.bind(host,render);
  bindCalculator(host);
  bindFs2(host);
  host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>{window.QazaqShell.show('personal');window.PersonalTrainers.openCatalog();});
