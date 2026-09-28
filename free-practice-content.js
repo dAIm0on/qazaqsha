@@ -16,12 +16,41 @@ const ANCHORS={
  'poss.20':[{blockId:'free.poss.stem',subcase:'ending',title:'Потренироваться'}],
  'poss.26':[{blockId:'free.poss.our',subcase:'full',title:'Потренироваться: наш'},{blockId:'free.poss.polite',subcase:'full',title:'Потренироваться: ваш'}],
  'poss.38':[{blockId:'free.poss.stem',subcase:'inner',title:'Потренироваться'}],
- 'poss.77':[{blockId:'free.poss.compare',subcase:'owners',title:'Потренироваться'}]
+ 'poss.77':[{blockId:'free.poss.compare',subcase:'owners',title:'Потренироваться'}],
+ 'dat.46':[{blockId:'free.harmony.limits',subcase:'limits',title:'Потренироваться'}],
+ 'loc.1':[{blockId:'free.harmony.meaning_loc',subcase:'place',title:'Потренироваться'}],
+ 'loc.11':[{blockId:'free.harmony.vowel_loc',subcase:'vowel',title:'Потренироваться: гласная'},{blockId:'free.voice.loc_onset',subcase:'onset',title:'Потренироваться: первая буква'}],
+ 'loc.18':[{blockId:'free.voice.loc_build',subcase:'full',title:'Потренироваться'}],
+ 'pl.1':[{blockId:'free.plural.meaning',subcase:'several',title:'Потренироваться'}],
+ 'pl.7':[{blockId:'free.plural.vowel',subcase:'vowel',title:'Потренироваться: гласная'},{blockId:'free.plural.group_vowel',subcase:'vowel',title:'После гласного'},{blockId:'free.plural.group_yw',subcase:'glide',title:'После й или у'},{blockId:'free.plural.group_r',subcase:'r',title:'После р'},{blockId:'free.plural.group_l',subcase:'l',title:'После л'},{blockId:'free.plural.group_nasal',subcase:'nasal',title:'После м, н, ң'},{blockId:'free.plural.group_z',subcase:'z',title:'После з или ж'},{blockId:'free.plural.group_voiceless',subcase:'voiceless',title:'После глухого'}],
+ 'pl.13':[{blockId:'free.plural.compare',subcase:'compare',title:'Потренироваться'}],
+ 'nas.5':[{blockId:'free.nasal.gen',subcase:'full',title:'Потренироваться'}],
+ 'nas.14':[{blockId:'free.nasal.acc',subcase:'full',title:'Потренироваться'}],
+ 'nas.21':[{blockId:'free.nasal.abl',subcase:'full',title:'Потренироваться'}],
+ 'nas.28':[{blockId:'free.nasal.ins_with',subcase:'with',title:'Потренироваться: с кем'}],
+ 'nas.31':[{blockId:'free.nasal.ins_tool',subcase:'tool',title:'Потренироваться: чем'}],
+ 'nas.38':[{blockId:'free.nasal.contrast',subcase:'contrast',title:'Потренироваться'}],
+ 'nas.47':[{blockId:'free.nasal.groups',subcase:'groups',title:'Потренироваться'}],
+ 'per.9':[{blockId:'free.person.i_we',subcase:'i',title:'Потренироваться: я'}],
+ 'per.20':[{blockId:'free.person.i_we',subcase:'we',title:'Потренироваться: мы'}],
+ 'per.29':[{blockId:'free.person.you',subcase:'you',title:'Потренироваться: ты и Вы'},{blockId:'free.person.you_many',subcase:'many',title:'Потренироваться: вы, несколько'}],
+ 'per.43':[{blockId:'free.person.question',subcase:'question',title:'Потренироваться'}],
+ 'per.56':[{blockId:'free.person.compare',subcase:'compare',title:'Потренироваться'}],
+ 'ch.7':[{blockId:'free.chains.poss_dat',subcase:'dat',title:'Куда после «его»'},{blockId:'free.chains.third_acc',subcase:'acc',title:'Кого после «его»'},{blockId:'free.chains.third_loc',subcase:'loc',title:'Где после «его»'},{blockId:'free.chains.third_abl',subcase:'abl',title:'Откуда после «его»'}],
+ 'ch.23':[{blockId:'free.chains.plural_poss',subcase:'plural',title:'Несколько, потом чьё'},{blockId:'free.chains.full',subcase:'full',title:'Целая цепочка'}],
+ 'vb.7':[{blockId:'free.verbs.negative',subcase:'neg',title:'Потренироваться'}],
+ 'vb.17':[{blockId:'free.verbs.past',subcase:'past',title:'Потренироваться'}],
+ 'vb.27':[{blockId:'free.verbs.short_person',subcase:'person',title:'Потренироваться'}],
+ 'vb.39':[{blockId:'free.verbs.condition',subcase:'cond',title:'Потренироваться'}],
+ 'vb.49':[{blockId:'free.verbs.participle',subcase:'ptcp',title:'Потренироваться'}],
+ 'vb.58':[{blockId:'free.verbs.connected',subcase:'cvb',title:'Потренироваться'}],
+ 'vb.67':[{blockId:'free.verbs.stem',subcase:'stem',title:'Потренироваться'}],
+ 'vb.72':[{blockId:'free.verbs.combined',subcase:'combined',title:'Потренироваться'}]
 };
 function formOf(lemma,sequence){try{const built=E.form(lemma.id,sequence);return built&&built.word?built:null;}catch(e){return null;}}
 function nouns(){return E.data.lemmas.filter(l=>l.split==='train'&&l.pos==='noun');}
 function swap(suffix,kind){
- const map=kind==='vowel'?{а:'е',е:'а',ы:'і',і:'ы'}:{ғ:'қ',қ:'ғ',г:'к',к:'г'};
+ const map=kind==='vowel'?{а:'е',е:'а',ы:'і',і:'ы'}:{ғ:'қ',қ:'ғ',г:'к',к:'г',д:'т',т:'д'};
  let changed=false;
  const out=[...suffix].map(ch=>{if(!changed&&map[ch]){changed=true;return map[ch];}return ch;}).join('');
  return changed&&out!==suffix?out:null;
@@ -116,7 +145,128 @@ function build(){
    if(keptCmp)cards.push(keptCmp);
   }
  }
+ addCoverage(cards, rows, byText, addForm);
  return cards;
+}
+function seriesWrong(suffix){
+ const pair={лар:'тар',лер:'тер',дар:'тар',дер:'тер',тар:'лар',тер:'лер'};
+ return pair[suffix]||null;
+}
+function addCoverage(cards, rows, byText, addForm){
+ const city=byText.get('қала'), school=byText.get('мектеп');
+ if(city)cards.push(meaningCard('mean:city:there','free.harmony.meaning_loc','place',city,'Человек уже в городе, не в дороге. Какой смысл?','где','куда','где'));
+ if(school)cards.push(meaningCard('mean:school:there','free.harmony.meaning_loc','place',school,'Человек уже находится в школе. Какой смысл?','где','куда','где'));
+ cards.push({cardId:'limit:u',blockId:'free.harmony.limits',subcase:'limits',targetSkillIds:['limits'],prerequisiteBlockIds:[],lemmaId:'n-су',normalizedLemmaKey:'су',split:'train',holdout:false,admissionStatus:'runtime_approved',exerciseType:'meaning',options:['только у этих слов','у любого слова на у'],answer:'только у этих слов',expected:'',showExpectedBeforeAnswer:false,promptSpec:{ru:'суға и тауға записаны у этих слов. Можно ли так с любым словом на у?',hint:'Класс записан у слова.'},translationSpec:{lemma:'су',lemmaRu:'вода',target:'куда',context:'су',contextRu:'вода'},feedbackRu:'Другие слова на у по одной букве не угадываем.'});
+ for(const lemma of rows){
+  addForm(lemma,['LOC'],'free.harmony.vowel_loc','vowel','LOC.vowel','vowel');
+  addForm(lemma,['LOC'],'free.voice.loc_onset','onset','LOC.onset','onset');
+  addForm(lemma,['LOC'],'free.voice.loc_build','full','LOC.full_form','full');
+  const plural=formOf(lemma,['PL']);
+  if(plural){
+   const edge=plural.trace[0].edge;
+   const group={vowel:['free.plural.group_vowel','vowel'],glide:['free.plural.group_yw','glide'],r:['free.plural.group_r','r'],l:['free.plural.group_l','l'],nasal:['free.plural.group_nasal','nasal'],voiced_fricative:['free.plural.group_z','z'],voiceless:['free.plural.group_voiceless','voiceless']}[edge];
+   const step=plural.trace[0];
+   const alt=seriesWrong(step.suffix);
+   const wrong=alt?step.stem+(step.space?' ':'')+alt:null;
+   if(group&&wrong&&wrong!==plural.word){
+    const card=base(lemma,plural,group[0],group[1],'PL.group');
+    const kept=choice(card,plural.word,[wrong],lemma.text+' — '+(lemma.gloss||'')+'. Несколько.','Конец зависит от края этого слова.','несколько',plural.word+' — несколько.');
+    if(kept)cards.push(kept);
+   }
+   const vowelWrong=wrongWord(plural,'vowel');
+   if(vowelWrong){
+    const card=base(lemma,plural,'free.plural.vowel','vowel','PL.vowel');
+    const kept=choice(card,plural.word,[vowelWrong],lemma.text+' — '+(lemma.gloss||'')+'. Несколько. Какая гласная в конце?','Ряд уже записан у слова.','несколько',plural.word+' — несколько.');
+    if(kept)cards.push(kept);
+   }
+   const one=lemma.text;
+   if(one!==plural.word){
+    const card=base(lemma,plural,'free.plural.compare','compare','PL.compare');
+    const kept=choice(card,plural.word,[one],lemma.text+' — '+(lemma.gloss||'')+'. Нужно несколько, не один.','Сначала смысл «несколько».','несколько',plural.word+' — несколько. '+one+' — один.');
+    if(kept)cards.push(kept);
+   }
+  }
+  for(const [blockId,seq,ru,subcase] of [['free.nasal.gen','GEN','чей или чего','full'],['free.nasal.acc','ACC','кого или что именно','full'],['free.nasal.abl','ABL','откуда','full'],['free.nasal.ins_with','INS','с кем','with'],['free.nasal.ins_tool','INS','чем','tool']]){
+   const built=formOf(lemma,[seq]);if(!built)continue;
+   if(blockId==='free.nasal.ins_with'&&!(lemma.gloss||'').includes('человек')&&lemma.text!=='адам'&&lemma.text!=='дос'&&lemma.text!=='бала')continue;
+   if(blockId==='free.nasal.ins_tool'&&((lemma.gloss||'').includes('человек')||lemma.text==='адам'||lemma.text==='дос'||lemma.text==='бала'))continue;
+   const card=base(lemma,built,blockId,subcase,'CASE.'+seq);
+   const wrong=wrongWord(built,'onset')||wrongWord(built,'vowel');
+   const kept=choice(card,built.word,wrong?[wrong]:[],lemma.text+' — '+(lemma.gloss||'')+'. Нужно: '+ru+'.','Сначала вопрос, потом конец.','ru'&&ru,built.word+' — '+ru+'.');
+   if(kept)cards.push(kept);
+  }
+  const gen=formOf(lemma,['GEN']),acc=formOf(lemma,['ACC']);
+  if(gen&&acc&&gen.word!==acc.word){
+   const card=base(lemma,gen,'free.nasal.contrast','contrast','CASE.contrast');
+   const kept=choice(card,gen.word,[acc.word],lemma.text+' — '+(lemma.gloss||'')+'. Нужно «чей или чего», не «кого именно».','Похожий конец, другой вопрос.','чей или чего',gen.word+' — чей. '+acc.word+' — кого именно.');
+   if(kept)cards.push(kept);
+   const group=base(lemma,gen,'free.nasal.groups','groups','CASE.groups');
+   const keptGroup=choice(group,gen.word,[acc.word],lemma.text+' — '+(lemma.gloss||'')+'. Край один, вопрос другой.','Группа края не выбирает вопрос.','чей или чего',gen.word+' — чей.');
+   if(keptGroup)cards.push(keptGroup);
+  }
+ }
+ if(city)cards.push(meaningCard('pl:city','free.plural.meaning','several',city,'Нужно сказать не один город, а несколько. Какой смысл?','несколько','один','несколько'));
+ const verbs=E.data.lemmas.filter(l=>l.split==='train'&&l.pos==='verb');
+ const verbMap=[['free.verbs.negative',['NEG'],'не делать','neg'],['free.verbs.past',['PAST'],'уже сделал','past'],['free.verbs.participle',['PTCP_GAN'],'предмет через действие','ptcp'],['free.verbs.condition',['COND'],'если','cond'],['free.verbs.connected',['CVB_IP'],'добавочное действие','cvb'],['free.verbs.combined',['NEG','PAST'],'не сделал','combined']];
+ for(const lemma of verbs){
+  for(const [blockId,seq,ru,subcase] of verbMap){
+   const built=formOf(lemma,seq);if(!built)continue;
+   const card=base(lemma,built,blockId,subcase,'VERB.'+seq[0]);
+   const wrong=wrongWord(built,'vowel')||wrongWord(built,'onset');
+   const kept=choice(card,built.word,wrong?[wrong]:[],lemma.text+' — '+(lemma.gloss||'')+'. Нужно: '+ru+'.','Один шаг глагола.','ru'&&ru,built.word+' — '+ru+'.');
+   if(kept)cards.push(kept);
+  }
+  const past=formOf(lemma,['PAST']),person=formOf(lemma,['PAST','AGR_SHORT_1SG']);
+  if(past&&person&&past.word!==person.word){
+   const card=base(lemma,person,'free.verbs.short_person','person','VERB.person');
+   const kept=choice(card,person.word,[past.word],lemma.text+' — '+(lemma.gloss||'')+'. Нужно «я уже сделал», не просто «уже сделал».','Лицо добавляется к уже сказанному.','я',person.word+' — я. '+past.word+' — без лица.');
+   if(kept)cards.push(kept);
+  }
+  const stem=formOf(lemma,['CVB_IP']);
+  if(stem&&stem.trace.some(step=>step.changed)){
+   const card=base(lemma,stem,'free.verbs.stem','stem','VERB.stem');
+   const plain=stem.trace[0].before+stem.trace[0].suffix;
+   if(plain!==stem.word){
+    const kept=choice(card,stem.word,[plain],lemma.text+' — '+(lemma.gloss||'')+'. В добавочном действии у этого слова записана замена.','Не переноси замену на все слова.','добавочное действие',stem.word+' — записанная форма.');
+    if(kept)cards.push(kept);
+   }
+  }
+  for(const [blockId,seq,ru] of [['free.person.i_we',['COP_1SG'],'я'],['free.person.i_we',['COP_1PL'],'мы'],['free.person.you',['COP_2SG'],'ты'],['free.person.you',['COP_2POL'],'Вы'],['free.person.you_many',['COP_2PL'],'вы, несколько'],['free.person.question',['Q'],'вопрос']]){
+   const built=formOf(lemma,seq);if(!built)continue;
+   const sub=seq[0]==='COP_1SG'?'i':seq[0]==='COP_1PL'?'we':seq[0]==='Q'?'question':seq[0]==='COP_2PL'?'many':'you';
+   const card=base(lemma,built,blockId,sub,'PERSON.'+seq[0]);
+   card.cardId=blockId+':'+lemma.id+':'+sub;
+   const wrong=wrongWord(built,'vowel');
+   const kept=choice(card,built.word,wrong?[wrong]:[],lemma.text+' — '+(lemma.gloss||'')+'. Нужно: '+ru+'.','Это не «чей предмет».',ru,built.word+' — '+ru+'.');
+   if(kept)cards.push(kept);
+  }
+ }
+ const people=rows.filter(l=>l.predicate);
+ for(const lemma of people){
+  for(const [blockId,seq,ru,sub] of [['free.person.i_we',['COP_1SG'],'я','i'],['free.person.i_we',['COP_1PL'],'мы','we'],['free.person.you',['COP_2SG'],'ты','you'],['free.person.you',['COP_2POL'],'Вы','you'],['free.person.you_many',['COP_2PL'],'вы, несколько','many'],['free.person.question',['Q'],'вопрос','question']]){
+   const built=formOf(lemma,seq);if(!built)continue;
+   const card=base(lemma,built,blockId,sub,'PERSON.'+seq[0]);
+   const poss=formOf(lemma,['POSS_1SG']);
+   const wrong=poss&&poss.word!==built.word?poss.word:wrongWord(built,'vowel');
+   const kept=choice(card,built.word,wrong?[wrong]:[],lemma.text+' — '+(lemma.gloss||'')+'. Нужно: '+ru+'. Не «мой».','Кто я и чья вещь — разные дела.',ru,built.word+' — '+ru+'.');
+   if(kept&&seq[0]==='COP_1SG'&&poss&&poss.word!==built.word){
+    const cmp=base(lemma,built,'free.person.compare','compare','PERSON.compare');
+    const keptCmp=choice(cmp,built.word,[poss.word],lemma.text+' — '+(lemma.gloss||'')+'. Это «я», не «мой».','Не путай с «чей предмет».','я',built.word+' — я. '+poss.word+' — мой.');
+    if(keptCmp)cards.push(keptCmp);
+   }
+   if(kept)cards.push(kept);
+  }
+ }
+ for(const lemma of rows){
+  const chainPairs=[['free.chains.poss_dat',['POSS_3','DAT'],['POSS_3','LOC'],'к его вещи','dat'],['free.chains.third_acc',['POSS_3','ACC'],['POSS_3','DAT'],'его вещь, именно эту','acc'],['free.chains.third_loc',['POSS_3','LOC'],['POSS_3','DAT'],'где его вещь','loc'],['free.chains.third_abl',['POSS_3','ABL'],['POSS_3','LOC'],'откуда его вещь','abl'],['free.chains.plural_poss',['PL','POSS_1PL'],['PL'],'наши, несколько','plural'],['free.chains.full',['PL','POSS_1PL','ABL'],['PL','POSS_1PL'],'из наших','full']];
+  for(const [blockId,seq,alt,ru,subcase] of chainPairs){
+   const built=formOf(lemma,seq),other=formOf(lemma,alt);
+   if(!built||!other||built.word===other.word)continue;
+   const card=base(lemma,built,blockId,subcase,'CHAIN.'+blockId);
+   const kept=choice(card,built.word,[other.word],lemma.text+' — '+(lemma.gloss||'')+'. Нужно: '+ru+'. Смотри на уже собранное слово.','Следующий конец не от первого слова.',ru,built.word+' — '+ru+'. '+other.word+' — другой шаг.');
+   if(kept)cards.push(kept);
+  }
+ }
 }
 let cache;
 function all(){if(!cache)cache=build();return cache;}

@@ -26,8 +26,24 @@ function synthetic(n){
  return cards;
 }
 function card(){return state.currentCard&&state.currentCard.card;}
+function openMixed(){
+ if(!enabled())return;
+ load();
+ pool=[];
+ const next=S.cas(state,state.revision,s=>{s.currentCard=null;s.preferences.mixedPick=true;s.selectedBlockIds=[];return s;});
+ state=next.ok?next.state:Object.assign(state,{currentCard:null});
+ state.preferences.mixedPick=true;
+ save(state);
+ open=true;
+}
+function mixedPickHtml(){
+ const ids=allowlist().filter(id=>C.forBlock(id,'').length&&!id.startsWith('free.mixed.'));
+ const boxes=ids.map(id=>'<label class="morph-feature-option"><input type="checkbox" data-free-mix="'+esc(id)+'">'+esc(id.replace('free.','').replace(/\./g,' · '))+'</label>').join('');
+ return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close>← К разделу</button><p class="eyebrow">СМЕШАТЬ ЗНАКОМОЕ</p><h2>Только уже открытые темы</h2><p>Можно попробовать один пример или заниматься дольше. Оценок нет. Когда захотите, переходите дальше.</p><div class="morph-feature-grid">'+boxes+'</div><div class="morph-actions"><button type="button" class="secondary-button" data-free-mix-start>Ещё пример</button><button type="button" class="secondary-button" data-free-cycle>Повторить знакомые</button><button type="button" class="primary-button" data-free-close>Дальше</button></div></div>';
+}
 function html(){
  if(!isOpen())return '';
+ if(state.preferences.mixedPick)return mixedPickHtml();
  const c=card();
  const shown=state.history.filter(h=>h.exposureKind==='question').length;
  const intro=shown>1?'':'<p>Можно попробовать один пример или заниматься дольше. Оценок нет. Когда захотите, переходите дальше.</p>';
@@ -41,7 +57,7 @@ function html(){
 }
 function anchorsHtml(headingId){
  if(!enabled())return '';
- const rows=C.anchorsFor(headingId).filter(row=>allowlist().includes(row.blockId));
+ const rows=C.anchorsFor(headingId).filter(row=>allowlist().includes(row.blockId)&&C.forBlock(row.blockId,row.subcase).length);
  if(!rows.length)return '';
  return '<div class="morph-actions" data-free-anchor="'+esc(headingId)+'">'+rows.map(row=>'<button type="button" class="secondary-button" data-free-block="'+esc(row.blockId)+'" data-free-subcase="'+esc(row.subcase)+'">'+esc(row.title)+'</button>').join('')+'<button type="button" class="primary-button" data-free-skip>Дальше</button></div>';
 }
@@ -51,6 +67,7 @@ function openBlock(blockId,subcase){
  pool=C.forBlock(blockId,subcase);
  const switched=S.cas(state,state.revision,s=>{s.selectedBlockIds=[blockId];if(!s.explainedBlockIds.includes(blockId))s.explainedBlockIds=s.explainedBlockIds.concat([blockId]);s.currentCard=null;return s;});
  if(switched.ok)state=switched.state;
+ state.preferences.mixedPick=false;
  const shown=S.present(state,pool);
  if(shown.ok)state=shown.state;
  save(state);
@@ -78,10 +95,19 @@ function bind(host,redraw){
  host.querySelector('[data-free-another]')?.addEventListener('click',()=>go(()=>S.present(state,pool)));
  host.querySelector('[data-free-reveal]')?.addEventListener('click',()=>go(()=>S.reveal(state)));
  host.querySelector('[data-free-support]')?.addEventListener('click',()=>go(()=>S.setSupport(state,state.preferences.supportLevel==='try_myself'?'supported':'try_myself')));
- host.querySelector('[data-free-cycle]')?.addEventListener('click',()=>go(()=>{const next=S.newCycle(state);return next.ok?S.present(next.state,pool):next;}));
+ host.querySelector('[data-free-cycle]')?.addEventListener('click',()=>go(()=>{const next=S.newCycle(state);if(!next.ok)return next;next.state.preferences.mixedPick=false;return pool.length?S.present(next.state,pool):next;}));
+ host.querySelector('[data-free-mix-start]')?.addEventListener('click',()=>{
+  const ids=[...host.querySelectorAll('[data-free-mix]:checked')].map(el=>el.dataset.freeMix);
+  pool=ids.flatMap(id=>C.forBlock(id,''));
+  const switched=S.cas(state,state.revision,s=>{s.selectedBlockIds=ids;s.explainedBlockIds=[...new Set(s.explainedBlockIds.concat(ids))];s.preferences.mixedPick=false;s.currentCard=null;return s;});
+  if(switched.ok)state=switched.state;
+  const shown=pool.length?S.present(state,pool):{ok:true,state};
+  if(shown.ok)save(shown.state);
+  redraw();
+ });
  for(const b of host.querySelectorAll('[data-free-answer]'))b.addEventListener('click',()=>{const value=b.dataset.freeAnswer;const ok=card()&&value===card().answer;go(()=>S.answer(state,value,!!ok));});
 }
-const api={enabled,allowlist,isOpen,entryHtml,html,anchorsHtml,open:openPractice,openBlock,bind,synthetic,debug(){return {state,pool,open};}};
+const api={enabled,allowlist,isOpen,entryHtml,html,anchorsHtml,open:openPractice,openBlock,openMixed,bind,synthetic,debug(){return {state,pool,open};}};
 if(node)module.exports=api;
 else{root.FreePractice=api;root.FreePractice.enabled=enabled;}
 })(typeof window!=='undefined'?window:globalThis);

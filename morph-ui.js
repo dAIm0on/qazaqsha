@@ -633,7 +633,7 @@ function exemplarScreen(){
 function freePracticeEntry(){
  const fp=window.FreePractice;
  if(!fp||!fp.enabled()||!fp.allowlist().length)return '';
- return '<button type="button" class="secondary-button" data-exemplar="learner.dat.kuda">Куда или кому</button><button type="button" class="secondary-button" data-exemplar="learner.poss.owner">Чей предмет</button>';
+ return '<div class="morph-routes"><button type="button" class="secondary-button" data-exemplar="learner.dat.kuda">Куда или кому</button><button type="button" class="secondary-button" data-exemplar="learner.loc.where">Где он уже</button><button type="button" class="secondary-button" data-exemplar="learner.pl.several">Несколько предметов</button><button type="button" class="secondary-button" data-exemplar="learner.nasal.senses">Похожий конец</button><button type="button" class="secondary-button" data-exemplar="learner.poss.owner">Чей предмет</button><button type="button" class="secondary-button" data-exemplar="learner.person.roles">Я, мы и вопрос</button><button type="button" class="secondary-button" data-exemplar="learner.chains.steps">Шаг за шагом</button><button type="button" class="secondary-button" data-exemplar="learner.verbs.steps">Не делать, уже сделал, если</button><button type="button" class="secondary-button" data-free-mixed>Смешать знакомое</button></div>';
 }
 function render(){
  const host=root();if(!host||!bridge()||!T)return;
@@ -712,6 +712,7 @@ function bind(host){
  host.querySelector('[data-morph-transfer]')?.addEventListener('click',()=>start('transfer'));
  host.querySelector('[data-morph-learn-zero]')?.addEventListener('click',()=>learnFromZero());
  for(const b of host.querySelectorAll('[data-exemplar]'))b.onclick=()=>{exemplarId=b.dataset.exemplar;exemplarMode='opening';teachingMode=false;showHub=false;topicOpen=false;render();};
+ host.querySelector('[data-free-mixed]')?.addEventListener('click',()=>{const fp=window.FreePractice;if(!fp)return;exemplarId=null;fp.openMixed();render();});
  host.querySelector('[data-exemplar-full]')?.addEventListener('click',()=>{exemplarMode='full';render();});
  host.querySelector('[data-exemplar-short]')?.addEventListener('click',()=>{exemplarMode='opening';render();});
  host.querySelector('[data-exemplar-close]')?.addEventListener('click',()=>{exemplarId=null;showHub=true;render();});

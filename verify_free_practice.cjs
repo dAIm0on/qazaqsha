@@ -107,6 +107,13 @@ const dat=L.lessons.find(x=>x.id==='learner.dat.kuda');
 const poss=L.lessons.find(x=>x.id==='learner.poss.owner');
 assert.ok(L.pieces(dat,'opening').some(p=>p.id==='dat.1'));
 assert.ok(L.pieces(poss,'full').some(p=>p.id==='poss.26'));
+const C=require('./free-practice-content.js');
+for(const [heading,rows] of Object.entries(C.ANCHORS)){
+ for(const row of rows){
+  if(row.blockId.startsWith('free.mixed.'))continue;
+  assert.ok(C.forBlock(row.blockId,row.subcase).length>0,heading+' '+row.blockId+' '+row.subcase);
+ }
+}
 assert.ok(L.visibleText(dat,'full').includes('қалаға'));
 assert.ok(L.visibleText(poss,'full').includes('кітабым'));
-console.log('FREE_PRACTICE_P2_OK',JSON.stringify(cap));
+console.log('FREE_PRACTICE_P3P4_OK',JSON.stringify(cap));
