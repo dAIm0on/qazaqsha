@@ -81,6 +81,24 @@ ID нельзя строить из позиции в массиве.
 
 Если меняется только формулировка текста, стабильный ID сохраняется. Если меняется смысл навыка/задания — нужен новый ID. `content_revision` используется для защиты staged-resume от старого evidence.
 
+Если ID всё же переименован без изменения смысла, это делается явно:
+
+```json
+{
+  "migrations": [{
+    "from_revision": "4-2.r1",
+    "to_revision": "4-2.r2",
+    "question_ids": {"old-question-id": "new-question-id"},
+    "chapter_ids": {"old-chapter-id": "new-chapter-id"},
+    "stage_ids": {},
+    "vocab_ids": {},
+    "drop_question_ids": []
+  }]
+}
+```
+
+Runtime не угадывает переименования. Если старый staged practice относится к другой `content_revision`, он не может автоматически закрыть новый stage.
+
 ## Компиляция
 
 ```bash
