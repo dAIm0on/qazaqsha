@@ -1205,6 +1205,7 @@
      return;
    }
    const ch=G.chapter(les.id,gp.chapterId);if(!ch){gp.phase='lesson';renderPath();return;}
+   const chTitle=Bank?Bank.chapterTitle(ch):ch.title;
    const beats=ch.beats||[],beat=beats[gp.beat];
    if(!beat){
      G.markChapterDone(gp,les.id,ch.id);
@@ -1228,7 +1229,6 @@
      if(nxt){G.startChapter(state,les.id,nxt.id);save();renderPath();return;}
      gp.phase='done';gp.chapterId=null;save();renderPath();return;
    }
-   const chTitle=Bank?Bank.chapterTitle(ch):ch.title;
    const v2Full=(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(les.id)&&ch.fullExplanation)?`<details class="path-full-v2"><summary>Полное объяснение блока</summary><p>${esc(ch.fullExplanation)}</p></details>`:'';
    const head=`${crumb(les,ch)}<p class="small">Урок ${esc(courseRow?courseRow.label:les.id)} · ${esc(courseRow?courseRow.name:les.title)}</p><p class="small">Глава ${les.chapters.findIndex(c=>c.id===ch.id)+1} из ${les.chapters.length} · ${esc(chTitle)}</p>${v2Full}`;
    const nextBeat=()=>{gp.beat++;save();renderPath();};
