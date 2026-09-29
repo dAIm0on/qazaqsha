@@ -907,6 +907,12 @@
       "role": "target",
       "source_refs": [
         "school-homework"
+      ],
+      "forms": [
+        "да",
+        "де",
+        "та",
+        "те"
       ]
     }
   ],
