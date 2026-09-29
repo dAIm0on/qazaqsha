@@ -23,7 +23,7 @@
  }
  for(const q of questions)coerceTyped(q);
  const byId=new Map(questions.map(q=>[q.id,q]));
- const topics=[['all','Все задания','∞'],['sounds','Звуки и слоги','01'],['plural','Множественное число','02'],['vocab','Слова','03'],['numbers','Числа и количество','04'],['person','Личные окончания','05'],['rules','Только правила','06'],['phrase','Фразы','07']];
+ const topics=[['all','Все задания','∞'],['sounds','Звуки и слоги','01'],['plural','Множественное число','02'],['vocab','Слова','03'],['numbers','Числа и количество','04'],['person','Личные окончания','05'],['verbs','Глаголы','06'],['rules','Только правила','07'],['phrase','Фразы','08']];
  const KEY='qazaq-kris-course-v1', BACKUP=KEY+'-before-import', MIGRATION=KEY+'-before-schema-5';
  const cfg=window.TRAINER_CONFIG, P=window.ProgressStore, catalog=window.CURRICULUM;
  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -45,7 +45,7 @@
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null,trainerReturn=null;
  let reviewReasonMap=Object.create(null),materialsQuery='',materialsLesson='',materialsKind='';
- const COURSE_BLOCKS=(window.ExplainBankUI&&window.ExplainBankUI.COURSE||[]).map(row=>({id:row.id,title:row.label,hint:row.name}));
+ const COURSE_BLOCKS=(window.LessonRegistry?window.LessonRegistry.course():(window.ExplainBankUI&&window.ExplainBankUI.COURSE||[])).map(row=>({id:row.id,title:row.label,hint:row.name}));
  function courseJumpMarkup(id){
    return `<div class="course-jump" id="${id}"><p>Уроки 1–1…3–3</p><div class="review-actions">${COURSE_BLOCKS.map(b=>`<button type="button" class="secondary-button" data-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}><span class="today-lesson-id">Урок ${b.title}</span><small>${esc(b.hint)}</small></button>`).join('')}</div></div>`;
  }
@@ -204,6 +204,9 @@
    const lp=P.ensureLessonProgress(state,id);
    if(lp&&lp.practiceSession&&restoreLessonPractice(id)){
      markLessonStarted(id,'practice');render();showView('practice');return;
+   }
+   if(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(id)&&(!lp||!lp.path||lp.path.phase!=='done')){
+     openPathLesson(id,{meaningful:true});return;
    }
    if(beginPacked(id))return;
    const nxt=P.nextRegistered&&P.nextRegistered(id,state.events);
@@ -420,6 +423,10 @@
    if(restoreLessonPractice(block)){
      markLessonStarted(block,'practice');render();showView('practice');return;
    }
+   if(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(block)){
+     const nextStage=P.nextRegistered&&P.nextRegistered(block,state.events);
+     if(nextStage&&beginStaged(block,nextStage))return;
+   }
    if(practiceHold&&practiceHold.lessonId===block){
      const hold=practiceHold;
      $('#exercise').innerHTML='<div class="empty-state"><h2>Сохранённая очередь на месте</h2><p>В снимке есть задание, которого нет в этой версии: '+esc(hold.missing.join(', '))+'. Очередь не пересобрана.</p><div class="finish-actions"><button type="button" class="secondary-button" id="hold-lessons">Выбрать занятие</button></div></div>';
@@ -607,10 +614,10 @@
  }
  function markPlace(surface,lessonId){
    const id=String(lessonId||'');
-   if(!/^[1-3]-[0-9]$/.test(id))return;
+   if(!P.courseIds().includes(id))return;
    state.place={surface,lessonId:id,mode:surface==='path'?'path':mode};
  }
- function courseIds(){return (window.ExplainBankUI&&window.ExplainBankUI.COURSE||[]).map(c=>c.id);}
+ function courseIds(){return P.courseIds();}
  function studyLive(){return ['homework','course','lesson','phrase','transfer','remediation'].includes(mode)&&queue.length>position;}
  function namedCourse(){
    const ids=courseIds(),cp=P.ensureCourseProgress(state),rp=cp.resumePointer||{};
