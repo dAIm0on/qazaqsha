@@ -91,7 +91,21 @@
  function byId(id){return installed.get(id)||null;}
  function isV2(id){return installed.has(id)||(root.LessonRegistry&&root.LessonRegistry.isV2(id));}
  function homework(id){const p=byId(id);if(!p)return null;const h=p.homework,ext=h.external_tasks||[];return {lesson_id:id,content_revision:p.content_revision,homework:{title:h.title,word_ids:h.word_ids.slice(),exercise_ids:h.exercise_ids.slice(),word_question_ids:root.COURSE.questions.filter(q=>q.lessonId===id&&q.topic==='vocab'&&q.wordRole==='must').map(q=>q.id),rule_map:Object.fromEntries(h.exercise_ids.map(qid=>{const q=root.COURSE.questions.find(q=>q.id===qid);return [qid,(q&&q.ruleIds&&q.ruleIds[0])||''];}).filter(x=>x[1])),external_test_url:ext[0]&&ext[0].url||'',external_tests:ext.map(x=>x.url),checklist:h.checklist.slice(),extras:[],method_title:(p.sources.find(s=>s.id==='school-method')||{}).title||('Методичка '+id),method_url:(p.sources.find(s=>s.id==='school-method')||{}).url||'',source_items:h.source_items.slice()}};}
- const api={installAll,installOne,byId,isV2,homework,installed,stagePlans,pathLesson};
+ function practiceForRule(lessonId,ruleId,limit=12){
+   if(!installed.has(lessonId)||!root.COURSE)return [];
+   const rows=(root.COURSE.questions||[]).filter(q=>q&&q.lessonId===lessonId&&q.topic==='verbs'&&(q.ruleIds||[]).includes(ruleId));
+   const priority=q=>q.origin==='research'?0:q.origin==='generated'?1:q.origin==='school'?2:3;
+   rows.sort((a,b)=>priority(a)-priority(b)||String(a.id).localeCompare(String(b.id),'en'));
+   const picked=[],lemmas=new Set();
+   for(const q of rows){
+     const lemma=q.generator&&q.generator.lexeme_id||String(q.stimulus||'').split(/[+—]/)[1]||q.id;
+     if(lemmas.has(lemma)&&picked.length<Math.min(4,limit))continue;
+     picked.push(q.id);lemmas.add(lemma);
+     if(picked.length>=limit)break;
+   }
+   return picked;
+ }
+ const api={installAll,installOne,byId,isV2,homework,practiceForRule,installed,stagePlans,pathLesson};
  root.LessonV2Runtime=api;
  installAll();
 })(typeof window!=='undefined'?window:globalThis);
