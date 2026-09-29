@@ -20,6 +20,12 @@
    }else if((q.topic==='person'||q.topic==='rules')&&q.kind==='fields'){
      const rule='rule:'+(q.ruleIds&&q.ruleIds[0]||'person-biz');
      q.fields.forEach((f,i)=>bind(rule,'application',i));
+   }else if(q.topic==='verbs'&&q.kind==='fields'){
+     const rules=(q.ruleIds||[]).filter(Boolean).slice(0,3);
+     q.fields.forEach((f,i)=>{
+       if(rules.length)rules.forEach(ruleId=>bind('rule:'+ruleId,'application',i));
+       else bind('exercise:'+q.id,'application',i);
+     });
    }else if((q.ruleIds||[]).includes('ordinal')||q.group==='ord'){
      const ans=(q.fields||[]).flatMap(f=>f.answers||[]);
      const skill=window.ErrorDiagnostics&&window.ErrorDiagnostics.ordinalSkill?window.ErrorDiagnostics.ordinalSkill(q.stimulus,ans):(/жиырмасыншы/.test(ans.join(' '))?'exception_20':'suffix_family');

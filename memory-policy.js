@@ -75,7 +75,7 @@
    if(contrastSide(q))return 'contrast';
    if(q.topic==='vocab'&&/казахск/i.test(q.title||''))return 'prod';
    if(q.topic==='vocab')return 'rec';
-   if(q.topic==='plural'||q.topic==='person')return 'prod';
+   if(q.topic==='plural'||q.topic==='person'||q.topic==='verbs')return 'prod';
    return 'other';
  }
  function direction(q){
@@ -161,7 +161,7 @@
    const t=blob(q);
    if(/алты|алпыс|жеті|жетпіс|сегіз|сексен|тоғыз|тоқсан/.test(t))return 'lexical_confuse';
    if(q.topic==='sounds'||(q.ruleIds||[]).includes('harmony'))return 'harmony';
-   if(q.topic==='person'||(q.id||'').includes('ending'))return 'ending';
+   if(q.topic==='person'||q.topic==='verbs'||(q.id||'').includes('ending'))return 'ending';
    if(q.topic==='numbers'||q.generatedNumber)return 'place_value';
    if((q.ruleIds||[]).includes('quantity'))return 'extra_plural';
    return 'other';

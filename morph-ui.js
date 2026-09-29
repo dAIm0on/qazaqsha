@@ -762,7 +762,7 @@ function render(){
   const boot=data().module,s=boot.session,tr=boot.teaching?.resume;
   const teachingNewer=tr&&(!s||(tr.updatedAt||0)>=(s.updatedAt||0));
   if(teachingNewer&&document.body.dataset.view==='morph'&&surface==='teach'){const rm=teachingModule(tr.currentModule,tr.familyId);teachingMode=true;showHub=false;topicOpen=false;level=rm?.id||'harmony';}
-  else if(s&&!s.complete&&document.body.dataset.view==='morph'&&surface==='card'){teachingMode=false;showHub=false;topicOpen=false;}
+  else if(s&&!s.complete&&document.body.dataset.view==='morph'&&(surface==='card'||!surface)){teachingMode=false;showHub=false;topicOpen=false;}
   else if(!exemplarId&&surface==='calc'){calcOpen=true;}
  }
  if(window.FreePractice&&window.FreePractice.isOpen()){

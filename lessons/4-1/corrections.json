@@ -1,0 +1,25 @@
+{
+  "lesson_id": "4-1",
+  "corrections": [
+    {
+      "id": "corr:4-1:exercise:6-1-4",
+      "source_ref": "school-exercises",
+      "source_item_id": "6-1.4",
+      "original": "Ол жазайды. — Он/она/они пишут.",
+      "corrected": "Ол жазады. — Он/она пишет / напишет.",
+      "reason": "Основа жаз заканчивается на согласную; твёрдое слово берёт а, затем третье лицо ды: жаз + а + ды.",
+      "status": "reviewed",
+      "qa_fixture_id": "fixture:4-1:bad-key:6-1-4"
+    },
+    {
+      "id": "corr:4-1:exercise:6-2-3",
+      "source_ref": "school-exercises",
+      "source_item_id": "6-2.3",
+      "original": "Сіз таппайсыздар.",
+      "corrected": "Сіз таппайсыз.",
+      "reason": "-сыздар относится к сіздер. При местоимении сіз окончание -сыз.",
+      "status": "reviewed",
+      "qa_fixture_id": "fixture:4-1:bad-key:6-2-3"
+    }
+  ]
+}

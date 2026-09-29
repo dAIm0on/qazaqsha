@@ -13,7 +13,7 @@ function create(api){
  }
  function currentId(){
   const Bank=window.ExplainBankUI;
-  const list=Bank?Bank.COURSE:[];
+  const list=window.LessonRegistry?window.LessonRegistry.course():(Bank?Bank.COURSE:[]);
   if(api.currentCourse){
    const id=api.currentCourse();
    if(id&&list.some(c=>c.id===id))return id;
@@ -29,7 +29,7 @@ function create(api){
  let picked='';
  function render(){
   const Bank=window.ExplainBankUI;
-  const list=Bank?Bank.COURSE:[];
+  const list=window.LessonRegistry?window.LessonRegistry.course():(Bank?Bank.COURSE:[]);
   const id=currentId();
   const cur=list.find(c=>c.id===id)||list[0];
   const G=window.GrammarPath;
@@ -45,13 +45,13 @@ function create(api){
   const prog=p.n?('Глава '+(Math.min(chPos+1,p.n))+' из '+p.n):'';
   const ruleId=cur&&cur.rules&&cur.rules[0];
   const ruleCard=ruleId&&window.ExplainBank&&window.ExplainBank.byId?window.ExplainBank.byId(ruleId):null;
-  const ruleBlock=ruleId&&window.ExplainOpen?'<div class="panel"><h2>Правило этого урока</h2><p>'+esc(ruleCard&&ruleCard.title||'')+'</p>'+window.ExplainOpen.openButton(ruleId)+'</div>':'';
+  const ruleBlock=ruleCard&&window.ExplainOpen?'<div class="panel"><h2>Правило этого урока</h2><p>'+esc(ruleCard.title||'')+'</p>'+window.ExplainOpen.openButton(ruleId)+'</div>':'';
   const lessonWords=(window.CURRICULUM&&window.CURRICULUM.words||[]).filter(w=>w.lesson_first_seen===id);
   const mustWords=lessonWords.filter(w=>w.target_or_context==='target');
   const metWords=lessonWords.filter(w=>w.target_or_context!=='target');
   const wordLine=list=>list.length?'<p lang="kk">'+list.map(w=>esc(w.kazakh)).join(' · ')+'</p>':'<p class="small">В этом уроке таких слов нет.</p>';
   const wordBlock=lessonWords.length?'<div class="panel"><h2>Слова этого урока</h2><p class="small">Те же слова словаря. Нового списка нет.</p><h3>Задано выучить</h3>'+wordLine(mustWords)+'<h3>Встречается в объяснении</h3>'+wordLine(metWords)+'</div>':'';
-  const subjects=[['','Этот урок'],['numbers','Числа'],['plural','Окончания'],['vocab','Слова'],['person','Лица'],['phrase','Фразы']];
+  const subjects=[['','Этот урок'],['numbers','Числа'],['plural','Окончания'],['vocab','Слова'],['person','Лица'],['verbs','Глаголы'],['phrase','Фразы']];
   $('#learn-content').innerHTML=
    '<article class="panel learn-now">'+
     '<p class="eyebrow">ТЕКУЩИЙ УРОК</p>'+
@@ -108,7 +108,7 @@ function create(api){
   return all.filter(l=>l&&(l.courseLesson===lessonId||l.courseLesson==='bank'));
  }
  function tracksMarkup(lessonId){
-  const TOPIC={sounds:'Звуки',vocab:'Слова',numbers:'Числа',plural:'Окончания',person:'Лица',rules:'Правила',phrase:'Фразы',possessive:'Притяжательность'};
+  const TOPIC={sounds:'Звуки',vocab:'Слова',numbers:'Числа',plural:'Окончания',person:'Лица',verbs:'Глаголы',rules:'Правила',phrase:'Фразы',possessive:'Притяжательность'};
   const all=window.LEARNING&&window.LEARNING.lessons||[];
   const rows=picked?all.filter(l=>l&&l.topic===picked):tracksFor(lessonId);
   const heading=picked?(TOPIC[picked]||'Ступени'):'Ступени этого урока';

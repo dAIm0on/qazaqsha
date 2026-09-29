@@ -125,6 +125,10 @@
    return orderedWords((questions||[]).filter(q=>lemmas.has(vocabLemma(q))));
  }
  function buildPack(lessonId,questions,course,opts={}){
+   if(!node&&root.LessonV2Runtime&&root.LessonV2Runtime.homework){
+     const v2=root.LessonV2Runtime.homework(lessonId);
+     if(v2)return v2;
+   }
    if(lessonId==='3-3'&&lesson33Homework){
      const spec=lesson33Homework.build({events:opts.events||[]});
      const qById=new Map((questions||[]).map(q=>[q.id,q]));
@@ -182,7 +186,8 @@
    };
  }
  function packs(questions,course,opts={}){
-   return ['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'].map(id=>buildPack(id,questions,course,opts)).filter(p=>p.homework.exercise_ids.length||p.homework.word_ids.length);
+   const ids=!node&&root.LessonRegistry&&root.LessonRegistry.ids?root.LessonRegistry.ids():['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
+   return ids.map(id=>buildPack(id,questions,course,opts)).filter(p=>p&&p.homework&&(p.homework.exercise_ids.length||p.homework.word_ids.length));
  }
  function validateHomework(raw,knownIds){
    return schema.validateHomework(raw,knownIds);
@@ -302,6 +307,8 @@
      checklist:attempt.checklist,
      external_test_url:pack.homework.external_test_url,
      external_test_done:!!attempt.checklist.external_test,
+     content_revision:pack.content_revision||null,
+     source_items:(pack.homework.source_items||[]).map(x=>({id:x.id,number:x.number,text:x.text,source_ref:x.source_ref})),
      items:(attempt.items||[]).filter(i=>i.id).map(i=>({id:i.id,answers:i.answers,status:i.status,correct:!!i.correct,rule_peek:!!i.rule_peek,answer_peek:!!i.answer_peek})),
      weak_tags:(attempt.weak_tags||[])
    };
@@ -313,17 +320,21 @@
    const check=attempt.checklist||{};
    const rows=(attempt.items||[]).map((it,i)=>{
      const q=byId.get(it.id);
-     const task=q?(q.title||'')+' · '+(q.stimulus||''):it.id;
-     return '<tr><td>'+(i+1)+'</td><td>'+esc(task)+'</td><td lang="kk">'+esc((it.answers||[]).join(' / '))+'</td><td>'+esc(it.status)+'</td></tr>';
+     const task=q?((q.prompt_original||q.title||'')+(q.stimulus?' · '+q.stimulus:'')):it.id;
+     const source=q&&q.source_item?q.source_item:String(i+1);
+     return '<tr><td>'+esc(source)+'</td><td>'+esc(task)+'</td><td lang="kk">'+esc((it.answers||[]).join(' / '))+'</td><td>'+esc(it.status)+'</td></tr>';
    }).join('');
+   const sourceItems=(pack.homework.source_items||[]).map(x=>'<li><strong>'+esc(x.number)+'.</strong> '+esc(x.text)+'</li>').join('');
    const missed=(attempt.items||[]).filter(it=>it.status==='ошибка'||it.status==='пропуск');
    const weak=(attempt.weak_tags||[]).map(t=>esc(t)).join(', ')||'нет';
    return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Домашка ${esc(pack.lesson_id)} · ${stamp}</title>
-<style>body{font:16px/1.45 Georgia,serif;color:#111;background:#fff;margin:16px}h1,h2{font-weight:700}table{border-collapse:collapse;width:100%}th,td{border:1px solid #333;padding:6px 8px;vertical-align:top}th{text-align:left}@media print{body{margin:12mm;color:#000;background:#fff}a{color:#000;text-decoration:none}nav,.no-print{display:none!important}}</style></head>
-<body><h1>Домашка ${esc(pack.homework.title)} · ${stamp}</h1>
+<style>@page{size:A4;margin:12mm}body{font:15px/1.45 Georgia,serif;color:#111;background:#fff;margin:16px}h1,h2{font-weight:700}table{border-collapse:collapse;width:100%;table-layout:fixed}th,td{border:1px solid #333;padding:6px 8px;vertical-align:top;overflow-wrap:anywhere}th{text-align:left}tr{break-inside:avoid}@media print{body{margin:0;color:#000;background:#fff}a{color:#000;text-decoration:none}nav,.no-print{display:none!important}}</style></head>
+<body><h1>Qazaqsha · ${esc(pack.homework.title)} · ${stamp}</h1>
+<p>Версия материала: ${esc(pack.content_revision||'legacy')}.</p>
+${sourceItems?'<h2>Исходная домашняя работа</h2><ol>'+sourceItems+'</ol>':''}
 <p>Чеклист: методичка ${check.method?'да':'нет'} · упражнения ${check.exercises?'да':'нет'} · слова ${check.words?'да':'нет'} · тест сайта ${check.external_test?'отмечен':'не отмечен'}</p>
 <p>Тест сайта: ${pack.homework.external_test_url?esc(pack.homework.external_test_url):'ссылка не найдена в PDF'}. Результат сайта здесь не проверяется.</p>
-<table><thead><tr><th>№</th><th>Задание</th><th>Мой ответ</th><th>Статус</th></tr></thead><tbody>${rows}</tbody></table>
+<table><thead><tr><th style="width:16%">Источник</th><th style="width:42%">Задание</th><th style="width:27%">Мой ответ</th><th style="width:15%">Статус</th></tr></thead><tbody>${rows}</tbody></table>
 <h2>Не сошлось</h2><p>${missed.length?missed.map(it=>esc(it.id)+' — '+esc((it.answers||[]).join(' / '))).join('; '):'нет'}</p>
 <p>Слабые места этого листа: ${weak}</p>
 </body></html>`;

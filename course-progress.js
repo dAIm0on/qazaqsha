@@ -8,9 +8,13 @@
  const statuses=new Set(['not_started','in_progress','completed']);
  const surfaces=new Set(['path','practice']);
  const studyModes=new Set(['course','phrase','lesson','transfer','remediation']);
- function courseIds(){return (Bank&&Array.isArray(Bank.COURSE)?Bank.COURSE:[]).map(row=>row&&row.id).filter(Boolean);}
+ function courseIds(){
+   const registry=!node&&root.LessonRegistry;
+   if(registry&&typeof registry.ids==='function')return registry.ids();
+   return (Bank&&Array.isArray(Bank.COURSE)?Bank.COURSE:[]).map(row=>row&&row.id).filter(Boolean);
+ }
  function validId(id){return courseIds().includes(id);}
- function emptyPath(){return {chapterId:null,beat:0,phase:'hub',pathDraft:null,canonShownFor:null,updatedAt:0};}
+ function emptyPath(){return {chapterId:null,beat:0,phase:'hub',contentRevision:null,pathDraft:null,canonShownFor:null,updatedAt:0};}
  function emptyLesson(){return {status:'not_started',path:emptyPath(),practiceSession:null,startedAt:null,completedAt:null,lastAttemptAt:null,updatedAt:0};}
  function empty(){const lessons=Object.create(null);for(const id of courseIds())lessons[id]=emptyLesson();return {lessons,resumePointer:{lessonId:null,surface:null,updatedAt:0}};}
  function normalizePath(raw){
@@ -18,6 +22,7 @@
    out.chapterId=typeof raw.chapterId==='string'?raw.chapterId.slice(0,100):null;
    out.beat=Math.max(0,Math.floor(Number(raw.beat)||0));
    out.phase=['lesson','beat','done','hub'].includes(raw.phase)?raw.phase:'hub';
+   out.contentRevision=typeof raw.contentRevision==='string'?raw.contentRevision.slice(0,80):null;
    if(obj(raw.pathDraft)&&typeof raw.pathDraft.value==='string')out.pathDraft={
      lessonId:typeof raw.pathDraft.lessonId==='string'?raw.pathDraft.lessonId.slice(0,20):null,
      chapterId:typeof raw.pathDraft.chapterId==='string'?raw.pathDraft.chapterId.slice(0,100):null,
@@ -31,7 +36,7 @@
  function normalizePractice(raw){
    if(!obj(raw)||!Array.isArray(raw.queue)||!Number.isInteger(raw.position)||raw.position<0||raw.position>raw.queue.length||typeof raw.mode!=='string')return null;
    const out={};
-   const scalar=['topic','mode','sourceFilter','courseBlock','position','answered','view','activeLesson','activeStep','hinted','elapsed_ms','queueEpoch','presented','sessionAttempts','sessionCorrect','sessionAssisted','remediation','updatedAt'];
+   const scalar=['topic','mode','sourceFilter','courseBlock','contentRevision','position','answered','view','activeLesson','activeStep','hinted','elapsed_ms','queueEpoch','presented','sessionAttempts','sessionCorrect','sessionAssisted','remediation','updatedAt'];
    const arrays=['queue','practiceIds'];
    const objects=['stepEvidence','variants','draft'];
    for(const k of scalar)if(raw[k]!==undefined)out[k]=copy(raw[k]);
@@ -68,7 +73,11 @@
    if(!validId(lessonId))return null;
    const stageId=cleanToken(raw.stageId,80);
    if(!/^[a-z0-9][a-z0-9_-]{0,79}$/.test(stageId))return null;
-   if(raw.contentRevision!==STAGE_REVISION)return null;
+   const revision=cleanToken(raw.contentRevision||STAGE_REVISION,80);
+   const revisionPrefix=lessonId+'.r';
+   const revisionNumber=revision.startsWith(revisionPrefix)?revision.slice(revisionPrefix.length):'';
+   const v2Revision=/^[1-9][0-9]*$/.test(revisionNumber);
+   if(!revision||(revision!==STAGE_REVISION&&!v2Revision))return null;
    const coreIds=idList(raw.coreIds,24);
    if(!coreIds.length)return null;
    const kind=STAGE_KINDS.has(raw.kind)?raw.kind:'learning';
@@ -77,7 +86,7 @@
    const ratio=Number(raw.minIndependentRatio);
    return {
      lessonId,
-     contentRevision:STAGE_REVISION,
+     contentRevision:revision,
      stageId,
      kind,
      coreIds,
