@@ -3,11 +3,11 @@
 BRANCH: `feature/lesson-package-v2-4-1-20260929`
 PR: `#19`
 BASE: `main`
-HEAD: `8bb2ba332015bd09f2ba5d72cef9c88c5b053771`
-PREVIEW: `https://bd41e056.qazaqsha.pages.dev/`
+HEAD: взять текущий `git rev-parse HEAD` ветки / PR #19 перед проверкой
+PREVIEW: взять immutable Preview URL из Cloudflare Pages check именно для этого HEAD
 BRANCH_PREVIEW: `https://feature-lesson-package-v2-4.qazaqsha.pages.dev/`
-CI: `Verify Qazaqsha #7` — PASS
-CLOUDFLARE: Deploy successful
+CI: перед black-box QA должен быть PASS на том же HEAD
+CLOUDFLARE: deploy должен быть SUCCESS на том же HEAD
 MERGE: ЗАПРЕЩЁН без отдельной фразы пользователя.
 
 ## Grok Build — сначала локальная проверка
@@ -46,7 +46,7 @@ git diff --exit-code -- compiled-lessons-v2.js
 
 ## Grok Build — preview
 
-Preview уже создан Cloudflare Pages и привязан к HEAD выше. Не создавать новый preview без причины. Сначала проверить именно `https://bd41e056.qazaqsha.pages.dev/` и доказать, что BUILD_IDENTITY совпадает с HEAD.
+Cloudflare Pages автоматически создаёт preview на каждый HEAD. Не использовать URL от предыдущего коммита. Сначала получить текущий HEAD PR #19, затем открыть Cloudflare check этого же SHA и взять его immutable Preview URL; branch preview можно использовать только как дополнительную ссылку.
 
 Сообщить строго:
 
