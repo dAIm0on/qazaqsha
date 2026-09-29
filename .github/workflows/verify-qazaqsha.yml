@@ -1,0 +1,48 @@
+name: Verify Qazaqsha
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Environment
+        run: |
+          node --version
+          python3 --version
+          git status --short
+
+      - name: Compile Lesson Package v2
+        run: |
+          set -euo pipefail
+          node tools/compile-lessons.cjs
+          git diff --exit-code -- compiled-lessons-v2.js
+
+      - name: Run all verification scripts
+        run: |
+          set -euo pipefail
+          count=0
+          for f in verify*.cjs; do
+            [ -f "$f" ] || continue
+            echo "::group::$f"
+            node "$f"
+            echo "::endgroup::"
+            count=$((count+1))
+          done
+          test "$count" -gt 0
+          echo "Ran $count verification scripts"
+
+      - name: Ensure worktree stayed clean
+        run: |
+          git status --short
+          test -z "$(git status --short)"
