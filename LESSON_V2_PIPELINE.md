@@ -10,7 +10,7 @@ Runtime знает только универсальный Lesson Package v2. С
 
 - `draft` — доступен на localhost/preview, запрещён на production.
 - `reviewed` — контент проверен, но всё ещё запрещён на production.
-- `released` — разрешён на `qazaqsha.pages.dev`.
+- `released` — разрешён на `qazaqsha.pages.dev` только вместе с `release.approved=true`, SHA40 preview HEAD и HTTPS preview URL.
 
 Production-gate встроен одновременно в `lesson-v2-runtime.js` и `lesson-registry.js`.
 
@@ -155,7 +155,13 @@ git diff --exit-code -- compiled-lessons-v2.js
 - Service Worker/offline retest PASS либо явно BLOCKED с причиной
 - известные ошибки источника не проходят как gold
 
-Только после этого статус урока меняется на `released`.
+Только после этого:
+1. записать фактический preview HEAD в `release.preview_head`;
+2. записать фактический preview URL в `release.preview_url`;
+3. поставить `release.approved=true` и дату/примечание;
+4. только затем поменять `status` на `released`.
+
+Одного ручного `status: released` недостаточно: schema и production runtime блокируют пакет без release metadata.
 
 ## Правило для AI-исполнителя
 
