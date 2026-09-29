@@ -1,7 +1,7 @@
 /* Installs compiled v2 lesson data into existing Qazaqsha registries. No lesson-specific branches. */
 (function(root){
  'use strict';
- const schema=root.LessonV2Schema,engine=root.NonpastEngine;
+ const schema=root.LessonV2Schema;
  const installed=new Map();
  function questionCopy(q,lessonId){
    return Object.assign({},q,{lessonId,kind:'fields',source:q.source||('v2-'+lessonId),group:q.group||q.id,part:q.part||'1',ruleIds:(q.ruleIds||q.rule_ids||[]).slice(),associationKeys:(q.associationKeys||[]).slice()});
@@ -86,9 +86,6 @@
    for(const s of p.sources)if(s.url)course.sources['v2-'+p.lesson_id+'-'+s.id]={title:s.title,url:s.url,additional:s.role!=='SCHOOL_NORM'};
    for(const r of p.rules)if(!catalog.rules.some(x=>x.id===r.id))catalog.rules.push({id:r.id,title:r.title,lesson_first_seen:p.lesson_id});
    addVocabQuestions(p,course,catalog);
-   for(const g of p.practice_generators||[]){
-     for(const q of engine.expand(p.lesson_id,g))addQuestion(course,catalog,q);
-   }
    for(const q of [...p.original_exercises,...p.generated_questions])addQuestion(course,catalog,q);
    if(!catalog.lessons.some(x=>x.id===p.lesson_id))catalog.lessons.push({id:p.lesson_id,title:p.title,active:true,status:p.status,depends_on:p.prerequisites.lessons.slice(),rules:p.rules.map(r=>r.id),sources:p.sources.filter(s=>s.url).map(s=>s.url)});
    const gLesson=pathLesson(p);if(!chapters.LESSONS.some(x=>x.id===p.lesson_id))chapters.LESSONS.push(gLesson);
