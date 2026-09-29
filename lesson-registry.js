@@ -6,9 +6,10 @@
    const b=node?null:root.ExplainBankUI;
    return b&&Array.isArray(b.COURSE)?b.COURSE.map(x=>Object.assign({kind:'legacy'},x)):[];
  }
+ function productionHost(){return !node&&root.location&&root.location.hostname==='qazaqsha.pages.dev';}
  function v2Rows(){
    const rows=node?[]:(root.LESSON_V2_COMPILED||[]);
-   return rows.map(x=>({id:x.lesson_id,label:x.label||x.lesson_id.replace('-','–'),name:x.name||x.title,rules:(x.rules||[]).map(r=>r.id),kind:'v2',content_revision:x.content_revision,status:x.status||'draft'}));
+   return rows.filter(x=>!productionHost()||x.status==='released').map(x=>({id:x.lesson_id,label:x.label||x.lesson_id.replace('-','–'),name:x.name||x.title,rules:(x.rules||[]).map(r=>r.id),kind:'v2',content_revision:x.content_revision,status:x.status||'draft'}));
  }
  function course(){
    const map=new Map();
