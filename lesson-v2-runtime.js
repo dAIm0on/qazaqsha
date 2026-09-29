@@ -34,7 +34,7 @@
      for(const c of t.contrastExamples||[])beats.push({k:'trap',bad:c.bad,good:c.good,why:c.why});
      for(const note of t.limitations||[])beats.push({k:'fold',t:'Граница урока',b:note});
      for(const check of t.checks||[])beats.push({k:'ask',id:check.id,type:check.type,prompt:check.prompt,answer:check.answers[0],answers:check.answers,error_key:check.error_key,rule_line:check.rule_line||t.shortHint});
-     return {id:p.lesson_id+'-v2-'+String(i+1).padStart(2,'0'),title:t.title,rule_ids:[t.rule_id],beats};
+     return {id:p.lesson_id+'-v2-'+String(i+1).padStart(2,'0'),title:t.title,rule_ids:[t.rule_id],fullExplanation:t.fullExplanation,source_refs:(t.source_refs||[]).slice(),beats};
    });
    return {id:p.lesson_id,title:p.name||p.title,chapters};
  }
