@@ -99,6 +99,31 @@
  }
  function installAll(){const out=[];for(const raw of root.LESSON_V2_COMPILED||[]){const p=installOne(raw);if(p)out.push(p);}return out;}
  function byId(id){return installed.get(id)||null;}
+ function migrationChain(lessonId,fromRevision){
+   const p=byId(lessonId);if(!p)return null;
+   if(!fromRevision||fromRevision===p.content_revision)return [];
+   const byFrom=new Map((p.migrations||[]).map(m=>[m.from_revision,m]));
+   const chain=[],seen=new Set();let rev=fromRevision;
+   while(rev!==p.content_revision){
+     if(seen.has(rev)||chain.length>=20)return null;
+     seen.add(rev);const m=byFrom.get(rev);if(!m)return null;
+     chain.push(m);rev=m.to_revision;
+   }
+   return chain;
+ }
+ function migrateId(lessonId,fromRevision,kind,value){
+   if(!['question_ids','chapter_ids','stage_ids','vocab_ids'].includes(kind))return null;
+   const chain=migrationChain(lessonId,fromRevision);if(chain===null)return null;
+   let v=value;
+   for(const m of chain){
+     if(kind==='question_ids'&&(m.drop_question_ids||[]).includes(v))return null;
+     v=(m[kind]&&m[kind][v])||v;
+   }
+   return v;
+ }
+ function migrateIds(lessonId,fromRevision,kind,values){
+   const out=[];for(const value of values||[]){const v=migrateId(lessonId,fromRevision,kind,value);if(!v)return null;if(!out.includes(v))out.push(v);}return out;
+ }
  function isV2(id){return installed.has(id)||(root.LessonRegistry&&root.LessonRegistry.isV2(id));}
  function homework(id){const p=byId(id);if(!p)return null;const h=p.homework,ext=h.external_tasks||[];return {lesson_id:id,content_revision:p.content_revision,homework:{title:h.title,word_ids:h.word_ids.slice(),exercise_ids:h.exercise_ids.slice(),word_question_ids:root.COURSE.questions.filter(q=>q.lessonId===id&&q.topic==='vocab'&&q.wordRole==='must').map(q=>q.id),rule_map:Object.fromEntries(h.exercise_ids.map(qid=>{const q=root.COURSE.questions.find(q=>q.id===qid);return [qid,(q&&q.ruleIds&&q.ruleIds[0])||''];}).filter(x=>x[1])),external_test_url:ext[0]&&ext[0].url||'',external_tests:ext.map(x=>x.url),checklist:h.checklist.slice(),extras:[],method_title:(p.sources.find(s=>s.id==='school-method')||{}).title||('Методичка '+id),method_url:(p.sources.find(s=>s.id==='school-method')||{}).url||'',source_items:h.source_items.slice()}};}
  function practiceForRule(lessonId,ruleId,limit=12){
@@ -124,7 +149,7 @@
    }
    return picked;
  }
- const api={installAll,installOne,byId,isV2,homework,practiceForRule,installed,stagePlans,pathLesson};
+ const api={installAll,installOne,byId,isV2,homework,practiceForRule,migrationChain,migrateId,migrateIds,installed,stagePlans,pathLesson};
  root.LessonV2Runtime=api;
  installAll();
 })(typeof window!=='undefined'?window:globalThis);
