@@ -47,11 +47,20 @@
  function addVocabQuestions(p,course,catalog){
    for(const v of p.vocabulary||[]){
      const w=catalog.addWord(v.lemma,v.translations,p.lesson_id,v.role);
+     const forms=(v.forms&&v.forms.length?v.forms:[v.lemma]).slice();
+     w.aliases=w.aliases||[];
+     for(const form of forms)if(!w.aliases.includes(form))w.aliases.push(form);
      const base='v2-'+p.lesson_id+'-vocab-'+String(v.id).split(':').at(-1);
-     const rows=[
-       {id:base+'-ru',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на русский',stimulus:v.lemma,fields:[{label:'Ответ',kind:'text',answers:v.translations}],explanation:v.lemma+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]},
-       {id:base+'-kk',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на казахский',stimulus:v.translations[0],fields:[{label:'Ответ',kind:'text',answers:[v.lemma]}],explanation:v.lemma+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]}
-     ];
+     const rows=[];
+     if(forms.length===1){
+       rows.push(
+         {id:base+'-ru',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на русский',stimulus:forms[0],fields:[{label:'Ответ',kind:'text',answers:v.translations}],explanation:forms[0]+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]},
+         {id:base+'-kk',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на казахский',stimulus:v.translations[0],fields:[{label:'Ответ',kind:'text',answers:[forms[0]]}],explanation:forms[0]+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]}
+       );
+     }else{
+       forms.forEach((form,i)=>rows.push({id:base+'-ru-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:'Узнай форму',stimulus:form,fields:[{label:'Перевод',kind:'text',answers:v.translations}],explanation:form+' — '+v.translations.join(' / ')+'. Формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]}));
+       rows.push({id:base+'-kk-set',origin:'generated',topic:'vocab',kind:'fields',title:'Напиши все формы',stimulus:v.translations[0],fields:[{label:'Все формы через пробел или /',kind:'set-text',answers:forms}],explanation:forms.join(' / ')+' — '+v.translations.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]});
+     }
      for(const q of rows){addQuestion(course,catalog,q);if(!w.card_ids.includes(q.id))w.card_ids.push(q.id);}
    }
  }
