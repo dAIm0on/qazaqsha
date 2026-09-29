@@ -120,6 +120,8 @@ ok('targeted 4-1 error diagnostics');
 
 const normalizedPractice=CourseProgress.normalizePractice({mode:'course',queue:['x'],position:0,contentRevision:'4-1.r9'});
 assert.equal(normalizedPractice.contentRevision,'4-1.r9');
+const normalizedPath=CourseProgress.normalizePath({chapterId:'v2-theory-4-1-negative',beat:3,phase:'beat',contentRevision:'4-1.r9'});
+assert.equal(normalizedPath.contentRevision,'4-1.r9');
 const ctx={lessonId:'3-3',contentRevision:'fixture.r2',stageId:'fixture-stage',kind:'checkpoint',coreIds:['x'],requiredIndependentIds:['x'],ruleIds:[],final:true};
 const stale=[{type:'answer',lesson_id:'3-3',stage_id:'fixture-stage',content_revision:'fixture.r1',card_id:'x',correct:true,first_try_correct:1}];
 assert.equal(CourseProgress.evaluateStage(stale,ctx).pass,false);
@@ -143,12 +145,46 @@ assert.equal(mock.COURSE.questions.filter(q=>q.origin==='school').length,71);
 assert.equal(mock.COURSE.questions.filter(q=>q.origin==='research').length,23);
 assert.equal(mock.COURSE.questions.filter(q=>q.topic==='vocab').length,23);
 assert.equal(mock.GRAMMAR_CHAPTERS.LESSONS.find(x=>x.id==='4-1').chapters.length,p.theory.length);
+const chapterIds=mock.GRAMMAR_CHAPTERS.LESSONS.find(x=>x.id==='4-1').chapters.map(x=>x.id);
+assert.ok(chapterIds.includes('v2-theory-4-1-meaning'));
+assert.ok(chapterIds.includes('v2-theory-4-1-negative'));
+assert.equal(chapterIds.some(x=>/-v2-0\d$/.test(x)),false);
 assert.ok(mock.GRAMMAR_CHAPTERS.LESSONS.find(x=>x.id==='4-1').chapters.every(x=>x.fullExplanation.length>=80));
 const extra=mock.LessonV2Runtime.practiceForRule('4-1','v2:4-1:negative',12);
 assert.equal(extra.length,12);
 assert.equal(new Set(extra).size,12);
 assert.equal(mock.COURSE.questions.length,439);
 ok('data-only runtime auto-registers theory, 439 questions, vocabulary and varied optional practice');
+
+const migratedPackage=JSON.parse(JSON.stringify(expectedCompiled));
+migratedPackage.migrations=[{
+  from_revision:'4-1.r0',to_revision:'4-1.r1',
+  question_ids:{'old-question':'gold:4-1:negative-01'},
+  chapter_ids:{'old-chapter':'v2-theory-4-1-negative'},
+  stage_ids:{},vocab_ids:{},drop_question_ids:['old-dropped']
+}];
+const migMock={
+  LessonV2Schema:Schema,LESSON_V2_COMPILED:[migratedPackage],
+  COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
+  CURRICULUM:{words:[],rules:[],lessons:[],addWord(kazakh,translation,lesson,role){let w=this.words.find(x=>x.kazakh===kazakh);if(!w){w={id:'word:'+kazakh,kazakh,translation:[...translation],lesson_first_seen:lesson,target_or_context:role==='target'?'target':'context',card_ids:[],aliases:[kazakh]};this.words.push(w);}return w;}},
+  CourseProgress:{registerStages(){return [];}},Canonical:null
+};
+vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8'),{window:migMock,globalThis:migMock,console});
+assert.equal(migMock.LessonV2Runtime.migrateId('4-1','4-1.r0','question_ids','old-question'),'gold:4-1:negative-01');
+assert.equal(migMock.LessonV2Runtime.migrateId('4-1','4-1.r0','chapter_ids','old-chapter'),'v2-theory-4-1-negative');
+assert.equal(migMock.LessonV2Runtime.migrateId('4-1','4-1.r0','question_ids','old-dropped'),null);
+ok('explicit migration map moves only declared stable IDs');
+
+const prodMock={
+  location:{hostname:'qazaqsha.pages.dev'},LessonV2Schema:Schema,LESSON_V2_COMPILED:[expectedCompiled],
+  COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
+  CURRICULUM:{words:[],rules:[],lessons:[],addWord(){throw Error('draft lesson must not install on production');}},
+  CourseProgress:{registerStages(){throw Error('draft lesson must not register stages');}},Canonical:null
+};
+vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8'),{window:prodMock,globalThis:prodMock,console});
+assert.equal(prodMock.LessonV2Runtime.installed.size,0);
+assert.equal(prodMock.COURSE.questions.length,0);
+ok('draft/reviewed v2 lesson is physically blocked on production');
 
 const indexText=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
 const swText=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
