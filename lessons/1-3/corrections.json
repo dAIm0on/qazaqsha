@@ -1,0 +1,35 @@
+{
+  "lesson_id": "1-3",
+  "corrections": [
+    {
+      "id": "corr:1-3:method:6-4",
+      "source_ref": "school-method",
+      "source_item_id": "6.4",
+      "original": "75 950 – Жетпіс бес тоғыз жүз елу",
+      "corrected": "75 950 — жетпіс бес мың тоғыз жүз елу",
+      "reason": "В ключе методички, пункт 6.4, пропущен разряд мың. Та же методичка собирает тысячи через мың. Без мың это не 75 950. Печатный PDF не менялся.",
+      "status": "reviewed",
+      "qa_fixture_id": "fixture:1-3:bad-key:6-4"
+    },
+    {
+      "id": "corr:1-3:wb:5-1-2",
+      "source_ref": "school-exercises",
+      "source_item_id": "5-1.2",
+      "original": "Көп адамдар – Көп адамдар – Много людей",
+      "corrected": "Көп адам — Много людей",
+      "reason": "Ключ сборника повторяет форму с окончанием. Методичка: после көп множественное не ставится. Көп адам, не көп адамдар.",
+      "status": "reviewed",
+      "qa_fixture_id": "fixture:1-3:bad-key:5-1-2"
+    },
+    {
+      "id": "corr:1-3:wb:5-2-3",
+      "source_ref": "school-exercises",
+      "source_item_id": "5-2.3",
+      "original": "Тоқсан көшелер – Тоқсан көшелер – Девяносто улиц",
+      "corrected": "Тоқсан көше — Девяносто улиц",
+      "reason": "Ключ сборника повторяет форму с окончанием. После числительного тоқсан основа голая: тоқсан көше.",
+      "status": "reviewed",
+      "qa_fixture_id": "fixture:1-3:bad-key:5-2-3"
+    }
+  ]
+}

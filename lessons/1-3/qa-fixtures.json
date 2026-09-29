@@ -1,0 +1,23 @@
+{
+  "lesson_id": "1-3",
+  "known_bad": [
+    {
+      "id": "fixture:1-3:bad-key:6-4",
+      "input": "жетпіс бес тоғыз жүз елу",
+      "must_reject_as_gold": true,
+      "expected": "жетпіс бес мың тоғыз жүз елу"
+    },
+    {
+      "id": "fixture:1-3:bad-key:5-1-2",
+      "input": "көп адамдар",
+      "must_reject_as_gold": true,
+      "expected": "көп адам"
+    },
+    {
+      "id": "fixture:1-3:bad-key:5-2-3",
+      "input": "тоқсан көшелер",
+      "must_reject_as_gold": true,
+      "expected": "тоқсан көше"
+    }
+  ]
+}
