@@ -7,13 +7,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 4–1 · Переходное время",
     "label": "4–1",
     "name": "Переходное время",
-    "status": "draft",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "PR #19 draft; browser QA and legacy local verify not completed."
+      "approved": true,
+      "preview_head": "780dea6bdd5c9d6514f1ab903db328cfcc058ae8",
+      "preview_url": "https://4ad0a239.qazaqsha.pages.dev/",
+      "approved_at": "2026-09-29T23:46:19+05:00",
+      "note": "PR #19 black-box QA FINAL PASS on validated QA HEAD 780dea6bdd5c9d6514f1ab903db328cfcc058ae8; preview https://4ad0a239.qazaqsha.pages.dev/"
     },
     "sources": [
       {

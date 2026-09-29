@@ -175,8 +175,11 @@ assert.equal(migMock.LessonV2Runtime.migrateId('4-1','4-1.r0','chapter_ids','old
 assert.equal(migMock.LessonV2Runtime.migrateId('4-1','4-1.r0','question_ids','old-dropped'),null);
 ok('explicit migration map moves only declared stable IDs');
 
+const blockedOnProduction=JSON.parse(JSON.stringify(expectedCompiled));
+blockedOnProduction.status='draft';
+blockedOnProduction.release={approved:false,preview_head:'',preview_url:'',approved_at:'',note:''};
 const prodMock={
-  location:{hostname:'qazaqsha.pages.dev'},LessonV2Schema:Schema,LESSON_V2_COMPILED:[expectedCompiled],
+  location:{hostname:'qazaqsha.pages.dev'},LessonV2Schema:Schema,LESSON_V2_COMPILED:[blockedOnProduction],
   COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
   CURRICULUM:{words:[],rules:[],lessons:[],addWord(){throw Error('draft lesson must not install on production');}},
   CourseProgress:{registerStages(){throw Error('draft lesson must not register stages');}},Canonical:null
@@ -185,6 +188,21 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'
 assert.equal(prodMock.LessonV2Runtime.installed.size,0);
 assert.equal(prodMock.COURSE.questions.length,0);
 ok('draft/reviewed v2 lesson is physically blocked on production');
+const releasedMock={
+  location:{hostname:'qazaqsha.pages.dev'},LessonV2Schema:Schema,LESSON_V2_COMPILED:[expectedCompiled],
+  COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
+  CURRICULUM:{words:[],rules:[],lessons:[],addWord(kazakh,translation,lesson,role){
+    let w=this.words.find(x=>x.kazakh===kazakh);
+    if(!w){w={id:'word:'+kazakh,kazakh,translation:[...translation],lesson_first_seen:lesson,target_or_context:role==='target'?'target':'context',card_ids:[],aliases:[kazakh]};this.words.push(w);}
+    return w;
+  }},
+  CourseProgress:{registerStages(){return [];}},Canonical:null
+};
+vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8'),{window:releasedMock,globalThis:releasedMock,console});
+assert.equal(releasedMock.LessonV2Runtime.byId('4-1').status,'released');
+assert.equal(releasedMock.LessonV2Runtime.byId('4-1').release.approved,true);
+assert.ok(releasedMock.COURSE.questions.length>0);
+ok('approved released lesson 4-1 installs on production');
 
 const indexText=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
 const swText=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
