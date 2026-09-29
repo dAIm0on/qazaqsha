@@ -14,7 +14,7 @@
    return (Bank&&Array.isArray(Bank.COURSE)?Bank.COURSE:[]).map(row=>row&&row.id).filter(Boolean);
  }
  function validId(id){return courseIds().includes(id);}
- function emptyPath(){return {chapterId:null,beat:0,phase:'hub',pathDraft:null,canonShownFor:null,updatedAt:0};}
+ function emptyPath(){return {chapterId:null,beat:0,phase:'hub',contentRevision:null,pathDraft:null,canonShownFor:null,updatedAt:0};}
  function emptyLesson(){return {status:'not_started',path:emptyPath(),practiceSession:null,startedAt:null,completedAt:null,lastAttemptAt:null,updatedAt:0};}
  function empty(){const lessons=Object.create(null);for(const id of courseIds())lessons[id]=emptyLesson();return {lessons,resumePointer:{lessonId:null,surface:null,updatedAt:0}};}
  function normalizePath(raw){
@@ -22,6 +22,7 @@
    out.chapterId=typeof raw.chapterId==='string'?raw.chapterId.slice(0,100):null;
    out.beat=Math.max(0,Math.floor(Number(raw.beat)||0));
    out.phase=['lesson','beat','done','hub'].includes(raw.phase)?raw.phase:'hub';
+   out.contentRevision=typeof raw.contentRevision==='string'?raw.contentRevision.slice(0,80):null;
    if(obj(raw.pathDraft)&&typeof raw.pathDraft.value==='string')out.pathDraft={
      lessonId:typeof raw.pathDraft.lessonId==='string'?raw.pathDraft.lessonId.slice(0,20):null,
      chapterId:typeof raw.pathDraft.chapterId==='string'?raw.pathDraft.chapterId.slice(0,100):null,
