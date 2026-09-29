@@ -4803,6 +4803,50 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ]
+      },
+      {
+        "id": "v2-1-2-vocab-on-ru",
+        "origin": "school",
+        "topic": "vocab",
+        "kind": "fields",
+        "title": "Переведи на русский",
+        "stimulus": "он",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "10"
+            ]
+          }
+        ],
+        "explanation": "он — 10",
+        "lessonId": "1-2",
+        "source_refs": [
+          "school-homework"
+        ]
+      },
+      {
+        "id": "v2-1-2-vocab-on-kk",
+        "origin": "school",
+        "topic": "vocab",
+        "kind": "fields",
+        "title": "Переведи на казахский",
+        "stimulus": "10",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "он"
+            ]
+          }
+        ],
+        "explanation": "он — 10",
+        "lessonId": "1-2",
+        "source_refs": [
+          "school-homework"
+        ]
       }
     ],
     "practice_generators": [],
