@@ -33,7 +33,7 @@ const lessonTemplate={
     contrastExamples:[],limitations:[],commonConfusions:[],source_refs:['school-method'],
     checks:[{id:'check:'+id+':rule-1',type:'one_prod',prompt:'REPLACE',answers:['REPLACE'],error_key:'rule-1'}]
   }],
-  vocabulary:[],original_exercises:[],generated_questions:[],practice_generators:[],corrections:[],
+  vocabulary:[],original_exercises:[],generated_questions:[],practice_generators:[],corrections:[],migrations:[],
   stages:[{id:'stage:'+id+':final',title:'Финальная проверка',kind:'checkpoint',core_ids:['REPLACE_WITH_3_OR_MORE_QUESTION_IDS'],required_independent_ids:['REPLACE_WITH_REQUIRED_ID'],rule_ids:['v2:'+id+':rule-1'],min_independent_ratio:0.75,max_presentations:16,final:true}],
   homework:{title:'Домашняя работа '+id.replace('-', '–'),source_items:[{id:'hw:'+id+':source:1',number:'1',text:'REPLACE',source_ref:'school-homework'}],word_ids:[],exercise_ids:[],external_tasks:[],checklist:['method','exercises','words']}
 };
