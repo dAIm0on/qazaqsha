@@ -711,8 +711,8 @@
  function renderStats(){
    const pause=$('#pause-session');
    if(pause){
-     pause.hidden=queue.length===0||position>=queue.length;
-     pause.textContent='←';
+     pause.hidden=queue.length===0;
+     pause.textContent='Назад';
      pause.setAttribute('aria-label',mode==='homework'||(mode==='remediation'&&hwReturn)?'Сделать паузу · Домашка':mode==='exam'?'Сделать паузу · Экзамен':'Сделать паузу · Сегодня');
    }
    const scope=subset(), tried=scope.filter(q=>records[q.id]?.attempts>0).length;
@@ -770,6 +770,37 @@
      return `<div class="field-row"><label class="field-label" for="answer-${i}">${esc(f.label)}</label><div class="field-control"><input id="answer-${i}" name="answer-${i}" type="text" lang="kk" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${f.kind==='number-text'?'inputmode="numeric"':''} aria-describedby="correction-${i}"><span class="field-correction" id="correction-${i}"></span></div></div>`;
    }).join('')}</div>`;
  }
+ function studentCopy(s){
+   return String(s||'')
+     .replace(/Ловушка(?![\u0400-\u04FF])/gi,'Не перепутай')
+     .replace(/(^|[\s>«"(\[\n])Запрет(?=[\s:.]|$)/gi,'$1Не так');
+ }
+ function seeText(s){return esc(studentCopy(s));}
+ function namedExercise(s){
+   return /^(ловушка|запрет)(?![\u0400-\u04FF])/i.test(String(s||''));
+ }
+ function faceTitle(s){
+   const t=String(s||'');
+   if(namedExercise(t))return 'Не перепутай';
+   return studentCopy(t);
+ }
+ function hiddenStudentBeat(b){
+   if(!b)return false;
+   if(b.k==='ask'&&b.type==='trap_choice')return true;
+   if(namedExercise(b.prompt))return true;
+   if(b.k==='slots'&&/^ловушка$/i.test(String(b.t||'').trim()))return true;
+   return false;
+ }
+ function visibleBeatIndex(chapter,start,dir){
+   const arr=(chapter&&chapter.beats)||[];
+   let i=start;
+   if(dir<0){
+     while(i>=0&&hiddenStudentBeat(arr[i]))i--;
+     return i;
+   }
+   while(i<arr.length&&hiddenStudentBeat(arr[i]))i++;
+   return i;
+ }
  function render(){
    retrying=false;
    introOpen=false;pauseTimer();elapsedMs=0;checked=false;hinted=false;rulePeeked=false;lastTextInput=null;renderStats();
@@ -788,7 +819,7 @@
    const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
    const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
    const letterBar=letters?`<div class="letter-keyboard" lang="kk" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div>`:'';
-   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(q.title)}</h2>${mode==='review'&&reviewReasonMap[q.id]?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div>${letterBar}</div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
+   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${esc(q.stimulus)}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div>${letterBar}</div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
    const goCard=()=>{if(checked)nextQuestion();else checkAnswer(q);};
    if(window._qazaqEnter)document.removeEventListener('keydown',window._qazaqEnter);
    window._qazaqEnter=e=>{
@@ -1187,9 +1218,19 @@
    if(gp.phase==='done'){
      bindTutor(les,null);
      root.innerHTML=`<div class="panel path-paper">${crumb(les,null)}<h2>Урок разобран</h2><p>${esc(courseRow?courseRow.name:les.title)}</p>
-       <div class="lesson-actions"><button type="button" class="primary-button" id="path-to-practice">Перейти к практике</button>
+       <div class="lesson-actions"><button type="button" class="text-button" id="path-back">Назад</button><button type="button" class="primary-button" id="path-to-practice">Перейти к практике</button>
        <button type="button" class="secondary-button" data-path-learn>К урокам</button></div></div>`;
      bindCrumb();
+     const backDone=$('#path-back');
+     if(backDone)backDone.onclick=()=>{
+       const chapters=les.chapters||[];
+       for(let i=chapters.length-1;i>=0;i--){
+         const prev=chapters[i];
+         const j=visibleBeatIndex(prev,(prev.beats||[]).length-1,-1);
+         if(j>=0){gp.phase='beat';gp.chapterId=prev.id;gp.beat=j;gp.canonShownFor=null;gp.canonVisible=false;save();renderPath();return;}
+       }
+       gp.phase='lesson';gp.chapterId=null;gp.beat=0;save();renderPath();
+     };
      const go=$('#path-to-practice');if(go)go.onclick=()=>startCourse(les.id);
      return;
    }
@@ -1203,7 +1244,7 @@
          const title=Bank?Bank.chapterTitle(c):c.title;
          return `<button type="button" class="secondary-button" data-ch="${c.id}">Глава ${i+1} из ${les.chapters.length} · ${esc(title)}${ok?' ✓':''}</button>`;
        }).join('')}</div>
-       <p><button type="button" class="text-button" data-path-learn>К урокам</button></p></div>`;
+       <p><button type="button" class="text-button" data-path-learn>Назад</button></p></div>`;
      bindCrumb();
      root.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>openChapter(les.id,b.dataset.ch));
      if(window.ExplainOpen)window.ExplainOpen.bind(root);
@@ -1211,7 +1252,35 @@
    }
    const ch=G.chapter(les.id,gp.chapterId);if(!ch){gp.phase='lesson';renderPath();return;}
    const chTitle=Bank?Bank.chapterTitle(ch):ch.title;
-   const beats=ch.beats||[],beat=beats[gp.beat];
+   const beats=ch.beats||[];
+   const bankCard=Bank&&Bank.cardForChapter(ch);
+   const jumped=visibleBeatIndex(ch,gp.beat,1);
+   if(jumped!==gp.beat)gp.beat=jumped;
+   let beat=beats[gp.beat];
+   const stepBack=()=>{
+     captureDraft();
+     const key=les.id+':'+ch.id;
+     if(gp.canonVisible){
+       gp.canonVisible=false;gp.canonShownFor=null;
+     }else if(beat&&gp.canonShownFor===key&&isCanonBeat(beat.k)&&bankCard){
+       gp.canonShownFor=null;save();renderPath();return;
+     }
+     const here=visibleBeatIndex(ch,gp.beat-1,-1);
+     if(here>=0){
+       gp.beat=here;
+       if(bankCard&&isCanonBeat(((ch.beats||[])[here]||{}).k))gp.canonShownFor=null;
+       save();renderPath();return;
+     }
+     const idx=(les.chapters||[]).findIndex(c=>c.id===ch.id);
+     for(let i=idx-1;i>=0;i--){
+       const prev=les.chapters[i];
+       const j=visibleBeatIndex(prev,(prev.beats||[]).length-1,-1);
+       if(j>=0){gp.chapterId=prev.id;gp.beat=j;gp.phase='beat';gp.canonShownFor=null;gp.canonVisible=false;save();renderPath();return;}
+     }
+     gp.phase='lesson';gp.chapterId=null;gp.beat=0;gp.canonShownFor=null;gp.canonVisible=false;save();renderPath();
+   };
+   const nav=(id,label)=>`<div class="lesson-actions"><button type="button" class="text-button" id="path-back">Назад</button><button type="button" class="primary-button" id="${id}">${label}</button></div>`;
+   const bindNav=(id,fn)=>{bindCrumb();const b=$('#path-back');if(b)b.onclick=stepBack;const n=$('#'+id);if(n)n.onclick=fn;};
    if(!beat){
      G.markChapterDone(gp,les.id,ch.id);
      const nxt=(les.chapters||[]).find(c=>c.id!==ch.id&&!(gp.completedChapters&&gp.completedChapters[les.id+':'+c.id]));
@@ -1222,10 +1291,12 @@
        root.innerHTML=`<div class="panel path-paper">${crumb(les,ch)}<p class="eyebrow">БЛОК РАЗОБРАН</p><h2>${esc(chTitle||ch.title)}</h2>
          <p>Можно перейти дальше или потренировать этот шаг ещё. Практика не ставит финальную оценку и её можно запускать повторно.</p>
          <div class="lesson-actions">
+           <button type="button" class="text-button" id="path-back">Назад</button>
            ${practiceIds.length?'<button type="button" class="secondary-button" id="path-more-practice">Практиковаться ещё</button>':''}
            <button type="button" class="primary-button" id="path-next-chapter">${nxt?'Дальше':'К практике урока'}</button>
          </div></div>`;
        bindCrumb();bindTutor(les,ch);
+       const backBlock=$('#path-back');if(backBlock)backBlock.onclick=stepBack;
        const more=$('#path-more-practice');
        if(more)more.onclick=()=>{pathPracticeReturn={lessonId:les.id,chapterId:ch.id};startCustom(shuffled(practiceIds),'review');save();};
        $('#path-next-chapter').onclick=continuePath;
@@ -1234,7 +1305,7 @@
      if(nxt){G.startChapter(state,les.id,nxt.id);save();renderPath();return;}
      gp.phase='done';gp.chapterId=null;save();renderPath();return;
    }
-   const v2Full=(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(les.id)&&ch.fullExplanation)?`<details class="path-full-v2"><summary>Полное объяснение блока</summary><p>${esc(ch.fullExplanation)}</p></details>`:'';
+   const v2Full=(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(les.id)&&ch.fullExplanation)?`<details class="path-full-v2"><summary>Полное объяснение блока</summary><p>${esc(studentCopy(ch.fullExplanation))}</p></details>`:'';
    const head=`${crumb(les,ch)}<p class="small">Урок ${esc(courseRow?courseRow.label:les.id)} · ${esc(courseRow?courseRow.name:les.title)}</p><p class="small">Глава ${les.chapters.findIndex(c=>c.id===ch.id)+1} из ${les.chapters.length} · ${esc(chTitle)}</p>${v2Full}`;
    const nextBeat=()=>{gp.beat++;save();renderPath();};
    const letters=state.prefs.letters;
@@ -1261,93 +1332,95 @@
      if(b.k==='goal')return clip(b.t||'');
      return clip(b.t||b.b||'');
    }
-   const bankCard=Bank&&Bank.cardForChapter(ch);
    const canonKey=les.id+':'+ch.id;
    if(bankCard&&isCanonBeat(beat.k)&&gp.canonShownFor!==canonKey){
      gp.canonShownFor=canonKey;
+     gp.canonVisible=true;
      const paras=Bank.paras;
-     const ru=paras(bankCard.ru_refresh).map(p=>'<p>'+esc(p)+'</p>').join('');
-     const med=paras(bankCard.medium).map(p=>'<p>'+esc(p)+'</p>').join('');
-     const ex=(bankCard.examples||[]).map(x=>'<li lang="kk">'+esc(x)+'</li>').join('');
-     const traps=(bankCard.traps||[]).map(t=>'<li>Не так: <span lang="kk">'+esc(String(t).replace(/^\*/,''))+'</span></li>').join('');
+     const ru=paras(bankCard.ru_refresh).map(p=>'<p>'+seeText(p)+'</p>').join('');
+     const med=paras(bankCard.medium).map(p=>'<p>'+seeText(p)+'</p>').join('');
+     const ex=(bankCard.examples||[]).map(x=>'<li lang="kk">'+seeText(x)+'</li>').join('');
+     const traps=(bankCard.traps||[]).map(t=>'<li>Не так: <span lang="kk">'+seeText(String(t).replace(/^\*/,''))+'</span></li>').join('');
      const rest=beats.find((b,i)=>i>=gp.beat&&!isCanonBeat(b.k));
      const cta=rest&&rest.k==='ask'?'Проверить себя':'Продолжить →';
-     root.innerHTML=`<div class="panel path-paper path-canon">${head}<h2>${esc(bankCard.title)}</h2>
+     root.innerHTML=`<div class="panel path-paper path-canon">${head}<h2>${seeText(faceTitle(bankCard.title))}</h2>
        ${ru?'<section class="path-block path-ru"><h3>Сравни с русским</h3>'+ru+'</section>':''}
        ${med?'<section class="path-block"><h3>Как работает</h3>'+med+'</section>':''}
        ${ex?'<section class="path-block"><h3>Примеры</h3><ul class="path-ex">'+ex+'</ul></section>':''}
        ${traps?'<section class="path-block"><h3>Не перепутай</h3><ul class="path-traps">'+traps+'</ul></section>':''}
        <button type="button" class="secondary-button" id="path-full" data-full-rule="${esc((ch.rule_ids||[])[0]||canonKey)}">Показать полностью</button>
-       <div id="path-full-panel" data-full-panel${(window.ExplainDepth&&window.ExplainDepth.get((ch.rule_ids||[])[0]||canonKey))?'':' hidden'}>${window.ExplainOpen?window.ExplainOpen.fullHtml((ch.rule_ids||[])[0]||''):''}</div>
-       <button type="button" class="primary-button" id="path-next">${cta}</button></div>`;
-     bindCrumb();bindTutor(les,ch);
-     $('#path-next').onclick=()=>{save();renderPath();};
+       <div id="path-full-panel" data-full-panel${(window.ExplainDepth&&window.ExplainDepth.get((ch.rule_ids||[])[0]||canonKey))?'':' hidden'}>${window.ExplainOpen?studentCopy(window.ExplainOpen.fullHtml((ch.rule_ids||[])[0]||'')):''}</div>
+       ${nav('path-next',cta)}</div>`;
+     bindNav('path-next',()=>{gp.canonVisible=false;save();renderPath();});
+     bindTutor(les,ch);
      if(window.ExplainOpen)window.ExplainOpen.bind(root);
      return;
    }
    bindTutor(les,ch);
    if(beat.k==='goal'){
-     root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">ЦЕЛЬ ГЛАВЫ</p><h2>После этой главы</h2><p>${esc(beat.t)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">ЦЕЛЬ ГЛАВЫ</p><h2>После этой главы</h2><p>${seeText(beat.t)}</p>${nav('path-next','Дальше')}</div>`;
+     bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='sound'){
-     root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">КАК ПРИМЕРНО ПОЧУВСТВОВАТЬ</p><h2 lang="kk">${esc(beat.letter)}</h2><p><strong>Русский якорь:</strong> ${esc(beat.anchor)}</p><p>${esc(beat.art)}</p><p lang="kk">${esc(beat.ex)}</p><p class="small">${esc(beat.warn)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">КАК ПРИМЕРНО ПОЧУВСТВОВАТЬ</p><h2 lang="kk">${seeText(beat.letter)}</h2><p><strong>Русский якорь:</strong> ${seeText(beat.anchor)}</p><p>${seeText(beat.art)}</p><p lang="kk">${seeText(beat.ex)}</p><p class="small">${seeText(beat.warn)}</p>${nav('path-next','Дальше')}</div>`;
+     bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='why'){
-     root.innerHTML=`<div class="panel path-paper">${head}<h2>${esc(beat.t)}</h2><p>${esc(beat.b)}</p><button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     root.innerHTML=`<div class="panel path-paper">${head}<h2>${seeText(beat.t)}</h2><p>${seeText(beat.b)}</p>${nav('path-next','Дальше')}</div>`;
+     bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='bridge'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Сравни с русским</h2>
-       <p><strong>В русском ты привыкла…</strong> ${esc(beat.ru)}</p>
-       <p><strong>В казахском иначе…</strong> ${esc(beat.kz)}</p>
-       <p><strong>Поэтому делай…</strong> ${esc(beat.do)}</p>
-       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+       <p><strong>В русском ты привыкла…</strong> ${seeText(beat.ru)}</p>
+       <p><strong>В казахском иначе…</strong> ${seeText(beat.kz)}</p>
+       <p><strong>Поэтому делай…</strong> ${seeText(beat.do)}</p>
+       ${nav('path-next','Дальше')}</div>`;
+     bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='slots'){
-     root.innerHTML=`<div class="panel path-paper">${head}<h2>Из чего это собирается</h2><p>${esc(beat.t)}</p>
-       <div class="path-slots">${(beat.parts||[]).map(p=>'<span class="path-slot">'+esc(p.l)+'</span>').join('<span class="path-plus">+</span>')}</div>
-       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     root.innerHTML=`<div class="panel path-paper">${head}<h2>Из чего это собирается</h2><p>${seeText(beat.t)}</p>
+       <div class="path-slots">${(beat.parts||[]).map(p=>'<span class="path-slot">'+seeText(p.l)+'</span>').join('<span class="path-plus">+</span>')}</div>
+       ${nav('path-next','Дальше')}</div>`;
+     bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='algo'){
-     root.innerHTML=`<div class="panel path-paper">${head}<h2>${esc(beat.t)}</h2><ol class="learning-steps">${(beat.items||[]).map(i=>'<li>'+esc(i)+'</li>').join('')}</ol>
-       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     root.innerHTML=`<div class="panel path-paper">${head}<h2>${seeText(beat.t)}</h2><ol class="learning-steps">${(beat.items||[]).map(i=>'<li>'+seeText(i)+'</li>').join('')}</ol>
+       ${nav('path-next','Дальше')}</div>`;
+     bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='ex'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Разобранный пример</h2>
-       <p lang="kk" class="stimulus">${esc(beat.from)} → ${esc(beat.to)}</p>
-       <p>${esc(beat.ru)}</p>
-       <p>Слот: <strong lang="kk">${esc(beat.slot)}</strong>. ${esc(beat.why)}</p>
-       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+       <p lang="kk" class="stimulus">${seeText(beat.from)} → ${seeText(beat.to)}</p>
+       <p>${seeText(beat.ru)}</p>
+       <p>Слот: <strong lang="kk">${seeText(beat.slot)}</strong>. ${seeText(beat.why)}</p>
+       ${nav('path-next','Дальше')}</div>`;
+     bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='trap'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Не перепутай</h2>
-       <p>Нельзя: <s lang="kk">${esc(beat.bad)}</s></p>
-       <p>Нужно: <strong lang="kk">${esc(beat.good)}</strong></p>
-       <p>${esc(beat.why)}</p>
-       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+       <p>Нельзя: <s lang="kk">${seeText(beat.bad)}</s></p>
+       <p>Нужно: <strong lang="kk">${seeText(beat.good)}</strong></p>
+       <p>${seeText(beat.why)}</p>
+       ${nav('path-next','Дальше')}</div>`;
+     bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='fold'){
-     root.innerHTML=`<div class="panel path-paper">${head}<details open><summary>${esc(beat.t)}</summary><p>${esc(beat.b)}</p></details>
-       <button type="button" class="primary-button" id="path-next">Дальше</button></div>`;
-     bindCrumb();$('#path-next').onclick=nextBeat;return;
+     root.innerHTML=`<div class="panel path-paper">${head}<details open><summary>${seeText(beat.t)}</summary><p>${seeText(beat.b)}</p></details>
+       ${nav('path-next','Дальше')}</div>`;
+     bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='ask'){
-     root.innerHTML=`<div class="panel path-paper">${head}<p class="phase-label">${beat.type==='one_prod'?'Самостоятельно':beat.type==='trap_choice'?'Ловушка':'Проверь понимание'}</p>
-       <h2>${esc(beat.prompt)}</h2>
+     root.innerHTML=`<div class="panel path-paper">${head}<p class="phase-label">${beat.type==='one_prod'?'Самостоятельно':'Проверь понимание'}</p>
+       <h2>${esc(faceTitle(beat.prompt))}</h2>
        ${beat.stem?'<p class="stimulus" lang="kk">'+esc(beat.stem)+'</p>':''}
        <form id="path-form" class="practice-composer"><div class="composer-row"><input id="path-answer" type="text" lang="kk" enterkeyhint="enter" autocomplete="off" spellcheck="false"><button type="submit" class="primary-button" id="path-check">Проверить</button></div>${kb}
          <div id="path-fb" class="feedback" hidden></div>
          <div class="lesson-actions">
+           <button type="button" class="text-button" id="path-back">Назад</button>
            <button type="button" class="secondary-button" id="path-rule">Подсказка</button>
            <button type="button" class="text-button" id="path-idk">Не знаю</button></div></form></div>`;
      bindCrumb();
+     const askBack=$('#path-back');if(askBack)askBack.onclick=stepBack;
      const input=$('#path-answer');
      if(input){
        input.dataset.lesson=les.id;input.dataset.chapter=ch.id;input.dataset.beat=String(gp.beat);
@@ -1364,7 +1437,7 @@
        if(beat.rule_line)return beat.rule_line;
        if(beat.type==='know_if')return 'Ответ да или нет. Это тот же смысл, что в заголовке, или другой?';
        if(beat.type==='know_lever')return 'Это вопрос «который по счёту», не «сколько предметов». Например екінші — второй, екі кітап — две книги.';
-       if(beat.type==='trap_choice')return beat.trap||'Напиши форму, которую курс как раз запрещает.';
+       if(beat.type==='trap_choice')return studentCopy(beat.trap)||'Напиши форму, которую здесь писать не нужно.';
        if(formAsk)return 'Обычное число из курса + одна наклейка справа. Пример: бір → бірінші.';
        return 'Вспомни объяснение этой главы, потом напиши короткий ответ.';
      };
@@ -1382,7 +1455,7 @@
      $('#path-rule').onclick=()=>{
        pathPeek=true;
        const local=hintLine();
-       showPathFb('hinted','<p>'+esc(local)+'</p>');
+       showPathFb('hinted','<p>'+seeText(local)+'</p>');
      };
      const pathSkillFor=(errorType,errorKey,beat)=>{
        const known={
@@ -1479,10 +1552,10 @@
        const chain=window.ExplainOpen&&window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(pathQ,val):'';
        const gap=window.AiTutor&&window.AiTutor.coverageGaps?window.AiTutor.coverageGaps().find(g=>noted.aiCodes.includes(g.error_code)):null;
        const gapHtml=gap&&!offers.isolated&&!offers.other?'<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>':'';
-       showPathFb('error','<p data-error-diff>Отличие: <s lang="kk">'+esc(val.trim()||'пусто')+'</s> → <strong lang="kk">'+esc(right)+'</strong></p><p>Ты написала: <strong lang="kk">'+esc(val.trim()||'пусто')+'</strong></p><p>Нужно: <strong lang="kk">'+esc(right)+'</strong></p>'+(why.length?'<p>'+esc([...new Set(why)].join(' · '))+'</p>':'')+'<p>'+esc(diag)+'</p>'+chain+offerHtml(offers)+gapHtml+(beat.trap?'<p>'+esc(beat.trap)+'</p>':'')+(bankCard&&bankCard.short?'<p class="small">'+esc(bankCard.short)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
+       showPathFb('error','<p data-error-diff>Отличие: <s lang="kk">'+esc(val.trim()||'пусто')+'</s> → <strong lang="kk">'+esc(right)+'</strong></p><p>Ты написала: <strong lang="kk">'+esc(val.trim()||'пусто')+'</strong></p><p>Нужно: <strong lang="kk">'+esc(right)+'</strong></p>'+(why.length?'<p>'+esc([...new Set(why)].join(' · '))+'</p>':'')+'<p>'+seeText(diag)+'</p>'+studentCopy(chain)+offerHtml(offers)+gapHtml+(beat.trap?'<p>'+seeText(beat.trap)+'</p>':'')+(bankCard&&bankCard.short?'<p class="small">'+seeText(bankCard.short)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
        if(window.ExplainOpen)window.ExplainOpen.bind($('#path-fb'));
        bindOffers($('#path-fb'));
-       const again=$('#path-again-rule');if(again)again.onclick=()=>{showPathFb('hinted','<p>'+esc(bankCard&&(bankCard.short||bankCard.medium)||hintLine())+'</p>');};
+       const again=$('#path-again-rule');if(again)again.onclick=()=>{showPathFb('hinted','<p>'+seeText(bankCard&&(bankCard.short||bankCard.medium)||hintLine())+'</p>');};
        const goTr=$('#path-transfer');if(goTr&&tr)goTr.onclick=()=>{if(!byId.has(tr.id)){course.questions.push(tr);byId.set(tr.id,tr);}mode='transfer';queue=[tr.id];practiceIds=[tr.id];position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();render();showView('practice');};
        const askT=$('#path-ask-tutor');if(askT)askT.onclick=()=>{
          if(!window.TutorUI)return;
@@ -1687,9 +1760,9 @@
    const Bank=window.ExplainBank;if(!Bank||!Bank.BANK)return '';
    return Object.keys(Bank.BANK).map(id=>{
      const card=Bank.BANK[id]||{};
-     const full=window.ExplainOpen&&window.ExplainOpen.fullHtml?window.ExplainOpen.fullHtml(id):'';
-     const body=full||esc([card.ru_refresh,card.medium,card.short,(card.examples||[]).join('\n'),(card.traps||[]).join('\n')].filter(Boolean).join('\n\n'));
-     return `<div class="panel rule-block" data-rule="${esc(id)}"><h2>${esc(card.title||'Правило')}</h2><p class="small">Полный текст. Краткая карточка его не заменяет.</p>${full?body:'<pre class="rule-pre">'+body+'</pre>'}</div>`;
+     const full=window.ExplainOpen&&window.ExplainOpen.fullHtml?studentCopy(window.ExplainOpen.fullHtml(id)):'';
+     const body=full||esc(studentCopy([card.ru_refresh,card.medium,card.short,(card.examples||[]).join('\n'),(card.traps||[]).join('\n')].filter(Boolean).join('\n\n')));
+     return `<div class="panel rule-block" data-rule="${esc(id)}"><h2>${esc(faceTitle(card.title||'Правило'))}</h2><p class="small">Полный текст. Краткая карточка его не заменяет.</p>${full?body:'<pre class="rule-pre">'+body+'</pre>'}</div>`;
    }).join('');
  }
  function liveSource(url){
@@ -1888,10 +1961,10 @@
      const found=window.CorpusSearch.search(query,{lesson:materialsLesson,kind:materialsKind});
      if(!found.rules.length&&!found.words.length){box.innerHTML='<p>В уже записанных материалах этого нет. Новая статья не создаётся.</p>';return;}
      const best=found.rules[0];
-     const full=best&&window.ExplainOpen&&window.ExplainOpen.fullHtml?window.ExplainOpen.fullHtml(best.id):'';
-     const more=found.rules.slice(best?1:0,6).map(r=>`<button type="button" class="text-button" data-open-canon="${esc(r.id)}">${esc(r.title)}</button>`).join(' ');
+     const full=best&&window.ExplainOpen&&window.ExplainOpen.fullHtml?studentCopy(window.ExplainOpen.fullHtml(best.id)):'';
+     const more=found.rules.slice(best?1:0,6).map(r=>`<button type="button" class="text-button" data-open-canon="${esc(r.id)}">${esc(faceTitle(r.title))}</button>`).join(' ');
      const words=found.words.length?`<p class="small">Слова, не вместо правила: ${found.words.map(w=>esc(w.title)+(w.gloss?' — '+esc(w.gloss):'')).join(' · ')}</p>`:'';
-     box.innerHTML=(best?`<article class="panel"><h2>${esc(best.title)}</h2><p class="small">${best.lesson?'Урок '+esc(String(best.lesson).replace('-','–')):''}</p>${full}<p><button type="button" class="secondary-button" data-open-canon="${esc(best.id)}">Открыть в правилах</button> <button type="button" class="secondary-button" data-try-rule="${esc(best.id)}">Попробовать</button></p><div data-try-choices></div></article>`:'')+(more?`<p>${more}</p>`:'')+words;
+     box.innerHTML=(best?`<article class="panel"><h2>${esc(faceTitle(best.title))}</h2><p class="small">${best.lesson?'Урок '+esc(String(best.lesson).replace('-','–')):''}</p>${full}<p><button type="button" class="secondary-button" data-open-canon="${esc(best.id)}">Открыть в правилах</button> <button type="button" class="secondary-button" data-try-rule="${esc(best.id)}">Попробовать</button></p><div data-try-choices></div></article>`:'')+(more?`<p>${more}</p>`:'')+words;
      if(window.ExplainOpen&&window.ExplainOpen.bind)window.ExplainOpen.bind(box);
      box.querySelectorAll('[data-open-canon]').forEach(b=>b.onclick=()=>openSearchedRule(b.dataset.openCanon));
      box.querySelectorAll('[data-try-rule]').forEach(b=>b.onclick=()=>tryRule(b.dataset.tryRule,b.parentElement&&b.parentElement.nextElementSibling));
@@ -1987,7 +2060,16 @@
    contrast:startContrast,setAssociation,promote,export:()=>{save();downloadProgress(P.serialize(state));},import:importProgress,
    restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
  });
- $('#pause-session').onclick=()=>showView(trainerReturn?'personal':mode==='homework'||(mode==='remediation'&&hwReturn)?'homework':mode==='exam'?'exam':'today');
+ $('#pause-session').onclick=()=>{
+   if(position>0&&queue.length){
+     cancelAdvance();abortTutor();draft=null;retrying=false;position--;
+     render();
+     const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});
+     focusAnswer();
+     return;
+   }
+   showView(trainerReturn?'personal':mode==='homework'||(mode==='remediation'&&hwReturn)?'homework':mode==='exam'?'exam':'today');
+ };
  const lettersPref=$('#pref-letters');
  if(lettersPref){lettersPref.checked=!!state.prefs.letters;lettersPref.onchange=()=>{state.prefs.letters=lettersPref.checked;state.prefs.lettersChosen=true;save();if(view==='practice')render();};}
  function issueContext(){

@@ -95,10 +95,10 @@ h3{font-size:1.125rem;letter-spacing:-.02em}
 .session-line,.practice-note,.mastery-label,.pref-check{color:var(--muted)}
 .pref-check input{accent-color:var(--primary)}
 .practice-head{
-  display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;
+  display:grid;grid-template-columns:max-content minmax(0,1fr) auto;gap:10px;align-items:center;
   margin:0 0 12px
 }
-.practice-back,#pause-session.practice-back{min-width:44px;min-height:44px;width:44px;margin:0;padding:0;font-size:1.25rem;text-align:center}
+.practice-back,#pause-session.practice-back{min-width:44px;min-height:44px;width:auto;margin:0;padding:0 10px;font-size:1rem;text-align:center}
 .practice-head-copy{min-width:0}
 .practice-head h1{margin:0;font-size:1.35rem}
 .practice-filter-summary{margin:0;font-size:.8125rem;color:var(--muted)}
