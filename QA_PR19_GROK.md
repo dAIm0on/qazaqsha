@@ -56,6 +56,15 @@ LEGACY_VERIFY: PASS/FAIL + перечень
 
 Не merge.
 
+После полного PASS не менять production напрямую. Сначала вернуть пользователю HEAD/PREVIEW/результаты. Только после явного решения о release можно обновить в `lessons/4-1/lesson.json`:
+- `release.preview_head`
+- `release.preview_url`
+- `release.approved=true`
+- `release.approved_at`
+- затем `status: released`
+
+После этого повторно compiler + verifiers + новый preview.
+
 ## Grok Bot — black-box QA после получения PREVIEW
 
 Проверять именно PREVIEW и именно заявленный HEAD.
