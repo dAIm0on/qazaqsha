@@ -3447,6 +3447,7 @@ window.LESSON_V2_COMPILED = [
         "qa_fixture_id": "fixture:4-1:bad-key:6-2-3"
       }
     ],
+    "migrations": [],
     "generated_questions": [
       {
         "id": "gold:4-1:linker-01",
