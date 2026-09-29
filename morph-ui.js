@@ -690,7 +690,7 @@ function calculatorScreen(){
  return '<div class="morph-panel morph-calc"><button class="text-button" data-calc-close>← К разделу</button><p class="eyebrow">РАЗБОР ФОРМЫ</p><h2>Разобрать слово</h2><p>Выбери проверенное слово и смысл. Здесь видно, как собралась форма. Это не задание и не оценка.</p><label for="calc-word">Слово</label><input id="calc-word" lang="kk" list="calc-words" value="'+esc(calcQuery)+'" autocomplete="off" enterkeyhint="search"><div class="morph-keys">'+letters+'</div><datalist id="calc-words">'+list+'</datalist><button type="button" class="secondary-button" data-calc-lookup>Найти слово</button>'+body+'</div>';
 }
 function bindCalculator(host){
- host.querySelector('[data-morph-calc]')?.addEventListener('click',()=>{calcOpen=true;teachingMode=false;showHub=false;topicOpen=false;message='';persistCalc();render();});
+ host.querySelector('[data-morph-calc]')?.addEventListener('click',()=>{if(window.MorphNav2&&window.MorphNav2.close)window.MorphNav2.close();calcOpen=true;teachingMode=false;showHub=false;topicOpen=false;exemplarId=null;message='';persistCalc();render();});
  host.querySelector('[data-calc-close]')?.addEventListener('click',()=>backToSection());
  const lookup=()=>{const input=host.querySelector('#calc-word');calcQuery=input?input.value:'';const found=learner()&&learner().resolveLemma(calcQuery,E.data.lemmas);calcLemmaId=found&&found.kind==='train'?found.lemma.id:'';calcSequence=[];persistCalc();render();};
  host.querySelector('[data-calc-lookup]')?.addEventListener('click',lookup);
@@ -791,17 +791,18 @@ function render(){
   if(wantFocus){wantFocus=false;const h=host.querySelector('h2');if(h){h.tabIndex=-1;h.focus();}}
   return;
  }
- if(calcOpen){
-  document.body.dataset.morphImmersive='1';
-  host.innerHTML=head+calculatorScreen();
-  saveSurface('calc');
+ if(window.MorphNav2&&window.MorphNav2.takeover()){
+  if(calcOpen){calcOpen=false;persistCalc();saveSurface('hub');}
+  document.body.dataset.morphImmersive=window.MorphNav2.immersive()?'1':'';
+  host.innerHTML=head+window.MorphNav2.html();
   bind(host);clock();
   if(wantFocus){wantFocus=false;const h=host.querySelector('h2');if(h){h.tabIndex=-1;h.focus();}}
   return;
  }
- if(window.MorphNav2&&window.MorphNav2.takeover()){
-  document.body.dataset.morphImmersive=window.MorphNav2.immersive()?'1':'';
-  host.innerHTML=head+window.MorphNav2.html();
+ if(calcOpen){
+  document.body.dataset.morphImmersive='1';
+  host.innerHTML=head+calculatorScreen();
+  saveSurface('calc');
   bind(host);clock();
   if(wantFocus){wantFocus=false;const h=host.querySelector('h2');if(h){h.tabIndex=-1;h.focus();}}
   return;
@@ -858,7 +859,8 @@ function stage9Screen(){
  return '<div class="morph-panel morph-teach-panel stage5-panel" data-module-lesson="mixed"><button type="button" class="text-button" data-teach-close>← К разделу</button><p class="eyebrow">СМЕШАННАЯ ПРАКТИКА</p><h2>'+esc(shellPhrase(built.status))+'</h2><p>'+esc(built.reason)+'</p><p class="small">Этот порог только открывает смешанную практику. Он не означает, что тема освоена навсегда. Сложность поднимай постепенно: не меняй сразу смысл, край слова, исключение, длинную цепочку и способ ответа. Проверка на новых словах и повтор на следующий день считаются отдельно.</p><button class="secondary-button" data-stage9-full>Открыть полное объяснение</button></div>';
 }
 function start(mode){
- const d=data();teachingMode=false;topicOpen=false;
+ const d=data();teachingMode=false;topicOpen=false;calcOpen=false;persistCalc();
+ if(window.MorphNav2&&window.MorphNav2.close)window.MorphNav2.close();
  if(level==='mixed'&&mode==='learn'){startMixed();return;}
  try{const s=E.createSession({level,mode,responseMode,events:d.module.events,records:d.records,knownLemmas:[...d.module.exposed,...d.knownLemmas,...(mode==='transfer'?P.stage10ContaminatedLemmas():[])]});saveSession(s);showHub=false;message=mode==='transfer'&&s.holdoutNote?P.STAGE10_SHORT_BANK:'';render();}catch(e){message=e.message&&String(e.message).includes('новых')?P.STAGE10_SHORT_BANK:e.message;render();}
 }

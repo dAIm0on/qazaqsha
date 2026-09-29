@@ -282,7 +282,7 @@ function aliasHtml(){
  const s=st();
  const choices=(s.aliasChoices||[]).map(id=>lesson(id)).filter(Boolean);
  const buttons=choices.length?choices.map(L=>'<button type="button" class="secondary-button" data-nav2-lesson="'+esc(L.id)+'">'+esc(L.number)+' '+esc(L.title)+'</button>').join(''):'<button type="button" class="primary-button" data-nav2="map">Все темы</button>';
- return '<div class="morph-panel morph-nav2"><p role="status">'+esc(s.bookmarkMessage||'Этот урок был обновлён. Выберите тему в списке')+'</p><div class="morph-routes">'+buttons+'</div></div>';
+ return '<div class="morph-panel morph-nav2"><button type="button" class="text-button" data-nav2="home">← К разделу</button><p role="status">'+esc(s.bookmarkMessage||'Этот урок был обновлён. Выберите тему в списке')+'</p><div class="morph-routes">'+buttons+'</div></div>';
 }
 function activitiesHtml(){
  const rows=Object.keys(st().viewed||{}).map(id=>lesson(id)).filter(Boolean);
