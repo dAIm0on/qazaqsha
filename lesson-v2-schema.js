@@ -63,7 +63,8 @@
  function vocabulary(w,lessonId){
    if(!obj(w))fail('vocabulary object');
    const role=w.role==='context'?'context':'target';
-   return {id:id(w.id,'vocab.id'),lemma:str(w.lemma,'vocab.lemma',120),translations:strings(w.translations,'vocab.translations',1,12),role,introduced_in:lessonId,source_refs:strings(w.source_refs||[],'vocab.source_refs',1,20).map(x=>id(x,'source_ref'))};
+   const lemma=str(w.lemma,'vocab.lemma',120),forms=strings(w.forms||[lemma],'vocab.forms',1,20);
+   return {id:id(w.id,'vocab.id'),lemma,forms,translations:strings(w.translations,'vocab.translations',1,12),role,introduced_in:lessonId,source_refs:strings(w.source_refs||[],'vocab.source_refs',1,20).map(x=>id(x,'source_ref'))};
  }
  function generator(g){
    if(!obj(g))fail('generator object');
