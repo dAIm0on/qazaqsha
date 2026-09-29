@@ -25,6 +25,7 @@
    }
    return chunks.map((b,i)=>({k:i===0?'why':'fold',t:i===0?t.title:'Ещё один шаг',b}));
  }
+ function stableSlug(v){return String(v||'').replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,100);}
  function pathLesson(p){
    const chapters=(p.theory||[]).map((t,i)=>{
      const beats=[
@@ -36,7 +37,7 @@
      for(const c of t.contrastExamples||[])beats.push({k:'trap',bad:c.bad,good:c.good,why:c.why});
      for(const note of t.limitations||[])beats.push({k:'fold',t:'Граница урока',b:note});
      for(const check of t.checks||[])beats.push({k:'ask',id:check.id,type:check.type,prompt:check.prompt,answer:check.answers[0],answers:check.answers,error_key:check.error_key,rule_line:check.rule_line||t.shortHint});
-     return {id:p.lesson_id+'-v2-'+String(i+1).padStart(2,'0'),title:t.title,rule_ids:[t.rule_id],fullExplanation:t.fullExplanation,source_refs:(t.source_refs||[]).slice(),beats};
+     return {id:'v2-'+stableSlug(t.id),title:t.title,rule_ids:[t.rule_id],fullExplanation:t.fullExplanation,source_refs:(t.source_refs||[]).slice(),beats};
    });
    return {id:p.lesson_id,title:p.name||p.title,chapters};
  }
@@ -71,7 +72,7 @@
    return (p.stages||[]).map((s,i)=>{
      const ids=s.core_ids.filter(id=>byId.has(id));
      const items=ids.slice(0,4).map(id=>{const q=byId.get(id);return {front:q.stimulus,back:(q.fields&&q.fields[0]&&q.fields[0].answers||[])[0]||'',cue:q.explanation||''};});
-     return {id:'v2-stage-'+p.lesson_id+'-'+String(i+1).padStart(2,'0'),title:s.title,topic:'verbs',courseLesson:p.lesson_id,intro:'Практика после объяснения. Можно повторять столько, сколько нужно.',items:[],questionIds:ids,chunks:[{title:s.title,explanation:'Сначала попробуй без подсказки. Ошибка вернётся позже на другом примере.',items,questionIds:ids,associationKey:'stage:'+s.id}]};
+     return {id:'v2-track-'+stableSlug(s.id),title:s.title,topic:'verbs',courseLesson:p.lesson_id,intro:'Практика после объяснения. Можно повторять столько, сколько нужно.',items:[],questionIds:ids,chunks:[{title:s.title,explanation:'Сначала попробуй без подсказки. Ошибка вернётся позже на другом примере.',items,questionIds:ids,associationKey:'stage:'+s.id}]};
    });
  }
  function stagePlans(p){
