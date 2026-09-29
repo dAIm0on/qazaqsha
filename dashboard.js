@@ -30,7 +30,7 @@
        const tip=(id,text)=>`<details class="help-line"><summary aria-label="Что это значит">?</summary><p id="${id}">${text}</p></details>`;
        const pairN=progress.pairs(state).length;
        const weakOpen=weak.length||weakWords.length||weakRules.length||(window.AiTutor&&window.AiTutor.topWeak().length);
-       const courseRows=(window.ExplainBankUI&&window.ExplainBankUI.COURSE)||[];
+       const courseRows=(window.LessonRegistry&&window.LessonRegistry.course())||(window.ExplainBankUI&&window.ExplainBankUI.COURSE)||[];
        const curCourse=courseRows.some(row=>row.id===step.lessonId)?step.lessonId:'';
        const lessonProgress=id=>progress.ensureLessonProgress?progress.ensureLessonProgress(state,id):((state.courseProgress&&state.courseProgress.lessons||{})[id]||{status:'not_started'});
        const statusText=p=>p.status==='completed'?'Завершён':p.status==='in_progress'?'В процессе':'Не начат';
@@ -44,7 +44,7 @@
        };
        const allCourseDone=courseRows.length>0&&courseRows.every(row=>lessonProgress(row.id).status==='completed');
        const pickerRows=courseRows.map(row=>{
-         const p=lessonProgress(row.id),primary=curCourse===row.id;
+         const p=lessonProgress(row.id)||{status:'not_started'},primary=curCourse===row.id;
          const actionLabel=p.status==='completed'?'Повторить':p.status==='in_progress'?'Продолжить':'Начать';
          return `<article class="lesson-picker-row${primary?' current':''}" data-picker-lesson="${esc(row.id)}"><div class="lesson-picker-copy"><div class="lesson-picker-top"><strong>${esc(row.label)}</strong><span class="lesson-status">${statusText(p)}</span>${primary?'<span class="lesson-primary">Основное прохождение</span>':''}</div><h3>${esc(row.name)}</h3><p class="small">${esc(progressHint(row.id,p))}</p></div><div class="lesson-picker-actions"><button type="button" class="text-button" data-action="lesson-view:${esc(row.id)}">Посмотреть</button><button type="button" class="secondary-button" data-action="lesson-start:${esc(row.id)}">${actionLabel}</button></div></article>`;
        }).join('');
