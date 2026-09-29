@@ -1068,12 +1068,14 @@
    const resumeAt=window.Homework.resumeIndex(h.exercise_ids,attempt);
    const check=key=>`<label class="pref-check"><input type="checkbox" data-hw-check="${key}" ${attempt.checklist[key]?'checked':''}> ${{method:'Повторила методичку',exercises:'Упражнения сборника',words:'Слова урока',external_test:'Зафиксировала на сайте',keyboard:'Казахская раскладка на телефоне',cheat:'Шпаргалка сохранена'}[key]||key}</label>`;
    const secBtns=(part,n)=>n<=1?'':`<div class="jump-row">${Array.from({length:n},(_,i)=>`<button type="button" class="chip" data-hw-part="${part}" data-hw-sec="${i}">Часть ${i+1}</button>`).join('')}</div>`;
-   const wordLine=(pack.lesson_id==='3-1'||pack.lesson_id==='3-2'||pack.lesson_id==='3-3')?`${(h.word_ids||[]).length} слов × направления, карточек ${wP.done} из ${wP.total}`:`${wP.done} из ${wP.total} слов`;
+   const wordLine=(h.word_question_ids||[]).length>(h.word_ids||[]).length?`${(h.word_ids||[]).length} слов × направления, карточек ${wP.done} из ${wP.total}`:`${wP.done} из ${wP.total} слов`;
+   const sourceHomework=(h.source_items||[]).length?`<details class="homework-source"><summary>Исходная домашняя работа</summary><ol>${h.source_items.map(x=>`<li><strong>${esc(x.number)}.</strong> ${esc(x.text)}</li>`).join('')}</ol></details>`:'';
    const headLine=exercisesClosed?'Упражнения ещё закрыты. Они появятся после сдачи правила. Просмотр карточки их не открывает.':`Готово ${exP.done} из ${exP.total} упражнений · ${wordLine}. Это выборка урока, не весь сборник и не повторение.`;
    const openExercises=exercisesClosed?'':`<button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button>`;
    root.innerHTML=`<div class="panel homework-head"><p class="eyebrow">УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>${headLine}</p>${openExercises}</div>
      <div class="panel"><div class="jump-row">${list.map(p=>`<button type="button" class="chip" data-hw-lesson="${p.lesson_id}" ${p.lesson_id===pack.lesson_id?'aria-pressed="true"':''}>${esc(p.homework.title)}</button>`).join('')}</div>
        <p class="small">Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике. Можно выйти в любой момент: ответы уже в листе.</p>
+       ${sourceHomework}
        <ol class="learning-steps">
          <li>Повторить методичку — ${h.method_url?`<a href="${esc(h.method_url)}" target="_blank" rel="noopener noreferrer">${esc(h.method_title)}</a>`:'ссылка на материал урока'}${check('method')}</li>
          <li>${exercisesClosed?'Упражнения сборника откроются вместе с правилом.':`Упражнения сборника (${h.exercise_ids.length} пунктов, по ${window.Homework.HW_SECTION} в части) <button type="button" class="secondary-button" data-hw-part="exercises">${exP.done?'Продолжить упражнения':'Открыть упражнения'}</button>${secBtns('exercises',exN)}`}</li>
