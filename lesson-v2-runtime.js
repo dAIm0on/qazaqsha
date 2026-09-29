@@ -6,11 +6,28 @@
  function questionCopy(q,lessonId){
    return Object.assign({},q,{lessonId,kind:'fields',source:q.source||('v2-'+lessonId),group:q.group||q.id,part:q.part||'1',ruleIds:(q.ruleIds||q.rule_ids||[]).slice(),associationKeys:(q.associationKeys||[]).slice()});
  }
+ function explanationBeats(t){
+   const raw=String(t.fullExplanation||'').trim();
+   const paras=raw.split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
+   const chunks=[];
+   for(const para of (paras.length?paras:[raw])){
+     if(para.length<=620){chunks.push(para);continue;}
+     const sentences=para.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[para];
+     let buf='';
+     for(const sentence of sentences){
+       const next=(buf+' '+sentence.trim()).trim();
+       if(buf&&next.length>620){chunks.push(buf);buf=sentence.trim();}
+       else buf=next;
+     }
+     if(buf)chunks.push(buf);
+   }
+   return chunks.map((b,i)=>({k:i===0?'why':'fold',t:i===0?t.title:'Ещё один шаг',b}));
+ }
  function pathLesson(p){
    const chapters=(p.theory||[]).map((t,i)=>{
      const beats=[
        {k:'goal',t:t.meaning},
-       {k:'why',t:t.title,b:t.fullExplanation},
+       ...explanationBeats(t),
        {k:'algo',t:'Как действовать',items:t.decisionSteps}
      ];
      for(const e of t.examples||[])beats.push({k:'ex',from:e.kazakh,to:e.kazakh,ru:e.translation,why:e.why||''});
