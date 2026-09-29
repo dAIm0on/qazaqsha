@@ -103,14 +103,23 @@
  function practiceForRule(lessonId,ruleId,limit=12){
    if(!installed.has(lessonId)||!root.COURSE)return [];
    const rows=(root.COURSE.questions||[]).filter(q=>q&&q.lessonId===lessonId&&q.topic==='verbs'&&(q.ruleIds||[]).includes(ruleId));
-   const priority=q=>q.origin==='research'?0:q.origin==='generated'?1:q.origin==='school'?2:3;
-   rows.sort((a,b)=>priority(a)-priority(b)||String(a.id).localeCompare(String(b.id),'en'));
-   const picked=[],lemmas=new Set();
+   const groups=new Map();
    for(const q of rows){
-     const lemma=q.generator&&q.generator.lexeme_id||String(q.stimulus||'').split(/[+—]/)[1]||q.id;
-     if(lemmas.has(lemma)&&picked.length<Math.min(4,limit))continue;
-     picked.push(q.id);lemmas.add(lemma);
-     if(picked.length>=limit)break;
+     const key=q.generator&&q.generator.lexeme_id||String(q.stimulus||q.id).split(/[+—]/)[1]||q.id;
+     if(!groups.has(key))groups.set(key,[]);
+     groups.get(key).push(q);
+   }
+   const shuffle=a=>{const x=a.slice();for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;};
+   const buckets=shuffle([...groups.values()].map(shuffle));
+   const picked=[];
+   let round=0;
+   while(picked.length<limit){
+     let added=false;
+     for(const bucket of buckets){
+       if(bucket[round]){picked.push(bucket[round].id);added=true;if(picked.length>=limit)break;}
+     }
+     if(!added)break;
+     round++;
    }
    return picked;
  }
