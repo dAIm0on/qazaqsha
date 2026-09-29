@@ -188,9 +188,17 @@ ok('draft/reviewed v2 lesson is physically blocked on production');
 
 const indexText=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
 const swText=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
+const appText=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 assert.equal(indexText.includes('src="nonpast-engine.js"'),false);
 assert.equal(swText.includes('"nonpast-engine.js"'),false);
-ok('lesson-specific generator is compile-time only, not browser/offline runtime');
+assert.equal(swText.includes('"compiled-lessons-v2.js"'),true);
+assert.match(swText,/qazaq-offline-preview-20260929-pr19-v2-1/);
+const renderPathStart=appText.indexOf('function renderPath');
+const chapterLookup=appText.indexOf("const ch=G.chapter(les.id,gp.chapterId)",renderPathStart);
+const titleInit=appText.indexOf("const chTitle=Bank?Bank.chapterTitle(ch):ch.title",chapterLookup);
+const beatEnd=appText.indexOf("if(!beat)",chapterLookup);
+assert.ok(renderPathStart>=0&&chapterLookup>renderPathStart&&titleInit>chapterLookup&&titleInit<beatEnd,'chTitle must initialize before the completed-beat branch');
+ok('compile-time generator stays out of browser, v2 snapshot is cached, and completed theory cannot hit chTitle TDZ');
 
 const dummy={
  schema_version:2,lesson_id:'9-9',content_revision:'9-9.r1',title:'Fixture',status:'draft',
