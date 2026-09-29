@@ -15,6 +15,8 @@
  function course(){
    const map=new Map();
    for(const x of [...legacy(),...v2Rows()])map.set(x.id,x);
+   const legacy42=map.get('4-2');
+   if(legacy42&&legacy42.kind!=='v2')map.delete('4-2');
    return [...map.values()].sort((a,b)=>{
      const p=s=>String(s).split('-').map(Number),aa=p(a.id),bb=p(b.id);
      return (aa[0]-bb[0])||(aa[1]-bb[1]);

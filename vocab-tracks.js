@@ -4,16 +4,28 @@
  'use strict';
  const c=window.COURSE,L=window.LEARNING,core=window.TrainerCore,B=window.WORD_BANK||{all:[]};
  const must=new Set((B.all||[]).filter(w=>w.role==='must').map(w=>core.normalize(w.kazakh)));
+ for(const rows of Object.values(B.must||{}))for(const w of rows||[])must.add(core.normalize(w.kazakh));
  const from21=new Set(((B.must||{})['2-1']||[]).map(w=>core.normalize(w.kazakh)));
  function formOf(q){
    if(/на казахский/i.test(q.title||''))return core.normalize((q.fields&&q.fields[0].answers||[])[0]||'');
    return core.normalize(q.stimulus||'');
  }
+ function lessonRank(id){const m=String(id||'').match(/^(\d+)-(\d+)$/);return m?Number(m[1])*100+Number(m[2]):null;}
+ function hiddenLegacy(id){return id==='4-2'&&!(window.LessonRegistry&&window.LessonRegistry.isV2('4-2'));}
+ function wordFor(q){
+   const catalog=window.CURRICULUM;if(!catalog||!catalog.words)return null;
+   for(const id of q.vocabIds||[]){const w=catalog.words.find(x=>x.id===id);if(w)return w;}
+   const form=formOf(q);
+   return catalog.words.find(w=>core.normalize(w.kazakh)===form||(w.aliases||[]).some(a=>a===form))||null;
+ }
  for(const q of c.questions){
    if(q.topic!=='vocab')continue;
-   if(q.source==='bank'){q.wordRole='used';continue;}
-   q.wordRole='must';
-   if(from21.has(formOf(q)))q.lessonId='2-1';
+   const form=formOf(q);
+   if(!q.lessonId&&from21.has(form))q.lessonId='2-1';
+   if(q.wordRole==='used'||q.wordRole==='must')continue;
+   const w=wordFor(q);
+   const bound=!!(w&&w.target_or_context==='target'&&lessonRank(w.target_lesson)!=null&&!hiddenLegacy(w.target_lesson));
+   q.wordRole=(must.has(form)||bound)?'must':'used';
  }
  function addTrack(id,title,intro,ids,note){
    if(!ids.length)return;

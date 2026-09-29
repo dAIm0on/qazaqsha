@@ -200,7 +200,7 @@
    };
  }
  function packs(questions,course,opts={}){
-   const ids=!node&&root.LessonRegistry&&root.LessonRegistry.ids?root.LessonRegistry.ids():['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3','4-2'];
+   const ids=!node&&root.LessonRegistry&&root.LessonRegistry.ids?root.LessonRegistry.ids():['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
    return ids.map(id=>buildPack(id,questions,course,opts)).filter(p=>p&&p.homework&&(p.homework.exercise_ids.length||p.homework.word_ids.length));
  }
  function validateHomework(raw,knownIds){

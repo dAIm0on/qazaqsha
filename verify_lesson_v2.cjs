@@ -95,7 +95,10 @@ const compiledText=fs.readFileSync(path.join(__dirname,'compiled-lessons-v2.js')
 const compiledJson=compiledText.replace(/^.*?window\.LESSON_V2_COMPILED\s*=\s*/s,'').replace(/;\s*$/s,'');
 const built=JSON.parse(JSON.stringify(p));built.generated_questions=[...p.generated_questions,...expanded];
 const expectedCompiled=Schema.validate(built);
-assert.deepEqual(JSON.parse(compiledJson),[expectedCompiled]);
+const compiledAll=JSON.parse(compiledJson);
+const compiled41=compiledAll.find(x=>x.lesson_id==='4-1');
+assert.ok(compiled41,'compiled snapshot has no lesson 4-1');
+assert.deepEqual(compiled41,expectedCompiled);
 assert.equal(expectedCompiled.generated_questions.length,345);
 ok('compiler expands 322 generated forms into normalized runtime data');
 

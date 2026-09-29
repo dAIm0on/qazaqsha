@@ -9,9 +9,26 @@
    {id:'quantity',title:'Количество перед существительным',lesson_first_seen:'1-2'},
    {id:'numbers',title:'Числительные по частям',lesson_first_seen:'1-2'}
  ];
+ function lessonRank(id){const m=String(id||'').match(/^(\d+)-(\d+)$/);return m?Number(m[1])*100+Number(m[2]):null;}
+ function earlierLesson(current,next){
+   const a=lessonRank(current),b=lessonRank(next);
+   if(b==null)return current;
+   if(a==null)return next;
+   return b<a?next:current;
+ }
  function addWord(k,translation,lesson,category='target',aliases=[],examples=[]){
-   const id='word:'+core.normalize(k);let existing=words.find(w=>w.id===id);if(existing){if(category==='target'){existing.target_or_context='target';existing.target_lesson=lesson;}return existing;}
-   const w={id,kazakh:k.toLowerCase(),translation:Array.isArray(translation)?translation:[translation],lesson_first_seen:lesson,target_lesson:category==='target'?lesson:null,target_or_context:category,aliases:[k,...aliases].map(x=>core.normalize(x)),examples,card_ids:[]};words.push(w);return w;
+   const id='word:'+core.normalize(k);let existing=words.find(w=>w.id===id);
+   if(existing){
+     const ranked=lessonRank(lesson)!=null;
+     if(category==='target'&&ranked){
+       existing.target_or_context='target';
+       existing.target_lesson=earlierLesson(existing.target_lesson,lesson);
+       existing.lesson_first_seen=earlierLesson(existing.lesson_first_seen,lesson);
+     }else if(ranked)existing.lesson_first_seen=earlierLesson(existing.lesson_first_seen,lesson);
+     return existing;
+   }
+   const ranked=lessonRank(lesson)!=null,asTarget=category==='target'&&ranked;
+   const w={id,kazakh:k.toLowerCase(),translation:Array.isArray(translation)?translation:[translation],lesson_first_seen:ranked?lesson:lesson,target_lesson:asTarget?lesson:null,target_or_context:asTarget?'target':'context',aliases:[k,...aliases].map(x=>core.normalize(x)),examples,card_ids:[]};words.push(w);return w;
  }
  for(const [k,r] of c.vocabulary)addWord(k,r,'1-1');
  for(const [k,r] of c.numbers)addWord(k,r,'1-2','target',k.split(' / '));
@@ -28,9 +45,11 @@
      'https://drive.google.com/file/d/1HwRDYC7mpcoplaDJIKnoBb6MJd2mbPUX/view']}
  ];
  for(const pack of window.LESSON_PACKS||[]){
+   if(pack.lesson_id==='4-2'&&!(window.LessonRegistry&&window.LessonRegistry.isV2('4-2')))continue;
    if(window.Canonical){window.Canonical.applyAll(pack.original_exercises||[]);window.Canonical.applyAll(pack.generated_exercises||[]);}
    Object.assign(c.sources,pack.sources||{});
-   for(const w of pack.target_vocabulary||[])addWord(w.kazakh,w.translation,pack.lesson_id,'target');
+   const bank=pack.lesson_id==='bank';
+   for(const w of pack.target_vocabulary||[])addWord(w.kazakh,w.translation,bank?(w.from_lesson||pack.lesson_id):pack.lesson_id,bank?'context':'target');
    for(const r of pack.rules||[])if(!rules.some(x=>x.id===r.id))rules.push({...r,lesson_first_seen:pack.lesson_id});
    const meta=lessonCatalog.find(x=>x.id===pack.lesson_id)||{};
    Object.assign(meta,{id:pack.lesson_id,title:pack.lesson_title,active:true,status:'reviewed-with-notes',depends_on:pack.dependencies,rules:pack.rules.map(r=>r.id),note:'Исходники сохранены. Расхождения с ключами отмечены в заданиях.'});

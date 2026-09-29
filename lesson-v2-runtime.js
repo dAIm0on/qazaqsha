@@ -48,11 +48,24 @@
    for(const wid of row.vocabIds||[]){const w=catalog.words.find(x=>x.id===wid);if(w&&!w.card_ids.includes(row.id))w.card_ids.push(row.id);}
  }
  function addVocabQuestions(p,course,catalog){
+   const norm=s=>root.TrainerCore&&root.TrainerCore.normalize?root.TrainerCore.normalize(s):String(s||'').trim().toLowerCase();
    for(const v of p.vocabulary||[]){
      const w=catalog.addWord(v.lemma,v.translations,p.lesson_id,v.role);
      const forms=(v.forms&&v.forms.length?v.forms:[v.lemma]).slice();
      w.aliases=w.aliases||[];
      for(const form of forms)if(!w.aliases.includes(form))w.aliases.push(form);
+     const lemmaKey=norm(v.lemma);
+     const lessonRank=id=>{const m=String(id||'').match(/^(\d+)-(\d+)$/);return m?Number(m[1])*100+Number(m[2]):null;};
+     const rankedTarget=v.role==='target'&&lessonRank(p.lesson_id)!=null;
+     const taken=(course.questions||[]).some(q=>{
+       if(!q||q.topic!=='vocab')return false;
+       if((q.vocabIds||[]).includes(w.id))return true;
+       const sameLemma=norm(q.stimulus)===lemmaKey||((q.fields||[]).flatMap(f=>f.answers||[])).some(a=>norm(a)===lemmaKey);
+       if(!sameLemma)return false;
+       if(rankedTarget&&(q.source==='bank'||lessonRank(q.lessonId)==null))return false;
+       return true;
+     });
+     if(taken)continue;
      const base='v2-'+p.lesson_id+'-vocab-'+String(v.id).split(':').at(-1);
      const rows=[];
      if(forms.length===1){
@@ -92,7 +105,7 @@
    addVocabQuestions(p,course,catalog);
    for(const q of [...p.original_exercises,...p.generated_questions])addQuestion(course,catalog,q);
    if(!catalog.lessons.some(x=>x.id===p.lesson_id))catalog.lessons.push({id:p.lesson_id,title:p.title,active:true,status:p.status,depends_on:p.prerequisites.lessons.slice(),rules:p.rules.map(r=>r.id),sources:p.sources.filter(s=>s.url).map(s=>s.url)});
-   const gLesson=pathLesson(p);if(!chapters.LESSONS.some(x=>x.id===p.lesson_id))chapters.LESSONS.push(gLesson);
+   const gLesson=pathLesson(p);const at=chapters.LESSONS.findIndex(x=>x.id===p.lesson_id);if(at<0)chapters.LESSONS.push(gLesson);else chapters.LESSONS[at]=gLesson;
    const existing=new Set((learning.lessons||[]).map(x=>x.id));for(const l of learningTracks(p,course.questions))if(!existing.has(l.id)){learning.lessons.push(l);existing.add(l.id);}
    if(root.CourseProgress&&root.CourseProgress.registerStages)root.CourseProgress.registerStages(p.lesson_id,stagePlans(p));
    installed.set(p.lesson_id,p);return p;

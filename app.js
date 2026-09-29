@@ -8,8 +8,8 @@
   for(const q of (window.Lesson31Pack?.extraQuestions?.()||[])){if(q&&!known31.has(q.id)){course.questions.push(q);known31.add(q.id);}}
  }catch{}
  try{window.Lesson32Pack?.install?.(course,window.CURRICULUM);}catch{}
- try{window.Lesson33Pack?.install?.(course,window.CURRICULUM);}catch{}
- try{window.Lesson42Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{if(!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-3')))window.Lesson33Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{if(window.LessonRegistry&&window.LessonRegistry.isV2('4-2'))window.Lesson42Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{window.PhraseDrill?.install?.(course,window.CURRICULUM);}catch{}
  try{window.TransferItems?.install?.(course,window.CURRICULUM);}catch{}
  const questions=course.questions;
@@ -42,8 +42,8 @@
  let records=state.records,learningState=state.learning;
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);try{if(window.Lesson31Pack&&P.registerStages)P.registerStages('3-1',window.Lesson31Pack.stagePlans());}catch{}
  try{if(window.Lesson32Pack&&P.registerStages)P.registerStages('3-2',window.Lesson32Pack.stagePlans());}catch{}
- try{if(window.Lesson33Pack&&P.registerStages)P.registerStages('3-3',window.Lesson33Pack.stagePlans());}catch{}
- try{if(window.Lesson42Pack&&P.registerStages)P.registerStages('4-2',window.Lesson42Pack.stagePlans());}catch{}
+ try{if(window.Lesson33Pack&&P.registerStages&&!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-3')))P.registerStages('3-3',window.Lesson33Pack.stagePlans());}catch{}
+ try{if(window.Lesson42Pack&&P.registerStages&&window.LessonRegistry&&window.LessonRegistry.isV2('4-2'))P.registerStages('4-2',window.Lesson42Pack.stagePlans());}catch{}
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null,trainerReturn=null;
  let reviewReasonMap=Object.create(null),materialsQuery='',materialsLesson='',materialsKind='';
@@ -484,6 +484,8 @@
    mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');
  }
  function beginPacked(id){
+   if(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(id))return false;
+   if(id==='4-2'&&!(window.LessonRegistry&&window.LessonRegistry.byId('4-2')))return false;
    const pack=id==='3-1'?window.Lesson31Pack:id==='3-2'?window.Lesson32Pack:id==='3-3'?window.Lesson33Pack:id==='4-2'?window.Lesson42Pack:null;
    if(!pack||!pack.courseSession)return false;
    const built=pack.courseSession(records,{events:state.events});
@@ -1089,14 +1091,15 @@
    const pick=hwLesson&&list.find(p=>p.lesson_id===hwLesson)||list[0];
    if(!pick){root.innerHTML='<div class="panel"><p>Пакеты ДЗ 1–1…1–3 ещё не собраны из банка.</p></div>';return;}
    const pack=pick,attempt=window.Homework.ensureAttempt(state,pack.lesson_id),h=pack.homework;
-   const exercisesClosed=pack.lesson_id==='3-3'&&!h.exercise_ids.length;
+   const exercisesClosed=!!h.gated&&!h.exercise_ids.length;
    const ready=!exercisesClosed&&window.Homework.sheetReady(attempt,pack);
    const exP=window.Homework.partProgress(attempt,h.exercise_ids),wP=window.Homework.partProgress(attempt,h.word_question_ids||[]);
    const exN=window.Homework.sectionCount(h.exercise_ids),wN=window.Homework.sectionCount(h.word_question_ids||[]);
    const resumeAt=window.Homework.resumeIndex(h.exercise_ids,attempt);
    const check=key=>`<label class="pref-check"><input type="checkbox" data-hw-check="${key}" ${attempt.checklist[key]?'checked':''}> ${{method:'Повторила методичку',exercises:'Упражнения сборника',words:'Слова урока',external_test:'Зафиксировала на сайте',keyboard:'Казахская раскладка на телефоне',cheat:'Шпаргалка сохранена'}[key]||key}</label>`;
    const secBtns=(part,n)=>n<=1?'':`<div class="jump-row">${Array.from({length:n},(_,i)=>`<button type="button" class="chip" data-hw-part="${part}" data-hw-sec="${i}">Часть ${i+1}</button>`).join('')}</div>`;
-   const wordLine=(h.word_question_ids||[]).length>(h.word_ids||[]).length?`${(h.word_ids||[]).length} слов × направления, карточек ${wP.done} из ${wP.total}`:`${wP.done} из ${wP.total} слов`;
+   const listed=(h.word_ids||[]).length,cards=(h.word_question_ids||[]).length;
+   const wordLine=cards>listed&&listed?`${listed} слов · карточек ${wP.done} из ${wP.total}`:!cards&&listed?`${listed} слов`:`${wP.done} из ${wP.total} слов`;
    const sourceHomework=(h.source_items||[]).length?`<details class="homework-source"><summary>Исходная домашняя работа</summary><ol>${h.source_items.map(x=>`<li><strong>${esc(x.number)}.</strong> ${esc(x.text)}</li>`).join('')}</ol></details>`:'';
    const headLine=exercisesClosed?'Упражнения ещё закрыты. Они появятся после сдачи правила. Просмотр карточки их не открывает.':`Готово ${exP.done} из ${exP.total} упражнений · ${wordLine}. Это выборка урока, не весь сборник и не повторение.`;
    const openExercises=exercisesClosed?'':`<button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button>`;
@@ -1107,7 +1110,7 @@
        <ol class="learning-steps">
          <li>Повторить методичку — ${h.method_url?`<a href="${esc(h.method_url)}" target="_blank" rel="noopener noreferrer">${esc(h.method_title)}</a>`:'ссылка на материал урока'}${check('method')}</li>
          <li>${exercisesClosed?'Упражнения сборника откроются вместе с правилом.':`Упражнения сборника (${h.exercise_ids.length} пунктов, по ${window.Homework.HW_SECTION} в части) <button type="button" class="secondary-button" data-hw-part="exercises">${exP.done?'Продолжить упражнения':'Открыть упражнения'}</button>${secBtns('exercises',exN)}`}</li>
-         <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${h.word_ids.length} слов. <button type="button" class="secondary-button" data-hw-part="words">${wP.done?'Продолжить слова':'Открыть слова'}</button>${secBtns('words',wN)}</li>
+         <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${wordLine}. <button type="button" class="secondary-button" data-hw-part="words">${wP.done?'Продолжить слова':'Открыть слова'}</button>${secBtns('words',wN)}</li>
          <li>Внешний тест: ${(h.external_tests&&h.external_tests.length?h.external_tests:[h.external_test_url]).filter(Boolean).map(u=>`<a class="ext-test-link" href="${esc(u)}" target="_blank" rel="noopener noreferrer">BatylBol · внешний тест</a>`).join(' · ')||'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
          ${(h.extras||[]).map(x=>'<li>'+check(x)+'</li>').join('')}
        </ol>
