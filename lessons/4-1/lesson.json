@@ -3573,14 +3573,6 @@
           "harmony": "front"
         },
         {
-          "id": "isteu",
-          "lemma": "жұмыс істеу",
-          "translation": "работать",
-          "stem": "істе",
-          "negative_stem": "істе",
-          "harmony": "front"
-        },
-        {
           "id": "zhazu",
           "lemma": "жазу",
           "translation": "писать",
