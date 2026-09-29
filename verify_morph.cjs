@@ -178,7 +178,7 @@ test('Written labels count unaided answers and do not turn speed into a grade',(
  const short=E.createSession({mode:'transfer',level:'person',seed:1,knownLemmas:E.data.lemmas.map(l=>l.id).filter(id=>!['n-арна','n-жыра'].includes(id))});
  assert.ok(short.holdoutNote.startsWith('Недостаточно новых основ'));
  const ui=fs.readFileSync('morph-ui.js','utf8');
- for(const banned of ['медиана','90%','освоено','слух натренирован','произношение освоено','больше не перебираешь'])assert.equal(ui.includes(banned),false,banned);
+ for(const banned of ['медиана','90%','освоено','слух натренирован','произношение освоено','больше не перебираешь','Версия morph-','обучение morph-teaching-'])assert.equal(ui.includes(banned),false,banned);
  assert.ok(ui.includes('на новых основах'));assert.ok(ui.includes('самостоятельно'));
 });
 console.log('MORPH_OK',n,'checks;',E.bank().length,'items;',gold.length,'gold pairs');

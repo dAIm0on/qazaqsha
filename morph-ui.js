@@ -755,7 +755,7 @@ function freePracticeEntry(){
 }
 function render(){
  const host=root();if(!host||!bridge()||!T)return;
- const head='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>';
+ const head='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button></div>';
  if(host.dataset.fs2boot!=='yes'){
   host.dataset.fs2boot='yes';
   const surface=loadSurface();
@@ -811,7 +811,7 @@ function render(){
  const m=data().module,s=m.session;
  if(calcOpen){teachingMode=false;showHub=false;topicOpen=false;}
  const body=calcOpen?calculatorScreen():teachingMode?teachingScreen():topicOpen?topicScreen():(!s||showHub?hub():s.complete?finish(s):question(s));
- host.innerHTML='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button><span class="small">Версия '+esc(E.data.version)+' · обучение '+esc(T.version)+'</span></div>'+(message||m.recovery||m.teaching?.recovery?'<p role="status" class="morph-notice">'+esc(message||m.teaching?.recovery||m.recovery)+'</p>':'')+body;
+ host.innerHTML=head+(message||m.recovery||m.teaching?.recovery?'<p role="status" class="morph-notice">'+esc(message||m.teaching?.recovery||m.recovery)+'</p>':'')+body;
  if(calcOpen)saveSurface('calc');
  else if(teachingMode)saveSurface('teach');
  else if(s&&!showHub&&!s.complete)saveSurface('card');
