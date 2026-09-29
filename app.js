@@ -1195,7 +1195,6 @@
        const continuePath=()=>{pathPracticeReturn=null;if(nxt)G.startChapter(state,les.id,nxt.id);else{gp.phase='done';gp.chapterId=null;}save();renderPath();};
        root.innerHTML=`<div class="panel path-paper">${crumb(les,ch)}<p class="eyebrow">БЛОК РАЗОБРАН</p><h2>${esc(chTitle||ch.title)}</h2>
          <p>Можно перейти дальше или потренировать этот шаг ещё. Практика не ставит финальную оценку и её можно запускать повторно.</p>
-         ${ch.fullExplanation?'<details class="path-full-v2"><summary>Полное объяснение блока</summary><p>'+esc(ch.fullExplanation)+'</p></details>':''}
          <div class="lesson-actions">
            ${practiceIds.length?'<button type="button" class="secondary-button" id="path-more-practice">Практиковаться ещё</button>':''}
            <button type="button" class="primary-button" id="path-next-chapter">${nxt?'Дальше':'К практике урока'}</button>
@@ -1210,7 +1209,8 @@
      gp.phase='done';gp.chapterId=null;save();renderPath();return;
    }
    const chTitle=Bank?Bank.chapterTitle(ch):ch.title;
-   const head=`${crumb(les,ch)}<p class="small">Урок ${esc(courseRow?courseRow.label:les.id)} · ${esc(courseRow?courseRow.name:les.title)}</p><p class="small">Глава ${les.chapters.findIndex(c=>c.id===ch.id)+1} из ${les.chapters.length} · ${esc(chTitle)}</p>`;
+   const v2Full=(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(les.id)&&ch.fullExplanation)?`<details class="path-full-v2"><summary>Полное объяснение блока</summary><p>${esc(ch.fullExplanation)}</p></details>`:'';
+   const head=`${crumb(les,ch)}<p class="small">Урок ${esc(courseRow?courseRow.label:les.id)} · ${esc(courseRow?courseRow.name:les.title)}</p><p class="small">Глава ${les.chapters.findIndex(c=>c.id===ch.id)+1} из ${les.chapters.length} · ${esc(chTitle)}</p>${v2Full}`;
    const nextBeat=()=>{gp.beat++;save();renderPath();};
    const letters=state.prefs.letters;
    const kb=letters?`<div class="letter-keyboard" lang="kk">${[...'әғқңөұүһі'].map(ch=>'<button type="button" lang="kk" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`:'';
