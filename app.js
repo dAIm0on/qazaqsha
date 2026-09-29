@@ -132,7 +132,8 @@
    return l&&P.courseIds().includes(l.courseLesson)?l.courseLesson:null;
  }
  function runtimePracticeSnapshot(){
-   const snap={topic,mode,sourceFilter,courseBlock,queue:[...queue],position,answered:checked,view,activeLesson,activeStep,practiceIds:[...practiceIds],stepEvidence:{...stepEvidence},variants:{...variants},hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft:draft?JSON.parse(JSON.stringify(draft)):null,sessionAttempts,sessionCorrect,sessionAssisted,remediation:remediation?JSON.parse(JSON.stringify(remediation)):null};
+   const currentV2=courseBlock&&window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(courseBlock):null;
+   const snap={topic,mode,sourceFilter,courseBlock,contentRevision:currentV2&&currentV2.content_revision||null,queue:[...queue],position,answered:checked,view,activeLesson,activeStep,practiceIds:[...practiceIds],stepEvidence:{...stepEvidence},variants:{...variants},hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft:draft?JSON.parse(JSON.stringify(draft)):null,sessionAttempts,sessionCorrect,sessionAssisted,remediation:remediation?JSON.parse(JSON.stringify(remediation)):null};
    if(stageContext)snap.stageContext=JSON.parse(JSON.stringify(stageContext));
    return snap;
  }
@@ -144,6 +145,11 @@
    practiceHold=null;
    const lp=P.ensureLessonProgress(state,id),s=lp&&lp.practiceSession;
    if(!s||!Array.isArray(s.queue))return false;
+   const currentV2=window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(id):null;
+   if(currentV2&&s.stageContext&&s.contentRevision!==currentV2.content_revision){
+     P.clearLessonPractice(state,id,Date.now());
+     return false;
+   }
    const missing=P.unknownQueueIds?P.unknownQueueIds(s.queue,byId):s.queue.filter(qid=>!byId.has(qid));
    if(missing.length){practiceHold={lessonId:id,missing,kept:s.queue.slice()};return false;}
    if(!s.queue.length)return false;
