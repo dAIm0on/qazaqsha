@@ -8,6 +8,13 @@ window.LESSON_V2_COMPILED = [
     "label": "4–1",
     "name": "Переходное время",
     "status": "draft",
+    "release": {
+      "approved": false,
+      "preview_head": "",
+      "preview_url": "",
+      "approved_at": "",
+      "note": "PR #19 draft; browser QA and legacy local verify not completed."
+    },
     "sources": [
       {
         "id": "school-method",
