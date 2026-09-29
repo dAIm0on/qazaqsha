@@ -241,6 +241,36 @@ function addCoverage(cards, rows, byText, addForm){
    if(kept)cards.push(kept);
   }
  }
+ const licensed=[
+  ['v-кел','келген адам','пришедший человек','Келген адам — пришедший человек. Нужна форма, которая описывает человека, не «он пришёл».'],
+  ['v-жаз','жазған сөз','написанное слово','Жазған сөз — написанное слово. Нужна форма, которая описывает слово, не «он написал».'],
+  ['v-айт','айтқан сөз','сказанное слово','Айтқан сөз — сказанное слово. Нужна форма, которая описывает слово, не «он сказал».'],
+  ['v-ойна','ойнаған бала','ребёнок, который играл','Ойнаған бала — ребёнок, который играл. Нужна форма, которая описывает ребёнка, не «он играл».']
+ ];
+ for(const [id,phrase,sense,prompt] of licensed){
+  const lemma=verbs.find(l=>l.id===id);
+  if(!lemma)continue;
+  const built=formOf(lemma,['PTCP_GAN']);
+  const past=formOf(lemma,['PAST']);
+  if(!built||!past||built.word===past.word)continue;
+  const card=base(lemma,built,'free.verbs.participle','attr','VERB.PTCP_GAN');
+  const kept=choice(card,built.word,[past.word],prompt,'Это описание человека или предмета, не готовое «он сделал».',sense,phrase+' — '+sense+'. '+past.word+' — уже сделанное действие без этого описания.');
+  if(kept)cards.push(kept);
+ }
+ const kel=verbs.find(l=>l.id==='v-кел');
+ if(kel){
+  const cvb=formOf(kel,['CVB_IP']);
+  const past=formOf(kel,['PAST']);
+  if(cvb&&past&&cvb.word!==past.word){
+   const card=base(kel,cvb,'free.verbs.connected','sequence','VERB.CVB_IP');
+   const kept=choice(card,cvb.word,[past.word],'Келіп айтты — придя, сказал. Келіп здесь шаг перед «сказал», не готовое «он пришёл».','Сначала один шаг, потом главное действие.','шаг перед «сказал»','келіп айтты — шаг перед «сказал». '+past.word+' — уже пришёл, без второго действия.');
+   if(kept){
+    // Queue spaces repeats by lemma. This construction is the only card, so its key is the phrase.
+    kept.normalizedLemmaKey='келіп айтты';
+    cards.push(kept);
+   }
+  }
+ }
  const people=rows.filter(l=>l.predicate);
  for(const lemma of people){
   for(const [blockId,seq,ru,sub] of [['free.person.i_we',['COP_1SG'],'я','i'],['free.person.i_we',['COP_1PL'],'мы','we'],['free.person.you',['COP_2SG'],'ты','you'],['free.person.you',['COP_2POL'],'Вы','you'],['free.person.you_many',['COP_2PL'],'вы, несколько','many'],['free.person.question',['Q'],'вопрос','question']]){

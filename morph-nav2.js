@@ -247,7 +247,7 @@ function summaryHtml(row){
  return '<p>Урок '+esc(row.number)+' на этом шаге закончен. Это не оценка знания.</p><ul class="morph-teach-list"><li>Шагов просмотрено: '+log.seen.length+'</li><li>Верно без помощи: '+log.unaided.length+'</li><li>С помощью: '+log.helped.length+'</li><li>Пропущено: '+log.skipped.length+'</li></ul><div class="morph-actions">'+back+nextBtn+'</div>';
 }
 function practiceReady(row){
- return row.id!=='nav2.1.1'&&row.sourceMappingStatus!=='BOUND_FILTER_GAP'&&!!row.practiceOpen;
+ return row.id!=='nav2.1.1'&&row.sourceMappingStatus!=='BOUND_FILTER_GAP'&&row.sourceMappingStatus!=='NO_LICENSED_CARDS'&&!!row.practiceOpen;
 }
 function learnBody(row){
  if(st().outcome==='summary')return summaryHtml(row);
@@ -263,7 +263,8 @@ function learnBody(row){
 }
 function practiceBody(row){
  if(row.id==='nav2.1.1')return '<p>Для этого урока отдельной очереди нет. Это наблюдение, не проверка.</p>';
- if(row.sourceMappingStatus==='BOUND_FILTER_GAP'||!row.practiceOpen)return '<p>Практику этой темы пока не открываем: в одном наборе карточек два разных смысла, и фильтр ещё не проверен.</p>';
+ if(row.practiceClosed)return '<p>'+esc(row.practiceClosed)+'</p>';
+ if(row.sourceMappingStatus==='BOUND_FILTER_GAP'||row.sourceMappingStatus==='NO_LICENSED_CARDS'||!row.practiceOpen)return '<p>Практику этой темы пока не открываем: в одном наборе карточек два разных смысла, и фильтр ещё не проверен.</p>';
  if(!st().explained[row.id])return '<p>Сначала посмотрите объяснение. Задание откроется после него.</p><button type="button" class="primary-button" data-nav2-tab="learn">К объяснению</button>';
  const bits=row.practiceOpen.split(':');
  return '<p>Можно потренироваться на словах этой темы. Это не оценка и не меняет расписание повторений.</p><button type="button" class="primary-button" data-nav2-practice="'+esc(bits[0])+'" data-nav2-sub="'+esc(bits[1]||'')+'">Потренироваться</button>';
