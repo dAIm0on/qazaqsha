@@ -1189,6 +1189,7 @@
        const continuePath=()=>{pathPracticeReturn=null;if(nxt)G.startChapter(state,les.id,nxt.id);else{gp.phase='done';gp.chapterId=null;}save();renderPath();};
        root.innerHTML=`<div class="panel path-paper">${crumb(les,ch)}<p class="eyebrow">БЛОК РАЗОБРАН</p><h2>${esc(chTitle||ch.title)}</h2>
          <p>Можно перейти дальше или потренировать этот шаг ещё. Практика не ставит финальную оценку и её можно запускать повторно.</p>
+         ${ch.fullExplanation?'<details class="path-full-v2"><summary>Полное объяснение блока</summary><p>'+esc(ch.fullExplanation)+'</p></details>':''}
          <div class="lesson-actions">
            ${practiceIds.length?'<button type="button" class="secondary-button" id="path-more-practice">Практиковаться ещё</button>':''}
            <button type="button" class="primary-button" id="path-next-chapter">${nxt?'Дальше':'К практике урока'}</button>
