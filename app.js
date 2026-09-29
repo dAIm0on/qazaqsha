@@ -228,10 +228,10 @@
  function continueLesson(id){
    viewOnlyPathLesson=null;
    const lp=P.ensureLessonProgress(state,id);
-   const nxt=P.nextRegistered&&P.nextRegistered(id,state.events);
    if(lp&&lp.practiceSession&&restoreLessonPractice(id)){
      markLessonStarted(id,'practice');render();showView('practice');return;
    }
+   const nxt=P.nextRegistered&&P.nextRegistered(id,state.events);
    if(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(id)&&(!lp||!lp.path||lp.path.phase!=='done')){
      openPathLesson(id,{meaningful:true});return;
    }
