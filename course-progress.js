@@ -8,7 +8,11 @@
  const statuses=new Set(['not_started','in_progress','completed']);
  const surfaces=new Set(['path','practice']);
  const studyModes=new Set(['course','phrase','lesson','transfer','remediation']);
- function courseIds(){return (Bank&&Array.isArray(Bank.COURSE)?Bank.COURSE:[]).map(row=>row&&row.id).filter(Boolean);}
+ function courseIds(){
+   const registry=!node&&root.LessonRegistry;
+   if(registry&&typeof registry.ids==='function')return registry.ids();
+   return (Bank&&Array.isArray(Bank.COURSE)?Bank.COURSE:[]).map(row=>row&&row.id).filter(Boolean);
+ }
  function validId(id){return courseIds().includes(id);}
  function emptyPath(){return {chapterId:null,beat:0,phase:'hub',pathDraft:null,canonShownFor:null,updatedAt:0};}
  function emptyLesson(){return {status:'not_started',path:emptyPath(),practiceSession:null,startedAt:null,completedAt:null,lastAttemptAt:null,updatedAt:0};}
@@ -68,7 +72,8 @@
    if(!validId(lessonId))return null;
    const stageId=cleanToken(raw.stageId,80);
    if(!/^[a-z0-9][a-z0-9_-]{0,79}$/.test(stageId))return null;
-   if(raw.contentRevision!==STAGE_REVISION)return null;
+   const revision=cleanToken(raw.contentRevision||STAGE_REVISION,80);
+   if(!revision)return null;
    const coreIds=idList(raw.coreIds,24);
    if(!coreIds.length)return null;
    const kind=STAGE_KINDS.has(raw.kind)?raw.kind:'learning';
@@ -77,7 +82,7 @@
    const ratio=Number(raw.minIndependentRatio);
    return {
      lessonId,
-     contentRevision:STAGE_REVISION,
+     contentRevision:revision,
      stageId,
      kind,
      coreIds,
