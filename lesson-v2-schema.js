@@ -110,6 +110,26 @@
    if(!obj(c))fail('correction object');
    return {id:id(c.id,'correction.id'),source_ref:id(c.source_ref,'correction.source_ref'),source_item_id:str(c.source_item_id,'correction.source_item_id',160),original:str(c.original,'correction.original',1200),corrected:str(c.corrected,'correction.corrected',1200),reason:str(c.reason,'correction.reason',3000),status:c.status==='reviewed'?'reviewed':'draft',qa_fixture_id:id(c.qa_fixture_id,'correction.qa_fixture_id')};
  }
+ function idMap(v,label){
+   if(v==null)return {};
+   if(!obj(v))fail(label+' должен быть object');
+   const out={},entries=Object.entries(v);if(entries.length>300)fail(label+' слишком большой');
+   for(const [from,to] of entries)out[id(from,label+'.from')]=id(to,label+'.to');
+   return out;
+ }
+ function migration(m,currentRevision){
+   if(!obj(m))fail('migration object');
+   const from=id(m.from_revision,'migration.from_revision'),to=id(m.to_revision||currentRevision,'migration.to_revision');
+   if(from===to)fail('migration from_revision и to_revision совпадают');
+   return {
+     from_revision:from,to_revision:to,
+     question_ids:idMap(m.question_ids,'migration.question_ids'),
+     chapter_ids:idMap(m.chapter_ids,'migration.chapter_ids'),
+     stage_ids:idMap(m.stage_ids,'migration.stage_ids'),
+     vocab_ids:idMap(m.vocab_ids,'migration.vocab_ids'),
+     drop_question_ids:strings(m.drop_question_ids||[],'migration.drop_question_ids',0,300).map(x=>id(x,'migration.drop_question_id'))
+   };
+ }
  function validate(raw){
    if(!obj(raw)||raw.schema_version!==2)fail('нужен schema_version=2');
    const lessonId=str(raw.lesson_id,'lesson_id',30);if(!/^\d+-\d+$/.test(lessonId))fail('lesson_id вида 4-1');
@@ -125,7 +145,8 @@
      vocabulary:list(raw.vocabulary||[],'vocabulary',0,500).map(w=>vocabulary(w,lessonId)),
      original_exercises:list(raw.original_exercises||[],'original_exercises',0,1000).map(q=>exercise(q,lessonId)),
      practice_generators:list(raw.practice_generators||[],'practice_generators',0,50).map(generator),
-     corrections:list(raw.corrections||[],'corrections',0,100).map(correction)
+     corrections:list(raw.corrections||[],'corrections',0,100).map(correction),
+     migrations:list(raw.migrations||[],'migrations',0,50).map(m=>migration(m,raw.content_revision))
    };
    const sourceIds=new Set(out.sources.map(s=>s.id)),ruleIds=new Set(out.rules.map(r=>r.id));
    for(const t of out.theory){
@@ -158,6 +179,11 @@
    for(const row of out.homework.source_items)if(!sourceIds.has(row.source_ref))fail('homework source_ref не найден: '+row.source_ref);
    const vocabIds=new Set(out.vocabulary.map(v=>v.id));
    for(const wid of out.homework.word_ids)if(!vocabIds.has(wid))fail('homework word_id не найден: '+wid);
+   const migrationFrom=new Set();
+   for(const m of out.migrations){
+     if(migrationFrom.has(m.from_revision))fail('duplicate migration from_revision '+m.from_revision);
+     migrationFrom.add(m.from_revision);
+   }
    return out;
  }
  const api={validate,id};
