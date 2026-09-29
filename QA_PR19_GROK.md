@@ -3,6 +3,11 @@
 BRANCH: `feature/lesson-package-v2-4-1-20260929`
 PR: `#19`
 BASE: `main`
+HEAD: `8bb2ba332015bd09f2ba5d72cef9c88c5b053771`
+PREVIEW: `https://bd41e056.qazaqsha.pages.dev/`
+BRANCH_PREVIEW: `https://feature-lesson-package-v2-4.qazaqsha.pages.dev/`
+CI: `Verify Qazaqsha #7` — PASS
+CLOUDFLARE: Deploy successful
 MERGE: ЗАПРЕЩЁН без отдельной фразы пользователя.
 
 ## Grok Build — сначала локальная проверка
@@ -41,9 +46,9 @@ git diff --exit-code -- compiled-lessons-v2.js
 
 ## Grok Build — preview
 
-GitHub PR публично показывает `This branch has not been deployed / No deployments`. Нужно создать preview тем способом, который реально используется для Qazaqsha в текущей локальной инфраструктуре/Cloudflare Pages. Не угадывать URL.
+Preview уже создан Cloudflare Pages и привязан к HEAD выше. Не создавать новый preview без причины. Сначала проверить именно `https://bd41e056.qazaqsha.pages.dev/` и доказать, что BUILD_IDENTITY совпадает с HEAD.
 
-После деплоя сообщить строго:
+Сообщить строго:
 
 ```text
 HEAD: <full sha>
