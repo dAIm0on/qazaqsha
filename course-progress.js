@@ -74,7 +74,10 @@
    const stageId=cleanToken(raw.stageId,80);
    if(!/^[a-z0-9][a-z0-9_-]{0,79}$/.test(stageId))return null;
    const revision=cleanToken(raw.contentRevision||STAGE_REVISION,80);
-   if(!revision)return null;
+   const revisionPrefix=lessonId+'.r';
+   const revisionNumber=revision.startsWith(revisionPrefix)?revision.slice(revisionPrefix.length):'';
+   const v2Revision=/^[1-9][0-9]*$/.test(revisionNumber);
+   if(!revision||(revision!==STAGE_REVISION&&!v2Revision))return null;
    const coreIds=idList(raw.coreIds,24);
    if(!coreIds.length)return null;
    const kind=STAGE_KINDS.has(raw.kind)?raw.kind:'learning';
