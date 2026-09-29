@@ -3,6 +3,8 @@
  'use strict';
  const schema=root.LessonV2Schema;
  const installed=new Map();
+ function productionHost(){return !!(root.location&&root.location.hostname==='qazaqsha.pages.dev');}
+ function publishable(raw){return !productionHost()||raw&&raw.status==='released';}
  function questionCopy(q,lessonId){
    return Object.assign({},q,{lessonId,kind:'fields',source:q.source||('v2-'+lessonId),group:q.group||q.id,part:q.part||'1',ruleIds:(q.ruleIds||q.rule_ids||[]).slice(),associationKeys:(q.associationKeys||[]).slice()});
  }
@@ -80,6 +82,7 @@
    }));
  }
  function installOne(raw){
+   if(!publishable(raw))return null;
    const p=schema.validate(raw);if(installed.has(p.lesson_id))return installed.get(p.lesson_id);
    const course=root.COURSE,catalog=root.CURRICULUM,learning=root.LEARNING,chapters=root.GRAMMAR_CHAPTERS;
    if(!course||!catalog||!learning||!chapters)throw Error('Lesson v2 runtime loaded before base registries');
@@ -93,7 +96,7 @@
    if(root.CourseProgress&&root.CourseProgress.registerStages)root.CourseProgress.registerStages(p.lesson_id,stagePlans(p));
    installed.set(p.lesson_id,p);return p;
  }
- function installAll(){const out=[];for(const raw of root.LESSON_V2_COMPILED||[])out.push(installOne(raw));return out;}
+ function installAll(){const out=[];for(const raw of root.LESSON_V2_COMPILED||[]){const p=installOne(raw);if(p)out.push(p);}return out;}
  function byId(id){return installed.get(id)||null;}
  function isV2(id){return installed.has(id)||(root.LessonRegistry&&root.LessonRegistry.isV2(id));}
  function homework(id){const p=byId(id);if(!p)return null;const h=p.homework,ext=h.external_tasks||[];return {lesson_id:id,content_revision:p.content_revision,homework:{title:h.title,word_ids:h.word_ids.slice(),exercise_ids:h.exercise_ids.slice(),word_question_ids:root.COURSE.questions.filter(q=>q.lessonId===id&&q.topic==='vocab'&&q.wordRole==='must').map(q=>q.id),rule_map:Object.fromEntries(h.exercise_ids.map(qid=>{const q=root.COURSE.questions.find(q=>q.id===qid);return [qid,(q&&q.ruleIds&&q.ruleIds[0])||''];}).filter(x=>x[1])),external_test_url:ext[0]&&ext[0].url||'',external_tests:ext.map(x=>x.url),checklist:h.checklist.slice(),extras:[],method_title:(p.sources.find(s=>s.id==='school-method')||{}).title||('Методичка '+id),method_url:(p.sources.find(s=>s.id==='school-method')||{}).url||'',source_items:h.source_items.slice()}};}
