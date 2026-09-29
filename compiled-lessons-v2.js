@@ -909,6 +909,12 @@ window.LESSON_V2_COMPILED = [
         "role": "target",
         "source_refs": [
           "school-homework"
+        ],
+        "forms": [
+          "да",
+          "де",
+          "та",
+          "те"
         ]
       }
     ],
