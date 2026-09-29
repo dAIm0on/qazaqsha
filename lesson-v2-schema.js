@@ -38,8 +38,8 @@
    };
    if(q.source_item)out.source_item=str(q.source_item,'exercise.source_item',240);
    if(q.prompt_original)out.prompt_original=str(q.prompt_original,'exercise.prompt_original',1600);
-   if(q.rule_ids)out.ruleIds=strings(q.rule_ids,'exercise.rule_ids',0,20).map(x=>id(x,'rule_id'));
-   if(q.source_refs)out.source_refs=strings(q.source_refs,'exercise.source_refs',0,20).map(x=>id(x,'source_ref'));
+   const ruleInput=q.rule_ids||q.ruleIds;if(ruleInput)out.ruleIds=strings(ruleInput,'exercise.rule_ids',0,20).map(x=>id(x,'rule_id'));
+   const sourceInput=q.source_refs||q.sourceRefs;if(sourceInput)out.source_refs=strings(sourceInput,'exercise.source_refs',0,20).map(x=>id(x,'source_ref'));
    if(q.diagnostic_codes)out.diagnostic_codes=strings(q.diagnostic_codes,'exercise.diagnostic_codes',0,20).map(x=>id(x,'diagnostic_code'));
    if(q.note)out.note=str(q.note,'exercise.note',1600);
    return out;
