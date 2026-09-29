@@ -12,7 +12,8 @@
   {id:'2-3',label:'2–3',name:'Ол / олар, вопрос, порядковые',rules:['T9_OL','T10_QUESTION','T11_ORDINAL']},
   {id:'3-1',label:'3–1',name:'Притяжательные формы: мой / твой / его; бар / жоқ',rules:['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']},
   {id:'3-2',label:'3–2',name:'Наш / ваш / их; указательные',rules:['T24_POSS_BIZ','T25_POSS_SENDER','T26_POSS_OLAR','T27_DEIXIS']},
-  {id:'3-3',label:'3–3',name:'Кто и чей вместе',rules:['T28_OWNER_SUBJECT','T29_POSS_PERSON_STACK','T30_THIRD_ZERO','T31_EMES_STACK','T32_OTBASY','T33_ADJ_ROLE','T34_INTERROGATIVE']}
+  {id:'3-3',label:'3–3',name:'Кто и чей вместе',rules:['T28_OWNER_SUBJECT','T29_POSS_PERSON_STACK','T30_THIRD_ZERO','T31_EMES_STACK','T32_OTBASY','T33_ADJ_ROLE','T34_INTERROGATIVE']},
+  {id:'4-2',label:'4–2',name:'Прошедшее время',rules:['T35_PAST_MEANING','T36_DY_TY','T37_PERSON2','T38_OL_ZERO_PAST','T39_PAST_ASSIM','T40_PAST_NEG','T41_PAST_Q','T42_PAST_EXCEPT']}
  ];
  const OPEN=COURSE.map(row=>row.id);
  const CHAPTER_RULE={
@@ -31,7 +32,9 @@
   '3-2-e':'T25_POSS_SENDER','3-2-f':'T25_POSS_SENDER','3-2-g':'T26_POSS_OLAR','3-2-h':'T26_POSS_OLAR',
   '3-2-i':'T27_DEIXIS','3-2-j':'T25_POSS_SENDER',
   '3-3-a':'T28_OWNER_SUBJECT','3-3-b':'T29_POSS_PERSON_STACK','3-3-c':'T29_POSS_PERSON_STACK','3-3-d':'T30_THIRD_ZERO',
-  '3-3-e':'T31_EMES_STACK','3-3-f':'T32_OTBASY','3-3-g':'T34_INTERROGATIVE'
+  '3-3-e':'T31_EMES_STACK','3-3-f':'T32_OTBASY','3-3-g':'T34_INTERROGATIVE',
+  '4-2-a':'T35_PAST_MEANING','4-2-b':'T36_DY_TY','4-2-c':'T37_PERSON2','4-2-d':'T38_OL_ZERO_PAST',
+  '4-2-e':'T39_PAST_ASSIM','4-2-f':'T40_PAST_NEG','4-2-g':'T41_PAST_Q','4-2-h':'T42_PAST_EXCEPT'
  };
  const TITLE_FIX={
   '1-2-a':'Гласная А или Е','1-2-b':'Начало Л / Д / Т','1-2-glue':'Сборка двух шагов',

@@ -9,6 +9,7 @@
  }catch{}
  try{window.Lesson32Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{window.Lesson33Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{window.Lesson42Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{window.PhraseDrill?.install?.(course,window.CURRICULUM);}catch{}
  try{window.TransferItems?.install?.(course,window.CURRICULUM);}catch{}
  const questions=course.questions;
@@ -34,7 +35,7 @@
  if(!state.prefs.lettersChosen&&typeof matchMedia==='function'&&matchMedia('(max-width:690px)').matches)state.prefs.letters=true;
  if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
  window.ExplainDepth={
-   get(id){const key=String(id||''),chosen=state.explainDepth&&state.explainDepth[key];if(chosen==='open')return true;if(chosen==='closed')return false;if(/^T2[4-7]_/.test(key)||/^T2[89]_|^T3[0-4]_/.test(key))return false;return true;},
+   get(id){const key=String(id||''),chosen=state.explainDepth&&state.explainDepth[key];if(chosen==='open')return true;if(chosen==='closed')return false;if(/^T2[4-7]_/.test(key)||/^T2[89]_|^T3[0-9]_|^T4[0-2]_/.test(key))return false;return true;},
    set(id,open){if(!id)return;state.explainDepth=state.explainDepth||Object.create(null);state.explainDepth[String(id).slice(0,40)]=open?'open':'closed';save();}
  };
  window.NumberLadder?.parkLearn(state.learning,state.records);
@@ -42,6 +43,7 @@
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);try{if(window.Lesson31Pack&&P.registerStages)P.registerStages('3-1',window.Lesson31Pack.stagePlans());}catch{}
  try{if(window.Lesson32Pack&&P.registerStages)P.registerStages('3-2',window.Lesson32Pack.stagePlans());}catch{}
  try{if(window.Lesson33Pack&&P.registerStages)P.registerStages('3-3',window.Lesson33Pack.stagePlans());}catch{}
+ try{if(window.Lesson42Pack&&P.registerStages)P.registerStages('4-2',window.Lesson42Pack.stagePlans());}catch{}
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null,trainerReturn=null;
  let reviewReasonMap=Object.create(null),materialsQuery='',materialsLesson='',materialsKind='';
@@ -482,7 +484,7 @@
    mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');
  }
  function beginPacked(id){
-   const pack=id==='3-1'?window.Lesson31Pack:id==='3-2'?window.Lesson32Pack:id==='3-3'?window.Lesson33Pack:null;
+   const pack=id==='3-1'?window.Lesson31Pack:id==='3-2'?window.Lesson32Pack:id==='3-3'?window.Lesson33Pack:id==='4-2'?window.Lesson42Pack:null;
    if(!pack||!pack.courseSession)return false;
    const built=pack.courseSession(records,{events:state.events});
    return !!(built&&built.stage&&beginStaged(id,Object.assign({},built.stage,{extraIds:built.remediationIds||[]})));
