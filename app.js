@@ -150,7 +150,19 @@
      P.clearLessonPractice(state,id,Date.now());
      return false;
    }
-   const missing=P.unknownQueueIds?P.unknownQueueIds(s.queue,byId):s.queue.filter(qid=>!byId.has(qid));
+   let missing=P.unknownQueueIds?P.unknownQueueIds(s.queue,byId):s.queue.filter(qid=>!byId.has(qid));
+   if(missing.length&&currentV2&&s.contentRevision&&s.contentRevision!==currentV2.content_revision&&window.LessonV2Runtime&&window.LessonV2Runtime.migrateIds){
+     const migrated=window.LessonV2Runtime.migrateIds(id,s.contentRevision,'question_ids',s.queue);
+     if(migrated&&migrated.every(qid=>byId.has(qid))){
+       s.queue=migrated;
+       if(Array.isArray(s.practiceIds)){
+         const movedPractice=window.LessonV2Runtime.migrateIds(id,s.contentRevision,'question_ids',s.practiceIds);
+         if(movedPractice)s.practiceIds=movedPractice;
+       }
+       s.contentRevision=currentV2.content_revision;
+       missing=[];
+     }
+   }
    if(missing.length){practiceHold={lessonId:id,missing,kept:s.queue.slice()};return false;}
    if(!s.queue.length)return false;
    topic=s.topic||'all';mode=s.mode||'course';sourceFilter=s.sourceFilter||null;courseBlock=id;
@@ -167,7 +179,9 @@
  function persistLessonPath(id){
    const gp=state.grammarPath;if(!gp)return null;
    const lessonId=id||gp.lessonId;if(!P.courseIds().includes(lessonId))return null;
-   return P.saveLessonPath(state,lessonId,gp,Date.now());
+   const currentV2=window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(lessonId):null;
+   const snap=Object.assign({},gp,{contentRevision:currentV2&&currentV2.content_revision||gp.contentRevision||null});
+   return P.saveLessonPath(state,lessonId,snap,Date.now());
  }
  function loadLessonPath(id){
    const G=window.GrammarPath;if(!G||!P.courseIds().includes(id))return null;
@@ -175,7 +189,13 @@
    G.migrateProgress(gp);
    if(gp.lessonId&&gp.lessonId!==id)persistLessonPath(gp.lessonId);
    const lp=P.ensureLessonProgress(state,id),p=lp&&lp.path;
-   gp.lessonId=id;gp.chapterId=p&&p.chapterId||null;gp.beat=Math.max(0,Number(p&&p.beat)||0);gp.phase=p&&['lesson','beat','done'].includes(p.phase)?p.phase:'lesson';
+   const currentV2=window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(id):null;
+   let chapterId=p&&p.chapterId||null;
+   if(currentV2&&p&&p.contentRevision&&p.contentRevision!==currentV2.content_revision&&chapterId&&!(G.chapter&&G.chapter(id,chapterId))){
+     const moved=window.LessonV2Runtime.migrateId&&window.LessonV2Runtime.migrateId(id,p.contentRevision,'chapter_ids',chapterId);
+     chapterId=moved||null;
+   }
+   gp.lessonId=id;gp.chapterId=chapterId;gp.beat=Math.max(0,Number(p&&p.beat)||0);gp.phase=p&&['lesson','beat','done'].includes(p.phase)?p.phase:'lesson';gp.contentRevision=currentV2&&currentV2.content_revision||p&&p.contentRevision||null;
    if(p&&p.pathDraft)gp.pathDraft=JSON.parse(JSON.stringify(p.pathDraft));else delete gp.pathDraft;
    if(p&&p.canonShownFor)gp.canonShownFor=p.canonShownFor;else delete gp.canonShownFor;
    return gp;
