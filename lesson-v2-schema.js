@@ -130,13 +130,32 @@
      drop_question_ids:strings(m.drop_question_ids||[],'migration.drop_question_ids',0,300).map(x=>id(x,'migration.drop_question_id'))
    };
  }
+ function releaseInfo(v,status){
+   const r=obj(v)?v:{};
+   const out={
+     approved:r.approved===true,
+     preview_head:typeof r.preview_head==='string'?r.preview_head.trim():'',
+     preview_url:typeof r.preview_url==='string'?r.preview_url.trim():'',
+     approved_at:typeof r.approved_at==='string'?r.approved_at.trim():'',
+     note:typeof r.note==='string'?r.note.trim().slice(0,2000):''
+   };
+   if(out.preview_url&&!/^https:\/\//.test(out.preview_url))fail('release.preview_url должен быть https');
+   if(status==='released'){
+     if(!out.approved)fail('released lesson требует release.approved=true');
+     if(!/^[0-9a-f]{40}$/i.test(out.preview_head))fail('released lesson требует release.preview_head SHA40');
+     if(!out.preview_url)fail('released lesson требует release.preview_url');
+   }
+   return out;
+ }
  function validate(raw){
    if(!obj(raw)||raw.schema_version!==2)fail('нужен schema_version=2');
    const lessonId=str(raw.lesson_id,'lesson_id',30);if(!/^\d+-\d+$/.test(lessonId))fail('lesson_id вида 4-1');
+   const status=['draft','reviewed','released'].includes(raw.status)?raw.status:'draft';
    const out={
      schema_version:2,lesson_id:lessonId,content_revision:id(raw.content_revision,'content_revision'),
      title:str(raw.title,'title',240),label:str(raw.label||lessonId.replace('-', '–'),'label',40),name:str(raw.name||raw.title,'name',240),
-     status:['draft','reviewed','released'].includes(raw.status)?raw.status:'draft',
+     status,
+     release:releaseInfo(raw.release,status),
      sources:list(raw.sources,'sources',3,100).map(source),
      prerequisites:{lessons:strings(raw.prerequisites&&raw.prerequisites.lessons||[],'prerequisites.lessons',0,50),skills_required:strings(raw.prerequisites&&raw.prerequisites.skills_required||[],'skills_required',0,100),skills_review:strings(raw.prerequisites&&raw.prerequisites.skills_review||[],'skills_review',0,100)},
      scope:{allowed:strings(raw.scope&&raw.scope.allowed||[],'scope.allowed',1,100),blocked_future:strings(raw.scope&&raw.scope.blocked_future||[],'scope.blocked_future',0,100)},
