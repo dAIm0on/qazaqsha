@@ -125,6 +125,10 @@
    return orderedWords((questions||[]).filter(q=>lemmas.has(vocabLemma(q))));
  }
  function buildPack(lessonId,questions,course,opts={}){
+   if(!node&&root.LessonV2Runtime&&root.LessonV2Runtime.homework){
+     const v2=root.LessonV2Runtime.homework(lessonId);
+     if(v2)return v2;
+   }
    if(lessonId==='3-3'&&lesson33Homework){
      const spec=lesson33Homework.build({events:opts.events||[]});
      const qById=new Map((questions||[]).map(q=>[q.id,q]));
@@ -182,7 +186,8 @@
    };
  }
  function packs(questions,course,opts={}){
-   return ['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'].map(id=>buildPack(id,questions,course,opts)).filter(p=>p.homework.exercise_ids.length||p.homework.word_ids.length);
+   const ids=!node&&root.LessonRegistry&&root.LessonRegistry.ids?root.LessonRegistry.ids():['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
+   return ids.map(id=>buildPack(id,questions,course,opts)).filter(p=>p&&p.homework&&(p.homework.exercise_ids.length||p.homework.word_ids.length));
  }
  function validateHomework(raw,knownIds){
    return schema.validateHomework(raw,knownIds);
