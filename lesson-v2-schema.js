@@ -127,17 +127,37 @@
      practice_generators:list(raw.practice_generators||[],'practice_generators',0,50).map(generator),
      corrections:list(raw.corrections||[],'corrections',0,100).map(correction)
    };
-   const sourceIds=new Set(out.sources.map(s=>s.id));
-   for(const t of out.theory)for(const ref of t.source_refs)if(!sourceIds.has(ref))fail('theory source_ref не найден: '+ref);
+   const sourceIds=new Set(out.sources.map(s=>s.id)),ruleIds=new Set(out.rules.map(r=>r.id));
+   for(const t of out.theory){
+     if(!ruleIds.has(t.rule_id))fail('theory rule_id не найден: '+t.rule_id);
+     for(const ref of t.source_refs)if(!sourceIds.has(ref))fail('theory source_ref не найден: '+ref);
+   }
    for(const w of out.vocabulary)for(const ref of w.source_refs)if(!sourceIds.has(ref))fail('vocab source_ref не найден: '+ref);
+   for(const q of out.original_exercises){
+     for(const ref of q.source_refs||[])if(!sourceIds.has(ref))fail('exercise source_ref не найден: '+ref);
+     for(const rid of q.ruleIds||[])if(!ruleIds.has(rid))fail('exercise rule_id не найден: '+rid);
+   }
+   for(const c of out.corrections)if(!sourceIds.has(c.source_ref))fail('correction source_ref не найден: '+c.source_ref);
    const ids=new Set();
    const take=(x,label)=>{if(ids.has(x))fail('duplicate id '+x+' ('+label+')');ids.add(x);};
    out.rules.forEach(x=>take(x.id,'rule'));out.theory.forEach(x=>take(x.id,'theory'));out.vocabulary.forEach(x=>take(x.id,'vocabulary'));out.original_exercises.forEach(x=>take(x.id,'exercise'));out.practice_generators.forEach(x=>take(x.id,'generator'));out.corrections.forEach(x=>take(x.id,'correction'));
    out.generated_questions=list(raw.generated_questions||[],'generated_questions',0,5000).map(q=>exercise(q,lessonId));
-   out.generated_questions.forEach(x=>take(x.id,'generated question'));
+   out.generated_questions.forEach(x=>{
+     take(x.id,'generated question');
+     for(const ref of x.source_refs||[])if(!sourceIds.has(ref))fail('generated source_ref не найден: '+ref);
+     for(const rid of x.ruleIds||[])if(!ruleIds.has(rid))fail('generated rule_id не найден: '+rid);
+   });
    const qids=new Set([...out.original_exercises,...out.generated_questions].map(q=>q.id));
-   out.stages=list(raw.stages||[],'stages',0,100).map(stage);out.stages.forEach(s=>{take(s.id,'stage');for(const q of s.core_ids)if(!qids.has(q))fail('stage core_id не найден: '+q);});
+   out.stages=list(raw.stages||[],'stages',0,100).map(stage);out.stages.forEach(st=>{
+     take(st.id,'stage');
+     for(const q of st.core_ids)if(!qids.has(q))fail('stage core_id не найден: '+q);
+     for(const q of st.required_independent_ids)if(!st.core_ids.includes(q))fail('stage required_id не входит в core_ids: '+q);
+     for(const rid of st.rule_ids)if(!ruleIds.has(rid))fail('stage rule_id не найден: '+rid);
+   });
    out.homework=homework(raw.homework||{source_items:[{id:'missing',number:'?',text:'TBD',source_ref:out.sources[0].id}]},qids,lessonId);
+   for(const row of out.homework.source_items)if(!sourceIds.has(row.source_ref))fail('homework source_ref не найден: '+row.source_ref);
+   const vocabIds=new Set(out.vocabulary.map(v=>v.id));
+   for(const wid of out.homework.word_ids)if(!vocabIds.has(wid))fail('homework word_id не найден: '+wid);
    return out;
  }
  const api={validate,id};
