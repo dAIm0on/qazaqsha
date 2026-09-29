@@ -42,13 +42,16 @@
    const out=[];
    for(const x of g.lexemes||[])for(const person of g.persons||[])for(const polarity of g.polarities||[]){
      const answer=form(x,person,polarity),sub=PERSON[person]&&PERSON[person].subject||person;
+     const ruleIds=polarity==='negative'?['v2:'+lessonId+':negative','v2:'+lessonId+':person']:['v2:'+lessonId+':linker','v2:'+lessonId+':person'];
+     if((x.negative_stem||x.stem)!==x.stem&&!ruleIds.includes('v2:'+lessonId+':alternation'))ruleIds.push('v2:'+lessonId+':alternation');
+     const skillBindings=ruleIds.map(ruleId=>({item_id:'rule:'+ruleId,skill_type:'application',field:0,facet:null}));
      out.push({
        id:qid(lessonId,g.id,x.id,person,polarity),origin:'generated',topic:'verbs',kind:'fields',
        title:polarity==='negative'?'Собери отрицательную форму':'Собери форму',
        stimulus:sub+' + '+x.lemma+' — '+x.translation,
        fields:[{label:'Ответ',kind:'text',answers:[answer]}],
        explanation:explanation(x,person,polarity),lessonId,
-       ruleIds:polarity==='negative'?['v2:'+lessonId+':negative']:['v2:'+lessonId+':linker','v2:'+lessonId+':person'],
+       ruleIds,skillBindings,
        generator:{generator_id:g.id,lexeme_id:x.id,person,polarity},
        item_type:'prod'
      });
