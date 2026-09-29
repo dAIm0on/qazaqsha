@@ -1,4 +1,4 @@
-/* Deterministic written-form engine for ауыспалы осы/келер шақ practice. */
+/* Compile-time deterministic written-form generator for ауыспалы осы/келер шақ. Not loaded by the browser runtime. */
 (function(root){
  'use strict';
  const node=typeof module!=='undefined'&&module.exports;
