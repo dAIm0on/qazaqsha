@@ -35,7 +35,7 @@
  function normalizePractice(raw){
    if(!obj(raw)||!Array.isArray(raw.queue)||!Number.isInteger(raw.position)||raw.position<0||raw.position>raw.queue.length||typeof raw.mode!=='string')return null;
    const out={};
-   const scalar=['topic','mode','sourceFilter','courseBlock','position','answered','view','activeLesson','activeStep','hinted','elapsed_ms','queueEpoch','presented','sessionAttempts','sessionCorrect','sessionAssisted','remediation','updatedAt'];
+   const scalar=['topic','mode','sourceFilter','courseBlock','contentRevision','position','answered','view','activeLesson','activeStep','hinted','elapsed_ms','queueEpoch','presented','sessionAttempts','sessionCorrect','sessionAssisted','remediation','updatedAt'];
    const arrays=['queue','practiceIds'];
    const objects=['stepEvidence','variants','draft'];
    for(const k of scalar)if(raw[k]!==undefined)out[k]=copy(raw[k]);
