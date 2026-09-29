@@ -22,7 +22,7 @@ const sourceTemplate={
   ]
 };
 const lessonTemplate={
-  schema_version:2,lesson_id:id,content_revision:id+'.r1',title:'Урок '+id.replace('-', '–')+' · '+title,label:id.replace('-', '–'),name:title,status:'draft',
+  schema_version:2,lesson_id:id,content_revision:id+'.r1',title:'Урок '+id.replace('-', '–')+' · '+title,label:id.replace('-', '–'),name:title,status:'draft',release:{approved:false,preview_head:'',preview_url:'',approved_at:'',note:''},
   prerequisites:{lessons:[],skills_required:[],skills_review:[]},
   scope:{allowed:['REPLACE_WITH_SKILL'],blocked_future:[]},
   rules:[{id:'v2:'+id+':rule-1',title:'REPLACE'}],
