@@ -37,6 +37,17 @@ for(const dir of dirs){
   if(lesson.status!=='draft')assert.ok(school.length>=3,'reviewed/released lesson needs method+exercise+homework sources '+lesson.lesson_id);
   if(lesson.status==='released')assert.ok(lesson.corrections.every(x=>x.status==='reviewed'),'released lesson has draft correction '+lesson.lesson_id);
 
+  const migByFrom=new Map((lesson.migrations||[]).map(m=>[m.from_revision,m]));
+  for(const start of migByFrom.keys()){
+    const seen=new Set();let rev=start,steps=0;
+    while(rev!==lesson.content_revision){
+      assert.equal(seen.has(rev),false,'migration cycle '+lesson.lesson_id+' at '+rev);
+      seen.add(rev);const m=migByFrom.get(rev);
+      assert.ok(m,'migration chain does not reach current revision '+lesson.lesson_id+' from '+start);
+      rev=m.to_revision;if(++steps>20)throw Error('migration chain too long '+lesson.lesson_id);
+    }
+  }
+
   const practiceRules=new Set([...lesson.original_exercises,...lesson.generated_questions].flatMap(q=>q.ruleIds||[]));
   for(const stage of lesson.stages)for(const rid of stage.rule_ids)practiceRules.add(rid);
   for(const t of lesson.theory)assert.ok(practiceRules.has(t.rule_id)||t.checks.length>0,'theory rule has no check/practice '+t.rule_id);
