@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const Schema=require('./lesson-v2-schema.js');
 const Nonpast=require('./nonpast-engine.js');
+const Generators=require('./tools/lesson-generators.cjs');
 const Diagnostics=require('./diagnostics.js');
 const CourseProgress=require('./course-progress.js');
 
@@ -43,7 +44,7 @@ assert.equal(form('zhabu','1sg','negative'),'жаппаймын');
 assert.equal(form('tigu','1sg','negative'),'тікпеймін');
 ok('deterministic nonpast engine');
 
-const expanded=Nonpast.expand(p.lesson_id,gen);
+const expanded=Generators.expand(p);
 assert.equal(expanded.length,322);
 assert.equal(new Set(expanded.map(x=>x.id)).size,expanded.length);
 const sharedSkills=new Set(expanded.flatMap(q=>(q.skillBindings||[]).map(b=>b.item_id)));
@@ -92,8 +93,11 @@ ok('persistent ids unique');
 
 const compiledText=fs.readFileSync(path.join(__dirname,'compiled-lessons-v2.js'),'utf8');
 const compiledJson=compiledText.replace(/^.*?window\.LESSON_V2_COMPILED\s*=\s*/s,'').replace(/;\s*$/s,'');
-assert.deepEqual(JSON.parse(compiledJson),[p]);
-ok('compiled snapshot is fresh and normalized');
+const built=JSON.parse(JSON.stringify(p));built.generated_questions=[...p.generated_questions,...expanded];
+const expectedCompiled=Schema.validate(built);
+assert.deepEqual(JSON.parse(compiledJson),[expectedCompiled]);
+assert.equal(expectedCompiled.generated_questions.length,345);
+ok('compiler expands 322 generated forms into normalized runtime data');
 
 const bad=JSON.parse(JSON.stringify(raw));
 bad.theory[0].source_refs=['missing-source'];
@@ -122,7 +126,7 @@ assert.equal(CourseProgress.evaluateStage(stale,ctx).pass,false);
 ok('resume keeps content revision and stale stage evidence cannot pass a new revision');
 
 const mock={
-  LessonV2Schema:Schema,NonpastEngine:Nonpast,LESSON_V2_COMPILED:[p],
+  LessonV2Schema:Schema,LESSON_V2_COMPILED:[expectedCompiled],
   COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
   CURRICULUM:{words:[],rules:[],lessons:[],addWord(kazakh,translation,lesson,role){
     let w=this.words.find(x=>x.kazakh===kazakh);
@@ -134,7 +138,7 @@ const mock={
 };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8'),{window:mock,globalThis:mock,console});
 assert.ok(mock.LessonV2Runtime.byId('4-1'));
-assert.equal(mock.COURSE.questions.filter(q=>q.generator).length,322);
+assert.equal(mock.COURSE.questions.filter(q=>String(q.id).startsWith('gen:4-1:')).length,322);
 assert.equal(mock.COURSE.questions.filter(q=>q.origin==='school').length,71);
 assert.equal(mock.COURSE.questions.filter(q=>q.origin==='research').length,23);
 assert.equal(mock.COURSE.questions.filter(q=>q.topic==='vocab').length,23);
@@ -143,7 +147,14 @@ assert.ok(mock.GRAMMAR_CHAPTERS.LESSONS.find(x=>x.id==='4-1').chapters.every(x=>
 const extra=mock.LessonV2Runtime.practiceForRule('4-1','v2:4-1:negative',12);
 assert.equal(extra.length,12);
 assert.equal(new Set(extra).size,12);
-ok('runtime auto-registers theory, 439 questions, vocabulary and varied optional practice');
+assert.equal(mock.COURSE.questions.length,439);
+ok('data-only runtime auto-registers theory, 439 questions, vocabulary and varied optional practice');
+
+const indexText=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
+const swText=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
+assert.equal(indexText.includes('src="nonpast-engine.js"'),false);
+assert.equal(swText.includes('"nonpast-engine.js"'),false);
+ok('lesson-specific generator is compile-time only, not browser/offline runtime');
 
 const dummy={
  schema_version:2,lesson_id:'9-9',content_revision:'9-9.r1',title:'Fixture',status:'draft',
