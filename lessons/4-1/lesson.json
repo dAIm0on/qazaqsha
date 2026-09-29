@@ -3998,5 +3998,12 @@
       "external_test"
     ]
   },
-  "migrations": []
+  "migrations": [],
+  "release": {
+    "approved": false,
+    "preview_head": "",
+    "preview_url": "",
+    "approved_at": "",
+    "note": "PR #19 draft; browser QA and legacy local verify not completed."
+  }
 }
