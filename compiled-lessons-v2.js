@@ -4088,6 +4088,7496 @@ window.LESSON_V2_COMPILED = [
           "research-errors",
           "research-bank"
         ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келеді"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + е + ді → келеді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келмейді"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + ме + й + ді → келмейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келемін"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + е + мін → келемін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келмеймін"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + ме + й + мін → келмеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келеміз"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + е + міз → келеміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келмейміз"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + ме + й + міз → келмейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келесің"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + е + сің → келесің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келмейсің"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + ме + й + сің → келмейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келесіңдер"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + е + сіңдер → келесіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келмейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + ме + й + сіңдер → келмейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келесіз"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + е + сіз → келесіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келмейсіз"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + ме + й + сіз → келмейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келесіздер"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + е + сіздер → келесіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kelu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + келу — приходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "келмейсіздер"
+            ]
+          }
+        ],
+        "explanation": "келу → кел + ме + й + сіздер → келмейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетеді"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + е + ді → кетеді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетпейді"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + пе + й + ді → кетпейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетемін"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + е + мін → кетемін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетпеймін"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + пе + й + мін → кетпеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетеміз"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + е + міз → кетеміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетпейміз"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + пе + й + міз → кетпейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетесің"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + е + сің → кетесің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетпейсің"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + пе + й + сің → кетпейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетесіңдер"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + е + сіңдер → кетесіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетпейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + пе + й + сіңдер → кетпейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетесіз"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + е + сіз → кетесіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетпейсіз"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + пе + й + сіз → кетпейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетесіздер"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + е + сіздер → кетесіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ketu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + кету — уходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кетпейсіздер"
+            ]
+          }
+        ],
+        "explanation": "кету → кет + пе + й + сіздер → кетпейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кіреді"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + е + ді → кіреді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кірмейді"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + ме + й + ді → кірмейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кіремін"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + е + мін → кіремін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кірмеймін"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + ме + й + мін → кірмеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кіреміз"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + е + міз → кіреміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кірмейміз"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + ме + й + міз → кірмейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кіресің"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + е + сің → кіресің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кірмейсің"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + ме + й + сің → кірмейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кіресіңдер"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + е + сіңдер → кіресіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кірмейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + ме + й + сіңдер → кірмейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кіресіз"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + е + сіз → кіресіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кірмейсіз"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + ме + й + сіз → кірмейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кіресіздер"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + е + сіздер → кіресіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:kiru:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + кіру — входить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кірмейсіздер"
+            ]
+          }
+        ],
+        "explanation": "кіру → кір + ме + й + сіздер → кірмейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шығады"
+            ]
+          }
+        ],
+        "explanation": "шығу → шығ + а + ды → шығады.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шықпайды"
+            ]
+          }
+        ],
+        "explanation": "шығу → шық + па + й + ды → шықпайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шығамын"
+            ]
+          }
+        ],
+        "explanation": "шығу → шығ + а + мын → шығамын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шықпаймын"
+            ]
+          }
+        ],
+        "explanation": "шығу → шық + па + й + мын → шықпаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шығамыз"
+            ]
+          }
+        ],
+        "explanation": "шығу → шығ + а + мыз → шығамыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шықпаймыз"
+            ]
+          }
+        ],
+        "explanation": "шығу → шық + па + й + мыз → шықпаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шығасың"
+            ]
+          }
+        ],
+        "explanation": "шығу → шығ + а + сың → шығасың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шықпайсың"
+            ]
+          }
+        ],
+        "explanation": "шығу → шық + па + й + сың → шықпайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шығасыңдар"
+            ]
+          }
+        ],
+        "explanation": "шығу → шығ + а + сыңдар → шығасыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шықпайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "шығу → шық + па + й + сыңдар → шықпайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шығасыз"
+            ]
+          }
+        ],
+        "explanation": "шығу → шығ + а + сыз → шығасыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шықпайсыз"
+            ]
+          }
+        ],
+        "explanation": "шығу → шық + па + й + сыз → шықпайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шығасыздар"
+            ]
+          }
+        ],
+        "explanation": "шығу → шығ + а + сыздар → шығасыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:shygu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + шығу — выходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шықпайсыздар"
+            ]
+          }
+        ],
+        "explanation": "шығу → шық + па + й + сыздар → шықпайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздейді"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + й + ді → іздейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздемейді"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + ме + й + ді → іздемейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздеймін"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + й + мін → іздеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздемеймін"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + ме + й + мін → іздемеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздейміз"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + й + міз → іздейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздемейміз"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + ме + й + міз → іздемейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздейсің"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + й + сің → іздейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздемейсің"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + ме + й + сің → іздемейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + й + сіңдер → іздейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздемейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + ме + й + сіңдер → іздемейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздейсіз"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + й + сіз → іздейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздемейсіз"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + ме + й + сіз → іздемейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздейсіздер"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + й + сіздер → іздейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:izdeu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + іздеу — искать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "іздемейсіздер"
+            ]
+          }
+        ],
+        "explanation": "іздеу → ізде + ме + й + сіздер → іздемейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "табады"
+            ]
+          }
+        ],
+        "explanation": "табу → таб + а + ды → табады.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "таппайды"
+            ]
+          }
+        ],
+        "explanation": "табу → тап + па + й + ды → таппайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "табамын"
+            ]
+          }
+        ],
+        "explanation": "табу → таб + а + мын → табамын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "таппаймын"
+            ]
+          }
+        ],
+        "explanation": "табу → тап + па + й + мын → таппаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "табамыз"
+            ]
+          }
+        ],
+        "explanation": "табу → таб + а + мыз → табамыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "таппаймыз"
+            ]
+          }
+        ],
+        "explanation": "табу → тап + па + й + мыз → таппаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "табасың"
+            ]
+          }
+        ],
+        "explanation": "табу → таб + а + сың → табасың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "таппайсың"
+            ]
+          }
+        ],
+        "explanation": "табу → тап + па + й + сың → таппайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "табасыңдар"
+            ]
+          }
+        ],
+        "explanation": "табу → таб + а + сыңдар → табасыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "таппайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "табу → тап + па + й + сыңдар → таппайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "табасыз"
+            ]
+          }
+        ],
+        "explanation": "табу → таб + а + сыз → табасыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "таппайсыз"
+            ]
+          }
+        ],
+        "explanation": "табу → тап + па + й + сыз → таппайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "табасыздар"
+            ]
+          }
+        ],
+        "explanation": "табу → таб + а + сыздар → табасыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tabu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + табу — находить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "таппайсыздар"
+            ]
+          }
+        ],
+        "explanation": "табу → тап + па + й + сыздар → таппайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асығады"
+            ]
+          }
+        ],
+        "explanation": "асығу → асығ + а + ды → асығады.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асықпайды"
+            ]
+          }
+        ],
+        "explanation": "асығу → асық + па + й + ды → асықпайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асығамын"
+            ]
+          }
+        ],
+        "explanation": "асығу → асығ + а + мын → асығамын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асықпаймын"
+            ]
+          }
+        ],
+        "explanation": "асығу → асық + па + й + мын → асықпаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асығамыз"
+            ]
+          }
+        ],
+        "explanation": "асығу → асығ + а + мыз → асығамыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асықпаймыз"
+            ]
+          }
+        ],
+        "explanation": "асығу → асық + па + й + мыз → асықпаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асығасың"
+            ]
+          }
+        ],
+        "explanation": "асығу → асығ + а + сың → асығасың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асықпайсың"
+            ]
+          }
+        ],
+        "explanation": "асығу → асық + па + й + сың → асықпайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асығасыңдар"
+            ]
+          }
+        ],
+        "explanation": "асығу → асығ + а + сыңдар → асығасыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асықпайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "асығу → асық + па + й + сыңдар → асықпайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асығасыз"
+            ]
+          }
+        ],
+        "explanation": "асығу → асығ + а + сыз → асығасыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асықпайсыз"
+            ]
+          }
+        ],
+        "explanation": "асығу → асық + па + й + сыз → асықпайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асығасыздар"
+            ]
+          }
+        ],
+        "explanation": "асығу → асығ + а + сыздар → асығасыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:asygu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + асығу — торопиться",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "асықпайсыздар"
+            ]
+          }
+        ],
+        "explanation": "асығу → асық + па + й + сыздар → асықпайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешігеді"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешіг + е + ді → кешігеді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешікпейді"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешік + пе + й + ді → кешікпейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешігемін"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешіг + е + мін → кешігемін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешікпеймін"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешік + пе + й + мін → кешікпеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешігеміз"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешіг + е + міз → кешігеміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешікпейміз"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешік + пе + й + міз → кешікпейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешігесің"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешіг + е + сің → кешігесің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешікпейсің"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешік + пе + й + сің → кешікпейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешігесіңдер"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешіг + е + сіңдер → кешігесіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешікпейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешік + пе + й + сіңдер → кешікпейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешігесіз"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешіг + е + сіз → кешігесіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешікпейсіз"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешік + пе + й + сіз → кешікпейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешігесіздер"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешіг + е + сіздер → кешігесіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:keshigu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + кешігу — опаздывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кешікпейсіздер"
+            ]
+          }
+        ],
+        "explanation": "кешігу → кешік + пе + й + сіздер → кешікпейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазады"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + а + ды → жазады.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазбайды"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + ба + й + ды → жазбайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазамын"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + а + мын → жазамын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазбаймын"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + ба + й + мын → жазбаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазамыз"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + а + мыз → жазамыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазбаймыз"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + ба + й + мыз → жазбаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазасың"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + а + сың → жазасың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазбайсың"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + ба + й + сың → жазбайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазасыңдар"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + а + сыңдар → жазасыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазбайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + ба + й + сыңдар → жазбайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазасыз"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + а + сыз → жазасыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазбайсыз"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + ба + й + сыз → жазбайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазасыздар"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + а + сыздар → жазасыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhazu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + жазу — писать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазбайсыздар"
+            ]
+          }
+        ],
+        "explanation": "жазу → жаз + ба + й + сыздар → жазбайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлейді"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + й + ді → сөйлейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлемейді"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + ме + й + ді → сөйлемейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлеймін"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + й + мін → сөйлеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлемеймін"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + ме + й + мін → сөйлемеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлейміз"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + й + міз → сөйлейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлемейміз"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + ме + й + міз → сөйлемейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлейсің"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + й + сің → сөйлейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлемейсің"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + ме + й + сің → сөйлемейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + й + сіңдер → сөйлейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлемейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + ме + й + сіңдер → сөйлемейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлейсіз"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + й + сіз → сөйлейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлемейсіз"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + ме + й + сіз → сөйлемейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлейсіздер"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + й + сіздер → сөйлейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:soyleu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + сөйлеу — разговаривать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сөйлемейсіздер"
+            ]
+          }
+        ],
+        "explanation": "сөйлеу → сөйле + ме + й + сіздер → сөйлемейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "алады"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + а + ды → алады.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "алмайды"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + ма + й + ды → алмайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "аламын"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + а + мын → аламын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "алмаймын"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + ма + й + мын → алмаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "аламыз"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + а + мыз → аламыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "алмаймыз"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + ма + й + мыз → алмаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "аласың"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + а + сың → аласың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "алмайсың"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + ма + й + сың → алмайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "аласыңдар"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + а + сыңдар → аласыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "алмайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + ма + й + сыңдар → алмайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "аласыз"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + а + сыз → аласыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "алмайсыз"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + ма + й + сыз → алмайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "аласыздар"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + а + сыздар → аласыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:alu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + алу — брать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "алмайсыздар"
+            ]
+          }
+        ],
+        "explanation": "алу → ал + ма + й + сыздар → алмайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "береді"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + е + ді → береді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бермейді"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + ме + й + ді → бермейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "беремін"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + е + мін → беремін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бермеймін"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + ме + й + мін → бермеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "береміз"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + е + міз → береміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бермейміз"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + ме + й + міз → бермейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бересің"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + е + сің → бересің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бермейсің"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + ме + й + сің → бермейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бересіңдер"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + е + сіңдер → бересіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бермейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + ме + й + сіңдер → бермейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бересіз"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + е + сіз → бересіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бермейсіз"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + ме + й + сіз → бермейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бересіздер"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + е + сіздер → бересіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:beru:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + беру — давать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бермейсіздер"
+            ]
+          }
+        ],
+        "explanation": "беру → бер + ме + й + сіздер → бермейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көреді"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + е + ді → көреді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көрмейді"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + ме + й + ді → көрмейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көремін"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + е + мін → көремін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көрмеймін"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + ме + й + мін → көрмеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көреміз"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + е + міз → көреміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көрмейміз"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + ме + й + міз → көрмейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көресің"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + е + сің → көресің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көрмейсің"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + ме + й + сің → көрмейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көресіңдер"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + е + сіңдер → көресіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көрмейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + ме + й + сіңдер → көрмейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көресіз"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + е + сіз → көресіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көрмейсіз"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + ме + й + сіз → көрмейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көресіздер"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + е + сіздер → көресіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:koru:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + көру — видеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көрмейсіздер"
+            ]
+          }
+        ],
+        "explanation": "көру → көр + ме + й + сіздер → көрмейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарайды"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + й + ды → қарайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарамайды"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + ма + й + ды → қарамайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қараймын"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + й + мын → қараймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарамаймын"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + ма + й + мын → қарамаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қараймыз"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + й + мыз → қараймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарамаймыз"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + ма + й + мыз → қарамаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарайсың"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + й + сың → қарайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарамайсың"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + ма + й + сың → қарамайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + й + сыңдар → қарайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарамайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + ма + й + сыңдар → қарамайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарайсыз"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + й + сыз → қарайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарамайсыз"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + ма + й + сыз → қарамайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарайсыздар"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + й + сыздар → қарайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:qarau:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + қарау — смотреть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қарамайсыздар"
+            ]
+          }
+        ],
+        "explanation": "қарау → қара + ма + й + сыздар → қарамайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінеді"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + е + ді → түсінеді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінбейді"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + бе + й + ді → түсінбейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінемін"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + е + мін → түсінемін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінбеймін"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + бе + й + мін → түсінбеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінеміз"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + е + міз → түсінеміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінбейміз"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + бе + й + міз → түсінбейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінесің"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + е + сің → түсінесің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінбейсің"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + бе + й + сің → түсінбейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінесіңдер"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + е + сіңдер → түсінесіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінбейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + бе + й + сіңдер → түсінбейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінесіз"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + е + сіз → түсінесіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінбейсіз"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + бе + й + сіз → түсінбейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінесіздер"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + е + сіздер → түсінесіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tusinu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + түсіну — понимать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "түсінбейсіздер"
+            ]
+          }
+        ],
+        "explanation": "түсіну → түсін + бе + й + сіздер → түсінбейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "барады"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + а + ды → барады.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бармайды"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + ма + й + ды → бармайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "барамын"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + а + мын → барамын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бармаймын"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + ма + й + мын → бармаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "барамыз"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + а + мыз → барамыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бармаймыз"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + ма + й + мыз → бармаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "барасың"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + а + сың → барасың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бармайсың"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + ма + й + сың → бармайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "барасыңдар"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + а + сыңдар → барасыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бармайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + ма + й + сыңдар → бармайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "барасыз"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + а + сыз → барасыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бармайсыз"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + ма + й + сыз → бармайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "барасыздар"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + а + сыздар → барасыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:baru:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + бару — идти",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бармайсыздар"
+            ]
+          }
+        ],
+        "explanation": "бару → бар + ма + й + сыздар → бармайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүреді"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + е + ді → жүреді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүрмейді"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + ме + й + ді → жүрмейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүремін"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + е + мін → жүремін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүрмеймін"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + ме + й + мін → жүрмеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүреміз"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + е + міз → жүреміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүрмейміз"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + ме + й + міз → жүрмейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүресің"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + е + сің → жүресің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүрмейсің"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + ме + й + сің → жүрмейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүресіңдер"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + е + сіңдер → жүресіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүрмейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + ме + й + сіңдер → жүрмейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүресіз"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + е + сіз → жүресіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүрмейсіз"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + ме + й + сіз → жүрмейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүресіздер"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + е + сіздер → жүресіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhuru:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + жүру — ходить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жүрмейсіздер"
+            ]
+          }
+        ],
+        "explanation": "жүру → жүр + ме + й + сіздер → жүрмейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатады"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + а + ды → жатады.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатпайды"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + па + й + ды → жатпайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатамын"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + а + мын → жатамын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатпаймын"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + па + й + мын → жатпаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатамыз"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + а + мыз → жатамыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатпаймыз"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + па + й + мыз → жатпаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатасың"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + а + сың → жатасың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатпайсың"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + па + й + сың → жатпайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатасыңдар"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + а + сыңдар → жатасыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатпайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + па + й + сыңдар → жатпайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатасыз"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + а + сыз → жатасыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатпайсыз"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + па + й + сыз → жатпайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатасыздар"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + а + сыздар → жатасыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhatu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + жату — лежать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жатпайсыздар"
+            ]
+          }
+        ],
+        "explanation": "жату → жат + па + й + сыздар → жатпайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырады"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + а + ды → отырады.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырмайды"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + ма + й + ды → отырмайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырамын"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + а + мын → отырамын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырмаймын"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + ма + й + мын → отырмаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырамыз"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + а + мыз → отырамыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырмаймыз"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + ма + й + мыз → отырмаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырасың"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + а + сың → отырасың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырмайсың"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + ма + й + сың → отырмайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырасыңдар"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + а + сыңдар → отырасыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырмайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + ма + й + сыңдар → отырмайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырасыз"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + а + сыз → отырасыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырмайсыз"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + ма + й + сыз → отырмайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырасыздар"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + а + сыздар → отырасыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:otyru:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + отыру — сидеть",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отырмайсыздар"
+            ]
+          }
+        ],
+        "explanation": "отыру → отыр + ма + й + сыздар → отырмайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрады"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + а + ды → тұрады.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрмайды"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + ма + й + ды → тұрмайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрамын"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + а + мын → тұрамын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрмаймын"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + ма + й + мын → тұрмаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрамыз"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + а + мыз → тұрамыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрмаймыз"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + ма + й + мыз → тұрмаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрасың"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + а + сың → тұрасың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрмайсың"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + ма + й + сың → тұрмайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрасыңдар"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + а + сыңдар → тұрасыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрмайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + ма + й + сыңдар → тұрмайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрасыз"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + а + сыз → тұрасыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрмайсыз"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + ма + й + сыз → тұрмайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрасыздар"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + а + сыздар → тұрасыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:turu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + тұру — стоять / проживать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тұрмайсыздар"
+            ]
+          }
+        ],
+        "explanation": "тұру → тұр + ма + й + сыздар → тұрмайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашады"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + а + ды → ашады.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашпайды"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + па + й + ды → ашпайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашамын"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + а + мын → ашамын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашпаймын"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + па + й + мын → ашпаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашамыз"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + а + мыз → ашамыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашпаймыз"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + па + й + мыз → ашпаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашасың"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + а + сың → ашасың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашпайсың"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + па + й + сың → ашпайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашасыңдар"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + а + сыңдар → ашасыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашпайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + па + й + сыңдар → ашпайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашасыз"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + а + сыз → ашасыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашпайсыз"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + па + й + сыз → ашпайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашасыздар"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + а + сыздар → ашасыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:ashu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + ашу — открывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ашпайсыздар"
+            ]
+          }
+        ],
+        "explanation": "ашу → аш + па + й + сыздар → ашпайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жабады"
+            ]
+          }
+        ],
+        "explanation": "жабу → жаб + а + ды → жабады.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жаппайды"
+            ]
+          }
+        ],
+        "explanation": "жабу → жап + па + й + ды → жаппайды.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жабамын"
+            ]
+          }
+        ],
+        "explanation": "жабу → жаб + а + мын → жабамын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жаппаймын"
+            ]
+          }
+        ],
+        "explanation": "жабу → жап + па + й + мын → жаппаймын.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жабамыз"
+            ]
+          }
+        ],
+        "explanation": "жабу → жаб + а + мыз → жабамыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жаппаймыз"
+            ]
+          }
+        ],
+        "explanation": "жабу → жап + па + й + мыз → жаппаймыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жабасың"
+            ]
+          }
+        ],
+        "explanation": "жабу → жаб + а + сың → жабасың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жаппайсың"
+            ]
+          }
+        ],
+        "explanation": "жабу → жап + па + й + сың → жаппайсың.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жабасыңдар"
+            ]
+          }
+        ],
+        "explanation": "жабу → жаб + а + сыңдар → жабасыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жаппайсыңдар"
+            ]
+          }
+        ],
+        "explanation": "жабу → жап + па + й + сыңдар → жаппайсыңдар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жабасыз"
+            ]
+          }
+        ],
+        "explanation": "жабу → жаб + а + сыз → жабасыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жаппайсыз"
+            ]
+          }
+        ],
+        "explanation": "жабу → жап + па + й + сыз → жаппайсыз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жабасыздар"
+            ]
+          }
+        ],
+        "explanation": "жабу → жаб + а + сыздар → жабасыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:zhabu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + жабу — закрывать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жаппайсыздар"
+            ]
+          }
+        ],
+        "explanation": "жабу → жап + па + й + сыздар → жаппайсыздар.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:3:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "ол / олар + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тігеді"
+            ]
+          }
+        ],
+        "explanation": "тігу → тіг + е + ді → тігеді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:3:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "ол / олар + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тікпейді"
+            ]
+          }
+        ],
+        "explanation": "тігу → тік + пе + й + ді → тікпейді.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:1sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "мен + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тігемін"
+            ]
+          }
+        ],
+        "explanation": "тігу → тіг + е + мін → тігемін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:1sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "мен + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тікпеймін"
+            ]
+          }
+        ],
+        "explanation": "тігу → тік + пе + й + мін → тікпеймін.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:1pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "біз + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тігеміз"
+            ]
+          }
+        ],
+        "explanation": "тігу → тіг + е + міз → тігеміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:1pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "біз + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тікпейміз"
+            ]
+          }
+        ],
+        "explanation": "тігу → тік + пе + й + міз → тікпейміз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:2sg:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сен + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тігесің"
+            ]
+          }
+        ],
+        "explanation": "тігу → тіг + е + сің → тігесің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:2sg:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сен + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тікпейсің"
+            ]
+          }
+        ],
+        "explanation": "тігу → тік + пе + й + сің → тікпейсің.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:2pl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сендер + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тігесіңдер"
+            ]
+          }
+        ],
+        "explanation": "тігу → тіг + е + сіңдер → тігесіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:2pl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сендер + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тікпейсіңдер"
+            ]
+          }
+        ],
+        "explanation": "тігу → тік + пе + й + сіңдер → тікпейсіңдер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:2pol:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіз + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тігесіз"
+            ]
+          }
+        ],
+        "explanation": "тігу → тіг + е + сіз → тігесіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:2pol:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіз + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тікпейсіз"
+            ]
+          }
+        ],
+        "explanation": "тігу → тік + пе + й + сіз → тікпейсіз.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:2polpl:affirmative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери форму",
+        "stimulus": "сіздер + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тігесіздер"
+            ]
+          }
+        ],
+        "explanation": "тігу → тіг + е + сіздер → тігесіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:linker",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
+      },
+      {
+        "id": "gen:4-1:nonpast-core:tigu:2polpl:negative",
+        "origin": "generated",
+        "topic": "verbs",
+        "kind": "fields",
+        "title": "Собери отрицательную форму",
+        "stimulus": "сіздер + тігу — шить",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тікпейсіздер"
+            ]
+          }
+        ],
+        "explanation": "тігу → тік + пе + й + сіздер → тікпейсіздер.",
+        "lessonId": "4-1",
+        "ruleIds": [
+          "v2:4-1:negative",
+          "v2:4-1:person",
+          "v2:4-1:alternation"
+        ]
       }
     ],
     "stages": [
