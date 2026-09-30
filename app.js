@@ -188,6 +188,61 @@
    const snap=Object.assign({},gp,{contentRevision:currentV2&&currentV2.content_revision||gp.contentRevision||null});
    return P.saveLessonPath(state,lessonId,snap,Date.now());
  }
+ function legacyPathRevision(lessonId,currentV2){
+   const migrations=currentV2&&Array.isArray(currentV2.migrations)?currentV2.migrations:[];
+   const hit=migrations.find(m=>m&&typeof m.from_revision==='string'&&m.from_revision.indexOf('.legacy')>=0);
+   return hit?hit.from_revision:(lessonId+'.legacy');
+ }
+ function clearLessonCompletedChapters(gp,lessonId){
+   if(!gp||!gp.completedChapters)return;
+   const prefix=lessonId+':';
+   for(const key of Object.keys(gp.completedChapters))if(key.startsWith(prefix))delete gp.completedChapters[key];
+ }
+ function migrateLessonCompletedChapters(gp,lessonId,fromRevision){
+   if(!gp||!window.LessonV2Runtime||!window.LessonV2Runtime.migrateId)return false;
+   gp.completedChapters=gp.completedChapters||Object.create(null);
+   const prefix=lessonId+':';
+   let changed=false;
+   for(const key of Object.keys(gp.completedChapters)){
+     if(!key.startsWith(prefix)||!gp.completedChapters[key])continue;
+     const oldId=key.slice(prefix.length);
+     const moved=window.LessonV2Runtime.migrateId(lessonId,fromRevision,'chapter_ids',oldId);
+     if(moved&&moved!==oldId){
+       gp.completedChapters[prefix+moved]=true;
+       delete gp.completedChapters[key];
+       changed=true;
+     }
+   }
+   return changed;
+ }
+ function v2ChapterIds(lessonId){
+   const G=window.GrammarPath;const les=G&&G.lesson(lessonId);
+   return new Set(((les&&les.chapters)||[]).map(ch=>ch.id));
+ }
+ function pathHasUnmappedChapters(lessonId,gp,chapterId){
+   const ids=v2ChapterIds(lessonId);if(!ids.size)return false;
+   if(chapterId&&!ids.has(chapterId))return true;
+   const prefix=lessonId+':';
+   for(const key of Object.keys((gp&&gp.completedChapters)||{})){
+     if(!key.startsWith(prefix)||!gp.completedChapters[key])continue;
+     if(!ids.has(key.slice(prefix.length)))return true;
+   }
+   return false;
+ }
+ function firstUnfinishedChapter(lessonId,gp){
+   const G=window.GrammarPath;const les=G&&G.lesson(lessonId);if(!les)return null;
+   return (les.chapters||[]).find(ch=>!(gp.completedChapters&&gp.completedChapters[les.id+':'+ch.id]))||null;
+ }
+ function pathNeedsV2TheoryReplay(lessonId,path,gp){
+   const currentV2=window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(lessonId):null;
+   if(!currentV2)return false;
+   const stored=path&&path.contentRevision||null;
+   const revisionBump=!stored||stored!==currentV2.content_revision;
+   const phase=(gp&&gp.phase)||(path&&path.phase)||null;
+   const chapterId=(gp&&gp.chapterId)||(path&&path.chapterId)||null;
+   const unmapped=pathHasUnmappedChapters(lessonId,gp||{},chapterId);
+   return phase==='done'&&(revisionBump||unmapped||!!(gp&&gp.pathNeedsReplay&&revisionBump));
+ }
  function loadLessonPath(id){
    const G=window.GrammarPath;if(!G||!P.courseIds().includes(id))return null;
    const gp=state.grammarPath||(state.grammarPath=G.emptyProgress());
@@ -196,13 +251,49 @@
    const lp=P.ensureLessonProgress(state,id),p=lp&&lp.path;
    const currentV2=window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(id):null;
    let chapterId=p&&p.chapterId||null;
-   if(currentV2&&p&&p.contentRevision&&p.contentRevision!==currentV2.content_revision&&chapterId&&!(G.chapter&&G.chapter(id,chapterId))){
-     const moved=window.LessonV2Runtime.migrateId&&window.LessonV2Runtime.migrateId(id,p.contentRevision,'chapter_ids',chapterId);
-     chapterId=moved||null;
+   let phase=p&&['lesson','beat','done'].includes(p.phase)?p.phase:'lesson';
+   let beat=Math.max(0,Number(p&&p.beat)||0);
+   let pathNeedsReplay=!!(p&&p.pathNeedsReplay);
+   let dirty=false;
+   if(currentV2){
+     const storedRev=p&&p.contentRevision||null;
+     const targetRev=currentV2.content_revision;
+     const pathActive=!!(p&&(p.updatedAt||p.chapterId||['lesson','beat','done'].includes(p.phase)));
+     const revisionFirstTime=!storedRev||storedRev!==targetRev;
+     const fromRev=storedRev||(pathActive?legacyPathRevision(id,currentV2):null);
+     if(pathActive&&fromRev&&fromRev!==targetRev&&window.LessonV2Runtime){
+       if(chapterId&&!(G.chapter&&G.chapter(id,chapterId))){
+         const moved=window.LessonV2Runtime.migrateId&&window.LessonV2Runtime.migrateId(id,fromRev,'chapter_ids',chapterId);
+         if(moved&&moved!==chapterId){chapterId=moved;dirty=true;}
+         else if(!moved||!(G.chapter&&G.chapter(id,chapterId))){chapterId=null;dirty=true;}
+       }
+       if(migrateLessonCompletedChapters(gp,id,fromRev))dirty=true;
+     }
+     const unmapped=pathActive&&pathHasUnmappedChapters(id,gp,chapterId);
+     if(pathActive&&phase==='done'&&(revisionFirstTime||unmapped)){
+       clearLessonCompletedChapters(gp,id);
+       const first=((G.lesson(id)||{}).chapters||[])[0]||null;
+       phase=first?'beat':'lesson';
+       chapterId=first?first.id:null;
+       beat=0;
+       pathNeedsReplay=true;
+       dirty=true;
+     }else if(pathActive&&(revisionFirstTime||unmapped)){
+       if(chapterId&&!(G.chapter&&G.chapter(id,chapterId))){chapterId=null;dirty=true;}
+       if(!chapterId||!(G.chapter&&G.chapter(id,chapterId))){
+         const unfinished=firstUnfinishedChapter(id,gp);
+         if(unfinished){phase='beat';chapterId=unfinished.id;beat=0;dirty=true;}
+         else if(phase!=='done'){phase='lesson';chapterId=null;beat=0;dirty=true;}
+       }
+     }
+     if(pathActive&&storedRev!==targetRev)dirty=true;
    }
-   gp.lessonId=id;gp.chapterId=chapterId;gp.beat=Math.max(0,Number(p&&p.beat)||0);gp.phase=p&&['lesson','beat','done'].includes(p.phase)?p.phase:'lesson';gp.contentRevision=currentV2&&currentV2.content_revision||p&&p.contentRevision||null;
+   gp.lessonId=id;gp.chapterId=chapterId;gp.beat=beat;gp.phase=phase;
+   gp.contentRevision=currentV2&&currentV2.content_revision||p&&p.contentRevision||null;
+   if(pathNeedsReplay)gp.pathNeedsReplay=true;else delete gp.pathNeedsReplay;
    if(p&&p.pathDraft)gp.pathDraft=JSON.parse(JSON.stringify(p.pathDraft));else delete gp.pathDraft;
    if(p&&p.canonShownFor)gp.canonShownFor=p.canonShownFor;else delete gp.canonShownFor;
+   if(dirty)persistLessonPath(id);
    return gp;
  }
  function markLessonStarted(id,surface){
@@ -233,11 +324,13 @@
  function continueLesson(id){
    viewOnlyPathLesson=null;
    const lp=P.ensureLessonProgress(state,id);
-   if(lp&&lp.practiceSession&&restoreLessonPractice(id)){
+   const gp=loadLessonPath(id);
+   const forceTheory=window.LessonV2Runtime&&window.LessonV2Runtime.isV2(id)&&(pathNeedsV2TheoryReplay(id,lp&&lp.path,gp)||!lp||!lp.path||(gp&&gp.phase!=='done'));
+   if(!forceTheory&&lp&&lp.practiceSession&&restoreLessonPractice(id)){
      markLessonStarted(id,'practice');render();showView('practice');return;
    }
    const nxt=P.nextRegistered&&P.nextRegistered(id,state.events);
-   if(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(id)&&(!lp||!lp.path||lp.path.phase!=='done')){
+   if(forceTheory){
      openPathLesson(id,{meaningful:true});return;
    }
    if(beginPacked(id))return;
@@ -721,7 +814,7 @@
        const les=G.lesson(lessonId);
        const next=les&&(les.chapters||[]).find(ch=>!(gp.completedChapters&&gp.completedChapters[les.id+':'+ch.id]));
        if(next)G.startChapter(state,les.id,next.id);
-       else{gp.phase='done';gp.chapterId=null;}
+       else{gp.phase='done';gp.chapterId=null;delete gp.pathNeedsReplay;}
      }
    }
    markPlace('path',lessonId);save();showView('path');
@@ -1286,6 +1379,7 @@
      bindTutor(les,null);
      root.innerHTML=`<div class="panel path-paper">${crumb(les,null)}<h2>Урок разобран</h2><p>${esc(courseRow?courseRow.name:les.title)}</p>
        <div class="lesson-actions"><button type="button" class="text-button chrome-back" id="path-back">← Назад</button><button type="button" class="primary-button" id="path-to-practice">Перейти к практике</button>
+       <button type="button" class="secondary-button" id="path-replay-theory">Повторить теорию</button>
        <button type="button" class="secondary-button" data-path-learn>К урокам</button></div></div>`;
      bindCrumb();
      const backDone=$('#path-back');
@@ -1299,6 +1393,18 @@
        gp.phase='lesson';gp.chapterId=null;gp.beat=0;save();renderPath();
      };
      const go=$('#path-to-practice');if(go)go.onclick=()=>startCourse(les.id);
+     const replayBtn=$('#path-replay-theory');
+     if(replayBtn)replayBtn.onclick=()=>{
+       clearLessonCompletedChapters(gp,les.id);
+       delete gp.pathNeedsReplay;
+       const currentV2=window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(les.id):null;
+       if(currentV2)gp.contentRevision=currentV2.content_revision;
+       G.startLesson(state,les.id);
+       const first=(les.chapters||[])[0];
+       if(first)G.startChapter(state,les.id,first.id);
+       markLessonStarted(les.id,'path');
+       persistLessonPath(les.id);save();renderPath();
+     };
      return;
    }
    if(gp.phase==='lesson'||!gp.chapterId){
@@ -1354,7 +1460,7 @@
      if(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(les.id)){
        const ruleId=(ch.rule_ids||[])[0]||'';
        const practiceIds=window.LessonV2Runtime.practiceForRule?window.LessonV2Runtime.practiceForRule(les.id,ruleId,12):[];
-       const continuePath=()=>{pathPracticeReturn=null;if(nxt)G.startChapter(state,les.id,nxt.id);else{gp.phase='done';gp.chapterId=null;}save();renderPath();};
+       const continuePath=()=>{pathPracticeReturn=null;if(nxt)G.startChapter(state,les.id,nxt.id);else{delete gp.pathNeedsReplay;gp.phase='done';gp.chapterId=null;}save();renderPath();};
        root.innerHTML=`<div class="panel path-paper">${crumb(les,ch)}<p class="eyebrow">БЛОК РАЗОБРАН</p><h2>${esc(chTitle||ch.title)}</h2>
          <p>Можно перейти дальше или потренировать этот шаг ещё. Практика не ставит финальную оценку и её можно запускать повторно.</p>
          <div class="lesson-actions">
@@ -1370,7 +1476,7 @@
        save();return;
      }
      if(nxt){G.startChapter(state,les.id,nxt.id);save();renderPath();return;}
-     gp.phase='done';gp.chapterId=null;save();renderPath();return;
+     delete gp.pathNeedsReplay;gp.phase='done';gp.chapterId=null;save();renderPath();return;
    }
    const v2Full=(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(les.id)&&ch.fullExplanation)?`<details class="path-full-v2"><summary>Полное объяснение блока</summary><p>${esc(studentCopy(ch.fullExplanation))}</p></details>`:'';
    const head=`${crumb(les,ch)}<p class="small">Урок ${esc(courseRow?courseRow.label:les.id)} · ${esc(courseRow?courseRow.name:les.title)}</p><p class="small">Глава ${les.chapters.findIndex(c=>c.id===ch.id)+1} из ${les.chapters.length} · ${esc(chTitle)}</p>${v2Full}`;

@@ -14,7 +14,7 @@
    return (Bank&&Array.isArray(Bank.COURSE)?Bank.COURSE:[]).map(row=>row&&row.id).filter(Boolean);
  }
  function validId(id){return courseIds().includes(id);}
- function emptyPath(){return {chapterId:null,beat:0,phase:'hub',contentRevision:null,pathDraft:null,canonShownFor:null,updatedAt:0};}
+ function emptyPath(){return {chapterId:null,beat:0,phase:'hub',contentRevision:null,pathNeedsReplay:false,pathDraft:null,canonShownFor:null,updatedAt:0};}
  function emptyLesson(){return {status:'not_started',path:emptyPath(),practiceSession:null,startedAt:null,completedAt:null,lastAttemptAt:null,updatedAt:0};}
  function empty(){const lessons=Object.create(null);for(const id of courseIds())lessons[id]=emptyLesson();return {lessons,resumePointer:{lessonId:null,surface:null,updatedAt:0}};}
  function normalizePath(raw){
@@ -30,6 +30,7 @@
      value:raw.pathDraft.value.slice(0,400)
    };
    out.canonShownFor=typeof raw.canonShownFor==='string'?raw.canonShownFor.slice(0,100):null;
+   out.pathNeedsReplay=raw.pathNeedsReplay===true;
    out.updatedAt=Math.max(0,Number(raw.updatedAt)||0);
    return out;
  }
@@ -213,7 +214,7 @@
    if(obj(gp)&&validId(gp.lessonId)){
      const lp=out.lessons[gp.lessonId],hadLesson=obj(src.lessons)&&obj(src.lessons[gp.lessonId]);
      if(!hadLesson||!src.lessons[gp.lessonId].path){
-       lp.path=normalizePath({chapterId:gp.chapterId,beat:gp.beat,phase:gp.phase,pathDraft:gp.pathDraft,canonShownFor:gp.canonShownFor,updatedAt:0});
+       lp.path=normalizePath({chapterId:gp.chapterId,beat:gp.beat,phase:gp.phase,contentRevision:gp.contentRevision,pathNeedsReplay:gp.pathNeedsReplay===true,pathDraft:gp.pathDraft,canonShownFor:gp.canonShownFor,updatedAt:0});
      }
      if(!hadLesson&&['lesson','beat'].includes(gp.phase)&&lp.status!=='completed')lp.status='in_progress';
    }
@@ -258,7 +259,7 @@
  }
  function savePath(state,id,gp,now=Date.now()){
    const lp=ensureLesson(state,id);if(!lp||!obj(gp))return null;
-   lp.path=normalizePath({chapterId:gp.chapterId,beat:gp.beat,phase:gp.phase,pathDraft:gp.pathDraft,canonShownFor:gp.canonShownFor,updatedAt:now});
+   lp.path=normalizePath({chapterId:gp.chapterId,beat:gp.beat,phase:gp.phase,contentRevision:gp.contentRevision,pathNeedsReplay:gp.pathNeedsReplay===true,pathDraft:gp.pathDraft,canonShownFor:gp.canonShownFor,updatedAt:now});
    lp.updatedAt=Math.max(lp.updatedAt||0,now);return lp.path;
  }
  function savePractice(state,id,snapshot,now=Date.now()){

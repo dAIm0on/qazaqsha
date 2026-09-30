@@ -5137,5 +5137,27 @@
       "words",
       "external_test"
     ]
-  }
+  },
+  "migrations": [
+    {
+      "from_revision": "2-1.legacy",
+      "to_revision": "2-1.r1",
+      "chapter_ids": {
+        "2-1-glue": "v2-theory-2-1-glue",
+        "2-1-pron": "v2-theory-2-1-pron",
+        "2-1-clause": "v2-theory-2-1-clause",
+        "2-1-men": "v2-theory-2-1-men",
+        "2-1-sen": "v2-theory-2-1-sen",
+        "2-1-siz": "v2-theory-2-1-siz",
+        "2-1-emes": "v2-theory-2-1-emes",
+        "2-1-ba": "v2-theory-2-1-ba",
+        "2-1-siz2": "v2-theory-2-1-siz-word",
+        "2-1-checkpoint": "v2-theory-2-1-checkpoint"
+      },
+      "question_ids": {},
+      "stage_ids": {},
+      "vocab_ids": {},
+      "drop_question_ids": []
+    }
+  ]
 }

@@ -2001,7 +2001,6 @@ assert.ok(!/pet-idle\.png/.test(tutorUiSrc),'default companion is not pet-idle')
 assert.ok(/school-tutor16/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor16');
 assert.ok(/\.tutor-sheet\{[^}]*max-height:min\(78dvh,640px\)/.test(petCss.replace(/\s+/g,''))&&/overflow-y:auto/.test(petCss),'ask panel max-height + overflow-y:auto');
 assert.ok(/document\.body\.appendChild\(sheet\)/.test(tutorUiSrc),'ask sheet is body sibling (no 44px clip)');
-
 assert.ok(/\.chrome-back\{[^}]*min-height:44px/.test(theme.replace(/\s+/g,'')));
 assert.ok(/\.chrome-back::before\{[^}]*height:44px/.test(theme.replace(/\s+/g,'')));
 assert.ok(!/\.chrome-back\{[^}]*border:1px solid/.test(theme.replace(/\s+/g,'')));
