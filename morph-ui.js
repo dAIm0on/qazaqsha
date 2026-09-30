@@ -76,9 +76,16 @@ function status(){
  if(s&&!s.complete)return 'Продолжить практику · '+(s.cursor+1)+' / '+s.queue.length;
  return 'Короткие подходы и обучение с нуля';
 }
-function open(){
+function leaveMorph(){
+ const back=window.__srez2MorphReturn==='personal'?'personal':'today';
+ window.__srez2MorphReturn='today';
+ if(window.QazaqShell&&window.QazaqShell.show)window.QazaqShell.show(back);
+ if(back==='personal'&&window.PersonalTrainers&&window.PersonalTrainers.openCatalog)window.PersonalTrainers.openCatalog();
+}
+function open(from){
  exemplarId=null;readToc=false;showHub=true;teachingMode=false;topicOpen=false;calcOpen=false;message='';
  saveCursor(false);saveSurface('hub');persistCalc();
+ window.__srez2MorphReturn=from==='personal'?'personal':'today';
  window.QazaqShell.show('morph');
 }
 function rule(l){return E.data.levels.find(x=>x.id===l)?.rule||'';}
@@ -755,7 +762,7 @@ function freePracticeEntry(){
 }
 function render(){
  const host=root();if(!host||!bridge()||!T)return;
- const head='<div class="morph-head"><button class="text-button" data-morph-exit>← Все тренажёры</button></div>';
+ const head='<div class="morph-head"><button type="button" class="text-button chrome-back" data-morph-exit>← Назад</button></div>';
  if(host.dataset.fs2boot!=='yes'){
   host.dataset.fs2boot='yes';
   const surface=loadSurface();
@@ -780,7 +787,7 @@ function render(){
   for(const b of host.querySelectorAll('[data-free-home]'))b.addEventListener('click',()=>{exemplarId=null;showHub=true;saveCursor(false);saveSurface('hub');},true);
   for(const b of host.querySelectorAll('[data-fs2-open-lesson]'))b.addEventListener('click',()=>{window.FreePractice.dismiss();openLesson(b.dataset.fs2OpenLesson,0,false);focusHeading();remember();render();});
   host.querySelector('[data-fs2-next]')?.addEventListener('click',()=>{window.FreePractice.dismiss();stepLesson(1,true);});
-  host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>{window.QazaqShell.show('personal');window.PersonalTrainers.openCatalog();});
+  host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>leaveMorph());
   clock();return;
  }
  if(exemplarId){
@@ -926,7 +933,7 @@ function bind(host){
  if(window.MorphNav2)window.MorphNav2.bind(host,render);
  bindCalculator(host);
  bindFs2(host);
- host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>{window.QazaqShell.show('personal');window.PersonalTrainers.openCatalog();});
+ host.querySelector('[data-morph-exit]')?.addEventListener('click',()=>leaveMorph());
  host.querySelector('[data-morph-start]')?.addEventListener('click',()=>start('learn'));
  host.querySelector('[data-morph-transfer]')?.addEventListener('click',()=>start('transfer'));
  host.querySelector('[data-morph-learn-zero]')?.addEventListener('click',()=>learnFromZero());

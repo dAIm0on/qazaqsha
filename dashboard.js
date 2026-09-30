@@ -18,7 +18,6 @@
        const weakWords=catalog.words.filter(w=>catalog.wordStats(w,state).weak),weakRules=catalog.rules.filter(r=>cards.some(q=>q.ruleIds?.includes(r.id)&&state.records[q.id]?.needsReview));
        const ms=progress.memoryStats(state);
        const weak=window.LearningSupport.weakSpots?window.LearningSupport.weakSpots(state,api.questions()):[];
-       const chunkN=(window.MemoryPolicy?api.questions().filter(q=>window.MemoryPolicy.isChunk(q)&&api.eligible(q)):[]).length;
        const step=api.continueInfo?api.continueInfo():{lessonId:'1-1',title:'Продолжить урок',hint:'Текущий урок курса.'};
        const dueHint=dueShow?'карточек в очереди повторения':'На сегодня всё повторено';
        const pauseN=cards.filter(q=>core.pauseReady(state.records[q.id])).length;
@@ -50,11 +49,34 @@
        }).join('');
        const recallCards=cards.filter(q=>q.kind==='fields'&&(q.fields||[]).some(f=>f.kind!=='select'));
        const remembered=recallCards.filter(q=>['REMEMBERED','MASTERED'].includes(state.records[q.id]?.mastery_level)).length;
-       root.innerHTML=`<div class="today-hero"><p>${allCourseDone?'Основное прохождение завершено.':'Сейчас урок '+esc(String(step.lessonId||'').replace('-','–'))+'. Одно следующее действие.'}</p><article class="today-hero-card"><p class="eyebrow">Прохождение</p><button type="button" class="today-main" data-action="continue"><span>${esc(step.title)}</span></button><p class="small">${esc(step.hint)}</p><div class="today-course-actions"><button type="button" class="secondary-button" data-picker-open>Выбрать урок</button><button type="button" class="today-path-quiet text-button" data-action="path">Уроки и правила</button></div></article></div>
-       ${gapHtml}
-       <div class="today-tiles"><button type="button" class="today-option" data-action="review"><span>Повторить сегодня</span><strong>${dueShow}</strong><small>${dueHint}</small></button><button type="button" class="today-option" data-view="learn"><span>Выбрать занятие</span><small>Урок, числа или ступень</small></button><button type="button" class="today-option" data-action="homework"><span>Домашка</span><small>Задания урока</small></button>${pauseN?`<button type="button" class="today-option" data-action="pause-prep"><span>Готовится к паузе</span><strong>${pauseN}</strong><small>Интервал уже длинный</small></button>`:''}${repairOn?`<button type="button" class="today-option" data-action="repair-open"><span>${repairLabel}</span><small>${esc(repairDetail)}</small></button>`:''}</div>
-       <div class="today-actions"><button type="button" class="today-option hero-spot" data-action="new"><span>Новые</span><strong>${Math.min(cfg.session.newLimit,newCount)}</strong><small>Рекомендовано на один подход</small></button>${chunkN?'<button type="button" class="today-option" data-action="chunks"><span>Приветствия и прощания</span><small>Готовые фразы</small></button>':''}<button type="button" class="today-option cat-trainer-card" data-action="personal-trainers"><span>Тренажёры</span><small>Буквы · числа · слова</small></button></div>
-       <div class="today-collage" aria-hidden="true"><div class="today-photo p1"></div><div class="today-photo p2"></div><div class="today-photo p3"></div><div class="today-photo p4"></div></div>
+       const hwBrief=(()=>{
+        const H=window.Homework,course=window.COURSE;
+        const empty={done:0,total:0,lessonId:String(step.lessonId||''),gated:false};
+        if(!H||!course)return empty;
+        let packs=[];
+        try{packs=H.packs(api.questions(),course,{});}catch(e){return empty;}
+        const pack=packs.find(x=>x.lesson_id===step.lessonId)||packs[0];
+        if(!pack)return empty;
+        const ids=pack.homework.exercise_ids||[];
+        const gated=!!pack.homework.gated&&!ids.length;
+        const attempt=api.state().homeworkAttempts&&api.state().homeworkAttempts[pack.lesson_id];
+        const ex=H.partProgress(attempt,ids);
+        const words=H.partProgress(attempt,pack.homework.word_question_ids||[]);
+        const useWords=!ex.total&&words.total;
+        return {done:useWords?words.done:ex.done,total:useWords?words.total:ex.total,lessonId:pack.lesson_id,gated};
+      })();
+      const hwTitle=hwBrief.gated?'Пока закрыта':(hwBrief.total?hwBrief.done+' из '+hwBrief.total:'Домашка');
+      const hwMeta=hwBrief.gated?'Упражнения откроются после правила':('Урок '+String(hwBrief.lessonId||'').replace('-','–'));
+      const morphLine=window.MorphTrainer&&window.MorphTrainer.status?window.MorphTrainer.status():'Короткие подходы и обучение с нуля';
+      root.innerHTML=`<div class="ia-stack" id="today-ia">
+        <article class="ia-card ia-card-main"><p class="small">${allCourseDone?'Основное прохождение завершено.':'Сейчас урок '+esc(String(step.lessonId||'').replace('-','–'))+'. Одно следующее действие.'}</p><p class="eyebrow">Сегодня</p><h2>${esc(step.title)}</h2><p class="small">${esc(step.hint)}</p><div class="today-course-actions"><button type="button" class="primary-button" data-action="continue">Продолжить</button><button type="button" class="secondary-button" data-picker-open>Выбрать урок</button></div></article>
+        <article class="ia-card" id="today-homework"><p class="eyebrow">Домашка</p><h2>${esc(hwTitle)}</h2><p class="small">${esc(hwMeta)}</p><button type="button" class="secondary-button" data-action="homework">Открыть домашку</button></article>
+        <article class="ia-card" id="today-morph"><p class="eyebrow">Форма слова</p><h2>Форма слова</h2><p class="small">${esc(morphLine)}</p><button type="button" class="secondary-button" data-view="morph">Открыть</button></article>
+      </div>
+      <p class="ia-quiet"><button type="button" class="text-button" data-action="personal-trainers"><span>Тренажёры</span><small>Буквы · числа · слова</small></button></p>
+      <div class="today-tiles"><button type="button" class="today-option" data-action="review"><span>Повторить сегодня</span><strong>${dueShow}</strong><small>${dueHint}</small></button><button type="button" class="today-option" data-view="learn"><span>Выбрать занятие</span><small>Урок, числа или ступень</small></button>${pauseN?`<button type="button" class="today-option" data-action="pause-prep"><span>Готовится к паузе</span><strong>${pauseN}</strong><small>Интервал уже длинный</small></button>`:''}${repairOn?`<button type="button" class="today-option" data-action="repair-open"><span>${repairLabel}</span><small>${esc(repairDetail)}</small></button>`:''}</div>
+      <div class="today-actions"><button type="button" class="today-option" data-action="new"><span>Новые</span><strong>${Math.min(cfg.session.newLimit,newCount)}</strong><small>Рекомендовано на один подход</small></button></div>
+      <div class="today-collage" aria-hidden="true"><div class="today-photo p1"></div><div class="today-photo p2"></div><div class="today-photo p3"></div><div class="today-photo p4"></div></div>
        <dialog id="lesson-picker" class="settings-dialog lesson-picker" aria-labelledby="lesson-picker-title"><div class="lesson-picker-head"><div><p class="eyebrow">Прохождение</p><h2 id="lesson-picker-title">Выбрать урок</h2><p class="small">Просмотр не меняет место, с которого продолжится основное обучение.</p></div><button type="button" class="text-button" data-picker-close>Закрыть</button></div><div class="lesson-picker-list">${pickerRows}</div></dialog>
        <details class="panel compact-panel"><summary>Память</summary><div class="panel-head">${tip('memory-help','Показывает, насколько материал вспоминается после паузы, а не процент знания языка.')}</div><p>Помню после паузы: <strong>${remembered} / ${recallCards.length}</strong></p>${recallLine?'<p>'+recallLine+'</p>':''}${ms.firstTry==null?'':'<p>Вспомнила самостоятельно: '+ms.firstTry+'%</p>'}${ms.peekRate==null?'':'<p>С подсказкой: '+ms.peekRate+'%</p>'}${ms.stop?'<p class="small">Если три дня подряд больше половины домашки открывается с подсказкой — уменьши пачку, не добавляй новый тип.</p>':''}</details>
        <details class="panel compact-panel"${weakOpen?' open':''}><summary>Слабые места</summary>${(window.RepairState&&window.ErrorDiagnostics?window.RepairState.metricParts(state,state.events).map(part=>'<p class="small">'+esc(part.kind==='savings'?'Стало легче вспоминать':window.ErrorDiagnostics.pauseLine(part.kind,part.value))+'</p>').join(''):'')}${weak.length?weak.map(w=>`<div class="confusion-row"><div><strong>${esc(window.Homework&&window.Homework.weakLabel?window.Homework.weakLabel(w.key):w.key)}</strong><p class="small">${w.count} за 14 дней. ${esc(w.expected)} → ${esc(w.actual)}</p></div><button type="button" class="secondary-button" data-action="weak:${esc(w.cardId)}">Разобрать</button></div>`).join(''):'<p>Устойчивых слабых мест пока нет.</p>'}${weakWords.length?'<p>'+weakWords.slice(0,5).map(w=>esc(w.kazakh)).join(' · ')+'</p>':''}${weakRules.length?'<p class="small">Правила: '+weakRules.map(r=>esc(r.title)).join(', ')+'</p>':''}${window.AiTutor&&window.AiTutor.topWeak().length?'<p class="small">'+window.AiTutor.topWeak().map(w=>esc(window.AiTutor.label(w.error_code))+' · '+w.count_recent).join('<br>')+'</p><button type="button" class="text-button" data-action="ai-summary">Краткий разбор сессии</button>':''}${pairN?`<button type="button" class="text-button" data-action="confusions">Часто путаю: ${pairN} →</button>`:''}</details>
