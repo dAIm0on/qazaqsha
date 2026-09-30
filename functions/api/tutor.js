@@ -10,7 +10,7 @@ const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3','4-
 const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'] ,'3-1':['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL'],'3-2':['T24_POSS_BIZ','T25_POSS_SENDER','T26_POSS_OLAR','T27_DEIXIS'],'3-3':['T28_OWNER_SUBJECT','T29_POSS_PERSON_STACK','T30_THIRD_ZERO','T31_EMES_STACK','T32_OTBASY','T33_ADJ_ROLE','T34_INTERROGATIVE'],'4-2':['T35_PAST_MEANING','T36_DY_TY','T37_PERSON2','T38_OL_ZERO_PAST','T39_PAST_ASSIM','T40_PAST_NEG','T41_PAST_Q','T42_PAST_EXCEPT']};
 const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам'] ,'3-1':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','жүрек','сақал','мысық','таз','тақырбас','қатты','саусақ','кім','не','қандай','қай','нешінші','бұл'],'3-2':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','бұл','мынау','осы','мына','анау','ана','ол','сол','сынып','сыныптас','отбасы','баба','іс','аяқ','кім','не','қандай','қай','нешінші'],'3-3':['келу','кету','кіру','шығу','іздеу','табу','асығу','кешігу','жұмыс істеу','жазу','сөйлеу','алу','беру','көру','қарау'],'4-2':['түсіну','бару','жүру','жату','отыру','тұру','ашу','жабу','тігу','сөйлеу','жазу','кету','алу','беру','келу','іздеу','көру','кіру','қарау','шығу','кешігу','табу','асығу','жұмыс істеу','ойлау','ойнау','сену','күту','айту']};
 const MAX_IN=12000,MAX_OUT=250,ASK_OUT=500;
-const PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000,RECOVERY_TIMEOUT_MS=4000;
+const PRIMARY_TIMEOUT_MS=14000,FALLBACK_TIMEOUT_MS=8000,RECOVERY_TIMEOUT_MS=4000;
 const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,translate_word:220,session_summary:800,remediation:450};
 const FUTURE_RE=/падеж|посессив|притяжательн|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|бар ма\?|кітабым/i;
 const ALWAYS_FUTURE_RE=/падеж|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|labial|comparative/i;
@@ -113,7 +113,8 @@ function localFallback(req,rid){
   r.primary_error_code=code||null;
   r.rule_ids_used=ctx.rule_id?[ctx.rule_id]:[];
   r.micro_rule_ru=ctx.short||ctx.title_ru||null;
-  r.contrast={wrong:wrote||null,correct:mode==='hint'?null:(expected||null)};
+  const hideExpected=mode==='hint'||mode==='ask_tutor'||mode==='simplify'||mode==='translate_word';
+  r.contrast={wrong:mode==='translate_word'?null:(wrote||null),correct:hideExpected?null:(expected||null)};
   r.needs_rule_context=false;
   r.confidence='medium';
   r.meta={request_id:rid,source:'local'};
@@ -141,6 +142,7 @@ function localFallback(req,rid){
   }else r.message_ru=lever;
   if(mode==='ask_tutor'||mode==='simplify'||mode==='explain_rule')r.next_action_ru=null;
   else r.next_action_ru='Введи правильную форму целиком.';
+  if(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word')r.contrast={wrong:mode==='translate_word'?null:(wrote||null),correct:null};
   r.message_ru=clip(r.message_ru,maxMessage(mode));
   return r;
 }
@@ -301,7 +303,8 @@ function assemble(req,text,meta){
   r.rule_ids_used=(req.rule_context||[]).map(c=>c&&c.rule_id).filter(Boolean).slice(0,6);
   const ctx=(req.rule_context&&req.rule_context[0])||{};
   r.micro_rule_ru=ctx.short||ctx.title_ru||null;
-  r.contrast={wrong:req.user_answer||null,correct:mode==='hint'?null:(req.expected_answer||null)};
+  const hideExpected=mode==='hint'||mode==='ask_tutor'||mode==='simplify'||mode==='translate_word';
+  r.contrast={wrong:mode==='translate_word'?null:(req.user_answer||null),correct:hideExpected?null:(req.expected_answer||null)};
   if(mode==='hint')r.next_action_ru='Введи форму целиком, не копируй готовый ответ.';
   else if(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'||mode==='explain_rule')r.next_action_ru=null;
   else r.next_action_ru='Введи правильную форму целиком.';
@@ -375,7 +378,7 @@ function userPayload(req){
     ctx[0]&&ctx[0].block_label?'block: '+ctx[0].block_label+(ctx[0].clipped?' · часть блока, не замена полного текста':''):'',
     req.prompt?'prompt: '+req.prompt:'',
     req.user_answer?'user_answer: '+req.user_answer:'',
-    req.mode==='hint'?'':'expected_answer: '+(req.expected_answer||''),
+    (req.mode==='hint'||req.mode==='ask_tutor'||req.mode==='simplify'||req.mode==='translate_word')?'':'expected_answer: '+(req.expected_answer||''),
     req.candidate_error_codes&&req.candidate_error_codes[0]?'candidate_error_code: '+req.candidate_error_codes[0]:'',
     'repeat_count: '+(req.repeat_count||0),
     'rule_context: '+JSON.stringify(ctx)
@@ -560,7 +563,7 @@ function parseBody(raw){
     mode,surface,lesson_id,
     prompt:clip(raw&&raw.prompt,400),
     user_answer:clip(raw&&raw.user_answer,400),
-    expected_answer:clip(raw&&raw.expected_answer,400),
+    expected_answer:(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'||mode==='hint')?'':clip(raw&&raw.expected_answer,400),
     is_correct:!!(raw&&raw.is_correct),
     hint_used:!!(raw&&raw.hint_used),
     repeat_count:Math.max(0,parseInt(raw&&raw.repeat_count,10)||0),

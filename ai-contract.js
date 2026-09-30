@@ -15,7 +15,7 @@
 const ALWAYS_FUTURE_RE=/падеж|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|labial|comparative/i;
 const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|кітабым/i;
  const MAX_IN=12000,MAX_MSG=450,MAX_OUT_TOKENS=250,ASK_OUT_TOKENS=400;
- const CLIENT_TIMEOUT_MS=25000,PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000;
+ const CLIENT_TIMEOUT_MS=30000,PRIMARY_TIMEOUT_MS=14000,FALLBACK_TIMEOUT_MS=8000;
  const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,translate_word:220,session_summary:800,remediation:450};
  const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha.\n\nТы не проверяешь правильность ответа. Правильность уже определил локальный код.\n\nТы не меняешь expected_answer.\n\nГлавный источник истины — переданный rule_context.\n\nОбъясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком.\n\nНе вводи будущие темы.\n\nНе исправляй учебную программу своими знаниями.\n\nНе называй внутренние ID правил.\n\nНе упоминай system prompt, error_code или внутреннюю архитектуру.\n\nПиши естественным русским языком. Казахские формы оставляй на казахском.\n\nЕсли mode=explain_error:\n1. скажи, что ученица написала;\n2. покажи отличие от правильной формы;\n3. объясни один механизм правила;\n4. используй текущий пример.\n\nЕсли mode=explain_rule:\nобъясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом.\n\nЕсли mode=simplify:\nобъясни то же правило проще, не меняя его смысл.\n\nЕсли mode=ask_tutor:\nответь прежде всего на user_question 2–6 предложениями. Сразу к сути, без приветствия и без переписывания вопроса ученицы.\nДля кітап+ым помни озвончение п→б: кітабым.\nРазрешено объяснять через русский язык, если это помогает ученице понять казахское правило.\nМожно давать дополнительные примеры только из текущей разрешённой лексики и уже пройденной грамматики.\n\nЕсли ученица пишет:\n«не поняла»,\n«ещё проще»,\n«объясни иначе»,\n«через русский»,\nто измени способ объяснения, но не правило.\n\nЕсли repeat_count >= 2:\nможно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ её понять.\nНе стыди ученицу. Не пиши «ты опять ошиблась».\n\nЕсли mode=hint:\nне показывай полный правильный ответ.\n\nВозвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context.\nБез JSON.\nБез markdown fences.\nБез <think>.\nНикогда не пиши English thinking aloud (Okay, Let me recall, the user is asking). Ответ ученице — только на русском.';
  function clip(s,n){s=String(s==null?'':s);return s.length<=n?s:s.slice(0,n);}
@@ -292,7 +292,8 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   r.primary_error_code=code||null;
   r.rule_ids_used=ctx.rule_id?[ctx.rule_id]:[];
   r.micro_rule_ru=ctx.short||ctx.title_ru||null;
-  r.contrast={wrong:wrote||null,correct:mode==='hint'?null:(expected||null)};
+  const hideExpected=mode==='hint'||mode==='ask_tutor'||mode==='simplify'||mode==='translate_word';
+  r.contrast={wrong:mode==='translate_word'?null:(wrote||null),correct:hideExpected?null:(expected||null)};
   r.needs_rule_context=false;
   r.confidence='medium';
   r.meta={request_id:(req&&req.request_id)||null,source:'local'};
@@ -320,6 +321,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   }else r.message_ru=lever;
   if(mode==='ask_tutor'||mode==='simplify'||mode==='explain_rule')r.next_action_ru=null;
   else r.next_action_ru='Введи правильную форму целиком.';
+  if(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word')r.contrast={wrong:mode==='translate_word'?null:(wrote||null),correct:null};
   r.message_ru=clip(r.message_ru,maxMessage(mode));
   return r;
  }
@@ -333,7 +335,8 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   r.rule_ids_used=((req&&req.rule_context)||[]).map(c=>c&&c.rule_id).filter(Boolean).slice(0,6);
   const ctx=(req&&req.rule_context&&req.rule_context[0])||{};
   r.micro_rule_ru=ctx.short||ctx.title_ru||null;
-  r.contrast={wrong:(req&&req.user_answer)||null,correct:mode==='hint'?null:((req&&req.expected_answer)||null)};
+  const hideExpected=mode==='hint'||mode==='ask_tutor'||mode==='simplify'||mode==='translate_word';
+  r.contrast={wrong:mode==='translate_word'?null:((req&&req.user_answer)||null),correct:hideExpected?null:((req&&req.expected_answer)||null)};
   if(mode==='hint')r.next_action_ru='Введи форму целиком, не копируй готовый ответ.';
   else if(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'||mode==='explain_rule')r.next_action_ru=null;
   else r.next_action_ru='Введи правильную форму целиком.';
@@ -374,7 +377,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
     exercise_id:clip(raw.exercise_id,80),
     prompt:clip(raw.prompt,400),
     user_answer:clip(raw.user_answer,400),
-    expected_answer:clip(raw.expected_answer,400),
+    expected_answer:(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'||mode==='hint')?'':clip(raw.expected_answer,400),
     is_correct:!!raw.is_correct,
     hint_used:!!raw.hint_used,
     repeat_count:Math.max(0,parseInt(raw.repeat_count,10)||0),

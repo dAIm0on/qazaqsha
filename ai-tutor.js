@@ -226,7 +226,7 @@
  }
  async function callTutor(req,timeoutMs,opts){
   opts=opts||{};
-  if(timeoutMs==null)timeoutMs=C.CLIENT_TIMEOUT_MS||25000;
+  if(timeoutMs==null)timeoutMs=C.CLIENT_TIMEOUT_MS||30000;
   if(req&&req.surface==='exam')return C.examBlocked(req.mode);
   const v=C.validateRequest(req||{});
   if(!v.ok){
@@ -278,7 +278,7 @@
    conversation_tail:extra.conversation_tail||(context&&context.conversation_tail)||[],
    repeat_count:extra.repeat_count
   });
-  return callTutor(req,C.CLIENT_TIMEOUT_MS||25000,extra);
+  return callTutor(req,C.CLIENT_TIMEOUT_MS||30000,extra);
  }
  const TEMPLATES={
   PLURAL_AFTER_NUMBER:[
@@ -358,7 +358,7 @@
    conversation_tail:extra.conversation_tail||[]
   });
   req.expected_answer='';
-  return callTutor(req,C.CLIENT_TIMEOUT_MS||25000,extra);
+  return callTutor(req,C.CLIENT_TIMEOUT_MS||30000,extra);
  }
 
  function hintLeaks(resp,expected){

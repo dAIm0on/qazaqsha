@@ -38,13 +38,13 @@ assert.equal(C.FALLBACK_MODEL,'@cf/qwen/qwen3-30b-a3b-fp8');
 assert.equal(C.MODEL_ID,C.PRIMARY_MODEL);
 assert.ok(C.MODES.includes('ask_tutor'));
 assert.ok(C.SURFACES.includes('exam'));
-assert.equal(C.CLIENT_TIMEOUT_MS,25000);
-assert.equal(C.PRIMARY_TIMEOUT_MS,11000);
+assert.equal(C.CLIENT_TIMEOUT_MS,30000);
+assert.equal(C.PRIMARY_TIMEOUT_MS,14000);
 assert.equal(C.FALLBACK_TIMEOUT_MS,8000);
 assert.ok(/RECOVERY_TIMEOUT_MS=4000/.test(tutorSrc));
 assert.ok(C.CLIENT_TIMEOUT_MS>C.PRIMARY_TIMEOUT_MS+C.FALLBACK_TIMEOUT_MS+4000);
 assert.ok(/PRIMARY_MODEL/.test(tutorSrc)&&/FALLBACK_MODEL/.test(tutorSrc));
-assert.ok(/11000/.test(tutorSrc)&&/8000/.test(tutorSrc));
+assert.ok(/14000/.test(tutorSrc)&&/8000/.test(tutorSrc));
 assert.ok(/runTutorModel/.test(tutorSrc));
 assert.ok(!/Верни только JSON/.test(tutorSrc));
 assert.ok(!/Верни только JSON/.test(contractSrc));
@@ -113,6 +113,25 @@ assert.ok(C.looksLikeBadTutorReply('Нужно объяснить, что ... о
 assert.ok(!C.isUsableText('Нужно объяснить, что окончания множественного числа и притяжательное'));
 ok('TEST planning meta Нужно объяснить rejected');
 ok('TEST tutor loop and kitabym gate');
+
+// A10: ask/simplify/translate_word must not leak expected_answer into contrast.correct
+{
+  const askA=C.assembleResponse({mode:'ask_tutor',lesson_id:'1-2',user_answer:'адамлар',expected_answer:'адамдар',user_question:'почему?',candidate_error_codes:[],rule_context:[]},'Короткий ответ тьютора без эталона.',{source:'primary',request_id:'a10'});
+  assert.ok(askA);assert.equal(askA.contrast.correct,null);
+  const simA=C.assembleResponse({mode:'simplify',lesson_id:'1-2',expected_answer:'SECRET',user_question:'проще',candidate_error_codes:[],rule_context:[{short:'x'}]},'Объясню проще: после числа множественное не ставим.',{source:'primary'});
+  assert.ok(simA);assert.equal(simA.contrast.correct,null);
+  const twA=C.assembleResponse({mode:'translate_word',lesson_id:'1-2',expected_answer:'SECRET',user_question:'кітап',candidate_error_codes:[],rule_context:[]},'кітап — книга (предмет для чтения).',{source:'primary'});
+  assert.ok(twA);assert.equal(twA.contrast.correct,null);assert.equal(twA.contrast.wrong,null);
+  const askL=C.localExplain({mode:'ask_tutor',lesson_id:'1-2',user_answer:'x',expected_answer:'SECRET',user_question:'?',rule_context:[]});
+  assert.equal(askL.contrast.correct,null);
+  const vr=C.validateRequest({mode:'ask_tutor',lesson_id:'1-2',user_question:'?',expected_answer:'SECRET',prompt:'p'});
+  assert.ok(vr.ok);assert.equal(vr.req.expected_answer,'');
+  const vrTw=C.validateRequest({mode:'translate_word',lesson_id:'1-2',user_question:'кітап',expected_answer:'SECRET',prompt:'кітап'});
+  assert.ok(vrTw.ok);assert.equal(vrTw.req.expected_answer,'');
+  assert.ok(tutorSrc2.includes("mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'")||tutorSrc2.includes('hideExpected'));
+  ok('TEST A10 no expected_answer in contrast.correct for ask/simplify/translate_word');
+}
+
 
 
 assert.equal(C.normalizeModelText('<think>secret</think>Ты написала бес кітаптар, нужно бес кітап.'),'Ты написала бес кітаптар, нужно бес кітап.');
@@ -239,7 +258,7 @@ assert.deepEqual(reqHint.allowed_lesson_ids,['1-1','1-2','1-3']);
 ok('TEST 34 hint request omits expected_answer; scope from lesson');
 
 assert.ok(typeof T.callTutor==='function');
-assert.ok(/25000/.test(fs.readFileSync(path.join(__dirname,'ai-tutor.js'),'utf8'))||T.callTutor.length>=1);
+assert.ok(/CLIENT_TIMEOUT_MS/.test(fs.readFileSync(path.join(__dirname,'ai-tutor.js'),'utf8'))||T.callTutor.length>=1);
 ok('TEST 78 client callTutor default 25s, no client model retry');
 
 const hijackCtx=C.validateRequest({

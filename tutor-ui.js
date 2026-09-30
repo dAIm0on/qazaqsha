@@ -235,7 +235,7 @@
    req.user_answer='';
    req.prompt=question||'';
   }
-  const resp=await root.AiTutor.callTutor(req,25000,{signal:abort&&abort.signal});
+  const resp=await root.AiTutor.callTutor(req,(root.AiContract&&root.AiContract.CLIENT_TIMEOUT_MS)||30000,{signal:abort&&abort.signal});
   if(my!==token||(resp&&resp.aborted))return;
   const msg=resp&&String(resp.message_ru||'').trim();
   if(msg){

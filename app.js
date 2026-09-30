@@ -1109,7 +1109,7 @@
        const req=window.AiTutor.buildRequest(m,q,extra);
        const ac=typeof AbortController!=='undefined'?new AbortController():null;
        tutorAbort=ac;
-       window.AiTutor.callTutor(req,25000,{signal:ac&&ac.signal}).then(resp=>paint(resp,token)).catch(()=>paint(window.AiTutor.localFallback(q,aiCodes,m,extra),token)).finally(()=>{if(token===tutorToken)unlock();});
+       window.AiTutor.callTutor(req,(window.AiContract&&window.AiContract.CLIENT_TIMEOUT_MS)||30000,{signal:ac&&ac.signal}).then(resp=>paint(resp,token)).catch(()=>paint(window.AiTutor.localFallback(q,aiCodes,m,extra),token)).finally(()=>{if(token===tutorToken)unlock();});
      };
      if($('#ai-why'))$('#ai-why').onclick=()=>ask('explain_error');
      if($('#ai-rule'))$('#ai-rule').onclick=()=>ask('explain_rule',true);
@@ -2091,7 +2091,7 @@
      if(next==='ai-summary'&&window.AiTutor){
        const lesson=currentLessonId();
        const req=window.AiTutor.buildRequest('session_summary',{lessonId:lesson,id:'',title:'',stimulus:'',fields:[]},{codes:window.AiTutor.topWeak().map(w=>w.error_code),surface:'practice',lesson_id:lesson});
-       window.AiTutor.callTutor(req,25000).then(resp=>{
+       window.AiTutor.callTutor(req,(window.AiContract&&window.AiContract.CLIENT_TIMEOUT_MS)||30000).then(resp=>{
          const root=document.getElementById('today-content');if(!root||!resp)return;
          const msg=String(resp.message_ru||'').trim()||'Слабые места сохранены локально.';
          const box=document.createElement('div');box.className='panel ai-tutor-out';box.innerHTML='<h2>Разбор</h2><p>'+esc(msg)+'</p>';
