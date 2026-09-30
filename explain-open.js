@@ -109,18 +109,17 @@
  }
  function forQuestion(q,typed){
   const ruleId=ruleIdOf(q);
-  const expected=q&&q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0]||'';
   const actual=Array.isArray(typed)?String(typed[0]||''):String(typed||'');
   const why=(q&&q.explanation)||'';
-  if(!ruleId&&!expected)return '';
-  return '<p><strong>Неверно:</strong> <span lang="kk">'+esc(actual)+'</span> → <strong>Верно:</strong> <span lang="kk">'+esc(expected)+'</span></p>'
+  if(!ruleId&&!actual&&!why)return '';
+  // P0: wrong-feedback must not reveal expected/correct form (A10 UI sibling).
+  return (actual?'<p><strong>Неверно:</strong> <span lang="kk">'+esc(actual)+'</span></p>':'')
    +(why?'<p><strong>Почему:</strong> '+esc(why)+'</p>':'')
    +openButton(ruleId);
  }
  function chainHtml(q,typed){
-  const expected=q&&q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0]||'';
   const actual=Array.isArray(typed)?String(typed[0]||''):String(typed||'');
-  const diff=actual&&expected&&actual!==expected?'<p data-error-diff>Отличие: <s lang="kk">'+esc(actual)+'</s> → <strong lang="kk">'+esc(expected)+'</strong></p>':'';
+  const diff=actual?'<p data-error-diff>Ты написала: <s lang="kk">'+esc(actual)+'</s>. Разберём механизм — без готового ответа.</p>':'';
   const body=forQuestion(q,typed);
   if(!diff&&!body)return '';
   return '<div data-error-chain>'+diff+body+'</div>';

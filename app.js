@@ -274,16 +274,13 @@
  function morphemeRow(errors,expected,actual){
    const types=(errors||[]).map(e=>e.error_type);
    if(!types.some(t=>t==='vowel_harmony'||t==='plural_initial_consonant'||t==='plural_after_numeral'))return '';
-   const exp=String(expected||'').split(' / ')[0],act=String(actual||'');
-   if(!exp)return '';
+   const act=String(actual||'');
+   // P0: do not paint the full expected form in wrong-feedback morph strip.
    if(types.includes('plural_after_numeral')){
-     return `<div class="rule-parts" lang="kk"><span class="morpheme">${esc(exp)}</span><span class="morpheme extra">лишнее окончание</span></div>`;
+     return `<div class="rule-parts"><span class="morpheme extra">лишнее окончание после числа</span></div>`;
    }
-   let i=0;while(i<exp.length&&i<act.length&&exp[i]===act[i])i++;
-   const stem=exp.slice(0,Math.max(1,i));
-   const need=exp.slice(stem.length);
-   const extra=act.slice(stem.length);
-   return `<div class="rule-parts" lang="kk"><span class="morpheme">${esc(stem)}</span>${need?`<span class="morpheme suffix">${esc(need)}</span>`:''}${extra&&extra!==need?`<span class="morpheme extra">${esc(extra)}</span>`:''}</div>`;
+   if(!act)return `<div class="rule-parts"><span class="morpheme extra">проверь окончание</span></div>`;
+   return `<div class="rule-parts" lang="kk"><span class="morpheme">${esc(act)}</span><span class="morpheme extra">проверь окончание</span></div>`;
  }
  function pauseTimer(){elapsedMs=elapsed();timerSince=null;if(examRaf){cancelAnimationFrame(examRaf);examRaf=null;}cancelAdvance();}
  function startTimer(){if(!introOpen&&view==='practice'&&!checked&&!document.hidden&&timerSince===null&&byId.has(queue[position]))timerSince=performance.now();}
@@ -398,7 +395,7 @@
    const feedback=$('#feedback');
    const answerLine=(q.fields||[]).map(f=>f.answers[0]).join(' · ');
    feedback.className='feedback '+(row.correct?'':'error');
-   feedback.innerHTML=`<h3>${row.correct?'Сходится.':'Пока не это.'}</h3><p><strong>Ответ:</strong> ${esc(answerLine)}</p><p class="small">${reveal?'Подсказка не засчитана.':'Это проверка дыр. Очередь «пора вспомнить» от неё не меняется.'}</p>`;
+   feedback.innerHTML=`<h3>${row.correct?'Сходится.':'Пока не это.'}</h3>${row.correct||reveal?'<p><strong>Ответ:</strong> '+esc(answerLine)+'</p>':''}<p class="small">${reveal?'Подсказка не засчитана.':'Это проверка дыр. Очередь «пора вспомнить» от неё не меняется.'}</p>`;
    feedback.hidden=false;
    $$('#answer-form input, #hint-button, #reveal-button, [data-letter]').forEach(el=>{el.disabled=true;});
    $('#check-button').hidden=true;$('#next-button').hidden=false;
@@ -1089,11 +1086,13 @@
      return rest.length?rest.join(', '):'';
    }).filter(Boolean).join('; ');
    const timeLine=mode==='exam'?(examTimedOut?'Время вышло.':'Короткий лимит на карточку'+(elapsedMs>cfg.session.examHardMs&&result.correct?' · медленно.':' · зачёт.')):'';
-   const local=errors.map(e=>window.ErrorDiagnostics.line&&window.ErrorDiagnostics.line(e.error_type,e.expected_answer,e.actual_answer,q)||window.ErrorDiagnostics.labels[e.error_type]).filter(Boolean);
+   const local=(!result.correct
+     ?errors.map(e=>(window.ErrorDiagnostics.labels&&window.ErrorDiagnostics.labels[e.error_type])||'').filter(Boolean)
+     :errors.map(e=>window.ErrorDiagnostics.line&&window.ErrorDiagnostics.line(e.error_type,e.expected_answer,e.actual_answer,q)||window.ErrorDiagnostics.labels[e.error_type]).filter(Boolean));
    const aiCodes=window.AiTutor&&mode!=='exam'?window.AiTutor.noteAnswer(q,answers,result,hinted,errors,now):[];
    const aiRepeat=window.AiTutor&&aiCodes[0]&&window.AiTutor.shouldOfferExplain(aiCodes[0]);
    const morph=!result.correct?morphemeRow(errors,answerLine,answers.join(' ')):'';
-   feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Нужно: <strong lang="kk">'+esc(answerLine)+'</strong>.</p>':''}${morph}${!tarErr?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
+   feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Число уже сказало, сколько. Окончание множественного здесь лишнее.</p>':''}${morph}${result.correct?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
    if(!result.correct&&mode!=='exam'&&window.TutorUI){
      const word=((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||answers[0]||'').toString().split(/\s+/)[0];
      window.TutorUI.setContext({
@@ -1615,7 +1614,7 @@
        const chain=window.ExplainOpen&&window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(pathQ,val):'';
        const gap=window.AiTutor&&window.AiTutor.coverageGaps?window.AiTutor.coverageGaps().find(g=>noted.aiCodes.includes(g.error_code)):null;
        const gapHtml=gap&&!offers.isolated&&!offers.other?'<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>':'';
-       showPathFb('error','<p data-error-diff>Отличие: <s lang="kk">'+esc(val.trim()||'пусто')+'</s> → <strong lang="kk">'+esc(right)+'</strong></p><p>Ты написала: <strong lang="kk">'+esc(val.trim()||'пусто')+'</strong></p><p>Нужно: <strong lang="kk">'+esc(right)+'</strong></p>'+(why.length?'<p>'+esc([...new Set(why)].join(' · '))+'</p>':'')+'<p>'+seeText(diag)+'</p>'+studentCopy(chain)+offerHtml(offers)+gapHtml+(beat.trap?'<p>'+seeText(beat.trap)+'</p>':'')+(bankCard&&bankCard.short?'<p class="small">'+seeText(bankCard.short)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
+       showPathFb('error','<p data-error-diff>Ты написала: <s lang="kk">'+esc(val.trim()||'пусто')+'</s>. Разберём механизм — без готового ответа.</p><p>Ты написала: <strong lang="kk">'+esc(val.trim()||'пусто')+'</strong></p>'+(why.length?'<p>'+esc([...new Set(why)].join(' · '))+'</p>':'')+'<p>'+seeText(diag)+'</p>'+studentCopy(chain)+offerHtml(offers)+gapHtml+(beat.trap?'<p>'+seeText(beat.trap)+'</p>':'')+(bankCard&&bankCard.short?'<p class="small">'+seeText(bankCard.short)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
        if(window.ExplainOpen)window.ExplainOpen.bind($('#path-fb'));
        bindOffers($('#path-fb'));
        const again=$('#path-again-rule');if(again)again.onclick=()=>{showPathFb('hinted','<p>'+seeText(bankCard&&(bankCard.short||bankCard.medium)||hintLine())+'</p>');};

@@ -1397,7 +1397,8 @@ assert.ok(/const CACHE='qazaq-offline-live-20260930-school(?:-tutor\d*)?'/.test(
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
-assert.ok(block.includes('Неверно')&&block.includes('Верно')&&block.includes('Показать полностью')&&block.includes('кітабым'));
+assert.ok(block.includes('Неверно')&&block.includes('Показать полностью')&&block.includes('кітапым'));
+assert.ok(!block.includes('Верно:')&&!/кітабым/.test(block.split('Показать полностью')[0]),'wrong-feedback must not reveal expected before rule panel');
 const map=Open.map31();
 assert.ok(map.includes('не 15 слов методички')&&map.includes('Круг A: 6')&&map.includes('жоқ')&&map.includes('7 шагов, 8 рецептов')&&!map.includes('в репозитории нет'));
 assert.ok(!/#A46042|#E15F2C/.test(fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8')));
@@ -1955,11 +1956,13 @@ ok('Astra step 8: a voicing error with no exercise stays due and says so');
 const OpenChain=require('./explain-open.js');
 const chainQ={id:'m1',ruleIds:['T1_HARMONY'],fields:[{answers:['кітаптар']}],explanation:'Смотри последний слог.'};
 const chainHtml=OpenChain.chainHtml(chainQ,'кітаплар');
-assert.ok(chainHtml.includes('data-error-chain')&&chainHtml.includes('Отличие')&&chainHtml.includes('Неверно')&&chainHtml.includes('Верно')&&chainHtml.includes('Показать полностью'));
+assert.ok(chainHtml.includes('data-error-chain')&&chainHtml.includes('Неверно')&&chainHtml.includes('Показать полностью'));
+assert.ok(!/Верно:\s*<span lang="kk">кітаптар/.test(chainHtml),'wrong-feedback must not reveal expected form');
+assert.ok(!/→\s*<strong lang="kk">кітаптар/.test(chainHtml),'wrong-feedback must not arrow to expected');
 assert.ok(/data-error-chain|chainHtml/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/Проверить этот навык отдельно/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/Другой пример/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
-ok('Astra step 9: wrong answer shows the difference, the block, and an existing same-skill offer');
+ok('Astra step 9: wrong answer shows the attempt, the block, and an existing same-skill offer (no expected reveal)');
 
 const depthState=progress.migrate({schema:6,records:{},explainDepth:{T1_HARMONY:'closed',T2_PLURAL_LDT:'open',bad:true}});
 assert.equal(depthState.explainDepth.T1_HARMONY,'closed');
