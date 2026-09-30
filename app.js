@@ -584,6 +584,21 @@
        return;
      }
    }
+   // PR-C Variant A: vocab-must Learn — due/NEW поверх frozen chunk-0 (адам/қыз),
+   // same chooseShortSession mix as catalogVocabIds/PR-B. Chunk step stays for UI only.
+   if(id==='vocab-must'){
+     const pool=(lesson.questionIds||[]).map(qid=>byId.get(qid)).filter(q=>q&&eligible(q));
+     const limit=Math.max(2,(cfg.session.size||10)+(cfg.session.newLimit||0));
+     const picked=core.chooseShortSession(pool,records,Date.now(),limit);
+     if(picked.length)stepIds=picked.map(q=>q.id);
+     const openChunk=lesson.chunks.findIndex(ch=>ch.questionIds.every(qid=>!byId.get(qid)||eligible(byId.get(qid)))&&ch.questionIds.some(qid=>!records[qid]?.seen));
+     if(openChunk>=0)step=openChunk;
+     else{
+       const dueChunk=lesson.chunks.findIndex(ch=>ch.questionIds.some(qid=>{const r=records[qid];return r&&(r.needsReview||core.isDue(r));}));
+       if(dueChunk>=0)step=dueChunk;
+     }
+     if(!lesson.chunks[step])step=Math.min(Math.max(0,step),lesson.chunks.length-1);
+   }
    courseBlock=lesson.courseLesson||courseBlock;
    activeLesson=id;activeStep=step;learningState.lessonId=id;learningState.steps[id]=step;topic=lesson.topic;mode=opts&&opts.voluntary?'voluntary':'lesson';sourceFilter=null;
    queue=lesson.topic==='numbers'?shuffled(stepIds):stepIds;practiceIds=[...queue];stepEvidence={};queueEpoch=Date.now()+Math.random();
