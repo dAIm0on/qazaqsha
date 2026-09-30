@@ -33,8 +33,11 @@ assert.ok(app.includes('Повторить теорию'));
 assert.ok(app.includes('pathNeedsV2TheoryReplay'));
 assert.ok(app.includes('legacyPathRevision'));
 assert.ok(app.includes('migrateLessonCompletedChapters'));
+assert.ok(app.includes('pathHasUnmappedChapters(lessonId,gp,gp.chapterId)'));
+assert.ok(app.includes('Stamp target revision only after chapter ids are current')||app.includes('only after chapter ids are current'));
 assert.ok(/continueLesson[\s\S]*pathNeedsV2TheoryReplay[\s\S]*openPathLesson/.test(app));
 ok('app.js has replay CTA + loadLessonPath/continueLesson migration gates');
+ok('persistLessonPath stamps contentRevision only when chapter ids current');
 
 const cp=fs.readFileSync(path.join(__dirname,'course-progress.js'),'utf8');
 assert.ok(cp.includes('contentRevision:gp.contentRevision'));
@@ -42,8 +45,8 @@ assert.ok(cp.includes('pathNeedsReplay'));
 ok('course-progress persists contentRevision + pathNeedsReplay');
 
 const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20260930-school-tutor14'"));
-ok('sw cache bumped to school-tutor14');
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20260930-school-tutor15'"));
+ok('sw cache bumped to school-tutor15');
 
 const mock={
   LessonV2Schema:Schema,
@@ -132,6 +135,100 @@ const currentDone=simulateLoad({phase:'done',chapterId:null,contentRevision:'2-1
 assert.equal(currentDone.phase,'done');
 assert.equal(currentDone.pathNeedsReplay,false);
 ok('current revision done stays done (replay via CTA only)');
+
+// --- save-then-open mid-path race (persistLessonPath before loadLessonPath) ---
+function pathHasUnmapped(chapterId,completed,Gchapters){
+  if(chapterId&&!Gchapters.has(chapterId))return true;
+  for(const k of Object.keys(completed||{})){
+    if(!k.startsWith('2-1:')||!completed[k])continue;
+    if(!Gchapters.has(k.slice(4)))return true;
+  }
+  return false;
+}
+function simulatePersist(savedPath,completed){
+  // Mirrors fixed persistLessonPath: stamp target only when ids already current.
+  const Gchapters=new Set(pathLes.chapters.map(c=>c.id));
+  const targetRev=mock.LessonV2Runtime.byId('2-1').content_revision;
+  let contentRevision=savedPath&&savedPath.contentRevision||null;
+  const chapterId=savedPath&&savedPath.chapterId||null;
+  if(!pathHasUnmapped(chapterId,completed,Gchapters))contentRevision=targetRev;
+  else if(contentRevision===targetRev)contentRevision='2-1.legacy';
+  return Object.assign({},savedPath||{},{contentRevision,chapterId,updatedAt:(savedPath&&savedPath.updatedAt)||1});
+}
+function simulateLoadResilient(savedPath,completed){
+  // loadLessonPath hardened: migrate when unmapped even if storedRev===targetRev (premature stamp).
+  const currentV2=mock.LessonV2Runtime.byId('2-1');
+  const Gchapters=new Set(pathLes.chapters.map(c=>c.id));
+  const gp={completedChapters:Object.assign(Object.create(null),completed||{})};
+  let chapterId=savedPath&&savedPath.chapterId||null;
+  let phase=savedPath&&['lesson','beat','done'].includes(savedPath.phase)?savedPath.phase:'lesson';
+  const storedRev=savedPath&&savedPath.contentRevision||null;
+  const targetRev=currentV2.content_revision;
+  const pathActive=!!(savedPath&&(savedPath.updatedAt||savedPath.chapterId||['lesson','beat','done'].includes(savedPath.phase)));
+  const revisionFirstTime=!storedRev||storedRev!==targetRev;
+  const fromRev=storedRev||(pathActive?'2-1.legacy':null);
+  const unmappedBefore=pathActive&&pathHasUnmapped(chapterId,gp.completedChapters,Gchapters);
+  const migFrom=(fromRev&&fromRev!==targetRev)?fromRev:(unmappedBefore?'2-1.legacy':null);
+  if(pathActive&&migFrom&&migFrom!==targetRev){
+    if(chapterId&&!Gchapters.has(chapterId)){
+      chapterId=mock.LessonV2Runtime.migrateId('2-1',migFrom,'chapter_ids',chapterId)||null;
+    }
+    for(const key of Object.keys(gp.completedChapters)){
+      if(!key.startsWith('2-1:'))continue;
+      const oldId=key.slice(4);
+      const moved=mock.LessonV2Runtime.migrateId('2-1',migFrom,'chapter_ids',oldId);
+      if(moved&&moved!==oldId){gp.completedChapters['2-1:'+moved]=true;delete gp.completedChapters[key];}
+    }
+  }
+  const unmapped=pathActive&&pathHasUnmapped(chapterId,gp.completedChapters,Gchapters);
+  const needsRevisionGate=revisionFirstTime||unmapped||(unmappedBefore&&storedRev===targetRev);
+  let pathNeedsReplay=false;
+  if(pathActive&&phase==='done'&&needsRevisionGate){
+    for(const key of Object.keys(gp.completedChapters))if(key.startsWith('2-1:'))delete gp.completedChapters[key];
+    phase='beat';chapterId=pathLes.chapters[0].id;pathNeedsReplay=true;
+  }else if(pathActive&&needsRevisionGate){
+    if(!chapterId||!Gchapters.has(chapterId)){
+      const unfinished=pathLes.chapters.find(ch=>!gp.completedChapters['2-1:'+ch.id]);
+      if(unfinished){phase='beat';chapterId=unfinished.id;}
+    }
+  }
+  return {phase,chapterId,pathNeedsReplay,contentRevision:targetRev,completed:Object.keys(gp.completedChapters)};
+}
+
+const midSeed={phase:'beat',chapterId:'2-1-emes',beat:0,contentRevision:null,updatedAt:1};
+const midCompleted={'2-1:2-1-glue':true,'2-1:2-1-pron':true,'2-1:2-1-clause':true,'2-1:2-1-men':true,'2-1:2-1-sen':true,'2-1:2-1-siz':true};
+const afterSave=simulatePersist(midSeed,midCompleted);
+assert.notEqual(afterSave.contentRevision,'2-1.r1','persist must NOT stamp target while legacy mid-path ids remain');
+assert.ok(afterSave.contentRevision===null||afterSave.contentRevision==='2-1.legacy');
+const afterOpen=simulateLoadResilient(afterSave,midCompleted);
+assert.equal(afterOpen.phase,'beat');
+assert.equal(afterOpen.chapterId,'v2-theory-2-1-emes');
+assert.ok(afterOpen.completed.includes('2-1:v2-theory-2-1-glue'));
+assert.ok(!afterOpen.completed.includes('2-1:2-1-glue'));
+ok('save-then-open mid-path: persist keeps legacy rev; load migrates to v2-theory-2-1-emes');
+
+// Recovery: already-stamped target + legacy ids (broken tip state) still migrates on open
+const premature={phase:'beat',chapterId:'2-1-emes',beat:0,contentRevision:'2-1.r1',updatedAt:2};
+const recovered=simulateLoadResilient(premature,midCompleted);
+assert.equal(recovered.chapterId,'v2-theory-2-1-emes');
+assert.ok(recovered.completed.includes('2-1:v2-theory-2-1-glue'));
+ok('premature contentRevision=2-1.r1 + legacy ids still migrate on load');
+
+const persistCurrent=simulatePersist({phase:'beat',chapterId:'v2-theory-2-1-emes',contentRevision:'2-1.r1',updatedAt:3},{
+  '2-1:v2-theory-2-1-glue':true
+});
+assert.equal(persistCurrent.contentRevision,'2-1.r1');
+ok('persist stamps target when chapter ids already current');
+
+const prematureDone=simulateLoadResilient({phase:'done',chapterId:null,contentRevision:'2-1.r1',updatedAt:2},{
+  '2-1:2-1-glue':true,'2-1:2-1-pron':true,'2-1:2-1-clause':true,'2-1:2-1-men':true,'2-1:2-1-sen':true,
+  '2-1:2-1-siz':true,'2-1:2-1-emes':true,'2-1:2-1-ba':true,'2-1:2-1-siz2':true,'2-1:2-1-checkpoint':true
+});
+assert.equal(prematureDone.phase,'beat');
+assert.equal(prematureDone.chapterId,'v2-theory-2-1-glue');
+assert.equal(prematureDone.pathNeedsReplay,true);
+assert.deepEqual(prematureDone.completed,[]);
+ok('premature stamp + legacy done still resets to first v2 theory');
 
 // Regression smoke: 1-1 and 4-1 still compile/install
 for(const id of ['1-1','4-1']){

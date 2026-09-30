@@ -185,7 +185,15 @@
    const gp=state.grammarPath;if(!gp)return null;
    const lessonId=id||gp.lessonId;if(!P.courseIds().includes(lessonId))return null;
    const currentV2=window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(lessonId):null;
-   const snap=Object.assign({},gp,{contentRevision:currentV2&&currentV2.content_revision||gp.contentRevision||null});
+   let contentRevision=gp.contentRevision||null;
+   if(currentV2){
+     const targetRev=currentV2.content_revision;
+     // Stamp target revision only after chapter ids are current. Premature stamp
+     // makes loadLessonPath skip migrateId and breaks mid-path resume (legacy ids).
+     if(!pathHasUnmappedChapters(lessonId,gp,gp.chapterId))contentRevision=targetRev;
+     else if(contentRevision===targetRev)contentRevision=legacyPathRevision(lessonId,currentV2);
+   }
+   const snap=Object.assign({},gp,{contentRevision});
    return P.saveLessonPath(state,lessonId,snap,Date.now());
  }
  function legacyPathRevision(lessonId,currentV2){
@@ -261,16 +269,21 @@
      const pathActive=!!(p&&(p.updatedAt||p.chapterId||['lesson','beat','done'].includes(p.phase)));
      const revisionFirstTime=!storedRev||storedRev!==targetRev;
      const fromRev=storedRev||(pathActive?legacyPathRevision(id,currentV2):null);
-     if(pathActive&&fromRev&&fromRev!==targetRev&&window.LessonV2Runtime){
+     // Migrate when revision differs, or when ids are still legacy despite a premature target stamp.
+     const unmappedBefore=pathActive&&pathHasUnmappedChapters(id,gp,chapterId);
+     const migFrom=(fromRev&&fromRev!==targetRev)?fromRev:(unmappedBefore?legacyPathRevision(id,currentV2):null);
+     if(pathActive&&migFrom&&migFrom!==targetRev&&window.LessonV2Runtime){
        if(chapterId&&!(G.chapter&&G.chapter(id,chapterId))){
-         const moved=window.LessonV2Runtime.migrateId&&window.LessonV2Runtime.migrateId(id,fromRev,'chapter_ids',chapterId);
+         const moved=window.LessonV2Runtime.migrateId&&window.LessonV2Runtime.migrateId(id,migFrom,'chapter_ids',chapterId);
          if(moved&&moved!==chapterId){chapterId=moved;dirty=true;}
          else if(!moved||!(G.chapter&&G.chapter(id,chapterId))){chapterId=null;dirty=true;}
        }
-       if(migrateLessonCompletedChapters(gp,id,fromRev))dirty=true;
+       if(migrateLessonCompletedChapters(gp,id,migFrom))dirty=true;
      }
      const unmapped=pathActive&&pathHasUnmappedChapters(id,gp,chapterId);
-     if(pathActive&&phase==='done'&&(revisionFirstTime||unmapped)){
+     // Premature target stamp + legacy ids: treat like first-time revision so done resets.
+     const needsRevisionGate=revisionFirstTime||unmapped||(unmappedBefore&&storedRev===targetRev);
+     if(pathActive&&phase==='done'&&needsRevisionGate){
        clearLessonCompletedChapters(gp,id);
        const first=((G.lesson(id)||{}).chapters||[])[0]||null;
        phase=first?'beat':'lesson';
@@ -278,7 +291,7 @@
        beat=0;
        pathNeedsReplay=true;
        dirty=true;
-     }else if(pathActive&&(revisionFirstTime||unmapped)){
+     }else if(pathActive&&needsRevisionGate){
        if(chapterId&&!(G.chapter&&G.chapter(id,chapterId))){chapterId=null;dirty=true;}
        if(!chapterId||!(G.chapter&&G.chapter(id,chapterId))){
          const unfinished=firstUnfinishedChapter(id,gp);
