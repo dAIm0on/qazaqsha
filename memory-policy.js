@@ -129,6 +129,19 @@
  function isLetterClassifier(q){
    return (q&&q.fields||[]).some(f=>(f.answers||[]).some(a=>/мягк|твёрд|тверд|зависит от слова/i.test(String(a))));
  }
+ /* Retired P0 2026-09-30: per-letter soft/hard breakdown («Разбери каждую букву»). Ban from all pools. */
+ const LETTER_BREAKDOWN_IDS=new Set(['m1-9-1','m1-10-1','m1-11-1','e1-2-1-1','e1-2-2-1','e1-2-3-1','e1-2-4-1','e1-2-5-1','e1-2-6-1','e1-2-7-1']);
+ function isLetterBreakdown(q){
+   if(!q)return false;
+   const id=String(q.id||'');
+   if(LETTER_BREAKDOWN_IDS.has(id))return true;
+   const title=String(q.title||q.prompt_original||'');
+   if(/Разбери каждую букву/i.test(title))return true;
+   const fields=q.fields||[];
+   const letterFields=fields.filter(f=>/буква\s*\d/i.test(String(f.label||'')));
+   if(letterFields.length>=2&&letterFields.some(f=>(f.answers||[]).some(a=>/мягк|твёрд|тверд|зависит от слова/i.test(String(a)))))return true;
+   return false;
+ }
  function mixRulesProbes(ids,questions,state,scope){
    scope=scope||{};
    const byId=new Map((questions||[]).map(q=>[q.id,q]));
@@ -166,6 +179,6 @@
    if((q.ruleIds||[]).includes('quantity'))return 'extra_plural';
    return 'other';
  }
- const api={PAIRS,PARTICLES,weekKey,contrastSide,breakRuns,classify,direction,isContextOnly,examReady,canMasterProduction,associationFaded,isChunk,rulesProbe,mixRulesProbes,isLetterClassifier,incidentalWeek,canAddIncidental,confusionTag,isAtomicNumber,isAssembleOnlyCard,answerFlags};
+ const api={PAIRS,PARTICLES,weekKey,contrastSide,breakRuns,classify,direction,isContextOnly,examReady,canMasterProduction,associationFaded,isChunk,rulesProbe,mixRulesProbes,isLetterClassifier,isLetterBreakdown,LETTER_BREAKDOWN_IDS,incidentalWeek,canAddIncidental,confusionTag,isAtomicNumber,isAssembleOnlyCard,answerFlags};
  if(node)module.exports=api;else root.MemoryPolicy=api;
 })(typeof window!=='undefined'?window:globalThis);

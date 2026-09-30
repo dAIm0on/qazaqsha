@@ -15,7 +15,7 @@ const crypto=require('crypto');
 const passed=[];
 function ok(name){passed.push(name);console.log('OK',name);}
 
-// 9. Bank 220 IDs unchanged
+// 9. Bank 210 IDs (letter-breakdown retired 2026-09-30)
 const vm=require('vm');
 const sandbox={window:{}};
 vm.runInNewContext(fs.readFileSync(path.join(__dirname,'data.js'),'utf8'),sandbox);
@@ -28,21 +28,21 @@ const frozenBank=JSON.parse(fs.readFileSync(path.join(__dirname,'original-bank-i
 function bankIdHash(list){
   return crypto.createHash('sha256').update(list.slice().sort().join('\n'),'utf8').digest('hex');
 }
-function assertOriginal220(label){
+function assertOriginal210(label){
   const live=course.questions.map(q=>q.id);
   const liveSet=new Set(live);
-  assert.equal(frozenBank.count,220,label+': snapshot must be 220 IDs');
-  assert.equal(frozenBank.ids.length,220,label+': snapshot length');
-  assert.equal(new Set(frozenBank.ids).size,220,label+': snapshot IDs unique');
+  assert.equal(frozenBank.count,210,label+': snapshot must be 210 IDs');
+  assert.equal(frozenBank.ids.length,210,label+': snapshot length');
+  assert.equal(new Set(frozenBank.ids).size,210,label+': snapshot IDs unique');
   const missing=frozenBank.ids.filter(id=>!liveSet.has(id));
   assert.deepEqual(missing,[],label+': missing original IDs '+missing.join(','));
   const frozenSorted=frozenBank.ids.slice().sort();
   const present=live.filter(id=>frozenBank.ids.includes(id)).sort();
-  assert.deepEqual(present,frozenSorted,label+': original 220 ID set changed (rename/swap)');
-  assert.equal(bankIdHash(present),frozenBank.sha256,label+': original 220 ID hash mismatch');
+  assert.deepEqual(present,frozenSorted,label+': original 210 ID set changed (rename/swap)');
+  assert.equal(bankIdHash(present),frozenBank.sha256,label+': original 210 ID hash mismatch');
 }
-assertOriginal220('9');
-ok('9 original 220 bank IDs exact set + hash');
+assertOriginal210('9');
+ok('9 original 210 bank IDs exact set + hash');
 
 // FSRS-6, retention 0.90, standard weights
 assert.equal(cfg.fsrs.desired_retention,0.90);
@@ -294,7 +294,7 @@ assert.ok(GP.thousandOk(JSON.stringify(gT8.mix)));
 assert.ok(/мың/.test(JSON.stringify(gT8)));
 ok('G10 75950 written with мың and course-key note');
 
-ok('G11 bank 220 ids untouched');
+ok('G11 bank 210 ids after letter-breakdown kill');
 ok('G12 older verify scenarios still above');
 
 assert.ok(GP.navIsLessons());
@@ -340,8 +340,8 @@ assert.ok(['1-1','1-2','1-3','2-1','2-2','2-3'].every(id=>{
 assert.ok(GP.FORBIDDEN.some(x=>/падеж|посессив|губн|степен/i.test(x)));
 ok('P8 possessive/менің only via opened 3-1; labial/degrees/cases stay forbidden');
 
-assertOriginal220('P9');
-ok('P9 original 220 bank IDs exact set + hash');
+assertOriginal210('P9');
+ok('P9 original 210 bank IDs exact set + hash');
 
 const stGood=progress.empty();
 stGood.vocabulary={адам:{target_or_context:'target',times_seen:1,last_seen:0}};
@@ -585,9 +585,9 @@ assert.ok(packImport.exercises[0].fields[0].answers.some(a=>/мың/.test(a)));
 assert.ok(!packImport.exercises[0].fields[0].answers.some(a=>core.normalize(a)==='жетпіс бес тоғыз жүз елу'));
 ok('canonical layer overrides bad pack key');
 
-assertOriginal220('A2');
+assertOriginal210('A2');
 assert.equal(cfg.fsrs.desired_retention,0.90);
-ok('A2/A4 original 220 IDs exact set; retention still intact');
+ok('A2/A4 original 210 IDs exact set; retention still intact');
 
 const faded=policy.associationFaded({recall_review_successes:2});
 const fresh=policy.associationFaded({recall_review_successes:0});
@@ -643,6 +643,12 @@ const leakMix=policy.mixRulesProbes(['keep-23'],[
 ],{records:{'m1-11-1':{seen:2,recall_review_successes:1},'facet-harmony-0':{seen:2,recall_review_successes:1}}},{lessonId:'2-3',topic:'person'});
 assert.ok(leakMix.includes('keep-23'));
 assert.ok(!leakMix.includes('m1-11-1'));
+assert.equal(policy.isLetterBreakdown({id:'e1-2-7-1',title:'Разбери каждую букву и определи тип слова',fields:[{label:'С · буква 1',answers:['Зависит от слова']},{label:'Ә · буква 2',answers:['Мягкая']}]}),true,'letter-breakdown banned');
+assert.equal(policy.isLetterBreakdown({id:'e1-1-1-1',title:'Напиши мягкие звуки',fields:[{label:'Ответ',answers:['Ә','Г']}]}),false,'soft listing kept');
+assert.equal(policy.isLetterBreakdown({id:'e1-3-1-1',title:'Раздели слово на слоги и определи их тип',fields:[{label:'Слог 1',answers:['Твёрдый']}]}),false,'syllable kept');
+const courseQs=require('fs').readFileSync(require('path').join(__dirname,'data.js'),'utf8');
+assert.ok(!/Разбери каждую букву/.test(courseQs),'data.js must not contain letter-breakdown title');
+
 assert.ok(!leakMix.includes('facet-harmony-0'));
 assert.ok(/tap-choices/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/classifierOptions/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
@@ -872,8 +878,8 @@ const badRem=AiC.validateResponse({ok:true,mode:'remediation',message_ru:'ok',re
 assert.ok(!badRem.resp.remediation||!badRem.resp.remediation.items.length);
 ok('AI-T22 unknown vocab item rejected');
 
-assertOriginal220('AI-T23');
-ok('AI-T23 original 220 bank IDs exact set + hash');
+assertOriginal210('AI-T23');
+ok('AI-T23 original 210 bank IDs exact set + hash');
 
 assert.ok(typeof AiT.localFallback==='function');
 assert.ok(/ai-why|Почему\?/.test(appSrc));
@@ -1399,7 +1405,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/const CACHE='qazaq-offline-live-20260930-school-tutor18'/.test(openSw));
+assert.ok(/const CACHE='qazaq-offline-live-20260930-school-tutor19'/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1988,7 +1994,7 @@ assert.ok(/Верно \$\{sessionCorrect\} из/.test(appVocabP1),'words P1 prog
 assert.ok(/countSessionAttempt/.test(appVocabP1),'words P1 skips session counter bump on wrong');
 assert.ok(/function vocabOfferHtml\(/.test(appVocabP1)&&/vocabRole==='used'/.test(appVocabP1),'words P1 no skill-separately mud; used may keep Другой пример');
 assert.ok(!/isVocabWordsMode\(\)[\s\S]{0,80}Проверить этот навык отдельно/.test(appVocabP1.split('function vocabOfferHtml')[1].split('function sameSkillOffers')[0]),'words offer path omits навык отдельно');
-assert.ok(/qazaq-offline-live-20260930-school-tutor18/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump school-tutor18');
+assert.ok(/qazaq-offline-live-20260930-school-tutor19/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump school-tutor19');
 ok('Vocab words P1: retry CTA, compact error, correct-only progress, no skill mud');
 
 ok('Astra step 9: wrong answer shows the attempt, the block, and an existing same-skill offer (no expected reveal)');
@@ -2010,7 +2016,7 @@ assert.ok(/#FF5A1F/.test(petCss),'sticker fill #FF5A1F');
 assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-index:22/.test(petCss),'sticker z-index below CTA');
 assert.ok(/tutor-sticker-dot/.test(tutorUiSrc)&&/\$\('#tutor-launch'\)\.onclick=\(e\)=>\{e\.preventDefault\(\);toggle\(\);\}/.test(tutorUiSrc)&&/function toggle\(\)\{[\s\S]*?close\(\);[\s\S]*?open\(\);/.test(tutorUiSrc),'tap sticker toggles ask');
 assert.ok(!/pet-idle\.png/.test(tutorUiSrc),'default companion is not pet-idle');
-assert.ok(/school-tutor18/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor18');
+assert.ok(/school-tutor19/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor19');
 assert.ok(/\.tutor-sheet\{[^}]*max-height:min\(78dvh,640px\)/.test(petCss.replace(/\s+/g,''))&&/overflow-y:auto/.test(petCss),'ask panel max-height + overflow-y:auto');
 assert.ok(/document\.body\.appendChild\(sheet\)/.test(tutorUiSrc),'ask sheet is body sibling (no 44px clip)');
 assert.ok(/\.chrome-back\{[^}]*min-height:44px/.test(theme.replace(/\s+/g,'')));

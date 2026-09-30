@@ -422,6 +422,7 @@
  function eligible(value){
   const q=typeof value==='string'?byId.get(value):value;
   if(!q)return false;
+  if(window.MemoryPolicy&&window.MemoryPolicy.isLetterBreakdown&&window.MemoryPolicy.isLetterBreakdown(q))return false;
   if(q.source==='p2b'&&!records[q.id]?.seen&&mode!=='course')return false;
   if(q.source==='phrase'&&!records[q.id]?.seen&&mode!=='phrase'&&mode!=='course')return false;
   if(q.lessonId==='3-3'&&q.source==='phrase'&&window.Lesson33Pack&&window.Lesson33Pack.phraseUnlocked&&!window.Lesson33Pack.phraseUnlocked(q.id,{events:state.events}))return false;

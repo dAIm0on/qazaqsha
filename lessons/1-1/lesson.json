@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "lesson_id": "1-1",
-  "content_revision": "1-1.r1",
+  "content_revision": "1-1.r2",
   "title": "Урок 1–1 · Алфавит и произношение, мягкие и твёрдые",
   "label": "1–1",
   "name": "Алфавит и произношение, мягкие и твёрдые",
@@ -1053,335 +1053,6 @@
       "source_item": "hw:1-1:source:2"
     },
     {
-      "id": "e1-2-1-1",
-      "origin": "school",
-      "topic": "sounds",
-      "title": "Разбери каждую букву и определи тип слова",
-      "stimulus": "көз",
-      "prompt_original": "Разбери каждую букву и определи тип слова",
-      "fields": [
-        {
-          "label": "К · буква 1",
-          "kind": "text",
-          "answers": [
-            "Мягкая"
-          ]
-        },
-        {
-          "label": "Ө · буква 2",
-          "kind": "text",
-          "answers": [
-            "Мягкая"
-          ]
-        },
-        {
-          "label": "З · буква 3",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "Слово целиком",
-          "kind": "text",
-          "answers": [
-            "Мягкое"
-          ]
-        }
-      ],
-      "explanation": "К и Ө — мягкие; З зависит от слова. Здесь слово мягкое.",
-      "rule_ids": [
-        "v2:1-1:signals"
-      ],
-      "source_refs": [
-        "school-exercises"
-      ],
-      "source_item": "hw:1-1:source:2"
-    },
-    {
-      "id": "e1-2-2-1",
-      "origin": "school",
-      "topic": "sounds",
-      "title": "Разбери каждую букву и определи тип слова",
-      "stimulus": "жер",
-      "prompt_original": "Разбери каждую букву и определи тип слова",
-      "fields": [
-        {
-          "label": "Ж · буква 1",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "Е · буква 2",
-          "kind": "text",
-          "answers": [
-            "Мягкая"
-          ]
-        },
-        {
-          "label": "Р · буква 3",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "Слово целиком",
-          "kind": "text",
-          "answers": [
-            "Мягкое"
-          ]
-        }
-      ],
-      "explanation": "Е — мягкая; Ж и Р зависят от слова. Слово мягкое.",
-      "rule_ids": [
-        "v2:1-1:signals"
-      ],
-      "source_refs": [
-        "school-exercises"
-      ],
-      "source_item": "hw:1-1:source:2"
-    },
-    {
-      "id": "e1-2-3-1",
-      "origin": "school",
-      "topic": "sounds",
-      "title": "Разбери каждую букву и определи тип слова",
-      "stimulus": "аю",
-      "prompt_original": "Разбери каждую букву и определи тип слова",
-      "fields": [
-        {
-          "label": "А · буква 1",
-          "kind": "text",
-          "answers": [
-            "Твёрдая"
-          ]
-        },
-        {
-          "label": "Ю · буква 2",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "Слово целиком",
-          "kind": "text",
-          "answers": [
-            "Твёрдое"
-          ]
-        }
-      ],
-      "explanation": "А — твёрдая. Ю бывает в обеих группах и здесь согласуется с А. Слово твёрдое.",
-      "rule_ids": [
-        "v2:1-1:iyu"
-      ],
-      "source_refs": [
-        "school-exercises"
-      ],
-      "source_item": "hw:1-1:source:2"
-    },
-    {
-      "id": "e1-2-4-1",
-      "origin": "school",
-      "topic": "sounds",
-      "title": "Разбери каждую букву и определи тип слова",
-      "stimulus": "ту",
-      "prompt_original": "Разбери каждую букву и определи тип слова",
-      "fields": [
-        {
-          "label": "Т · буква 1",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "У · буква 2",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "Слово целиком",
-          "kind": "text",
-          "answers": [
-            "Твёрдое"
-          ]
-        }
-      ],
-      "explanation": "Т и У могут быть в обеих группах. Слово ту запоминаем как твёрдое: тулар.",
-      "rule_ids": [
-        "v2:1-1:iyu"
-      ],
-      "source_refs": [
-        "school-exercises"
-      ],
-      "source_item": "hw:1-1:source:2"
-    },
-    {
-      "id": "e1-2-5-1",
-      "origin": "school",
-      "topic": "sounds",
-      "title": "Разбери каждую букву и определи тип слова",
-      "stimulus": "ит",
-      "prompt_original": "Разбери каждую букву и определи тип слова",
-      "fields": [
-        {
-          "label": "И · буква 1",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "Т · буква 2",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "Слово целиком",
-          "kind": "text",
-          "answers": [
-            "Мягкое"
-          ]
-        }
-      ],
-      "explanation": "И и Т могут быть в обеих группах. Ит — мягкое слово: иттер. Не путай И и І.",
-      "rule_ids": [
-        "v2:1-1:iyu"
-      ],
-      "source_refs": [
-        "school-exercises"
-      ],
-      "source_item": "hw:1-1:source:2"
-    },
-    {
-      "id": "e1-2-6-1",
-      "origin": "school",
-      "topic": "sounds",
-      "title": "Разбери каждую букву и определи тип слова",
-      "stimulus": "құдық",
-      "prompt_original": "Разбери каждую букву и определи тип слова",
-      "fields": [
-        {
-          "label": "Қ · буква 1",
-          "kind": "text",
-          "answers": [
-            "Твёрдая"
-          ]
-        },
-        {
-          "label": "Ұ · буква 2",
-          "kind": "text",
-          "answers": [
-            "Твёрдая"
-          ]
-        },
-        {
-          "label": "Д · буква 3",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "Ы · буква 4",
-          "kind": "text",
-          "answers": [
-            "Твёрдая"
-          ]
-        },
-        {
-          "label": "Қ · буква 5",
-          "kind": "text",
-          "answers": [
-            "Твёрдая"
-          ]
-        },
-        {
-          "label": "Слово целиком",
-          "kind": "text",
-          "answers": [
-            "Твёрдое"
-          ]
-        }
-      ],
-      "explanation": "Қ, Ұ, Ы — твёрдые; Д зависит от слова. Слово твёрдое.",
-      "rule_ids": [
-        "v2:1-1:signals"
-      ],
-      "source_refs": [
-        "school-exercises"
-      ],
-      "source_item": "hw:1-1:source:2"
-    },
-    {
-      "id": "e1-2-7-1",
-      "origin": "school",
-      "topic": "sounds",
-      "title": "Разбери каждую букву и определи тип слова",
-      "stimulus": "сәлем",
-      "prompt_original": "Разбери каждую букву и определи тип слова",
-      "fields": [
-        {
-          "label": "С · буква 1",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "Ә · буква 2",
-          "kind": "text",
-          "answers": [
-            "Мягкая"
-          ]
-        },
-        {
-          "label": "Л · буква 3",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "Е · буква 4",
-          "kind": "text",
-          "answers": [
-            "Мягкая"
-          ]
-        },
-        {
-          "label": "М · буква 5",
-          "kind": "text",
-          "answers": [
-            "Зависит от слова"
-          ]
-        },
-        {
-          "label": "Слово целиком",
-          "kind": "text",
-          "answers": [
-            "Мягкое"
-          ]
-        }
-      ],
-      "explanation": "Ә и Е — мягкие; С, Л, М зависят от слова. Слово мягкое.",
-      "rule_ids": [
-        "v2:1-1:signals"
-      ],
-      "source_refs": [
-        "school-exercises"
-      ],
-      "source_item": "hw:1-1:source:2"
-    },
-    {
       "id": "e1-3-1-1",
       "origin": "school",
       "topic": "sounds",
@@ -1704,11 +1375,7 @@
         "e1-1-3-1",
         "e1-1-4-1",
         "e1-1-5-1",
-        "e1-1-6-1",
-        "e1-2-1-1",
-        "e1-2-2-1",
-        "e1-2-6-1",
-        "e1-2-7-1"
+        "e1-1-6-1"
       ],
       "required_independent_ids": [
         "e1-1-1-1",
@@ -1716,35 +1383,10 @@
         "e1-1-3-1",
         "e1-1-4-1",
         "e1-1-5-1",
-        "e1-1-6-1",
-        "e1-2-1-1",
-        "e1-2-2-1",
-        "e1-2-6-1",
-        "e1-2-7-1"
+        "e1-1-6-1"
       ],
       "rule_ids": [
         "v2:1-1:signals"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:1-1:iyu",
-      "title": "Сборник · И, У, Ю из методички",
-      "kind": "learning",
-      "core_ids": [
-        "e1-2-3-1",
-        "e1-2-4-1",
-        "e1-2-5-1"
-      ],
-      "required_independent_ids": [
-        "e1-2-3-1",
-        "e1-2-4-1",
-        "e1-2-5-1"
-      ],
-      "rule_ids": [
-        "v2:1-1:iyu"
       ],
       "min_independent_ratio": 0.8,
       "max_presentations": 24,
@@ -1855,13 +1497,6 @@
       "e1-1-4-1",
       "e1-1-5-1",
       "e1-1-6-1",
-      "e1-2-1-1",
-      "e1-2-2-1",
-      "e1-2-3-1",
-      "e1-2-4-1",
-      "e1-2-5-1",
-      "e1-2-6-1",
-      "e1-2-7-1",
       "e1-3-1-1",
       "e1-3-2-1",
       "e1-3-3-1",
@@ -1884,5 +1519,29 @@
       "words",
       "external_test"
     ]
-  }
+  },
+  "migrations": [
+    {
+      "from_revision": "1-1.r1",
+      "to_revision": "1-1.r2",
+      "question_ids": {},
+      "chapter_ids": {},
+      "stage_ids": {
+        "stage:1-1:iyu": "stage:1-1:signals"
+      },
+      "vocab_ids": {},
+      "drop_question_ids": [
+        "e1-2-1-1",
+        "e1-2-2-1",
+        "e1-2-3-1",
+        "e1-2-4-1",
+        "e1-2-5-1",
+        "e1-2-6-1",
+        "e1-2-7-1",
+        "m1-10-1",
+        "m1-11-1",
+        "m1-9-1"
+      ]
+    }
+  ]
 }
