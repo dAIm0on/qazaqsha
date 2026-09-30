@@ -1984,10 +1984,10 @@ assert.ok(/stemCandidates/.test(tutorUiSrc)&&/WORD_BANK/.test(tutorUiSrc),'gloss
 assert.ok(/isLoneLetter/.test(tutorUiSrc),'focus_word rejects lone letters');
 assert.ok(/medium\|\|c\.ru_refresh/.test(tutorUiSrc)&&/ruleForChapter/.test(tutorUiSrc),'Не ясно prefers medium+ru_refresh with rule resolve');
 const petCss=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
-assert.ok(/\.tutor-pet-img\{[^}]*width:56px!important/.test(petCss.replace(/\s+/g,''))||/width:56px!important/.test(petCss),'pet display ≥56px');
+assert.ok((/\.tutor-pet-img\{[^}]*width:64px!important/.test(petCss.replace(/\s+/g,''))||/width:64px!important/.test(petCss)),'pet display ≥64px');
 assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-index:22/.test(petCss));
-assert.ok(/56px \+ env\(safe-area-inset-bottom/.test(petCss),'pet bottom clears CTA + safe-area');
-assert.ok(/school-tutor7/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor7');
+assert.ok(/64px \+ env\(safe-area-inset-bottom/.test(petCss),'pet bottom clears CTA + safe-area');
+assert.ok(/school-tutor8/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor8');
 
 
 const TutorBlock=require('./ai-tutor.js');
