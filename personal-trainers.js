@@ -5,7 +5,7 @@
   const REGISTRY=Object.freeze([
     Object.freeze({id:'morphophonology',order:5,title:'Форма слова',description:'Выбор формы, цепочки и проверка на новых основах',enabled:true,kind:'morph'}),
     Object.freeze({id:'harmony_letters',order:1,title:'Буквы · кот',description:'Твёрдые / мягкие сигналы, пары и слова',enabled:true,kind:'cat'}),
-    Object.freeze({id:'numbers',order:2,title:'Числа',description:'Лестница от 0–10 до сотен и тысяч',enabled:true,kind:'numbers'}),
+    Object.freeze({id:'numbers',order:2,title:'Числа',description:'Лестница от 0–10 до сотен и тысяч. Числительные урока 1–2 — в тренажёре Числа, не в „Новых словах“.',enabled:true,kind:'numbers'}),
     Object.freeze({id:'vocab_must',order:3,title:'Новые слова',description:'Слова, которые задали выучить · оба направления вперемешку',enabled:true,kind:'bridge',target:'vocab:must'}),
     Object.freeze({id:'vocab_used',order:4,title:'Встречавшиеся слова',description:'Узнать и написать вперемешку в одном подходе',enabled:true,kind:'bridge',target:'vocab:used'})
   ]);
@@ -89,7 +89,7 @@
       const label=live?'Продолжить':(item.open?'Открыть':'Пока закрыто');
       return '<article class="personal-trainer-card"><div><p class="eyebrow">СТУПЕНЬ '+(i+1)+'</p><h2>'+esc(item.title)+'</h2><p class="small">'+esc(hint)+'</p></div><div class="personal-trainer-actions"><button type="button" class="primary-button" data-number-track="'+esc(item.id)+'"'+(item.open?'':' disabled')+'>'+label+'</button></div></article>';
     }).join('');
-    return '<div class="personal-trainer-head"><button type="button" class="text-button" data-back-catalog>← Все тренажёры</button><div><p class="eyebrow">ЧИСЛА</p><h2>Лестница чисел</h2><p class="small">Используется существующий NumberLadder. Закрытые ступени не обходятся.</p></div></div><div class="personal-trainer-list">'+rows+'</div>';
+    return '<div class="personal-trainer-head"><button type="button" class="text-button" data-back-catalog>← Все тренажёры</button><div><p class="eyebrow">ЧИСЛА</p><h2>Лестница чисел</h2><p class="small">Числительные урока 1–2 — в тренажёре Числа, не в „Новых словах“. Закрытые ступени не обходятся.</p></div></div><div class="personal-trainer-list">'+rows+'</div>';
   }
   function stageIntro(session){
     return '<div class="cat-stage-card"><p class="eyebrow">СТУПЕНЬ 0</p><h2>Карта пар</h2><p>Сначала держим в голове шесть контрастов. Остальные буквы потом сортируем отдельно.</p>'+
