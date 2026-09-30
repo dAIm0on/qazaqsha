@@ -128,6 +128,16 @@ ok('TEST tutor loop and kitabym gate');
   assert.ok(vr.ok);assert.equal(vr.req.expected_answer,'');
   const vrTw=C.validateRequest({mode:'translate_word',lesson_id:'1-2',user_question:'кітап',expected_answer:'SECRET',prompt:'кітап'});
   assert.ok(vrTw.ok);assert.equal(vrTw.req.expected_answer,'');
+  // QA-shaped aliases (action_or_mode / action / message / word) must resolve mode and strip expected
+  const vrAlias=C.validateRequest({action_or_mode:'ask_tutor',lesson_id:'3-1',message:'Не ясно',expected_answer:'SECRET_A10_LEAK_TEST'});
+  assert.ok(vrAlias.ok);assert.equal(vrAlias.req.mode,'ask_tutor');assert.equal(vrAlias.req.expected_answer,'');assert.equal(vrAlias.req.user_question,'Не ясно');
+  const askAliasA=C.assembleResponse(vrAlias.req,'Ответ без эталона.',{source:'primary'});
+  assert.equal(askAliasA.contrast.correct,null);
+  const vrAct=C.validateRequest({action:'translate_word',lesson_id:'3-1',word:'кітабым',expected_answer:'SECRET'});
+  assert.ok(vrAct.ok);assert.equal(vrAct.req.mode,'translate_word');assert.equal(vrAct.req.expected_answer,'');
+  const twAliasA=C.assembleResponse(vrAct.req,'кітабым — моя книга.',{source:'primary'});
+  assert.equal(twAliasA.contrast.correct,null);assert.equal(twAliasA.contrast.wrong,null);
+  assert.ok(tutorSrc2.includes('resolveMode')||tutorSrc2.includes('action_or_mode'));
   assert.ok(tutorSrc2.includes("mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'")||tutorSrc2.includes('hideExpected'));
   ok('TEST A10 no expected_answer in contrast.correct for ask/simplify/translate_word');
 }

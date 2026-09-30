@@ -550,8 +550,13 @@ async function checkRate(env,ip){
     return 'error';
   }
 }
+function resolveMode(raw){
+  const cand=[raw&&raw.mode,raw&&raw.action,raw&&raw.action_or_mode].map(v=>String(v||'').trim()).filter(Boolean);
+  for(const m of cand){if(MODES.includes(m))return m;}
+  return 'explain_error';
+}
 function parseBody(raw){
-  const mode=MODES.includes(raw&&raw.mode)?raw.mode:'explain_error';
+  const mode=resolveMode(raw);
   const surface=SURFACES.includes(raw&&raw.surface)?raw.surface:'practice';
   const lesson_id=ALLOWED_LESSONS.includes(raw&&raw.lesson_id)?raw.lesson_id:'';
   const resolved=resolveCurriculum(lesson_id);
@@ -559,11 +564,13 @@ function parseBody(raw){
   const allowVocab=new Set(resolved.allowed_vocab.map(normKey));
   const clientRules=asArr(raw&&raw.allowed_rule_ids).filter(id=>allowRules.has(id));
   const clientVocab=asArr(raw&&raw.allowed_vocab).filter(w=>allowVocab.has(normKey(w)));
+  const hideExpected=mode==='hint'||mode==='ask_tutor'||mode==='simplify'||mode==='translate_word';
+  const question=clip(raw&&(raw.user_question||raw.message||raw.word||raw.prompt),400);
   return {
     mode,surface,lesson_id,
-    prompt:clip(raw&&raw.prompt,400),
+    prompt:clip(raw&&(raw.prompt||raw.word||raw.message),400),
     user_answer:clip(raw&&raw.user_answer,400),
-    expected_answer:(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'||mode==='hint')?'':clip(raw&&raw.expected_answer,400),
+    expected_answer:hideExpected?'':clip(raw&&raw.expected_answer,400),
     is_correct:!!(raw&&raw.is_correct),
     hint_used:!!(raw&&raw.hint_used),
     repeat_count:Math.max(0,parseInt(raw&&raw.repeat_count,10)||0),
@@ -574,7 +581,7 @@ function parseBody(raw){
     candidate_error_codes:asArr(raw&&raw.candidate_error_codes).slice(0,8),
     recent_error_summary:raw&&raw.recent_error_summary&&typeof raw.recent_error_summary==='object'?raw.recent_error_summary:{},
     rule_context:clipRuleContext(raw&&raw.rule_context,allowRules),
-    user_question:clip(raw&&raw.user_question,400),
+    user_question:question,
     conversation_tail:clipTail(raw&&raw.conversation_tail)
   };
 }
@@ -615,4 +622,4 @@ function json(body,status=200){
   return new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
 }
 
-export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,RECOVERY_TIMEOUT_MS,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,clipRuleContext,buildTutorMessages,buildRecoveryMessages,userPayload,messagesToPrompt,glmPayload,qwenPayload,payloadFor,looksFuture,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism};
+export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,RECOVERY_TIMEOUT_MS,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,resolveMode,clipRuleContext,buildTutorMessages,buildRecoveryMessages,userPayload,messagesToPrompt,glmPayload,qwenPayload,payloadFor,looksFuture,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism};

@@ -357,7 +357,8 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
  }
  function validateRequest(raw){
   if(!raw||typeof raw!=='object')return {ok:false,error:'bad_body'};
-  const mode=String(raw.mode||'');
+  const modeCand=[raw.mode,raw.action,raw.action_or_mode].map(v=>String(v||'').trim()).filter(Boolean);
+  const mode=modeCand.find(m=>MODES.includes(m))||'';
   if(!MODES.includes(mode))return {ok:false,error:'bad_mode'};
   const json=JSON.stringify(raw);
   if(json.length>MAX_IN)return {ok:false,error:'too_large'};
@@ -375,7 +376,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
     mode,surface,locale:raw.locale==='kk'?'kk':'ru',
     lesson_id,
     exercise_id:clip(raw.exercise_id,80),
-    prompt:clip(raw.prompt,400),
+    prompt:clip(raw.prompt||raw.word||raw.message,400),
     user_answer:clip(raw.user_answer,400),
     expected_answer:(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'||mode==='hint')?'':clip(raw.expected_answer,400),
     is_correct:!!raw.is_correct,
@@ -388,7 +389,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
     candidate_error_codes:asArr(raw.candidate_error_codes).filter(c=>ERROR_CODES.includes(c)).slice(0,8),
     recent_error_summary:raw.recent_error_summary&&typeof raw.recent_error_summary==='object'?raw.recent_error_summary:{},
     rule_context:clipRuleContext(raw.rule_context,allowRules),
-    user_question:clip(raw.user_question,400),
+    user_question:clip(raw.user_question||raw.message||raw.word||raw.prompt,400),
     conversation_tail:clipTail(raw.conversation_tail)
   }};
  }

@@ -204,7 +204,7 @@
     exercise_id:q&&q.id||'',
     prompt:(q&&(q.title||'')+' '+(q.stimulus||'')).trim(),
     user_answer:extra.user_answer||'',
-    expected_answer:(mode==='hint'||mode==='translate_word')?'':expected,
+    expected_answer:(mode==='hint'||mode==='translate_word'||mode==='ask_tutor'||mode==='simplify')?'':expected,
     is_correct:!!extra.is_correct,
     hint_used:!!extra.hint_used,
     repeat_count:extra.repeat_count!=null?extra.repeat_count:(codes[0]?sameErrorCount(codes[0]):0),
