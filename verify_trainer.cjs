@@ -386,7 +386,7 @@ ok('Path v5 1-1-ru: қол/көл, орман/арман, sound anchors, single 
 
 assert.ok(/function contextPrompts/.test(pathTutorSrc));
 assert.ok(/conversation_tail:tail\.slice\(\)/.test(pathTutorSrc));
-assert.ok(/callTutor\(req,\(window\.AiContract&&window\.AiContract\.CLIENT_TIMEOUT_MS\)\|\|30000/.test(pathTutorSrc)||/callTutor\(req,25000/.test(pathTutorSrc));
+assert.ok(/callTutor\(req,\((?:root|window)\.AiContract&&(?:root|window)\.AiContract\.CLIENT_TIMEOUT_MS\)\|\|30000/.test(pathTutorSrc)||/callTutor\(req,25000/.test(pathTutorSrc));
 assert.ok(/две книги/.test(pathTutorSrc)&&/кто есть/.test(pathTutorSrc));
 assert.ok(!/рычаг|бирк|алломорф|слот/i.test(pathTutorSrc));
 assert.ok(/rules-ask-send/.test(pathAppSrc));
