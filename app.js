@@ -516,6 +516,16 @@
  function shuffled(items){
    const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
  }
+ function lemmaSessionKey(id){
+   const qq=byId.get(id);
+   if(core.lemmaKey)return core.lemmaKey(qq||{id});
+   if(qq&&window.Knowledge){const w=(window.Knowledge.bindings(qq)||[]).find(b=>String(b.item_id||'').startsWith('word:'));if(w)return w.item_id;}
+   return id;
+ }
+ function lemmaSessionCount(id){
+   const k=lemmaSessionKey(id);
+   return queue.filter(qid=>lemmaSessionKey(qid)===k).length;
+ }
  function examReady(r){return window.MemoryPolicy?window.MemoryPolicy.examReady(r):!!r&&(r.recall_review_successes||0)>=2;}
  function startQueue({all=false}={}){
    activeLesson=null;activeStep=null;stepEvidence={};
@@ -577,6 +587,21 @@
        if(nextId)return startLesson(nextId,0,opts);
        return;
      }
+   }
+   // PR-C Variant A: vocab-must Learn — due/NEW поверх frozen chunk-0 (адам/қыз),
+   // same chooseShortSession mix as catalogVocabIds/PR-B. Chunk step stays for UI only.
+   if(id==='vocab-must'){
+     const pool=(lesson.questionIds||[]).map(qid=>byId.get(qid)).filter(q=>q&&eligible(q));
+     const limit=Math.max(2,(cfg.session.size||10)+(cfg.session.newLimit||0));
+     const picked=core.chooseShortSession(pool,records,Date.now(),limit);
+     if(picked.length)stepIds=picked.map(q=>q.id);
+     const openChunk=lesson.chunks.findIndex(ch=>ch.questionIds.every(qid=>!byId.get(qid)||eligible(byId.get(qid)))&&ch.questionIds.some(qid=>!records[qid]?.seen));
+     if(openChunk>=0)step=openChunk;
+     else{
+       const dueChunk=lesson.chunks.findIndex(ch=>ch.questionIds.some(qid=>{const r=records[qid];return r&&(r.needsReview||core.isDue(r));}));
+       if(dueChunk>=0)step=dueChunk;
+     }
+     if(!lesson.chunks[step])step=Math.min(Math.max(0,step),lesson.chunks.length-1);
    }
    courseBlock=lesson.courseLesson||courseBlock;
    activeLesson=id;activeStep=step;learningState.lessonId=id;learningState.steps[id]=step;topic=lesson.topic;mode=opts&&opts.voluntary?'voluntary':'lesson';sourceFilter=null;
@@ -992,10 +1017,10 @@
      if(stageContext.presentations>=stageContext.maxPresentations){
        stageContext.limitReached=true;
        queue.splice(position+1);
-     }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2){
-       core.scheduleRepeat(queue,position,q.id,rec.streak,stageContext.coreIds.filter(id=>id!==q.id&&byId.has(id)),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
+     }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2&&lemmaSessionCount(q.id)<(cfg.schedule.learningSessionBlinds||3)){
+       core.scheduleRepeat(queue,position,q.id,rec.streak,stageContext.coreIds.filter(id=>id!==q.id&&byId.has(id)),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0,lemmaAppearCap:cfg.schedule.learningSessionBlinds||3});
      }
-   }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2)core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0});
+   }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2&&lemmaSessionCount(q.id)<(cfg.schedule.learningSessionBlinds||3))core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0,lemmaAppearCap:cfg.schedule.learningSessionBlinds||3});
    const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);
    if(!stageContext&&mate&&!result.correct&&!hinted){
      const other=questions.find(x=>x.id!==q.id&&window.MemoryPolicy.contrastSide(x)?.pair===mate.pair&&window.MemoryPolicy.contrastSide(x)?.side!==mate.side);
@@ -1670,25 +1695,45 @@
  function catalogNumberTracks(){
    const order=window.NumberLadder&&window.NumberLadder.ORDER||[];
    const by=new Map((window.LEARNING&&window.LEARNING.lessons||[]).map(l=>[l.id,l]));
-   return order.map(id=>by.get(id)).filter(Boolean).map(l=>{
-     const open=(l.questionIds||[]).some(qid=>{const q=byId.get(qid);return q&&(!window.NumberLadder||window.NumberLadder.allowed(q,state));});
-     return {id:l.id,title:l.title||l.id,open};
+   const rows=order.map(id=>by.get(id)).filter(Boolean).map(l=>{
+     const qs=(l.questionIds||[]).map(qid=>byId.get(qid)).filter(Boolean);
+     const total=qs.length;
+     const allowedCount=qs.filter(q=>!window.NumberLadder||window.NumberLadder.allowed(q,state)).length;
+     // Fully open only when EVERY card is allowed — units ≤10 must not leak a later step open via some().
+     const fullyOpen=total>0&&allowedCount===total;
+     return {id:l.id,title:l.title||l.id,fullyOpen};
    });
+   const firstUnfinished=rows.findIndex(r=>!r.fullyOpen);
+   return rows.map((r,i)=>({id:r.id,title:r.title,open:r.fullyOpen||i===firstUnfinished}));
  }
  function catalogVocabIds(role){
-   let list=questions.filter(q=>eligible(q)&&q.topic==='vocab'&&q.wordRole===role);
-   list=window.Knowledge&&window.Knowledge.choose?window.Knowledge.choose(shuffled(list),state,Infinity):shuffled(list);
-   const recognize=shuffled(list.filter(q=>/-ru$/.test(q.id)));
-   const produce=shuffled(list.filter(q=>/-kk$/.test(q.id)));
-   const other=shuffled(list.filter(q=>!/-ru$|-kk$/.test(q.id)));
-   const mixed=[];
-   while(recognize.length||produce.length){
-     if(recognize.length&&produce.length)mixed.push((Math.random()<0.5?recognize:produce).shift());
-     else mixed.push((recognize.length?recognize:produce).shift());
-   }
-   mixed.push(...other);
+   const pool=questions.filter(q=>eligible(q)&&q.topic==='vocab'&&q.wordRole===role);
    const limit=Math.max(2,(cfg.session.size||10)+(cfg.session.newLimit||0));
-   let ids=mixed.map(q=>q.id);
+   let list;
+   if(role==='must'){
+     // due/needsReview first, reserved NEW (newLimit), then learning — not pure random
+     list=core.chooseShortSession(pool,records,Date.now(),limit);
+     if(list.length<limit){
+       const have=new Set(list.map(q=>q.id));
+       const fillers=pool.filter(q=>!have.has(q.id));
+       const more=window.Knowledge&&window.Knowledge.choose?window.Knowledge.choose(shuffled(fillers),state,limit-list.length):shuffled(fillers).slice(0,limit-list.length);
+       list=list.concat(more);
+     }
+     if(window.Knowledge&&window.Knowledge.choose)list=window.Knowledge.choose(list,state,limit);
+   }else{
+     list=window.Knowledge&&window.Knowledge.choose?window.Knowledge.choose(shuffled(pool),state,Infinity):shuffled(pool);
+     const recognize=shuffled(list.filter(q=>/-ru$/.test(q.id)));
+     const produce=shuffled(list.filter(q=>/-kk$/.test(q.id)));
+     const other=shuffled(list.filter(q=>!/-ru$|-kk$/.test(q.id)));
+     const mixed=[];
+     while(recognize.length||produce.length){
+       if(recognize.length&&produce.length)mixed.push((Math.random()<0.5?recognize:produce).shift());
+       else mixed.push((recognize.length?recognize:produce).shift());
+     }
+     mixed.push(...other);
+     list=mixed;
+   }
+   let ids=list.map(q=>q.id);
    if(window.MemoryPolicy&&window.MemoryPolicy.breakRuns)ids=window.MemoryPolicy.breakRuns(ids,questions);
    return ids.slice(0,limit);
  }

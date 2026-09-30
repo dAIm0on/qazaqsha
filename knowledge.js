@@ -103,8 +103,18 @@
    sync(state,window.COURSE.questions);return logs;
  }
  function choose(questions,state,limit=window.TRAINER_CONFIG.session.size){
-   const used=new Set(),out=[];
-   for(const q of questions){const keys=bindings(q).map(key);if(keys.every(k=>used.has(k)))continue;out.push(q);keys.forEach(k=>used.add(k));if(out.length>=limit)break;}return out;
+   const used=new Set(),usedLemmas=new Set(),out=[];
+   for(const q of questions){
+     const bs=bindings(q),keys=bs.map(key);
+     if(keys.every(k=>used.has(k)))continue;
+     const lemmas=bs.map(b=>b.item_id).filter(id=>String(id||'').startsWith('word:'));
+     if(lemmas.length&&lemmas.every(id=>usedLemmas.has(id)))continue;
+     out.push(q);
+     keys.forEach(k=>used.add(k));
+     lemmas.forEach(id=>usedLemmas.add(id));
+     if(out.length>=limit)break;
+   }
+   return out;
  }
  function wordSkills(w,state){const item=items.get(w.id);return Object.entries(item?.skills||{}).map(([type,k])=>({type,label:labels[type]||type,record:state.skills[k]}));}
  window.Knowledge={items,labels,bindings,key,register,hydrate,sync,observe,choose,wordSkills,isChoice,canMasterProduction};

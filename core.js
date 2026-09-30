@@ -112,15 +112,62 @@
     const pol=typeof module!=='undefined'&&module.exports?require('./memory-policy.js'):root.MemoryPolicy;
     return !!(pol&&pol.isAssembleOnlyCard(q));
   }
-  function chooseShortSession(items,records,now=Date.now(),limit=config.session.size){
-    items=(items||[]).filter(q=>q&&!q.contextOnly&&q.wordRole!=='used'&&!String(q.id||'').startsWith('learn-compose-')&&!assembleOnly(q));
+  function lemmaKey(q){
+    if(!q)return 'id:';
+    const fromBind=(q.skillBindings||[]).map(b=>b&&b.item_id).find(id=>String(id||'').startsWith('word:'));
+    if(fromBind)return fromBind;
+    if(q.vocabIds&&q.vocabIds.length)return q.vocabIds[0];
+    const id=String(q.id||'');
+    const base=id.replace(/-kk-rev$|-ru-rev$|-kk$|-ru$|-rev$/,'');
+    if(base&&base!==id)return 'cardbase:'+base;
+    if(q.stimulus)return 'stim:'+normalize(q.stimulus);
+    return 'id:'+id;
+  }
+  function dedupeByLemma(list){
+    const seen=new Set(),out=[];
+    for(const q of list||[]){
+      const k=lemmaKey(q);
+      if(seen.has(k))continue;
+      seen.add(k);out.push(q);
+    }
+    return out;
+  }
+  function chooseShortSession(items,records,now=Date.now(),limit=config.session.size,opts={}){
+    items=(items||[]).filter(q=>q&&!q.contextOnly&&(opts.allowUsed||q.wordRole!=='used')&&!String(q.id||'').startsWith('learn-compose-')&&!assembleOnly(q));
+    const newLimit=Math.max(0,Number(config.session.newLimit)||0);
+    const isNew=q=>{const r=records&&records[q.id];return !(r&&r.seen);};
     const errors=items.filter(q=>records[q.id]?.needsReview);
-    const due=items.filter(q=>!records[q.id]?.needsReview&&isDue(records[q.id],now)).sort((a,b)=>records[a.id].dueAt-records[b.id].dueAt);
-    const learning=items.filter(q=>!records[q.id]?.needsReview&&!isDue(records[q.id],now)&&(records[q.id]?.streak||0)<2);
-    return [...errors,...due,...learning].slice(0,limit);
+    const due=items.filter(q=>!records[q.id]?.needsReview&&isDue(records[q.id],now)).sort((a,b)=>(records[a.id].dueAt||0)-(records[b.id].dueAt||0));
+    const fresh=items.filter(isNew);
+    const learning=items.filter(q=>!isNew(q)&&!records[q.id]?.needsReview&&!isDue(records[q.id],now)&&(records[q.id]?.streak||0)<2);
+    const review=dedupeByLemma([...errors,...due]);
+    const news=dedupeByLemma(fresh);
+    const learn=dedupeByLemma(learning);
+    const reservedNew=Math.min(newLimit,limit,news.length);
+    const reviewCap=Math.max(0,limit-reservedNew);
+    const out=[],used=new Set();
+    const take=(list,cap)=>{
+      let n=0;
+      for(const q of list){
+        if(out.length>=limit||n>=cap)break;
+        const k=lemmaKey(q);
+        if(used.has(k))continue;
+        used.add(k);out.push(q);n++;
+      }
+    };
+    take(review,reviewCap);
+    take(news,reservedNew);
+    take(learn,limit);
+    return out;
   }
   function scheduleRepeat(queue,index,id,streak,fillers=[],opts={}){
     const blinds=Number.isFinite(opts.sessionBlinds)?opts.sessionBlinds:streak;
+    const appearCap=Number.isFinite(opts.lemmaAppearCap)?opts.lemmaAppearCap:(config.schedule.learningSessionBlinds||3);
+    const appearCount=queue.filter(x=>x===id).length;
+    if(appearCount>=appearCap){
+      for(let i=queue.length-1;i>index;i--)if(queue[i]===id)queue.splice(i,1);
+      return queue;
+    }
     if(opts.learning){
       if(blinds>=(config.schedule.learningSessionBlinds||3)){
         for(let i=queue.length-1;i>index;i--)if(queue[i]===id)queue.splice(i,1);
@@ -184,6 +231,6 @@
     }
     return questions;
   }
-  const api={normalize,evaluate,migrateRecord,updateRecord,isDue,isDay0Learning,pauseReady,scheduleRepeat,chooseShortSession,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY,shareVocabAlts};
+  const api={normalize,evaluate,migrateRecord,updateRecord,isDue,isDay0Learning,pauseReady,scheduleRepeat,chooseShortSession,lemmaKey,dedupeByLemma,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY,shareVocabAlts};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TrainerCore=api;
 })(typeof window!=='undefined'?window:globalThis);
