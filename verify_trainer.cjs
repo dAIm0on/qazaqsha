@@ -1399,7 +1399,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/const CACHE='qazaq-offline-live-20260930-school(?:-tutor\d*)?'/.test(openSw));
+assert.ok(/const CACHE='qazaq-offline-live-20260930-school-tutor18'/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1979,6 +1979,18 @@ const spoilHead=spoilHtml.split('Показать полностью')[0];
 assert.ok(!/мягкая группа/.test(spoilHead)&&!/Ә и Г/.test(spoilHead),'A10: wrong-feedback must not paint soft/hard spoiler explanation');
 assert.ok(/Неверно/.test(spoilHead));
 assert.ok(/safeWrongWhy|spoilsOnWrong/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')),'practice wrong path gates explanation via sanitizer');
+
+const appVocabP1=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(/function isVocabWordsMode\(\)/.test(appVocabP1),'words P1 helper');
+assert.ok(/function beginVocabRetry\(\)/.test(appVocabP1)&&/id=\"retry-button\"/.test(appVocabP1)&&/#feedback-retry|id=\"feedback-retry\"/.test(appVocabP1),'words P1 explicit Ещё раз CTA');
+assert.ok(/data-vocab-compact/.test(appVocabP1)&&/Пока не всё верно/.test(appVocabP1),'words P1 compact error block');
+assert.ok(/Верно \$\{sessionCorrect\} из/.test(appVocabP1),'words P1 progress counts correct only');
+assert.ok(/countSessionAttempt/.test(appVocabP1),'words P1 skips session counter bump on wrong');
+assert.ok(/function vocabOfferHtml\(/.test(appVocabP1)&&/vocabRole==='used'/.test(appVocabP1),'words P1 no skill-separately mud; used may keep Другой пример');
+assert.ok(!/isVocabWordsMode\(\)[\s\S]{0,80}Проверить этот навык отдельно/.test(appVocabP1.split('function vocabOfferHtml')[1].split('function sameSkillOffers')[0]),'words offer path omits навык отдельно');
+assert.ok(/qazaq-offline-live-20260930-school-tutor18/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump school-tutor18');
+ok('Vocab words P1: retry CTA, compact error, correct-only progress, no skill mud');
+
 ok('Astra step 9: wrong answer shows the attempt, the block, and an existing same-skill offer (no expected reveal)');
 
 const depthState=progress.migrate({schema:6,records:{},explainDepth:{T1_HARMONY:'closed',T2_PLURAL_LDT:'open',bad:true}});
@@ -1998,7 +2010,7 @@ assert.ok(/#FF5A1F/.test(petCss),'sticker fill #FF5A1F');
 assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-index:22/.test(petCss),'sticker z-index below CTA');
 assert.ok(/tutor-sticker-dot/.test(tutorUiSrc)&&/\$\('#tutor-launch'\)\.onclick=\(e\)=>\{e\.preventDefault\(\);toggle\(\);\}/.test(tutorUiSrc)&&/function toggle\(\)\{[\s\S]*?close\(\);[\s\S]*?open\(\);/.test(tutorUiSrc),'tap sticker toggles ask');
 assert.ok(!/pet-idle\.png/.test(tutorUiSrc),'default companion is not pet-idle');
-assert.ok(/school-tutor17/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor17');
+assert.ok(/school-tutor18/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor18');
 assert.ok(/\.tutor-sheet\{[^}]*max-height:min\(78dvh,640px\)/.test(petCss.replace(/\s+/g,''))&&/overflow-y:auto/.test(petCss),'ask panel max-height + overflow-y:auto');
 assert.ok(/document\.body\.appendChild\(sheet\)/.test(tutorUiSrc),'ask sheet is body sibling (no 44px clip)');
 assert.ok(/\.chrome-back\{[^}]*min-height:44px/.test(theme.replace(/\s+/g,'')));
