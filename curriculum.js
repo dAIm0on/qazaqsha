@@ -45,7 +45,7 @@
      'https://drive.google.com/file/d/1HwRDYC7mpcoplaDJIKnoBb6MJd2mbPUX/view']}
  ];
  for(const pack of window.LESSON_PACKS||[]){
-   if(pack.lesson_id==='4-2'&&!(window.LessonRegistry&&window.LessonRegistry.isV2('4-2')))continue;
+   if(pack.lesson_id==='4-2')continue;
    if(window.Canonical){window.Canonical.applyAll(pack.original_exercises||[]);window.Canonical.applyAll(pack.generated_exercises||[]);}
    Object.assign(c.sources,pack.sources||{});
    const bank=pack.lesson_id==='bank';

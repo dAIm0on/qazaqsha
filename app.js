@@ -9,7 +9,7 @@
  }catch{}
  try{window.Lesson32Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{if(!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-3')))window.Lesson33Pack?.install?.(course,window.CURRICULUM);}catch{}
- try{if(window.LessonRegistry&&window.LessonRegistry.isV2('4-2'))window.Lesson42Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{if(!(window.LESSON_V2_COMPILED||[]).some(x=>x&&x.lesson_id==='4-2'))window.Lesson42Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{window.PhraseDrill?.install?.(course,window.CURRICULUM);}catch{}
  try{window.TransferItems?.install?.(course,window.CURRICULUM);}catch{}
  const questions=course.questions;
@@ -43,7 +43,7 @@
  try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);try{if(window.Lesson31Pack&&P.registerStages)P.registerStages('3-1',window.Lesson31Pack.stagePlans());}catch{}
  try{if(window.Lesson32Pack&&P.registerStages)P.registerStages('3-2',window.Lesson32Pack.stagePlans());}catch{}
  try{if(window.Lesson33Pack&&P.registerStages&&!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-3')))P.registerStages('3-3',window.Lesson33Pack.stagePlans());}catch{}
- try{if(window.Lesson42Pack&&P.registerStages&&window.LessonRegistry&&window.LessonRegistry.isV2('4-2'))P.registerStages('4-2',window.Lesson42Pack.stagePlans());}catch{}
+ try{if(window.Lesson42Pack&&P.registerStages&&!(window.LESSON_V2_COMPILED||[]).some(x=>x&&x.lesson_id==='4-2'))P.registerStages('4-2',window.Lesson42Pack.stagePlans());}catch{}
  let confusionIndex=P.answerIndex(questions);
  let topic='all',mode='ordered',sourceFilter=null,courseBlock=null,vocabRole=null,queue=[],position=0,checked=false,hinted=false,view='today',lastTextInput=null,activeLesson=null,activeStep=null,trainerReturn=null;
  let reviewReasonMap=Object.create(null),materialsQuery='',materialsLesson='',materialsKind='';
