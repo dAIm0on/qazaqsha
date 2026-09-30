@@ -204,7 +204,7 @@
     exercise_id:q&&q.id||'',
     prompt:(q&&(q.title||'')+' '+(q.stimulus||'')).trim(),
     user_answer:extra.user_answer||'',
-    expected_answer:mode==='hint'?'':expected,
+    expected_answer:(mode==='hint'||mode==='translate_word')?'':expected,
     is_correct:!!extra.is_correct,
     hint_used:!!extra.hint_used,
     repeat_count:extra.repeat_count!=null?extra.repeat_count:(codes[0]?sameErrorCount(codes[0]):0),
@@ -347,9 +347,23 @@
     VOCAB_RECALL:'Слово'
   }[code]||code;
  }
+
+ function translateWord(word,extra){
+  extra=extra||{};
+  const q={id:'tutor:gloss',lessonId:extra.lesson_id||'',title:'',stimulus:word||'',fields:[{answers:['']}],ruleIds:[]};
+  const req=buildRequest('translate_word',q,{
+   user_question:word||'',
+   surface:extra.surface||'practice',
+   lesson_id:extra.lesson_id||'',
+   conversation_tail:extra.conversation_tail||[]
+  });
+  req.expected_answer='';
+  return callTutor(req,C.CLIENT_TIMEOUT_MS||25000,extra);
+ }
+
  function hintLeaks(resp,expected){
   return C.containsExpected(resp,expected);
  }
- const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,coverageGaps,localFallback,isLiveMessage,buildRequest,callTutor,askTutor,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset,snapshot,restore};
+ const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,coverageGaps,localFallback,isLiveMessage,buildRequest,callTutor,askTutor,translateWord,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset,snapshot,restore};
  if(node)module.exports=api;else root.AiTutor=api;
 })(typeof window!=='undefined'?window:globalThis);

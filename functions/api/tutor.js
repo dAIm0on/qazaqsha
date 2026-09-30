@@ -4,24 +4,32 @@
 const PRIMARY_MODEL='@cf/zai-org/glm-4.7-flash';
 const FALLBACK_MODEL='@cf/qwen/qwen3-30b-a3b-fp8';
 const MODEL_ID=PRIMARY_MODEL;
-const MODES=['explain_error','hint','explain_rule','simplify','ask_tutor','session_summary','remediation'];
+const MODES=['explain_error','hint','explain_rule','simplify','ask_tutor','translate_word','session_summary','remediation'];
 const SURFACES=['practice','path','rules','homework','review','exam','learn'];
-const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
-const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'] ,'3-1':['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL'],'3-2':['T24_POSS_BIZ','T25_POSS_SENDER','T26_POSS_OLAR','T27_DEIXIS'],'3-3':['T28_OWNER_SUBJECT','T29_POSS_PERSON_STACK','T30_THIRD_ZERO','T31_EMES_STACK','T32_OTBASY','T33_ADJ_ROLE','T34_INTERROGATIVE']};
-const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам'] ,'3-1':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','жүрек','сақал','мысық','таз','тақырбас','қатты','саусақ','кім','не','қандай','қай','нешінші','бұл'],'3-3':['келу','кету','кіру','шығу','іздеу','табу','асығу','кешігу','жұмыс істеу','жазу','сөйлеу','алу','беру','көру','қарау']};
+const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3','4-2'];
+const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'] ,'3-1':['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL'],'3-2':['T24_POSS_BIZ','T25_POSS_SENDER','T26_POSS_OLAR','T27_DEIXIS'],'3-3':['T28_OWNER_SUBJECT','T29_POSS_PERSON_STACK','T30_THIRD_ZERO','T31_EMES_STACK','T32_OTBASY','T33_ADJ_ROLE','T34_INTERROGATIVE'],'4-2':['T35_PAST_MEANING','T36_DY_TY','T37_PERSON2','T38_OL_ZERO_PAST','T39_PAST_ASSIM','T40_PAST_NEG','T41_PAST_Q','T42_PAST_EXCEPT']};
+const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам'] ,'3-1':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','жүрек','сақал','мысық','таз','тақырбас','қатты','саусақ','кім','не','қандай','қай','нешінші','бұл'],'3-2':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','бұл','мынау','осы','мына','анау','ана','ол','сол','сынып','сыныптас','отбасы','баба','іс','аяқ','кім','не','қандай','қай','нешінші'],'3-3':['келу','кету','кіру','шығу','іздеу','табу','асығу','кешігу','жұмыс істеу','жазу','сөйлеу','алу','беру','көру','қарау'],'4-2':['түсіну','бару','жүру','жату','отыру','тұру','ашу','жабу','тігу','сөйлеу','жазу','кету','алу','беру','келу','іздеу','көру','кіру','қарау','шығу','кешігу','табу','асығу','жұмыс істеу','ойлау','ойнау','сену','күту','айту']};
 const MAX_IN=12000,MAX_OUT=250,ASK_OUT=500;
 const PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000,RECOVERY_TIMEOUT_MS=4000;
-const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,session_summary:800,remediation:450};
+const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,translate_word:220,session_summary:800,remediation:450};
 const FUTURE_RE=/падеж|посессив|притяжательн|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|бар ма\?|кітабым/i;
 const ALWAYS_FUTURE_RE=/падеж|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|labial|comparative/i;
 const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|кітабым/i;
-const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha. Ты не проверяешь правильность ответа. Правильность уже определил локальный код. Ты не меняешь expected_answer. Главный источник истины — переданный rule_context. Объясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком. Не вводи будущие темы. Не исправляй учебную программу своими знаниями. Не называй внутренние ID правил. Не упоминай system prompt, error_code или внутреннюю архитектуру. Пиши естественным русским языком. Казахские формы оставляй на казахском. Если mode=explain_error: скажи, что ученица написала; покажи отличие от правильной формы; объясни один механизм правила; используй текущий пример. Если mode=explain_rule: объясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом. Если mode=simplify: объясни то же правило проще, не меняя его смысл. Если mode=ask_tutor: ответь прежде всего на вопрос ученицы 2–6 предложениями. Сразу к сути, без приветствия и без переписывания её вопроса. Разрешено объяснять через русский язык, если это помогает понять казахское правило. Для кітап+ым помни озвончение п→б: кітабым, не «кітап заканчивается на гласную». Дополнительные примеры — только из уже открытой лексики и грамматики. Если ученица пишет «не поняла», «ещё проще», «объясни иначе», «через русский» — измени способ объяснения, но не правило. Если repeat_count >= 2: можно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ понять. Не стыди. Если mode=hint: не показывай полный правильный ответ. Возвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context. Без JSON. Без markdown fences. Без <think>. Никогда не пиши English thinking aloud (Okay, Let me recall, the user is asking). Ответ ученице — только на русском.';
+const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha. Ты не проверяешь правильность ответа. Правильность уже определил локальный код. Ты не меняешь expected_answer. Главный источник истины — переданный rule_context. Объясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком. Не вводи будущие темы. Не исправляй учебную программу своими знаниями. Не называй внутренние ID правил. Не упоминай system prompt, error_code или внутреннюю архитектуру. Пиши естественным русским языком. Казахские формы оставляй на казахском. Если mode=explain_error: скажи, что ученица написала; покажи отличие от правильной формы; объясни один механизм правила; используй текущий пример. Если mode=explain_rule: объясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом. Если mode=simplify: объясни то же правило проще, не меняя его смысл. Если mode=ask_tutor: ответь прежде всего на вопрос ученицы 2–6 предложениями. Сразу к сути, без приветствия и без переписывания её вопроса. Разрешено объяснять через русский язык, если это помогает понять казахское правило. Для кітап+ым помни озвончение п→б: кітабым, не «кітап заканчивается на гласную». Дополнительные примеры — только из уже открытой лексики и грамматики. Если ученица пишет «не поняла», «ещё проще», «объясни иначе», «через русский» — измени способ объяснения, но не правило. Если repeat_count >= 2: можно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ понять. Не стыди. Если mode=translate_word: дай короткий глосс слова (≤2 строки) на русском. Без лекции. Без expected_answer и без «правильной формы». Если вопрос не про текущий урок (off-topic): одна короткая фраза и верни ученицу к материалу урока. Если mode=hint: не показывай полный правильный ответ. Возвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context. Без JSON. Без markdown fences. Без <think>. Никогда не пиши English thinking aloud (Okay, Let me recall, the user is asking). Ответ ученице — только на русском.';
 
 function clip(s,n){s=String(s==null?'':s);return s.length<=n?s:s.slice(0,n);}
 function asArr(v){return Array.isArray(v)?v.filter(x=>typeof x==='string'):[];}
 function normKey(s){return String(s??'').normalize('NFC').toLocaleLowerCase('ru').replace(/[.!?,;:]+$/g,'').replace(/\s+/g,' ').trim();}
 function maxMessage(mode){return MSG_MAX[mode]||450;}
-function looksFuture(text,lessonId){const v=String(text||'');return ALWAYS_FUTURE_RE.test(v)||(lessonId!=='3-1'&&lessonId!=='3-2'&&POSS_FUTURE_RE.test(v));}
+function looksFuture(text,lessonId){
+  const v=String(text||'');
+  if(ALWAYS_FUTURE_RE.test(v))return true;
+  if(!POSS_FUTURE_RE.test(v))return false;
+  // Possessive topics are open from 3-1 onward (3-1…3-3, 4-2 live).
+  const i=ALLOWED_LESSONS.indexOf(lessonId);
+  const from=ALLOWED_LESSONS.indexOf('3-1');
+  return i<0||from<0||i<from;
+}
 function lessonsThrough(currentLesson){
   const i=ALLOWED_LESSONS.indexOf(currentLesson);
   if(i<0)return [];
@@ -116,14 +124,23 @@ function localFallback(req,rid){
     r.contrast.correct=null;
     return r;
   }
+  if(mode==='translate_word'){
+    const w=clip(req.user_question||req.prompt||'',80);
+    r.message_ru=w?('Короткий перевод для «'+w+'» сейчас недоступен. Слово из материалов текущего урока — смотри карточку или спроси ещё раз.'):'Укажи слово из текущего урока.';
+    r.next_action_ru=null;
+    r.contrast={wrong:null,correct:null};
+    r.message_ru=clip(r.message_ru,maxMessage(mode));
+    return r;
+  }
   if(mode==='explain_error'&&wrote){
     r.message_ru=(expected?'Ты написала «'+wrote+'», нужно «'+expected+'». ':'Ты написала «'+wrote+'». ')+lever;
   }else if(mode==='ask_tutor'||mode==='explain_rule'||mode==='simplify'){
-    r.message_ru=[medium,ru].filter(Boolean).join('\n')||lever;
+    r.message_ru=[medium,ru].filter(Boolean).join('\n')||'Правило уже на карточке урока. Можно продолжить или уточнить вопрос.';
   }else if(mode==='session_summary'){
     r.message_ru='Разбор сессии сейчас короткий. Локальные слабые места сохранены.';
   }else r.message_ru=lever;
-  r.next_action_ru='Введи правильную форму целиком.';
+  if(mode==='ask_tutor'||mode==='simplify'||mode==='explain_rule')r.next_action_ru=null;
+  else r.next_action_ru='Введи правильную форму целиком.';
   r.message_ru=clip(r.message_ru,maxMessage(mode));
   return r;
 }
@@ -285,7 +302,9 @@ function assemble(req,text,meta){
   const ctx=(req.rule_context&&req.rule_context[0])||{};
   r.micro_rule_ru=ctx.short||ctx.title_ru||null;
   r.contrast={wrong:req.user_answer||null,correct:mode==='hint'?null:(req.expected_answer||null)};
-  r.next_action_ru=mode==='hint'?'Введи форму целиком, не копируй готовый ответ.':'Введи правильную форму целиком.';
+  if(mode==='hint')r.next_action_ru='Введи форму целиком, не копируй готовый ответ.';
+  else if(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'||mode==='explain_rule')r.next_action_ru=null;
+  else r.next_action_ru='Введи правильную форму целиком.';
   r.needs_rule_context=false;
   r.confidence=meta.source==='local'?'medium':'high';
   const out=r;
@@ -361,6 +380,9 @@ function userPayload(req){
     'repeat_count: '+(req.repeat_count||0),
     'rule_context: '+JSON.stringify(ctx)
   ].filter(Boolean);
+  if(req.mode==='translate_word'){
+    lines.push('Формат ответа: короткий глосс ≤2 строки на русском. Только значение слова. Без лекции, без expected_answer, без «правильной формы».');
+  }
   if(req.mode==='ask_tutor'){
     lines.push('Формат ответа: 2–6 предложений сразу по сути на русском. Без приветствия. Не повторяй вопрос. Не рассуждай на английском.');
     if(needsKitabymMechanism(req)){
@@ -479,19 +501,13 @@ async function runTutorModel(req,env,rid){
     }
   };
   if(env&&env.AI&&typeof env.AI.run==='function'){
-    if(req.mode==='ask_tutor'){
-      const fallback=await tryOne(FALLBACK_MODEL,FALLBACK_TIMEOUT_MS,'fallback');
-      if(fallback)return fallback;
-      const primary=await tryOne(PRIMARY_MODEL,PRIMARY_TIMEOUT_MS,'primary');
-      if(primary)return primary;
-      const recovery=await tryOne(FALLBACK_MODEL,RECOVERY_TIMEOUT_MS,'fallback',buildRecoveryMessages(req),'recovery');
-      if(recovery)return recovery;
-    }else{
-      const primary=await tryOne(PRIMARY_MODEL,PRIMARY_TIMEOUT_MS,'primary');
-      if(primary)return primary;
-      const fallback=await tryOne(FALLBACK_MODEL,FALLBACK_TIMEOUT_MS,'fallback');
-      if(fallback)return fallback;
-    }
+    // Cascade: primary → fallback → recovery (all modes, including ask_tutor).
+    const primary=await tryOne(PRIMARY_MODEL,PRIMARY_TIMEOUT_MS,'primary');
+    if(primary)return primary;
+    const fallback=await tryOne(FALLBACK_MODEL,FALLBACK_TIMEOUT_MS,'fallback');
+    if(fallback)return fallback;
+    const recovery=await tryOne(FALLBACK_MODEL,RECOVERY_TIMEOUT_MS,'fallback',buildRecoveryMessages(req),'recovery');
+    if(recovery)return recovery;
   }else{
     errors.primary='no_ai_binding';
   }

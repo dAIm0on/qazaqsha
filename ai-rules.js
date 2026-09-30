@@ -1,4 +1,4 @@
-/* Grounded rule cards from current open course 1-1…3-1. */
+/* Grounded rule cards from current open course 1-1…4-2. */
 (function(root){
  'use strict';
  const hw=typeof module!=='undefined'&&module.exports?require('./homework.js'):root.Homework;
@@ -31,7 +31,15 @@
   {rule_id:'T31_EMES_STACK',lesson_id:'3-3',course_rule:'emes_stack',title_ru:'Емес забирает личное',explanation_ru:'Сен менің жауым емессің. Наклейка владельца остаётся, личное переезжает на емес.',examples_correct:['Сен менің жауым емессің'],examples_wrong:['Сен менің жауымсың емес'],error_codes:['EMES_PERSON_POSITION','EMES_POSS_DROPPED']},
   {rule_id:'T32_OTBASY',lesson_id:'3-3',course_rule:'otbasy',title_ru:'Отбасы без лишней сы',explanation_ru:'Оның отбасы. Сен оның отбасысың — это личное сың, не вторая сы.',examples_correct:['Оның отбасы','Сен оның отбасысың'],examples_wrong:['Оның отбасысы','Сен оның отбасысысың'],error_codes:['OTBASY_DOUBLE_POSS']},
   {rule_id:'T33_ADJ_ROLE',lesson_id:'3-3',course_rule:'adj_role',title_ru:'Признак слева или справа',explanation_ru:'Ақылды бала и Бала ақылды в этом уроке не подменяют друг друга.',examples_correct:['Ақылды бала','Бала ақылды'],examples_wrong:[],error_codes:['ADJ_ROLE_ORDER']},
-  {rule_id:'T34_INTERROGATIVE',lesson_id:'3-3',course_rule:'interrogative',title_ru:'Кім, не, қандай, қай, нешінші',explanation_ru:'Характеристика — қандай. Выбор из нескольких — қай. По счёту — нешінші.',examples_correct:['қандай','қай','нешінші'],examples_wrong:[],error_codes:['INTERROGATIVE_CHOICE']}
+  {rule_id:'T34_INTERROGATIVE',lesson_id:'3-3',course_rule:'interrogative',title_ru:'Кім, не, қандай, қай, нешінші',explanation_ru:'Характеристика — қандай. Выбор из нескольких — қай. По счёту — нешінші.',examples_correct:['қандай','қай','нешінші'],examples_wrong:[],error_codes:['INTERROGATIVE_CHOICE']},
+  {rule_id:'T35_PAST_MEANING',lesson_id:'4-2',course_rule:'past',title_ru:'Уже было: одна форма',explanation_ru:'Основа + (не) + ды/ді/ты/ті + кто-2. Одна форма на «делал» и «сделал».',examples_correct:['Бардым','Жаздым'],examples_wrong:['Жазамын'],error_codes:['UNKNOWN']},
+  {rule_id:'T36_DY_TY',lesson_id:'4-2',course_rule:'past',title_ru:'Ды / ді / ты / ті',explanation_ru:'Глухой край → ты/ті. Иначе ды/ді. Ряд последнего слога.',examples_correct:['барды','ашты','кетті'],examples_wrong:['жазтым'],error_codes:['UNKNOWN']},
+  {rule_id:'T37_PERSON2',lesson_id:'4-2',course_rule:'past',title_ru:'Кто-2 на прошедшем',explanation_ru:'мен м, біз қ/к, сен ң, сендер ңдар/ңдер, сіз ңыз/ңіз. Не мын из 4-1.',examples_correct:['бардым','бардық'],examples_wrong:['бардыммын'],error_codes:['UNKNOWN']},
+  {rule_id:'T38_OL_ZERO_PAST',lesson_id:'4-2',course_rule:'past',title_ru:'Ол / олар без кто-2',explanation_ru:'У ол и олар после куска времени пусто.',examples_correct:['Ол барды','Жатты'],examples_wrong:['Ол бардым'],error_codes:['OL_OLAR']},
+  {rule_id:'T39_PAST_ASSIM',lesson_id:'4-2',course_rule:'past',title_ru:'Ғ г б снова қ к п',explanation_ru:'Перед глухим куском времени звонкие края снова глухие.',examples_correct:['шықты','кепті'],examples_wrong:[],error_codes:['UNKNOWN']},
+  {rule_id:'T40_PAST_NEG',lesson_id:'4-2',course_rule:'past',title_ru:'Не к основе, потом ды/ді',explanation_ru:'Стоп-знак к основе, потом всегда ды/ді, потом кто-2.',examples_correct:['жазбадым'],examples_wrong:['жазбатым'],error_codes:['UNKNOWN']},
+  {rule_id:'T41_PAST_Q',lesson_id:'4-2',course_rule:'past',title_ru:'Вопрос после готовой формы',explanation_ru:'Сначала готовая форма прошедшего, потом вопрос. Да/де отдельно.',examples_correct:['Бардың ба?'],examples_wrong:[],error_codes:['QUESTION_PARTICLE']},
+  {rule_id:'T42_PAST_EXCEPT',lesson_id:'4-2',course_rule:'past',title_ru:'Оқу есту қою сүю',explanation_ru:'Особые основы: оқу, есту, қою, сүю. Жатырмын ещё нет.',examples_correct:['оқыдым'],examples_wrong:['жатырмын'],error_codes:['UNKNOWN']}
  ];
  function byId(id){return CARDS.find(c=>c.rule_id===id)||null;}
  function byCourse(rule){return CARDS.filter(c=>c.course_rule===rule);}
@@ -60,13 +68,13 @@
  }
  function allowedVocab(lessonIds){
   const src=hw&&hw.WORD_LEMMAS||{};
-  const ids=lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
+  const ids=lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3','4-2'];
   const out=[];
   for(const id of ids)for(const w of src[id]||[])if(!out.includes(w))out.push(w);
   return out;
  }
  function allowedRuleIds(lessonIds){
-  const max=new Set(lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3']);
+  const max=new Set(lessonIds&&lessonIds.length?lessonIds:['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3','4-2']);
   return CARDS.filter(c=>max.has(c.lesson_id)).map(c=>c.rule_id);
  }
  function toRuleContext(card){
