@@ -101,7 +101,10 @@ assert.ok(C.needsKitabymMechanism({mode:'ask_tutor',user_question:'Объясн�
 assert.ok(C.hasKitabymMechanism('Менің кітабым: п→б и наклейка -ым справа.'));
 assert.ok(!C.hasKitabymMechanism('Кітабым это мой книга.'));
 const tutorSrc2=fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8');
-assert.ok(/mode==='ask_tutor'[\s\S]{0,120}?tryOne\(FALLBACK_MODEL/.test(tutorSrc2));
+// Cascade must be primary → fallback → recovery for ALL modes (incl. ask_tutor). Not Qwen-first.
+assert.ok(/const primary=await tryOne\(PRIMARY_MODEL/.test(tutorSrc2));
+assert.ok(tutorSrc2.indexOf('const primary=await tryOne(PRIMARY_MODEL') < tutorSrc2.indexOf('const fallback=await tryOne(FALLBACK_MODEL,FALLBACK_TIMEOUT_MS'));
+assert.ok(!/if\(req\.mode==='ask_tutor'\)\{\s*const fallback=await tryOne\(FALLBACK_MODEL/.test(tutorSrc2));
 assert.ok(/kitabym_canned_after_unusable/.test(tutorSrc2));
 assert.ok(/source:'local'[\s\S]{0,80}?kitabym_canned_after_unusable|kitabym_canned_after_unusable[\s\S]{0,200}?source:'local'/.test(tutorSrc2));
 assert.ok(!/kitabym_canned_after_unusable[\s\S]{0,220}?source:'fallback'/.test(tutorSrc2));
@@ -143,6 +146,12 @@ assert.ok(!C.looksFuture('Почему в русском «пять книг», 
 assert.ok(C.looksFuture('А как здесь будет притяжательное окончание?'));
 assert.equal(C.assembleResponse({mode:'ask_tutor',lesson_id:'1-2',user_question:'через русский',candidate_error_codes:[],rule_context:[]},'Сначала разберём падеж и кітабым.',{source:'primary'}),null);
 ok('TEST 15 future topic local; Russian contrast allowed');
+assert.ok(!C.looksFuture('А как здесь будет притяжательное окончание?','3-3'));
+assert.ok(!C.looksFuture('кітабым','3-1'));
+assert.ok(!C.looksFuture('посессив','4-2'));
+assert.ok(C.ALLOWED_LESSONS.includes('4-2'));
+assert.ok(C.MODES.includes('translate_word'));
+ok('TEST looksFuture open 3-1…3-3/4-2; ALLOWED 4-2; translate_word');
 
 const t4=R.toRuleContext(R.byId('T4_NO_PLURAL_AFTER_NUMBER'));
 assert.ok(t4.medium);
@@ -150,6 +159,7 @@ assert.ok(/книг/.test(t4.ru_refresh));
 const askLocal=C.localExplain({mode:'ask_tutor',lesson_id:'1-3',user_question:'Объясни через русский',rule_context:[t4]});
 assert.ok(/кітап/.test(askLocal.message_ru)||/книг/.test(askLocal.message_ru));
 assert.ok(!/Не разобрала/.test(askLocal.message_ru));
+assert.equal(askLocal.next_action_ru,null);
 ok('TEST 12/25 ask_tutor local Russian refresh');
 
 const tail=C.clipTail([
@@ -364,13 +374,13 @@ ok('TEST 1.5.2 tutor.js splits GLM/Qwen payloads, no enable_thinking');
   }}};
   const recovered=await tutor.runTutorModel(parsed,recoveryEnv,'recovery-test');
   assert.equal(calls.length,3);
-  assert.equal(calls[0].model,tutor.FALLBACK_MODEL);
-  assert.equal(calls[1].model,tutor.PRIMARY_MODEL);
+  assert.equal(calls[0].model,tutor.PRIMARY_MODEL);
+  assert.equal(calls[1].model,tutor.FALLBACK_MODEL);
   assert.equal(calls[2].model,tutor.FALLBACK_MODEL);
   assert.equal(recovered.meta.source,'fallback');
   assert.equal(recovered.meta.recovery,true);
   assert.ok(/адамдар/.test(recovered.message_ru));
-  ok('TEST unusable standard model replies get one honest Qwen recovery before local');
+  ok('TEST unusable primary then fallback get one honest Qwen recovery before local');
 
   assert.equal(tutor.normalizeModelText({choices:[{message:{content:'GLM choices content: бес кітап без -тар.'}}]}),'GLM choices content: бес кітап без -тар.');
   assert.equal(tutor.normalizeModelText({choices:[{message:{content:null,reasoning_content:'GLM reasoning: бес кітап без множественного.'}}]}),'GLM reasoning: бес кітап без множественного.');
