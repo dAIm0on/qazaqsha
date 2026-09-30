@@ -1,0 +1,23 @@
+{
+  "lesson_id": "2-3",
+  "known_bad": [
+    {
+      "id": "fixture:2-3:bad-key:5-2-3",
+      "input": "отызыншы біріншісіңдер ме",
+      "must_reject_as_gold": true,
+      "expected": "жиырмасыншысыңдар ма"
+    },
+    {
+      "id": "fixture:2-3:bad-key:7-5",
+      "input": "щедрые – сороковые",
+      "must_reject_as_gold": true,
+      "expected": "щедрые – вторые"
+    },
+    {
+      "id": "fixture:2-3:bad-key:bolynyzdar",
+      "input": "до свидания (много человек, фамильярно)",
+      "must_reject_as_gold": true,
+      "expected": "до свидания (много человек, уважительно)"
+    }
+  ]
+}
