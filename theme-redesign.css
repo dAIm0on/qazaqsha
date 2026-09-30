@@ -655,9 +655,9 @@ body[data-view=path] #today-view,body[data-view=learn] #today-view{display:none!
 body[data-view=learn] #learn-content,body[data-view=path] #path-content{padding-bottom:72px}
 body[data-view=learn] .issue-toggle,body[data-view=path] .issue-toggle{display:none!important}
 /* Pet: display 80×80px with object-fit contain; keep a safe CTA gap above sticky controls. */
-#tutor-host{position:fixed;z-index:22;right:8px;bottom:calc(88px + env(safe-area-inset-bottom,0px) + var(--bottom-nav-height,64px));pointer-events:none}
-body.path-immersive #tutor-host{bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-body[data-view=practice] #tutor-host,body[data-view=homework] #tutor-host{bottom:calc(88px + env(safe-area-inset-bottom,0px) + var(--bottom-nav-height,64px))}
+#tutor-host{position:fixed;z-index:22;right:8px;bottom:calc(104px + env(safe-area-inset-bottom,0px) + var(--bottom-nav-height,64px));pointer-events:none}
+body.path-immersive #tutor-host{bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+body[data-view=practice] #tutor-host,body[data-view=homework] #tutor-host{bottom:calc(104px + env(safe-area-inset-bottom,0px) + var(--bottom-nav-height,64px))}
 #tutor-host[hidden]{display:none}
 .tutor-pet,.tutor-launch{pointer-events:auto;min-width:80px;min-height:80px;width:80px;height:80px;padding:0;border:0;border-radius:18px;background:transparent;box-shadow:none;display:grid;place-items:center;cursor:pointer}
 .tutor-pet img,.tutor-launch img,.tutor-pet-img{width:80px!important;height:80px!important;min-width:80px;min-height:80px;max-width:80px;max-height:80px;object-fit:contain;object-position:center;pointer-events:none;filter:drop-shadow(0 4px 10px rgba(22,20,18,.18))}
