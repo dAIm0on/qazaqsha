@@ -579,6 +579,7 @@
    return list;
  }
  function startCourse(block){
+   ensureV2(block);
    if(!P.courseIds().includes(block))return;
    viewOnlyPathLesson=null;
    persistLessonPractice();persistLessonPath();
@@ -661,6 +662,7 @@
  }
  function examReady(r){return window.MemoryPolicy?window.MemoryPolicy.examReady(r):!!r&&(r.recall_review_successes||0)>=2;}
  function startQueue({all=false}={}){
+   if(courseBlock)ensureV2(courseBlock);
    activeLesson=null;activeStep=null;stepEvidence={};
    if(topic==='phrase'&&courseBlock&&window.PhraseDrill&&mode!=='exam'){
      mode='phrase';
@@ -829,6 +831,7 @@
    continueLesson(s.lessonId);
  }
  function openChapter(lessonId,chapterId){
+   ensureV2(lessonId);
    const G=window.GrammarPath;
    if(!G||!P.courseIds().includes(lessonId))return;
    const lp=P.ensureLessonProgress(state,lessonId),changesResume=viewOnlyPathLesson!==lessonId&&lp&&lp.status!=='completed';
@@ -841,7 +844,23 @@
    G.startChapter(state,lessonId,chapterId);
    if(changesResume)markLessonStarted(lessonId,'path');markPlace('path',lessonId);save();renderPath();
  }
+ function ensureV2(lessonId){
+  try{
+    if(!(window.LessonV2Runtime&&window.LessonV2Runtime.ensure&&lessonId))return;
+    window.LessonV2Runtime.ensure(lessonId);
+    // Lazy install pushes into COURSE.questions; keep app byId / Knowledge in sync.
+    let added=false;
+    for(const q of course.questions){
+      if(!byId.has(q.id)){coerceTyped(q);byId.set(q.id,q);added=true;}
+    }
+    if(added){
+      try{window.Knowledge.hydrate(state,questions);}catch(_){}
+      confusionIndex=P.answerIndex(questions);
+    }
+  }catch(e){}
+}
  function openPathLesson(lessonId,options){
+   ensureV2(lessonId);
    const G=window.GrammarPath;if(!G){showView('path');return;}
    if(!P.courseIds().includes(lessonId))return;
    const meaningful=!!(options&&options.meaningful);
@@ -1352,6 +1371,7 @@
    return {sessionGUnlocked,events:state.events};
  }
  function startHomework(lessonId,part,section){
+   ensureV2(lessonId);
    const H=window.Homework,pack=(H.packs(questions,course,homeworkOpts()).find(p=>p.lesson_id===lessonId));
    if(!pack)return;
    hwLesson=lessonId;hwPart=part||'exercises';mode='homework';topic='all';sourceFilter=null;vocabRole=null;activeLesson=null;activeStep=null;courseBlock=lessonId;

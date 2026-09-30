@@ -2,7 +2,7 @@
 (function(root){
  'use strict';
  const schema=root.LessonV2Schema;
- const installed=new Map();
+ const installed=new Map(); const shells=new Map();
  function productionHost(){return !!(root.location&&root.location.hostname==='qazaqsha.pages.dev');}
  function publishable(raw){return !productionHost()||!!(raw&&raw.status==='released'&&raw.release&&raw.release.approved===true&&/^[0-9a-f]{40}$/i.test(raw.release.preview_head||'')&&/^https:\/\//.test(raw.release.preview_url||''));}
  function questionCopy(q,lessonId){
@@ -95,11 +95,38 @@
      nextStageId:(p.stages[i+1]&&p.stages[i+1].id||'').replace(/:/g,'-')||null,minIndependentRatio:s.min_independent_ratio,maxPresentations:s.max_presentations,final:s.final
    }));
  }
+ function releaseHeavy(raw){
+   if(!raw||typeof raw!=='object')return;
+   const list=root.LESSON_V2_COMPILED;
+   if(!Array.isArray(list))return;
+   const i=list.indexOf(raw);
+   if(i<0)return;
+   // Replace array slot (do not mutate shared object graphs used by tests/clones).
+   list[i]={
+     lesson_id:raw.lesson_id,content_revision:raw.content_revision,title:raw.title,label:raw.label,name:raw.name||raw.title,
+     status:raw.status,release:raw.release||null,sources:raw.sources||[],prerequisites:raw.prerequisites||{lessons:[]},
+     rules:raw.rules||[],homework:raw.homework||null,_hydrated:true
+   };
+ }
+ function installShell(raw){
+   if(!publishable(raw))return null;
+   const course=root.COURSE,catalog=root.CURRICULUM,chapters=root.GRAMMAR_CHAPTERS;
+   if(!course||!catalog||!chapters)throw Error('Lesson v2 runtime loaded before base registries');
+   const id=raw.lesson_id;if(!id||shells.has(id))return shells.get(id)||null;
+   for(const s of raw.sources||[])if(s&&s.url)course.sources['v2-'+id+'-'+s.id]={title:s.title,url:s.url,additional:s.role!=='SCHOOL_NORM'};
+   for(const r of raw.rules||[])if(r&&r.id&&!catalog.rules.some(x=>x.id===r.id))catalog.rules.push({id:r.id,title:r.title,lesson_first_seen:id});
+   if(!catalog.lessons.some(x=>x.id===id))catalog.lessons.push({id,title:raw.title,active:true,status:raw.status,depends_on:((raw.prerequisites&&raw.prerequisites.lessons)||[]).slice(),rules:(raw.rules||[]).map(r=>r.id),sources:(raw.sources||[]).filter(s=>s&&s.url).map(s=>s.url)});
+   // Light grammar shell so path hub lists chapters without materializing exercise banks.
+   const light={lesson_id:id,title:raw.title,name:raw.name||raw.title,theory:raw.theory||[],rules:raw.rules||[]};
+   const gLesson=pathLesson(light);const at=chapters.LESSONS.findIndex(x=>x.id===id);if(at<0)chapters.LESSONS.push(gLesson);else chapters.LESSONS[at]=gLesson;
+   shells.set(id,{lesson_id:id,content_revision:raw.content_revision,status:raw.status});return shells.get(id);
+ }
  function installOne(raw){
    if(!publishable(raw))return null;
    const p=schema.validate(raw);if(installed.has(p.lesson_id))return installed.get(p.lesson_id);
    const course=root.COURSE,catalog=root.CURRICULUM,learning=root.LEARNING,chapters=root.GRAMMAR_CHAPTERS;
    if(!course||!catalog||!learning||!chapters)throw Error('Lesson v2 runtime loaded before base registries');
+   installShell(raw);
    for(const s of p.sources)if(s.url)course.sources['v2-'+p.lesson_id+'-'+s.id]={title:s.title,url:s.url,additional:s.role!=='SCHOOL_NORM'};
    for(const r of p.rules)if(!catalog.rules.some(x=>x.id===r.id))catalog.rules.push({id:r.id,title:r.title,lesson_first_seen:p.lesson_id});
    addVocabQuestions(p,course,catalog);
@@ -108,9 +135,21 @@
    const gLesson=pathLesson(p);const at=chapters.LESSONS.findIndex(x=>x.id===p.lesson_id);if(at<0)chapters.LESSONS.push(gLesson);else chapters.LESSONS[at]=gLesson;
    const existing=new Set((learning.lessons||[]).map(x=>x.id));for(const l of learningTracks(p,course.questions))if(!existing.has(l.id)){learning.lessons.push(l);existing.add(l.id);}
    if(root.CourseProgress&&root.CourseProgress.registerStages)root.CourseProgress.registerStages(p.lesson_id,stagePlans(p));
-   installed.set(p.lesson_id,p);return p;
+   // Keep metadata only in installed map; questions live in COURSE, theory in GRAMMAR_CHAPTERS.
+   const kept={lesson_id:p.lesson_id,content_revision:p.content_revision,status:p.status,title:p.title,name:p.name||p.title,release:p.release||null,homework:p.homework,migrations:p.migrations||[],sources:p.sources,rules:p.rules,stages:p.stages};
+   installed.set(p.lesson_id,kept);
+   releaseHeavy(raw);
+   return kept;
+ }
+ function ensure(id){
+   if(!id)return null;
+   if(installed.has(id))return installed.get(id);
+   const raw=(root.LESSON_V2_COMPILED||[]).find(x=>x&&x.lesson_id===id);
+   if(!raw)return null;
+   return installOne(raw);
  }
  function installAll(){const out=[];for(const raw of root.LESSON_V2_COMPILED||[]){const p=installOne(raw);if(p)out.push(p);}return out;}
+ function installShells(){const out=[];for(const raw of root.LESSON_V2_COMPILED||[]){const p=installShell(raw);if(p)out.push(p);}return out;}
  function byId(id){return installed.get(id)||null;}
  function migrationChain(lessonId,fromRevision){
    const p=byId(lessonId);if(!p)return null;
@@ -137,8 +176,26 @@
  function migrateIds(lessonId,fromRevision,kind,values){
    const out=[];for(const value of values||[]){const v=migrateId(lessonId,fromRevision,kind,value);if(!v)return null;if(!out.includes(v))out.push(v);}return out;
  }
- function isV2(id){return installed.has(id)||(root.LessonRegistry&&root.LessonRegistry.isV2(id));}
- function homework(id){const p=byId(id);if(!p)return null;const h=p.homework,ext=h.external_tasks||[];const src=k=>p.sources.find(s=>s.id===k)||{};const method=src('school-method'),hwPdf=src('school-homework');return {lesson_id:id,content_revision:p.content_revision,homework:{title:h.title,word_ids:h.word_ids.slice(),exercise_ids:h.exercise_ids.slice(),word_question_ids:root.COURSE.questions.filter(q=>q.lessonId===id&&q.topic==='vocab'&&q.wordRole==='must').map(q=>q.id),rule_map:Object.fromEntries(h.exercise_ids.map(qid=>{const q=root.COURSE.questions.find(q=>q.id===qid);return [qid,(q&&q.ruleIds&&q.ruleIds[0])||''];}).filter(x=>x[1])),external_test_url:ext[0]&&ext[0].url||'',external_tests:ext.map(x=>x.url),checklist:h.checklist.slice(),extras:[],method_title:method.title||('Методичка '+id),method_url:method.url||'',homework_pdf_title:hwPdf.title||('Домашка '+id),homework_pdf_url:hwPdf.url||'',source_items:h.source_items.slice()}};}
+ function isV2(id){return installed.has(id)||shells.has(id)||(root.LessonRegistry&&root.LessonRegistry.isV2(id));}
+ function homeworkMeta(raw){
+   if(!raw||!publishable(raw)||!raw.homework)return null;
+   const h=raw.homework,ext=h.external_tasks||[],id=raw.lesson_id;
+   const src=k=>(raw.sources||[]).find(s=>s&&s.id===k)||{};
+   const method=src('school-method'),hwPdf=src('school-homework');
+   const installedQs=(root.COURSE&&root.COURSE.questions||[]).filter(q=>q.lessonId===id);
+   return {lesson_id:id,content_revision:raw.content_revision,homework:{title:h.title,word_ids:(h.word_ids||[]).slice(),exercise_ids:(h.exercise_ids||[]).slice(),word_question_ids:installedQs.filter(q=>q.topic==='vocab'&&q.wordRole==='must').map(q=>q.id),rule_map:Object.fromEntries((h.exercise_ids||[]).map(qid=>{const q=installedQs.find(q=>q.id===qid);return [qid,(q&&q.ruleIds&&q.ruleIds[0])||''];}).filter(x=>x[1])),external_test_url:ext[0]&&ext[0].url||'',external_tests:ext.map(x=>x.url),checklist:(h.checklist||[]).slice(),extras:[],method_title:method.title||('Методичка '+id),method_url:method.url||'',homework_pdf_title:hwPdf.title||('Домашка '+id),homework_pdf_url:hwPdf.url||'',source_items:(h.source_items||[]).slice()}};
+ }
+ function homework(id){
+   // Do not ensure() here: Homework.packs() maps every lesson id for the picker.
+   // App calls ensure(id) before starting a sheet so questions exist in COURSE.
+   const p=byId(id);
+   if(p){
+     const h=p.homework,ext=h.external_tasks||[];const src=k=>p.sources.find(s=>s.id===k)||{};const method=src('school-method'),hwPdf=src('school-homework');
+     return {lesson_id:id,content_revision:p.content_revision,homework:{title:h.title,word_ids:h.word_ids.slice(),exercise_ids:h.exercise_ids.slice(),word_question_ids:root.COURSE.questions.filter(q=>q.lessonId===id&&q.topic==='vocab'&&q.wordRole==='must').map(q=>q.id),rule_map:Object.fromEntries(h.exercise_ids.map(qid=>{const q=root.COURSE.questions.find(q=>q.id===qid);return [qid,(q&&q.ruleIds&&q.ruleIds[0])||''];}).filter(x=>x[1])),external_test_url:ext[0]&&ext[0].url||'',external_tests:ext.map(x=>x.url),checklist:h.checklist.slice(),extras:[],method_title:method.title||('Методичка '+id),method_url:method.url||'',homework_pdf_title:hwPdf.title||('Домашка '+id),homework_pdf_url:hwPdf.url||'',source_items:h.source_items.slice()}};
+   }
+   const raw=(root.LESSON_V2_COMPILED||[]).find(x=>x&&x.lesson_id===id);
+   return homeworkMeta(raw);
+ }
  function practiceForRule(lessonId,ruleId,limit=12){
    if(!installed.has(lessonId)||!root.COURSE)return [];
    const rows=(root.COURSE.questions||[]).filter(q=>q&&q.lessonId===lessonId&&q.topic==='verbs'&&(q.ruleIds||[]).includes(ruleId));
@@ -162,7 +219,9 @@
    }
    return picked;
  }
- const api={installAll,installOne,byId,isV2,homework,practiceForRule,migrationChain,migrateId,migrateIds,installed,stagePlans,pathLesson};
+ const api={installAll,installOne,installShells,ensure,byId,isV2,homework,practiceForRule,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
  root.LessonV2Runtime=api;
- installAll();
+ // P0 Chrome Error 9: do not materialize every lesson pack (4-1 has 345 generated Qs) at boot.
+ // Shells keep path/learn navigation; ensure(id) hydrates exercises on first open.
+ installShells();
 })(typeof window!=='undefined'?window:globalThis);

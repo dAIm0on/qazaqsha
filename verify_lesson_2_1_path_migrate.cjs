@@ -45,8 +45,8 @@ assert.ok(cp.includes('pathNeedsReplay'));
 ok('course-progress persists contentRevision + pathNeedsReplay');
 
 const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20261001-hw-m3-p0'"));
-ok('sw cache bumped to hw-m3-p0');
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20261001-error9-p0'"));
+ok('sw cache bumped to error9-p0');
 
 const mock={
   LessonV2Schema:Schema,
@@ -59,11 +59,13 @@ const mock={
   Canonical:null
 };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8'),{window:mock,globalThis:mock,console});
+mock.LessonV2Runtime.installAll();
 assert.equal(mock.LessonV2Runtime.migrateId('2-1','2-1.legacy','chapter_ids','2-1-glue'),'v2-theory-2-1-glue');
 assert.equal(mock.LessonV2Runtime.migrateId('2-1','2-1.legacy','chapter_ids','2-1-siz2'),'v2-theory-2-1-siz-word');
 const installed=mock.LessonV2Runtime.byId('2-1');
 assert.ok(installed);
-const pathLes=mock.LessonV2Runtime.pathLesson(installed);
+const pathLes=mock.GRAMMAR_CHAPTERS.LESSONS.find(x=>x.id==='2-1');
+assert.ok(pathLes);
 assert.ok(pathLes.chapters.some(c=>c.id==='v2-theory-2-1-siz-word'));
 assert.ok(pathLes.chapters.every(c=>String(c.id).startsWith('v2-theory-2-1-')));
 ok('runtime migrateId + pathLesson chapter ids for 2-1');
