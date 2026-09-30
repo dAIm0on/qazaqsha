@@ -1248,7 +1248,7 @@
    const crumb=(les,ch)=>{
      const Bank=window.ExplainBankUI;
      const title=ch&&Bank?Bank.chapterTitle(ch):(ch&&ch.title)||'';
-     const bits=['<button type="button" class="text-button" data-path-learn>← Занятия</button>'];
+     const bits=['<button type="button" class="text-button chrome-back" data-path-learn>← Занятия</button>'];
      if(les)bits.push('<span>→</span><button type="button" class="text-button" data-path-les="'+esc(les.id)+'">Урок '+esc(les.id)+'</button>');
      if(ch)bits.push('<span>→</span><strong>'+esc(title)+'</strong>');
      return '<nav class="path-crumb">'+bits.join(' ')+'</nav>';
@@ -1285,7 +1285,7 @@
    if(gp.phase==='done'){
      bindTutor(les,null);
      root.innerHTML=`<div class="panel path-paper">${crumb(les,null)}<h2>Урок разобран</h2><p>${esc(courseRow?courseRow.name:les.title)}</p>
-       <div class="lesson-actions"><button type="button" class="text-button" id="path-back">← Назад</button><button type="button" class="primary-button" id="path-to-practice">Перейти к практике</button>
+       <div class="lesson-actions"><button type="button" class="text-button chrome-back" id="path-back">← Назад</button><button type="button" class="primary-button" id="path-to-practice">Перейти к практике</button>
        <button type="button" class="secondary-button" data-path-learn>К урокам</button></div></div>`;
      bindCrumb();
      const backDone=$('#path-back');
@@ -1311,7 +1311,7 @@
          const title=Bank?Bank.chapterTitle(c):c.title;
          return `<button type="button" class="secondary-button" data-ch="${c.id}">Глава ${i+1} из ${les.chapters.length} · ${esc(title)}${ok?' ✓':''}</button>`;
        }).join('')}</div>
-       <p><button type="button" class="text-button" data-path-learn>← Назад</button></p></div>`;
+       <p><button type="button" class="text-button chrome-back" data-path-learn>← Назад</button></p></div>`;
      bindCrumb();
      root.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>openChapter(les.id,b.dataset.ch));
      if(window.ExplainOpen)window.ExplainOpen.bind(root);
@@ -1346,7 +1346,7 @@
      }
      gp.phase='lesson';gp.chapterId=null;gp.beat=0;gp.canonShownFor=null;gp.canonVisible=false;save();renderPath();
    };
-   const nav=(id,label)=>`<div class="lesson-actions"><button type="button" class="text-button" id="path-back">← Назад</button><button type="button" class="primary-button" id="${id}">${label}</button></div>`;
+   const nav=(id,label)=>`<div class="lesson-actions"><button type="button" class="text-button chrome-back" id="path-back">← Назад</button><button type="button" class="primary-button" id="${id}">${label}</button></div>`;
    const bindNav=(id,fn)=>{bindCrumb();const b=$('#path-back');if(b)b.onclick=stepBack;const n=$('#'+id);if(n)n.onclick=fn;};
    if(!beat){
      G.markChapterDone(gp,les.id,ch.id);
@@ -1358,7 +1358,7 @@
        root.innerHTML=`<div class="panel path-paper">${crumb(les,ch)}<p class="eyebrow">БЛОК РАЗОБРАН</p><h2>${esc(chTitle||ch.title)}</h2>
          <p>Можно перейти дальше или потренировать этот шаг ещё. Практика не ставит финальную оценку и её можно запускать повторно.</p>
          <div class="lesson-actions">
-           <button type="button" class="text-button" id="path-back">← Назад</button>
+           <button type="button" class="text-button chrome-back" id="path-back">← Назад</button>
            ${practiceIds.length?'<button type="button" class="secondary-button" id="path-more-practice">Практиковаться ещё</button>':''}
            <button type="button" class="primary-button" id="path-next-chapter">${nxt?'Дальше':'К практике урока'}</button>
          </div></div>`;
@@ -1483,7 +1483,7 @@
        <form id="path-form" class="practice-composer"><div class="composer-row"><input id="path-answer" type="text" lang="kk" enterkeyhint="enter" autocomplete="off" spellcheck="false"><button type="submit" class="primary-button" id="path-check">Проверить</button></div>${kb}
          <div id="path-fb" class="feedback" hidden></div>
          <div class="lesson-actions">
-           <button type="button" class="text-button" id="path-back">← Назад</button>
+           <button type="button" class="text-button chrome-back" id="path-back">← Назад</button>
            <button type="button" class="secondary-button" id="path-rule">Подсказка</button>
            <button type="button" class="text-button" id="path-idk">Не знаю</button></div></form></div>`;
      bindCrumb();

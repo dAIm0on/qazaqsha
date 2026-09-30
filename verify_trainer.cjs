@@ -713,11 +713,15 @@ assert.ok(/encodingMarkup\(q\)/.test(appSrc));
 assert.ok(/Ассоциация/.test(appSrc));
 ok('P1.2/H1 association on card until fade; button remains Ассоциация');
 
-assert.ok(/isChunk/.test(dashSrc));
-assert.ok(/data-action="chunks"/.test(dashSrc));
-assert.ok(/Приветствия и прощания/.test(dashSrc));
+assert.ok(/isChunk/.test(fs.readFileSync(path.join(__dirname,'memory-policy.js'),'utf8')));
 assert.ok(/next==='chunks'/.test(appSrc));
-ok('P1.5 chunk channel for greetings/farewells, not verb paradigm');
+assert.ok(!/data-action="chunks"/.test(dashSrc));
+assert.ok(!/Приветствия и прощания/.test(dashSrc));
+const ptHub=fs.readFileSync(path.join(__dirname,'personal-trainers.js'),'utf8');
+assert.ok(/function hubVisible/.test(ptHub));
+assert.ok(!/title:'Приветствие'/.test(ptHub)&&!/title:"Приветствие"/.test(ptHub));
+assert.ok(!/Приветстви/.test(ptHub));
+ok('P1.5 chunks stay in app/memory; Приветствие not a Today/hub trainer card');
 
 assert.ok(/rule:ordinal/.test(knSrc));
 assert.ok(/exception_20/.test(knSrc));
@@ -1994,9 +1998,17 @@ assert.ok(/#FF5A1F/.test(petCss),'sticker fill #FF5A1F');
 assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-index:22/.test(petCss),'sticker z-index below CTA');
 assert.ok(/tutor-sticker-dot/.test(tutorUiSrc)&&/\$\('#tutor-launch'\)\.onclick=\(e\)=>\{e\.preventDefault\(\);toggle\(\);\}/.test(tutorUiSrc)&&/function toggle\(\)\{[\s\S]*?close\(\);[\s\S]*?open\(\);/.test(tutorUiSrc),'tap sticker toggles ask');
 assert.ok(!/pet-idle\.png/.test(tutorUiSrc),'default companion is not pet-idle');
-assert.ok(/school-tutor15/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor15');
+assert.ok(/school-tutor16/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor16');
 assert.ok(/\.tutor-sheet\{[^}]*max-height:min\(78dvh,640px\)/.test(petCss.replace(/\s+/g,''))&&/overflow-y:auto/.test(petCss),'ask panel max-height + overflow-y:auto');
 assert.ok(/document\.body\.appendChild\(sheet\)/.test(tutorUiSrc),'ask sheet is body sibling (no 44px clip)');
+
+assert.ok(/\.chrome-back\{[^}]*min-height:44px/.test(theme.replace(/\s+/g,'')));
+assert.ok(/\.chrome-back::before\{[^}]*height:44px/.test(theme.replace(/\s+/g,'')));
+assert.ok(!/\.chrome-back\{[^}]*border:1px solid/.test(theme.replace(/\s+/g,'')));
+assert.ok(/chrome-back/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/chrome-back/.test(fs.readFileSync(path.join(__dirname,'personal-trainers.js'),'utf8')));
+ok('СРЕЗ2: ← Назад/← Занятия chrome-back ≥44px hit, thin text-link');
+
 const TutorBlock=require('./ai-tutor.js');
 TutorBlock.reset();
 TutorBlock.noteAnswer({id:'num',lessonId:'1-3',ruleIds:['quantity'],fields:[{answers:['үш кітап']}],topic:'numbers'},['үш кітаптар'],{correct:false},false,[],1);

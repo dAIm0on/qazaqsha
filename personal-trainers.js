@@ -65,9 +65,17 @@
   function pairMapMarkup(){
     return '<div class="cat-pair-map">'+H.PAIRS.map(p=>'<div class="cat-pair"><strong>'+esc(p.hard)+'</strong><span>↔</span><strong>'+esc(p.soft)+'</strong></div>').join('')+'</div>';
   }
+  function hubVisible(item){
+    if(!item||!item.enabled)return false;
+    const id=String(item.id||''),title=String(item.title||''),target=String(item.target||'');
+    if(/greeting|chunks|привет/i.test(id))return false;
+    if(/приветств/i.test(title))return false;
+    if(/chunk|greeting|привет/i.test(target))return false;
+    return true;
+  }
   function catalogMarkup(){
     const store=load(),bridge=window.TrainerCatalogBridge;
-    const ordered=REGISTRY.filter(x=>x.enabled).slice().sort((a,b)=>a.order-b.order);
+    const ordered=REGISTRY.filter(hubVisible).slice().sort((a,b)=>a.order-b.order);
     const morph=ordered.find(x=>x.kind==='morph');
     const morphStatus=morph&&window.MorphTrainer?window.MorphTrainer.status():'';
     const strip=morph?'<div class="trainer-tools"><article class="ia-card trainer-tool"><p class="eyebrow">Инструменты</p><h2>'+esc(morph.title)+'</h2><p>'+esc(morph.description)+'</p><p class="small">'+esc(morphStatus)+'</p><div class="personal-trainer-actions"><button type="button" class="primary-button" data-trainer-open="'+esc(morph.id)+'">Начать</button></div></article></div>':'';
@@ -93,7 +101,7 @@
       const label=live?'Продолжить':(item.open?'Начать':'Пока закрыто');
       return '<article class="personal-trainer-card"><div><p class="eyebrow">СТУПЕНЬ '+(i+1)+'</p><h2>'+esc(item.title)+'</h2><p class="small">'+esc(hint)+'</p></div><div class="personal-trainer-actions"><button type="button" class="primary-button" data-number-track="'+esc(item.id)+'"'+(item.open?'':' disabled')+'>'+label+'</button></div></article>';
     }).join('');
-    return '<div class="personal-trainer-head"><button type="button" class="text-button" data-back-catalog>← Назад</button><div><p class="eyebrow">ЧИСЛА</p><h2>Лестница чисел</h2><p class="small">Числительные урока 1–2 — в тренажёре Числа, не в „Новых словах“. Закрытые ступени не обходятся.</p></div></div><div class="personal-trainer-list">'+rows+'</div>';
+    return '<div class="personal-trainer-head"><button type="button" class="text-button chrome-back" data-back-catalog>← Назад</button><div><p class="eyebrow">ЧИСЛА</p><h2>Лестница чисел</h2><p class="small">Числительные урока 1–2 — в тренажёре Числа, не в „Новых словах“. Закрытые ступени не обходятся.</p></div></div><div class="personal-trainer-list">'+rows+'</div>';
   }
   function stageIntro(session){
     return '<div class="cat-stage-card"><p class="eyebrow">СТУПЕНЬ 0</p><h2>Карта пар</h2><p>Сначала держим в голове шесть контрастов. Остальные буквы потом сортируем отдельно.</p>'+
@@ -168,7 +176,7 @@
     const root=getRoot();if(!root||!H)return;
     if(screen==='catalog')root.innerHTML=catalogMarkup();
     else if(screen==='numbers')root.innerHTML=numbersMarkup();
-    else root.innerHTML='<div class="personal-trainer-head"><button type="button" class="text-button" data-back-catalog>← Назад</button><div><p class="eyebrow">ТРЕНАЖЁР КОТА</p><h2>1. Твёрдые / мягкие звуки</h2></div></div>'+trainerMarkup();
+    else root.innerHTML='<div class="personal-trainer-head"><button type="button" class="text-button chrome-back" data-back-catalog>← Назад</button><div><p class="eyebrow">ТРЕНАЖЁР КОТА</p><h2>1. Твёрдые / мягкие звуки</h2></div></div>'+trainerMarkup();
     bind(root);
     itemShownAt=Date.now();
   }
