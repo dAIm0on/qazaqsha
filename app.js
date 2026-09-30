@@ -351,6 +351,34 @@
    openPathLesson(id,{meaningful:true});
  }
  function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;sessionUnaided=Object.create(null);}
+ function isVocabWordsMode(){return mode==='words';}
+ function beginVocabRetry(){
+   if(!isVocabWordsMode())return;
+   const fb=$('#feedback');
+   if(fb){fb.hidden=true;fb.classList.remove('is-collapsed');}
+   const check=$('#check-button'),retry=$('#retry-button'),fbRetry=$('#feedback-retry');
+   if(retry)retry.hidden=true;
+   if(fbRetry)fbRetry.hidden=true;
+   if(check){check.hidden=false;check.textContent='Проверить';}
+   const q=byId.get(queue[position]);
+   if(q&&q.fields)q.fields.forEach((_,i)=>{const el=$('#answer-'+i);if(el){el.disabled=false;el.removeAttribute('aria-invalid');}});
+   focusAnswer();
+ }
+ function collapseVocabErrorOnInput(){
+   if(!isVocabWordsMode()||!retrying)return;
+   const fb=$('#feedback');
+   if(fb&&!fb.hidden){fb.hidden=true;fb.classList.add('is-collapsed');}
+   const check=$('#check-button'),retry=$('#retry-button'),fbRetry=$('#feedback-retry');
+   if(retry)retry.hidden=true;
+   if(fbRetry)fbRetry.hidden=true;
+   if(check){check.hidden=false;check.textContent='Проверить';}
+ }
+ function vocabOfferHtml(offers){
+   if(vocabRole==='used'&&offers&&offers.other){
+     return '<div data-error-offers class="vocab-error-secondary"><button type="button" class="text-button" data-chain-offer="'+esc(offers.other)+'">Другой пример</button></div>';
+   }
+   return '';
+ }
  function sameSkillOffers(q){
    if(!q)return {isolated:'',other:''};
    const iso=window.Homework&&window.Homework.isolatedFor?window.Homework.isolatedFor(q,questions,state):[];
@@ -847,7 +875,11 @@
    }
    const scope=subset(), tried=scope.filter(q=>records[q.id]?.attempts>0).length;
    const sp=$('#session-position');
-   if(sp)sp.textContent=['smart','lesson','course','review','contrast'].includes(mode)?`Шаг ${Math.min(position+1,queue.length)} из ${queue.length}`:`Встречалось ${tried} из ${scope.length}`;
+   if(sp){
+     if(isVocabWordsMode())sp.textContent=`Верно ${sessionCorrect} из ${queue.length}`;
+     else if(['smart','lesson','course','review','contrast'].includes(mode))sp.textContent=`Шаг ${Math.min(position+1,queue.length)} из ${queue.length}`;
+     else sp.textContent=`Встречалось ${tried} из ${scope.length}`;
+   }
    const ss=$('#session-score');
    if(ss)ss.textContent=sessionAttempts?`Без подсказки: ${sessionCorrect} / ${sessionAttempts}`:'';
    const pt=$('#practice-title');
@@ -949,8 +981,8 @@
    const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
    const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
    const letterBar=letters?`<div class="letter-keyboard" lang="kk" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div>`:'';
-   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus):esc(q.stimulus)))}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div>${letterBar}</div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
-   const goCard=()=>{if(checked)nextQuestion();else checkAnswer(q);};
+   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus):esc(q.stimulus)))}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="retry-button" hidden>Ещё раз</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div>${letterBar}</div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
+   const goCard=()=>{if(checked)nextQuestion();else if(isVocabWordsMode()&&retrying&&$('#retry-button')&&!$('#retry-button').hidden)beginVocabRetry();else checkAnswer(q);};
    if(window._qazaqEnter)document.removeEventListener('keydown',window._qazaqEnter);
    window._qazaqEnter=e=>{
      if(e.key!=='Enter'&&e.key!=='NumpadEnter')return;
@@ -968,6 +1000,7 @@
    $('#reveal-button').onclick=()=>mode==='exam'?checkAnswer(q,true):peekAnswer(q);
    if(mode==='slice'||mode==='repair'){const h=$('#hint-button'),r=$('#reveal-button');if(h)h.hidden=true;if(r)r.hidden=true;}
    $('#next-button').onclick=nextQuestion;
+   if($('#retry-button'))$('#retry-button').onclick=e=>{e.preventDefault();beginVocabRetry();};
    $('#association-button').onclick=()=>openAssociation(q);
    $$('#answer-form input[type=text]').forEach(el=>el.addEventListener('focus',()=>{lastTextInput=el;syncKbInset();const dock=$('#practice-dock');if(dock&&dock.scrollIntoView)try{dock.scrollIntoView({block:'nearest'});}catch{}}));
    $$('[data-letter]').forEach(b=>{
@@ -993,7 +1026,7 @@
      else q.fields.forEach((f,i)=>{$('#answer-'+i).value=String(draft.answers[i]||'');});
    }
    $$('[data-fill]').forEach(b=>{const inp=$('#'+b.dataset.fill);if(inp&&inp.value===b.dataset.val)b.setAttribute('aria-pressed','true');});
-   $('#answer-form').addEventListener('input',save);$('#answer-form').addEventListener('change',save);
+   $('#answer-form').addEventListener('input',()=>{collapseVocabErrorOnInput();save();});$('#answer-form').addEventListener('change',save);
    activateCard();save();syncKbInset();
   if(window.TutorUI&&mode!=='exam'){
     const lid=currentLessonId(q);
@@ -1073,8 +1106,41 @@
      if(answers.some(a=>!String(a).trim())&&q.kind!=='multi'){warning.textContent='Набери форму целиком.';warning.hidden=false;return;}
      warning.hidden=true;
      const result=core.evaluate(q,answers);
-     if(result.correct){nextQuestion();return;}
+     if(result.correct){
+       // Words P1: progress counts closed/correct cards; retry path must credit the success.
+       if(isVocabWordsMode()){sessionAttempts++;if(hinted)sessionAssisted++;else sessionCorrect++;}
+       nextQuestion();return;
+     }
      warning.hidden=true;
+     if(isVocabWordsMode()){
+       const feedback=$('#feedback');
+       const errors=window.ErrorDiagnostics.diagnose(q,answers,result,Date.now());
+       const local=errors.map(e=>(window.ErrorDiagnostics.labels&&window.ErrorDiagnostics.labels[e.error_type])||'').filter(Boolean);
+       const where=local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':'';
+       const aiBits=`<div class="ai-tutor-panel ai-tutor-secondary" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div><div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`;
+       feedback.className='feedback error';
+       feedback.setAttribute('data-vocab-compact','1');
+       feedback.innerHTML=`<h3>Пока не всё верно</h3>${where}<p class="small">Эта карточка появится снова.</p><div class="vocab-retry-wrap"><button type="button" class="primary-button" id="feedback-retry">Ещё раз</button></div>`+aiBits+vocabOfferHtml(sameSkillOffers(q));
+       feedback.hidden=false;
+       const fr=$('#feedback-retry');if(fr)fr.onclick=e=>{e.preventDefault();beginVocabRetry();};
+       bindOffers(feedback);
+       $('#check-button').hidden=true;if($('#retry-button')){$('#retry-button').hidden=false;$('#retry-button').textContent='Ещё раз';}
+       if(window.AiTutor){
+         const aiCodes=window.AiTutor.noteAnswer(q,answers,result,hinted,errors,Date.now())||[];
+         const ask=(m,localOnly)=>{
+           const token=++tutorToken;const out=$('#ai-tutor-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
+           ['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=true;});
+           const extra={user_answer:answers.join(' '),is_correct:false,hint_used:hinted,codes:aiCodes,surface:tutorSurface(),lesson_id:currentLessonId(q),repeat_count:aiCodes[0]?window.AiTutor.sameErrorCount(aiCodes[0]):0};
+           const paint=(resp)=>{const o=$('#ai-tutor-out');if(!o||!resp)return;const msg=String(resp.message_ru||'').trim();if(!msg||resp.aborted)return;o.hidden=false;o.innerHTML='<p>'+esc(msg)+'</p>';['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=false;});};
+           if(m==='explain_rule'||localOnly){paint(window.AiTutor.localFallback(q,aiCodes,'explain_rule',extra));return;}
+           const req=window.AiTutor.buildRequest(m,q,extra);
+           window.AiTutor.callTutor(req,(window.AiContract&&window.AiContract.CLIENT_TIMEOUT_MS)||30000).then(paint).catch(()=>paint(window.AiTutor.localFallback(q,aiCodes,m,extra)));
+         };
+         if($('#ai-why'))$('#ai-why').onclick=()=>ask('explain_error');
+         if($('#ai-rule'))$('#ai-rule').onclick=()=>ask('explain_rule',true);
+       }
+       try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}
+     }
      focusAnswer();return;
    }
    const answers=readAnswers(q), warning=$('#validation');
@@ -1135,7 +1201,8 @@
    if(!voluntary)P.observeConfusions(state,q,answers,result,now,confusionIndex,hinted||reveal||rulePeeked);
    for(const pair of Object.values(state.confusions)){pair.expected_item=[...confusionIndex.get(pair.expected_answer)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.given_item=[...confusionIndex.get(pair.wrong_answer_given)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.last_confused=pair.last_wrong;}
    if(activeLesson&&practiceIds.includes(q.id))stepEvidence[q.id]=result.correct&&!hinted;
-   sessionAttempts++;if(result.correct){if(hinted)sessionAssisted++;else sessionCorrect++;}
+   const countSessionAttempt=!(isVocabWordsMode()&&!result.correct&&!reveal);
+   if(countSessionAttempt){sessionAttempts++;if(result.correct){if(hinted)sessionAssisted++;else sessionCorrect++;}}
    if(!hinted&&!result.correct)sessionBlindFails[q.id]=(sessionBlindFails[q.id]||0)+1;
    const day0=core.isDay0Learning(rec,now);
    if(hinted||!result.correct)sessionUnaided[q.id]=0;
@@ -1171,10 +1238,16 @@
    if(!allowRetry){
      $$('#answer-form input, #answer-form select, #hint-button, #reveal-button, [data-letter]').forEach(el=>{el.disabled=true;});
      $('#answer-form').classList.add('answered');
-     $('#check-button').hidden=true;$('#next-button').hidden=false;
+     $('#check-button').hidden=true;if($('#retry-button'))$('#retry-button').hidden=true;$('#next-button').hidden=false;
    }else{
      retrying=true;checked=false;
-     $('#check-button').hidden=false;$('#next-button').hidden=true;
+     $('#next-button').hidden=true;
+     if(isVocabWordsMode()){
+       $('#check-button').hidden=true;
+       if($('#retry-button')){$('#retry-button').hidden=false;$('#retry-button').textContent='Ещё раз';}
+     }else{
+       $('#check-button').hidden=false;if($('#retry-button'))$('#retry-button').hidden=true;
+     }
      q.fields.forEach((_,i)=>{const el=$('#answer-'+i);if(el){el.classList.add('invalid');el.disabled=false;}});
      focusAnswer();
    }
@@ -1201,7 +1274,21 @@
    const aiCodes=window.AiTutor&&mode!=='exam'?window.AiTutor.noteAnswer(q,answers,result,hinted,errors,now):[];
    const aiRepeat=window.AiTutor&&aiCodes[0]&&window.AiTutor.shouldOfferExplain(aiCodes[0]);
    const morph=!result.correct?morphemeRow(errors,answerLine,answers.join(' ')):'';
+   const vocabWrong=isVocabWordsMode()&&!result.correct;
+   if(vocabWrong){
+     const where=local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':'';
+     const aiBits=mode!=='exam'?`<div class="ai-tutor-panel ai-tutor-secondary" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'';
+     feedback.className='feedback error';
+     feedback.setAttribute('data-vocab-compact','1');
+     feedback.innerHTML=`<h3>Пока не всё верно</h3>${where}<p class="small">Эта карточка появится снова.</p><div class="vocab-retry-wrap"><button type="button" class="primary-button" id="feedback-retry">Ещё раз</button></div>`+aiBits+vocabOfferHtml(sameSkillOffers(q));
+     feedback.hidden=false;
+     const fr=$('#feedback-retry');if(fr)fr.onclick=e=>{e.preventDefault();beginVocabRetry();};
+     bindOffers(feedback);
+     try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}
+   }else{
    feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Число уже сказало, сколько. Окончание множественного здесь лишнее.</p>':''}${morph}${result.correct?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}${(()=>{const raw=q.explanation||'';if(result.correct)return raw?'<p>'+esc(raw)+'</p>':'';const safe=(window.ExplainOpen&&window.ExplainOpen.safeWrongWhy)?window.ExplainOpen.safeWrongWhy(raw,q):(raw&&window.ExplainOpen&&window.ExplainOpen.spoilsOnWrong&&window.ExplainOpen.spoilsOnWrong(raw,q)?'':raw);return safe?'<p>'+esc(safe)+'</p>':'';})()}<p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
+   }
+
    if(!result.correct&&mode!=='exam'&&window.TutorUI){
      const rawFocus=((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||answers[0]||q.stimulus||'').toString();
      const word=(rawFocus.match(/[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}/)||[])[0]||'';
