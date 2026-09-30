@@ -1405,7 +1405,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/const CACHE='qazaq-offline-live-20260930-kb-compact3'/.test(openSw));
+assert.ok(/const CACHE='qazaq-offline-live-20260930-kb-compact4'/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1994,7 +1994,7 @@ assert.ok(/Верно \$\{sessionCorrect\} из/.test(appVocabP1),'words P1 prog
 assert.ok(/countSessionAttempt/.test(appVocabP1),'words P1 skips session counter bump on wrong');
 assert.ok(/function vocabOfferHtml\(/.test(appVocabP1)&&/vocabRole==='used'/.test(appVocabP1),'words P1 no skill-separately mud; used may keep Другой пример');
 assert.ok(!/isVocabWordsMode\(\)[\s\S]{0,80}Проверить этот навык отдельно/.test(appVocabP1.split('function vocabOfferHtml')[1].split('function sameSkillOffers')[0]),'words offer path omits навык отдельно');
-assert.ok(/qazaq-offline-live-20260930-kb-compact3/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact3');
+assert.ok(/qazaq-offline-live-20260930-kb-compact4/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact4');
 ok('Vocab words P1: retry CTA, compact error, correct-only progress, no skill mud');
 
 ok('Astra step 9: wrong answer shows the attempt, the block, and an existing same-skill offer (no expected reveal)');
@@ -2017,7 +2017,7 @@ assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-ind
 assert.ok(/tutor-sticker-dot/.test(tutorUiSrc)&&/\$\('#tutor-launch'\)\.onclick=\(e\)=>\{e\.preventDefault\(\);toggle\(\);\}/.test(tutorUiSrc)&&/function toggle\(\)\{[\s\S]*?close\(\);[\s\S]*?open\(\);/.test(tutorUiSrc),'tap sticker toggles ask');
 assert.ok(!/pet-idle\.png/.test(tutorUiSrc),'default companion is not pet-idle');
 assert.ok(/kb-compact/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE kb-compact');
-assert.ok(/qazaq-offline-live-20260930-kb-compact3/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact3');
+assert.ok(/qazaq-offline-live-20260930-kb-compact4/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact4');
 assert.ok(/html\.typing-compact \.question-actions/.test(theme)&&/html\.typing-compact \.secondary-actions/.test(theme)&&/html\.typing-compact \.lesson-actions/.test(theme),'typing-compact hides help wrappers broadly');
 assert.ok(/html\.typing-compact #hint-button/.test(theme)&&/html\.typing-compact #reveal-button/.test(theme)&&/html\.typing-compact #association-button/.test(theme),'typing-compact hides hint/idk/assoc buttons');
 assert.ok(/html\.typing-compact #path-rule/.test(theme)&&/html\.typing-compact #path-idk/.test(theme),'typing-compact hides path help');
@@ -2025,6 +2025,22 @@ assert.ok(/html\.typing-compact \.session-line/.test(theme)&&/html\.typing-compa
 assert.ok(/html\.typing-compact #issue-toggle/.test(theme)&&/html\.typing-compact #tutor-host/.test(theme)&&/html\.typing-compact \.tutor-sticker-dot/.test(theme),'typing-compact hides issue + orange sticker');
 assert.ok(/display:none!important/.test(theme.split('hide help/progress/issue/sticker')[1]||theme),'typing-compact hide block uses display:none!important');
 assert.ok(/body\.typing-compact \.question-actions/.test(theme)&&/\.typing-compact \.lesson-actions/.test(theme),'typing-compact also on body/card');
+
+/* P0 letter-row: always mounted for text modes; compact must not hide; any width. */
+assert.ok(/const letters=hasText;/.test(appSrc)||/const letters=hasText\b/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')),'practice mounts letter-keyboard whenever hasText (not prefs/width)');
+const appLetter=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(!/const letters=hasText&&state\.prefs\.letters/.test(appLetter),'practice letter row not gated on prefs.letters');
+assert.ok(/Path ask: always show letter row/.test(appLetter)||/const kb=`<div class="letter-keyboard"/.test(appLetter),'path ask always mounts letter-keyboard');
+assert.ok(!/matchMedia\('\(max-width:690px\)'\)\.matches\)state\.prefs\.letters=true/.test(appLetter),'letters default no longer mobile-only in app.js');
+const progSrc=fs.readFileSync(path.join(__dirname,'progress.js'),'utf8');
+assert.ok(/prefs:\{letters:true/.test(progSrc),'progress empty defaults letters:true');
+assert.ok(!/matchMedia\('\(max-width:690px\)'\)\.matches\)state\.prefs\.letters=true/.test(progSrc),'progress migrate letters default not mobile-only');
+assert.ok(!/html\.typing-compact[^,{]*\.letter-keyboard[^,{]*\{[^}]*display:\s*none/.test(theme.replace(/\s+/g,' ')),'typing-compact CSS must not display:none letter-keyboard');
+assert.ok(!/html\.typing-compact[^,{]*\.typing-strip[^,{]*\{[^}]*display:\s*none/.test(theme.replace(/\s+/g,' ')),'typing-compact CSS must not display:none typing-strip');
+assert.ok(!/html\.typing-compact[^,{]*\.morph-keys[^,{]*\{[^}]*display:\s*none/.test(theme.replace(/\s+/g,' ')),'typing-compact CSS must not display:none morph-keys');
+assert.ok(/letter-row always visible: typing-compact must NOT hide/.test(theme),'explicit CSS guard keeps letter-row visible in compact');
+assert.ok(/@media\(min-width:691px\)\{[\s\S]*?\.letter-keyboard[\s\S]*?display:flex/.test(theme),'wide viewport CSS keeps letter-keyboard flex/visible');
+ok('P0 letter-row always on text surfaces any width; compact does not hide');
 
 assert.ok(/\.tutor-sheet\{[^}]*max-height:min\(78dvh,640px\)/.test(petCss.replace(/\s+/g,''))&&/overflow-y:auto/.test(petCss),'ask panel max-height + overflow-y:auto');
 assert.ok(/document\.body\.appendChild\(sheet\)/.test(tutorUiSrc),'ask sheet is body sibling (no 44px clip)');

@@ -1020,3 +1020,30 @@ html.typing-compact #morph-answer,
 html.typing-compact #stage7-answer{
   min-height:48px
 }
+
+/* letter-row always visible: typing-compact must NOT hide letters/strip/keys (any width). */
+html.typing-compact .letter-keyboard,
+html.typing-compact .morph-keys,
+html.typing-compact .typing-strip,
+html.typing-compact .typing-strip .letter-keyboard,
+html.typing-compact .typing-strip .morph-keys{
+  visibility:visible!important;opacity:1!important;
+  height:auto!important;max-height:none!important;pointer-events:auto!important
+}
+html.typing-compact .letter-keyboard,
+html.typing-compact .morph-keys,
+html.typing-compact .typing-strip .letter-keyboard,
+html.typing-compact .typing-strip .morph-keys{display:flex!important}
+/* Compact docks the strip; non-compact keeps strip/keys in normal document flow. */
+html.typing-compact #answer-form .practice-composer .typing-strip,
+html.typing-compact .typing-strip{display:flex!important}
+/* Desktop (wide): same letter row as mobile — never hide by viewport width. */
+@media(min-width:691px){
+  #answer-form .letter-keyboard,
+  #path-form .letter-keyboard,
+  .practice-composer .letter-keyboard,
+  .typing-strip .letter-keyboard,
+  .typing-strip .morph-keys,
+  .morph-keys{display:flex;visibility:visible}
+}
+

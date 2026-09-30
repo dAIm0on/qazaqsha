@@ -34,7 +34,8 @@
  let state=P.empty(),savedSession=null,storageAvailable=true,storageReadError=null;
  try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);}}
  catch(error){storageAvailable=false;storageReadError=error;}
- if(!state.prefs.lettersChosen&&typeof matchMedia==='function'&&matchMedia('(max-width:690px)').matches)state.prefs.letters=true;
+ // Letter row must always show on text-input surfaces (any width). Pref defaults on; mount no longer gates on max-width.
+ if(!state.prefs.lettersChosen)state.prefs.letters=true;
  if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
  window.ExplainDepth={
    get(id){const key=String(id||''),chosen=state.explainDepth&&state.explainDepth[key];if(chosen==='open')return true;if(chosen==='closed')return false;if(/^T2[4-7]_/.test(key)||/^T2[89]_|^T3[0-9]_|^T4[0-2]_/.test(key))return false;return true;},
@@ -1036,7 +1037,8 @@
    const sourceLabel=sourceUrl?`<a href="${esc(sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`:esc(source.title);
    const location=placeLine(q);
    const hasText=(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='number-text'&&!classifierOptions(f));
-   const letters=hasText&&state.prefs.letters;
+   // Always mount Kazakh letter row for text fields — any viewport width, idle+focus (not only prefs/mobile).
+   const letters=hasText;
    const exam=mode==='exam';
    const hw=mode==='homework';
    const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
@@ -1659,8 +1661,8 @@
    const v2Full=(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(les.id)&&ch.fullExplanation)?`<details class="path-full-v2"><summary>Полное объяснение блока</summary><p>${esc(studentCopy(ch.fullExplanation))}</p></details>`:'';
    const head=`${crumb(les,ch)}<p class="small">Урок ${esc(courseRow?courseRow.label:les.id)} · ${esc(courseRow?courseRow.name:les.title)}</p><p class="small">Глава ${les.chapters.findIndex(c=>c.id===ch.id)+1} из ${les.chapters.length} · ${esc(chTitle)}</p>${v2Full}`;
    const nextBeat=()=>{gp.beat++;save();renderPath();};
-   const letters=state.prefs.letters;
-   const kb=letters?`<div class="letter-keyboard" lang="kk">${[...'әғқңөұүһі'].map(ch=>'<button type="button" lang="kk" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`:'';
+   // Path ask: always show letter row (any width), matching practice text modes.
+   const kb=`<div class="letter-keyboard" lang="kk">${[...'әғқңөұүһі'].map(ch=>'<button type="button" lang="kk" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`;
    function beatPlain(b){
      if(!b)return '';
      const clip=s=>String(s||'').trim();
