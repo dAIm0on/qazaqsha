@@ -673,7 +673,7 @@ body.path-immersive #tutor-host{bottom:16px}
 .tutor-sheet{pointer-events:auto;position:fixed;left:0;right:0;bottom:0;z-index:45;max-height:min(78dvh,640px);overflow:auto;background:var(--surface);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px) + var(--kbinset,0px));box-shadow:0 -10px 24px rgba(22,20,18,.12)}
 .tutor-sheet-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;margin-bottom:8px}
 .tutor-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
-.tutor-word-tap{display:inline;margin:0;padding:0 1px;border:0;border-radius:4px;background:transparent;color:inherit;font:inherit;line-height:inherit;min-height:0;min-width:0;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;cursor:pointer;box-shadow:none}
+.tutor-word-tap{display:inline;position:relative;z-index:1;margin:0;padding:0 1px;border:0;border-radius:4px;background:transparent;color:inherit;font:inherit;line-height:inherit;min-height:0;min-width:0;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;cursor:pointer;box-shadow:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .tutor-word-tap:hover,.tutor-word-tap:focus-visible{background:var(--sage,#E8F0EA);outline:2px solid var(--ink);outline-offset:2px}
 .tutor-chip-gloss{font-weight:650}
 

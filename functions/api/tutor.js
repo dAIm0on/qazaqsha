@@ -229,6 +229,22 @@ function looksLikeBadTutorReply(t){
   if(/^Хорошо,?\s*$/i.test(t))return true;
   return false;
 }
+function looksLikeMetaCotLead(s){
+  s=String(s||'').trim();
+  if(!s)return false;
+  if(/Хорошо,?\s*учениц/i.test(s))return true;
+  if(/учениц[ая]\s+просит/i.test(s))return true;
+  if(/Нужно следовать/i.test(s))return true;
+  if(/внутренн(ие|их)\s+инструкц/i.test(s))return true;
+  if(/структурирую ответ/i.test(s))return true;
+  if(/сначала (подумаю|разберу)/i.test(s))return true;
+  if(/разберу инструкции/i.test(s))return true;
+  if(/следуя инструкциям/i.test(s))return true;
+  if(/Okay,?\s+the user (asked|is asking)/i.test(s))return true;
+  if(/\bI will structure\b/i.test(s))return true;
+  if(/Let me (structure|think|recall|analyze)/i.test(s))return true;
+  return false;
+}
 function cleanTutorReply(t){
   t=String(t||'').trim().replace(/^\.+\s*/,'');
   t=t.replace(/<think>[\s\S]*?<\/think>/gi,'');
@@ -247,6 +263,17 @@ function cleanTutorReply(t){
     t=best||parts[parts.length-1].trim();
   }
   t=t.replace(/<\/?think>/gi,'').trim();
+  // Strip leading RU/EN CoT / meta paragraphs before student-facing answer
+  {
+    const paras=t.split(/\n{2,}/).map(s=>s.trim()).filter(Boolean);
+    while(paras.length>1&&looksLikeMetaCotLead(paras[0]))paras.shift();
+    if(paras.length)t=paras.join('\n\n').trim();
+  }
+  t=t.replace(/^(Хорошо,?\s*учениц[ая][^.!?…\n]*[.!?…]?\s*)+/i,'');
+  t=t.replace(/^(учениц[ая]\s+просит[^.!?…\n]*[.!?…]?\s*)+/i,'');
+  t=t.replace(/^(Нужно следовать[^.!?…\n]*[.!?…]?\s*)+/i,'');
+  t=t.replace(/^(Okay,?\s+the user (asked|is asking)[^.!?…\n]*[.!?…]?\s*)+/i,'');
+  t=t.replace(/^(I will structure[^.!?…\n]*[.!?…]?\s*)+/i,'');
   const solid=t.match(/(В русском[\s\S]*)$/i);
   if(solid&&/(кітабым|наклейк|п\s*[→\-–]\s*б|озвонч|-ым)/i.test(solid[1]))t=solid[1];
   const chunks=t.split(/(?<=[.!?…»])\s+/).map(s=>s.trim()).filter(Boolean);
@@ -280,6 +307,18 @@ function looksLikePromptLeak(t){
   if(/the user is (asking|confused)/i.test(t))return true;
   if(/\bWait,?\s+the user\b/i.test(t))return true;
   if(/I need to (explain|recall|think|check)/i.test(t)&&/rule/i.test(t))return true;
+  // Russian / English CoT meta leaked as the student answer
+  if(/Хорошо,?\s*учениц/i.test(t))return true;
+  if(/учениц[ая]\s+просит/i.test(t))return true;
+  if(/Нужно следовать/i.test(t))return true;
+  if(/внутренн(ие|их)\s+инструкц/i.test(t))return true;
+  if(/структурирую ответ/i.test(t))return true;
+  if(/сначала (подумаю|разберу)/i.test(t))return true;
+  if(/разберу инструкции/i.test(t))return true;
+  if(/следуя инструкциям/i.test(t))return true;
+  if(/Okay,?\s+the user asked/i.test(t))return true;
+  if(/\bI will structure\b/i.test(t))return true;
+  if(looksLikeMetaCotLead(t)&&t.length<420)return true;
   const cyr=(t.match(/[А-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі]/g)||[]).length;
   const lat=(t.match(/[A-Za-z]/g)||[]).length;
   if(lat>=80&&cyr<20&&/\b(the|user|rule|explain|asking|recall)\b/i.test(t))return true;
@@ -622,4 +661,4 @@ function json(body,status=200){
   return new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
 }
 
-export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,RECOVERY_TIMEOUT_MS,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,resolveMode,clipRuleContext,buildTutorMessages,buildRecoveryMessages,userPayload,messagesToPrompt,glmPayload,qwenPayload,payloadFor,looksFuture,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism};
+export {PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,RECOVERY_TIMEOUT_MS,runTutorModel,normalizeModelText,lessonsThrough,localFallback,assemble,parseBody,resolveMode,clipRuleContext,buildTutorMessages,buildRecoveryMessages,userPayload,messagesToPrompt,glmPayload,qwenPayload,payloadFor,looksFuture,looksLikeMetaCotLead,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism};

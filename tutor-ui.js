@@ -249,6 +249,22 @@
   if(r)r.hidden=false;
  }
 
+ function stripClientMeta(raw){
+  let t=String(raw||'').trim().replace(/reasoning[_a-z]*\s*:[\s\S]*/i,'').trim();
+  t=t.replace(/<think>[\s\S]*?<\/think>/gi,'').replace(/<\/?think>/gi,'').trim();
+  const metaRe=/Хорошо,?\s*учениц|учениц[ая]\s+просит|Нужно следовать|внутренн(ие|их)\s+инструкц|структурирую ответ|сначала (подумаю|разберу)|разберу инструкции|следуя инструкциям|Okay,?\s+the user (asked|is asking)|\bI will structure\b|Let me (structure|think|recall|analyze)/i;
+  const paras=t.split(/\n{2,}/).map(s=>s.trim()).filter(Boolean);
+  while(paras.length>1&&metaRe.test(paras[0]))paras.shift();
+  if(paras.length)t=paras.join('\n\n').trim();
+  t=t.replace(/^(Хорошо,?\s*учениц[ая][^.!?…\n]*[.!?…]?\s*)+/i,'');
+  t=t.replace(/^(Нужно следовать[^.!?…\n]*[.!?…]?\s*)+/i,'');
+  t=t.replace(/^(Okay,?\s+the user (asked|is asking)[^.!?…\n]*[.!?…]?\s*)+/i,'');
+  t=t.replace(/^(I will structure[^.!?…\n]*[.!?…]?\s*)+/i,'');
+  t=t.replace(/^(сначала (подумаю|разберу)[^.!?…\n]*[.!?…]?\s*)+/i,'');
+  t=t.replace(/^(следуя инструкциям[^.!?…\n]*[.!?…]?\s*)+/i,'');
+  if(metaRe.test(t)&&t.length<420&&!/(В русском|По-казахски|наклейк|п\s*[→\-–]\s*б)/i.test(t))return '';
+  return t.trim();
+ }
  function showOut(html,meta){
   const out=$('#tutor-out');if(!out)return;
   out.hidden=false;
@@ -300,8 +316,9 @@
   const msg=resp&&String(resp.message_ru||'').trim();
   if(msg){
    if(question&&mode!=='translate_word'){tail.push({role:'user',content:question});tail.push({role:'assistant',content:msg});tail=tail.slice(-4);}
-   // Strip any CoT / reasoning fields if present in message accidentally
-   const clean=msg.replace(/reasoning[_a-z]*\s*:[\s\S]*/i,'').trim();
+   // Strip any CoT / reasoning / RU meta if API slipped
+   const clean=stripClientMeta(msg);
+   if(!clean){localCanon(mode,question);return;}
    showOut('<p>'+esc(clean)+'</p>',resp.meta||{});
    return;
   }

@@ -112,6 +112,20 @@ assert.ok(!/assemble\(req,canned,\{[\s\S]*?source:'fallback'/.test(tutorSrc2));
 assert.ok(C.looksLikeBadTutorReply('Нужно объяснить, что ... окончания множественного числа и притяжательное'));
 assert.ok(!C.isUsableText('Нужно объяснить, что окончания множественного числа и притяжательное'));
 ok('TEST planning meta Нужно объяснить rejected');
+assert.ok(C.looksLikePromptLeak('Хорошо, ученица попросила объяснить кітабым. Нужно следовать инструкциям.'));
+assert.ok(!C.isUsableText('Хорошо, ученица попросила объяснить. Нужно следовать правилам ответа.'));
+assert.ok(C.looksLikePromptLeak('Сначала подумаю и разберу инструкции, потом отвечу ученице.'));
+assert.ok(C.looksLikePromptLeak('Я структурирую ответ по шагам, следуя инструкциям.'));
+assert.ok(C.looksLikePromptLeak('Okay the user asked to explain. I will structure the reply.'));
+assert.ok(C.looksLikePromptLeak('Ученица просит объяснить через русский, следуя внутренним инструкциям.'));
+assert.ok(!C.isUsableText('Нужно следовать внутренним инструкциям и структурирую ответ.'));
+{
+  const stripped=C.cleanTutorReply('Хорошо, ученица попросила объяснить.\n\nВ русском «моя книга» — отдельные слова. В казахском менің кітабым: справа -ым, п→б.');
+  assert.ok(/В русском/.test(stripped));
+  assert.ok(!/Хорошо,?\s*учениц/i.test(stripped));
+  assert.ok(C.isUsableText(stripped));
+}
+ok('TEST Russian CoT / meta phrases rejected or stripped');
 ok('TEST tutor loop and kitabym gate');
 
 // A10: ask/simplify/translate_word must not leak expected_answer into contrast.correct
