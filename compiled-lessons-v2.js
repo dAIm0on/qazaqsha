@@ -7,13 +7,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 1–1 · Алфавит и произношение, мягкие и твёрдые",
     "label": "1–1",
     "name": "Алфавит и произношение, мягкие и твёрдые",
-    "status": "reviewed",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "reviewed, not released. На боевой хост не ставить, пока нет отдельного выпуска."
+      "approved": true,
+      "preview_head": "e3604319ab6178f26d6cce7213205479a668e94a",
+      "preview_url": "https://554b8157.qazaqsha.pages.dev/",
+      "approved_at": "2026-09-30T16:48:08+05:00",
+      "note": "Школьный блок. Приёмка §5 https://554b8157.qazaqsha.pages.dev SHA e3604319ab6178f26d6cce7213205479a668e94a. Одна фраза можно в бой 2026-09-30."
     },
     "sources": [
       {
@@ -1980,13 +1980,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 1–2 · Множественные окончания",
     "label": "1–2",
     "name": "Множественные окончания",
-    "status": "reviewed",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "reviewed, not released. На боевой хост не ставить, пока нет отдельного выпуска."
+      "approved": true,
+      "preview_head": "e3604319ab6178f26d6cce7213205479a668e94a",
+      "preview_url": "https://554b8157.qazaqsha.pages.dev/",
+      "approved_at": "2026-09-30T16:48:08+05:00",
+      "note": "Школьный блок. Приёмка §5 https://554b8157.qazaqsha.pages.dev SHA e3604319ab6178f26d6cce7213205479a668e94a. Одна фраза можно в бой 2026-09-30."
     },
     "sources": [
       {
@@ -5313,13 +5313,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 1–3 · Множественные окончания, числительные",
     "label": "1–3",
     "name": "Множественные окончания, числительные",
-    "status": "reviewed",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "reviewed, not released. На боевой хост не ставить, пока нет отдельного выпуска."
+      "approved": true,
+      "preview_head": "e3604319ab6178f26d6cce7213205479a668e94a",
+      "preview_url": "https://554b8157.qazaqsha.pages.dev/",
+      "approved_at": "2026-09-30T16:48:08+05:00",
+      "note": "Школьный блок. Приёмка §5 https://554b8157.qazaqsha.pages.dev SHA e3604319ab6178f26d6cce7213205479a668e94a. Одна фраза можно в бой 2026-09-30."
     },
     "sources": [
       {
@@ -9601,13 +9601,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 2–1 · Мен, сен, сіз; емес; ба, бе",
     "label": "2–1",
     "name": "Мен, сен, сіз; емес; ба, бе",
-    "status": "reviewed",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "reviewed, not released. На боевой хост не ставить, пока нет отдельного выпуска."
+      "approved": true,
+      "preview_head": "e3604319ab6178f26d6cce7213205479a668e94a",
+      "preview_url": "https://554b8157.qazaqsha.pages.dev/",
+      "approved_at": "2026-09-30T16:48:08+05:00",
+      "note": "Школьный блок. Приёмка §5 https://554b8157.qazaqsha.pages.dev SHA e3604319ab6178f26d6cce7213205479a668e94a. Одна фраза можно в бой 2026-09-30."
     },
     "sources": [
       {
@@ -15094,13 +15094,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 2–2 · Біз, сендер, сіздер; прилагательное",
     "label": "2–2",
     "name": "Біз, сендер, сіздер; прилагательное",
-    "status": "reviewed",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "reviewed, not released. На боевой хост не ставить, пока нет отдельного выпуска."
+      "approved": true,
+      "preview_head": "e3604319ab6178f26d6cce7213205479a668e94a",
+      "preview_url": "https://554b8157.qazaqsha.pages.dev/",
+      "approved_at": "2026-09-30T16:48:08+05:00",
+      "note": "Школьный блок. Приёмка §5 https://554b8157.qazaqsha.pages.dev SHA e3604319ab6178f26d6cce7213205479a668e94a. Одна фраза можно в бой 2026-09-30."
     },
     "sources": [
       {
@@ -19410,13 +19410,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 2–3 · Ол / олар, вопрос, порядковые",
     "label": "2–3",
     "name": "Ол / олар, вопрос, порядковые",
-    "status": "reviewed",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "reviewed, not released. На боевой хост не ставить, пока нет отдельного выпуска."
+      "approved": true,
+      "preview_head": "e3604319ab6178f26d6cce7213205479a668e94a",
+      "preview_url": "https://554b8157.qazaqsha.pages.dev/",
+      "approved_at": "2026-09-30T16:48:08+05:00",
+      "note": "Школьный блок. Приёмка §5 https://554b8157.qazaqsha.pages.dev SHA e3604319ab6178f26d6cce7213205479a668e94a. Одна фраза можно в бой 2026-09-30."
     },
     "sources": [
       {
@@ -24987,13 +24987,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 3–1 · Менің, сенің, сіздің, оның",
     "label": "3–1",
     "name": "Менің, сенің, сіздің, оның",
-    "status": "reviewed",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "reviewed, not released. На боевой хост не ставить, пока нет отдельного выпуска."
+      "approved": true,
+      "preview_head": "e3604319ab6178f26d6cce7213205479a668e94a",
+      "preview_url": "https://554b8157.qazaqsha.pages.dev/",
+      "approved_at": "2026-09-30T16:48:08+05:00",
+      "note": "Школьный блок. Приёмка §5 https://554b8157.qazaqsha.pages.dev SHA e3604319ab6178f26d6cce7213205479a668e94a. Одна фраза можно в бой 2026-09-30."
     },
     "sources": [
       {
@@ -29290,13 +29290,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 3–2 · Біздің, сендердің, сіздердің, олардың",
     "label": "3–2",
     "name": "Біздің, сендердің, сіздердің, олардың",
-    "status": "reviewed",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "reviewed, not released. На боевой хост не ставить, пока нет отдельного выпуска."
+      "approved": true,
+      "preview_head": "e3604319ab6178f26d6cce7213205479a668e94a",
+      "preview_url": "https://554b8157.qazaqsha.pages.dev/",
+      "approved_at": "2026-09-30T16:48:08+05:00",
+      "note": "Школьный блок. Приёмка §5 https://554b8157.qazaqsha.pages.dev SHA e3604319ab6178f26d6cce7213205479a668e94a. Одна фраза можно в бой 2026-09-30."
     },
     "sources": [
       {
@@ -34080,13 +34080,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 3–3 · Комбинация личных и притяжательных окончаний",
     "label": "3–3",
     "name": "Комбинация личных и притяжательных окончаний",
-    "status": "reviewed",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "reviewed, not released. На боевой хост не ставить, пока нет отдельного выпуска."
+      "approved": true,
+      "preview_head": "e3604319ab6178f26d6cce7213205479a668e94a",
+      "preview_url": "https://554b8157.qazaqsha.pages.dev/",
+      "approved_at": "2026-09-30T16:48:08+05:00",
+      "note": "Школьный блок. Приёмка §5 https://554b8157.qazaqsha.pages.dev SHA e3604319ab6178f26d6cce7213205479a668e94a. Одна фраза можно в бой 2026-09-30."
     },
     "sources": [
       {
@@ -50426,13 +50426,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 4–2 · Прошедшее время",
     "label": "4–2",
     "name": "Прошедшее время",
-    "status": "reviewed",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "reviewed, not released. На боевой хост не ставить отдельным выпуском."
+      "approved": true,
+      "preview_head": "e3604319ab6178f26d6cce7213205479a668e94a",
+      "preview_url": "https://554b8157.qazaqsha.pages.dev/",
+      "approved_at": "2026-09-30T16:48:08+05:00",
+      "note": "Школьный блок. Приёмка §5 https://554b8157.qazaqsha.pages.dev SHA e3604319ab6178f26d6cce7213205479a668e94a. Одна фраза можно в бой 2026-09-30."
     },
     "sources": [
       {

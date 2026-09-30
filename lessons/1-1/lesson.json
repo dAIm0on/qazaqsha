@@ -5,13 +5,13 @@
   "title": "Урок 1–1 · Алфавит и произношение, мягкие и твёрдые",
   "label": "1–1",
   "name": "Алфавит и произношение, мягкие и твёрдые",
-  "status": "reviewed",
+  "status": "released",
   "release": {
-    "approved": false,
-    "preview_head": "",
-    "preview_url": "",
-    "approved_at": "",
-    "note": "reviewed, not released. На боевой хост не ставить, пока нет отдельного выпуска."
+    "approved": true,
+    "preview_head": "e3604319ab6178f26d6cce7213205479a668e94a",
+    "preview_url": "https://554b8157.qazaqsha.pages.dev/",
+    "approved_at": "2026-09-30T16:48:08+05:00",
+    "note": "Школьный блок. Приёмка §5 https://554b8157.qazaqsha.pages.dev SHA e3604319ab6178f26d6cce7213205479a668e94a. Одна фраза можно в бой 2026-09-30."
   },
   "prerequisites": {
     "lessons": [],
