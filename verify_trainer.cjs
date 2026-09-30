@@ -1987,7 +1987,7 @@ const petCss=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
 assert.ok((/\.tutor-pet-img\{[^}]*width:72px!important/.test(petCss.replace(/\s+/g,''))||/width:72px!important/.test(petCss)),'pet display 72px');
 assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-index:22/.test(petCss));
 assert.ok(/80px \+ env\(safe-area-inset-bottom/.test(petCss),'pet bottom clears CTA + safe-area');
-assert.ok(/school-tutor9/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor9');
+assert.ok(/school-tutor10/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor10');
 
 
 const TutorBlock=require('./ai-tutor.js');
