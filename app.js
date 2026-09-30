@@ -60,6 +60,7 @@
  let sessionAttempts=0,sessionCorrect=0,sessionAssisted=0,draft=null,remediation=null,introOpen=false,cloudApplying=false;
  let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),sessionUnaided=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null,hwSection=0,hwReturn=null,pathPracticeReturn=null,remediationNote='',retrying=false,rulesArticle=null;
  let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null,stageContext=null,practiceHold=null;
+ let hwOrigin='today';
  function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
  function currentLessonId(q){
    if(q&&q.lessonId)return q.lessonId;
@@ -660,11 +661,10 @@
    save();
  }
  function shellTab(next){
-   if(next==='practice')return mode==='exam'?'review':'today';
-   if(['learn','homework','path','personal','morph'].includes(next))return 'today';
-   if(['rules','vocabulary'].includes(next))return 'materials';
-   if(next==='exam')return 'review';
-   return next;
+   if(next==='morph')return 'morph';
+   if(next==='personal')return 'personal';
+   if(next==='practice'&&trainerReturn)return 'personal';
+   return 'today';
  }
  function markPlace(surface,lessonId){
    const id=String(lessonId||'');
@@ -736,7 +736,7 @@
    const pause=$('#pause-session');
    if(pause){
      pause.hidden=queue.length===0;
-     pause.textContent='Назад';
+     pause.textContent='← Назад';
      pause.setAttribute('aria-label',mode==='homework'||(mode==='remediation'&&hwReturn)?'Сделать паузу · Домашка':mode==='exam'?'Сделать паузу · Экзамен':'Сделать паузу · Сегодня');
    }
    const scope=subset(), tried=scope.filter(q=>records[q.id]?.attempts>0).length;
@@ -1200,7 +1200,7 @@
    const sourceHomework=(h.source_items||[]).length?`<details class="homework-source"><summary>Исходная домашняя работа</summary><ol>${h.source_items.map(x=>`<li><strong>${esc(x.number)}.</strong> ${esc(x.text)}</li>`).join('')}</ol></details>`:'';
    const headLine=exercisesClosed?'Упражнения ещё закрыты. Они появятся после сдачи правила. Просмотр карточки их не открывает.':`Готово ${exP.done} из ${exP.total} упражнений · ${wordLine}. Это выборка урока, не весь сборник и не повторение.`;
    const openExercises=exercisesClosed?'':`<button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button>`;
-   root.innerHTML=`<div class="panel homework-head"><p class="eyebrow">УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>${headLine}</p>${openExercises}</div>
+   root.innerHTML=`<div class="panel homework-head ia-card"><p class="eyebrow">УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>${headLine}</p>${openExercises}</div>
      <div class="panel"><div class="jump-row">${list.map(p=>`<button type="button" class="chip" data-hw-lesson="${p.lesson_id}" ${p.lesson_id===pack.lesson_id?'aria-pressed="true"':''}>${esc(p.homework.title)}</button>`).join('')}</div>
        <p class="small">Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике. Можно выйти в любой момент: ответы уже в листе.</p>
        ${sourceHomework}
@@ -1285,7 +1285,7 @@
    if(gp.phase==='done'){
      bindTutor(les,null);
      root.innerHTML=`<div class="panel path-paper">${crumb(les,null)}<h2>Урок разобран</h2><p>${esc(courseRow?courseRow.name:les.title)}</p>
-       <div class="lesson-actions"><button type="button" class="text-button" id="path-back">Назад</button><button type="button" class="primary-button" id="path-to-practice">Перейти к практике</button>
+       <div class="lesson-actions"><button type="button" class="text-button" id="path-back">← Назад</button><button type="button" class="primary-button" id="path-to-practice">Перейти к практике</button>
        <button type="button" class="secondary-button" data-path-learn>К урокам</button></div></div>`;
      bindCrumb();
      const backDone=$('#path-back');
@@ -1311,7 +1311,7 @@
          const title=Bank?Bank.chapterTitle(c):c.title;
          return `<button type="button" class="secondary-button" data-ch="${c.id}">Глава ${i+1} из ${les.chapters.length} · ${esc(title)}${ok?' ✓':''}</button>`;
        }).join('')}</div>
-       <p><button type="button" class="text-button" data-path-learn>Назад</button></p></div>`;
+       <p><button type="button" class="text-button" data-path-learn>← Назад</button></p></div>`;
      bindCrumb();
      root.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>openChapter(les.id,b.dataset.ch));
      if(window.ExplainOpen)window.ExplainOpen.bind(root);
@@ -1346,7 +1346,7 @@
      }
      gp.phase='lesson';gp.chapterId=null;gp.beat=0;gp.canonShownFor=null;gp.canonVisible=false;save();renderPath();
    };
-   const nav=(id,label)=>`<div class="lesson-actions"><button type="button" class="text-button" id="path-back">Назад</button><button type="button" class="primary-button" id="${id}">${label}</button></div>`;
+   const nav=(id,label)=>`<div class="lesson-actions"><button type="button" class="text-button" id="path-back">← Назад</button><button type="button" class="primary-button" id="${id}">${label}</button></div>`;
    const bindNav=(id,fn)=>{bindCrumb();const b=$('#path-back');if(b)b.onclick=stepBack;const n=$('#'+id);if(n)n.onclick=fn;};
    if(!beat){
      G.markChapterDone(gp,les.id,ch.id);
@@ -1358,7 +1358,7 @@
        root.innerHTML=`<div class="panel path-paper">${crumb(les,ch)}<p class="eyebrow">БЛОК РАЗОБРАН</p><h2>${esc(chTitle||ch.title)}</h2>
          <p>Можно перейти дальше или потренировать этот шаг ещё. Практика не ставит финальную оценку и её можно запускать повторно.</p>
          <div class="lesson-actions">
-           <button type="button" class="text-button" id="path-back">Назад</button>
+           <button type="button" class="text-button" id="path-back">← Назад</button>
            ${practiceIds.length?'<button type="button" class="secondary-button" id="path-more-practice">Практиковаться ещё</button>':''}
            <button type="button" class="primary-button" id="path-next-chapter">${nxt?'Дальше':'К практике урока'}</button>
          </div></div>`;
@@ -1483,7 +1483,7 @@
        <form id="path-form" class="practice-composer"><div class="composer-row"><input id="path-answer" type="text" lang="kk" enterkeyhint="enter" autocomplete="off" spellcheck="false"><button type="submit" class="primary-button" id="path-check">Проверить</button></div>${kb}
          <div id="path-fb" class="feedback" hidden></div>
          <div class="lesson-actions">
-           <button type="button" class="text-button" id="path-back">Назад</button>
+           <button type="button" class="text-button" id="path-back">← Назад</button>
            <button type="button" class="secondary-button" id="path-rule">Подсказка</button>
            <button type="button" class="text-button" id="path-idk">Не знаю</button></div></form></div>`;
      bindCrumb();
@@ -2084,7 +2084,15 @@
      }catch(error){out.textContent=error.message;}
    };
  }
- $$('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+ $$('[data-view]').forEach(b=>b.addEventListener('click',()=>{
+  if(b.dataset.view==='morph')window.__srez2MorphReturn='today';
+  showView(b.dataset.view);
+ }));
+ document.querySelectorAll('[data-chrome-back]').forEach(b=>b.addEventListener('click',ev=>{
+  ev.preventDefault();ev.stopPropagation();
+  const kind=b.dataset.chromeBack;
+  showView(kind==='homework'?(hwOrigin==='learn'?'learn':'today'):(kind||'today'));
+ }));
  $$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;startQueue();showView('practice');const dlg=$('#practice-filter');if(dlg&&dlg.open&&dlg.close)dlg.close();}));
  const filterOpen=$('#practice-filter-open'),filterClose=$('#practice-filter-close'),filterDlg=$('#practice-filter');
  if(filterOpen&&filterDlg)filterOpen.onclick=()=>{if(filterDlg.showModal)filterDlg.showModal();else filterDlg.setAttribute('open','');};
@@ -2095,13 +2103,13 @@
  }
  const learning=window.LearningUI.create({
    get state(){return learningState;},save,startLesson,startCourse,courseJumpMarkup,bindCourseJump,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today'),
-   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,continueStep,progress:()=>state,openHomework(id){hwLesson=id;showView('homework');}
+   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,continueStep,progress:()=>state,openHomework(id){hwLesson=id;hwOrigin='learn';showView('homework');}
  });
  const dashboard=window.DashboardUI.create({
    state:()=>state,questions:()=>questions,eligible,hasSession:()=>queue.length>position,continueInfo:stepNow,
    action(next){
      if(next.startsWith('remedy:')){startRemedy(next.slice(7));return;}
-     if(next==='homework'){hwLesson=null;showView('homework');return;}
+     if(next==='homework'){hwOrigin='today';showView('homework');return;}
      if(next==='path'){showView('path');return;}
      if(next==='personal-trainers'){showView('personal');return;}
      if(next.startsWith('weak:')){startBlockReview(next.slice(5));return;}
