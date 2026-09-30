@@ -241,7 +241,7 @@
   const host=document.createElement('div');
   host.id='tutor-host';
   host.innerHTML=`<button type="button" class="tutor-launch" id="tutor-launch" aria-label="Спросить тьютора" aria-haspopup="dialog" aria-controls="tutor-sheet">
-    <img class="tutor-pet-img" src="assets/tutor/pet-idle.png" alt="" width="56" height="64" decoding="async" loading="lazy">
+    <span class="tutor-sticker-dot" aria-hidden="true"></span>
   </button>
   <div id="tutor-steb" class="tutor-steb" hidden role="status" aria-live="polite"></div>
   <div id="tutor-sheet" class="tutor-sheet" hidden role="dialog" aria-labelledby="tutor-sheet-title">
@@ -514,11 +514,7 @@
    });
   }
 
-  function setIdle(){
-   if(!img)return;
-   img.src='assets/tutor/pet-idle.png';
-   img.classList.toggle('tutor-pet-blink',reduced()||true);
-  }
+  function setIdle(){/* default companion is the CSS sticker; pet-idle is not shown */ }
 
   function showSteb(text){
    if(!steb)return;
@@ -529,6 +525,7 @@
   }
 
   function playMischief(){
+   return; /* wave1 webp stay in assets, unused */
    if(frozen||reduced()||!available.length||clipPlaying)return;
    const clip=available[Math.floor(Math.random()*available.length)];
    clipPlaying=true;
@@ -557,8 +554,6 @@
   }
 
   function ensure(){
-   setIdle();
-   probeAssets();
    document.addEventListener('focusin',onFocusIn,true);
    document.addEventListener('focusout',onFocusOut,true);
    if(launch){
