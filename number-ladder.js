@@ -40,6 +40,19 @@
    chunks:chunked('Пара единица / десяток','Напиши слово или цифры. Рядом всегда парное число.',contrastIds,PAIR.map(([u,t,uw,tw])=>({front:String(u)+' и '+t,back:uw+' / '+tw,cue:'не путать'})))
  });
 
+
+ const teens=[11,12,13,14,15,16,17,18,19];
+ const teensIds=teens.flatMap(n=>both('teens-'+n,n,'он + единица (атом). Не учи 11–19 как отдельные слова: он бір, он екі…'));
+ L.lessons.push({
+   id:'numbers-teens',topic:'numbers',title:'11–19: он + единица',courseLesson:'1-2',
+   intro:'После пар 6/60 собираем подростковые числа: он + атом единицы. Карточки вперемешку, оба направления — не список по порядку.',
+   method:'N-build он + атом',tool:'number',
+   note:'Q5 шаг 4: после контраста единиц/десятков — процедура teens. 11–14 раньше почти не было в пулах; 15–19 жили только в echo2.',
+   items:teens.map(n=>({front:String(n),back:core.numberToKazakh(n),cue:'он + '+core.numberToKazakh(n%10)})),
+   questionIds:teensIds,
+   chunks:chunked('он + единица','Собери он + атом. Напиши слово или цифры. Вперемешку.',teensIds,teens.map(n=>({front:String(n),back:core.numberToKazakh(n),cue:'он + '+core.numberToKazakh(n%10)})))
+ });
+
  const mix2=[5,52,8,89,6,61,7,73,9,94,4,41,3,32,2,28,1,18];
  const mix2Ids=mix2.flatMap(n=>both('mix2-'+n,n,n<10?'Сначала единица. Рядом будет двузначное с этим же звуком.':'Двузначное: десяток + единица. Сравни с голой цифрой той же семьи.'));
  L.lessons.push({
@@ -86,8 +99,9 @@
  const POOLS={
    tens:[10,20,30,40,50,60,70,80,90],
    contrast:[6,60,7,70,8,80,9,90],
+   teens:[11,12,13,14,15,16,17,18,19],
    mix2:[5,52,8,89,6,61,7,73,9,94,4,41,3,32,2,28,1,18],
-   echo2:[55,66,77,88,99,50,60,70,80,90,15,16,17,18,19],
+   echo2:[55,66,77,88,99,50,60,70,80,90],
    echo3:[100,200,500,800,505,550,555,508,580,588,606,660,666,707,770,777,808,880,888,909,990,999],
    echo4:[1000,1505,1550,1555,1808,1880,1888,5000,5050,5500,5555,8000,8008,8080,8088,8800,8880,8888]
  };
@@ -144,7 +158,7 @@
  }
  window.NumberPractice={prepare,session,templates:[...prev.templates,...extraTemplates],POOLS};
 
- const ORDER=['numbers-0','numbers-1','tens-1','tens-2','numbers-contrast','numbers-mix2','numbers-echo-2','number-build','numbers-echo-3','hundreds','numbers-echo-4','school-1-3-numbers','school-1-3-phone'];
+ const ORDER=['numbers-0','numbers-1','numbers-quantity-words','tens-1','tens-2','numbers-contrast','numbers-teens','numbers-mix2','numbers-echo-2','number-build','hundreds','numbers-echo-3','numbers-echo-4','school-1-3-numbers','school-1-3-phone'];
  (function reorderNumberLessons(){
    const byId=new Map(L.lessons.map(l=>[l.id,l]));
    const placed=new Set();
@@ -198,6 +212,8 @@
    const n=extractN(q);
    const cap=capBand(state?.records||{});
    if(isPhone(q))return cap>=3&&practiced(state?.records||{},q=>band(extractN(q))===3)>=0.3;
+   // Quantity lemmas (аз/көп/қанша/неше): no digit → not gated by tens/hundreds bands.
+   if(n==null)return true;
    return band(n)<=cap;
  }
  function filter(list,state){return list.filter(q=>allowed(q,state));}

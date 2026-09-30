@@ -1617,10 +1617,16 @@
  function catalogNumberTracks(){
    const order=window.NumberLadder&&window.NumberLadder.ORDER||[];
    const by=new Map((window.LEARNING&&window.LEARNING.lessons||[]).map(l=>[l.id,l]));
-   return order.map(id=>by.get(id)).filter(Boolean).map(l=>{
-     const open=(l.questionIds||[]).some(qid=>{const q=byId.get(qid);return q&&(!window.NumberLadder||window.NumberLadder.allowed(q,state));});
-     return {id:l.id,title:l.title||l.id,open};
+   const rows=order.map(id=>by.get(id)).filter(Boolean).map(l=>{
+     const qs=(l.questionIds||[]).map(qid=>byId.get(qid)).filter(Boolean);
+     const total=qs.length;
+     const allowedCount=qs.filter(q=>!window.NumberLadder||window.NumberLadder.allowed(q,state)).length;
+     // Fully open only when EVERY card is allowed — units ≤10 must not leak a later step open via some().
+     const fullyOpen=total>0&&allowedCount===total;
+     return {id:l.id,title:l.title||l.id,fullyOpen};
    });
+   const firstUnfinished=rows.findIndex(r=>!r.fullyOpen);
+   return rows.map((r,i)=>({id:r.id,title:r.title,open:r.fullyOpen||i===firstUnfinished}));
  }
  function catalogVocabIds(role){
    const pool=questions.filter(q=>eligible(q)&&q.topic==='vocab'&&q.wordRole===role);
