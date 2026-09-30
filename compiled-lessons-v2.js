@@ -24665,18 +24665,21 @@ window.LESSON_V2_COMPILED = [
         "id": "school-method",
         "role": "SCHOOL_NORM",
         "title": "3_1_методичка_Менің,_сенің,_сіздің,_оның,_ассимиляция.pdf",
+        "url": "https://drive.google.com/file/d/1B2c2UJKpvBvty-LhSlkoC8ubPGZC9-aQ/view",
         "note": "Школьная методичка. Менің м/ым/ім, сенің ң/ың/ің, сіздің ңыз/ңіз, оның ы/і/сы/сі. П К Қ перед гласной. Бар и жоқ против емес. Пункт 7.4: менің қалам как «мой город»."
       },
       {
         "id": "school-exercises",
         "role": "SCHOOL_NORM",
         "title": "3_1_упражнения_Менің,_сенің,_сіздің,_оның,_ассимиляция.pdf",
+        "url": "https://drive.google.com/file/d/1SXf2AzFXedKI_VpCyhqlAO_1DyvkRI1E/view",
         "note": "Сто клеток сборника, модули 1–6. Ключ 6-1.1 повторяет менің оқушысым. Ключ 6-2.2 повторяет оның доссы. Ключ 4-2.2 даёт әжеңіз и апаңыз."
       },
       {
         "id": "school-homework",
         "role": "SCHOOL_NORM",
         "title": "3_1_домашняя_работа_Менің,_сенің,_сіздің,_оның,_ассимиляция.pdf",
+        "url": "https://drive.google.com/file/d/1X2BqOVav3sb01ni8MIe4f-J-JO2UHAyo/view",
         "note": "Четыре пункта. В «выучить» двенадцать клеток. После ссылки на том же листе ещё шесть вопросительных слов. Одна ссылка PrityazhEdChislo.html. Клавиатуры и шпаргалки нет."
       },
       {
@@ -28968,18 +28971,21 @@ window.LESSON_V2_COMPILED = [
         "id": "school-method",
         "role": "SCHOOL_NORM",
         "title": "3_2_методичка_Біздің,_сендердің,_сіздердің.pdf",
+        "url": "https://drive.google.com/file/d/199RvveieVt_VZFq7Z7sTXS5FC7NP91br/view",
         "note": "Школьная методичка. Біздің: мыз/міз/ымыз/іміз, п/к/қ перед гласной. Множественное перед притяжательным. Тело в 1 лице обычно без множественного. Сендердің и сіздердің в модели листа всегда с множественным. Олардың — множественное не обязательно. Указательные: мына и осы на листе только при слове."
       },
       {
         "id": "school-exercises",
         "role": "SCHOOL_NORM",
         "title": "3_2_упражнения_Біздің,_сендердің,_сіздердің.pdf",
+        "url": "https://drive.google.com/file/d/1_eQY2EFMfOFq18xGq8j5g27Mvh0EYVgi/view",
         "note": "Сто двадцать четыре клетки сборника, модули 1–6. Ключ 6-2.1 повторяет сенің көршісің и переводит это как «твой сосед»."
       },
       {
         "id": "school-homework",
         "role": "SCHOOL_NORM",
         "title": "3_2_домашняя_работа_Біздің,_сендердің,_сіздердің.pdf",
+        "url": "https://drive.google.com/file/d/1cWz68CuBedhrSzipdoKy1pNO9NlzT2Tc/view",
         "note": "Четыре пункта. В «выучить» шесть клеток. После ссылки на том же листе ещё пять вопросительных слов. Одна ссылка Prityazh.html. Клавиатуры и шпаргалки нет."
       },
       {

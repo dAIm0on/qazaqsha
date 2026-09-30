@@ -207,7 +207,7 @@
    return schema.validateHomework(raw,knownIds);
  }
  function emptyAttempt(lessonId,now=Date.now()){
-   return {lessonId,started_at:now,items:[],rule_peeks:0,answer_peeks:0,submitted_at:null,export_rev:0,checklist:{method:false,exercises:false,words:false,external_test:false,keyboard:false,cheat:false},previous:[]};
+   return {lessonId,started_at:now,items:[],rule_peeks:0,answer_peeks:0,submitted_at:null,export_rev:0,cursor:null,checklist:{method:false,exercises:false,words:false,external_test:false,keyboard:false,cheat:false},previous:[]};
  }
  function ensureAttempt(state,lessonId,now=Date.now()){
    state.homeworkAttempts=state.homeworkAttempts||Object.create(null);
@@ -247,10 +247,10 @@
    const list=ids||[];
    if(!list.length)return 0;
    const done=new Set((attempt&&attempt.items||[]).map(i=>i.id));
-   const fromCursor=attempt&&attempt.cursor?list.indexOf(attempt.cursor):-1;
-   if(fromCursor>=0&&fromCursor+1<list.length)return fromCursor+1;
+   // First unanswered wins: stale cursor must not roll progress backward.
    const firstOpen=list.findIndex(id=>!done.has(id));
-   return firstOpen<0?0:firstOpen;
+   if(firstOpen>=0)return firstOpen;
+   return list.length;
  }
  const HW_SECTION=20;
  function sliceSection(ids,section){
