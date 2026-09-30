@@ -178,12 +178,13 @@ body.keyboard-open[data-view=practice] .practice-dock{
 body.keyboard-open[data-view=path] #path-form{
   background:var(--surface)
 }
-/* kb-compact8: only dock is VV-fixed; morph still needs strip clearance. */
+/* kb-compact9: only dock is VV-fixed; morph still needs strip clearance. */
 html.typing-compact body[data-view=morph] .morph-panel{
   padding-bottom:calc(var(--dockh, 148px) + 10px)
 }
-/* kb-compact8: keep ←Назад (#pause-session) + bottom-nav reachable while keyboard open.
-   Hide only clutter (progress/source/notes), never exit chrome. */
+/* kb-compact9: keep ←Назад (#pause-session) reachable while keyboard open.
+   Hide only clutter (progress/source/notes), never exit chrome.
+   .bottom-nav is hidden under .typing-compact (see below) so it cannot cover Проверить. */
 body.keyboard-open[data-view=practice] .question-top,
 body.keyboard-open[data-view=practice] .session-line,
 body.keyboard-open[data-view=practice] .pref-check,
@@ -907,13 +908,14 @@ h2.practice-prompt,
 .typing-strip .morph-keys button::before{
   content:"";position:absolute;left:50%;top:50%;width:44px;height:44px;transform:translate(-50%,-50%)
 }
-/* Compact kb-compact8: simpler model closer to first working variant.
+/* Compact kb-compact9: simpler model closer to first working variant.
    ONLY .typing-dock is VV-fixed: top = vv.offsetTop + vv.height − barH
    (barH = contentH + ~44 iOS accessory). Do NOT position:fixed the whole
-   #answer-form / .path-paper (that orphans bottom-nav / ←Назад / chrome).
+   #answer-form / .path-paper (that orphans ←Назад / chrome).
    Scroll ONLY .typing-scroll (max-height from --typing-scroll-max).
    Do NOT lock overflow:hidden on html/body. Never bottom:0 on window.
-   Do NOT add env(safe-area-inset-bottom) on the strip. */
+   Do NOT add env(safe-area-inset-bottom) on the strip.
+   Hide .bottom-nav under compact so dock/Проверить sit fully above keyboard. */
 html.typing-compact #answer-form,
 html.typing-compact .path-paper:has(#path-form){
   display:flex!important;flex-direction:column;gap:0;margin:0;
@@ -955,8 +957,8 @@ html.typing-compact .path-paper,
 html.typing-compact .morph-panel{padding:8px 10px}
 html.typing-compact .exercise-card .question-top{padding:8px 10px 0}
 
-/* typing-compact must-fix: hide ONLY help / progress strip / issue / sticker.
-   NEVER hide bottom-nav / ←Назад / .chrome-back / #path-back / #pause-session. */
+/* typing-compact must-fix: hide help / progress strip / issue / sticker / .bottom-nav.
+   NEVER hide ←Назад / .chrome-back / #path-back / #pause-session / .practice-head. */
 html.typing-compact .question-actions,
 html.typing-compact .secondary-actions,
 html.typing-compact #hint-button,
@@ -996,8 +998,8 @@ body.typing-compact .path-crumb,
 body.typing-compact .morph-progress{
   display:none!important
 }
-/* Explicit chrome keep — never orphan exit/menu while compact.
-   Practice mobile normally hides .bottom-nav; compact overrides so menu stays. */
+/* Explicit chrome keep — ←Назад / practice-head stay; hide .bottom-nav (kb-compact9).
+   Floating Учёба/Форма слова/Тренажёры must not cover Проверить when keyboard open. */
 html.typing-compact .practice-head,
 body.typing-compact .practice-head{
   display:grid!important;visibility:visible!important;pointer-events:auto!important;
@@ -1007,9 +1009,8 @@ html.typing-compact .bottom-nav,
 body.typing-compact .bottom-nav,
 html.typing-compact body[data-view=practice] .bottom-nav,
 body.typing-compact[data-view=practice] .bottom-nav{
-  display:grid!important;visibility:visible!important;pointer-events:auto!important;
-  opacity:1!important;height:auto!important;min-height:var(--bottom-nav-height,64px)!important;
-  overflow:visible!important;z-index:50
+  display:none!important;visibility:hidden!important;pointer-events:none!important;
+  opacity:0!important;height:0!important;min-height:0!important;overflow:hidden!important
 }
 html.typing-compact .chrome-back,
 html.typing-compact #pause-session,
@@ -1105,7 +1106,8 @@ html.typing-compact .typing-strip{display:flex!important}
 }
 
 /* kb-compact8 guard: never kill document scroll via html/body overflow lock.
-   Scroll lives on .typing-scroll; page shell (chrome/back/nav) stays in flow. */
+   Scroll lives on .typing-scroll; page shell (chrome/back) stays in flow.
+   kb-compact9: .bottom-nav is hidden under typing-compact (not kept in flow). */
 html.typing-compact,html.typing-compact body{
   overflow:visible!important;height:auto!important;max-height:none!important
 }

@@ -175,11 +175,12 @@
      clearTypingShellStyles();
      return;
    }
-   /* kb-compact8: NEVER position:fixed the whole #answer-form / .path-paper
-      (that orphans bottom-nav / ←Назад / chrome). Only .typing-dock is VV-fixed:
+   /* kb-compact9: NEVER position:fixed the whole #answer-form / .path-paper
+      (that orphans ←Назад / chrome). Only .typing-dock is VV-fixed:
       top = vv.offsetTop + vv.height − barH (barH = contentH + ~44 accessory).
       Scroll ONLY .typing-scroll. Do NOT lock html/body overflow:hidden.
-      Do NOT use position:fixed; bottom:0 against the layout window. */
+      Do NOT use position:fixed; bottom:0 against the layout window.
+      Under compact, hide .bottom-nav so it cannot cover Проверить. */
    const left=Math.round(vv.offsetLeft||0);
    const width=Math.round(vv.width);
    const height=Math.round(vv.height);
