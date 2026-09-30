@@ -5,18 +5,18 @@
  const FALLBACK_MODEL='@cf/qwen/qwen3-30b-a3b-fp8';
  const MODEL_ID=PRIMARY_MODEL;
  const FALLBACK=FALLBACK_MODEL;
- const MODES=['explain_error','hint','explain_rule','simplify','ask_tutor','session_summary','remediation'];
+ const MODES=['explain_error','hint','explain_rule','simplify','ask_tutor','translate_word','session_summary','remediation'];
  const SURFACES=['practice','path','rules','homework','review','exam','learn'];
  const ERROR_CODES=['HARMONY_FRONT_BACK','HARMONY_AMBIGUOUS_I_U_YU','PLURAL_HARMONY_AE','PLURAL_INITIAL_LDT','PLURAL_FORM_COMBINED','PLURAL_AFTER_NUMBER','QUANTIFIER_NO_PLURAL','NUMERAL_LEXEME','NUMERAL_CONFUSION_6_60','NUMERAL_CONFUSION_7_70','NUMERAL_CONFUSION_8_80','NUMERAL_CONFUSION_9_90','NUMERAL_COMPOSITION','NUMERAL_HUNDREDS_THOUSANDS','PERSON_MEN_ENDING','PERSON_SEN_ENDING','PERSON_SIZ_ENDING','EMES_SUFFIX_POSITION','PREDICATIVE_ADJECTIVE','PERSON_BIZ_ENDING','PERSON_SENDER_ENDING','PERSON_SIZDER_ENDING','NO_EXTRA_PLURAL_WITH_PERSON','OL_OLAR','QUESTION_PARTICLE','QUESTION_PARTICLE_HARMONY','QUESTION_PARTICLE_PHONOLOGY','ORDINAL_SUFFIX','KAZAKH_SPELLING','WORD_ORDER_CURRENT','VOCAB_RECALL','POSS_PRONOUN','POSS_PERSON_SUFFIX','POSS_HARMONY','POSS_VOWEL_BUFFER','POSS_ASSIM_VOICE','POSS_PLURAL_ORDER','POSS_ADJ_POSITION','POSS_OWNER_FORM','BAR_ZHOK','MULTI_ERROR','PERSON_VS_POSS','OWNER_SUBJECT_SWAP','OWNER_WRONG','SUBJECT_WRONG','POSS_PERSON_STACK','PERSON_AFTER_POSS_WRONG','PERSON_AFTER_POSS_MISSING','THIRD_PERSON_EXTRA_PERSONAL','EMES_PERSON_POSITION','EMES_POSS_DROPPED','OTBASY_DOUBLE_POSS','ADJ_ROLE_ORDER','INTERROGATIVE_CHOICE','UNKNOWN'];
- const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
- const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'] ,'3-1':['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL'],'3-2':['T24_POSS_BIZ','T25_POSS_SENDER','T26_POSS_OLAR','T27_DEIXIS'],'3-3':['T28_OWNER_SUBJECT','T29_POSS_PERSON_STACK','T30_THIRD_ZERO','T31_EMES_STACK','T32_OTBASY','T33_ADJ_ROLE','T34_INTERROGATIVE']};
- const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам'] ,'3-1':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','жүрек','сақал','мысық','таз','тақырбас','қатты','саусақ','кім','не','қандай','қай','нешінші','бұл'],'3-3':['келу','кету','кіру','шығу','іздеу','табу','асығу','кешігу','жұмыс істеу','жазу','сөйлеу','алу','беру','көру','қарау']};
+ const ALLOWED_LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3','4-2'];
+ const RULE_BY_LESSON={'1-1':['T1_HARMONY'],'1-2':['T1_HARMONY','T2_PLURAL_LDT'],'1-3':['T1_HARMONY','T2_PLURAL_LDT','T4_NO_PLURAL_AFTER_NUMBER','T5_NUMERAL_CONFUSION','T5_NUMERAL_COMPOSE'],'2-1':['T1_HARMONY','T6_PERSON_SG','T7_EMES'],'2-2':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED'],'2-3':['T1_HARMONY','T6_PERSON_SG','T7_EMES','T8_PERSON_PL','T8_ADJ_PRED','T9_OL','T10_QUESTION','T11_ORDINAL'] ,'3-1':['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL'],'3-2':['T24_POSS_BIZ','T25_POSS_SENDER','T26_POSS_OLAR','T27_DEIXIS'],'3-3':['T28_OWNER_SUBJECT','T29_POSS_PERSON_STACK','T30_THIRD_ZERO','T31_EMES_STACK','T32_OTBASY','T33_ADJ_ROLE','T34_INTERROGATIVE'],'4-2':['T35_PAST_MEANING','T36_DY_TY','T37_PERSON2','T38_OL_ZERO_PAST','T39_PAST_ASSIM','T40_PAST_NEG','T41_PAST_Q','T42_PAST_EXCEPT']};
+ const VOCAB_BY_LESSON={'1-1':['адам','қыз','ұл','жігіт','кітап','жер','су','ту','сөз','қала','көше'],'1-2':['нөл','бір','екі','үш','төрт','бес','алты','жеті','сегіз','тоғыз','он','жиырма','отыз','қырық','елу','алпыс','жетпіс','сексен','тоқсан','жүз','мың','аз','көп','қанша'],'1-3':['дос','құрбы','мұғалім','ғалым','дәрігер','заңгер','оқушы','студент','мен','біз','сен','сендер','сіз','сіздер','ол','олар','иә','жоқ','емес'],'2-1':['әдемі','сұлу','ақылды','жомарт','сараң','бай','кедей','жас','зейнеткер','есепші','жұмыссыз','жұмысшы','бастық','жолсерік','ақын','жазушы','жүргізуші','кәсіпкер','оқырман','аспаз'],'2-2':['көрші','әріптес','жау','қонақ','туыс','маман','таныс','қазақ','орыс','семіз'],'2-3':['бала','әке','ана','әже','апа','ата','тәте','аға','іні','әпке','қарындас','сіңлі','егіз','жұмыс','мамандық','ат','мектеп','көлік','пәтер','қалам'] ,'3-1':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','жүрек','сақал','мысық','таз','тақырбас','қатты','саусақ','кім','не','қандай','қай','нешінші','бұл'],'3-2':['бас','қол','көз','тіл','қалам','көйлек','жақсы','жаман','біздің','сендердің','сіздердің','олардың','бұл','мынау','осы','мына','анау','ана','ол','сол','сынып','сыныптас','отбасы','баба','іс','аяқ','кім','не','қандай','қай','нешінші'],'3-3':['келу','кету','кіру','шығу','іздеу','табу','асығу','кешігу','жұмыс істеу','жазу','сөйлеу','алу','беру','көру','қарау'],'4-2':['түсіну','бару','жүру','жату','отыру','тұру','ашу','жабу','тігу','сөйлеу','жазу','кету','алу','беру','келу','іздеу','көру','кіру','қарау','шығу','кешігу','табу','асығу','жұмыс істеу','ойлау','ойнау','сену','күту','айту']};
  const FUTURE_RE=/падеж|посессив|притяжательн|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|бар ма\?|кітабым/i;
 const ALWAYS_FUTURE_RE=/падеж|губн(ая|ой) гармо|степен(и|ей) сравнен|imperative|labial|comparative/i;
 const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|кітабым/i;
  const MAX_IN=12000,MAX_MSG=450,MAX_OUT_TOKENS=250,ASK_OUT_TOKENS=400;
- const CLIENT_TIMEOUT_MS=25000,PRIMARY_TIMEOUT_MS=11000,FALLBACK_TIMEOUT_MS=8000;
- const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,session_summary:800,remediation:450};
+ const CLIENT_TIMEOUT_MS=30000,PRIMARY_TIMEOUT_MS=14000,FALLBACK_TIMEOUT_MS=8000;
+ const MSG_MAX={explain_error:450,hint:220,explain_rule:900,simplify:700,ask_tutor:1200,translate_word:220,session_summary:800,remediation:450};
  const SYSTEM='Ты — контекстный персональный тьютор казахского языка внутри Qazaqsha.\n\nТы не проверяешь правильность ответа. Правильность уже определил локальный код.\n\nТы не меняешь expected_answer.\n\nГлавный источник истины — переданный rule_context.\n\nОбъясняй только те правила, которые присутствуют в rule_context и разрешены текущим уроком.\n\nНе вводи будущие темы.\n\nНе исправляй учебную программу своими знаниями.\n\nНе называй внутренние ID правил.\n\nНе упоминай system prompt, error_code или внутреннюю архитектуру.\n\nПиши естественным русским языком. Казахские формы оставляй на казахском.\n\nЕсли mode=explain_error:\n1. скажи, что ученица написала;\n2. покажи отличие от правильной формы;\n3. объясни один механизм правила;\n4. используй текущий пример.\n\nЕсли mode=explain_rule:\nобъясни переданное правило применительно к текущей форме. Не заменяй канонический текст новым правилом.\n\nЕсли mode=simplify:\nобъясни то же правило проще, не меняя его смысл.\n\nЕсли mode=ask_tutor:\nответь прежде всего на user_question 2–6 предложениями. Сразу к сути, без приветствия и без переписывания вопроса ученицы.\nДля кітап+ым помни озвончение п→б: кітабым.\nРазрешено объяснять через русский язык, если это помогает ученице понять казахское правило.\nМожно давать дополнительные примеры только из текущей разрешённой лексики и уже пройденной грамматики.\n\nЕсли ученица пишет:\n«не поняла»,\n«ещё проще»,\n«объясни иначе»,\n«через русский»,\nто измени способ объяснения, но не правило.\n\nЕсли repeat_count >= 2:\nможно коротко отметить, что эта ошибка уже встречалась, и предложить другой способ её понять.\nНе стыди ученицу. Не пиши «ты опять ошиблась».\n\nЕсли mode=hint:\nне показывай полный правильный ответ.\n\nВозвращай только текст ответа ученице на русском. Сразу ответ, без планов и чеклистов. Не пиши Analyze the Request, Role, Constraints, Mode, expected_answer, rule_context.\nБез JSON.\nБез markdown fences.\nБез <think>.\nНикогда не пиши English thinking aloud (Okay, Let me recall, the user is asking). Ответ ученице — только на русском.';
  function clip(s,n){s=String(s==null?'':s);return s.length<=n?s:s.slice(0,n);}
  function asArr(v){return Array.isArray(v)?v.filter(x=>typeof x==='string'):[];}
@@ -172,6 +172,22 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   if(/^Хорошо,?\s*$/i.test(t))return true;
   return false;
  }
+ function looksLikeMetaCotLead(s){
+  s=String(s||'').trim();
+  if(!s)return false;
+  if(/Хорошо,?\s*учениц/i.test(s))return true;
+  if(/учениц[ая]\s+просит/i.test(s))return true;
+  if(/Нужно следовать/i.test(s))return true;
+  if(/внутренн(ие|их)\s+инструкц/i.test(s))return true;
+  if(/структурирую ответ/i.test(s))return true;
+  if(/сначала (подумаю|разберу)/i.test(s))return true;
+  if(/разберу инструкции/i.test(s))return true;
+  if(/следуя инструкциям/i.test(s))return true;
+  if(/Okay,?\s+the user (asked|is asking)/i.test(s))return true;
+  if(/\bI will structure\b/i.test(s))return true;
+  if(/Let me (structure|think|recall|analyze)/i.test(s))return true;
+  return false;
+ }
    function cleanTutorReply(t){
    t=String(t||'').trim().replace(/^\.+\s*/,'');
    t=t.replace(/<think>[\s\S]*?<\/think>/gi,'');
@@ -190,6 +206,17 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
      t=best||parts[parts.length-1].trim();
    }
    t=t.replace(/<\/?think>/gi,'').trim();
+   // Strip leading RU/EN CoT / meta paragraphs before student-facing answer
+   {
+     const paras=t.split(/\n{2,}/).map(s=>s.trim()).filter(Boolean);
+     while(paras.length>1&&looksLikeMetaCotLead(paras[0]))paras.shift();
+     if(paras.length)t=paras.join('\n\n').trim();
+   }
+   t=t.replace(/^(Хорошо,?\s*учениц[ая][^.!?…\n]*[.!?…]?\s*)+/i,'');
+   t=t.replace(/^(учениц[ая]\s+просит[^.!?…\n]*[.!?…]?\s*)+/i,'');
+   t=t.replace(/^(Нужно следовать[^.!?…\n]*[.!?…]?\s*)+/i,'');
+   t=t.replace(/^(Okay,?\s+the user (asked|is asking)[^.!?…\n]*[.!?…]?\s*)+/i,'');
+   t=t.replace(/^(I will structure[^.!?…\n]*[.!?…]?\s*)+/i,'');
    const solid=t.match(/(В русском[\s\S]*)$/i);
    if(solid&&/(кітабым|наклейк|п\s*[→\-–]\s*б|озвонч|-ым)/i.test(solid[1]))t=solid[1];
    const chunks=t.split(/(?<=[.!?…»])\s+/).map(s=>s.trim()).filter(Boolean);
@@ -222,6 +249,18 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   if(/the user is (asking|confused)/i.test(t))return true;
   if(/\bWait,?\s+the user\b/i.test(t))return true;
   if(/I need to (explain|recall|think|check)/i.test(t)&&/rule/i.test(t))return true;
+  // Russian / English CoT meta leaked as the student answer
+  if(/Хорошо,?\s*учениц/i.test(t))return true;
+  if(/учениц[ая]\s+просит/i.test(t))return true;
+  if(/Нужно следовать/i.test(t))return true;
+  if(/внутренн(ие|их)\s+инструкц/i.test(t))return true;
+  if(/структурирую ответ/i.test(t))return true;
+  if(/сначала (подумаю|разберу)/i.test(t))return true;
+  if(/разберу инструкции/i.test(t))return true;
+  if(/следуя инструкциям/i.test(t))return true;
+  if(/Okay,?\s+the user asked/i.test(t))return true;
+  if(/\bI will structure\b/i.test(t))return true;
+  if(looksLikeMetaCotLead(t)&&t.length<420)return true;
   const cyr=(t.match(/[А-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі]/g)||[]).length;
   const lat=(t.match(/[A-Za-z]/g)||[]).length;
   if(lat>=80&&cyr<20&&/\b(the|user|rule|explain|asking|recall)\b/i.test(t))return true;
@@ -292,7 +331,8 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   r.primary_error_code=code||null;
   r.rule_ids_used=ctx.rule_id?[ctx.rule_id]:[];
   r.micro_rule_ru=ctx.short||ctx.title_ru||null;
-  r.contrast={wrong:wrote||null,correct:mode==='hint'?null:(expected||null)};
+  const hideExpected=mode==='hint'||mode==='ask_tutor'||mode==='simplify'||mode==='translate_word';
+  r.contrast={wrong:mode==='translate_word'?null:(wrote||null),correct:hideExpected?null:(expected||null)};
   r.needs_rule_context=false;
   r.confidence='medium';
   r.meta={request_id:(req&&req.request_id)||null,source:'local'};
@@ -303,14 +343,24 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
    r.contrast.correct=null;
    return r;
   }
+  if(mode==='translate_word'){
+   const w=clip((req&&req.user_question)||(req&&req.prompt)||'',80);
+   r.message_ru=w?('Короткий перевод для «'+w+'» сейчас недоступен. Слово из материалов текущего урока — смотри карточку или спроси ещё раз.'):'Укажи слово из текущего урока.';
+   r.next_action_ru=null;
+   r.contrast={wrong:null,correct:null};
+   r.message_ru=clip(r.message_ru,maxMessage(mode));
+   return r;
+  }
   if(mode==='explain_error'&&wrote){
    r.message_ru=(expected?'Ты написала «'+wrote+'», нужно «'+expected+'». ':'Ты написала «'+wrote+'». ')+lever;
   }else if(mode==='ask_tutor'||mode==='explain_rule'||mode==='simplify'){
-   r.message_ru=[medium,ru].filter(Boolean).join('\n')||lever;
+   r.message_ru=[medium,ru].filter(Boolean).join('\n')||'Правило уже на карточке урока. Можно продолжить или уточнить вопрос.';
   }else if(mode==='session_summary'){
    r.message_ru='Разбор сессии сейчас короткий. Локальные слабые места сохранены.';
   }else r.message_ru=lever;
-  r.next_action_ru='Введи правильную форму целиком.';
+  if(mode==='ask_tutor'||mode==='simplify'||mode==='explain_rule')r.next_action_ru=null;
+  else r.next_action_ru='Введи правильную форму целиком.';
+  if(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word')r.contrast={wrong:mode==='translate_word'?null:(wrote||null),correct:null};
   r.message_ru=clip(r.message_ru,maxMessage(mode));
   return r;
  }
@@ -324,8 +374,11 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   r.rule_ids_used=((req&&req.rule_context)||[]).map(c=>c&&c.rule_id).filter(Boolean).slice(0,6);
   const ctx=(req&&req.rule_context&&req.rule_context[0])||{};
   r.micro_rule_ru=ctx.short||ctx.title_ru||null;
-  r.contrast={wrong:(req&&req.user_answer)||null,correct:mode==='hint'?null:((req&&req.expected_answer)||null)};
-  r.next_action_ru=mode==='hint'?'Введи форму целиком, не копируй готовый ответ.':'Введи правильную форму целиком.';
+  const hideExpected=mode==='hint'||mode==='ask_tutor'||mode==='simplify'||mode==='translate_word';
+  r.contrast={wrong:mode==='translate_word'?null:((req&&req.user_answer)||null),correct:hideExpected?null:((req&&req.expected_answer)||null)};
+  if(mode==='hint')r.next_action_ru='Введи форму целиком, не копируй готовый ответ.';
+  else if(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'||mode==='explain_rule')r.next_action_ru=null;
+  else r.next_action_ru='Введи правильную форму целиком.';
   r.needs_rule_context=false;
   r.confidence=source==='local'?'medium':'high';
   r.remediation=null;
@@ -343,7 +396,8 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
  }
  function validateRequest(raw){
   if(!raw||typeof raw!=='object')return {ok:false,error:'bad_body'};
-  const mode=String(raw.mode||'');
+  const modeCand=[raw.mode,raw.action,raw.action_or_mode].map(v=>String(v||'').trim()).filter(Boolean);
+  const mode=modeCand.find(m=>MODES.includes(m))||'';
   if(!MODES.includes(mode))return {ok:false,error:'bad_mode'};
   const json=JSON.stringify(raw);
   if(json.length>MAX_IN)return {ok:false,error:'too_large'};
@@ -361,9 +415,9 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
     mode,surface,locale:raw.locale==='kk'?'kk':'ru',
     lesson_id,
     exercise_id:clip(raw.exercise_id,80),
-    prompt:clip(raw.prompt,400),
+    prompt:clip(raw.prompt||raw.word||raw.message,400),
     user_answer:clip(raw.user_answer,400),
-    expected_answer:clip(raw.expected_answer,400),
+    expected_answer:(mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'||mode==='hint')?'':clip(raw.expected_answer,400),
     is_correct:!!raw.is_correct,
     hint_used:!!raw.hint_used,
     repeat_count:Math.max(0,parseInt(raw.repeat_count,10)||0),
@@ -374,7 +428,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
     candidate_error_codes:asArr(raw.candidate_error_codes).filter(c=>ERROR_CODES.includes(c)).slice(0,8),
     recent_error_summary:raw.recent_error_summary&&typeof raw.recent_error_summary==='object'?raw.recent_error_summary:{},
     rule_context:clipRuleContext(raw.rule_context,allowRules),
-    user_question:clip(raw.user_question,400),
+    user_question:clip(raw.user_question||raw.message||raw.word||raw.prompt,400),
     conversation_tail:clipTail(raw.conversation_tail)
   }};
  }
@@ -413,6 +467,7 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   r.needs_rule_context=reason==='no_context'||reason==='conflict';
   if(mode==='hint')r.message_ru='Проверь правило текущего урока и слот окончания. Полный ответ не показываю.';
   if(reason==='hint_leak')r.message_ru='Подсказка не должна содержать готовый ответ. Проверь правило, затем введи форму целиком.';
+  else if(mode==='translate_word')r.message_ru='Короткий перевод сейчас недоступен. Смотри слово в материалах урока.';
   else if(mode==='explain_rule'||mode==='simplify'||mode==='ask_tutor')r.message_ru=(req&&req.rule_context&&req.rule_context[0]&&(req.rule_context[0].medium||req.rule_context[0].explanation_ru||req.rule_context[0].ru_refresh))||'Правило уже на карточке. Можно продолжить упражнение.';
   else if(mode==='session_summary')r.message_ru='Разбор сессии сейчас короткий. Локальные слабые места сохранены.';
   else r.message_ru='Разбор по правилу урока сейчас короткий. Можно продолжить упражнение.';
@@ -420,8 +475,15 @@ const POSS_FUTURE_RE=/посессив|притяжательн|бар ма\?|к
   r.meta={request_id:null,source:'local'};
   return r;
  }
- function looksFuture(text,lessonId){const v=String(text||'');return ALWAYS_FUTURE_RE.test(v)||(lessonId!=='3-1'&&lessonId!=='3-2'&&POSS_FUTURE_RE.test(v));}
+ function looksFuture(text,lessonId){
+  const v=String(text||'');
+  if(ALWAYS_FUTURE_RE.test(v))return true;
+  if(!POSS_FUTURE_RE.test(v))return false;
+  const i=ALLOWED_LESSONS.indexOf(lessonId);
+  const from=ALLOWED_LESSONS.indexOf('3-1');
+  return i<0||from<0||i<from;
+ }
  function outTokens(mode){return mode==='ask_tutor'?ASK_OUT_TOKENS:MAX_OUT_TOKENS;}
- const api={PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,FALLBACK,MODES,SURFACES,ERROR_CODES,ALLOWED_LESSONS,RULE_BY_LESSON,VOCAB_BY_LESSON,FUTURE_RE,MAX_OUT_TOKENS,ASK_OUT_TOKENS,CLIENT_TIMEOUT_MS,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,SYSTEM,validateRequest,validateResponse,extractJson,normalizeModelText,isUsableText,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism,emptyResp,fallback,localExplain,assembleResponse,examBlocked,futureBlocked,missingLesson,looksFuture,clip,normKey,resolveCurriculum,lessonsThrough,containsExpected,clipTail,clipRuleContext,maxMessage,outTokens,leverLine};
+ const api={PRIMARY_MODEL,FALLBACK_MODEL,MODEL_ID,FALLBACK,MODES,SURFACES,ERROR_CODES,ALLOWED_LESSONS,RULE_BY_LESSON,VOCAB_BY_LESSON,FUTURE_RE,MAX_OUT_TOKENS,ASK_OUT_TOKENS,CLIENT_TIMEOUT_MS,PRIMARY_TIMEOUT_MS,FALLBACK_TIMEOUT_MS,SYSTEM,validateRequest,validateResponse,extractJson,normalizeModelText,isUsableText,looksLikeMetaCotLead,looksLikePromptLeak,looksLikeBadTutorReply,cleanTutorReply,needsKitabymMechanism,hasKitabymMechanism,emptyResp,fallback,localExplain,assembleResponse,examBlocked,futureBlocked,missingLesson,looksFuture,clip,normKey,resolveCurriculum,lessonsThrough,containsExpected,clipTail,clipRuleContext,maxMessage,outTokens,leverLine};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.AiContract=api;
 })(typeof window!=='undefined'?window:globalThis);

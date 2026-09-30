@@ -107,20 +107,40 @@
   const hidden=ruleOpen(ruleId)?'':' hidden';
   return '<p><button type="button" class="secondary-button" data-full-rule="'+esc(ruleId)+'">Показать полностью</button></p><div data-full-panel'+hidden+'>'+body+'</div>';
  }
+ function spoilsOnWrong(why,q){
+  const t=String(why||'').trim();
+  if(!t)return false;
+  // Soft/hard grouping that names the correct letter sets (A10 content leak).
+  if(/мягк\w*\s+групп|групп\w*[^.\n]{0,40}мягк/i.test(t))return true;
+  if(/мягк/i.test(t)&&/(твёрд|тверд)/i.test(t))return true;
+  // Ready "слово — форма/перевод" lines that embed the answer.
+  if(/[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}\s*[—–]\s*[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}/.test(t))return true;
+  const answers=[];
+  ((q&&q.fields)||[]).forEach(f=>((f&&f.answers)||[]).forEach(a=>answers.push(String(a||''))));
+  ((q&&q.correct)||[]).forEach(a=>answers.push(String(a||'')));
+  for(const a of answers){
+   if(a.length>=2&&t.indexOf(a)!==-1)return true;
+  }
+  if(answers.some(a=>a.length===1)&&/(мягк|твёрд|тверд|групп)/i.test(t))return true;
+  return false;
+ }
+ function safeWrongWhy(why,q){
+  if(!why||spoilsOnWrong(why,q))return '';
+  return String(why);
+ }
  function forQuestion(q,typed){
   const ruleId=ruleIdOf(q);
-  const expected=q&&q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0]||'';
   const actual=Array.isArray(typed)?String(typed[0]||''):String(typed||'');
-  const why=(q&&q.explanation)||'';
-  if(!ruleId&&!expected)return '';
-  return '<p><strong>Неверно:</strong> <span lang="kk">'+esc(actual)+'</span> → <strong>Верно:</strong> <span lang="kk">'+esc(expected)+'</span></p>'
+  const why=safeWrongWhy((q&&q.explanation)||'',q);
+  if(!ruleId&&!actual&&!why)return '';
+  // P0: wrong-feedback must not reveal expected/correct form (A10 UI sibling).
+  return (actual?'<p><strong>Неверно:</strong> <span lang="kk">'+esc(actual)+'</span></p>':'')
    +(why?'<p><strong>Почему:</strong> '+esc(why)+'</p>':'')
    +openButton(ruleId);
  }
  function chainHtml(q,typed){
-  const expected=q&&q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0]||'';
   const actual=Array.isArray(typed)?String(typed[0]||''):String(typed||'');
-  const diff=actual&&expected&&actual!==expected?'<p data-error-diff>Отличие: <s lang="kk">'+esc(actual)+'</s> → <strong lang="kk">'+esc(expected)+'</strong></p>':'';
+  const diff=actual?'<p data-error-diff>Ты написала: <s lang="kk">'+esc(actual)+'</s>. Разберём механизм — без готового ответа.</p>':'';
   const body=forQuestion(q,typed);
   if(!diff&&!body)return '';
   return '<div data-error-chain>'+diff+body+'</div>';
@@ -157,7 +177,7 @@
    };
   });
  }
- const api={ruleIdOf,fullHtml,openButton,forQuestion,chainHtml,map31,bind,chaptersFor};
+ const api={ruleIdOf,fullHtml,openButton,forQuestion,chainHtml,map31,bind,chaptersFor,spoilsOnWrong,safeWrongWhy};
  if(node)module.exports=api;
  else root.ExplainOpen=api;
 })(typeof window!=='undefined'?window:globalThis);

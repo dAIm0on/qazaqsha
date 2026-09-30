@@ -38,13 +38,13 @@ assert.equal(C.FALLBACK_MODEL,'@cf/qwen/qwen3-30b-a3b-fp8');
 assert.equal(C.MODEL_ID,C.PRIMARY_MODEL);
 assert.ok(C.MODES.includes('ask_tutor'));
 assert.ok(C.SURFACES.includes('exam'));
-assert.equal(C.CLIENT_TIMEOUT_MS,25000);
-assert.equal(C.PRIMARY_TIMEOUT_MS,11000);
+assert.equal(C.CLIENT_TIMEOUT_MS,30000);
+assert.equal(C.PRIMARY_TIMEOUT_MS,14000);
 assert.equal(C.FALLBACK_TIMEOUT_MS,8000);
 assert.ok(/RECOVERY_TIMEOUT_MS=4000/.test(tutorSrc));
 assert.ok(C.CLIENT_TIMEOUT_MS>C.PRIMARY_TIMEOUT_MS+C.FALLBACK_TIMEOUT_MS+4000);
 assert.ok(/PRIMARY_MODEL/.test(tutorSrc)&&/FALLBACK_MODEL/.test(tutorSrc));
-assert.ok(/11000/.test(tutorSrc)&&/8000/.test(tutorSrc));
+assert.ok(/14000/.test(tutorSrc)&&/8000/.test(tutorSrc));
 assert.ok(/runTutorModel/.test(tutorSrc));
 assert.ok(!/Верни только JSON/.test(tutorSrc));
 assert.ok(!/Верни только JSON/.test(contractSrc));
@@ -101,7 +101,10 @@ assert.ok(C.needsKitabymMechanism({mode:'ask_tutor',user_question:'Объясн�
 assert.ok(C.hasKitabymMechanism('Менің кітабым: п→б и наклейка -ым справа.'));
 assert.ok(!C.hasKitabymMechanism('Кітабым это мой книга.'));
 const tutorSrc2=fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8');
-assert.ok(/mode==='ask_tutor'[\s\S]{0,120}?tryOne\(FALLBACK_MODEL/.test(tutorSrc2));
+// Cascade must be primary → fallback → recovery for ALL modes (incl. ask_tutor). Not Qwen-first.
+assert.ok(/const primary=await tryOne\(PRIMARY_MODEL/.test(tutorSrc2));
+assert.ok(tutorSrc2.indexOf('const primary=await tryOne(PRIMARY_MODEL') < tutorSrc2.indexOf('const fallback=await tryOne(FALLBACK_MODEL,FALLBACK_TIMEOUT_MS'));
+assert.ok(!/if\(req\.mode==='ask_tutor'\)\{\s*const fallback=await tryOne\(FALLBACK_MODEL/.test(tutorSrc2));
 assert.ok(/kitabym_canned_after_unusable/.test(tutorSrc2));
 assert.ok(/source:'local'[\s\S]{0,80}?kitabym_canned_after_unusable|kitabym_canned_after_unusable[\s\S]{0,200}?source:'local'/.test(tutorSrc2));
 assert.ok(!/kitabym_canned_after_unusable[\s\S]{0,220}?source:'fallback'/.test(tutorSrc2));
@@ -109,7 +112,50 @@ assert.ok(!/assemble\(req,canned,\{[\s\S]*?source:'fallback'/.test(tutorSrc2));
 assert.ok(C.looksLikeBadTutorReply('Нужно объяснить, что ... окончания множественного числа и притяжательное'));
 assert.ok(!C.isUsableText('Нужно объяснить, что окончания множественного числа и притяжательное'));
 ok('TEST planning meta Нужно объяснить rejected');
+assert.ok(C.looksLikePromptLeak('Хорошо, ученица попросила объяснить кітабым. Нужно следовать инструкциям.'));
+assert.ok(!C.isUsableText('Хорошо, ученица попросила объяснить. Нужно следовать правилам ответа.'));
+assert.ok(C.looksLikePromptLeak('Сначала подумаю и разберу инструкции, потом отвечу ученице.'));
+assert.ok(C.looksLikePromptLeak('Я структурирую ответ по шагам, следуя инструкциям.'));
+assert.ok(C.looksLikePromptLeak('Okay the user asked to explain. I will structure the reply.'));
+assert.ok(C.looksLikePromptLeak('Ученица просит объяснить через русский, следуя внутренним инструкциям.'));
+assert.ok(!C.isUsableText('Нужно следовать внутренним инструкциям и структурирую ответ.'));
+{
+  const stripped=C.cleanTutorReply('Хорошо, ученица попросила объяснить.\n\nВ русском «моя книга» — отдельные слова. В казахском менің кітабым: справа -ым, п→б.');
+  assert.ok(/В русском/.test(stripped));
+  assert.ok(!/Хорошо,?\s*учениц/i.test(stripped));
+  assert.ok(C.isUsableText(stripped));
+}
+ok('TEST Russian CoT / meta phrases rejected or stripped');
 ok('TEST tutor loop and kitabym gate');
+
+// A10: ask/simplify/translate_word must not leak expected_answer into contrast.correct
+{
+  const askA=C.assembleResponse({mode:'ask_tutor',lesson_id:'1-2',user_answer:'адамлар',expected_answer:'адамдар',user_question:'почему?',candidate_error_codes:[],rule_context:[]},'Короткий ответ тьютора без эталона.',{source:'primary',request_id:'a10'});
+  assert.ok(askA);assert.equal(askA.contrast.correct,null);
+  const simA=C.assembleResponse({mode:'simplify',lesson_id:'1-2',expected_answer:'SECRET',user_question:'проще',candidate_error_codes:[],rule_context:[{short:'x'}]},'Объясню проще: после числа множественное не ставим.',{source:'primary'});
+  assert.ok(simA);assert.equal(simA.contrast.correct,null);
+  const twA=C.assembleResponse({mode:'translate_word',lesson_id:'1-2',expected_answer:'SECRET',user_question:'кітап',candidate_error_codes:[],rule_context:[]},'кітап — книга (предмет для чтения).',{source:'primary'});
+  assert.ok(twA);assert.equal(twA.contrast.correct,null);assert.equal(twA.contrast.wrong,null);
+  const askL=C.localExplain({mode:'ask_tutor',lesson_id:'1-2',user_answer:'x',expected_answer:'SECRET',user_question:'?',rule_context:[]});
+  assert.equal(askL.contrast.correct,null);
+  const vr=C.validateRequest({mode:'ask_tutor',lesson_id:'1-2',user_question:'?',expected_answer:'SECRET',prompt:'p'});
+  assert.ok(vr.ok);assert.equal(vr.req.expected_answer,'');
+  const vrTw=C.validateRequest({mode:'translate_word',lesson_id:'1-2',user_question:'кітап',expected_answer:'SECRET',prompt:'кітап'});
+  assert.ok(vrTw.ok);assert.equal(vrTw.req.expected_answer,'');
+  // QA-shaped aliases (action_or_mode / action / message / word) must resolve mode and strip expected
+  const vrAlias=C.validateRequest({action_or_mode:'ask_tutor',lesson_id:'3-1',message:'Не ясно',expected_answer:'SECRET_A10_LEAK_TEST'});
+  assert.ok(vrAlias.ok);assert.equal(vrAlias.req.mode,'ask_tutor');assert.equal(vrAlias.req.expected_answer,'');assert.equal(vrAlias.req.user_question,'Не ясно');
+  const askAliasA=C.assembleResponse(vrAlias.req,'Ответ без эталона.',{source:'primary'});
+  assert.equal(askAliasA.contrast.correct,null);
+  const vrAct=C.validateRequest({action:'translate_word',lesson_id:'3-1',word:'кітабым',expected_answer:'SECRET'});
+  assert.ok(vrAct.ok);assert.equal(vrAct.req.mode,'translate_word');assert.equal(vrAct.req.expected_answer,'');
+  const twAliasA=C.assembleResponse(vrAct.req,'кітабым — моя книга.',{source:'primary'});
+  assert.equal(twAliasA.contrast.correct,null);assert.equal(twAliasA.contrast.wrong,null);
+  assert.ok(tutorSrc2.includes('resolveMode')||tutorSrc2.includes('action_or_mode'));
+  assert.ok(tutorSrc2.includes("mode==='ask_tutor'||mode==='simplify'||mode==='translate_word'")||tutorSrc2.includes('hideExpected'));
+  ok('TEST A10 no expected_answer in contrast.correct for ask/simplify/translate_word');
+}
+
 
 
 assert.equal(C.normalizeModelText('<think>secret</think>Ты написала бес кітаптар, нужно бес кітап.'),'Ты написала бес кітаптар, нужно бес кітап.');
@@ -143,6 +189,12 @@ assert.ok(!C.looksFuture('Почему в русском «пять книг», 
 assert.ok(C.looksFuture('А как здесь будет притяжательное окончание?'));
 assert.equal(C.assembleResponse({mode:'ask_tutor',lesson_id:'1-2',user_question:'через русский',candidate_error_codes:[],rule_context:[]},'Сначала разберём падеж и кітабым.',{source:'primary'}),null);
 ok('TEST 15 future topic local; Russian contrast allowed');
+assert.ok(!C.looksFuture('А как здесь будет притяжательное окончание?','3-3'));
+assert.ok(!C.looksFuture('кітабым','3-1'));
+assert.ok(!C.looksFuture('посессив','4-2'));
+assert.ok(C.ALLOWED_LESSONS.includes('4-2'));
+assert.ok(C.MODES.includes('translate_word'));
+ok('TEST looksFuture open 3-1…3-3/4-2; ALLOWED 4-2; translate_word');
 
 const t4=R.toRuleContext(R.byId('T4_NO_PLURAL_AFTER_NUMBER'));
 assert.ok(t4.medium);
@@ -150,6 +202,7 @@ assert.ok(/книг/.test(t4.ru_refresh));
 const askLocal=C.localExplain({mode:'ask_tutor',lesson_id:'1-3',user_question:'Объясни через русский',rule_context:[t4]});
 assert.ok(/кітап/.test(askLocal.message_ru)||/книг/.test(askLocal.message_ru));
 assert.ok(!/Не разобрала/.test(askLocal.message_ru));
+assert.equal(askLocal.next_action_ru,null);
 ok('TEST 12/25 ask_tutor local Russian refresh');
 
 const tail=C.clipTail([
@@ -229,7 +282,7 @@ assert.deepEqual(reqHint.allowed_lesson_ids,['1-1','1-2','1-3']);
 ok('TEST 34 hint request omits expected_answer; scope from lesson');
 
 assert.ok(typeof T.callTutor==='function');
-assert.ok(/25000/.test(fs.readFileSync(path.join(__dirname,'ai-tutor.js'),'utf8'))||T.callTutor.length>=1);
+assert.ok(/CLIENT_TIMEOUT_MS/.test(fs.readFileSync(path.join(__dirname,'ai-tutor.js'),'utf8'))||T.callTutor.length>=1);
 ok('TEST 78 client callTutor default 25s, no client model retry');
 
 const hijackCtx=C.validateRequest({
@@ -364,13 +417,13 @@ ok('TEST 1.5.2 tutor.js splits GLM/Qwen payloads, no enable_thinking');
   }}};
   const recovered=await tutor.runTutorModel(parsed,recoveryEnv,'recovery-test');
   assert.equal(calls.length,3);
-  assert.equal(calls[0].model,tutor.FALLBACK_MODEL);
-  assert.equal(calls[1].model,tutor.PRIMARY_MODEL);
+  assert.equal(calls[0].model,tutor.PRIMARY_MODEL);
+  assert.equal(calls[1].model,tutor.FALLBACK_MODEL);
   assert.equal(calls[2].model,tutor.FALLBACK_MODEL);
   assert.equal(recovered.meta.source,'fallback');
   assert.equal(recovered.meta.recovery,true);
   assert.ok(/адамдар/.test(recovered.message_ru));
-  ok('TEST unusable standard model replies get one honest Qwen recovery before local');
+  ok('TEST unusable primary then fallback get one honest Qwen recovery before local');
 
   assert.equal(tutor.normalizeModelText({choices:[{message:{content:'GLM choices content: бес кітап без -тар.'}}]}),'GLM choices content: бес кітап без -тар.');
   assert.equal(tutor.normalizeModelText({choices:[{message:{content:null,reasoning_content:'GLM reasoning: бес кітап без множественного.'}}]}),'GLM reasoning: бес кітап без множественного.');
