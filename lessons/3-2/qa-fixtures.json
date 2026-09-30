@@ -1,0 +1,10 @@
+{
+  "lesson_id": "3-2",
+  "known_bad": [
+    {
+      "id": "fixture:3-2:bad-key:6-2-1",
+      "reject": "Сенің көршісің",
+      "accept": "Сенің көршің"
+    }
+  ]
+}
