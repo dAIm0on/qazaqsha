@@ -1072,6 +1072,19 @@
    const aiRepeat=window.AiTutor&&aiCodes[0]&&window.AiTutor.shouldOfferExplain(aiCodes[0]);
    const morph=!result.correct?morphemeRow(errors,answerLine,answers.join(' ')):'';
    feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Нужно: <strong lang="kk">'+esc(answerLine)+'</strong>.</p>':''}${morph}${!tarErr?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
+   if(!result.correct&&mode!=='exam'&&window.TutorUI){
+     const word=((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||answers[0]||'').toString().split(/\s+/)[0];
+     window.TutorUI.setContext({
+       surface:tutorSurface(),
+       lesson_id:currentLessonId(q),
+       rule_id:(q.ruleIds&&q.ruleIds[0])||'',
+       user_answer:answers.join(' '),
+       expected_answer:(q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'',
+       codes:aiCodes||[],
+       focus_word:word
+     });
+     window.TutorUI.syncView(mode==='homework'?'homework':'practice');
+   }
    if(!result.correct&&mode!=='exam'&&window.AiTutor){
      const unlock=()=>{['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=false;});};
      const paint=(resp,token)=>{
@@ -1587,7 +1600,8 @@
        const askT=$('#path-ask-tutor');if(askT)askT.onclick=()=>{
          if(!window.TutorUI)return;
          const Bank=window.ExplainBankUI;
-         window.TutorUI.setContext({surface:'path',lesson_id:les.id,chapter_id:ch.id,rule_id:Bank?Bank.ruleForChapter(ch):'',user_answer:val,expected_answer:right,codes:noted.aiCodes});
+         window.TutorUI.setContext({surface:'path',lesson_id:les.id,chapter_id:ch.id,rule_id:Bank?Bank.ruleForChapter(ch):'',user_answer:val,expected_answer:right,codes:noted.aiCodes,focus_word:String(right||val||'').split(/\s+/)[0]});
+         window.TutorUI.syncView('path');
          window.TutorUI.open();
        };
        save();
