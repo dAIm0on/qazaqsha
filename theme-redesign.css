@@ -654,13 +654,13 @@ body[data-view=path] #path-view,body[data-view=learn] #learn-view{display:block!
 body[data-view=path] #today-view,body[data-view=learn] #today-view{display:none!important}
 body[data-view=learn] #learn-content,body[data-view=path] #path-content{padding-bottom:72px}
 body[data-view=learn] .issue-toggle,body[data-view=path] .issue-toggle{display:none!important}
-/* Pet: display 64–72px; sit above sticky Проверить/CTA; z below practice-dock (30) and fixed CTA (40). */
-#tutor-host{position:fixed;z-index:22;right:8px;bottom:calc(64px + env(safe-area-inset-bottom,0px) + var(--bottom-nav-height,64px));pointer-events:none}
-body.path-immersive #tutor-host{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
-body[data-view=practice] #tutor-host,body[data-view=homework] #tutor-host{bottom:calc(64px + env(safe-area-inset-bottom,0px) + var(--bottom-nav-height,64px))}
+/* Pet: display 72×72px with a cover crop; keep a safe CTA gap above sticky controls. */
+#tutor-host{position:fixed;z-index:22;right:8px;bottom:calc(80px + env(safe-area-inset-bottom,0px) + var(--bottom-nav-height,64px));pointer-events:none}
+body.path-immersive #tutor-host{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+body[data-view=practice] #tutor-host,body[data-view=homework] #tutor-host{bottom:calc(80px + env(safe-area-inset-bottom,0px) + var(--bottom-nav-height,64px))}
 #tutor-host[hidden]{display:none}
-.tutor-pet,.tutor-launch{pointer-events:auto;min-width:56px;min-height:56px;width:64px;height:72px;padding:0;border:0;border-radius:18px;background:transparent;box-shadow:none;display:grid;place-items:center;cursor:pointer}
-.tutor-pet img,.tutor-launch img,.tutor-pet-img{width:64px!important;height:72px!important;min-width:64px;min-height:72px;max-width:72px;max-height:72px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 10px rgba(22,20,18,.18))}
+.tutor-pet,.tutor-launch{pointer-events:auto;min-width:72px;min-height:72px;width:72px;height:72px;padding:0;border:0;border-radius:18px;background:transparent;box-shadow:none;display:grid;place-items:center;cursor:pointer}
+.tutor-pet img,.tutor-launch img,.tutor-pet-img{width:72px!important;height:72px!important;min-width:72px;min-height:72px;max-width:72px;max-height:72px;object-fit:cover;object-position:center;pointer-events:none;filter:drop-shadow(0 4px 10px rgba(22,20,18,.18))}
 .tutor-pet-frozen .tutor-launch{opacity:.7}
 .tutor-pet-school .tutor-launch{transform:translateY(-4px)}
 .tutor-steb{pointer-events:none;position:absolute;right:72px;bottom:18px;max-width:140px;padding:6px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-size:.75rem;color:var(--muted);box-shadow:0 4px 12px rgba(22,20,18,.08)}
@@ -683,8 +683,8 @@ body[data-view=practice] #tutor-host,body[data-view=homework] #tutor-host{bottom
 .tutor-out{margin-top:10px;line-height:1.5}
 html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
 @media(min-width:900px){
-  .tutor-pet,.tutor-launch{width:72px;height:80px;right:16px}
-  .tutor-pet img,.tutor-launch img,.tutor-pet-img{width:64px!important;height:72px!important;min-width:64px;min-height:72px}
+  .tutor-pet,.tutor-launch{width:72px;height:72px;right:16px}
+  .tutor-pet img,.tutor-launch img,.tutor-pet-img{width:72px!important;height:72px!important;min-width:72px;min-height:72px}
   .tutor-sheet{left:auto;right:24px;bottom:88px;width:min(380px,42vw);border:1px solid var(--line);border-radius:16px;max-height:70vh}
   .path-paper{max-width:42rem}
 }
