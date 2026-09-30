@@ -1959,9 +1959,17 @@ const chainHtml=OpenChain.chainHtml(chainQ,'кітаплар');
 assert.ok(chainHtml.includes('data-error-chain')&&chainHtml.includes('Неверно')&&chainHtml.includes('Показать полностью'));
 assert.ok(!/Верно:\s*<span lang="kk">кітаптар/.test(chainHtml),'wrong-feedback must not reveal expected form');
 assert.ok(!/→\s*<strong lang="kk">кітаптар/.test(chainHtml),'wrong-feedback must not arrow to expected');
+assert.ok(/Почему:<\/strong>\s*Смотри последний слог/.test(chainHtml),'safe mechanism tip may stay');
 assert.ok(/data-error-chain|chainHtml/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/Проверить этот навык отдельно/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/Другой пример/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+const spoilQ={id:'e1-1-1-1',ruleIds:['T1_HARMONY'],fields:[{answers:['Ә','Г']}],explanation:'Ә и Г — мягкая группа; Қ и О — твёрдая.',stimulus:'Ә · Қ · Г · О'};
+assert.ok(OpenChain.spoilsOnWrong(spoilQ.explanation,spoilQ),'A10: soft/hard letter list spoils');
+const spoilHtml=OpenChain.forQuestion(spoilQ,['Қ']);
+const spoilHead=spoilHtml.split('Показать полностью')[0];
+assert.ok(!/мягкая группа/.test(spoilHead)&&!/Ә и Г/.test(spoilHead),'A10: wrong-feedback must not paint soft/hard spoiler explanation');
+assert.ok(/Неверно/.test(spoilHead));
+assert.ok(/safeWrongWhy|spoilsOnWrong/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')),'practice wrong path gates explanation via sanitizer');
 ok('Astra step 9: wrong answer shows the attempt, the block, and an existing same-skill offer (no expected reveal)');
 
 const depthState=progress.migrate({schema:6,records:{},explainDepth:{T1_HARMONY:'closed',T2_PLURAL_LDT:'open',bad:true}});
@@ -1971,6 +1979,16 @@ assert.equal(depthState.explainDepth.bad,undefined);
 assert.ok(/ExplainDepth/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(!/data-full-panel hidden/.test(fs.readFileSync(path.join(__dirname,'explain-open.js'),'utf8').split('function openButton')[1].split('function forQuestion')[0])||/ruleOpen/.test(fs.readFileSync(path.join(__dirname,'explain-open.js'),'utf8')));
 ok('Astra step 10: rule depth is remembered and does not start closed');
+const tutorUiSrc=fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8');
+assert.ok(/stemCandidates/.test(tutorUiSrc)&&/WORD_BANK/.test(tutorUiSrc),'glossLookup stems + WORD_BANK');
+assert.ok(/isLoneLetter/.test(tutorUiSrc),'focus_word rejects lone letters');
+assert.ok(/medium\|\|c\.ru_refresh/.test(tutorUiSrc)&&/ruleForChapter/.test(tutorUiSrc),'Не ясно prefers medium+ru_refresh with rule resolve');
+const petCss=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
+assert.ok(/\.tutor-pet-img\{[^}]*width:56px!important/.test(petCss.replace(/\s+/g,''))||/width:56px!important/.test(petCss),'pet display ≥56px');
+assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-index:22/.test(petCss));
+assert.ok(/56px \+ env\(safe-area-inset-bottom/.test(petCss),'pet bottom clears CTA + safe-area');
+assert.ok(/school-tutor6/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor6');
+
 
 const TutorBlock=require('./ai-tutor.js');
 TutorBlock.reset();

@@ -899,7 +899,10 @@
       const m=stim.match(/[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}/);
       if(m)focus=m[0];
     }
-    if(!focus)focus=ans.split(/\s+/)[0]||'';
+    if(!focus){
+      const tok=(ans.match(/[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}/)||[])[0]||'';
+      focus=tok;
+    }
     window.TutorUI.setContext({
       surface:mode==='homework'?'homework':'practice',
       lesson_id:lid,
@@ -1092,15 +1095,17 @@
    const aiCodes=window.AiTutor&&mode!=='exam'?window.AiTutor.noteAnswer(q,answers,result,hinted,errors,now):[];
    const aiRepeat=window.AiTutor&&aiCodes[0]&&window.AiTutor.shouldOfferExplain(aiCodes[0]);
    const morph=!result.correct?morphemeRow(errors,answerLine,answers.join(' ')):'';
-   feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Число уже сказало, сколько. Окончание множественного здесь лишнее.</p>':''}${morph}${result.correct?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}<p>${esc(q.explanation)}</p><p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
+   feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Число уже сказало, сколько. Окончание множественного здесь лишнее.</p>':''}${morph}${result.correct?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}${(()=>{const raw=q.explanation||'';if(result.correct)return raw?'<p>'+esc(raw)+'</p>':'';const safe=(window.ExplainOpen&&window.ExplainOpen.safeWrongWhy)?window.ExplainOpen.safeWrongWhy(raw,q):(raw&&window.ExplainOpen&&window.ExplainOpen.spoilsOnWrong&&window.ExplainOpen.spoilsOnWrong(raw,q)?'':raw);return safe?'<p>'+esc(safe)+'</p>':'';})()}<p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
    if(!result.correct&&mode!=='exam'&&window.TutorUI){
-     const word=((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||answers[0]||'').toString().split(/\s+/)[0];
+     const rawFocus=((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||answers[0]||q.stimulus||'').toString();
+     const word=(rawFocus.match(/[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}/)||[])[0]||'';
      window.TutorUI.setContext({
        surface:tutorSurface(),
        lesson_id:currentLessonId(q),
        rule_id:(q.ruleIds&&q.ruleIds[0])||'',
        user_answer:answers.join(' '),
        expected_answer:(q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'',
+       stimulus:String(q.stimulus||''),
        codes:aiCodes||[],
        focus_word:word
      });
@@ -1614,7 +1619,7 @@
        const chain=window.ExplainOpen&&window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(pathQ,val):'';
        const gap=window.AiTutor&&window.AiTutor.coverageGaps?window.AiTutor.coverageGaps().find(g=>noted.aiCodes.includes(g.error_code)):null;
        const gapHtml=gap&&!offers.isolated&&!offers.other?'<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>':'';
-       showPathFb('error','<p data-error-diff>Ты написала: <s lang="kk">'+esc(val.trim()||'пусто')+'</s>. Разберём механизм — без готового ответа.</p><p>Ты написала: <strong lang="kk">'+esc(val.trim()||'пусто')+'</strong></p>'+(why.length?'<p>'+esc([...new Set(why)].join(' · '))+'</p>':'')+'<p>'+seeText(diag)+'</p>'+studentCopy(chain)+offerHtml(offers)+gapHtml+(beat.trap?'<p>'+seeText(beat.trap)+'</p>':'')+(bankCard&&bankCard.short?'<p class="small">'+seeText(bankCard.short)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
+       showPathFb('error','<p data-error-diff>Ты написала: <s lang="kk">'+esc(val.trim()||'пусто')+'</s>. Разберём механизм — без готового ответа.</p><p>Ты написала: <strong lang="kk">'+esc(val.trim()||'пусто')+'</strong></p>'+(why.length?'<p>'+esc([...new Set(why)].join(' · '))+'</p>':'')+studentCopy(chain)+offerHtml(offers)+gapHtml+(beat.trap?'<p>'+seeText(beat.trap)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
        if(window.ExplainOpen)window.ExplainOpen.bind($('#path-fb'));
        bindOffers($('#path-fb'));
        const again=$('#path-again-rule');if(again)again.onclick=()=>{showPathFb('hinted','<p>'+seeText(bankCard&&(bankCard.short||bankCard.medium)||hintLine())+'</p>');};
@@ -1622,7 +1627,7 @@
        const askT=$('#path-ask-tutor');if(askT)askT.onclick=()=>{
          if(!window.TutorUI)return;
          const Bank=window.ExplainBankUI;
-         window.TutorUI.setContext({surface:'path',lesson_id:les.id,chapter_id:ch.id,rule_id:Bank?Bank.ruleForChapter(ch):'',user_answer:val,expected_answer:right,codes:noted.aiCodes,focus_word:String(right||val||'').split(/\s+/)[0]});
+         window.TutorUI.setContext({surface:'path',lesson_id:les.id,chapter_id:ch.id,rule_id:Bank?Bank.ruleForChapter(ch):'',user_answer:val,expected_answer:right,stimulus:String(beat.stem||beat.from||''),codes:noted.aiCodes,focus_word:(String(right||beat.stem||beat.from||val||'').match(/[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}/)||[])[0]||''});
          window.TutorUI.syncView('path');
          window.TutorUI.open();
        };

@@ -63,36 +63,113 @@
   const vocab=root.AiContract&&root.AiContract.VOCAB_BY_LESSON&&root.AiContract.VOCAB_BY_LESSON[lessonId];
   return (vocab&&vocab[0])||'';
  }
- function glossLookup(word,lessonId){
+ function stemCandidates(word){
   const w=normWord(word);
-  if(!w)return null;
+  if(!w)return [];
+  const out=[w];
+  const endings=['ларымыз','леріміз','дарымыз','деріміз','тарымыз','теріміз','ларың','лерің','дарың','дерің','тарың','терің','лары','лері','дары','дері','тары','тері','ымыз','іміз','умыз','үміз','ыңыз','іңіз','ым','ім','ум','үм','ың','ің','уң','үң','сы','сі','ны','ні','ы','і','у','ү'];
+  for(const e of endings){
+   if(w.length>e.length+2&&w.endsWith(e)){
+    const stem=w.slice(0,-e.length);
+    out.push(stem);
+    if(/б$/.test(stem))out.push(stem.slice(0,-1)+'п');
+    if(/г$/.test(stem))out.push(stem.slice(0,-1)+'к');
+    if(/ғ$/.test(stem))out.push(stem.slice(0,-1)+'қ');
+   }
+  }
+  return [...new Set(out.filter(Boolean))];
+ }
+ function bankVocabRows(lessonId){
+  const rows=[];
   const packs=root.LESSON_PACKS||[];
   const through=(root.AiContract&&root.AiContract.lessonsThrough&&root.AiContract.lessonsThrough(lessonId))||null;
-  const matchPack=packs.filter(p=>p&&(!lessonId||p.lesson_id===lessonId||(Array.isArray(through)&&through.includes(p.lesson_id))));
-  const scan=list=>{
-   for(const p of list){
-    for(const row of (p.target_vocabulary||[])){
-     const kk=normWord(row.kazakh||row.kk||row.word||'');
-     if(kk!==w)continue;
-     const tr=row.translation||row.ru||row.gloss;
-     const gloss=Array.isArray(tr)?tr[0]:tr;
-     if(gloss)return {word:row.kazakh||row.kk||word,gloss:String(gloss),source:'local'};
+  for(const p of packs){
+   if(!p)continue;
+   if(lessonId&&p.lesson_id!==lessonId&&!(Array.isArray(through)&&through.includes(p.lesson_id)))continue;
+   for(const row of (p.target_vocabulary||[]))rows.push(row);
+  }
+  const WB=root.WORD_BANK;
+  if(WB){
+   const lessons=Array.isArray(through)&&through.length?through:(lessonId?[lessonId]:Object.keys(WB.must||{}));
+   const buckets=[WB.must,WB.extra,WB.bonus,WB.optional].filter(Boolean);
+   for(const bucket of buckets){
+    for(const lid of lessons){
+     for(const row of (bucket[lid]||[]))rows.push(row);
     }
+    // also scan all lessons as fallback
+    for(const lid of Object.keys(bucket)){
+     if(lessons.includes(lid))continue;
+     for(const row of (bucket[lid]||[]))rows.push(row);
+    }
+   }
+  }
+  return rows;
+ }
+ function glossLookup(word,lessonId){
+  const surface=String(word||'').trim();
+  const w=normWord(surface);
+  if(!w)return null;
+  const rows=bankVocabRows(lessonId);
+  const scanExact=(needle)=>{
+   for(const row of rows){
+    const kk=normWord(row.kazakh||row.kk||row.word||'');
+    if(kk!==needle)continue;
+    const tr=row.translation||row.ru||row.gloss;
+    const gloss=Array.isArray(tr)?tr[0]:tr;
+    if(gloss)return {word:row.kazakh||row.kk||surface,gloss:String(gloss),source:'local',surface:surface||row.kazakh||row.kk};
    }
    return null;
   };
-  return scan(matchPack.length?matchPack:packs)||scan(packs);
+  let hit=scanExact(w);
+  if(hit)return hit;
+  // Inflected forms (кітабым → кітап): try stems, keep surface label.
+  for(const cand of stemCandidates(w)){
+   if(cand===w)continue;
+   hit=scanExact(cand);
+   if(hit)return {word:surface||hit.word,gloss:hit.gloss,source:'local-stem',stem:hit.word,surface:surface};
+  }
+  // Longest vocab prefix of the surface form.
+  let best=null;
+  for(const row of rows){
+   const kk=normWord(row.kazakh||row.kk||row.word||'');
+   if(kk.length<2||!w.startsWith(kk))continue;
+   const tr=row.translation||row.ru||row.gloss;
+   const gloss=Array.isArray(tr)?tr[0]:tr;
+   if(!gloss)continue;
+   if(!best||kk.length>best._n)best={word:surface||row.kazakh||row.kk,gloss:String(gloss),source:'local-prefix',stem:row.kazakh||row.kk,surface:surface,_n:kk.length};
+  }
+  if(best){delete best._n;return best;}
+  return null;
+ }
+ function isLoneLetter(s){
+  const t=String(s||'').trim();
+  return !t||t.length<2||!KK_RE.test(t);
+ }
+ function preferVocabFocus(){
+  const bag=[ctx.stimulus,ctx.expected_answer,ctx.user_answer,ctx.focus_word].filter(Boolean).join(' ');
+  const re=new RegExp(KK_RE.source,'g');
+  let m,best='',bestHit=null;
+  while((m=re.exec(bag))){
+   const hit=glossLookup(m[0],ctx.lesson_id);
+   if(hit&&m[0].length>=(best||'').length){best=hit.word||m[0];bestHit=hit;}
+  }
+  if(bestHit)return bestHit.word||best;
+  re.lastIndex=0;best='';
+  while((m=re.exec(bag))){if(m[0].length>(best||'').length)best=m[0];}
+  return best||'';
  }
  function focusWordFromCtx(){
-  if(ctx.focus_word)return String(ctx.focus_word);
-  return extractKkToken(ctx.stimulus)||extractKkToken(ctx.expected_answer)||extractKkToken(ctx.user_answer)||'';
+  const raw=ctx.focus_word?String(ctx.focus_word):'';
+  if(raw&&!isLoneLetter(raw))return raw;
+  return preferVocabFocus()||extractKkToken(ctx.stimulus)||extractKkToken(ctx.expected_answer)||extractKkToken(ctx.user_answer)||'';
  }
  function ensureFocusWord(){
   let w=focusWordFromCtx();
-  if(w){ctx.focus_word=w;return w;}
+  if(w&&!isLoneLetter(w)){ctx.focus_word=w;return w;}
   w=lessonFirstWord(ctx.lesson_id);
-  if(w)ctx.focus_word=w;
-  return w||'';
+  if(w&&!isLoneLetter(w))ctx.focus_word=w;
+  else ctx.focus_word=w||'';
+  return ctx.focus_word||'';
  }
  function markKkWords(text){
   const s=String(text||'');
@@ -140,6 +217,7 @@
    codes:Array.isArray(next.codes)?next.codes.filter(x=>typeof x==='string').slice(0,8):[],
    focus_word:next.focus_word!=null?String(next.focus_word).slice(0,80):(next.word!=null?String(next.word).slice(0,80):ctx.focus_word||'')
   };
+  if(isLoneLetter(ctx.focus_word))ctx.focus_word='';
   if(!ctx.focus_word)ensureFocusWord();
   const now=ctx.lesson_id+':'+ctx.chapter_id+':'+ctx.rule_id;
   if(now!==prev){tail=[];exampleIndex=0;}
@@ -197,7 +275,8 @@
   const box=$('#tutor-chips');if(!box)return;
   const word=ensureFocusWord();
   const glossHit=word?glossLookup(word,ctx.lesson_id):null;
-  const glossLabel=glossHit?(glossHit.word+' — '+String(glossHit.gloss).slice(0,28)):(word?word:'Слово');
+  const chipWord=(glossHit&&(glossHit.surface||glossHit.word))||word;
+  const glossLabel=glossHit?(chipWord+' — '+String(glossHit.gloss).slice(0,28)):(word&&!isLoneLetter(word)?word:'Слово');
   const chips=[];
   // P0: first chip always = current/tapped word gloss (≤2 taps with cat)
   chips.push('<button type="button" class="secondary-button tutor-chip-gloss" data-tutor-act="gloss" data-word="'+esc(word)+'">'+esc(glossLabel.length>36?glossLabel.slice(0,34)+'…':glossLabel)+'</button>');
@@ -367,15 +446,29 @@
    await callAI('translate_word',w);return;
   }
   if(act==='unclear'){
-   // Primary = fullExplanation + research-card (not shortHint)
-   const c=card();
+   // Primary = fullExplanation + research-card (medium+ru_refresh), never short tip / futureBlocked.
+   let c=card();
+   if((!c||!(c.medium||c.ru_refresh))&&bank()){
+    if(ctx.chapter_id){
+     const rid=bank().ruleForChapter({id:ctx.chapter_id,rule_ids:[]});
+     if(rid){ctx.rule_id=rid;c=card();}
+    }
+    if((!c||!(c.medium||c.ru_refresh))){
+     const row=bank().courseById(ctx.lesson_id);
+     if(row&&row.rules&&row.rules[0]){ctx.rule_id=row.rules[0];c=card();}
+    }
+   }
    if(c&&(c.medium||c.ru_refresh)){
     const html=[c.medium?('<p>'+esc(c.medium).replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')+'</p>'):'',
                 c.ru_refresh?('<p class="small">'+esc(c.ru_refresh).replace(/\n/g,'<br>')+'</p>'):''].join('');
-    showOut(html||('<p>'+esc(c.short||'')+'</p>'),{source:'local'});
+    showOut(html,{source:'local'});
     return;
    }
-   await callAI('ask_tutor','Не ясно. Объясни правило этой главы ещё раз, коротко.');
+   if(c&&c.short){
+    showOut('<p>'+esc(c.short)+'</p>',{source:'local'});
+    return;
+   }
+   await callAI('ask_tutor','Не ясно. Объясни правило этой главы ещё раз полностью.');
    return;
   }
   if(act==='explain'){
