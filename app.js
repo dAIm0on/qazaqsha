@@ -1360,10 +1360,11 @@
    const n=H.sectionCount(all);
    let sec=section==null?H.sectionOf(H.resumeIndex(all,attempt)):Math.floor(Number(section)||0);
    sec=Math.max(0,Math.min(n-1,sec));
-   if(mode==='homework'&&hwLesson===lessonId&&(hwPart||'exercises')===(part||'exercises')&&hwSection===sec&&queue.length>position){showView('practice');return;}
+   // Always rebuild from attempt progress — never reuse a stale in-memory queue/position.
    hwSection=sec;
-   queue=H.sliceSection(all,sec);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=H.resumeIndex(queue,attempt);checked=false;resetCounts();
-   if(!queue.length){renderHomework();showView('homework');return;}
+   queue=H.sliceSection(all,sec);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();
+   position=H.resumeIndex(queue,attempt);checked=false;resetCounts();
+   if(!queue.length||position>=queue.length){renderHomework();showView('homework');return;}
    render();showView('practice');
  }
  function startBlockReview(failedId){
@@ -1379,8 +1380,10 @@
    const root=$('#homework-content');if(!root||!window.Homework)return;
    const list=window.Homework.packs(questions,course,homeworkOpts());
    const weak=window.Homework.weakSpots(state,questions);
-   const pick=hwLesson&&list.find(p=>p.lesson_id===hwLesson)||list[0];
+   const want=hwLesson||namedCourse()||(list[0]&&list[0].lesson_id);
+   const pick=list.find(p=>p.lesson_id===want)||list[0];
    if(!pick){root.innerHTML='<div class="panel"><p>Пакеты ДЗ 1–1…1–3 ещё не собраны из банка.</p></div>';return;}
+   hwLesson=pick.lesson_id;
    const pack=pick,attempt=window.Homework.ensureAttempt(state,pack.lesson_id),h=pack.homework;
    const exercisesClosed=!!h.gated&&!h.exercise_ids.length;
    const ready=!exercisesClosed&&window.Homework.sheetReady(attempt,pack);
@@ -1393,13 +1396,19 @@
    const wordLine=cards>listed&&listed?`${listed} слов · карточек ${wP.done} из ${wP.total}`:!cards&&listed?`${listed} слов`:`${wP.done} из ${wP.total} слов`;
    const sourceHomework=(h.source_items||[]).length?`<details class="homework-source"><summary>Исходная домашняя работа</summary><ol>${h.source_items.map(x=>`<li><strong>${esc(x.number)}.</strong> ${esc(x.text)}</li>`).join('')}</ol></details>`:'';
    const headLine=exercisesClosed?'Упражнения ещё закрыты. Они появятся после сдачи правила. Просмотр карточки их не открывает.':`Готово ${exP.done} из ${exP.total} упражнений · ${wordLine}. Это выборка урока, не весь сборник и не повторение.`;
-   const openExercises=exercisesClosed?'':`<button type="button" class="primary-button" data-hw-part="exercises">${exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения'}</button>`;
+   const openLabel=exercisesClosed?'':(exP.total&&exP.done>=exP.total)?'Смотреть упражнения':exP.done?('Продолжить с задания '+(resumeAt+1)):'Открыть упражнения';
+   const openExercises=exercisesClosed||!openLabel?'':`<button type="button" class="primary-button" data-hw-part="exercises">${openLabel}</button>`;
+   const pdfLink=(url,title,kind)=>{
+     if(url)return `<a class="ext-test-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(title||kind)}</a>`;
+     return `<span class="small">PDF «${esc(title||kind)}» пока без ссылки.</span> <button type="button" class="text-button" data-hw-pdf-retry="${esc(kind)}">Повторить</button>`;
+   };
    root.innerHTML=`<div class="panel homework-head ia-card"><p class="eyebrow">УРОК ${esc(pack.lesson_id)}</p><h2>${esc(h.title)}</h2><p>${headLine}</p>${openExercises}</div>
      <div class="panel"><div class="jump-row">${list.map(p=>`<button type="button" class="chip" data-hw-lesson="${p.lesson_id}" ${p.lesson_id===pack.lesson_id?'aria-pressed="true"':''}>${esc(p.homework.title)}</button>`).join('')}</div>
        <p class="small">Открытие правила не повышает уровень. Готовый ответ — как подсказка в практике. Можно выйти в любой момент: ответы уже в листе.</p>
        ${sourceHomework}
        <ol class="learning-steps">
-         <li>Повторить методичку — ${h.method_url?`<a href="${esc(h.method_url)}" target="_blank" rel="noopener noreferrer">${esc(h.method_title)}</a>`:'ссылка на материал урока'}${check('method')}</li>
+         <li>Повторить методичку — ${pdfLink(h.method_url,h.method_title,'method')}${check('method')}</li>
+         <li>PDF домашки — ${pdfLink(h.homework_pdf_url,h.homework_pdf_title||('Домашка '+pack.lesson_id),'homework-pdf')}</li>
          <li>${exercisesClosed?'Упражнения сборника откроются вместе с правилом.':`Упражнения сборника (${h.exercise_ids.length} пунктов, по ${window.Homework.HW_SECTION} в части) <button type="button" class="secondary-button" data-hw-part="exercises">${exP.done?'Продолжить упражнения':'Открыть упражнения'}</button>${secBtns('exercises',exN)}`}</li>
          <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${wordLine}. <button type="button" class="secondary-button" data-hw-part="words">${wP.done?'Продолжить слова':'Открыть слова'}</button>${secBtns('words',wN)}</li>
          <li>Внешний тест: ${(h.external_tests&&h.external_tests.length?h.external_tests:[h.external_test_url]).filter(Boolean).map(u=>`<a class="ext-test-link" href="${esc(u)}" target="_blank" rel="noopener noreferrer">BatylBol · внешний тест</a>`).join(' · ')||'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
@@ -1423,6 +1432,13 @@
      </div>`;
    root.querySelectorAll('[data-hw-lesson]').forEach(b=>b.onclick=()=>{hwLesson=b.dataset.hwLesson;renderHomework();});
    root.querySelectorAll('[data-hw-part]').forEach(b=>b.onclick=()=>startHomework(pack.lesson_id,b.dataset.hwPart,b.dataset.hwSec==null?undefined:Number(b.dataset.hwSec)));
+   root.querySelectorAll('[data-hw-pdf-retry]').forEach(b=>b.onclick=()=>{
+     const kind=b.dataset.hwPdfRetry;
+     const url=kind==='homework-pdf'?h.homework_pdf_url:h.method_url;
+     if(url){window.open(url,'_blank','noopener,noreferrer');return;}
+     b.textContent='Ссылка всё ещё недоступна — напиши в поддержку урока';
+     b.disabled=true;
+   });
    root.querySelectorAll('[data-hw-check]').forEach(el=>el.onchange=()=>{window.Homework.markChecklist(state,pack.lesson_id,el.dataset.hwCheck,el.checked);save();});
    const neu=root.querySelector('[data-hw-new]');if(neu)neu.onclick=()=>{if(!window.confirm('Начать новую сдачу? Прошлый экспорт останется в истории попытки.'))return;window.Homework.newAttempt(state,pack.lesson_id);save();renderHomework();};
    root.querySelectorAll('[data-weak]').forEach(b=>b.onclick=()=>startBlockReview(b.dataset.weak));
@@ -2316,7 +2332,7 @@
    state:()=>state,questions:()=>questions,eligible,hasSession:()=>queue.length>position,continueInfo:stepNow,
    action(next){
      if(next.startsWith('remedy:')){startRemedy(next.slice(7));return;}
-     if(next==='homework'){hwOrigin='today';showView('homework');return;}
+     if(next==='homework'){hwOrigin='today';hwLesson=hwLesson||namedCourse();showView('homework');return;}
      if(next==='path'){showView('path');return;}
      if(next==='personal-trainers'){showView('personal');return;}
      if(next.startsWith('weak:')){startBlockReview(next.slice(5));return;}
