@@ -109,30 +109,75 @@
    return {open,vv,gap,gapLayout,gapBase};
  }
  function scrollFieldAndStrip(field){
+   /* In typing-compact the prompt scrolls inside .typing-scroll; do not
+      scrollIntoView the field (that scrolls the document and hides the prompt). */
+   if(document.documentElement.classList.contains('typing-compact')){
+     const sc=document.querySelector('.typing-scroll');
+     if(sc){try{sc.scrollTop=0;}catch{}}
+     return;
+   }
    if(field)try{field.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
    const strip=document.querySelector('.typing-strip');
-   if(strip&&!document.documentElement.classList.contains('typing-compact')){
+   if(strip){
      try{strip.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
    }
  }
- function anchorTypingStrips(open,vv){
-   document.querySelectorAll('.typing-strip').forEach(strip=>{
-     if(!open||!vv){
-       strip.style.top='';
-       strip.style.left='';
-       strip.style.width='';
-       strip.style.bottom='';
-       return;
-     }
-     /* Dock flush to visualViewport bottom (not layout viewport / accessory gap).
-        top = offsetTop + height - stripHeight; no safe-area padding in compact CSS. */
-     const h=Math.max(strip.offsetHeight||0,strip.getBoundingClientRect().height||0);
-     const top=vv.offsetTop+vv.height-h;
-     strip.style.bottom='auto';
-     strip.style.top=Math.round(top)+'px';
-     strip.style.left=Math.round(vv.offsetLeft||0)+'px';
-     strip.style.width=Math.round(vv.width)+'px';
+ function clearTypingShellStyles(){
+   document.querySelectorAll('#answer-form,.path-paper:has(#path-form),.typing-dock,.practice-dock.typing-dock,.typing-strip').forEach(el=>{
+     el.style.top='';el.style.left='';el.style.width='';el.style.height='';
+     el.style.bottom='';el.style.right='';el.style.position='';
    });
+ }
+ function anchorTypingStrips(open,vv){
+   if(!open||!vv){
+     clearTypingShellStyles();
+     return;
+   }
+   /* VV shell: form/path-paper fills visualViewport. Scroll-body (.typing-scroll)
+      takes remaining height; dock (input + letters + Проверить) sits at VV bottom.
+      Do NOT lock overflow:hidden on html/body — only the shell clips. */
+   const left=Math.round(vv.offsetLeft||0);
+   const top=Math.round(vv.offsetTop||0);
+   const width=Math.round(vv.width);
+   const height=Math.round(vv.height);
+   const form=$('#answer-form');
+   if(form&&document.body.getAttribute('data-view')==='practice'){
+     form.style.position='fixed';
+     form.style.left=left+'px';
+     form.style.top=top+'px';
+     form.style.width=width+'px';
+     form.style.height=height+'px';
+     form.style.bottom='auto';
+     form.style.right='auto';
+     /* Strip stays in-flow inside dock (not separately fixed). */
+     document.querySelectorAll('#answer-form .typing-strip').forEach(strip=>{
+       strip.style.top='';strip.style.left='';strip.style.width='';strip.style.bottom='';strip.style.position='';
+     });
+   }
+   const paper=document.querySelector('.path-paper:has(#path-form)');
+   if(paper&&document.body.getAttribute('data-view')==='path'){
+     paper.style.position='fixed';
+     paper.style.left=left+'px';
+     paper.style.top=top+'px';
+     paper.style.width=width+'px';
+     paper.style.height=height+'px';
+     paper.style.bottom='auto';
+     paper.style.right='auto';
+     document.querySelectorAll('#path-form .typing-strip').forEach(strip=>{
+       strip.style.top='';strip.style.left='';strip.style.width='';strip.style.bottom='';strip.style.position='';
+     });
+   }
+   /* Morph / free-practice: keep strip docked to VV bottom (no scroll-shell yet). */
+   if(document.body.getAttribute('data-view')==='morph'){
+     document.querySelectorAll('.typing-strip').forEach(strip=>{
+       const h=Math.max(strip.offsetHeight||0,strip.getBoundingClientRect().height||0);
+       const stripTop=vv.offsetTop+vv.height-h;
+       strip.style.bottom='auto';
+       strip.style.top=Math.round(stripTop)+'px';
+       strip.style.left=left+'px';
+       strip.style.width=width+'px';
+     });
+   }
  }
  function syncKbInset(){
    if(document.documentElement.hasAttribute('data-kbinset-lock'))return;
@@ -153,11 +198,11 @@
    if(open&&vv){
      requestAnimationFrame(()=>{
        anchorTypingStrips(true,window.visualViewport||vv);
-       const dock=$('.typing-strip')||$('#practice-dock');
+       const dock=$('.typing-dock')||$('#practice-dock')||$('.typing-strip');
        if(dock)document.documentElement.style.setProperty('--dockh',dock.offsetHeight+'px');
      });
    }
-   const dock=$('.typing-strip')||$('#practice-dock');
+   const dock=$('.typing-dock')||$('#practice-dock')||$('.typing-strip');
    if(dock)document.documentElement.style.setProperty('--dockh',dock.offsetHeight+'px');
    const tog=$('#issue-toggle');
    if(tog)tog.hidden=!!open;
@@ -1103,7 +1148,7 @@
    const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
    const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
    const letterBar=letters?`<div class="letter-keyboard" lang="kk" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div>`:'';
-   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc((q.phase&&q.phase!=='Вспомнить')?q.phase:(q.source.startsWith('hw')?'':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title" class="practice-prompt">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]&&!/вспомнить/i.test(reviewReasonMap[q.id])?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus):esc(q.stimulus)))}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}</div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div><div class="typing-strip" id="typing-strip">${letterBar}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="retry-button" hidden>Ещё раз</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div></div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
+   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div></div><form id="answer-form"><div class="typing-scroll"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc((q.phase&&q.phase!=='Вспомнить')?q.phase:(q.source.startsWith('hw')?'':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title" class="practice-prompt">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]&&!/вспомнить/i.test(reviewReasonMap[q.id])?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus):esc(q.stimulus)))}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></div><div class="practice-dock typing-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}</div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div><div class="typing-strip" id="typing-strip">${letterBar}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="retry-button" hidden>Ещё раз</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div></div></div></form>`;
    const goCard=()=>{if(checked)nextQuestion();else if(isVocabWordsMode()&&retrying&&$('#retry-button')&&!$('#retry-button').hidden)beginVocabRetry();else checkAnswer(q);};
    if(window._qazaqEnter)document.removeEventListener('keydown',window._qazaqEnter);
    window._qazaqEnter=e=>{
@@ -1822,11 +1867,11 @@
      bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='ask'){
-     root.innerHTML=`<div class="panel path-paper">${head}<p class="phase-label">${beat.type==='one_prod'?'Самостоятельно':'Проверь понимание'}</p>
+     root.innerHTML=`<div class="panel path-paper">${head}<div class="typing-scroll"><p class="phase-label">${beat.type==='one_prod'?'Самостоятельно':'Проверь понимание'}</p>
        <h2 class="practice-prompt">${esc(faceTitle(beat.prompt))}</h2>
        ${beat.stem?'<p class="stimulus" lang="kk">'+(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(beat.stem):esc(beat.stem))+'</p>':''}
-       <form id="path-form" class="practice-composer"><div class="composer-row"><input id="path-answer" type="text" lang="kk" enterkeyhint="enter" autocomplete="off" spellcheck="false"></div><div class="typing-strip">${kb}<button type="submit" class="primary-button" id="path-check">Проверить</button></div>
-         <div id="path-fb" class="feedback" hidden></div>
+       <div id="path-fb" class="feedback" hidden></div></div>
+       <form id="path-form" class="practice-composer typing-dock"><div class="composer-row"><input id="path-answer" type="text" lang="kk" enterkeyhint="enter" autocomplete="off" spellcheck="false"></div><div class="typing-strip">${kb}<button type="submit" class="primary-button" id="path-check">Проверить</button></div>
          <div class="lesson-actions">
            <button type="button" class="text-button chrome-back" id="path-back">← Назад</button>
            <button type="button" class="secondary-button" id="path-rule">Подсказка</button>

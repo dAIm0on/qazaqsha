@@ -178,8 +178,8 @@ body.keyboard-open[data-view=practice] .practice-dock{
 body.keyboard-open[data-view=path] #path-form{
   background:var(--surface)
 }
-html.typing-compact body[data-view=path] .path-paper,
-html.typing-compact body[data-view=practice] .exercise-card{
+/* kb-compact6: practice/path fill VV via shell; no card pad needed. */
+html.typing-compact body[data-view=morph] .morph-panel{
   padding-bottom:calc(var(--dockh, 148px) + 10px)
 }
 body.keyboard-open[data-view=practice] .bottom-nav,
@@ -907,15 +907,41 @@ h2.practice-prompt,
 .typing-strip .morph-keys button::before{
   content:"";position:absolute;left:50%;top:50%;width:44px;height:44px;transform:translate(-50%,-50%)
 }
-/* Compact strip: dock flush to visualViewport bottom via JS top=
-   vv.offsetTop+vv.height-h. Do NOT add env(safe-area-inset-bottom) —
-   that pads Проверить up and leaves a gap above the iOS accessory bar. */
-html.typing-compact #answer-form .practice-composer .typing-strip,
-html.typing-compact .typing-strip{
-  display:flex;position:fixed;z-index:45;right:auto;bottom:auto;margin:0;
+/* Compact kb-compact6: VV shell + scroll-body + dock.
+   JS pins #answer-form / .path-paper to visualViewport; .typing-scroll
+   (flex:1, overflow-y:auto) keeps the prompt scrollable; .typing-dock
+   holds input + letter row + Проверить at VV bottom.
+   Do NOT lock overflow:hidden on html/body (kills exercise scroll).
+   Do NOT add env(safe-area-inset-bottom) on the strip — that pads
+   Проверить up and leaves a gap above the iOS accessory bar. */
+html.typing-compact #answer-form,
+html.typing-compact .path-paper:has(#path-form){
+  display:flex!important;flex-direction:column;gap:0;margin:0;
+  z-index:40;background:var(--surface);box-sizing:border-box;
+  overflow:hidden; /* shell only — scroll lives on .typing-scroll */
+  border-radius:0;max-width:none;padding:0
+}
+html.typing-compact .typing-scroll{
+  flex:1 1 auto;min-height:0;min-width:0;
+  overflow-x:hidden;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding:8px 10px;touch-action:pan-y
+}
+html.typing-compact .typing-dock,
+html.typing-compact .practice-dock.typing-dock,
+html.typing-compact #path-form.typing-dock{
+  flex:0 0 auto;position:relative;z-index:45;margin:0;
   background:var(--surface);border-top:1px solid var(--line);
   box-shadow:0 -6px 16px rgba(22,20,18,.10);
-  padding:6px 10px;gap:4px
+  padding:6px 10px;gap:4px;
+  /* stay in-flow at bottom of VV shell — not position:fixed alone */
+}
+html.typing-compact #answer-form .practice-composer .typing-strip,
+html.typing-compact .typing-strip{
+  display:flex;position:relative;z-index:auto;right:auto;bottom:auto;top:auto;
+  left:auto;width:auto;margin:0;
+  background:transparent;border-top:0;box-shadow:none;
+  padding:0;gap:4px
 }
 html.typing-compact #answer-form .letter-keyboard,
 html.typing-compact #answer-form .primary-slot{grid-area:auto;width:100%}
@@ -1000,7 +1026,10 @@ html.typing-compact .practice-composer{
 html.typing-compact #answer-form .composer-row,
 html.typing-compact #path-form .composer-row,
 html.typing-compact .composer-row{display:flex!important}
-html.typing-compact .practice-dock{
+html.typing-compact .practice-dock.typing-dock{
+  gap:4px!important;display:flex;flex-direction:column
+}
+html.typing-compact .practice-dock:not(.typing-dock){
   gap:0!important;padding:0!important;margin:0!important;
   box-shadow:none!important;background:transparent
 }
@@ -1009,10 +1038,8 @@ html.typing-compact .letter-keyboard,
 html.typing-compact .morph-keys,
 html.typing-compact .typing-strip .letter-keyboard,
 html.typing-compact .typing-strip .morph-keys{margin:0!important}
-html.typing-compact body[data-view=path] .path-paper,
-html.typing-compact body[data-view=practice] .exercise-card,
-html.typing-compact .path-paper,
-html.typing-compact .exercise-card{
+/* Practice/path use VV shell — no extra card pad. Morph still needs room for fixed strip. */
+html.typing-compact body[data-view=morph] .morph-panel{
   padding-bottom:calc(var(--dockh, 120px) + 8px)
 }
 html.typing-compact .composer-row .fields input[type=text],
@@ -1050,3 +1077,8 @@ html.typing-compact .typing-strip{display:flex!important}
   .morph-keys{display:flex;visibility:visible}
 }
 
+/* kb-compact6 guard: never kill document scroll via html/body overflow lock.
+   Exercise scroll lives on .typing-scroll inside the VV shell. */
+html.typing-compact,html.typing-compact body{
+  overflow:visible!important;height:auto!important;max-height:none!important
+}
