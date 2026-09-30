@@ -655,7 +655,7 @@ body[data-view=path] #today-view,body[data-view=learn] #today-view{display:none!
 body[data-view=learn] #learn-content,body[data-view=path] #path-content{padding-bottom:72px}
 body[data-view=learn] .issue-toggle,body[data-view=path] .issue-toggle{display:none!important}
 /* Companion: 44px orange sticker. z-index 22 is below practice-dock (30) and bottom-nav (30). */
-#tutor-host{position:fixed;z-index:22;right:16px;bottom:calc(12px + env(safe-area-inset-bottom,0px) + var(--bottom-nav-height,64px));width:44px;height:44px;pointer-events:none}
+#tutor-host{position:fixed;z-index:22;right:16px;bottom:calc(12px + env(safe-area-inset-bottom,0px) + var(--bottom-nav-height,64px));width:44px;height:44px;pointer-events:none;overflow:visible}
 body.path-immersive #tutor-host,body[data-view=path] #tutor-host,body[data-view=homework] #tutor-host{top:calc(84px + env(safe-area-inset-top,0px));right:16px;bottom:auto}
 body[data-view=practice] #tutor-host{top:64px;right:16px;bottom:auto}
 #tutor-host[hidden]{display:none}
@@ -670,7 +670,7 @@ body[data-view=practice] #tutor-host{top:64px;right:16px;bottom:auto}
   .tutor-launch{transform:none}
 }
 @keyframes tutor-blink{0%,92%,100%{opacity:1}94%,96%{opacity:.35}}
-.tutor-sheet{pointer-events:auto;position:fixed;left:0;right:0;bottom:0;z-index:45;max-height:min(78dvh,640px);overflow:auto;background:var(--surface);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px) + var(--kbinset,0px));box-shadow:0 -10px 24px rgba(22,20,18,.12)}
+.tutor-sheet{pointer-events:auto;position:fixed;left:0;right:0;bottom:0;z-index:45;max-height:min(78dvh,640px);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--surface);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px) + var(--kbinset,0px));box-shadow:0 -10px 24px rgba(22,20,18,.12)}
 .tutor-sheet-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;margin-bottom:8px}
 .tutor-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .tutor-word-tap{display:inline;position:relative;z-index:1;margin:0;padding:0 1px;border:0;border-radius:4px;background:transparent;color:inherit;font:inherit;line-height:inherit;min-height:0;min-width:0;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;cursor:pointer;box-shadow:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
@@ -678,12 +678,12 @@ body[data-view=practice] #tutor-host{top:64px;right:16px;bottom:auto}
 .tutor-chip-gloss{font-weight:650}
 
 #tutor-q{width:100%;min-height:54px;font-size:max(16px,1rem);margin:6px 0}
-.tutor-out{margin-top:10px;line-height:1.5}
+.tutor-out{margin-top:10px;line-height:1.5;overflow-wrap:anywhere}
 html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
 @media(min-width:900px){
   .tutor-pet,.tutor-launch,.tutor-sticker-dot{width:44px;height:44px;min-width:44px;min-height:44px}
   #tutor-host{right:16px}
-  .tutor-sheet{left:auto;right:24px;bottom:88px;width:min(380px,42vw);border:1px solid var(--line);border-radius:16px;max-height:70vh}
+  .tutor-sheet{left:auto;right:24px;bottom:88px;width:min(380px,42vw);border:1px solid var(--line);border-radius:16px;max-height:min(70vh,640px);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .path-paper{max-width:42rem}
 }
 @media(prefers-reduced-motion:reduce){
