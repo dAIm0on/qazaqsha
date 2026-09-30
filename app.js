@@ -80,17 +80,40 @@
    return 'practice';
  }
  function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}
- let kbScrollLock=false;
+ let kbScrollLock=false,typingFocus=false,vvBaseline=0,vvFocusPoll=null;
+ /* iOS Safari often shrinks window.innerHeight with the keyboard, so
+    innerHeight-vv.height≈0. Keep a closed-keyboard baseline and treat
+    focused typing + VV shrink vs baseline as open. */
+ function captureVvBaseline(force){
+   const vv=window.visualViewport;
+   if(!vv)return;
+   const off=Math.max(0,vv.offsetTop||0);
+   const gapLayout=window.innerHeight-vv.height-off;
+   if(force||(!typingFocus&&gapLayout<40)){
+     vvBaseline=Math.max(vvBaseline||0,window.innerHeight,vv.height+off);
+   }
+   if(!vvBaseline)vvBaseline=Math.max(window.innerHeight,vv.height);
+ }
  function vvKeyboardGap(){
    const vv=window.visualViewport;
    if(!vv)return {open:false,vv:null,gap:0};
-   const gap=window.innerHeight-vv.height-Math.max(0,vv.offsetTop);
-   return {open:gap>80,vv,gap};
+   captureVvBaseline(false);
+   const off=Math.max(0,vv.offsetTop||0);
+   const gapLayout=window.innerHeight-vv.height-off;
+   const gapBase=Math.max(0,(vvBaseline||0)-vv.height-off);
+   const gap=Math.max(gapLayout,gapBase);
+   /* Threshold 80 normally; while a practice text field is focused, 50 is
+      enough (keyboard animation / accessory) so Слова gets typing-compact. */
+   const thresh=typingFocus?50:80;
+   const open=gap>thresh;
+   return {open,vv,gap,gapLayout,gapBase};
  }
  function scrollFieldAndStrip(field){
    if(field)try{field.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
    const strip=document.querySelector('.typing-strip');
-   if(strip)try{strip.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
+   if(strip&&!document.documentElement.classList.contains('typing-compact')){
+     try{strip.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
+   }
  }
  function anchorTypingStrips(open,vv){
    document.querySelectorAll('.typing-strip').forEach(strip=>{
@@ -98,12 +121,16 @@
        strip.style.top='';
        strip.style.left='';
        strip.style.width='';
+       strip.style.bottom='';
        return;
      }
-     const h=strip.offsetHeight||strip.getBoundingClientRect().height;
+     /* Dock flush to visualViewport bottom (not layout viewport / accessory gap).
+        top = offsetTop + height - stripHeight; no safe-area padding in compact CSS. */
+     const h=Math.max(strip.offsetHeight||0,strip.getBoundingClientRect().height||0);
      const top=vv.offsetTop+vv.height-h;
+     strip.style.bottom='auto';
      strip.style.top=Math.round(top)+'px';
-     strip.style.left=Math.round(vv.offsetLeft)+'px';
+     strip.style.left=Math.round(vv.offsetLeft||0)+'px';
      strip.style.width=Math.round(vv.width)+'px';
    });
  }
@@ -121,7 +148,15 @@
    if(card)card.classList.toggle('typing-compact',open&&document.body.getAttribute('data-view')==='practice');
    const paper=document.querySelector('#path-content .path-paper');
    if(paper)paper.classList.toggle('typing-compact',open&&document.body.getAttribute('data-view')==='path');
+   /* Apply fixed layout first, then measure+dock (height changes with display:flex). */
    anchorTypingStrips(open,vv);
+   if(open&&vv){
+     requestAnimationFrame(()=>{
+       anchorTypingStrips(true,window.visualViewport||vv);
+       const dock=$('.typing-strip')||$('#practice-dock');
+       if(dock)document.documentElement.style.setProperty('--dockh',dock.offsetHeight+'px');
+     });
+   }
    const dock=$('.typing-strip')||$('#practice-dock');
    if(dock)document.documentElement.style.setProperty('--dockh',dock.offsetHeight+'px');
    const tog=$('#issue-toggle');
@@ -136,6 +171,17 @@
      }
    }
  }
+ function isPracticeTypingField(t){
+   return !!(t&&t.matches&&t.matches('input[type=text],textarea')&&t.closest('#answer-form,#path-form,#morph-answer-form,#stage7-answer-form,[data-free-write-form]'));
+ }
+ function armTypingFocusPoll(){
+   if(vvFocusPoll)clearInterval(vvFocusPoll);
+   let n=0;
+   vvFocusPoll=setInterval(()=>{
+     syncKbInset();
+     if(++n>=24){clearInterval(vvFocusPoll);vvFocusPoll=null;}
+   },50);
+ }
  if(window.visualViewport){
    window.visualViewport.addEventListener('resize',syncKbInset);
    window.visualViewport.addEventListener('scroll',syncKbInset);
@@ -143,13 +189,26 @@
  window.addEventListener('resize',syncKbInset);
  document.addEventListener('focusin',e=>{
    const t=e.target;
-   if(!t||!t.matches)return;
-   if(t.matches('input[type=text],textarea')&&t.closest('#answer-form,#path-form,#morph-answer-form,#stage7-answer-form,[data-free-write-form]')){
-     lastTextInput=t;
-     syncKbInset();
-     if(document.documentElement.classList.contains('typing-compact'))scrollFieldAndStrip(t);
-   }
+   if(!isPracticeTypingField(t))return;
+   lastTextInput=t;
+   typingFocus=true;
+   captureVvBaseline(true);
+   syncKbInset();
+   armTypingFocusPoll();
+   if(document.documentElement.classList.contains('typing-compact'))scrollFieldAndStrip(t);
  });
+ document.addEventListener('focusout',e=>{
+   if(!isPracticeTypingField(e.target))return;
+   setTimeout(()=>{
+     const ae=document.activeElement;
+     if(isPracticeTypingField(ae))return;
+     typingFocus=false;
+     if(vvFocusPoll){clearInterval(vvFocusPoll);vvFocusPoll=null;}
+     syncKbInset();
+     captureVvBaseline(true);
+   },0);
+ });
+ captureVvBaseline(true);
  syncKbInset();
  function focusAnswer(){
    const el=$('#answer-0')||$('#path-answer');

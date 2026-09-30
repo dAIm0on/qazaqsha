@@ -907,12 +907,15 @@ h2.practice-prompt,
 .typing-strip .morph-keys button::before{
   content:"";position:absolute;left:50%;top:50%;width:44px;height:44px;transform:translate(-50%,-50%)
 }
+/* Compact strip: dock flush to visualViewport bottom via JS top=
+   vv.offsetTop+vv.height-h. Do NOT add env(safe-area-inset-bottom) —
+   that pads Проверить up and leaves a gap above the iOS accessory bar. */
 html.typing-compact #answer-form .practice-composer .typing-strip,
 html.typing-compact .typing-strip{
   display:flex;position:fixed;z-index:45;right:auto;bottom:auto;margin:0;
   background:var(--surface);border-top:1px solid var(--line);
   box-shadow:0 -6px 16px rgba(22,20,18,.10);
-  padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));gap:4px
+  padding:6px 10px;gap:4px
 }
 html.typing-compact #answer-form .letter-keyboard,
 html.typing-compact #answer-form .primary-slot{grid-area:auto;width:100%}
