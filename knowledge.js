@@ -100,7 +100,14 @@
      r.error_history=[...(old?.error_history||[]),...errors.filter(e=>b.field===null||e.field===b.field)];
      state.skills[k]=r;logs.push({skill_id:k,item_id:b.item_id,skill_type:b.skill_type,correct,independent:correct&&!event.hinted&&!event.rule_peek,previous_answer_at:old?.last_answer||null,rating:r.fsrs_log.rating,fsrs_log:r.fsrs_log,fsrs_state:r.fsrs});
    }
-   sync(state,window.COURSE.questions);return logs;
+   // P0 Error 9: sync only this card + siblings sharing touched skills (not all ~3k COURSE.questions).
+   const touched=new Set(updates.keys());
+   const pool=window.COURSE&&window.COURSE.questions||[];
+   const related=pool.filter(other=>{
+     if(other===q||other.id===q.id)return true;
+     return bindings(other).some(b=>touched.has(key(b)));
+   });
+   sync(state,related.length?related:[q]);return logs;
  }
  function choose(questions,state,limit=window.TRAINER_CONFIG.session.size){
    const used=new Set(),usedLemmas=new Set(),out=[];

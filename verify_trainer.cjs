@@ -1405,7 +1405,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/const CACHE='qazaq-offline-live-20261001-hw-m3-p0'/.test(openSw));
+assert.ok(/const CACHE='qazaq-offline-live-20261001-error9-p0'/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1994,7 +1994,7 @@ assert.ok(/Верно \$\{sessionCorrect\} из/.test(appVocabP1),'words P1 prog
 assert.ok(/countSessionAttempt/.test(appVocabP1),'words P1 skips session counter bump on wrong');
 assert.ok(/function vocabOfferHtml\(/.test(appVocabP1)&&/vocabRole==='used'/.test(appVocabP1),'words P1 no skill-separately mud; used may keep Другой пример');
 assert.ok(!/isVocabWordsMode\(\)[\s\S]{0,80}Проверить этот навык отдельно/.test(appVocabP1.split('function vocabOfferHtml')[1].split('function sameSkillOffers')[0]),'words offer path omits навык отдельно');
-assert.ok(/qazaq-offline-live-20261001-hw-m3-p0/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump hw-m3-p0');
+assert.ok(/qazaq-offline-live-20261001-error9-p0/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE error9-p0');
 ok('Vocab words P1: retry CTA, compact error, correct-only progress, no skill mud');
 
 ok('Astra step 9: wrong answer shows the attempt, the block, and an existing same-skill offer (no expected reveal)');
@@ -2016,7 +2016,7 @@ assert.ok(/#FF5A1F/.test(petCss),'sticker fill #FF5A1F');
 assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-index:22/.test(petCss),'sticker z-index below CTA');
 assert.ok(/tutor-sticker-dot/.test(tutorUiSrc)&&/\$\('#tutor-launch'\)\.onclick=\(e\)=>\{e\.preventDefault\(\);toggle\(\);\}/.test(tutorUiSrc)&&/function toggle\(\)\{[\s\S]*?close\(\);[\s\S]*?open\(\);/.test(tutorUiSrc),'tap sticker toggles ask');
 assert.ok(!/pet-idle\.png/.test(tutorUiSrc),'default companion is not pet-idle');
-assert.ok(/hw-m3-p0/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE hw-m3-p0');
+assert.ok(/qazaq-offline-live-20261001-error9-p0/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE error9-p0');
 assert.ok(/\.tutor-sheet\{[^}]*max-height:min\(78dvh,640px\)/.test(petCss.replace(/\s+/g,''))&&/overflow-y:auto/.test(petCss),'ask panel max-height + overflow-y:auto');
 assert.ok(/document\.body\.appendChild\(sheet\)/.test(tutorUiSrc),'ask sheet is body sibling (no 44px clip)');
 assert.ok(/\.chrome-back\{[^}]*min-height:44px/.test(theme.replace(/\s+/g,'')));

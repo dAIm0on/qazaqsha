@@ -142,6 +142,7 @@ const mock={
   Canonical:null
 };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8'),{window:mock,globalThis:mock,console});
+mock.LessonV2Runtime.installAll();
 assert.ok(mock.LessonV2Runtime.byId('4-1'));
 assert.equal(mock.COURSE.questions.filter(q=>String(q.id).startsWith('gen:4-1:')).length,322);
 assert.equal(mock.COURSE.questions.filter(q=>q.origin==='school').length,71);
@@ -173,6 +174,7 @@ const migMock={
   CourseProgress:{registerStages(){return [];}},Canonical:null
 };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8'),{window:migMock,globalThis:migMock,console});
+migMock.LessonV2Runtime.installAll();
 assert.equal(migMock.LessonV2Runtime.migrateId('4-1','4-1.r0','question_ids','old-question'),'gold:4-1:negative-01');
 assert.equal(migMock.LessonV2Runtime.migrateId('4-1','4-1.r0','chapter_ids','old-chapter'),'v2-theory-4-1-negative');
 assert.equal(migMock.LessonV2Runtime.migrateId('4-1','4-1.r0','question_ids','old-dropped'),null);
@@ -202,6 +204,7 @@ const releasedMock={
   CourseProgress:{registerStages(){return [];}},Canonical:null
 };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8'),{window:releasedMock,globalThis:releasedMock,console});
+releasedMock.LessonV2Runtime.installAll();
 assert.equal(releasedMock.LessonV2Runtime.byId('4-1').status,'released');
 assert.equal(releasedMock.LessonV2Runtime.byId('4-1').release.approved,true);
 assert.ok(releasedMock.COURSE.questions.length>0);
@@ -213,7 +216,7 @@ const appText=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 assert.equal(indexText.includes('src="nonpast-engine.js"'),false);
 assert.equal(swText.includes('"nonpast-engine.js"'),false);
 assert.equal(swText.includes('"compiled-lessons-v2.js"'),true);
-assert.match(swText,/const CACHE='qazaq-offline-live-20261001-hw-m3-p0'/);
+assert.match(swText,/const CACHE='qazaq-offline-live-20261001-error9-p0'/);
 const renderPathStart=appText.indexOf('function renderPath');
 const chapterLookup=appText.indexOf("const ch=G.chapter(les.id,gp.chapterId)",renderPathStart);
 const titleInit=appText.indexOf("const chTitle=Bank?Bank.chapterTitle(ch):ch.title",chapterLookup);

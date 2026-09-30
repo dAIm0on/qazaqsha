@@ -58,6 +58,7 @@ for(const f of order){if(skip.has(f))continue;try{load(f);}catch(e){/* noncritic
 
 assert.ok(sandbox.LessonV2Runtime,'V2 runtime');
 for(const id of ['3-1','3-2','3-3','2-1']){
+  sandbox.LessonV2Runtime.ensure(id);
   const pack=sandbox.LessonV2Runtime.homework(id);
   assert.ok(pack,id+' pack');
   assert.equal(pack.lesson_id,id);
