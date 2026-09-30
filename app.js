@@ -143,11 +143,13 @@
    }
  }
  function clearTypingShellStyles(){
-   document.querySelectorAll('#answer-form,.path-paper:has(#path-form),.typing-dock,.practice-dock.typing-dock,#path-form.typing-dock,.typing-strip').forEach(el=>{
+   document.querySelectorAll('#answer-form,.path-paper:has(#path-form),.typing-dock,.practice-dock.typing-dock,#path-form.typing-dock,.typing-strip,.typing-scroll').forEach(el=>{
      el.style.top='';el.style.left='';el.style.width='';el.style.height='';
      el.style.bottom='';el.style.right='';el.style.position='';
-     el.style.paddingBottom='';
+     el.style.paddingBottom='';el.style.maxHeight='';el.style.minHeight='';
    });
+   document.documentElement.style.removeProperty('--typing-scroll-max');
+   document.documentElement.style.removeProperty('--dock-content-h');
  }
  function pinDockToVisualViewport(dock,vv,left,width){
    /* Dock ONLY to visualViewport: top = vv.offsetTop + vv.height − barH.
@@ -173,32 +175,48 @@
      clearTypingShellStyles();
      return;
    }
-   /* kb-compact7: scroll shell above dock; dock pinned with
-      top = vv.offsetTop + vv.height − barH (barH includes ~44 accessory).
-      Do NOT use position:fixed; bottom:0 against the layout window.
-      Do NOT lock overflow:hidden on html/body. */
+   /* kb-compact8: NEVER position:fixed the whole #answer-form / .path-paper
+      (that orphans bottom-nav / ←Назад / chrome). Only .typing-dock is VV-fixed:
+      top = vv.offsetTop + vv.height − barH (barH = contentH + ~44 accessory).
+      Scroll ONLY .typing-scroll. Do NOT lock html/body overflow:hidden.
+      Do NOT use position:fixed; bottom:0 against the layout window. */
    const left=Math.round(vv.offsetLeft||0);
-   const top=Math.round(vv.offsetTop||0);
    const width=Math.round(vv.width);
    const height=Math.round(vv.height);
    const view=document.body.getAttribute('data-view');
+   function constrainTypingScroll(root,dockTop){
+     const sc=root&&root.querySelector('.typing-scroll');
+     if(!sc)return;
+     /* Keep chrome (practice-head / path crumb back) above the scroll body. */
+     const head=document.querySelector('.practice-head:not([hidden])')||root.querySelector('.path-crumb')||null;
+     let topEdge=Math.round(vv.offsetTop||0);
+     if(head){
+       const hr=head.getBoundingClientRect();
+       if(hr.height>0)topEdge=Math.max(topEdge,Math.round(hr.bottom));
+     }else{
+       const sr=sc.getBoundingClientRect();
+       if(sr.top>0)topEdge=Math.max(topEdge,Math.round(sr.top));
+     }
+     const maxH=Math.max(72,Math.round(dockTop-topEdge-8));
+     sc.style.maxHeight=maxH+'px';
+     document.documentElement.style.setProperty('--typing-scroll-max',maxH+'px');
+   }
    if(view==='practice'){
      const form=$('#answer-form');
      const dock=form&&(form.querySelector('.typing-dock')||form.querySelector('#practice-dock'));
      if(form&&dock){
-       /* Strip stays in-flow inside dock (not separately fixed). */
        document.querySelectorAll('#answer-form .typing-strip').forEach(strip=>{
          strip.style.top='';strip.style.left='';strip.style.width='';strip.style.bottom='';strip.style.position='';
        });
+       /* Form stays in normal flow — chrome/back remain reachable. */
+       form.style.position='';form.style.left='';form.style.top='';
+       form.style.width='';form.style.height='';form.style.bottom='';form.style.right='';
        const barH=pinDockToVisualViewport(dock,vv,left,width);
-       const shellH=Math.max(0,height-barH);
-       form.style.position='fixed';
-       form.style.left=left+'px';
-       form.style.top=top+'px';
-       form.style.width=width+'px';
-       form.style.height=Math.round(shellH)+'px';
-       form.style.bottom='auto';
-       form.style.right='auto';
+       const contentH=Math.max(48,Math.round(dock.getBoundingClientRect().height||0));
+       form.style.paddingBottom=contentH+'px'; /* in-flow spacer for fixed dock */
+       document.documentElement.style.setProperty('--dock-content-h',contentH+'px');
+       const dockTop=vv.offsetTop+vv.height-barH;
+       constrainTypingScroll(form,dockTop);
      }
    }
    if(view==='path'){
@@ -208,15 +226,14 @@
        document.querySelectorAll('#path-form .typing-strip').forEach(strip=>{
          strip.style.top='';strip.style.left='';strip.style.width='';strip.style.bottom='';strip.style.position='';
        });
+       paper.style.position='';paper.style.left='';paper.style.top='';
+       paper.style.width='';paper.style.height='';paper.style.bottom='';paper.style.right='';
        const barH=pinDockToVisualViewport(dock,vv,left,width);
-       const shellH=Math.max(0,height-barH);
-       paper.style.position='fixed';
-       paper.style.left=left+'px';
-       paper.style.top=top+'px';
-       paper.style.width=width+'px';
-       paper.style.height=Math.round(shellH)+'px';
-       paper.style.bottom='auto';
-       paper.style.right='auto';
+       const contentH=Math.max(48,Math.round(dock.getBoundingClientRect().height||0));
+       paper.style.paddingBottom=contentH+'px';
+       document.documentElement.style.setProperty('--dock-content-h',contentH+'px');
+       const dockTop=vv.offsetTop+vv.height-barH;
+       constrainTypingScroll(paper,dockTop);
      }
    }
    /* Morph / free-practice: strip docked with same VV formula + accessory. */
