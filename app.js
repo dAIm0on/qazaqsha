@@ -2,12 +2,14 @@
 (function(){
  'use strict';
  const course=window.COURSE, core=window.TrainerCore;
- try{window.Lesson31Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{if(!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-1')))window.Lesson31Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{
-  const known31=new Set((course.questions||[]).map(q=>q.id));
-  for(const q of (window.Lesson31Pack?.extraQuestions?.()||[])){if(q&&!known31.has(q.id)){course.questions.push(q);known31.add(q.id);}}
+  if(!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-1'))){
+   const known31=new Set((course.questions||[]).map(q=>q.id));
+   for(const q of (window.Lesson31Pack?.extraQuestions?.()||[])){if(q&&!known31.has(q.id)){course.questions.push(q);known31.add(q.id);}}
+  }
  }catch{}
- try{window.Lesson32Pack?.install?.(course,window.CURRICULUM);}catch{}
+ try{if(!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-2')))window.Lesson32Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{if(!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-3')))window.Lesson33Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{if(!(window.LESSON_V2_COMPILED||[]).some(x=>x&&x.lesson_id==='4-2'))window.Lesson42Pack?.install?.(course,window.CURRICULUM);}catch{}
  try{window.PhraseDrill?.install?.(course,window.CURRICULUM);}catch{}
@@ -40,8 +42,8 @@
  };
  window.NumberLadder?.parkLearn(state.learning,state.records);
  let records=state.records,learningState=state.learning;
- try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);try{if(window.Lesson31Pack&&P.registerStages)P.registerStages('3-1',window.Lesson31Pack.stagePlans());}catch{}
- try{if(window.Lesson32Pack&&P.registerStages)P.registerStages('3-2',window.Lesson32Pack.stagePlans());}catch{}
+ try{window.LessonPackages.install(state.lesson_packages);}catch(error){storageReadError=error;storageAvailable=false;}catalog.activatePromotions(state);for(const q of questions){coerceTyped(q);byId.set(q.id,q);}window.Knowledge.hydrate(state,questions);try{if(window.Lesson31Pack&&P.registerStages&&!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-1')))P.registerStages('3-1',window.Lesson31Pack.stagePlans());}catch{}
+ try{if(window.Lesson32Pack&&P.registerStages&&!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-2')))P.registerStages('3-2',window.Lesson32Pack.stagePlans());}catch{}
  try{if(window.Lesson33Pack&&P.registerStages&&!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-3')))P.registerStages('3-3',window.Lesson33Pack.stagePlans());}catch{}
  try{if(window.Lesson42Pack&&P.registerStages&&!(window.LESSON_V2_COMPILED||[]).some(x=>x&&x.lesson_id==='4-2'))P.registerStages('4-2',window.Lesson42Pack.stagePlans());}catch{}
  let confusionIndex=P.answerIndex(questions);
