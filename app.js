@@ -108,12 +108,32 @@
    const open=gap>thresh;
    return {open,vv,gap,gapLayout,gapBase};
  }
+ const IOS_KB_ACCESSORY=44; /* iOS QuickType / Done bar — keep Проверить above it */
+ function ensureTargetAboveDock(){
+   /* Compact only: scroll .typing-scroll so target/prompt stays above the dock.
+      Never page-level scrollIntoView (hides the prompt under the input). */
+   const sc=document.querySelector('.typing-scroll');
+   if(!sc)return;
+   const dock=document.querySelector('.typing-dock')||document.querySelector('#practice-dock')||document.querySelector('#path-form.typing-dock');
+   const target=sc.querySelector('.practice-prompt,#question-title,.stimulus,.phase-label')||sc.firstElementChild;
+   if(!dock||!target){try{sc.scrollTop=0;}catch{}return;}
+   const pad=6;
+   const scTop=sc.getBoundingClientRect().top;
+   let tRect=target.getBoundingClientRect();
+   const dockTop=dock.getBoundingClientRect().top;
+   /* prompt bottom must stay ≤ dock top (target NEVER under the input) */
+   if(tRect.bottom>dockTop-pad){
+     sc.scrollTop+=Math.ceil(tRect.bottom-(dockTop-pad));
+     tRect=target.getBoundingClientRect();
+   }
+   if(tRect.top<scTop+pad){
+     sc.scrollTop-=Math.ceil((scTop+pad)-tRect.top);
+   }
+ }
  function scrollFieldAndStrip(field){
-   /* In typing-compact the prompt scrolls inside .typing-scroll; do not
-      scrollIntoView the field (that scrolls the document and hides the prompt). */
+   /* In typing-compact: only scroll .typing-scroll; forbid page scrollIntoView. */
    if(document.documentElement.classList.contains('typing-compact')){
-     const sc=document.querySelector('.typing-scroll');
-     if(sc){try{sc.scrollTop=0;}catch{}}
+     ensureTargetAboveDock();
      return;
    }
    if(field)try{field.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
@@ -123,55 +143,90 @@
    }
  }
  function clearTypingShellStyles(){
-   document.querySelectorAll('#answer-form,.path-paper:has(#path-form),.typing-dock,.practice-dock.typing-dock,.typing-strip').forEach(el=>{
+   document.querySelectorAll('#answer-form,.path-paper:has(#path-form),.typing-dock,.practice-dock.typing-dock,#path-form.typing-dock,.typing-strip').forEach(el=>{
      el.style.top='';el.style.left='';el.style.width='';el.style.height='';
      el.style.bottom='';el.style.right='';el.style.position='';
+     el.style.paddingBottom='';
    });
+ }
+ function pinDockToVisualViewport(dock,vv,left,width){
+   /* Dock ONLY to visualViewport: top = vv.offsetTop + vv.height − barH.
+      barH = contentH + IOS_KB_ACCESSORY (~44). Gap below dock clears accessory;
+      do not pad/height-inflate the dock (would squash input/Проверить).
+      Never position:fixed; bottom:0 against the layout window. */
+   if(!dock||!vv)return 0;
+   dock.style.height='';
+   dock.style.paddingBottom='';
+   dock.style.bottom='auto';
+   dock.style.right='auto';
+   dock.style.left=left+'px';
+   dock.style.width=width+'px';
+   const contentH=Math.max(48,Math.round(dock.getBoundingClientRect().height||dock.offsetHeight||0));
+   const barH=contentH+IOS_KB_ACCESSORY;
+   const dockTop=vv.offsetTop+vv.height-barH;
+   dock.style.position='fixed';
+   dock.style.top=Math.round(dockTop)+'px';
+   return barH;
  }
  function anchorTypingStrips(open,vv){
    if(!open||!vv){
      clearTypingShellStyles();
      return;
    }
-   /* VV shell: form/path-paper fills visualViewport. Scroll-body (.typing-scroll)
-      takes remaining height; dock (input + letters + Проверить) sits at VV bottom.
-      Do NOT lock overflow:hidden on html/body — only the shell clips. */
+   /* kb-compact7: scroll shell above dock; dock pinned with
+      top = vv.offsetTop + vv.height − barH (barH includes ~44 accessory).
+      Do NOT use position:fixed; bottom:0 against the layout window.
+      Do NOT lock overflow:hidden on html/body. */
    const left=Math.round(vv.offsetLeft||0);
    const top=Math.round(vv.offsetTop||0);
    const width=Math.round(vv.width);
    const height=Math.round(vv.height);
-   const form=$('#answer-form');
-   if(form&&document.body.getAttribute('data-view')==='practice'){
-     form.style.position='fixed';
-     form.style.left=left+'px';
-     form.style.top=top+'px';
-     form.style.width=width+'px';
-     form.style.height=height+'px';
-     form.style.bottom='auto';
-     form.style.right='auto';
-     /* Strip stays in-flow inside dock (not separately fixed). */
-     document.querySelectorAll('#answer-form .typing-strip').forEach(strip=>{
-       strip.style.top='';strip.style.left='';strip.style.width='';strip.style.bottom='';strip.style.position='';
-     });
+   const view=document.body.getAttribute('data-view');
+   if(view==='practice'){
+     const form=$('#answer-form');
+     const dock=form&&(form.querySelector('.typing-dock')||form.querySelector('#practice-dock'));
+     if(form&&dock){
+       /* Strip stays in-flow inside dock (not separately fixed). */
+       document.querySelectorAll('#answer-form .typing-strip').forEach(strip=>{
+         strip.style.top='';strip.style.left='';strip.style.width='';strip.style.bottom='';strip.style.position='';
+       });
+       const barH=pinDockToVisualViewport(dock,vv,left,width);
+       const shellH=Math.max(0,height-barH);
+       form.style.position='fixed';
+       form.style.left=left+'px';
+       form.style.top=top+'px';
+       form.style.width=width+'px';
+       form.style.height=Math.round(shellH)+'px';
+       form.style.bottom='auto';
+       form.style.right='auto';
+     }
    }
-   const paper=document.querySelector('.path-paper:has(#path-form)');
-   if(paper&&document.body.getAttribute('data-view')==='path'){
-     paper.style.position='fixed';
-     paper.style.left=left+'px';
-     paper.style.top=top+'px';
-     paper.style.width=width+'px';
-     paper.style.height=height+'px';
-     paper.style.bottom='auto';
-     paper.style.right='auto';
-     document.querySelectorAll('#path-form .typing-strip').forEach(strip=>{
-       strip.style.top='';strip.style.left='';strip.style.width='';strip.style.bottom='';strip.style.position='';
-     });
+   if(view==='path'){
+     const paper=document.querySelector('.path-paper:has(#path-form)');
+     const dock=paper&&(paper.querySelector('#path-form.typing-dock')||paper.querySelector('.typing-dock')||paper.querySelector('#path-form'));
+     if(paper&&dock){
+       document.querySelectorAll('#path-form .typing-strip').forEach(strip=>{
+         strip.style.top='';strip.style.left='';strip.style.width='';strip.style.bottom='';strip.style.position='';
+       });
+       const barH=pinDockToVisualViewport(dock,vv,left,width);
+       const shellH=Math.max(0,height-barH);
+       paper.style.position='fixed';
+       paper.style.left=left+'px';
+       paper.style.top=top+'px';
+       paper.style.width=width+'px';
+       paper.style.height=Math.round(shellH)+'px';
+       paper.style.bottom='auto';
+       paper.style.right='auto';
+     }
    }
-   /* Morph / free-practice: keep strip docked to VV bottom (no scroll-shell yet). */
-   if(document.body.getAttribute('data-view')==='morph'){
+   /* Morph / free-practice: strip docked with same VV formula + accessory. */
+   if(view==='morph'){
      document.querySelectorAll('.typing-strip').forEach(strip=>{
-       const h=Math.max(strip.offsetHeight||0,strip.getBoundingClientRect().height||0);
-       const stripTop=vv.offsetTop+vv.height-h;
+       strip.style.position='relative';strip.style.paddingBottom='';strip.style.height='';
+       const contentH=Math.max(strip.offsetHeight||0,Math.round(strip.getBoundingClientRect().height)||0);
+       const barH=contentH+IOS_KB_ACCESSORY;
+       const stripTop=vv.offsetTop+vv.height-barH;
+       strip.style.position='fixed';
        strip.style.bottom='auto';
        strip.style.top=Math.round(stripTop)+'px';
        strip.style.left=left+'px';
@@ -199,11 +254,12 @@
      requestAnimationFrame(()=>{
        anchorTypingStrips(true,window.visualViewport||vv);
        const dock=$('.typing-dock')||$('#practice-dock')||$('.typing-strip');
-       if(dock)document.documentElement.style.setProperty('--dockh',dock.offsetHeight+'px');
+       if(dock)document.documentElement.style.setProperty('--dockh',(dock.offsetHeight+IOS_KB_ACCESSORY)+'px');
+       ensureTargetAboveDock();
      });
    }
    const dock=$('.typing-dock')||$('#practice-dock')||$('.typing-strip');
-   if(dock)document.documentElement.style.setProperty('--dockh',dock.offsetHeight+'px');
+   if(dock)document.documentElement.style.setProperty('--dockh',(open?dock.offsetHeight+IOS_KB_ACCESSORY:dock.offsetHeight)+'px');
    const tog=$('#issue-toggle');
    if(tog)tog.hidden=!!open;
    if(open&&!kbScrollLock){
@@ -1306,7 +1362,7 @@
          if($('#ai-why'))$('#ai-why').onclick=()=>ask('explain_error');
          if($('#ai-rule'))$('#ai-rule').onclick=()=>ask('explain_rule',true);
        }
-       try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}
+       if(!document.documentElement.classList.contains('typing-compact')){try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}}else{const sc=document.querySelector('.typing-scroll');if(sc&&feedback){try{const d=feedback.getBoundingClientRect().bottom-sc.getBoundingClientRect().bottom;if(d>0)sc.scrollTop+=d+8;}catch{}}}
      }
      focusAnswer();return;
    }
@@ -1451,7 +1507,7 @@
      feedback.hidden=false;
      const fr=$('#feedback-retry');if(fr)fr.onclick=e=>{e.preventDefault();beginVocabRetry();};
      bindOffers(feedback);
-     try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}
+     if(!document.documentElement.classList.contains('typing-compact')){try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}}else{const sc=document.querySelector('.typing-scroll');if(sc&&feedback){try{const d=feedback.getBoundingClientRect().bottom-sc.getBoundingClientRect().bottom;if(d>0)sc.scrollTop+=d+8;}catch{}}}
    }else{
    feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Число уже сказало, сколько. Окончание множественного здесь лишнее.</p>':''}${morph}${result.correct?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}${(()=>{const raw=q.explanation||'';if(result.correct)return raw?'<p>'+esc(raw)+'</p>':'';const safe=(window.ExplainOpen&&window.ExplainOpen.safeWrongWhy)?window.ExplainOpen.safeWrongWhy(raw,q):(raw&&window.ExplainOpen&&window.ExplainOpen.spoilsOnWrong&&window.ExplainOpen.spoilsOnWrong(raw,q)?'':raw);return safe?'<p>'+esc(safe)+'</p>':'';})()}<p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
    }

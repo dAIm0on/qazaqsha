@@ -1405,7 +1405,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/const CACHE='qazaq-offline-live-20260930-kb-compact6'/.test(openSw));
+assert.ok(/const CACHE='qazaq-offline-live-20260930-kb-compact7'/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1994,7 +1994,7 @@ assert.ok(/Верно \$\{sessionCorrect\} из/.test(appVocabP1),'words P1 prog
 assert.ok(/countSessionAttempt/.test(appVocabP1),'words P1 skips session counter bump on wrong');
 assert.ok(/function vocabOfferHtml\(/.test(appVocabP1)&&/vocabRole==='used'/.test(appVocabP1),'words P1 no skill-separately mud; used may keep Другой пример');
 assert.ok(!/isVocabWordsMode\(\)[\s\S]{0,80}Проверить этот навык отдельно/.test(appVocabP1.split('function vocabOfferHtml')[1].split('function sameSkillOffers')[0]),'words offer path omits навык отдельно');
-assert.ok(/qazaq-offline-live-20260930-kb-compact6/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact6');
+assert.ok(/qazaq-offline-live-20260930-kb-compact7/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
 ok('Vocab words P1: retry CTA, compact error, correct-only progress, no skill mud');
 
 ok('Astra step 9: wrong answer shows the attempt, the block, and an existing same-skill offer (no expected reveal)');
@@ -2017,7 +2017,7 @@ assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-ind
 assert.ok(/tutor-sticker-dot/.test(tutorUiSrc)&&/\$\('#tutor-launch'\)\.onclick=\(e\)=>\{e\.preventDefault\(\);toggle\(\);\}/.test(tutorUiSrc)&&/function toggle\(\)\{[\s\S]*?close\(\);[\s\S]*?open\(\);/.test(tutorUiSrc),'tap sticker toggles ask');
 assert.ok(!/pet-idle\.png/.test(tutorUiSrc),'default companion is not pet-idle');
 assert.ok(/kb-compact/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE kb-compact');
-assert.ok(/qazaq-offline-live-20260930-kb-compact6/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact6');
+assert.ok(/qazaq-offline-live-20260930-kb-compact7/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
 assert.ok(/html\.typing-compact \.question-actions/.test(theme)&&/html\.typing-compact \.secondary-actions/.test(theme)&&/html\.typing-compact \.lesson-actions/.test(theme),'typing-compact hides help wrappers broadly');
 assert.ok(/html\.typing-compact #hint-button/.test(theme)&&/html\.typing-compact #reveal-button/.test(theme)&&/html\.typing-compact #association-button/.test(theme),'typing-compact hides hint/idk/assoc buttons');
 assert.ok(/html\.typing-compact #path-rule/.test(theme)&&/html\.typing-compact #path-idk/.test(theme),'typing-compact hides path help');
@@ -2048,11 +2048,11 @@ assert.ok(/vvBaseline/.test(appKb5)&&/captureVvBaseline/.test(appKb5),'VV baseli
 assert.ok(/typingFocus/.test(appKb5)&&/armTypingFocusPoll/.test(appKb5),'focus poll recompute while keyboard animates');
 assert.ok(/thresh=typingFocus\?50:80/.test(appKb5)||/typingFocus\?50:80/.test(appKb5),'focused threshold 50, else 80');
 assert.ok(/gapBase/.test(appKb5)&&/vvBaseline/.test(appKb5),'gap uses max\(layout, baseline\)');
-assert.ok(/vv\.offsetTop\+vv\.height-h/.test(appKb5),'morph strip still docks with vv.offsetTop+vv.height-h');
+assert.ok(/vv\.offsetTop\+vv\.height-barH/.test(appKb5),'morph strip docks with vv.offsetTop+vv.height-barH');
 assert.ok(/focusout/.test(appKb5)&&/isPracticeTypingField/.test(appKb5),'focusout clears typingFocus on practice fields');
 const themeKb5=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
 assert.ok(/Do NOT add env\(safe-area-inset-bottom\)/.test(themeKb5),'compact strip docs: no safe-area pad');
-assert.ok(/qazaq-offline-live-20260930-kb-compact6/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact6');
+assert.ok(/qazaq-offline-live-20260930-kb-compact7/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
 ok('P0 kb-compact5: iOS VV baseline+focus poll kept');
 
 /* QA tip kb-compact6: scroll-body + dock — prompt scrollable, dock at VV bottom. */
@@ -2065,10 +2065,26 @@ assert.ok(/form\.style\.position='fixed'/.test(appKb6),'practice form pinned to 
 assert.ok(/html\.typing-compact \.typing-scroll/.test(themeKb6),'CSS targets .typing-scroll in compact');
 assert.ok(/overflow-y:auto/.test(themeKb6),'typing-scroll overflow-y auto');
 assert.ok(/-webkit-overflow-scrolling:touch/.test(themeKb6),'typing-scroll touch momentum scroll');
-assert.ok(/kb-compact6 guard/.test(themeKb6),'explicit guard against html/body overflow lock');
+assert.ok(/kb-compact7 guard/.test(themeKb6),'explicit guard against html/body overflow lock');
 assert.ok(/html\.typing-compact,html\.typing-compact body\{[\s\S]*?overflow:visible!important/.test(themeKb6),'html/body overflow visible in compact');
-assert.ok(/qazaq-offline-live-20260930-kb-compact6/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact6');
-ok('P0 kb-compact6: scroll-body + dock; prompt scrollable; no html/body overflow lock');
+assert.ok(/qazaq-offline-live-20260930-kb-compact7/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
+ok('P0 kb-compact6 keep: scroll-body + dock; prompt scrollable; no html/body overflow lock');
+
+/* QA tip kb-compact7: accessory clearance + dock VV formula; target above input. */
+const appKb7=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+const themeKb7=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
+assert.ok(/IOS_KB_ACCESSORY\s*=\s*44/.test(appKb7),'iOS accessory clearance constant 44');
+assert.ok(/pinDockToVisualViewport/.test(appKb7),'explicit pinDockToVisualViewport helper');
+assert.ok(/vv\.offsetTop\+vv\.height-barH/.test(appKb7),'dock top = vv.offsetTop + vv.height - barH');
+assert.ok(/barH\s*=\s*contentH\s*\+\s*IOS_KB_ACCESSORY/.test(appKb7),'barH includes accessory clearance');
+assert.ok(/ensureTargetAboveDock/.test(appKb7),'ensureTargetAboveDock keeps prompt above dock');
+assert.ok(/prompt bottom must stay/.test(appKb7)||/tRect\.bottom>dockTop/.test(appKb7),'scroll so prompt bottom ≤ dock top');
+assert.ok(/typing-compact[\s\S]{0,120}ensureTargetAboveDock|contains\('typing-compact'\)\{[\s\S]*?ensureTargetAboveDock/.test(appKb7),'compact path uses ensureTargetAboveDock, not page scrollIntoView');
+assert.ok(/html\.typing-compact,html\.typing-compact body\{[\s\S]*?overflow:visible!important/.test(themeKb7),'html/body never overflow:hidden under compact');
+assert.ok(/overflow:visible!important/.test(themeKb7)&&/kb-compact7 guard/.test(themeKb7),'html/body overflow visible + compact7 guard');
+assert.ok(/Never position:fixed; bottom:0 against the layout window/.test(themeKb7)||/Never position:fixed; bottom:0/.test(appKb7),'docs forbid layout-window bottom:0 dock');
+assert.ok(/qazaq-offline-live-20260930-kb-compact7/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
+ok('P0 kb-compact7: accessory+44 barH VV dock; target above input; no body overflow/scrollIntoView');
 
 assert.ok(/\.tutor-sheet\{[^}]*max-height:min\(78dvh,640px\)/.test(petCss.replace(/\s+/g,''))&&/overflow-y:auto/.test(petCss),'ask panel max-height + overflow-y:auto');
 assert.ok(/document\.body\.appendChild\(sheet\)/.test(tutorUiSrc),'ask sheet is body sibling (no 44px clip)');
