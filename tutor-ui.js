@@ -4,7 +4,7 @@
  const $=s=>document.querySelector(s);
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const TUTOR_SURFACES=new Set(['learn','path','practice','homework','rules','review','theory']);
- let ctx={surface:'learn',lesson_id:'1-1',chapter_id:'',rule_id:'',focus_word:''};
+ let ctx={surface:'learn',lesson_id:'1-1',chapter_id:'',rule_id:'',focus_word:'',stimulus:'',expected_answer:'',user_answer:'',codes:[]};
  let tail=[];
  let exampleIndex=0;
  let abort=null;
@@ -43,11 +43,32 @@
   return base;
  }
 
+ const KK_RE=/[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}/;
+ function extractKkToken(raw){
+  const m=String(raw||'').match(KK_RE);
+  return m?m[0]:'';
+ }
+ function lessonFirstWord(lessonId){
+  const packs=root.LESSON_PACKS||[];
+  const through=(root.AiContract&&root.AiContract.lessonsThrough&&root.AiContract.lessonsThrough(lessonId))||null;
+  const prefer=packs.filter(p=>p&&(!lessonId||p.lesson_id===lessonId||(Array.isArray(through)&&through.includes(p.lesson_id))));
+  for(const list of [prefer,packs]){
+   for(const p of list){
+    for(const row of (p&&p.target_vocabulary)||[]){
+     const kk=row.kazakh||row.kk||row.word||'';
+     if(kk)return String(kk);
+    }
+   }
+  }
+  const vocab=root.AiContract&&root.AiContract.VOCAB_BY_LESSON&&root.AiContract.VOCAB_BY_LESSON[lessonId];
+  return (vocab&&vocab[0])||'';
+ }
  function glossLookup(word,lessonId){
   const w=normWord(word);
   if(!w)return null;
   const packs=root.LESSON_PACKS||[];
-  const matchPack=packs.filter(p=>p&&(!lessonId||p.lesson_id===lessonId||(Array.isArray(root.AiContract&&root.AiContract.lessonsThrough&&root.AiContract.lessonsThrough(lessonId))?root.AiContract.lessonsThrough(lessonId).includes(p.lesson_id):true)));
+  const through=(root.AiContract&&root.AiContract.lessonsThrough&&root.AiContract.lessonsThrough(lessonId))||null;
+  const matchPack=packs.filter(p=>p&&(!lessonId||p.lesson_id===lessonId||(Array.isArray(through)&&through.includes(p.lesson_id))));
   const scan=list=>{
    for(const p of list){
     for(const row of (p.target_vocabulary||[])){
@@ -55,19 +76,48 @@
      if(kk!==w)continue;
      const tr=row.translation||row.ru||row.gloss;
      const gloss=Array.isArray(tr)?tr[0]:tr;
-     if(gloss)return {word:row.kazakh||word,gloss:String(gloss),source:'local'};
+     if(gloss)return {word:row.kazakh||row.kk||word,gloss:String(gloss),source:'local'};
     }
    }
    return null;
   };
   return scan(matchPack.length?matchPack:packs)||scan(packs);
  }
-
  function focusWordFromCtx(){
-  if(ctx.focus_word)return ctx.focus_word;
-  const raw=ctx.user_answer||ctx.expected_answer||'';
-  const m=String(raw).match(/[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}/);
-  return m?m[0]:'';
+  if(ctx.focus_word)return String(ctx.focus_word);
+  return extractKkToken(ctx.stimulus)||extractKkToken(ctx.expected_answer)||extractKkToken(ctx.user_answer)||'';
+ }
+ function ensureFocusWord(){
+  let w=focusWordFromCtx();
+  if(w){ctx.focus_word=w;return w;}
+  w=lessonFirstWord(ctx.lesson_id);
+  if(w)ctx.focus_word=w;
+  return w||'';
+ }
+ function markKkWords(text){
+  const s=String(text||'');
+  let out='',last=0,m;
+  const re=new RegExp(KK_RE.source,'g');
+  while((m=re.exec(s))){
+   out+=esc(s.slice(last,m.index));
+   out+='<button type="button" class="tutor-word-tap" data-tutor-word="'+esc(m[0])+'" lang="kk">'+esc(m[0])+'</button>';
+   last=m.index+m[0].length;
+  }
+  return out+esc(s.slice(last));
+ }
+ function bindWordTaps(rootEl){
+  const rootNode=rootEl||document;
+  rootNode.querySelectorAll('[data-tutor-word]').forEach(b=>{
+   if(b.dataset.tutorBound)return;
+   b.dataset.tutorBound='1';
+   b.addEventListener('click',e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const w=b.getAttribute('data-tutor-word')||'';
+    if(!w)return;
+    openGloss(w);
+   });
+  });
  }
 
  function setContext(next){
@@ -86,9 +136,11 @@
    lesson_id,chapter_id,rule_id,
    user_answer:next.user_answer!=null?String(next.user_answer).slice(0,400):'',
    expected_answer:next.expected_answer!=null?String(next.expected_answer).slice(0,400):'',
+   stimulus:next.stimulus!=null?String(next.stimulus).slice(0,400):'',
    codes:Array.isArray(next.codes)?next.codes.filter(x=>typeof x==='string').slice(0,8):[],
    focus_word:next.focus_word!=null?String(next.focus_word).slice(0,80):(next.word!=null?String(next.word).slice(0,80):ctx.focus_word||'')
   };
+  if(!ctx.focus_word)ensureFocusWord();
   const now=ctx.lesson_id+':'+ctx.chapter_id+':'+ctx.rule_id;
   if(now!==prev){tail=[];exampleIndex=0;}
   paintChips();
@@ -143,23 +195,31 @@
 
  function paintChips(){
   const box=$('#tutor-chips');if(!box)return;
-  const word=focusWordFromCtx();
+  const word=ensureFocusWord();
   const glossHit=word?glossLookup(word,ctx.lesson_id):null;
-  const glossLabel=glossHit?(`${glossHit.word} — ${String(glossHit.gloss).slice(0,28)}`): (word||'');
+  const glossLabel=glossHit?(glossHit.word+' — '+String(glossHit.gloss).slice(0,28)):(word?word:'Слово');
   const chips=[];
-  if(glossLabel)chips.push(`<button type="button" class="secondary-button" data-tutor-act="gloss" data-word="${esc(word)}">${esc(glossLabel.length>36?glossLabel.slice(0,34)+'…':glossLabel)}</button>`);
-  chips.push(`<button type="button" class="secondary-button" data-tutor-act="unclear">Не ясно</button>`);
-  chips.push(`<button type="button" class="secondary-button" data-tutor-act="explain">Объясни</button>`);
+  // P0: first chip always = current/tapped word gloss (≤2 taps with cat)
+  chips.push('<button type="button" class="secondary-button tutor-chip-gloss" data-tutor-act="gloss" data-word="'+esc(word)+'">'+esc(glossLabel.length>36?glossLabel.slice(0,34)+'…':glossLabel)+'</button>');
+  chips.push('<button type="button" class="secondary-button" data-tutor-act="unclear">Не ясно</button>');
+  chips.push('<button type="button" class="secondary-button" data-tutor-act="explain">Объясни</button>');
   box.innerHTML=chips.join('');
   box.querySelectorAll('[data-tutor-act]').forEach(b=>b.onclick=()=>quick(b.dataset.tutorAct,b.dataset.word||''));
  }
 
  function open(){
   const sheet=$('#tutor-sheet');if(!sheet)return;
+  ensureFocusWord();
   paintCtx();paintChips();
   sheet.hidden=false;
   document.body.classList.add('tutor-open');
   const q=$('#tutor-q');if(q)try{q.focus({preventScroll:true});}catch{q.focus();}
+ }
+ function openGloss(word){
+  const w=String(word||'').trim()||ensureFocusWord();
+  if(w)ctx.focus_word=w;
+  open();
+  quick('gloss',w);
  }
 
  function close(){
@@ -410,6 +470,6 @@
   return {ensure,onView,playMischief,available:()=>available};
  }
 
- const api={mount,setContext,syncView,open,close,context:()=>ctx,glossLookup,focusWord:focusWordFromCtx};
+ const api={mount,setContext,syncView,open,openGloss,close,context:()=>ctx,glossLookup,focusWord:focusWordFromCtx,ensureFocusWord,markKkWords,bindWordTaps};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TutorUI=api;
 })(typeof window!=='undefined'?window:globalThis);
