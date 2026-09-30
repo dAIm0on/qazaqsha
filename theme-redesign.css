@@ -925,25 +925,98 @@ html.typing-compact .path-paper,
 html.typing-compact .morph-panel{padding:8px 10px}
 html.typing-compact .exercise-card .question-top{padding:8px 10px 0}
 
-/* typing-compact must-fix: help row off first screen; strip sits under input (no gap). */
-html.typing-compact #answer-form .question-actions,
-html.typing-compact #answer-form .secondary-actions,
-html.typing-compact #path-form .lesson-actions{
+/* typing-compact must-fix: hide help/progress/issue/sticker on ALL typing surfaces. */
+html.typing-compact .question-actions,
+html.typing-compact .secondary-actions,
+html.typing-compact .lesson-actions,
+html.typing-compact #hint-button,
+html.typing-compact #reveal-button,
+html.typing-compact #association-button,
+html.typing-compact #rule-button,
+html.typing-compact #path-rule,
+html.typing-compact #path-idk,
+html.typing-compact #path-back,
+body.typing-compact .question-actions,
+body.typing-compact .secondary-actions,
+body.typing-compact .lesson-actions,
+.typing-compact .question-actions,
+.typing-compact .secondary-actions,
+.typing-compact .lesson-actions{
+  display:none!important;
+  margin:0!important;padding:0!important;height:0!important;min-height:0!important;
+  overflow:hidden!important;border:0!important;visibility:hidden!important
+}
+html.typing-compact .session-line,
+html.typing-compact #session-position,
+html.typing-compact #session-score,
+html.typing-compact .practice-head,
+html.typing-compact #pause-session,
+html.typing-compact .practice-note,
+html.typing-compact .pref-check,
+html.typing-compact .path-crumb,
+html.typing-compact .morph-progress,
+html.typing-compact .mastery-label,
+html.typing-compact .mastery-dots,
+html.typing-compact .phase-label,
+html.typing-compact .question-top,
+html.typing-compact .source-label,
+body.typing-compact .session-line,
+body.typing-compact .practice-head,
+body.typing-compact .path-crumb,
+body.typing-compact .morph-progress{
   display:none!important
 }
-html.typing-compact #answer-form .practice-composer{
-  display:flex;flex-direction:column;gap:4px;
-  grid-template-areas:none
+html.typing-compact #issue-toggle,
+html.typing-compact .issue-toggle,
+body.typing-compact #issue-toggle,
+body.typing-compact .issue-toggle{
+  display:none!important;visibility:hidden!important;pointer-events:none!important
 }
-html.typing-compact #answer-form .composer-row{display:flex}
-html.typing-compact .practice-composer{gap:4px}
-html.typing-compact .practice-dock{gap:0;padding-top:0;margin-top:0}
-html.typing-compact .practice-dock .secondary-actions{margin:0}
+html.typing-compact #tutor-host,
+html.typing-compact .tutor-launch,
+html.typing-compact .tutor-sticker-dot,
+html.typing-compact .tutor-pet,
+body.typing-compact #tutor-host,
+body.typing-compact .tutor-launch,
+body.typing-compact .tutor-sticker-dot{
+  display:none!important;visibility:hidden!important;pointer-events:none!important
+}
+/* free-practice / morph write: hide support/reveal row while keyboard compact */
+html.typing-compact [data-free-practice] .morph-actions,
+html.typing-compact [data-free-write-form] ~ .morph-actions,
+html.typing-compact .morph-panel > .morph-actions,
+body.typing-compact [data-free-practice] .morph-actions{
+  display:none!important
+}
+html.typing-compact #answer-form .practice-composer,
+html.typing-compact #path-form.practice-composer,
+html.typing-compact .practice-composer{
+  display:flex!important;flex-direction:column;gap:4px!important;
+  grid-template-areas:none!important;grid-template-rows:none!important
+}
+html.typing-compact #answer-form .composer-row,
+html.typing-compact #path-form .composer-row,
+html.typing-compact .composer-row{display:flex!important}
+html.typing-compact .practice-dock{
+  gap:0!important;padding:0!important;margin:0!important;
+  box-shadow:none!important;background:transparent
+}
+html.typing-compact .practice-dock .secondary-actions{margin:0!important}
+html.typing-compact .letter-keyboard,
+html.typing-compact .morph-keys,
+html.typing-compact .typing-strip .letter-keyboard,
+html.typing-compact .typing-strip .morph-keys{margin:0!important}
 html.typing-compact body[data-view=path] .path-paper,
-html.typing-compact body[data-view=practice] .exercise-card{
+html.typing-compact body[data-view=practice] .exercise-card,
+html.typing-compact .path-paper,
+html.typing-compact .exercise-card{
   padding-bottom:calc(var(--dockh, 120px) + 8px)
 }
 html.typing-compact .composer-row .fields input[type=text],
-html.typing-compact #path-form .composer-row input[type=text]{
+html.typing-compact #path-form .composer-row input[type=text],
+html.typing-compact #path-answer,
+html.typing-compact #free-write,
+html.typing-compact #morph-answer,
+html.typing-compact #stage7-answer{
   min-height:48px
 }
