@@ -112,6 +112,10 @@
     const pol=typeof module!=='undefined'&&module.exports?require('./memory-policy.js'):root.MemoryPolicy;
     return !!(pol&&pol.isAssembleOnlyCard(q));
   }
+  function letterBreakdownOnly(q){
+    const pol=typeof module!=='undefined'&&module.exports?require('./memory-policy.js'):root.MemoryPolicy;
+    return !!(pol&&pol.isLetterBreakdown&&pol.isLetterBreakdown(q));
+  }
   function lemmaKey(q){
     if(!q)return 'id:';
     const fromBind=(q.skillBindings||[]).map(b=>b&&b.item_id).find(id=>String(id||'').startsWith('word:'));
@@ -133,7 +137,7 @@
     return out;
   }
   function chooseShortSession(items,records,now=Date.now(),limit=config.session.size,opts={}){
-    items=(items||[]).filter(q=>q&&!q.contextOnly&&(opts.allowUsed||q.wordRole!=='used')&&!String(q.id||'').startsWith('learn-compose-')&&!assembleOnly(q));
+    items=(items||[]).filter(q=>q&&!q.contextOnly&&(opts.allowUsed||q.wordRole!=='used')&&!String(q.id||'').startsWith('learn-compose-')&&!assembleOnly(q)&&!letterBreakdownOnly(q));
     const newLimit=Math.max(0,Number(config.session.newLimit)||0);
     const isNew=q=>{const r=records&&records[q.id];return !(r&&r.seen);};
     const errors=items.filter(q=>records[q.id]?.needsReview);
