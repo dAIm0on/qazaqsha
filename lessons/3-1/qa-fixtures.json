@@ -1,0 +1,15 @@
+{
+  "lesson_id": "3-1",
+  "known_bad": [
+    {
+      "id": "fixture:3-1:bad-key:6-1-1",
+      "reject": "Менің оқушысым",
+      "accept": "Менің оқушым"
+    },
+    {
+      "id": "fixture:3-1:bad-key:6-2-2",
+      "reject": "Оның доссы",
+      "accept": "Оның досы"
+    }
+  ]
+}
