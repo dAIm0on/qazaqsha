@@ -172,17 +172,15 @@ input[id^="answer-"],
   box-shadow:0 -8px 18px rgba(22,20,18,.08)
 }
 html.keyboard-open body[data-view=practice] .practice-dock,
-body.keyboard-open[data-view=practice] .practice-dock,
-body.keyboard-open[data-view=path] #path-form{
-  position:fixed;left:0;right:0;bottom:var(--kbinset,0px);z-index:40;
-  margin:0;max-height:calc(100dvh - var(--kbinset) - 96px);
-  overflow:auto;border-top:1px solid var(--line);
-  background:var(--surface);
-  border-radius:18px 18px 0 0;padding:8px 12px 10px
+body.keyboard-open[data-view=practice] .practice-dock{
+  background:var(--surface)
 }
-body.keyboard-open[data-view=path] .path-paper{padding-bottom:240px}
-body.keyboard-open[data-view=practice] .exercise-card{
-  padding-bottom:calc(var(--dockh, 180px) + 12px)
+body.keyboard-open[data-view=path] #path-form{
+  background:var(--surface)
+}
+html.typing-compact body[data-view=path] .path-paper,
+html.typing-compact body[data-view=practice] .exercise-card{
+  padding-bottom:calc(var(--dockh, 148px) + 10px)
 }
 body.keyboard-open[data-view=practice] .bottom-nav,
 body.keyboard-open[data-view=practice] .question-top,
@@ -883,3 +881,46 @@ html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
   min-height:44px;
 }
 .primary-slot>#retry-button{width:100%}
+
+/* typing-compact: letters + Проверить sit on the visual viewport, not window bottom. */
+.phase-label:empty{display:none}
+#question-title.practice-prompt,
+h2.practice-prompt,
+.exercise-card .question-note{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;
+  overflow:hidden
+}
+.typing-strip{
+  display:flex;flex-direction:column;gap:6px;
+  box-shadow:0 -4px 12px rgba(22,20,18,.08)
+}
+#answer-form .practice-composer .typing-strip{display:contents}
+.typing-strip .letter-keyboard,
+.typing-strip .morph-keys{display:flex;flex-wrap:nowrap;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.typing-strip .letter-keyboard button,
+.typing-strip .morph-keys button{
+  position:relative;box-sizing:border-box;overflow:visible;
+  width:38px;height:38px;min-width:38px;max-width:40px;min-height:38px;max-height:40px;
+  flex:0 0 38px;padding:0;font-size:1.05rem
+}
+.typing-strip .letter-keyboard button::before,
+.typing-strip .morph-keys button::before{
+  content:"";position:absolute;left:50%;top:50%;width:44px;height:44px;transform:translate(-50%,-50%)
+}
+html.typing-compact #answer-form .practice-composer .typing-strip,
+html.typing-compact .typing-strip{
+  display:flex;position:fixed;z-index:45;right:auto;bottom:auto;margin:0;
+  background:var(--surface);border-top:1px solid var(--line);
+  box-shadow:0 -6px 16px rgba(22,20,18,.10);
+  padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));gap:4px
+}
+html.typing-compact #answer-form .letter-keyboard,
+html.typing-compact #answer-form .primary-slot{grid-area:auto;width:100%}
+html.typing-compact .session-line,
+html.typing-compact #issue-toggle,
+html.typing-compact #tutor-host,
+html.typing-compact .morph-progress{display:none!important}
+html.typing-compact .exercise-card .question-body,
+html.typing-compact .path-paper,
+html.typing-compact .morph-panel{padding:8px 10px}
+html.typing-compact .exercise-card .question-top{padding:8px 10px 0}

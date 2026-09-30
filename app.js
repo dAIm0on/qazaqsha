@@ -80,27 +80,59 @@
  }
  function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}
  let kbScrollLock=false;
+ function vvKeyboardGap(){
+   const vv=window.visualViewport;
+   if(!vv)return {open:false,vv:null,gap:0};
+   const gap=window.innerHeight-vv.height-Math.max(0,vv.offsetTop);
+   return {open:gap>80,vv,gap};
+ }
+ function scrollFieldAndStrip(field){
+   if(field)try{field.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
+   const strip=document.querySelector('.typing-strip');
+   if(strip)try{strip.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
+ }
+ function anchorTypingStrips(open,vv){
+   document.querySelectorAll('.typing-strip').forEach(strip=>{
+     if(!open||!vv){
+       strip.style.top='';
+       strip.style.left='';
+       strip.style.width='';
+       return;
+     }
+     const h=strip.offsetHeight||strip.getBoundingClientRect().height;
+     const top=vv.offsetTop+vv.height-h;
+     strip.style.top=Math.round(top)+'px';
+     strip.style.left=Math.round(vv.offsetLeft)+'px';
+     strip.style.width=Math.round(vv.width)+'px';
+   });
+ }
  function syncKbInset(){
    if(document.documentElement.hasAttribute('data-kbinset-lock'))return;
-   const vv=window.visualViewport;
-   const inset=vv?Math.max(0,window.innerHeight-vv.height-vv.offsetTop):0;
-   document.documentElement.style.setProperty('--kbinset',Math.round(inset)+'px');
-   const open=inset>80;
+   const info=vvKeyboardGap();
+   const open=info.open,vv=info.vv;
+   const inset=Math.max(0,Math.round(info.gap));
+   document.documentElement.style.setProperty('--kbinset',inset+'px');
    document.documentElement.classList.toggle('keyboard-open',open);
    document.body.classList.toggle('keyboard-open',open);
-   const dock=$('#practice-dock');
+   document.documentElement.classList.toggle('typing-compact',open);
+   document.body.classList.toggle('typing-compact',open);
+   const card=$('#exercise');
+   if(card)card.classList.toggle('typing-compact',open&&document.body.getAttribute('data-view')==='practice');
+   const paper=document.querySelector('#path-content .path-paper');
+   if(paper)paper.classList.toggle('typing-compact',open&&document.body.getAttribute('data-view')==='path');
+   anchorTypingStrips(open,vv);
+   const dock=$('.typing-strip')||$('#practice-dock');
    if(dock)document.documentElement.style.setProperty('--dockh',dock.offsetHeight+'px');
    const tog=$('#issue-toggle');
-   if(tog)tog.hidden=open||(inset>48&&document.body.getAttribute('data-view')==='practice');
-   if(open&&!kbScrollLock&&document.body.getAttribute('data-view')==='practice'){
-     kbScrollLock=true;
-     const field=lastTextInput||$('#answer-0');
-     if(field&&(!dock||!dock.contains(field))){
-       const r=field.getBoundingClientRect();
-       const visBottom=window.innerHeight-inset-(dock?dock.offsetHeight:0)-8;
-       if(r.bottom>visBottom||r.top<8){try{field.scrollIntoView({block:'nearest'});}catch{}}
+   if(tog)tog.hidden=!!open;
+   if(open&&!kbScrollLock){
+     const view=document.body.getAttribute('data-view');
+     if(view==='practice'||view==='path'||view==='morph'){
+       kbScrollLock=true;
+       const field=lastTextInput||$('#answer-0')||$('#path-answer')||$('#morph-answer')||$('#stage7-answer')||$('#free-write');
+       scrollFieldAndStrip(field);
+       setTimeout(()=>{kbScrollLock=false;anchorTypingStrips(open,window.visualViewport);},220);
      }
-     setTimeout(()=>{kbScrollLock=false;},220);
    }
  }
  if(window.visualViewport){
@@ -108,12 +140,21 @@
    window.visualViewport.addEventListener('scroll',syncKbInset);
  }
  window.addEventListener('resize',syncKbInset);
+ document.addEventListener('focusin',e=>{
+   const t=e.target;
+   if(!t||!t.matches)return;
+   if(t.matches('input[type=text],textarea')&&t.closest('#answer-form,#path-form,#morph-answer-form,#stage7-answer-form,[data-free-write-form]')){
+     lastTextInput=t;
+     syncKbInset();
+     if(document.documentElement.classList.contains('typing-compact'))scrollFieldAndStrip(t);
+   }
+ });
  syncKbInset();
  function focusAnswer(){
-   const el=$('#answer-0');
-   if(el&&!el.disabled){try{el.focus({preventScroll:false});}catch{el.focus();}}
-   const dock=$('#practice-dock');
-   if(dock&&dock.scrollIntoView)try{dock.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
+   const el=$('#answer-0')||$('#path-answer');
+   if(el&&!el.disabled){try{el.focus({preventScroll:true});}catch{el.focus();}}
+   if(document.documentElement.classList.contains('typing-compact')){scrollFieldAndStrip(el);return;}
+   if(el)try{el.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
  }
  function captureDraft(){
    const pathInput=$('#path-answer');
@@ -1001,7 +1042,7 @@
    const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
    const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
    const letterBar=letters?`<div class="letter-keyboard" lang="kk" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div>`:'';
-   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus):esc(q.stimulus)))}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="retry-button" hidden>Ещё раз</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div>${letterBar}</div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
+   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc((q.phase&&q.phase!=='Вспомнить')?q.phase:(q.source.startsWith('hw')?'':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title" class="practice-prompt">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]&&!/вспомнить/i.test(reviewReasonMap[q.id])?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus):esc(q.stimulus)))}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}</div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div><div class="typing-strip" id="typing-strip">${letterBar}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="retry-button" hidden>Ещё раз</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div></div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
    const goCard=()=>{if(checked)nextQuestion();else if(isVocabWordsMode()&&retrying&&$('#retry-button')&&!$('#retry-button').hidden)beginVocabRetry();else checkAnswer(q);};
    if(window._qazaqEnter)document.removeEventListener('keydown',window._qazaqEnter);
    window._qazaqEnter=e=>{
@@ -1022,7 +1063,7 @@
    $('#next-button').onclick=nextQuestion;
    if($('#retry-button'))$('#retry-button').onclick=e=>{e.preventDefault();beginVocabRetry();};
    $('#association-button').onclick=()=>openAssociation(q);
-   $$('#answer-form input[type=text]').forEach(el=>el.addEventListener('focus',()=>{lastTextInput=el;syncKbInset();const dock=$('#practice-dock');if(dock&&dock.scrollIntoView)try{dock.scrollIntoView({block:'nearest'});}catch{}}));
+   $$('#answer-form input[type=text]').forEach(el=>el.addEventListener('focus',()=>{lastTextInput=el;syncKbInset();if(document.documentElement.classList.contains('typing-compact'))scrollFieldAndStrip(el);else try{el.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}}));
    $$('[data-letter]').forEach(b=>{
      b.addEventListener('pointerdown',e=>e.preventDefault());
      b.addEventListener('mousedown',e=>e.preventDefault());
@@ -1100,8 +1141,8 @@
    if($('#hint-button'))$('#hint-button').disabled=true;
    if(!$('.letter-keyboard')&&(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='number-text')){
      const keys=document.createElement('div');keys.className='letter-keyboard';keys.lang='kk';keys.innerHTML=[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}">${c}</button>`).join('');
-     const slot=$('.practice-composer .primary-slot');
-     if(slot)slot.before(keys);else box.after(keys);
+     const strip=$('#typing-strip');
+     if(strip)strip.prepend(keys);else{const slot=$('.practice-composer .primary-slot');if(slot)slot.before(keys);else box.after(keys);}
      keys.querySelectorAll('[data-letter]').forEach(b=>b.addEventListener('pointerdown',e=>{
        e.preventDefault();
        const target=lastTextInput||$('#answer-0');if(!target||target.disabled)return;
@@ -1365,7 +1406,7 @@
      advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
    }
  }
- function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
+ function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}focusAnswer();}
  function homeworkOpts(){
    const sessionGUnlocked=!!(window.Lesson31Pack?.sessionG?.().length)&&window.Lesson31Pack.sessionG().every(q=>records[q.id]?.seen);
    return {sessionGUnlocked,events:state.events};
@@ -1721,9 +1762,9 @@
    }
    if(beat.k==='ask'){
      root.innerHTML=`<div class="panel path-paper">${head}<p class="phase-label">${beat.type==='one_prod'?'Самостоятельно':'Проверь понимание'}</p>
-       <h2>${esc(faceTitle(beat.prompt))}</h2>
+       <h2 class="practice-prompt">${esc(faceTitle(beat.prompt))}</h2>
        ${beat.stem?'<p class="stimulus" lang="kk">'+(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(beat.stem):esc(beat.stem))+'</p>':''}
-       <form id="path-form" class="practice-composer"><div class="composer-row"><input id="path-answer" type="text" lang="kk" enterkeyhint="enter" autocomplete="off" spellcheck="false"><button type="submit" class="primary-button" id="path-check">Проверить</button></div>${kb}
+       <form id="path-form" class="practice-composer"><div class="composer-row"><input id="path-answer" type="text" lang="kk" enterkeyhint="enter" autocomplete="off" spellcheck="false"></div><div class="typing-strip">${kb}<button type="submit" class="primary-button" id="path-check">Проверить</button></div>
          <div id="path-fb" class="feedback" hidden></div>
          <div class="lesson-actions">
            <button type="button" class="text-button chrome-back" id="path-back">← Назад</button>
@@ -1737,6 +1778,7 @@
        const saved=gp.pathDraft;
        if(saved&&saved.chapterId===ch.id&&Number(saved.beat)===gp.beat&&(!saved.lessonId||saved.lessonId===les.id))input.value=saved.value||'';
        input.addEventListener('input',save);
+       input.addEventListener('focus',()=>{lastTextInput=input;syncKbInset();if(document.documentElement.classList.contains('typing-compact'))scrollFieldAndStrip(input);});
        input.focus();
      }
      $$('#path-form [data-letter]').forEach(b=>{b.addEventListener('pointerdown',e=>e.preventDefault());b.onclick=()=>{const s=input.selectionStart||input.value.length,end=input.selectionEnd||s;input.value=input.value.slice(0,s)+b.dataset.letter+input.value.slice(end);const n=s+b.dataset.letter.length;try{input.setSelectionRange(n,n);}catch{}input.dispatchEvent(new Event('input',{bubbles:true}));input.focus();};});
@@ -2403,7 +2445,7 @@
    if(position>0&&queue.length){
      cancelAdvance();abortTutor();draft=null;retrying=false;position--;
      render();
-     const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});
+     if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}
      focusAnswer();
      return;
    }
