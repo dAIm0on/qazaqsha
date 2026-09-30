@@ -240,12 +240,18 @@
   if($('#tutor-host')){if(pet)pet.ensure();return;}
   const host=document.createElement('div');
   host.id='tutor-host';
-  host.innerHTML=`<button type="button" class="tutor-launch" id="tutor-launch" aria-label="Спросить тьютора" aria-haspopup="dialog" aria-controls="tutor-sheet">
+  host.innerHTML=`<button type="button" class="tutor-launch" id="tutor-launch" aria-label="Спросить тьютора" aria-haspopup="dialog" aria-controls="tutor-sheet" aria-expanded="false">
     <span class="tutor-sticker-dot" aria-hidden="true"></span>
   </button>
-  <div id="tutor-steb" class="tutor-steb" hidden role="status" aria-live="polite"></div>
-  <div id="tutor-sheet" class="tutor-sheet" hidden role="dialog" aria-labelledby="tutor-sheet-title">
-    <div class="tutor-sheet-head">
+  <div id="tutor-steb" class="tutor-steb" hidden role="status" aria-live="polite"></div>`;
+  /* Sheet is a body sibling so the 44×44 host cannot clip long answers. */
+  const sheet=document.createElement('div');
+  sheet.id='tutor-sheet';
+  sheet.className='tutor-sheet';
+  sheet.hidden=true;
+  sheet.setAttribute('role','dialog');
+  sheet.setAttribute('aria-labelledby','tutor-sheet-title');
+  sheet.innerHTML=`<div class="tutor-sheet-head">
       <p class="eyebrow" id="tutor-sheet-title">Спросить про это</p>
       <p class="small" id="tutor-sheet-ctx"></p>
       <button type="button" class="text-button" id="tutor-close">Готово</button>
@@ -258,10 +264,10 @@
       <span id="tutor-badge" class="tutor-badge" hidden></span>
       <button type="button" class="text-button" id="tutor-retry" hidden>Повторить</button>
     </div>
-    <div id="tutor-out" class="tutor-out" hidden></div>
-  </div>`;
+    <div id="tutor-out" class="tutor-out" hidden></div>`;
   document.body.appendChild(host);
-  $('#tutor-launch').onclick=(e)=>{e.preventDefault();open();};
+  document.body.appendChild(sheet);
+  $('#tutor-launch').onclick=(e)=>{e.preventDefault();toggle();};
   $('#tutor-close').onclick=()=>close();
   $('#tutor-send').onclick=()=>askFree();
   $('#tutor-retry').onclick=()=>retryLast();
@@ -286,12 +292,22 @@
   box.querySelectorAll('[data-tutor-act]').forEach(b=>b.onclick=()=>quick(b.dataset.tutorAct,b.dataset.word||''));
  }
 
+ function setLaunchExpanded(isOpen){
+  const launch=$('#tutor-launch');
+  if(launch)launch.setAttribute('aria-expanded',isOpen?'true':'false');
+ }
+ function toggle(){
+  const sheet=$('#tutor-sheet');
+  if(sheet&&!sheet.hidden)close();
+  else open();
+ }
  function open(){
   const sheet=$('#tutor-sheet');if(!sheet)return;
   ensureFocusWord();
   paintCtx();paintChips();
   sheet.hidden=false;
   document.body.classList.add('tutor-open');
+  setLaunchExpanded(true);
   const q=$('#tutor-q');if(q)try{q.focus({preventScroll:true});}catch{q.focus();}
  }
  function openGloss(word){
@@ -304,6 +320,7 @@
  function close(){
   const sheet=$('#tutor-sheet');if(sheet)sheet.hidden=true;
   document.body.classList.remove('tutor-open');
+  setLaunchExpanded(false);
   token++;
   try{if(abort)abort.abort();}catch{}
   hideBadge();

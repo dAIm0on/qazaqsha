@@ -1987,9 +1987,11 @@ const petCss=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
 assert.ok(/\.tutor-sticker-dot\{[^}]*width:44px/.test(petCss.replace(/\s+/g,''))&&/height:44px/.test(petCss),'sticker 44px');
 assert.ok(/#FF5A1F/.test(petCss),'sticker fill #FF5A1F');
 assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-index:22/.test(petCss),'sticker z-index below CTA');
-assert.ok(/tutor-sticker-dot/.test(tutorUiSrc)&&/\$\('#tutor-launch'\)\.onclick=\(e\)=>\{e\.preventDefault\(\);open\(\);\}/.test(tutorUiSrc),'tap sticker opens ask');
+assert.ok(/tutor-sticker-dot/.test(tutorUiSrc)&&/\$\('#tutor-launch'\)\.onclick=\(e\)=>\{e\.preventDefault\(\);toggle\(\);\}/.test(tutorUiSrc)&&/function toggle\(\)\{[\s\S]*?close\(\);[\s\S]*?open\(\);/.test(tutorUiSrc),'tap sticker toggles ask');
 assert.ok(!/pet-idle\.png/.test(tutorUiSrc),'default companion is not pet-idle');
-assert.ok(/school-tutor13/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor13');
+assert.ok(/school-tutor15/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE tutor15');
+assert.ok(/\.tutor-sheet\{[^}]*max-height:min\(78dvh,640px\)/.test(petCss.replace(/\s+/g,''))&&/overflow-y:auto/.test(petCss),'ask panel max-height + overflow-y:auto');
+assert.ok(/document\.body\.appendChild\(sheet\)/.test(tutorUiSrc),'ask sheet is body sibling (no 44px clip)');
 
 
 const TutorBlock=require('./ai-tutor.js');
