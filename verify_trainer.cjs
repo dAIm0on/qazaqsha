@@ -1997,20 +1997,21 @@ assert.ok(!/isVocabWordsMode\(\)[\s\S]{0,80}Проверить этот навы
 assert.ok(/qazaq-offline-live-20261001-words-error-lemma/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
 ok('Vocab words P1: retry CTA, compact error, correct-only progress, no skill mud');
 
-/* P0 words-error-lemma 2026-10-01: after wrong in words — show lemma + Ещё раз; no bottom AI strip. */
-assert.ok(/class=\"vocab-lemma\"/.test(appVocabP1),'words P0 vocab-lemma class');
-assert.ok(/vocab-lemma[\s\S]{0,80}Ответ:/.test(appVocabP1),'words P0 shows lemma/эталон after wrong');
-assert.ok((appVocabP1.match(/data-vocab-compact/g)||[]).length>=2,'words P0 compact block on first wrong + retry');
-const vocabBlocks=[...appVocabP1.matchAll(/data-vocab-compact[\s\S]{0,900}/g)].map(m=>m[0]);
-assert.ok(vocabBlocks.length>=2,'words P0 has vocab-compact templates');
-for(const b of vocabBlocks){
-  assert.ok(!/Почему так\?/.test(b)&&!/Покажи правило/.test(b)&&!/ai-tutor-panel/.test(b),'words P0 no bottom AI in vocab-compact');
-  assert.ok(/vocab-lemma/.test(b)&&/feedback-retry/.test(b),'words P0 lemma + Ещё раз in vocab-compact');
-}
+/* P0 words-error-lemma 2026-10-01 (frame): Не знаю ≠ ask-circle; wrong = strike + orange lemma + Ещё раз. */
+assert.ok(/function paintVocabLemmaFeedback\(/.test(appVocabP1)&&/function vocabWrongFeedbackHtml\(/.test(appVocabP1),'words P0 lemma feedback helpers');
+assert.ok(/vocab-lemma-banner/.test(appVocabP1)&&/vocab-attempt-strike/.test(appVocabP1),'words P0 orange banner + strikethrough attempt');
+assert.ok(/isVocabWordsMode\(\)[\s\S]{0,200}paintVocabLemmaFeedback/.test(appVocabP1.split('function peekAnswer')[1]||''),'words P0 Не знаю → immediate lemma via peekAnswer');
+assert.ok(/data-vocab-idk|vocab-idk/.test(appVocabP1),'words P0 Не знаю hit ≥44 marker');
+assert.ok(/paintVocabLemmaFeedback\(feedback,q,answers/.test(appVocabP1),'words P0 wrong path uses lemma painter');
 assert.ok(/window\.AiTutor&&!vocabWrong/.test(appVocabP1),'words P0 skips AiTutor bottom wiring on vocabWrong');
-assert.ok(/#tutor-host/.test(fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8')),'orange ask circle host kept');
+assert.ok(!/vocabWrong[\s\S]{0,400}vocabOfferHtml|paintVocabLemmaFeedback[\s\S]{0,200}vocabOfferHtml/.test(appVocabP1),'words P0 error screen has no skill-links');
+const themeVocab=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
+assert.ok(/#FF5A1F/.test(themeVocab)&&/vocab-lemma-banner/.test(themeVocab)&&/line-through/.test(themeVocab),'theme orange banner + strike');
+assert.ok(/#reveal-button\.vocab-idk|#reveal-button\[data-vocab-idk\]/.test(themeVocab.replace(/\s+/g,''))||/#reveal-button\.vocab-idk/.test(themeVocab),'Не знаю ≥44 CSS');
+assert.ok(/#tutor-host/.test(fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8')),'ask circle host kept (explain only)');
+assert.ok(/data-tutor-act=\"unclear\"/.test(fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8'))&&/data-tutor-act=\"explain\"/.test(fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8')),'ask chips Не ясно/Объясни unchanged');
 assert.ok(/qazaq-offline-live-20261001-words-error-lemma/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump words-error-lemma');
-ok('Vocab words P0: lemma after wrong + Ещё раз; no bottom AI strip; ask circle kept');
+ok('Vocab words P0: Не знаю→lemma; wrong strike+orange banner+Ещё раз; no AI/skill-links; ask explain-only');
 
 ok('Astra step 9: wrong answer shows the attempt, the block, and an existing same-skill offer (words P0 may reveal lemma)');
 
