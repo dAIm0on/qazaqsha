@@ -77,9 +77,36 @@ assert(navSource.includes("if(b.type==='link')"),'source link renderer missing')
 assert(navSource.includes('<caption>')||navSource.includes("'<caption>'"),'table captions are not rendered');
 
 assert(stateSource.includes("preferences:{supportLevel:'try_myself'"),'new free-practice state must start unaided');
-assert(practiceView.includes("const options=independent?''"),'unaided mode must hide answer choices');
-assert(practiceView.includes('!independent&&c.showExpectedBeforeAnswer'),'unaided mode must hide expected form');
+assert(stateSource.includes('everSupported'), 'assisted history must survive switching back to unaided UI');
+assert(practiceView.includes("const options=!independent&&!scaffoldActive&&!c.decisionSpec?"),'form scaffold must never expose legacy full-word choices');
+assert(practiceView.includes('!finished&&!independent&&!scaffoldActive&&!c.decisionSpec&&c.showExpectedBeforeAnswer'),'unaided/scaffold modes must hide expected form');
 assert(practiceView.includes('Напишите форму самостоятельно'),'unaided full-form input missing');
+assert(practiceView.includes('Правильный ответ не показан'),'wrong full-input answer must not reveal expected form');
+assert(practiceView.includes('Разбор. Это не самостоятельный ответ.'),'reveal must be distinct from unaided success');
+assert(practiceView.includes('data-free-step-answer'),'B-E scaffold controls missing');
+assert(practiceView.includes('data-free-step-form'),'F suffix assembly missing');
+assert(practiceView.includes('data-free-key-target'),'Kazakh keyrail must target active input');
+assert(navSource.includes('sourcePracticeHtml(row,st().step||0)'),'source-section practice is not embedded in NAV2 learning flow');
+assert(navSource.includes('data-nav2-source-practice'),'source-section practice marker missing');
+
+const allPracticeCards=practiceContent.all();
+const formCards=allPracticeCards.filter(c=>c.exerciseType!=='meaning');
+assert(formCards.length>0,'no productive form cards');
+for(const card of formCards){
+ assert(card.decisionSpec,'form card lacks engine-derived decisionSpec '+card.cardId);
+ const levels=card.decisionSpec.levels||{};
+ assert(levels.F&&levels.F.kind==='input','form card lacks F suffix assembly '+card.cardId);
+ assert(levels.G&&levels.G.kind==='input','form card lacks G full input '+card.cardId);
+ assert.strictEqual(levels.G.answer,card.answer,'G must verify canonical full answer '+card.cardId);
+ assert(Array.isArray(card.practiceLevels)&&card.practiceLevels.join('')==='ABCDEFGHI','A-I declaration missing '+card.cardId);
+ for(const key of ['B','C','D','E']){
+  const level=levels[key];if(!level)continue;
+  for(const option of level.options||[])assert.notStrictEqual(option,card.answer,'guided level leaks full word '+card.cardId+' '+key);
+ }
+}
+const semanticCards=allPracticeCards.filter(c=>c.exerciseType==='meaning');
+assert(semanticCards.every(c=>Array.isArray(c.practiceLevels)&&c.practiceLevels.includes('G')),'semantic card lacks independent G path');
+
 
 const specialTypes=['table','example','warning','list','ordered-list','try','term','link'];
 const special={};
@@ -97,6 +124,9 @@ const summary={
  totalScreens,
  productiveLessons:cat.lessons.filter(x=>x.practiceMode!=='observation_only').length,
  observationOnly:cat.lessons.filter(x=>x.practiceMode==='observation_only').map(x=>x.id),
+ practiceCards:allPracticeCards.length,
+ productiveFormCards:formCards.length,
+ semanticCards:semanticCards.length,
  special
 };
 console.log('VERIFY_MORPH_NAV2_1TO1 PASS');
