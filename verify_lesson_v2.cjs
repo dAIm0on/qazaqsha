@@ -199,8 +199,11 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'
 assert.equal(prodMock.LessonV2Runtime.installed.size,0);
 assert.equal(prodMock.COURSE.questions.length,0);
 ok('draft/reviewed v2 lesson is physically blocked on production');
+const releasedPackage=JSON.parse(JSON.stringify(expectedCompiled));
+releasedPackage.status='released';
+releasedPackage.release={approved:true,preview_head:'1234567890abcdef1234567890abcdef12345678',preview_url:'https://preview.example.test/',approved_at:'2026-10-01T00:00:00Z',note:'release gate fixture'};
 const releasedMock={
-  location:{hostname:'qazaqsha.pages.dev'},LessonV2Schema:Schema,LESSON_V2_COMPILED:[expectedCompiled],
+  location:{hostname:'qazaqsha.pages.dev'},LessonV2Schema:Schema,LESSON_V2_COMPILED:[releasedPackage],
   COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
   CURRICULUM:{words:[],rules:[],lessons:[],addWord(kazakh,translation,lesson,role){
     let w=this.words.find(x=>x.kazakh===kazakh);
