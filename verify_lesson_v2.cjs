@@ -163,8 +163,8 @@ assert.ok(mock.GRAMMAR_CHAPTERS.LESSONS.find(x=>x.id==='4-1').chapters.every(x=>
 const extra=mock.LessonV2Runtime.practiceForRule('4-1','v2:4-1:negative',12);
 assert.equal(extra.length,12);
 assert.equal(new Set(extra).size,12);
-assert.equal(mock.COURSE.questions.length,439);
-ok('data-only runtime auto-registers theory, 439 questions, vocabulary and varied optional practice');
+assert.equal(mock.COURSE.questions.length,444);
+ok('data-only runtime auto-registers theory, 444 questions, vocabulary and varied optional practice');
 
 const migratedPackage=JSON.parse(JSON.stringify(expectedCompiled));
 migratedPackage.migrations=[{
