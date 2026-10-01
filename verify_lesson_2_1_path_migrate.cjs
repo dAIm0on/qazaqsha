@@ -45,7 +45,7 @@ assert.ok(cp.includes('pathNeedsReplay'));
 ok('course-progress persists contentRevision + pathNeedsReplay');
 
 const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20261001-v2-resume-p0'"));
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20261001-lesson-4-2'"));
 ok('sw cache bumped to kb-compact');
 
 const mock={
