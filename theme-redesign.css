@@ -909,6 +909,15 @@ h2.practice-prompt,
 .typing-strip .morph-keys button::before{
   content:"";position:absolute;left:50%;top:50%;width:44px;height:44px;transform:translate(-50%,-50%)
 }
+/* Nine letters must stay fully inside a 390px screen. Fixed 38px buttons push і past the row. */
+@media(max-width:430px){
+  .typing-strip .letter-keyboard,
+  .typing-strip .morph-keys{width:100%;max-width:100%;gap:4px;overflow:visible}
+  .typing-strip .letter-keyboard button,
+  .typing-strip .morph-keys button{
+    flex:1 1 0;width:auto;min-width:0;max-width:none
+  }
+}
 /* Compact kb-compact9: simpler model closer to first working variant.
    ONLY .typing-dock is VV-fixed: top = vv.offsetTop + vv.height − barH
    (barH = contentH + ~44 iOS accessory). Do NOT position:fixed the whole
