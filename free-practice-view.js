@@ -123,6 +123,24 @@ function mixedPickHtml(){
 function notes(){
  return (saveWarning?'<p role="status">'+esc(saveWarning)+'</p>':'')+(cardNotice?'<p role="status">'+esc(cardNotice)+'</p>':'');
 }
+function scaffoldOrder(c){
+ const d=c&&c.decisionSpec;
+ return d&&Array.isArray(d.order)?d.order.filter(x=>x!=='G'&&d.levels&&d.levels[x]):[];
+}
+function scaffoldHtml(c){
+ const d=c&&c.decisionSpec,cur=state.currentCard;
+ if(!d||!cur||cur.supportLevel!=='supported'||!cur.scaffoldLevel)return '';
+ const level=d.levels&&d.levels[cur.scaffoldLevel];
+ if(!level)return '';
+ const feedback=cur.scaffoldFeedback==='no'?'<div role="status" class="morph-nav2-error"><p>Пока не то. Ответ не показан.</p><p>'+esc(level.hint||'Проверь только этот шаг.')+'</p></div>':'';
+ const intro='<div class="morph-nav2-try" data-free-scaffold><p class="eyebrow">ШАГ '+esc(cur.scaffoldLevel)+'</p><h3>'+esc(level.prompt||'Разберите один шаг')+'</h3>'+(level.context?'<p lang="kk">'+esc(level.context)+'</p>':'');
+ if(level.kind==='choice'){
+  const options=(level.options||[]).map(o=>'<button type="button" class="secondary-button" data-free-step-answer="'+esc(o)+'">'+esc(o)+'</button>').join('');
+  return intro+'<div class="morph-choices">'+options+'</div>'+feedback+'</div>';
+ }
+ const letters=[...'әғқңөұүһі'].map(ch=>'<button type="button" class="text-button" data-free-key="'+ch+'" data-free-key-target="#free-step-input">'+ch+'</button>').join('');
+ return intro+'<form data-free-step-form><label for="free-step-input">Впишите только окончание</label><input id="free-step-input" lang="kk" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="32"><div class="typing-strip"><div class="morph-keys">'+letters+'</div><button type="submit" class="primary-button">Проверить этот шаг</button></div></form>'+feedback+'</div>';
+}
 function html(){
  if(!isOpen())return '';
  if(corruptRaw)return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><h2>Свободная практика</h2><p role="status">Запись свободной практики не читается. Курс не меняется. Можно начать её заново, прежняя запись останется копией.</p>'+notes()+'<div class="morph-actions"><button type="button" class="primary-button" data-free-reset>Начать свободную практику заново</button></div></div>';
@@ -140,20 +158,34 @@ function html(){
   return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p><h2>'+esc(topicHeading())+'</h2><p role="status">'+line+'</p><div class="morph-actions">'+again+retry+'<button type="button" class="secondary-button" data-free-topics>Выбрать тему</button><button type="button" class="primary-button" data-free-close>К разделу</button></div></div>';
  }
  const tr=c.translationSpec||{};
- const hint=state.preferences.supportLevel==='try_myself'?'':('<p class="morph-rule">'+esc(c.promptSpec&&c.promptSpec.hint||'Смотри на уже объяснённый шаг.')+'</p>');
- const options=(state.currentCard.renderedOptions||[]).map(o=>'<button type="button" class="secondary-button" data-free-answer="'+esc(o)+'">'+esc(o)+'</button>').join('');
- const done=!!(state.currentCard.revealed||state.currentCard.answered);
- const letters=[...'әғқңөұүһі'].map(ch=>'<button type="button" class="text-button" data-free-key="'+ch+'">'+ch+'</button>').join('');
- const writer=done?'':(writeOpen?'<form data-free-write-form><label for="free-write">Напишите форму</label><input id="free-write" lang="kk" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80"><div class="typing-strip"><div class="morph-keys">'+letters+'</div><button type="submit" class="primary-button">Проверить написанное</button></div></form>':'<button type="button" class="secondary-button" data-free-write>Написать самому</button>');
+ const independent=state.preferences.supportLevel==='try_myself';
+ const scaffoldActive=!!(c.decisionSpec&&state.currentCard&&state.currentCard.scaffoldLevel&&state.currentCard.supportLevel==='supported');
+ const hint=!independent&&!scaffoldActive?('<p class="morph-rule">'+esc(c.promptSpec&&c.promptSpec.hint||'Смотри только на один уже объяснённый шаг.')+'</p>'):'';
+ const options=!independent&&!scaffoldActive&&!c.decisionSpec?(state.currentCard.renderedOptions||[]).map(o=>'<button type="button" class="secondary-button" data-free-answer="'+esc(o)+'">'+esc(o)+'</button>').join(''):'';
  const ok=state.currentCard.feedback==='yes';
  const wrong=state.currentCard.feedback==='no';
- const result=done?('<div role="status"><p>'+(state.currentCard.revealed&&!wrong&&!ok?'Разбор. Это не ошибка.':ok?'Верно для этого шага.':'Пока не то.')+'</p>'+(state.currentCard.rawInput?'<p>Твой ответ: '+esc(state.currentCard.rawInput)+'</p>':'')+(c.answer||c.expected?'<p lang="kk">'+esc(c.expected||c.answer)+'</p><p>'+esc(tr.target||'')+'</p>':'')+'<p>'+esc(c.feedbackRu||'')+'</p>'+(wrong?'<p>Дальше можно то же на другом слове.</p>':'')+'</div>'):'';
- const visible=!done&&c.showExpectedBeforeAnswer&&c.expected?'<p lang="kk">'+esc(c.expected)+'</p>':'';
+ const revealed=!!state.currentCard.revealed;
+ const finished=!!(revealed||ok);
+ const letters=[...'әғқңөұүһі'].map(ch=>'<button type="button" class="text-button" data-free-key="'+ch+'" data-free-key-target="#free-write">'+ch+'</button>').join('');
+ const writeForm='<form data-free-write-form><label for="free-write">'+(c.exerciseType==='meaning'?'Введите ответ самостоятельно':'Напишите форму самостоятельно')+'</label><input id="free-write" lang="kk" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80"><div class="typing-strip"><div class="morph-keys">'+letters+'</div><button type="submit" class="primary-button">Проверить написанное</button></div></form>';
+ const writer=finished||scaffoldActive?'':(independent?writeForm:(writeOpen?writeForm:'<button type="button" class="secondary-button" data-free-write>Написать самому</button>'));
+ let result='';
+ if(revealed){
+  result='<div role="status" class="morph-nav2-note"><p>Разбор. Это не самостоятельный ответ.</p>'+(state.currentCard.rawInput?'<p>Ваш ответ: '+esc(state.currentCard.rawInput)+'</p>':'')+'<p lang="kk">'+esc(c.expected||c.answer||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(c.feedbackRu||'')+'</p><p>Теперь возьмите другой пример.</p></div>';
+ }else if(ok){
+  result='<div role="status" class="morph-nav2-ok"><p>'+(state.currentCard.everSupported?'Верно после разбора по шагам.':'Верно самостоятельно.')+'</p><p lang="kk">'+esc(c.expected||c.answer||'')+'</p><p>'+esc(c.feedbackRu||'')+'</p></div>';
+ }else if(wrong){
+  result='<div role="status" class="morph-nav2-error"><p>Пока не то. Правильный ответ не показан.</p>'+(state.currentCard.rawInput?'<p>Ваш ответ: '+esc(state.currentCard.rawInput)+'</p>':'')+'<p>'+esc(c.promptSpec&&c.promptSpec.hint||'Проверьте один шаг и попробуйте ещё раз.')+'</p></div>';
+ }
+ const visible=!finished&&!independent&&!scaffoldActive&&!c.decisionSpec&&c.showExpectedBeforeAnswer&&c.expected?'<p lang="kk">'+esc(c.expected)+'</p>':'';
  const repeat=state.preferences.repeatNotice?'<p>Повторяем знакомые примеры.</p>':'';
- const moreLabel=done?'Ещё пример':'Другой пример';
- const moreClass=done?'primary-button':'secondary-button';
- const leaveClass=done?'secondary-button':'primary-button';
- return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+notes()+intro+repeat+'<h2>'+esc(topicHeading())+'</h2><p>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</p><p lang="kk">'+esc(tr.lemma||'')+'</p><p>'+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+visible+hint+'<div class="morph-choices">'+options+'</div>'+writer+result+'<div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+(state.preferences.supportLevel==='try_myself'?'С подсказкой':'Попробую сам')+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="'+moreClass+'" data-free-another>'+moreLabel+'</button><button type="button" class="'+leaveClass+'" data-free-close>Дальше по уроку</button></div></div>';
+ const scaffold=scaffoldHtml(c);
+ const levelLine=scaffoldActive?'<p class="small">Опора B–F: решаем по одному признаку. Полная правильная форма скрыта.</p>':(!finished&&!independent&&state.currentCard.everSupported?'<p class="small">Теперь уровень G: соберите всю форму без готового ответа.</p>':'');
+ const supportLabel=c.decisionSpec?(independent?'Разобрать по шагам':'Попробую целиком'):(independent?'С подсказкой':'Попробую сам');
+ const moreLabel=revealed?'Новое слово':finished?'Ещё пример':'Другой пример';
+ const moreClass=finished?'primary-button':'secondary-button';
+ const leaveClass=finished?'secondary-button':'primary-button';
+ return '<div class="morph-panel" data-free-practice><button type="button" class="text-button" data-free-close data-free-home>← К разделу</button><p class="eyebrow">СВОБОДНАЯ ПРАКТИКА</p>'+notes()+intro+repeat+'<h2>'+esc(topicHeading())+'</h2><p>'+esc(c.promptSpec&&c.promptSpec.ru||'Собери форму')+'</p><p lang="kk">'+esc(tr.lemma||'')+'</p><p>'+esc(tr.lemmaRu||'')+'</p><p>'+esc(tr.target||'')+'</p><p>'+esc(tr.contextRu||'')+'</p>'+visible+hint+levelLine+scaffold+'<div class="morph-choices">'+options+'</div>'+writer+result+'<div class="morph-actions"><button type="button" class="secondary-button" data-free-support>'+esc(supportLabel)+'</button><button type="button" class="secondary-button" data-free-reveal>Показать разбор</button><button type="button" class="'+moreClass+'" data-free-another>'+moreLabel+'</button><button type="button" class="'+leaveClass+'" data-free-close>Дальше по уроку</button></div></div>';
 }
 function anchorsHtml(headingId){
  if(!enabled())return '';
@@ -232,9 +264,48 @@ function bind(host,redraw){
  host.querySelector('[data-free-another]')?.addEventListener('click',()=>{writeOpen=false;go(()=>S.present(state,pool));});
  host.querySelector('[data-free-reveal]')?.addEventListener('click',()=>{writeOpen=false;go(()=>S.reveal(state));});
  host.querySelector('[data-free-write]')?.addEventListener('click',()=>{writeOpen=true;redraw();});
- host.querySelectorAll('[data-free-key]').forEach(b=>b.addEventListener('click',()=>{const input=host.querySelector('#free-write');if(!input)return;input.value+=b.dataset.freeKey;input.focus();}));
+ host.querySelectorAll('[data-free-key]').forEach(b=>{
+  b.addEventListener('pointerdown',ev=>ev.preventDefault());
+  b.addEventListener('click',()=>{
+   const selector=b.dataset.freeKeyTarget||'#free-write';
+   const input=host.querySelector(selector);if(!input)return;
+   const ch=b.dataset.freeKey||'',start=typeof input.selectionStart==='number'?input.selectionStart:input.value.length,end=typeof input.selectionEnd==='number'?input.selectionEnd:start;
+   input.value=input.value.slice(0,start)+ch+input.value.slice(end);
+   input.focus();try{input.setSelectionRange(start+ch.length,start+ch.length);}catch(e){}
+  });
+ });
  host.querySelector('[data-free-write-form]')?.addEventListener('submit',ev=>{ev.preventDefault();const input=host.querySelector('#free-write');const value=input?input.value.trim():'';const ok=card()&&value===card().answer;writeOpen=false;go(()=>S.answer(state,value,!!ok));});
- host.querySelector('[data-free-support]')?.addEventListener('click',()=>go(()=>S.setSupport(state,state.preferences.supportLevel==='try_myself'?'supported':'try_myself')));
+ const advanceScaffold=(value)=>{
+  const cur=card(),d=cur&&cur.decisionSpec,levelId=state.currentCard&&state.currentCard.scaffoldLevel,level=d&&d.levels&&d.levels[levelId];
+  if(!level)return {ok:false,state};
+  const correct=String(value||'').normalize('NFC').trim()===String(level.answer||'').normalize('NFC').trim();
+  return S.cas(state,state.revision,s=>{
+   if(!s.currentCard)return s;
+   s.currentCard.everSupported=true;
+   s.currentCard.scaffoldFeedback=correct?'yes':'no';
+   s.history=s.history.map(h=>h.occurrenceId===s.currentCard.occurrenceId?Object.assign({},h,{everSupported:true,supportLevel:'supported'}):h);
+   if(correct){
+    const order=scaffoldOrder(s.currentCard.card),i=order.indexOf(levelId),next=order[i+1]||null;
+    s.currentCard.scaffoldLevel=next;
+    s.currentCard.scaffoldFeedback=null;
+    if(!next){s.preferences.supportLevel='try_myself';s.currentCard.supportLevel='try_myself';}
+   }
+   return s;
+  });
+ };
+ host.querySelector('[data-free-step-form]')?.addEventListener('submit',ev=>{ev.preventDefault();const input=host.querySelector('#free-step-input');go(()=>advanceScaffold(input?input.value:''));});
+ for(const b of host.querySelectorAll('[data-free-step-answer]'))b.addEventListener('click',()=>go(()=>advanceScaffold(b.dataset.freeStepAnswer||'')));
+ host.querySelector('[data-free-support]')?.addEventListener('click',()=>go(()=>{
+  const cur=card(),d=cur&&cur.decisionSpec;
+  if(!d)return S.setSupport(state,state.preferences.supportLevel==='try_myself'?'supported':'try_myself');
+  if(state.preferences.supportLevel==='try_myself'){
+   const supported=S.setSupport(state,'supported');if(!supported.ok)return supported;
+   const order=scaffoldOrder(cur);
+   return S.cas(supported.state,supported.state.revision,s=>{if(s.currentCard){s.currentCard.scaffoldLevel=order[0]||null;s.currentCard.scaffoldFeedback=null;s.currentCard.everSupported=true;}return s;});
+  }
+  const independent=S.setSupport(state,'try_myself');if(!independent.ok)return independent;
+  return S.cas(independent.state,independent.state.revision,s=>{if(s.currentCard){s.currentCard.scaffoldLevel=null;s.currentCard.scaffoldFeedback=null;}return s;});
+ }));
  host.querySelector('[data-free-cycle]')?.addEventListener('click',()=>go(()=>{const next=S.newCycle(state);if(!next.ok)return next;next.state.preferences.mixedPick=false;if(!pool.length){next.state.exhaustReason='empty';return next;}return S.present(next.state,pool);}));
  host.querySelector('[data-free-topics]')?.addEventListener('click',()=>{openMixed();redraw();});
  host.querySelector('[data-free-retry]')?.addEventListener('click',()=>{const ids=state.selectedBlockIds||[];pool=ids.flatMap(id=>{try{return C.forBlock(id,'');}catch(e){return [];}});const shown=S.present(state,pool);if(shown.ok)save(shown.state);redraw();});

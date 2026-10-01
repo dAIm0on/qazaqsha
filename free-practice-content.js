@@ -62,9 +62,39 @@ function wrongWord(built,kind){
  const word=step.stem+(step.space?' ':'')+next;
  return word===built.word?null:word;
 }
+const EDGE_LABELS={vowel:'гласная',glide:'й или у',r:'р',l:'л',nasal:'м, н или ң',voiced_fricative:'з или ж',voiceless:'глухая согласная'};
+const EDGE_ORDER=['vowel','glide','r','l','nasal','voiced_fricative','voiceless'];
+const PRACTICE_VOWELS='аәеоөұүыі';
+function unique(xs){return [...new Set((xs||[]).filter(Boolean))];}
+function firstVowel(text){return [...String(text||'')].find(ch=>PRACTICE_VOWELS.includes(ch))||'';}
+function decisionSpec(built){
+ const step=built&&built.trace&&built.trace[built.trace.length-1];
+ if(!step)return null;
+ const family=E.data&&E.data.families&&E.data.families[step.morpheme];
+ const variants=unique((family&&family.variants)||[]);
+ const firsts=unique(variants.map(v=>[...String(v)][0]));
+ const vowels=unique(variants.map(firstVowel));
+ const correctVowel=firstVowel(step.suffix);
+ const levels={};
+ if(EDGE_LABELS[step.edge]){
+  levels.B={kind:'choice',prompt:'На какой тип звука заканчивается слово перед этим окончанием?',context:step.before,options:EDGE_ORDER.map(k=>EDGE_LABELS[k]),answer:EDGE_LABELS[step.edge],hint:'Посмотри только на последнюю букву уже собранного слова.'};
+ }
+ if(firsts.length>1&&firsts.includes([...String(step.suffix)][0])){
+  levels.C={kind:'choice',prompt:'Какую первую букву окончания выбрать?',context:step.before,options:firsts,answer:[...String(step.suffix)][0],hint:'Сейчас выбираем только первую букву окончания, не всю форму.'};
+ }
+ if(vowels.length>1&&correctVowel&&vowels.includes(correctVowel)){
+  levels.D={kind:'choice',prompt:'Какую гласную выбрать в окончании?',context:step.before,options:vowels,answer:correctVowel,hint:'Смотри на ряд гласных исходного слова.'};
+ }
+ if(variants.length>1&&variants.includes(step.suffix)){
+  levels.E={kind:'choice',prompt:'Какое полное окончание подходит?',context:step.before,options:variants,answer:step.suffix,hint:'Основа пока не показывается вместе с готовым ответом: выбери только окончание.'};
+ }
+ levels.F={kind:'input',prompt:'Впиши только окончание.',context:step.stem+' + ___',answer:step.suffix,hint:'Собираем только последний шаг. Полную форму пока не показываем.'};
+ levels.G={kind:'input',prompt:'Собери форму целиком самостоятельно.',context:built.lemma&&built.lemma.text||step.before,answer:built.word,hint:'Применяй шаги по порядку. Готового ответа здесь нет.'};
+ return {morpheme:step.morpheme,changed:!!step.changed,levels,order:['B','C','D','E','F','G'].filter(k=>levels[k])};
+}
 function base(lemma,built,blockId,subcase,skill){
  const step=built.trace[built.trace.length-1];
- return {cardId:blockId+':'+lemma.id+':'+subcase,blockId,subcase,targetSkillIds:[skill],prerequisiteBlockIds:[],lemmaId:lemma.id,normalizedLemmaKey:String(lemma.text).toLocaleLowerCase('kk'),split:'train',holdout:false,admissionStatus:'runtime_approved',engineWord:built.word,expected:built.word,promptSpec:{ru:'',hint:''},translationSpec:{lemma:lemma.text,lemmaRu:lemma.gloss||'',target:'',context:lemma.text,contextRu:lemma.gloss||''},exerciseType:'choose',options:[],answer:built.word,feedbackRu:'',showExpectedBeforeAnswer:false,changed:!!step.changed};
+ return {cardId:blockId+':'+lemma.id+':'+subcase,blockId,subcase,targetSkillIds:[skill],prerequisiteBlockIds:[],lemmaId:lemma.id,normalizedLemmaKey:String(lemma.text).toLocaleLowerCase('kk'),split:'train',holdout:false,admissionStatus:'runtime_approved',engineWord:built.word,expected:built.word,promptSpec:{ru:'',hint:''},translationSpec:{lemma:lemma.text,lemmaRu:lemma.gloss||'',target:'',context:lemma.text,contextRu:lemma.gloss||''},exerciseType:'choose',options:[],answer:built.word,feedbackRu:'',showExpectedBeforeAnswer:false,changed:!!step.changed,decisionSpec:decisionSpec(built),practiceLevels:['A','B','C','D','E','F','G','H','I']};
 }
 function choice(card,correct,wrongs,prompt,hint,target,feedback){
  const options=[correct].concat(wrongs).filter((x,i,a)=>x&&a.indexOf(x)===i);
@@ -72,7 +102,7 @@ function choice(card,correct,wrongs,prompt,hint,target,feedback){
  card.options=options;card.answer=correct;card.promptSpec={ru:prompt,hint};card.translationSpec.target=target;card.feedbackRu=feedback;return card;
 }
 function meaningCard(id,blockId,subcase,lemma,prompt,answer,other,target){
- return {cardId:id,blockId,subcase,targetSkillIds:['meaning'],prerequisiteBlockIds:[],lemmaId:lemma.id,normalizedLemmaKey:String(lemma.text).toLocaleLowerCase('kk'),split:'train',holdout:false,admissionStatus:'runtime_approved',exerciseType:'meaning',options:[answer,other].filter((x,i,a)=>a.indexOf(x)===i),answer,expected:'',showExpectedBeforeAnswer:false,promptSpec:{ru:prompt,hint:'Смысл решаем до окончания.'},translationSpec:{lemma:lemma.text,lemmaRu:lemma.gloss||'',target,context:lemma.text,contextRu:lemma.gloss||''},feedbackRu:answer==='куда'?'Сейчас человек ещё в пути: куда.':answer==='где'?'Сейчас человек уже на месте: где.':answer==='кому'?'Сейчас важно, кому это дают: кому.':'Смысл: '+answer+'.'};
+ return {cardId:id,blockId,subcase,targetSkillIds:['meaning'],prerequisiteBlockIds:[],lemmaId:lemma.id,normalizedLemmaKey:String(lemma.text).toLocaleLowerCase('kk'),split:'train',holdout:false,admissionStatus:'runtime_approved',exerciseType:'meaning',options:[answer,other].filter((x,i,a)=>a.indexOf(x)===i),answer,expected:'',showExpectedBeforeAnswer:false,promptSpec:{ru:prompt,hint:'Смысл решаем до окончания.'},translationSpec:{lemma:lemma.text,lemmaRu:lemma.gloss||'',target,context:lemma.text,contextRu:lemma.gloss||''},feedbackRu:answer==='куда'?'Сейчас человек ещё в пути: куда.':answer==='где'?'Сейчас человек уже на месте: где.':answer==='кому'?'Сейчас важно, кому это дают: кому.':'Смысл: '+answer+'.',practiceLevels:['A','B','G','H','I']};
 }
 function build(){
  const rows=nouns();
@@ -80,17 +110,18 @@ function build(){
  const byText=new Map(rows.map(l=>[l.text,l]));
  const need=['мектеп','қала','бала','үй','кітап','дос'];
  for(const text of need)if(!byText.get(text))return cards;
- const school=byText.get('мектеп'),city=byText.get('қала'),child=byText.get('бала');
+ const school=byText.get('мектеп'),city=byText.get('қала'),child=byText.get('бала'),friend=byText.get('дос');
  cards.push(meaningCard('mean:school:go','free.harmony.meaning_dat','direction',school,'Человек ещё не в школе и идёт туда. Какой смысл?','куда','где','куда'));
  cards.push(meaningCard('mean:city:go','free.harmony.meaning_dat','direction',city,'Человек едет в город и ещё не приехал. Какой смысл?','куда','где','куда'));
  cards.push(meaningCard('mean:child:give','free.harmony.meaning_dat','addressee',child,'Книгу дают ребёнку. Никто никуда не идёт. Какой смысл?','кому','куда','кому'));
+ cards.push(meaningCard('mean:friend:give','free.harmony.meaning_dat','addressee',friend,'Подарок дают другу. Никто никуда не идёт. Какой смысл?','кому','куда','кому'));
  cards.push(meaningCard('mean:school:in','free.voice.direction_place','meaning',school,'Человек уже находится в школе. Какой смысл?','где','куда','где'));
  cards.push(meaningCard('mean:city:in','free.voice.direction_place','meaning',city,'Человек уже в городе. Какой смысл?','где','куда','где'));
  const three=[['куда','DAT'],['где','LOC'],['откуда','ABL']];
  for(const lemma of [city,school]){
   const forms=three.map(([label,id])=>{const built=formOf(lemma,[id]);return built?{label,word:built.word}:null;});
   if(forms.some(x=>!x))continue;
-  cards.push({cardId:'three:'+lemma.id,blockId:'free.voice.direction_place',subcase:'three',targetSkillIds:['meaning'],prerequisiteBlockIds:[],lemmaId:lemma.id,normalizedLemmaKey:lemma.text,split:'train',holdout:false,admissionStatus:'runtime_approved',exerciseType:'meaning',showExpectedBeforeAnswer:true,expected:forms.map(x=>x.word+' — '+x.label).join(', '),options:forms.map(x=>x.label),answer:'куда',promptSpec:{ru:lemma.gloss+': '+forms.map(x=>x.word+' — '+x.label).join('; ')+'. Какой смысл у первой формы?',hint:'Сначала смысл, потом конец.'},translationSpec:{lemma:lemma.text,lemmaRu:lemma.gloss||'',target:'куда, где или откуда',context:lemma.text,contextRu:lemma.gloss||''},feedbackRu:forms[0].word+' — куда.'});
+  cards.push({cardId:'three:'+lemma.id,blockId:'free.voice.direction_place',subcase:'three',targetSkillIds:['meaning'],prerequisiteBlockIds:[],lemmaId:lemma.id,normalizedLemmaKey:lemma.text,split:'train',holdout:false,admissionStatus:'runtime_approved',exerciseType:'meaning',showExpectedBeforeAnswer:true,expected:forms.map(x=>x.word+' — '+x.label).join(', '),options:forms.map(x=>x.label),answer:'куда',promptSpec:{ru:lemma.gloss+': '+forms.map(x=>x.word+' — '+x.label).join('; ')+'. Какой смысл у первой формы?',hint:'Сначала смысл, потом конец.'},translationSpec:{lemma:lemma.text,lemmaRu:lemma.gloss||'',target:'куда, где или откуда',context:lemma.text,contextRu:lemma.gloss||''},feedbackRu:forms[0].word+' — куда.',practiceLevels:['A','B','G','H','I']});
  }
  function addForm(lemma,sequence,blockId,subcase,skill,kind){
   const built=formOf(lemma,sequence);if(!built)return;
@@ -156,7 +187,7 @@ function addCoverage(cards, rows, byText, addForm){
  const city=byText.get('қала'), school=byText.get('мектеп');
  if(city)cards.push(meaningCard('mean:city:there','free.harmony.meaning_loc','place',city,'Человек уже в городе, не в дороге. Какой смысл?','где','куда','где'));
  if(school)cards.push(meaningCard('mean:school:there','free.harmony.meaning_loc','place',school,'Человек уже находится в школе. Какой смысл?','где','куда','где'));
- cards.push({cardId:'limit:u',blockId:'free.harmony.limits',subcase:'limits',targetSkillIds:['limits'],prerequisiteBlockIds:[],lemmaId:'n-су',normalizedLemmaKey:'су',split:'train',holdout:false,admissionStatus:'runtime_approved',exerciseType:'meaning',options:['только у этих слов','у любого слова на у'],answer:'только у этих слов',expected:'',showExpectedBeforeAnswer:false,promptSpec:{ru:'суға и тауға записаны у этих слов. Можно ли так с любым словом на у?',hint:'Класс записан у слова.'},translationSpec:{lemma:'су',lemmaRu:'вода',target:'куда',context:'су',contextRu:'вода'},feedbackRu:'Другие слова на у по одной букве не угадываем.'});
+ cards.push({cardId:'limit:u',blockId:'free.harmony.limits',subcase:'limits',targetSkillIds:['limits'],prerequisiteBlockIds:[],lemmaId:'n-су',normalizedLemmaKey:'су',split:'train',holdout:false,admissionStatus:'runtime_approved',exerciseType:'meaning',options:['только у этих слов','у любого слова на у'],answer:'только у этих слов',expected:'',showExpectedBeforeAnswer:false,promptSpec:{ru:'суға и тауға записаны у этих слов. Можно ли так с любым словом на у?',hint:'Класс записан у слова.'},translationSpec:{lemma:'су',lemmaRu:'вода',target:'куда',context:'су',contextRu:'вода'},feedbackRu:'Другие слова на у по одной букве не угадываем.',practiceLevels:['A','B','G']});
  for(const lemma of rows){
   addForm(lemma,['LOC'],'free.harmony.vowel_loc','vowel','LOC.vowel','vowel');
   addForm(lemma,['LOC'],'free.voice.loc_onset','onset','LOC.onset','onset');
@@ -205,7 +236,7 @@ function addCoverage(cards, rows, byText, addForm){
    if(keptGroup)cards.push(keptGroup);
   }
  }
- if(city)cards.push(meaningCard('pl:city','free.plural.meaning','several',city,'Нужно сказать не один город, а несколько. Какой смысл?','несколько','один','несколько'));
+ for(const lemma of rows)cards.push(meaningCard('pl:'+lemma.id,'free.plural.meaning','several',lemma,'Нужно сказать не один предмет, а несколько. Какой смысл?','несколько','один','несколько'));
  const verbs=E.data.lemmas.filter(l=>l.split==='train'&&l.pos==='verb');
  const verbMap=[['free.verbs.negative',['NEG'],'не делать','neg'],['free.verbs.past',['PAST'],'уже сделал','past'],['free.verbs.participle',['PTCP_GAN'],'предмет через действие','ptcp'],['free.verbs.condition',['COND'],'если','cond'],['free.verbs.connected',['CVB_IP'],'добавочное действие','cvb'],['free.verbs.combined',['NEG','PAST'],'не сделал','combined']];
  for(const lemma of verbs){

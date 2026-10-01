@@ -1,4 +1,4 @@
-/* NAV-2.2 shell. View only. Does not score and does not call the morph engine. */
+/* NAV-2.3 1:1 shell. Renders canonical MorphLearner source units; free practice remains non-scored. */
 (function(root){
 'use strict';
 const KEY='qazaqsha-nav2-v1';
@@ -24,7 +24,7 @@ const ARTICLES=[
  {id:'ref.dat.after-poss',title:'После «его» или «мой»',heading:'dat.46'},
  {id:'ref.poss.five',title:'Пять смыслов рядом',heading:'poss.26'}
 ];
-function blank(){return {schemaVersion:2,catalogVersion:'NAV-2.2-CHERNILA',migrated:true,bookmarkApplied:false,screen:null,part:1,lessonId:'nav2.1.1',homeLessonId:'nav2.1.1',step:0,tab:'learn',pick:'',outcome:'',fromLesson:false,viewed:{},log:{},explained:{},perLessonCursors:{},draftAnswers:{},navBack:[],excursionOrigin:null,find:'',aliasId:'',aliasChoices:[],pendingAlias:'',aliasDismissed:false,oldViews:{},activeMode:'learn'};}
+function blank(){return {schemaVersion:2,catalogVersion:(cat()&&cat().version)||'NAV-2.3-1TO1',migrated:true,bookmarkApplied:false,screen:null,part:1,lessonId:'nav2.1.1',homeLessonId:'nav2.1.1',step:0,tab:'learn',pick:'',outcome:'',fromLesson:false,viewed:{},log:{},explained:{},perLessonCursors:{},draftAnswers:{},navBack:[],excursionOrigin:null,find:'',aliasId:'',aliasChoices:[],pendingAlias:'',aliasDismissed:false,oldViews:{},activeMode:'learn'};}
 function readFs2(){
  try{return JSON.parse(sessionStorage.getItem('qazaqsha-fs2-read')||'null');}catch(e){return null;}
 }
@@ -41,7 +41,7 @@ function load(){
   x.migrated=true;
   changed=true;
  }
- x.catalogVersion=x.catalogVersion||'NAV-2.2-CHERNILA';
+ x.catalogVersion=(cat()&&cat().version)||x.catalogVersion||'NAV-2.3-1TO1';
  x.log=x.log||{};
  x.explained=x.explained||{};
  x.viewed=x.viewed||{};
@@ -74,6 +74,17 @@ function putLog(id,row){
 }
 function addOnly(list,id){return list.includes(id)?list:list.concat([id]);}
 function drop(list,id){return list.filter(x=>x!==id);}
+function savedStepFor(id,saved){
+ const row=lesson(id);
+ if(!row||!row.steps||!row.steps.length)return 0;
+ let key=saved&&saved.stepId||'';
+ if(key&&row.legacyStepAliases&&row.legacyStepAliases[key])key=row.legacyStepAliases[key];
+ if(key){
+  const i=row.steps.findIndex(s=>s.id===key||(s.sourceUnitIds||[]).includes(key));
+  if(i>=0)return i;
+ }
+ return Math.min(Math.max(0,Number(saved&&saved.step)||0),row.steps.length-1);
+}
 function save(s){try{sessionStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
 let state=null;
 function st(){if(!state)state=load();return state;}
@@ -83,7 +94,7 @@ function snapshot(){const s=st();return {screen:s.screen,lessonId:s.lessonId,ste
 function rememberPlace(){
  const s=st();
  const row=current();
- const step=row&&row.steps?row.steps[s.step]:null;
+ const step=row&&row.steps?row.steps[Math.min(Math.max(0,s.step||0),Math.max(0,row.steps.length-1))]:null;
  const cursors=Object.assign({},s.perLessonCursors);
  cursors[s.lessonId]={step:s.step,tab:s.tab,pick:s.pick,outcome:s.outcome,stepId:step?step.id:''};
  const drafts=Object.assign({},s.draftAnswers);
@@ -194,6 +205,16 @@ function partHtml(){
  const gen=p.number===4?'<p>Родительный падеж — урок 3.6. <button type="button" class="text-button" data-nav2-lesson="nav2.3.6">Книга ребёнка</button></p>':'';
  return '<div class="morph-panel morph-nav2"><button type="button" class="text-button" data-nav2="map">← Все темы</button><p class="eyebrow">Часть '+p.number+'</p><h2>'+esc(p.title)+'</h2><p>'+esc(p.example)+'</p>'+gen+body+'<div class="morph-actions">'+hops+'</div></div>';
 }
+function sourceUnit(id){
+ const learner=root.MorphLearner;
+ if(!learner||!id)return null;
+ for(const row of learner.lessons||[]){
+  const hit=(row.blocks||[]).find(b=>b.id===id);
+  if(hit)return hit;
+ }
+ return null;
+}
+function sourceUnits(ids){return (ids||[]).map(sourceUnit).filter(Boolean);}
 function slice(headingId){
  const learner=root.MorphLearner;
  if(!learner||!headingId)return [];
@@ -210,12 +231,26 @@ function slice(headingId){
  }
  return out;
 }
-function blockHtml(b){
+function stepTry(step){return sourceUnits(step&&step.sourceUnitIds).find(b=>b.type==='try')||null;}
+function blockHtml(b,step){
  if(b.type==='subheading')return '<h3>'+esc(b.text)+'</h3>';
- if(b.type==='paragraph'||b.type==='warning'||b.type==='term')return '<p'+(b.type==='warning'?' class="morph-nav2-note"':'')+'>'+esc(b.text)+'</p>';
- if(b.type==='example')return '<div class="morph-nav2-sun" lang="kk"><p>'+esc(b.before)+' → '+esc(b.after)+'</p><p class="small" lang="ru">'+esc(b.beforeRu)+' → '+esc(b.afterRu)+'</p></div>';
+ if(b.type==='paragraph')return '<p>'+esc(b.text)+'</p>';
+ if(b.type==='warning')return '<div class="morph-nav2-note"><p>'+esc(b.text)+'</p></div>';
+ if(b.type==='term')return '<p class="small">'+esc(b.text)+'</p>';
+ if(b.type==='example')return '<div class="morph-nav2-sun"><p lang="kk">'+esc(b.before)+' → '+esc(b.after)+'</p><p class="small" lang="ru">'+esc(b.beforeRu)+' → '+esc(b.afterRu)+'</p></div>';
  if(b.type==='list'||b.type==='ordered-list'||b.type==='ordered_list'){const tag=b.type==='list'?'ul':'ol';return '<'+tag+' class="morph-teach-list">'+(b.items||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</'+tag+'>';}
- if(b.type==='table')return '<div class="morph-matrix"><table><thead><tr>'+(b.headers||[]).map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+(b.rows||[]).map(r=>'<tr>'+r.map(c=>'<td>'+esc(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+ if(b.type==='table'){const caption=b.caption?'<caption>'+esc(b.caption)+'</caption>':'';return '<div class="morph-matrix" tabindex="0"><table>'+caption+'<thead><tr>'+(b.headers||[]).map(h=>'<th scope="col">'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+(b.rows||[]).map(r=>'<tr>'+r.map(c=>'<td>'+esc(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
+ if(b.type==='link')return '<button type="button" class="text-button" data-nav2-source-link="'+esc(b.lessonId||'')+'">'+esc(b.text||'Открыть связанное правило')+'</button>';
+ if(b.type==='try'){
+  if(!step)return '<div class="morph-nav2-note"><p>'+esc(b.prompt||'Попробуйте применить правило.')+'</p><p>'+esc((b.options||[]).join(' · '))+'</p></div>';
+  const picked=st().pick,outcome=st().outcome;
+  let html='<div class="morph-nav2-try"><p>'+esc(b.prompt||'Попробуйте применить правило.')+'</p><div class="morph-choices">'+(b.options||[]).map(o=>'<button type="button" class="secondary-button'+(picked===o?' morph-nav2-picked':'')+'" data-nav2-pick="'+esc(o)+'">'+esc(o)+'</button>').join('')+'</div>';
+  if(outcome==='wrong')html+='<p class="morph-nav2-spot">Пока не то</p><div class="morph-nav2-error"><p>'+esc(b.bad||'Проверьте правило и попробуйте ещё раз.')+'</p><p>Ваш выбор: '+esc(picked)+'</p><button type="button" class="secondary-button" data-nav2-retry>Попробовать ещё раз</button><button type="button" class="text-button" data-nav2-show>Показать разбор</button></div>';
+  if(outcome==='right')html+='<div class="morph-nav2-ok"><p>Верно.</p><p>'+esc(b.good||'')+'</p></div>';
+  if(outcome==='helped')html+='<div class="morph-nav2-note"><p>Ответ открыт с помощью. Это не самостоятельный успех.</p><p lang="kk">'+esc(b.answer||'')+'</p><p>'+esc(b.good||'')+'</p></div>';
+  if(outcome==='skip')html+='<div class="morph-nav2-note"><p>Задание пропущено. К нему можно вернуться.</p></div>';
+  return html+'</div>';
+ }
  return '';
 }
 function lesson11(row){
@@ -246,28 +281,69 @@ function summaryHtml(row){
  const nextBtn=nxt?'<button type="button" class="primary-button" data-nav2-lesson="'+esc(nxt.id)+'">Следующий урок: '+esc(nxt.number)+' '+esc(nxt.title)+'</button>':'<button type="button" class="primary-button" data-nav2="home">К разделу</button>';
  return '<p>Урок '+esc(row.number)+' на этом шаге закончен. Это не оценка знания.</p><ul class="morph-teach-list"><li>Шагов просмотрено: '+log.seen.length+'</li><li>Верно без помощи: '+log.unaided.length+'</li><li>С помощью: '+log.helped.length+'</li><li>Пропущено: '+log.skipped.length+'</li></ul><div class="morph-actions">'+back+nextBtn+'</div>';
 }
+function sectionHeadingFor(row,stepIndex){
+ let heading='';
+ for(let i=0;i<=stepIndex&&i<(row.steps||[]).length;i++){
+  for(const id of row.steps[i].sourceUnitIds||[]){
+   const b=sourceUnit(id);
+   if(b&&b.type==='subheading')heading=b.id;
+  }
+ }
+ return heading;
+}
+function sectionEndsAt(row,stepIndex){
+ const next=row.steps&&row.steps[stepIndex+1];
+ if(!next)return true;
+ const first=(next.sourceUnitIds||[]).map(sourceUnit).find(Boolean);
+ return !!(first&&first.type==='subheading');
+}
+function sourcePracticeHtml(row,stepIndex){
+ if(row.practiceMode==='observation_only'||!sectionEndsAt(row,stepIndex))return '';
+ const heading=sectionHeadingFor(row,stepIndex);
+ const C=root.FreePracticeContent;
+ if(!heading||!C||!C.anchorsFor||!C.forBlock)return '';
+ const allowed=new Set((row.practiceRoutes||[]).map(String));
+ if(!allowed.size)return '';
+ const rows=(C.anchorsFor(heading)||[]).filter(x=>{
+  const route=x.blockId+':'+(x.subcase||'');
+  if(allowed.size&&!allowed.has(route))return false;
+  try{return !!(C.forBlock(x.blockId,x.subcase||'')||[]).length;}catch(e){return false;}
+ });
+ if(!rows.length)return '';
+ const buttons=rows.map(x=>'<button type="button" class="secondary-button" data-free-block="'+esc(x.blockId)+'" data-free-subcase="'+esc(x.subcase||'')+'">'+esc(x.title||'Потренировать эту мысль')+'</button>').join('');
+ return '<div class="morph-nav2-section-practice" data-nav2-source-practice="'+esc(heading)+'"><p class="small">Практика именно этого объяснения — по желанию.</p><div class="morph-actions">'+buttons+'</div></div>';
+}
 function practiceReady(row){
  return row.id!=='nav2.1.1'&&row.sourceMappingStatus!=='BOUND_FILTER_GAP'&&row.sourceMappingStatus!=='NO_LICENSED_CARDS'&&!!row.practiceOpen;
 }
 function learnBody(row){
  if(st().outcome==='summary')return summaryHtml(row);
- if(row.id==='nav2.1.1')return lesson11(row);
  const step=row.steps[st().step]||row.steps[0];
  if(!step)return '<p>В этом уроке пока нет шага.</p>';
- const blocks=step.sourceHeadingId?slice(step.sourceHeadingId):[];
- const body=blocks.length?blocks.map(blockHtml).join(''):'<h3>'+esc(step.title)+'</h3><p>'+esc(row.goal)+'</p>';
- const last=st().step>=row.steps.length-1;
- const btn=last?'<button type="button" class="primary-button" data-nav2-finish>Закончить урок</button>':'<button type="button" class="primary-button" data-nav2-next>Дальше</button>';
- const toPractice=practiceReady(row)&&!st().explained[row.id]?'<button type="button" class="secondary-button" data-nav2-explained>К практике</button>':'';
- return body+'<div class="morph-actions">'+btn+toPractice+'</div><p class="small">Шаг '+(st().step+1)+' из '+row.steps.length+'</p>';
+ const blocks=sourceUnits(step.sourceUnitIds||[]);
+ const body=blocks.length?blocks.map(b=>blockHtml(b,step)).join(''):'<h3>'+esc(step.title)+'</h3><p>'+esc(row.goal)+'</p>';
+ const task=stepTry(step),last=st().step>=row.steps.length-1;
+ let actions='';
+ if(task&&!st().outcome)actions='<button type="button" class="text-button" data-nav2-skip>Пропустить</button>';
+ else if(task&&st().outcome==='wrong')actions='';
+ else actions=last?'<button type="button" class="primary-button" data-nav2-finish>Закончить урок</button>':'<button type="button" class="primary-button" data-nav2-next>Дальше</button>';
+ const toPractice=last&&practiceReady(row)&&st().outcome!=='wrong'?'<button type="button" class="secondary-button" data-nav2-explained>К самостоятельной практике</button>':'';
+ const microPractice=sourcePracticeHtml(row,st().step||0);
+ return body+microPractice+'<div class="morph-actions">'+actions+toPractice+'</div><p class="small">Шаг '+(st().step+1)+' из '+row.steps.length+' · '+esc(step.title||'')+'</p>';
+}
+function practiceRouteLabel(route,index){
+ const sub=String(route||'').split(':')[1]||'';
+ const labels={direction:'Куда?',addressee:'Кому?',place:'Где?',vowel:'Выбрать гласную окончания',onset:'Выбрать первую букву окончания',full:'Собрать форму целиком',compare:'Сравнить похожие формы',several:'Один или несколько',glide:'После й или у',r:'После р',l:'После л',nasal:'После м, н, ң',z:'После з или ж',voiceless:'После глухого',groups:'Сравнить группы окончаний',contrast:'Различить похожие окончания',with:'С кем?',tool:'Чем?',i:'Я',we:'Мы',you:'Ты и Вы',many:'Несколько собеседников',question:'Вопрос',owners:'Мой / твой / его / наш / ваш',plural:'Количество + принадлежность',dat:'Падеж после принадлежности',acc:'Кого или что именно',loc:'Где?',abl:'Откуда?',stem:'Основа глагола',past:'Действие уже произошло',neg:'Не делать',person:'Кто сделал',cond:'Если',ptcp:'Причастие',cvb:'Деепричастие',combined:'Соединить несколько шагов',meaning:'Выбрать смысл',three:'Куда / где / откуда'};
+ return labels[sub]||('Практика '+(index+1));
 }
 function practiceBody(row){
- if(row.id==='nav2.1.1')return '<p>Для этого урока отдельной очереди нет. Это наблюдение, не проверка.</p>';
+ if(row.practiceMode==='observation_only')return '<p>Этот урок нужен для наблюдения за устройством слова. Отдельная проверка здесь не требуется.</p>';
  if(row.practiceClosed)return '<p>'+esc(row.practiceClosed)+'</p>';
- if(row.sourceMappingStatus==='BOUND_FILTER_GAP'||row.sourceMappingStatus==='NO_LICENSED_CARDS'||!row.practiceOpen)return '<p>Практику этой темы пока не открываем: в одном наборе карточек два разных смысла, и фильтр ещё не проверен.</p>';
- if(!st().explained[row.id])return '<p>Сначала посмотрите объяснение. Задание откроется после него.</p><button type="button" class="primary-button" data-nav2-tab="learn">К объяснению</button>';
- const bits=row.practiceOpen.split(':');
- return '<p>Можно потренироваться на словах этой темы. Это не оценка и не меняет расписание повторений.</p><button type="button" class="primary-button" data-nav2-practice="'+esc(bits[0])+'" data-nav2-sub="'+esc(bits[1]||'')+'">Потренироваться</button>';
+ const routes=(row.practiceRoutes&&row.practiceRoutes.length?row.practiceRoutes:(row.practiceOpen?[row.practiceOpen]:[]));
+ if(row.sourceMappingStatus==='BOUND_FILTER_GAP'||row.sourceMappingStatus==='NO_LICENSED_CARDS'||!routes.length)return '<p>Для этой темы пока нет проверенного самостоятельного задания. Учебный материал остаётся доступен полностью.</p>';
+ if(!st().explained[row.id])return '<p>Сначала закончите объяснение этого урока. Практика использует только уже показанные условия.</p><button type="button" class="primary-button" data-nav2-tab="learn">К объяснению</button>';
+ const buttons=routes.map((route,i)=>{const bits=route.split(':');return '<button type="button" class="'+(i===0?'primary-button':'secondary-button')+'" data-nav2-practice="'+esc(bits[0])+'" data-nav2-sub="'+esc(bits[1]||'')+'">'+esc(practiceRouteLabel(route,i))+'</button>';}).join('');
+ return '<p>Сначала соберите форму сами: варианты ответа скрыты. Подсказку или выбор из вариантов можно включить по желанию. Это не оценка и не меняет расписание повторений.</p><div class="morph-actions">'+buttons+'</div>';
 }
 function rulesBody(row){
  const step=row.steps[st().step]||row.steps[0];
@@ -317,7 +393,7 @@ function html(){
 function bind(host,rerender){
  host.querySelectorAll('[data-nav2]').forEach(b=>b.addEventListener('click',()=>{
   const name=b.dataset.nav2;
-  if(name==='home'){const id=st().homeLessonId||st().lessonId;const saved=(st().perLessonCursors||{})[id]||{};go({screen:null,fromLesson:false,lessonId:id,step:saved.step||0,tab:saved.tab||'learn',pick:saved.pick||'',outcome:saved.outcome||'',nav:true});}
+  if(name==='home'){const id=st().homeLessonId||st().lessonId;const saved=(st().perLessonCursors||{})[id]||{};go({screen:null,fromLesson:false,lessonId:id,step:savedStepFor(id,saved),tab:saved.tab||'learn',pick:saved.pick||'',outcome:saved.outcome||'',nav:true});}
   else if(name==='map')go({screen:'map',fromLesson:false,find:'',nav:true});
   else if(name==='activities')go({screen:'activities',nav:true});
   rerender();
@@ -326,11 +402,12 @@ function bind(host,rerender){
  host.querySelectorAll('[data-nav2-lesson]').forEach(b=>b.addEventListener('click',()=>{
   const id=b.dataset.nav2Lesson;
   const saved=(st().perLessonCursors||{})[id]||{};
+  const savedStep=savedStepFor(id,saved);
   const fromSide=st().screen==='map'||st().screen==='alias'||st().screen==='activities'||st().screen==='reference';
   const fromBrowse=st().screen==='map'||st().screen==='part'||st().screen==='reference'||st().screen==='alias';
   const origin=fromSide?(st().excursionOrigin||null):null;
   const seen=Object.assign({},st().viewed);
-  const patch={screen:'lesson',lessonId:id,step:saved.step||0,tab:saved.tab||'learn',pick:saved.pick||'',outcome:saved.outcome||'',fromLesson:false,excursionOrigin:origin,viewed:seen,aliasDismissed:true,nav:true};
+  const patch={screen:'lesson',lessonId:id,step:savedStep,tab:saved.tab||'learn',pick:saved.pick||'',outcome:saved.outcome||'',fromLesson:false,excursionOrigin:origin,viewed:seen,aliasDismissed:true,nav:true};
   if(!fromBrowse)patch.homeLessonId=id;
   go(patch);
   rerender();
@@ -368,14 +445,14 @@ function bind(host,rerender){
   const row=current(),step=row.steps[st().step];
   const log=lessonLog(row.id);
   log.seen=addOnly(log.seen,step?step.id:String(st().step));
-  const explained=Object.assign({},st().explained);explained[row.id]=true;
-  go({step:st().step+1,pick:'',outcome:'',log:putLog(row.id,log),explained:explained});
+  go({step:Math.min(st().step+1,row.steps.length-1),pick:'',outcome:'',log:putLog(row.id,log)});
   rerender();
  }));
  host.querySelectorAll('[data-nav2-pick]').forEach(b=>b.addEventListener('click',()=>{
   const row=current(),step=row.steps[st().step];
+  const task=stepTry(step);
   const pick=b.dataset.nav2Pick;
-  const ok=pick===step.answer;
+  const ok=!!task&&pick===task.answer;
   const log=lessonLog(row.id);
   log.attempted=addOnly(log.attempted,step.id);
   log.skipped=drop(log.skipped,step.id);
@@ -429,13 +506,18 @@ function bind(host,rerender){
   if(root.FreePractice&&root.FreePractice.openBlock)root.FreePractice.openBlock(b.dataset.nav2Practice,b.dataset.nav2Sub||'');
   rerender();
  }));
+ host.querySelectorAll('[data-nav2-source-link]').forEach(b=>b.addEventListener('click',()=>{
+  const id=b.dataset.nav2SourceLink;
+  if(CHOICES[id])go({screen:'alias',aliasId:id,aliasChoices:CHOICES[id],bookmarkMessage:'Связанная тема разделена на несколько уроков. Выберите нужную.',nav:true});
+  rerender();
+ }));
 }
 function close(){go({screen:null,fromLesson:false});}
 function openBookmark(id){
  if(!id)return false;
  if(lesson(id)){
   const saved=(st().perLessonCursors||{})[id]||{};
-  go({screen:'lesson',lessonId:id,step:saved.step||0,tab:'learn',pick:saved.pick||'',outcome:saved.outcome||'',nav:true});
+  go({screen:'lesson',lessonId:id,step:savedStepFor(id,saved),tab:'learn',pick:saved.pick||'',outcome:saved.outcome||'',nav:true});
   return true;
  }
  if(CHOICES[id]){

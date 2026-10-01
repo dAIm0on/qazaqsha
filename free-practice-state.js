@@ -4,7 +4,7 @@
 const Q=typeof module!=='undefined'&&module.exports?require('./free-practice-queue.js'):root.FreePracticeQueue;
 const cfg=typeof module!=='undefined'&&module.exports?require('./free-practice-config.js'):root.FreePracticeConfig;
 function empty(seed){
- return {schemaVersion:1,contentVersion:cfg.config.version,revision:0,currentCycle:1,selectedBlockIds:[],explainedBlockIds:[],theoryCursor:null,preferences:{supportLevel:'supported',introSeen:false,repeatNotice:false},seed:(seed>>>0)||1,seedStep:0,currentCard:null,exhaustReason:'',history:[],recentError:null,ownerId:null,lastUpdated:0};
+ return {schemaVersion:1,contentVersion:cfg.config.version,revision:0,currentCycle:1,selectedBlockIds:[],explainedBlockIds:[],theoryCursor:null,preferences:{supportLevel:'try_myself',introSeen:false,repeatNotice:false},seed:(seed>>>0)||1,seedStep:0,currentCard:null,exhaustReason:'',history:[],recentError:null,ownerId:null,lastUpdated:0};
 }
 function migrate(raw){
  if(!raw||raw.schemaVersion!==1)return empty();
@@ -58,11 +58,11 @@ function present(base,pool){
  return cas(base,base.revision,state=>{
   const lemma=Q.keyOf(picked.card);
   const n=Q.countQuestions(state.history,lemma,state.currentCycle)+1;
-  state.history=state.history.concat([{occurrenceId,normalizedLemmaKey:lemma,lemmaId:picked.card.lemmaId,blockId:picked.card.blockId,cardId:picked.card.cardId,subcase:picked.card.subcase||'',exerciseType:picked.card.exerciseType||'',presentedAtStep:state.history.length,presentationCountInCycle:n,exposureKind:'question',answered:false,revealed:false,supportLevel:state.preferences.supportLevel,createdAt:state.lastUpdated,cycle:state.currentCycle}]);
+  state.history=state.history.concat([{occurrenceId,normalizedLemmaKey:lemma,lemmaId:picked.card.lemmaId,blockId:picked.card.blockId,cardId:picked.card.cardId,subcase:picked.card.subcase||'',exerciseType:picked.card.exerciseType||'',presentedAtStep:state.history.length,presentationCountInCycle:n,exposureKind:'question',answered:false,revealed:false,supportLevel:state.preferences.supportLevel,everSupported:false,createdAt:state.lastUpdated,cycle:state.currentCycle}]);
   const asked=state.history.some(h=>h.exposureKind==='question'&&h.cycle===state.currentCycle);
   if(asked)state.preferences.repeatNotice=false;
   state.exhaustReason='';
-  state.currentCard={occurrenceId,cardId:picked.card.cardId,contentRevision:picked.card.contentRevision||cfg.config.version,blockId:picked.card.blockId,renderedOptions:picked.optionOrder.slice(),seedStateBefore:base.seedStep||0,seedStateAfter:picked.seedStep,rawInput:'',supportLevel:state.preferences.supportLevel,revealed:false,answered:false,feedback:null,presentationCommitted:true,card:picked.card};
+  state.currentCard={occurrenceId,cardId:picked.card.cardId,contentRevision:picked.card.contentRevision||cfg.config.version,blockId:picked.card.blockId,renderedOptions:picked.optionOrder.slice(),seedStateBefore:base.seedStep||0,seedStateAfter:picked.seedStep,rawInput:'',supportLevel:state.preferences.supportLevel,everSupported:false,scaffoldLevel:null,scaffoldFeedback:null,revealed:false,answered:false,feedback:null,presentationCommitted:true,card:picked.card};
   state.seedStep=picked.seedStep;
   state.preferences.introSeen=true;
   return state;
@@ -85,11 +85,16 @@ function answer(base,rawInput,correct,skillId){
   return state;
  });
 }
-function reveal(base){return mark(base,{revealed:true,answered:true});}
+function reveal(base){return mark(base,{revealed:true,answered:true,everSupported:true});}
 function setSupport(base,level){
  return cas(base,base.revision,state=>{
-  state.preferences.supportLevel=level==='try_myself'?'try_myself':'supported';
-  if(state.currentCard)state.currentCard.supportLevel=state.preferences.supportLevel;
+  const nextLevel=level==='try_myself'?'try_myself':'supported';
+  state.preferences.supportLevel=nextLevel;
+  if(state.currentCard){
+   state.currentCard.supportLevel=nextLevel;
+   if(nextLevel==='supported')state.currentCard.everSupported=true;
+   state.history=state.history.map(h=>h.occurrenceId===state.currentCard.occurrenceId?Object.assign({},h,{supportLevel:nextLevel,everSupported:!!(h.everSupported||nextLevel==='supported')}):h);
+  }
   return state;
  });
 }
