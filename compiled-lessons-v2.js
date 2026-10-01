@@ -9241,7 +9241,7 @@ window.LESSON_V2_COMPILED = [
   {
     "schema_version": 2,
     "lesson_id": "2-1",
-    "content_revision": "2-1.r2",
+    "content_revision": "2-1.r1",
     "title": "Урок 2–1 · Мен, сен, сіз; емес; ба, бе",
     "label": "2–1",
     "name": "Мен, сен, сіз; емес; ба, бе",
@@ -14261,15 +14261,6 @@ window.LESSON_V2_COMPILED = [
         "stage_ids": {},
         "vocab_ids": {},
         "drop_question_ids": []
-      },
-      {
-        "from_revision": "2-1.r1",
-        "to_revision": "2-1.r2",
-        "question_ids": {},
-        "chapter_ids": {},
-        "stage_ids": {},
-        "vocab_ids": {},
-        "drop_question_ids": []
       }
     ],
     "generated_questions": [],
@@ -14809,7 +14800,7 @@ window.LESSON_V2_COMPILED = [
   {
     "schema_version": 2,
     "lesson_id": "2-2",
-    "content_revision": "2-2.r2",
+    "content_revision": "2-2.r1",
     "title": "Урок 2–2 · Біз, сендер, сіздер; прилагательное",
     "label": "2–2",
     "name": "Біз, сендер, сіздер; прилагательное",
@@ -18616,17 +18607,7 @@ window.LESSON_V2_COMPILED = [
         "qa_fixture_id": "fixture:2-2:bad-key:bolynyzdar"
       }
     ],
-    "migrations": [
-      {
-        "from_revision": "2-2.r1",
-        "to_revision": "2-2.r2",
-        "question_ids": {},
-        "chapter_ids": {},
-        "stage_ids": {},
-        "vocab_ids": {},
-        "drop_question_ids": []
-      }
-    ],
+    "migrations": [],
     "generated_questions": [],
     "stages": [
       {
@@ -19166,7 +19147,7 @@ window.LESSON_V2_COMPILED = [
   {
     "schema_version": 2,
     "lesson_id": "2-3",
-    "content_revision": "2-3.r2",
+    "content_revision": "2-3.r1",
     "title": "Урок 2–3 · Ол / олар, вопрос, порядковые",
     "label": "2–3",
     "name": "Ол / олар, вопрос, порядковые",
@@ -24129,17 +24110,7 @@ window.LESSON_V2_COMPILED = [
         "qa_fixture_id": "fixture:2-3:bad-key:bolynyzdar"
       }
     ],
-    "migrations": [
-      {
-        "from_revision": "2-3.r1",
-        "to_revision": "2-3.r2",
-        "question_ids": {},
-        "chapter_ids": {},
-        "stage_ids": {},
-        "vocab_ids": {},
-        "drop_question_ids": []
-      }
-    ],
+    "migrations": [],
     "generated_questions": [],
     "stages": [
       {
