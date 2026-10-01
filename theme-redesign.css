@@ -1126,3 +1126,28 @@ html.typing-compact .typing-strip{display:flex!important}
 html.typing-compact,html.typing-compact body{
   overflow:visible!important;height:auto!important;max-height:none!important
 }
+
+
+/* NAV2 accessibility: desktop zoom can cross the <=690px breakpoint.
+   Keep top-level section navigation reachable for fine-pointer desktop users
+   without reintroducing the global bottom nav on touch/mobile immersive lessons. */
+@media(max-width:690px) and (pointer:fine){
+  body[data-view=morph] .topbar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-start;
+  }
+  body[data-view=morph] .topnav{
+    display:flex;
+    order:3;
+    width:100%;
+    margin:8px 0 0;
+    gap:4px;
+    flex-wrap:wrap;
+  }
+  body[data-view=morph] .topnav button{
+    flex:1 1 9rem;
+    min-width:0;
+    white-space:normal;
+  }
+}
