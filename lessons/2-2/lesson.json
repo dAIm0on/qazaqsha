@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "lesson_id": "2-2",
-  "content_revision": "2-2.r2",
+  "content_revision": "2-2.r1",
   "title": "Урок 2–2 · Біз, сендер, сіздер; прилагательное",
   "label": "2–2",
   "name": "Біз, сендер, сіздер; прилагательное",
@@ -4025,15 +4025,5 @@
       "external_test"
     ]
   },
-  "migrations": [
-    {
-      "from_revision": "2-2.r1",
-      "to_revision": "2-2.r2",
-      "question_ids": {},
-      "chapter_ids": {},
-      "stage_ids": {},
-      "vocab_ids": {},
-      "drop_question_ids": []
-    }
-  ]
+  "migrations": []
 }
