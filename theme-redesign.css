@@ -70,7 +70,7 @@ h3{font-size:1.125rem;letter-spacing:-.02em}
 .eyebrow:before{content:"";width:24px;height:1px;background:var(--ink);flex:0 0 24px}
 
 /* Shell */
-.topbar,.topnav,.bottom-nav{
+.topbar,.topnav{
   backdrop-filter:none;-webkit-backdrop-filter:none
 }
 .topbar{
@@ -429,12 +429,17 @@ body[data-view=practice] .issue-toggle{
 }
 #issue-dialog textarea{width:100%;min-height:96px;margin:8px 0;font:inherit}
 .bottom-nav{
+  display:none;position:fixed;z-index:30;
   background:rgba(255,250,244,.72);border:1px solid var(--line);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   grid-template-columns:repeat(3,minmax(0,1fr))!important;
   left:8px;right:8px;bottom:8px;width:auto;
   border-radius:20px;box-shadow:0 12px 40px rgba(22,20,18,.16);
-  padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))
+  padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));
+  min-height:var(--bottom-nav-height,calc(64px + env(safe-area-inset-bottom,0px)))
+}
+@media(max-width:690px){
+  .bottom-nav{display:grid}
 }
 :root{--bottom-nav-height:calc(64px + env(safe-area-inset-bottom, 0px))}
 .bottom-nav button{
@@ -1034,12 +1039,17 @@ body.typing-compact .tutor-launch,
 body.typing-compact .tutor-sticker-dot{
   display:none!important;visibility:hidden!important;pointer-events:none!important
 }
-/* free-practice / morph write: hide support/reveal row while keyboard compact */
+/* Compact hides free-practice write actions. Lesson «Дальше» stays visible. */
 html.typing-compact [data-free-practice] .morph-actions,
 html.typing-compact [data-free-write-form] ~ .morph-actions,
-html.typing-compact .morph-panel > .morph-actions,
+html.typing-compact .morph-panel:not(.morph-nav2-lesson) > .morph-actions,
 body.typing-compact [data-free-practice] .morph-actions{
   display:none!important
+}
+html.typing-compact .morph-nav2-lesson .morph-actions,
+body.typing-compact .morph-nav2-lesson .morph-actions{
+  display:flex!important;visibility:visible!important;pointer-events:auto!important;
+  height:auto!important;min-height:44px!important;overflow:visible!important
 }
 html.typing-compact #answer-form .practice-composer,
 html.typing-compact #path-form.practice-composer,
