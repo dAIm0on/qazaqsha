@@ -68,10 +68,11 @@ assert.ok(p21.every(id=>question(id)&&question(id).topic==='person'));
 assert.equal(new Set(p21).size,p21.length);
 
 // 2-2 proves legacy/non-verb banks without question.ruleIds are reachable through stage rule_ids -> core_ids.
-const r22='v2:2-2:biz';
+const r22='v2:2-2:sizder';
 const stage22=stageCoreFor('2-2',r22);
 const direct22=directFor('2-2',r22);
 assert.ok(stage22.size>0,'2-2 fixture needs stage mapping');
+assert.deepEqual(Array.from(mock.LessonV2Runtime.practiceForRule('2-2','v2:2-2:biz',12)),[],'early multi-rule stage must not leak future sender/sizder material');
 assert.equal(direct22.size,0,'2-2 fixture must exercise stage-only fallback');
 const p22=mock.LessonV2Runtime.practiceForRule('2-2',r22,999);
 assert.ok(p22.length>0,'2-2 stage-only optional practice should produce cards');
@@ -79,9 +80,10 @@ assert.ok(p22.every(id=>stage22.has(id)||direct22.has(id)));
 assert.ok(p22.some(id=>stage22.has(id)));
 
 // 2-3 proves the same contract works for a different grammar topic.
-const r23='v2:2-3:ord';
+const r23='v2:2-3:ordp';
 const stage23=stageCoreFor('2-3',r23);
 assert.ok(stage23.size>0,'2-3 ordinal stage mapping missing');
+assert.deepEqual(Array.from(mock.LessonV2Runtime.practiceForRule('2-3','v2:2-3:ord',12)),[],'early ordinal chapter must not leak comp/ordp stage material');
 const p23=mock.LessonV2Runtime.practiceForRule('2-3',r23,12);
 assert.ok(p23.length>0,'2-3 optional practice should produce cards');
 assert.ok(p23.every(id=>question(id)&&['person','numbers'].includes(question(id).topic)));
