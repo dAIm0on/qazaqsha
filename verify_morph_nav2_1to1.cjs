@@ -10,6 +10,7 @@ const navSource=fs.readFileSync('./morph-nav2.js','utf8');
 const catalogSource=fs.readFileSync('./morph-nav2-catalog.js','utf8');
 const stateSource=fs.readFileSync('./free-practice-state.js','utf8');
 const practiceView=fs.readFileSync('./free-practice-view.js','utf8');
+const themeSource=fs.readFileSync('./theme-redesign.css','utf8');
 
 const ctx={window:{}};
 vm.runInNewContext(catalogSource,ctx,{filename:'morph-nav2-catalog.js'});
@@ -95,6 +96,9 @@ assert(practiceView.includes('data-free-step-form'),'F suffix assembly missing')
 assert(practiceView.includes('data-free-key-target'),'Kazakh keyrail must target active input');
 assert(navSource.includes('sourcePracticeHtml(row,st().step||0)'),'source-section practice is not embedded in NAV2 learning flow');
 assert(navSource.includes('data-nav2-source-practice'),'source-section practice marker missing');
+assert(themeSource.includes('@media(max-width:690px) and (pointer:fine)'),'desktop zoom accessibility breakpoint missing');
+assert(themeSource.includes('body[data-view=morph] .topnav'),'morph section nav is not restored for desktop zoom');
+
 
 const allPracticeCards=practiceContent.all();
 const formCards=allPracticeCards.filter(c=>c.exerciseType!=='meaning');
