@@ -207,11 +207,20 @@
    const byId=new Map(lessonRows.map(q=>[q.id,q]));
    const candidateIds=[],seen=new Set();
    const add=id=>{if(id&&byId.has(id)&&!seen.has(id)){seen.add(id);candidateIds.push(id);}};
-   // Stage mapping is the canonical fallback for legacy/non-verb banks that do not carry ruleIds.
+   // Stage mapping is a fallback for legacy/non-verb banks that do not carry ruleIds.
+   // A multi-rule stage becomes eligible only after every rule attached to that stage
+   // has already appeared in theory, so optional practice cannot leak future material.
+   const grammarLesson=root.GRAMMAR_CHAPTERS&&root.GRAMMAR_CHAPTERS.LESSONS&&root.GRAMMAR_CHAPTERS.LESSONS.find(x=>x&&x.id===lessonId);
+   const ruleOrder=new Map();
+   for(const [i,ch] of ((grammarLesson&&grammarLesson.chapters)||[]).entries())for(const rid of ch.rule_ids||[])if(!ruleOrder.has(rid))ruleOrder.set(rid,i);
+   const currentOrder=ruleOrder.get(ruleId);
    for(const s of p.stages||[]){
-     if((s.rule_ids||[]).includes(ruleId))for(const id of s.core_ids||[])add(id);
+     const stageRules=s.rule_ids||[];
+     if(!stageRules.includes(ruleId))continue;
+     const safe=stageRules.length<=1||(currentOrder!=null&&stageRules.every(rid=>!ruleOrder.has(rid)||ruleOrder.get(rid)<=currentOrder));
+     if(safe)for(const id of s.core_ids||[])add(id);
    }
-   // Direct ruleIds remain supported and preserve the richer generated pools used by 4-1+.
+   // Direct ruleIds are precise and remain supported for every topic.
    for(const q of lessonRows)if((q.ruleIds||[]).includes(ruleId))add(q.id);
    const rows=candidateIds.map(id=>byId.get(id)).filter(Boolean);
    const groups=new Map();
