@@ -5,48 +5,56 @@
       "id": "school-method",
       "role": "SCHOOL_NORM",
       "title": "4-2 методичка. Прошедшее время",
+      "url": "https://drive.google.com/file/d/1zlTf1yP51wYmuquDbLrNv5quD81lFLTY/view",
       "note": "Повтор переходного времени, формула ды/ді/ты/ті, лица-2, оглушение, отрицание, да/де/та/те, список слов урока. Школа разрешает и только что, и сто лет назад и сужает предпочтение до нескольких недель."
     },
     {
       "id": "school-exercises",
       "role": "SCHOOL_NORM",
       "title": "4-2 упражнения. Прошедшее время",
+      "url": "https://drive.google.com/file/d/12_U8YTuw6X8KR5RM1iRjOTxmK6uZMKbw/view",
       "note": "Модули 1–7. Сборник 7-2.2 печатает Достарым кешіктім и переводит это как «мои друзья опоздали»."
     },
     {
       "id": "school-homework",
       "role": "SCHOOL_NORM",
       "title": "4-2 домашняя работа. Прошедшее время",
+      "url": "https://drive.google.com/file/d/1RfhEzZSUBMdSufoZ3e_6wuUTOzjt7zQk/view",
       "note": "Четыре пункта. Слова листа и ссылка ProshVremyaBezIsk.html в течение 24 часов. Оқу и есту помечены как исключения."
     },
     {
       "id": "research-index",
       "role": "RESEARCH_VERIFIED",
       "title": "4-2_00_индекс_и_диагноз.md",
+      "url": "https://drive.google.com/file/d/1QuXwuSUlasLzjukUe6eEioyexZGKo_6B/view",
       "note": "Индекс исследования 29.09.2026. Норма — школьные PDF."
     },
     {
       "id": "research-full",
       "role": "RESEARCH_VERIFIED",
       "title": "4-2_РАЗЖЁВАНО_для_ученика.md",
+      "url": "https://drive.google.com/file/d/1W5QJo4HZw1pnzzztF0-QBOJOsFpHjaM8/view",
       "note": "Слой для чтения без учителя. Два вопроса про ды/ты. После «не» всегда ды/ді. Три ловушки: шықтымыз, жазбатым, достарым кешіктім."
     },
     {
       "id": "research-sequence",
       "role": "RESEARCH_VERIFIED",
       "title": "4-2_КАК_ОБЪЯСНИТЬ_с_нуля.md",
+      "url": "https://drive.google.com/file/d/1ITd0_w-QWDW00IXglCDIBALSCdBkZ-Ww/view",
       "note": "Порядок экранов: повтор 4–1, смысл, один глагол, ды/ты, лица, два ды, местоимение, оглушение, отрицание, вопрос, да/де, исключения, поза."
     },
     {
       "id": "research-errors",
       "role": "RESEARCH_VERIFIED",
       "title": "4-2 заметка об ошибках",
+      "url": "https://drive.google.com/file/d/18rIQVwiylIuo_JZSsuPTk2ATjNj8z6lc/view",
       "note": "Дыры сборника и типичные сборки. Место 7-2.2 чинится."
     },
     {
       "id": "research-bank",
       "role": "RESEARCH_VERIFIED",
       "title": "4-2_БАНК_форм_и_таблица.md",
+      "url": "https://drive.google.com/file/d/1p7rOeo1MR2dqzkBCVQfsNv5mLbalnOJQ/view",
       "note": "Сборки слов урока. Генератор прошедшего в пакет не входит."
     }
   ]
