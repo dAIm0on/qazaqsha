@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "lesson_id": "2-3",
-  "content_revision": "2-3.r2",
+  "content_revision": "2-3.r1",
   "title": "Урок 2–3 · Ол / олар, вопрос, порядковые",
   "label": "2–3",
   "name": "Ол / олар, вопрос, порядковые",
@@ -5170,15 +5170,5 @@
       "external_test"
     ]
   },
-  "migrations": [
-    {
-      "from_revision": "2-3.r1",
-      "to_revision": "2-3.r2",
-      "question_ids": {},
-      "chapter_ids": {},
-      "stage_ids": {},
-      "vocab_ids": {},
-      "drop_question_ids": []
-    }
-  ]
+  "migrations": []
 }
