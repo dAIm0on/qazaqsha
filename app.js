@@ -255,7 +255,13 @@
  function syncKbInset(){
    if(document.documentElement.hasAttribute('data-kbinset-lock'))return;
    const info=vvKeyboardGap();
-   const open=info.open,vv=info.vv;
+   let open=info.open;
+   const vv=info.vv;
+   const viewNow=document.body.getAttribute('data-view');
+   /* A stale visualViewport baseline must not keep typing-compact after the keyboard is gone. */
+   if(!typingFocus&&info.gapLayout<80)open=false;
+   if(viewNow!=='practice'&&viewNow!=='path'&&viewNow!=='morph')open=false;
+   if(viewNow==='morph'&&!isPracticeTypingField(document.activeElement))open=false;
    const inset=Math.max(0,Math.round(info.gap));
    document.documentElement.style.setProperty('--kbinset',inset+'px');
    document.documentElement.classList.toggle('keyboard-open',open);
@@ -1032,6 +1038,9 @@
    captureDraft();
    pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
    view=next;document.body.dataset.view=next;
+   /* Immersive hides .bottom-nav. Leaving morph must drop the flag or the menu stays gone. */
+   if(next!=='morph')delete document.body.dataset.morphImmersive;
+   if(next!=='practice'&&next!=='path'&&next!=='morph')typingFocus=false;
    const gpNow=state.grammarPath||{};
    document.body.classList.toggle('path-immersive',next==='path'&&!!(gpNow.lessonId&&gpNow.phase==='beat'));
    document.querySelectorAll('main > section').forEach(el=>{el.hidden=el.id!==next+'-view';});
@@ -1045,6 +1054,7 @@
      window.TutorUI.syncView(next==='practice'&&mode==='exam'?'exam':next);
    }
    save();
+   syncKbInset();
  }
  function shellTab(next){
    if(next==='morph')return 'morph';
