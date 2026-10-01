@@ -262,6 +262,7 @@
    if(!typingFocus&&info.gapLayout<80)open=false;
    if(viewNow!=='practice'&&viewNow!=='path'&&viewNow!=='morph')open=false;
    if(viewNow==='morph'&&!isPracticeTypingField(document.activeElement))open=false;
+   if(!typingFocus&&viewNow==='practice'&&mode==='words'&&!isPracticeTypingField(document.activeElement))open=false;
    const inset=Math.max(0,Math.round(info.gap));
    document.documentElement.style.setProperty('--kbinset',inset+'px');
    document.documentElement.classList.toggle('keyboard-open',open);
@@ -322,13 +323,24 @@
    armTypingFocusPoll();
    if(document.documentElement.classList.contains('typing-compact'))scrollFieldAndStrip(t);
  });
+ function wordsBlurKeepsDraft(next){
+   return !!(next&&next.closest&&next.closest('#check-button,#retry-button,#next-button,#hint-button,#reveal-button,#association-button,#rule-button,[data-letter],#tutor-host,.tutor-launch,#issue-dialog'));
+ }
  document.addEventListener('focusout',e=>{
    if(!isPracticeTypingField(e.target))return;
+   const left=e.target;
    setTimeout(()=>{
      const ae=document.activeElement;
      if(isPracticeTypingField(ae))return;
      typingFocus=false;
      if(vvFocusPoll){clearInterval(vvFocusPoll);vvFocusPoll=null;}
+     /* Words: an uncommitted fragment must not stay after the field loses focus.
+        Keep it when the tap is Проверить, a letter, hint, or the ask circle. */
+     if(isVocabWordsMode()&&!checked&&!retrying&&left.isConnected&&!wordsBlurKeepsDraft(ae)){
+       $$('#answer-form input[type=text]').forEach(el=>{if(!el.disabled)el.value='';});
+       draft=null;
+       save();
+     }
      syncKbInset();
      captureVvBaseline(true);
    },0);
