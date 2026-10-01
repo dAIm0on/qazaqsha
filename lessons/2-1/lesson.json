@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "lesson_id": "2-1",
-  "content_revision": "2-1.r2",
+  "content_revision": "2-1.r1",
   "title": "Урок 2–1 · Мен, сен, сіз; емес; ба, бе",
   "label": "2–1",
   "name": "Мен, сен, сіз; емес; ба, бе",
@@ -5199,15 +5199,6 @@
         "2-1-checkpoint": "v2-theory-2-1-checkpoint"
       },
       "question_ids": {},
-      "stage_ids": {},
-      "vocab_ids": {},
-      "drop_question_ids": []
-    },
-    {
-      "from_revision": "2-1.r1",
-      "to_revision": "2-1.r2",
-      "question_ids": {},
-      "chapter_ids": {},
       "stage_ids": {},
       "vocab_ids": {},
       "drop_question_ids": []
