@@ -7,7 +7,7 @@ const path=require('node:path');
 const vm=require('node:vm');
 const Schema=require('./lesson-v2-schema.js');
 
-const lessonIds=['2-1','2-2','2-3'];
+const lessonIds=['2-1','2-2','2-3','3-1','3-2','3-3'];
 const compiledText=fs.readFileSync(path.join(__dirname,'compiled-lessons-v2.js'),'utf8');
 const compiledJson=compiledText.replace(/^.*?window\.LESSON_V2_COMPILED\s*=\s*/s,'').replace(/;\s*$/s,'');
 const compiledAll=JSON.parse(compiledJson);
@@ -86,6 +86,19 @@ const p23=mock.LessonV2Runtime.practiceForRule('2-3',r23,12);
 assert.ok(p23.length>0,'2-3 optional practice should produce cards');
 assert.ok(p23.every(id=>question(id)&&['person','numbers'].includes(question(id).topic)));
 
+// 3-x regression: direct non-verb ruleIds must work for possessive/person banks too.
+const p31=mock.LessonV2Runtime.practiceForRule('3-1','v2:3-1:poss',12);
+assert.ok(p31.length>0,'3-1 possessive optional practice should produce cards');
+assert.ok(p31.every(id=>question(id)&&question(id).topic==='possessive'));
+
+const p32=mock.LessonV2Runtime.practiceForRule('3-2','v2:3-2:poss',12);
+assert.ok(p32.length>0,'3-2 possessive optional practice should produce cards');
+assert.ok(p32.every(id=>question(id)&&question(id).topic==='possessive'));
+
+const p33=mock.LessonV2Runtime.practiceForRule('3-3','v2:3-3:who-whose',12);
+assert.ok(p33.length>0,'3-3 person optional practice should produce cards');
+assert.ok(p33.every(id=>question(id)&&question(id).topic==='person'));
+
 // Direct non-verb fallback must work even when no stage mentions the rule.
 mock.COURSE.questions.push({
   id:'fixture-direct-nonverb',
@@ -128,10 +141,19 @@ assert.ok(tracks22.every(x=>x.topic==='person'),'2-2 tracks should be person, no
 const ordTrack=mock.LEARNING.lessons.find(x=>x.id==='v2-track-stage-2-3-ord');
 assert.ok(ordTrack,'2-3 ordinal track missing');
 assert.equal(ordTrack.topic,'numbers');
+const track31=mock.LEARNING.lessons.find(x=>x.id==='v2-track-stage-3-1-1-1');
+assert.ok(track31,'3-1 first track missing');
+assert.equal(track31.topic,'possessive');
+const track32=mock.LEARNING.lessons.find(x=>x.id==='v2-track-stage-3-2-1-1');
+assert.ok(track32,'3-2 first track missing');
+assert.equal(track32.topic,'possessive');
 
 console.log('OPTIONAL_PRACTICE_V2_VERIFY_OK',{
   p21:p21.length,
   p22:p22.length,
   p23:p23.length,
+  p31:p31.length,
+  p32:p32.length,
+  p33:p33.length,
   tracks22:tracks22.length
 });
