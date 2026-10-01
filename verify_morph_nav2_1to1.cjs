@@ -53,12 +53,19 @@ for(const lesson of cat.lessons){
  }else{
   assert(Array.isArray(lesson.practiceRoutes)&&lesson.practiceRoutes.length,'productive lesson without practice routes '+lesson.id);
   assert(lesson.finalUnaidedTask&&lesson.finalUnaidedTask.kind==='free_practice_full_input','productive lesson without final unaided task '+lesson.id);
+  let linkedMicro=0;
+  const lessonHeadings=(lesson.orderedSourceUnitIds||[]).filter(id=>byId.get(id)&&byId.get(id).block.type==='subheading');
   for(const route of lesson.practiceRoutes){
    const [blockId,subcase='']=route.split(':');
    assert(practiceCfg.config.enabledBlockIds.includes(blockId),'practice route not enabled '+route+' in '+lesson.id);
    const cards=practiceContent.forBlock(blockId,subcase);
    assert(cards.length>0,'practice route has no licensed cards '+route+' in '+lesson.id);
+   const uniqueLemmas=new Set(cards.map(card=>card.normalizedLemmaKey));
+   if(blockId!=='free.harmony.limits')assert(uniqueLemmas.size>=2,'practice route lacks H/new-word transfer '+route+' in '+lesson.id);
+   const exact=blockId+':'+subcase;
+   if(lessonHeadings.some(h=>(practiceContent.anchorsFor(h)||[]).some(a=>a.blockId+':'+(a.subcase||'')===exact)))linkedMicro++;
   }
+  assert(linkedMicro>0,'productive lesson has no source-linked micro-practice '+lesson.id);
  }
 }
 
