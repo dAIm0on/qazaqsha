@@ -62,9 +62,39 @@ function wrongWord(built,kind){
  const word=step.stem+(step.space?' ':'')+next;
  return word===built.word?null:word;
 }
+const EDGE_LABELS={vowel:'гласная',glide:'й или у',r:'р',l:'л',nasal:'м, н или ң',voiced_fricative:'з или ж',voiceless:'глухая согласная'};
+const EDGE_ORDER=['vowel','glide','r','l','nasal','voiced_fricative','voiceless'];
+const PRACTICE_VOWELS='аәеоөұүыі';
+function unique(xs){return [...new Set((xs||[]).filter(Boolean))];}
+function firstVowel(text){return [...String(text||'')].find(ch=>PRACTICE_VOWELS.includes(ch))||'';}
+function decisionSpec(built){
+ const step=built&&built.trace&&built.trace[built.trace.length-1];
+ if(!step)return null;
+ const family=E.data&&E.data.families&&E.data.families[step.morpheme];
+ const variants=unique((family&&family.variants)||[]);
+ const firsts=unique(variants.map(v=>[...String(v)][0]));
+ const vowels=unique(variants.map(firstVowel));
+ const correctVowel=firstVowel(step.suffix);
+ const levels={};
+ if(EDGE_LABELS[step.edge]){
+  levels.B={kind:'choice',prompt:'На какой тип звука заканчивается слово перед этим окончанием?',context:step.before,options:EDGE_ORDER.map(k=>EDGE_LABELS[k]),answer:EDGE_LABELS[step.edge],hint:'Посмотри только на последнюю букву уже собранного слова.'};
+ }
+ if(firsts.length>1&&firsts.includes([...String(step.suffix)][0])){
+  levels.C={kind:'choice',prompt:'Какую первую букву окончания выбрать?',context:step.before,options:firsts,answer:[...String(step.suffix)][0],hint:'Сейчас выбираем только первую букву окончания, не всю форму.'};
+ }
+ if(vowels.length>1&&correctVowel&&vowels.includes(correctVowel)){
+  levels.D={kind:'choice',prompt:'Какую гласную выбрать в окончании?',context:step.before,options:vowels,answer:correctVowel,hint:'Смотри на ряд гласных исходного слова.'};
+ }
+ if(variants.length>1&&variants.includes(step.suffix)){
+  levels.E={kind:'choice',prompt:'Какое полное окончание подходит?',context:step.before,options:variants,answer:step.suffix,hint:'Основа пока не показывается вместе с готовым ответом: выбери только окончание.'};
+ }
+ levels.F={kind:'input',prompt:'Впиши только окончание.',context:step.stem+' + ___',answer:step.suffix,hint:'Собираем только последний шаг. Полную форму пока не показываем.'};
+ levels.G={kind:'input',prompt:'Собери форму целиком самостоятельно.',context:built.lemma&&built.lemma.text||step.before,answer:built.word,hint:'Применяй шаги по порядку. Готового ответа здесь нет.'};
+ return {morpheme:step.morpheme,changed:!!step.changed,levels,order:['B','C','D','E','F','G'].filter(k=>levels[k])};
+}
 function base(lemma,built,blockId,subcase,skill){
  const step=built.trace[built.trace.length-1];
- return {cardId:blockId+':'+lemma.id+':'+subcase,blockId,subcase,targetSkillIds:[skill],prerequisiteBlockIds:[],lemmaId:lemma.id,normalizedLemmaKey:String(lemma.text).toLocaleLowerCase('kk'),split:'train',holdout:false,admissionStatus:'runtime_approved',engineWord:built.word,expected:built.word,promptSpec:{ru:'',hint:''},translationSpec:{lemma:lemma.text,lemmaRu:lemma.gloss||'',target:'',context:lemma.text,contextRu:lemma.gloss||''},exerciseType:'choose',options:[],answer:built.word,feedbackRu:'',showExpectedBeforeAnswer:false,changed:!!step.changed};
+ return {cardId:blockId+':'+lemma.id+':'+subcase,blockId,subcase,targetSkillIds:[skill],prerequisiteBlockIds:[],lemmaId:lemma.id,normalizedLemmaKey:String(lemma.text).toLocaleLowerCase('kk'),split:'train',holdout:false,admissionStatus:'runtime_approved',engineWord:built.word,expected:built.word,promptSpec:{ru:'',hint:''},translationSpec:{lemma:lemma.text,lemmaRu:lemma.gloss||'',target:'',context:lemma.text,contextRu:lemma.gloss||''},exerciseType:'choose',options:[],answer:built.word,feedbackRu:'',showExpectedBeforeAnswer:false,changed:!!step.changed,decisionSpec:decisionSpec(built),practiceLevels:['A','B','C','D','E','F','G','H','I']};
 }
 function choice(card,correct,wrongs,prompt,hint,target,feedback){
  const options=[correct].concat(wrongs).filter((x,i,a)=>x&&a.indexOf(x)===i);
