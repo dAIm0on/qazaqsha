@@ -861,19 +861,15 @@ html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
   #today-content .ia-stack,#today-content .ia-quiet{grid-column:1}
 }
 
-/* Vocab words P1: compact error + retry CTA */
+/* Vocab words P0 lemma: compact error + эталон + retry CTA; no bottom AI strip */
 #retry-button,
 #feedback-retry,
 .vocab-retry-wrap .primary-button{
   min-width:44px;min-height:44px;
 }
 .vocab-retry-wrap{margin:12px 0 4px}
-.feedback.error[data-vocab-compact] .ai-tutor-panel.ai-tutor-secondary{
-  margin-top:14px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--error) 22%,var(--line));
-  opacity:.92;
-}
-.feedback.error[data-vocab-compact] .ai-tutor-actions .text-button{
-  min-height:44px;
+.feedback.error[data-vocab-compact] .vocab-lemma{
+  margin:8px 0;font-size:1.05em;
 }
 .feedback.error[data-vocab-compact] .vocab-error-secondary{
   margin-top:8px;

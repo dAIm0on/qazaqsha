@@ -1358,27 +1358,21 @@
        const errors=window.ErrorDiagnostics.diagnose(q,answers,result,Date.now());
        const local=errors.map(e=>(window.ErrorDiagnostics.labels&&window.ErrorDiagnostics.labels[e.error_type])||'').filter(Boolean);
        const where=local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':'';
-       const aiBits=`<div class="ai-tutor-panel ai-tutor-secondary" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div><div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`;
+       const lemma=q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>(f.answers||[]).join(' / ')).join('; ');
+       // P0 words-error-lemma: show эталон + Ещё раз; no bottom AI strip (ask stays via #tutor-host).
        feedback.className='feedback error';
        feedback.setAttribute('data-vocab-compact','1');
-       feedback.innerHTML=`<h3>Пока не всё верно</h3>${where}<p class="small">Эта карточка появится снова.</p><div class="vocab-retry-wrap"><button type="button" class="primary-button" id="feedback-retry">Ещё раз</button></div>`+aiBits+vocabOfferHtml(sameSkillOffers(q));
+       feedback.innerHTML=`<h3>Пока не всё верно</h3>${where}<p class="vocab-lemma" lang="kk"><strong>Ответ:</strong> ${esc(lemma)}</p><p class="small">Эта карточка появится снова.</p><div class="vocab-retry-wrap"><button type="button" class="primary-button" id="feedback-retry">Ещё раз</button></div>`+vocabOfferHtml(sameSkillOffers(q));
        feedback.hidden=false;
        const fr=$('#feedback-retry');if(fr)fr.onclick=e=>{e.preventDefault();beginVocabRetry();};
        bindOffers(feedback);
        $('#check-button').hidden=true;if($('#retry-button')){$('#retry-button').hidden=false;$('#retry-button').textContent='Ещё раз';}
-       if(window.AiTutor){
-         const aiCodes=window.AiTutor.noteAnswer(q,answers,result,hinted,errors,Date.now())||[];
-         const ask=(m,localOnly)=>{
-           const token=++tutorToken;const out=$('#ai-tutor-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
-           ['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=true;});
-           const extra={user_answer:answers.join(' '),is_correct:false,hint_used:hinted,codes:aiCodes,surface:tutorSurface(),lesson_id:currentLessonId(q),repeat_count:aiCodes[0]?window.AiTutor.sameErrorCount(aiCodes[0]):0};
-           const paint=(resp)=>{const o=$('#ai-tutor-out');if(!o||!resp)return;const msg=String(resp.message_ru||'').trim();if(!msg||resp.aborted)return;o.hidden=false;o.innerHTML='<p>'+esc(msg)+'</p>';['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=false;});};
-           if(m==='explain_rule'||localOnly){paint(window.AiTutor.localFallback(q,aiCodes,'explain_rule',extra));return;}
-           const req=window.AiTutor.buildRequest(m,q,extra);
-           window.AiTutor.callTutor(req,(window.AiContract&&window.AiContract.CLIENT_TIMEOUT_MS)||30000).then(paint).catch(()=>paint(window.AiTutor.localFallback(q,aiCodes,m,extra)));
-         };
-         if($('#ai-why'))$('#ai-why').onclick=()=>ask('explain_error');
-         if($('#ai-rule'))$('#ai-rule').onclick=()=>ask('explain_rule',true);
+       if(window.AiTutor){window.AiTutor.noteAnswer(q,answers,result,hinted,errors,Date.now());}
+       if(window.TutorUI){
+         const rawFocus=((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||answers[0]||q.stimulus||'').toString();
+         const word=(rawFocus.match(/[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}/)||[])[0]||'';
+         window.TutorUI.setContext({surface:tutorSurface(),lesson_id:currentLessonId(q),rule_id:(q.ruleIds&&q.ruleIds[0])||'',user_answer:answers.join(' '),expected_answer:(q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'',stimulus:String(q.stimulus||''),codes:[],focus_word:word});
+         window.TutorUI.syncView('practice');
        }
        if(!document.documentElement.classList.contains('typing-compact')){try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}}else{const sc=document.querySelector('.typing-scroll');if(sc&&feedback){try{const d=feedback.getBoundingClientRect().bottom-sc.getBoundingClientRect().bottom;if(d>0)sc.scrollTop+=d+8;}catch{}}}
      }
@@ -1518,10 +1512,10 @@
    const vocabWrong=isVocabWordsMode()&&!result.correct;
    if(vocabWrong){
      const where=local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':'';
-     const aiBits=mode!=='exam'?`<div class="ai-tutor-panel ai-tutor-secondary" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'';
+     // P0 words-error-lemma: show эталон + Ещё раз; strip bottom AI («Почему так?» / «Покажи правило»).
      feedback.className='feedback error';
      feedback.setAttribute('data-vocab-compact','1');
-     feedback.innerHTML=`<h3>Пока не всё верно</h3>${where}<p class="small">Эта карточка появится снова.</p><div class="vocab-retry-wrap"><button type="button" class="primary-button" id="feedback-retry">Ещё раз</button></div>`+aiBits+vocabOfferHtml(sameSkillOffers(q));
+     feedback.innerHTML=`<h3>Пока не всё верно</h3>${where}<p class="vocab-lemma" lang="kk"><strong>Ответ:</strong> ${esc(answerLine)}</p><p class="small">Эта карточка появится снова.</p><div class="vocab-retry-wrap"><button type="button" class="primary-button" id="feedback-retry">Ещё раз</button></div>`+vocabOfferHtml(sameSkillOffers(q));
      feedback.hidden=false;
      const fr=$('#feedback-retry');if(fr)fr.onclick=e=>{e.preventDefault();beginVocabRetry();};
      bindOffers(feedback);
@@ -1545,7 +1539,7 @@
      });
      window.TutorUI.syncView(mode==='homework'?'homework':'practice');
    }
-   if(!result.correct&&mode!=='exam'&&window.AiTutor){
+   if(!result.correct&&mode!=='exam'&&window.AiTutor&&!vocabWrong){
      const unlock=()=>{['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=false;});};
      const paint=(resp,token)=>{
        if(token!==tutorToken)return;
