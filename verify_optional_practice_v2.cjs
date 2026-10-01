@@ -52,7 +52,8 @@ mock.LessonV2Runtime.installAll();
 
 const question=id=>mock.COURSE.questions.find(q=>q.id===id);
 const stageCoreFor=(lessonId,ruleId)=>{
-  const p=packages.find(x=>x.lesson_id===lessonId);
+  const p=mock.LessonV2Runtime.byId(lessonId);
+  assert.ok(p,'installed lesson missing '+lessonId);
   return new Set((p.stages||[]).filter(s=>(s.rule_ids||[]).includes(ruleId)).flatMap(s=>s.core_ids||[]));
 };
 const directFor=(lessonId,ruleId)=>new Set(
