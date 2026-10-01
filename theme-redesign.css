@@ -861,25 +861,21 @@ html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
   #today-content .ia-stack,#today-content .ia-quiet{grid-column:1}
 }
 
-/* Vocab words P1: compact error + retry CTA */
+/* Vocab words P0 lemma2: orange #FF5A1F h3 sticker = эталон; strike attempt; one bottom Ещё раз */
 #retry-button,
-#feedback-retry,
-.vocab-retry-wrap .primary-button{
+#reveal-button.vocab-idk,
+#reveal-button[data-vocab-idk]{
   min-width:44px;min-height:44px;
 }
-.vocab-retry-wrap{margin:12px 0 4px}
-.feedback.error[data-vocab-compact] .ai-tutor-panel.ai-tutor-secondary{
-  margin-top:14px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--error) 22%,var(--line));
-  opacity:.92;
+.feedback.error[data-vocab-compact] .vocab-attempt{margin:6px 0 10px}
+.feedback.error[data-vocab-compact] .vocab-attempt-strike{
+  text-decoration:line-through;
+  text-decoration-thickness:2px;
+  color:var(--muted,#6A645C);
 }
-.feedback.error[data-vocab-compact] .ai-tutor-actions .text-button{
-  min-height:44px;
-}
-.feedback.error[data-vocab-compact] .vocab-error-secondary{
-  margin-top:8px;
-}
-.feedback.error[data-vocab-compact] .vocab-error-secondary .text-button{
-  min-height:44px;
+/* h3 already paints as solid #FF5A1F sticker via .feedback.error h3 — keep lemma readable */
+.feedback.error[data-vocab-compact] h3.vocab-lemma-sticker-pill{
+  font-style:normal; /* lemma should read clear, not italic display */
 }
 .primary-slot>#retry-button{width:100%}
 

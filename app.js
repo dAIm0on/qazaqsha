@@ -599,6 +599,35 @@
    }
    return '';
  }
+ function vocabLemmaLine(q){
+   if(!q)return '';
+   if(q.kind==='multi')return (q.correct||[]).join(', ');
+   return (q.fields||[]).map(f=>(f.answers||[]).join(' / ')).join('; ');
+ }
+ function vocabUserLine(answers){
+   return (answers||[]).map(a=>String(a==null?'':a).trim()).filter(Boolean).join(' · ');
+ }
+ /** P0 words-error-lemma2: orange #FF5A1F h3 sticker carries эталон; strike attempt; only bottom Ещё раз. No AI / skill-links. */
+ function vocabWrongFeedbackHtml(lemma,userLine,opts){
+   const o=opts||{};
+   const attempt=userLine?('<p class="vocab-attempt"><span class="vocab-attempt-strike">'+esc(userLine)+'</span></p>'):'';
+   /* .feedback.error h3 IS the solid #FF5A1F skewed sticker — put lemma there (not «Пока не всё верно»). */
+   const sticker='<h3 lang="kk" class="vocab-lemma-sticker-pill">Ответ: '+esc(lemma||'')+'</h3>';
+   const note=o.note!=null?o.note:'<p class="small">Эта карточка появится снова.</p>';
+   return sticker+attempt+note;
+ }
+ function paintVocabLemmaFeedback(feedback,q,answers,opts){
+   if(!feedback)return;
+   const lemma=vocabLemmaLine(q);
+   const userLine=vocabUserLine(answers);
+   feedback.className='feedback error';
+   feedback.setAttribute('data-vocab-compact','1');
+   feedback.innerHTML=vocabWrongFeedbackHtml(lemma,userLine,opts);
+   feedback.hidden=false;
+   /* Only lower primary #retry-button (≥44) — no inner #feedback-retry. */
+   $('#check-button').hidden=true;if($('#retry-button')){$('#retry-button').hidden=false;$('#retry-button').textContent='Ещё раз';}
+   if(!document.documentElement.classList.contains('typing-compact')){try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}}else{const sc=document.querySelector('.typing-scroll');if(sc&&feedback){try{const d=feedback.getBoundingClientRect().bottom-sc.getBoundingClientRect().bottom;if(d>0)sc.scrollTop+=d+8;}catch{}}}
+ }
  function sameSkillOffers(q){
    if(!q)return {isolated:'',other:''};
    const iso=window.Homework&&window.Homework.isolatedFor?window.Homework.isolatedFor(q,questions,state):[];
@@ -1238,7 +1267,7 @@
    $('#answer-form').addEventListener('submit',e=>{e.preventDefault();if(e.isComposing||(e.nativeEvent&&e.nativeEvent.isComposing))return;goCard();});
    if($('#rule-button'))$('#rule-button').onclick=()=>showRule(q);
    $('#hint-button').onclick=()=>showHint(q);
-   $('#reveal-button').onclick=()=>mode==='exam'?checkAnswer(q,true):peekAnswer(q);
+   $('#reveal-button').onclick=()=>mode==='exam'?checkAnswer(q,true):peekAnswer(q);if(isVocabWordsMode()&&$('#reveal-button')){$('#reveal-button').classList.add('vocab-idk');$('#reveal-button').setAttribute('data-vocab-idk','1');}
    if(mode==='slice'||mode==='repair'){const h=$('#hint-button'),r=$('#reveal-button');if(h)h.hidden=true;if(r)r.hidden=true;}
    $('#next-button').onclick=nextQuestion;
    if($('#retry-button'))$('#retry-button').onclick=e=>{e.preventDefault();beginVocabRetry();};
@@ -1311,6 +1340,24 @@
  function peekAnswer(q){
    if(checked||mode==='exam')return;
    hinted=true;hintEvent(q,'reveal');
+   if(isVocabWordsMode()){
+     // Separate «Не знаю» (≥44): show эталон immediately. Does NOT count as correct. Ask-circle stays explain-only.
+     const answers=readAnswers(q);
+     const feedback=$('#feedback');
+     paintVocabLemmaFeedback(feedback,q,answers,{title:'Не знаю',note:'<p class="small">Подсказка = провал для интервала. Эта карточка появится снова.</p>'});
+     retrying=true;checked=false;
+     (q.fields||[]).forEach((_,i)=>{const el=$('#answer-'+i);if(el){el.classList.add('invalid');el.disabled=false;}});
+     if($('#reveal-button'))$('#reveal-button').disabled=true;
+     if($('#hint-button'))$('#hint-button').disabled=true;
+     if(window.TutorUI){
+       const rawFocus=((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||answers[0]||q.stimulus||'').toString();
+       const word=(rawFocus.match(/[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}/)||[])[0]||'';
+       window.TutorUI.setContext({surface:tutorSurface(),lesson_id:currentLessonId(q),rule_id:(q.ruleIds&&q.ruleIds[0])||'',user_answer:answers.join(' '),expected_answer:(q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'',stimulus:String(q.stimulus||''),codes:[],focus_word:word});
+       window.TutorUI.syncView('practice');
+     }
+     focusAnswer();save();
+     return;
+   }
    const answerLine=q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
    const why=q.explanation?('<p class="small">'+esc(q.explanation)+'</p>'):'';
    const box=$('#hint-box');
@@ -1356,31 +1403,15 @@
      if(isVocabWordsMode()){
        const feedback=$('#feedback');
        const errors=window.ErrorDiagnostics.diagnose(q,answers,result,Date.now());
-       const local=errors.map(e=>(window.ErrorDiagnostics.labels&&window.ErrorDiagnostics.labels[e.error_type])||'').filter(Boolean);
-       const where=local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':'';
-       const aiBits=`<div class="ai-tutor-panel ai-tutor-secondary" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div><div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`;
-       feedback.className='feedback error';
-       feedback.setAttribute('data-vocab-compact','1');
-       feedback.innerHTML=`<h3>Пока не всё верно</h3>${where}<p class="small">Эта карточка появится снова.</p><div class="vocab-retry-wrap"><button type="button" class="primary-button" id="feedback-retry">Ещё раз</button></div>`+aiBits+vocabOfferHtml(sameSkillOffers(q));
-       feedback.hidden=false;
-       const fr=$('#feedback-retry');if(fr)fr.onclick=e=>{e.preventDefault();beginVocabRetry();};
-       bindOffers(feedback);
-       $('#check-button').hidden=true;if($('#retry-button')){$('#retry-button').hidden=false;$('#retry-button').textContent='Ещё раз';}
-       if(window.AiTutor){
-         const aiCodes=window.AiTutor.noteAnswer(q,answers,result,hinted,errors,Date.now())||[];
-         const ask=(m,localOnly)=>{
-           const token=++tutorToken;const out=$('#ai-tutor-out');if(out){out.hidden=false;out.textContent='Разбираю этот ответ…';}
-           ['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=true;});
-           const extra={user_answer:answers.join(' '),is_correct:false,hint_used:hinted,codes:aiCodes,surface:tutorSurface(),lesson_id:currentLessonId(q),repeat_count:aiCodes[0]?window.AiTutor.sameErrorCount(aiCodes[0]):0};
-           const paint=(resp)=>{const o=$('#ai-tutor-out');if(!o||!resp)return;const msg=String(resp.message_ru||'').trim();if(!msg||resp.aborted)return;o.hidden=false;o.innerHTML='<p>'+esc(msg)+'</p>';['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=false;});};
-           if(m==='explain_rule'||localOnly){paint(window.AiTutor.localFallback(q,aiCodes,'explain_rule',extra));return;}
-           const req=window.AiTutor.buildRequest(m,q,extra);
-           window.AiTutor.callTutor(req,(window.AiContract&&window.AiContract.CLIENT_TIMEOUT_MS)||30000).then(paint).catch(()=>paint(window.AiTutor.localFallback(q,aiCodes,m,extra)));
-         };
-         if($('#ai-why'))$('#ai-why').onclick=()=>ask('explain_error');
-         if($('#ai-rule'))$('#ai-rule').onclick=()=>ask('explain_rule',true);
+       // P0: strike + orange h3 lemma sticker; bottom Ещё раз only; no AI / Why / skill-links. Error ≠ correct.
+       paintVocabLemmaFeedback(feedback,q,answers,{});
+       if(window.AiTutor){window.AiTutor.noteAnswer(q,answers,result,hinted,errors,Date.now());}
+       if(window.TutorUI){
+         const rawFocus=((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||answers[0]||q.stimulus||'').toString();
+         const word=(rawFocus.match(/[A-Za-zА-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі-]{2,}/)||[])[0]||'';
+         window.TutorUI.setContext({surface:tutorSurface(),lesson_id:currentLessonId(q),rule_id:(q.ruleIds&&q.ruleIds[0])||'',user_answer:answers.join(' '),expected_answer:(q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'',stimulus:String(q.stimulus||''),codes:[],focus_word:word});
+         window.TutorUI.syncView('practice');
        }
-       if(!document.documentElement.classList.contains('typing-compact')){try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}}else{const sc=document.querySelector('.typing-scroll');if(sc&&feedback){try{const d=feedback.getBoundingClientRect().bottom-sc.getBoundingClientRect().bottom;if(d>0)sc.scrollTop+=d+8;}catch{}}}
      }
      focusAnswer();return;
    }
@@ -1517,15 +1548,8 @@
    const morph=!result.correct?morphemeRow(errors,answerLine,answers.join(' ')):'';
    const vocabWrong=isVocabWordsMode()&&!result.correct;
    if(vocabWrong){
-     const where=local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':'';
-     const aiBits=mode!=='exam'?`<div class="ai-tutor-panel ai-tutor-secondary" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'';
-     feedback.className='feedback error';
-     feedback.setAttribute('data-vocab-compact','1');
-     feedback.innerHTML=`<h3>Пока не всё верно</h3>${where}<p class="small">Эта карточка появится снова.</p><div class="vocab-retry-wrap"><button type="button" class="primary-button" id="feedback-retry">Ещё раз</button></div>`+aiBits+vocabOfferHtml(sameSkillOffers(q));
-     feedback.hidden=false;
-     const fr=$('#feedback-retry');if(fr)fr.onclick=e=>{e.preventDefault();beginVocabRetry();};
-     bindOffers(feedback);
-     if(!document.documentElement.classList.contains('typing-compact')){try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}}else{const sc=document.querySelector('.typing-scroll');if(sc&&feedback){try{const d=feedback.getBoundingClientRect().bottom-sc.getBoundingClientRect().bottom;if(d>0)sc.scrollTop+=d+8;}catch{}}}
+     // P0: strike attempt + orange #FF5A1F h3 sticker with lemma; bottom Ещё раз only; no Why/правило/skill-links.
+     paintVocabLemmaFeedback(feedback,q,answers,{});
    }else{
    feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Число уже сказало, сколько. Окончание множественного здесь лишнее.</p>':''}${morph}${result.correct?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}${(()=>{const raw=q.explanation||'';if(result.correct)return raw?'<p>'+esc(raw)+'</p>':'';const safe=(window.ExplainOpen&&window.ExplainOpen.safeWrongWhy)?window.ExplainOpen.safeWrongWhy(raw,q):(raw&&window.ExplainOpen&&window.ExplainOpen.spoilsOnWrong&&window.ExplainOpen.spoilsOnWrong(raw,q)?'':raw);return safe?'<p>'+esc(safe)+'</p>':'';})()}<p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
    }
@@ -1545,7 +1569,7 @@
      });
      window.TutorUI.syncView(mode==='homework'?'homework':'practice');
    }
-   if(!result.correct&&mode!=='exam'&&window.AiTutor){
+   if(!result.correct&&mode!=='exam'&&window.AiTutor&&!vocabWrong){
      const unlock=()=>{['ai-why','ai-rule'].forEach(id=>{const b=$('#'+id);if(b)b.disabled=false;});};
      const paint=(resp,token)=>{
        if(token!==tutorToken)return;
