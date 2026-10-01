@@ -1,4 +1,11 @@
 {
   "lesson_id": "2-1",
-  "known_bad": []
+  "known_bad": [
+    {
+      "id": "fixture:2-1:bad-key:7-2-3",
+      "input": "сен мұғалімсің емессің",
+      "must_reject_as_gold": true,
+      "expected": "сен мұғалім емессің"
+    }
+  ]
 }
