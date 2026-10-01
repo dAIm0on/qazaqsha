@@ -24,7 +24,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
   "rules": [
     {
       "id": "ol-zero",
-      "title": "Ол / олар без личной бирки"
+      "title": "Ол / олар без личного окончания"
     },
     {
       "id": "ordinal",
@@ -1707,7 +1707,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Көрші",
       "fields": [
         {
@@ -1734,7 +1734,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Көрші",
       "fields": [
         {
@@ -1761,7 +1761,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Көрші",
       "fields": [
         {
@@ -1788,7 +1788,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Көрші",
       "fields": [
         {
@@ -1815,7 +1815,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Көрші",
       "fields": [
         {
@@ -1842,7 +1842,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Көрші",
       "fields": [
         {
@@ -1869,7 +1869,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Көрші",
       "fields": [
         {
@@ -1885,7 +1885,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + көрші → Көрші. Ол/олар без бирки.",
+      "explanation": "Ол + көрші → Көрші. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -1900,7 +1900,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Қазақ",
       "fields": [
         {
@@ -1927,7 +1927,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Қазақ",
       "fields": [
         {
@@ -1954,7 +1954,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Қазақ",
       "fields": [
         {
@@ -1981,7 +1981,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Қазақ",
       "fields": [
         {
@@ -2008,7 +2008,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Қазақ",
       "fields": [
         {
@@ -2035,7 +2035,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Қазақ",
       "fields": [
         {
@@ -2062,7 +2062,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Қазақ",
       "fields": [
         {
@@ -2078,7 +2078,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + қазақ → Қазақ. Ол/олар без бирки.",
+      "explanation": "Ол + қазақ → Қазақ. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -2093,7 +2093,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Маман",
       "fields": [
         {
@@ -2120,7 +2120,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Маман",
       "fields": [
         {
@@ -2147,7 +2147,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Маман",
       "fields": [
         {
@@ -2174,7 +2174,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Маман",
       "fields": [
         {
@@ -2201,7 +2201,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Маман",
       "fields": [
         {
@@ -2228,7 +2228,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Маман",
       "fields": [
         {
@@ -2255,7 +2255,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Маман",
       "fields": [
         {
@@ -2271,7 +2271,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + маман → Маман. Ол/олар без бирки.",
+      "explanation": "Ол + маман → Маман. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -2286,7 +2286,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Жомарт",
       "fields": [
         {
@@ -2313,7 +2313,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Жомарт",
       "fields": [
         {
@@ -2340,7 +2340,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Жомарт",
       "fields": [
         {
@@ -2367,7 +2367,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Жомарт",
       "fields": [
         {
@@ -2394,7 +2394,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Жомарт",
       "fields": [
         {
@@ -2421,7 +2421,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Жомарт",
       "fields": [
         {
@@ -2448,7 +2448,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Жомарт",
       "fields": [
         {
@@ -2464,7 +2464,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + жомарт → Жомарт. Ол/олар без бирки.",
+      "explanation": "Ол + жомарт → Жомарт. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -2479,7 +2479,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Семіз",
       "fields": [
         {
@@ -2506,7 +2506,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Семіз",
       "fields": [
         {
@@ -2533,7 +2533,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Семіз",
       "fields": [
         {
@@ -2560,7 +2560,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Семіз",
       "fields": [
         {
@@ -2587,7 +2587,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Семіз",
       "fields": [
         {
@@ -2614,7 +2614,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Семіз",
       "fields": [
         {
@@ -2641,7 +2641,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Семіз",
       "fields": [
         {
@@ -2657,7 +2657,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + семіз → Семіз. Ол/олар без бирки.",
+      "explanation": "Ол + семіз → Семіз. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -2672,7 +2672,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Әдемі",
       "fields": [
         {
@@ -2699,7 +2699,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Әдемі",
       "fields": [
         {
@@ -2726,7 +2726,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Әдемі",
       "fields": [
         {
@@ -2753,7 +2753,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Әдемі",
       "fields": [
         {
@@ -2780,7 +2780,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Әдемі",
       "fields": [
         {
@@ -2807,7 +2807,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Әдемі",
       "fields": [
         {
@@ -2834,7 +2834,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Әдемі",
       "fields": [
         {
@@ -2850,7 +2850,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + әдемі → Әдемі. Ол/олар без бирки.",
+      "explanation": "Ол + әдемі → Әдемі. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -2865,7 +2865,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Әріптес",
       "fields": [
         {
@@ -2892,7 +2892,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Әріптес",
       "fields": [
         {
@@ -2908,7 +2908,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + әріптес → Әріптес. Ол/олар без бирки.",
+      "explanation": "Ол + әріптес → Әріптес. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -2923,7 +2923,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Әріптес",
       "fields": [
         {
@@ -2950,7 +2950,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Әріптес",
       "fields": [
         {
@@ -2977,7 +2977,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Әріптес",
       "fields": [
         {
@@ -3004,7 +3004,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Әріптес",
       "fields": [
         {
@@ -3031,7 +3031,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Әріптес",
       "fields": [
         {
@@ -3058,7 +3058,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Жау",
       "fields": [
         {
@@ -3085,7 +3085,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Жау",
       "fields": [
         {
@@ -3101,7 +3101,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + жау → Жау. Ол/олар без бирки.",
+      "explanation": "Ол + жау → Жау. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -3116,7 +3116,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Жау",
       "fields": [
         {
@@ -3143,7 +3143,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Жау",
       "fields": [
         {
@@ -3170,7 +3170,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Жау",
       "fields": [
         {
@@ -3197,7 +3197,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Жау",
       "fields": [
         {
@@ -3224,7 +3224,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Жау",
       "fields": [
         {
@@ -3251,7 +3251,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Заңгер",
       "fields": [
         {
@@ -3278,7 +3278,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Заңгер",
       "fields": [
         {
@@ -3294,7 +3294,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + заңгер → Заңгер. Ол/олар без бирки.",
+      "explanation": "Ол + заңгер → Заңгер. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -3309,7 +3309,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Заңгер",
       "fields": [
         {
@@ -3336,7 +3336,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Заңгер",
       "fields": [
         {
@@ -3363,7 +3363,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Заңгер",
       "fields": [
         {
@@ -3390,7 +3390,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Заңгер",
       "fields": [
         {
@@ -3417,7 +3417,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Заңгер",
       "fields": [
         {
@@ -3444,7 +3444,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Бай",
       "fields": [
         {
@@ -3460,7 +3460,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + бай → Бай. Ол/олар без бирки.",
+      "explanation": "Ол + бай → Бай. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -3475,7 +3475,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Бай",
       "fields": [
         {
@@ -3502,7 +3502,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Бай",
       "fields": [
         {
@@ -3529,7 +3529,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Бай",
       "fields": [
         {
@@ -3556,7 +3556,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Бай",
       "fields": [
         {
@@ -3583,7 +3583,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Бай",
       "fields": [
         {
@@ -3610,7 +3610,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Бай",
       "fields": [
         {
@@ -3637,7 +3637,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Қонақ",
       "fields": [
         {
@@ -3653,7 +3653,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + қонақ → Қонақ. Ол/олар без бирки.",
+      "explanation": "Ол + қонақ → Қонақ. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -3668,7 +3668,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Қонақ",
       "fields": [
         {
@@ -3695,7 +3695,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Қонақ",
       "fields": [
         {
@@ -3722,7 +3722,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Қонақ",
       "fields": [
         {
@@ -3749,7 +3749,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Қонақ",
       "fields": [
         {
@@ -3776,7 +3776,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Қонақ",
       "fields": [
         {
@@ -3803,7 +3803,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Қонақ",
       "fields": [
         {
@@ -3830,7 +3830,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Жұмыссыз",
       "fields": [
         {
@@ -3846,7 +3846,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + жұмыссыз → Жұмыссыз. Ол/олар без бирки.",
+      "explanation": "Ол + жұмыссыз → Жұмыссыз. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -3861,7 +3861,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Жұмыссыз",
       "fields": [
         {
@@ -3888,7 +3888,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Жұмыссыз",
       "fields": [
         {
@@ -3915,7 +3915,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Жұмыссыз",
       "fields": [
         {
@@ -3942,7 +3942,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Жұмыссыз",
       "fields": [
         {
@@ -3969,7 +3969,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Жұмыссыз",
       "fields": [
         {
@@ -3996,7 +3996,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Жұмыссыз",
       "fields": [
         {
@@ -4023,7 +4023,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Жас",
       "fields": [
         {
@@ -4050,7 +4050,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Жас",
       "fields": [
         {
@@ -4077,7 +4077,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Жас",
       "fields": [
         {
@@ -4104,7 +4104,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Жас",
       "fields": [
         {
@@ -4131,7 +4131,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Жас",
       "fields": [
         {
@@ -4158,7 +4158,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Жас",
       "fields": [
         {
@@ -4174,7 +4174,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + жас → Жас. Ол/олар без бирки.",
+      "explanation": "Ол + жас → Жас. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -4189,7 +4189,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Жас",
       "fields": [
         {
@@ -4216,7 +4216,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Жігіт",
       "fields": [
         {
@@ -4243,7 +4243,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Жігіт",
       "fields": [
         {
@@ -4270,7 +4270,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Жігіт",
       "fields": [
         {
@@ -4297,7 +4297,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Жігіт",
       "fields": [
         {
@@ -4324,7 +4324,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Жігіт",
       "fields": [
         {
@@ -4351,7 +4351,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Жігіт",
       "fields": [
         {
@@ -4367,7 +4367,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + жігіт → Жігіт. Ол/олар без бирки.",
+      "explanation": "Ол + жігіт → Жігіт. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -4382,7 +4382,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Жігіт",
       "fields": [
         {
@@ -4409,7 +4409,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіз + Кедей",
       "fields": [
         {
@@ -4436,7 +4436,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Мен + Кедей",
       "fields": [
         {
@@ -4463,7 +4463,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сен + Кедей",
       "fields": [
         {
@@ -4490,7 +4490,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сендер + Кедей",
       "fields": [
         {
@@ -4517,7 +4517,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Біз + Кедей",
       "fields": [
         {
@@ -4544,7 +4544,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Ол + Кедей",
       "fields": [
         {
@@ -4560,7 +4560,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол + кедей → Кедей. Ол/олар без бирки.",
+      "explanation": "Ол + кедей → Кедей. Ол/олар без личного окончания.",
       "hint": "Ол/олар: голое слово. Остальные — личное окончание.",
       "ruleIds": [
         "ol-zero"
@@ -4575,7 +4575,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
       "lessonId": "2-3",
       "topic": "person",
       "kind": "fields",
-      "title": "Напиши форму (ол — без бирки)",
+      "title": "Напиши форму (ол — без личного окончания)",
       "stimulus": "Сіздер + Кедей",
       "fields": [
         {
@@ -5610,7 +5610,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Он екінші. Наклейка только на последнее слово.",
+      "explanation": "Он екінші. Порядковый суффикс только на последнее слово.",
       "ruleIds": [
         "ordinal"
       ]
@@ -5635,7 +5635,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Қырық бірінші. Наклейка только на последнее слово.",
+      "explanation": "Қырық бірінші. Порядковый суффикс только на последнее слово.",
       "ruleIds": [
         "ordinal"
       ]
@@ -5660,7 +5660,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Жүз тоқсаныншы. Наклейка только на последнее слово.",
+      "explanation": "Жүз тоқсаныншы. Порядковый суффикс только на последнее слово.",
       "ruleIds": [
         "ordinal"
       ]
@@ -5685,7 +5685,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Бес жүз жиырмасыншы. Наклейка только на последнее слово.",
+      "explanation": "Бес жүз жиырмасыншы. Порядковый суффикс только на последнее слово.",
       "ruleIds": [
         "ordinal"
       ]
@@ -5710,7 +5710,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Екі мың жеті жүз қырқыншы. Наклейка только на последнее слово.",
+      "explanation": "Екі мың жеті жүз қырқыншы. Порядковый суффикс только на последнее слово.",
       "ruleIds": [
         "ordinal"
       ]
@@ -5737,7 +5737,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Жиырмасыншымын Сначала порядковое, потом бирка лица.",
+      "explanation": "Жиырмасыншымын Сначала порядковое, потом личное окончание.",
       "ruleIds": [
         "ordinal"
       ]
@@ -5764,7 +5764,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Қырық екіншісіңдер Сначала порядковое, потом бирка лица.",
+      "explanation": "Қырық екіншісіңдер Сначала порядковое, потом личное окончание.",
       "ruleIds": [
         "ordinal"
       ]
@@ -5791,7 +5791,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Бір мың сегіз жүз қырық алтыншымыз Сначала порядковое, потом бирка лица.",
+      "explanation": "Бір мың сегіз жүз қырық алтыншымыз Сначала порядковое, потом личное окончание.",
       "ruleIds": [
         "ordinal"
       ]
@@ -5818,7 +5818,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Үш жүз алпыс үшіншісіз Сначала порядковое, потом бирка лица.",
+      "explanation": "Үш жүз алпыс үшіншісіз Сначала порядковое, потом личное окончание.",
       "ruleIds": [
         "ordinal"
       ]
@@ -5845,7 +5845,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Елу жеті мың бес жүз он тоғызыншысың Сначала порядковое, потом бирка лица.",
+      "explanation": "Елу жеті мың бес жүз он тоғызыншысың Сначала порядковое, потом личное окончание.",
       "ruleIds": [
         "ordinal"
       ]
@@ -5895,7 +5895,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([{
           ]
         }
       ],
-      "explanation": "Ол жігіт. Без бирки.",
+      "explanation": "Ол жігіт. Без личного окончания.",
       "ruleIds": [
         "ol-zero"
       ]
