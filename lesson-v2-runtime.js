@@ -82,10 +82,14 @@
  }
  function learningTracks(p,allQuestions){
    const byId=new Map(allQuestions.map(q=>[q.id,q]));
+   const topicForIds=ids=>{
+     const topics=[...new Set(ids.map(id=>byId.get(id)).filter(Boolean).map(q=>q.topic).filter(Boolean))];
+     return topics.length===1?topics[0]:'rules';
+   };
    return (p.stages||[]).map((s,i)=>{
      const ids=s.core_ids.filter(id=>byId.has(id));
      const items=ids.slice(0,4).map(id=>{const q=byId.get(id);return {front:q.stimulus,back:(q.fields&&q.fields[0]&&q.fields[0].answers||[])[0]||'',cue:q.explanation||''};});
-     return {id:'v2-track-'+stableSlug(s.id),title:s.title,topic:'verbs',courseLesson:p.lesson_id,intro:'Практика после объяснения. Можно повторять столько, сколько нужно.',items:[],questionIds:ids,chunks:[{title:s.title,explanation:'Сначала попробуй без подсказки. Ошибка вернётся позже на другом примере.',items,questionIds:ids,associationKey:'stage:'+s.id}]};
+     return {id:'v2-track-'+stableSlug(s.id),title:s.title,topic:topicForIds(ids),courseLesson:p.lesson_id,intro:'Практика после объяснения. Можно повторять столько, сколько нужно.',items:[],questionIds:ids,chunks:[{title:s.title,explanation:'Сначала попробуй без подсказки. Ошибка вернётся позже на другом примере.',items,questionIds:ids,associationKey:'stage:'+s.id}]};
    });
  }
  function stagePlans(p){
@@ -197,8 +201,28 @@
    return homeworkMeta(raw);
  }
  function practiceForRule(lessonId,ruleId,limit=12){
-   if(!installed.has(lessonId)||!root.COURSE)return [];
-   const rows=(root.COURSE.questions||[]).filter(q=>q&&q.lessonId===lessonId&&q.topic==='verbs'&&(q.ruleIds||[]).includes(ruleId));
+   const p=installed.get(lessonId);
+   if(!p||!root.COURSE||!ruleId)return [];
+   const lessonRows=(root.COURSE.questions||[]).filter(q=>q&&q.lessonId===lessonId);
+   const byId=new Map(lessonRows.map(q=>[q.id,q]));
+   const candidateIds=[],seen=new Set();
+   const add=id=>{if(id&&byId.has(id)&&!seen.has(id)){seen.add(id);candidateIds.push(id);}};
+   // Stage mapping is a fallback for legacy/non-verb banks that do not carry ruleIds.
+   // A multi-rule stage becomes eligible only after every rule attached to that stage
+   // has already appeared in theory, so optional practice cannot leak future material.
+   const grammarLesson=root.GRAMMAR_CHAPTERS&&root.GRAMMAR_CHAPTERS.LESSONS&&root.GRAMMAR_CHAPTERS.LESSONS.find(x=>x&&x.id===lessonId);
+   const ruleOrder=new Map();
+   for(const [i,ch] of ((grammarLesson&&grammarLesson.chapters)||[]).entries())for(const rid of ch.rule_ids||[])if(!ruleOrder.has(rid))ruleOrder.set(rid,i);
+   const currentOrder=ruleOrder.get(ruleId);
+   for(const s of p.stages||[]){
+     const stageRules=s.rule_ids||[];
+     if(!stageRules.includes(ruleId))continue;
+     const safe=stageRules.length<=1||(currentOrder!=null&&stageRules.every(rid=>!ruleOrder.has(rid)||ruleOrder.get(rid)<=currentOrder));
+     if(safe)for(const id of s.core_ids||[])add(id);
+   }
+   // Direct ruleIds are precise and remain supported for every topic.
+   for(const q of lessonRows)if((q.ruleIds||[]).includes(ruleId))add(q.id);
+   const rows=candidateIds.map(id=>byId.get(id)).filter(Boolean);
    const groups=new Map();
    for(const q of rows){
      const key=q.generator&&q.generator.lexeme_id||String(q.stimulus||q.id).split(/[+—]/)[1]||q.id;
