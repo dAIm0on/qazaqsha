@@ -7004,7 +7004,10 @@
         "e42-w72-2",
         "e42-w72-3",
         "e42-w72-4",
-        "e42-w72-5"
+        "e42-w72-5",
+        "gold:4-2:meaning-12",
+        "gold:4-2:da-01",
+        "gold:4-2:except-01"
       ],
       "required_independent_ids": [
         "e42-w71-1",
@@ -7016,12 +7019,18 @@
         "e42-w72-2",
         "e42-w72-3",
         "e42-w72-4",
-        "e42-w72-5"
+        "e42-w72-5",
+        "gold:4-2:meaning-12",
+        "gold:4-2:da-01",
+        "gold:4-2:except-01"
       ],
       "rule_ids": [
         "v2:4-2:person",
         "v2:4-2:neg",
-        "v2:4-2:assim"
+        "v2:4-2:assim",
+        "v2:4-2:meaning",
+        "v2:4-2:da",
+        "v2:4-2:except"
       ],
       "min_independent_ratio": 0.8,
       "max_presentations": 24,
@@ -7204,5 +7213,1333 @@
       "words",
       "external_test"
     ]
-  }
+  },
+  "generated_questions": [
+    {
+      "id": "gold:4-2:meaning-01",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "бару — идти. Напиши: «Я пошёл».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "бардым",
+            "мен бардым",
+            "Мен бардым"
+          ]
+        }
+      ],
+      "explanation": "Бардым — действие уже произошло.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:meaning-02",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "келу — приходить. Напиши: «Он пришёл».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "келді",
+            "ол келді",
+            "Ол келді"
+          ]
+        }
+      ],
+      "explanation": "Келді — действие уже произошло.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:meaning-03",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "ашу — открывать. Напиши: «Он открыл».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ашты",
+            "ол ашты",
+            "Ол ашты"
+          ]
+        }
+      ],
+      "explanation": "Ашты — прошедшая форма.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:meaning-04",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "жазу — писать. Напиши: «Я писал / написал».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "жаздым",
+            "мен жаздым",
+            "Мен жаздым"
+          ]
+        }
+      ],
+      "explanation": "Жаздым подходит для «писал / написал» в этом уроке.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:meaning-05",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "түсіну — понимать. Напиши: «Ты понял».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "түсіндің",
+            "сен түсіндің",
+            "Сен түсіндің"
+          ]
+        }
+      ],
+      "explanation": "Түсіндің — прошедшая форма для сен.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:meaning-06",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "шығу — выходить. Напиши: «Он вышел».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "шықты",
+            "ол шықты",
+            "Ол шықты"
+          ]
+        }
+      ],
+      "explanation": "Шығу → шықты.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:meaning-07",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "кешігу — опаздывать. Напиши: «Мы опоздали».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "кешіктік",
+            "біз кешіктік",
+            "Біз кешіктік"
+          ]
+        }
+      ],
+      "explanation": "Кешіктік — прошедшая форма для біз.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:meaning-08",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "отыру — сидеть. Напиши: «Он сидел».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "отырды",
+            "ол отырды",
+            "Ол отырды"
+          ]
+        }
+      ],
+      "explanation": "Отырды — обычная прошедшая форма.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:meaning-09",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "тұру — стоять. Напиши: «Мы стояли».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "тұрдық",
+            "біз тұрдық",
+            "Біз тұрдық"
+          ]
+        }
+      ],
+      "explanation": "Тұрдық — прошедшая форма для біз.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:meaning-10",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "жүру — ходить. Напиши: «Ты ходил».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "жүрдің",
+            "сен жүрдің",
+            "Сен жүрдің"
+          ]
+        }
+      ],
+      "explanation": "Жүрдің — прошедшая форма для сен.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:meaning-11",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "тігу — шить. Напиши: «Он шил».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "тікті",
+            "ол тікті",
+            "Ол тікті"
+          ]
+        }
+      ],
+      "explanation": "Тігу → тікті.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:meaning-12",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Уже было",
+      "stimulus": "жату — лежать. Напиши: «Я лежал / лёг».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "жаттым",
+            "мен жаттым",
+            "Мен жаттым"
+          ]
+        }
+      ],
+      "explanation": "Жаттым — прошедшая форма; другие функции жату здесь не нужны.",
+      "rule_ids": [
+        "v2:4-2:meaning"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-01",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Переведи: «Он говорит / скажет».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ол сөйлейді",
+            "Ол сөйлейді"
+          ]
+        }
+      ],
+      "explanation": "Сөйлейді — форма 4–1.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-02",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Переведи: «Он говорил».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ол сөйледі",
+            "Ол сөйледі"
+          ]
+        }
+      ],
+      "explanation": "Сөйледі — прошедшее 4–2.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-03",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Переведи: «Он пишет / напишет».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ол жазады",
+            "Ол жазады"
+          ]
+        }
+      ],
+      "explanation": "Жазады — форма 4–1.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-04",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Переведи: «Он писал / написал».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ол жазды",
+            "Ол жазды"
+          ]
+        }
+      ],
+      "explanation": "Жазды — прошедшее 4–2.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-05",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Переведи: «Я иду / пойду».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "мен барамын",
+            "Мен барамын",
+            "барамын",
+            "Барамын"
+          ]
+        }
+      ],
+      "explanation": "Барамын — форма 4–1.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-06",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Переведи: «Я пошёл».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "мен бардым",
+            "Мен бардым",
+            "бардым",
+            "Бардым"
+          ]
+        }
+      ],
+      "explanation": "Бардым — прошедшее 4–2.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-07",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Переведи: «Он не пишет / не напишет».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ол жазбайды",
+            "Ол жазбайды"
+          ]
+        }
+      ],
+      "explanation": "Жазбайды — отрицание 4–1.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-08",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Переведи: «Он не писал / не написал».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ол жазбады",
+            "Ол жазбады"
+          ]
+        }
+      ],
+      "explanation": "Жазбады — прошедшее отрицание 4–2.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-09",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Что значит «Ол сөйлейді»? Напиши по-русски.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Он говорит",
+            "он говорит",
+            "Он скажет",
+            "он скажет",
+            "Он говорит / скажет",
+            "он говорит / скажет"
+          ]
+        }
+      ],
+      "explanation": "Сөйлейді относится к 4–1.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-10",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Что значит «Ол сөйледі»? Напиши по-русски.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Он говорил",
+            "он говорил",
+            "Он сказал",
+            "он сказал"
+          ]
+        }
+      ],
+      "explanation": "Сөйледі — действие уже было.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-11",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Выбери прошедшее и напиши его: жазады / жазды.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "жазды",
+            "Жазды"
+          ]
+        }
+      ],
+      "explanation": "Жазды — прошедшее.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:contrast-12",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Сравни 4–1 и 4–2",
+      "stimulus": "Выбери форму 4–1 и напиши её: сөйлейді / сөйледі.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сөйлейді",
+            "Сөйлейді"
+          ]
+        }
+      ],
+      "explanation": "Сөйлейді — форма 4–1.",
+      "rule_ids": [
+        "v2:4-2:contrast"
+      ],
+      "source_refs": [
+        "school-method",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-01",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Переведи: «Я тоже пошёл».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "мен де бардым",
+            "Мен де бардым"
+          ]
+        }
+      ],
+      "explanation": "Мен де бардым. «Тоже» пишется отдельно.",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-02",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Переведи: «Он тоже пришёл».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ол да келді",
+            "Ол да келді"
+          ]
+        }
+      ],
+      "explanation": "Ол да келді. Да пишется отдельно.",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-03",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Переведи: «Мы тоже открыли».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "біз де аштық",
+            "Біз де аштық"
+          ]
+        }
+      ],
+      "explanation": "Біз де аштық.",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-04",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Переведи: «Ты тоже понял».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сен де түсіндің",
+            "Сен де түсіндің"
+          ]
+        }
+      ],
+      "explanation": "Сен де түсіндің.",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-05",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Переведи: «Они тоже вышли».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "олар да шықты",
+            "Олар да шықты"
+          ]
+        }
+      ],
+      "explanation": "Олар да шықты.",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-06",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Переведи: «Я тоже не писал».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "мен де жазбадым",
+            "Мен де жазбадым"
+          ]
+        }
+      ],
+      "explanation": "Мен де жазбадым.",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-07",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Вставь отдельное «тоже»: Мен __ бардым.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "де"
+          ]
+        }
+      ],
+      "explanation": "После мен: де.",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-08",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Вставь отдельное «тоже»: Ол __ келді.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "да"
+          ]
+        }
+      ],
+      "explanation": "После ол: да.",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-09",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Вставь отдельное «тоже»: Кітап __ болды.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "та"
+          ]
+        }
+      ],
+      "explanation": "После кітап: та.",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-10",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Вставь отдельное «тоже»: Көлік __ болды.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "те"
+          ]
+        }
+      ],
+      "explanation": "После көлік: те.",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-11",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Исправь написание: мендебардым.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "мен де бардым",
+            "Мен де бардым"
+          ]
+        }
+      ],
+      "explanation": "Частица де пишется отдельно.",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:da-12",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "«Тоже»",
+      "stimulus": "Что значит «Мен де бардым»? Напиши по-русски.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Я тоже пошел",
+            "Я тоже пошёл",
+            "я тоже пошел",
+            "я тоже пошёл"
+          ]
+        }
+      ],
+      "explanation": "Мен де бардым — «Я тоже пошёл».",
+      "rule_ids": [
+        "v2:4-2:da"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-sequence"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-01",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Оқу — читать/учиться. Напиши: «Я читал / учился».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "оқыдым",
+            "мен оқыдым",
+            "Мен оқыдым"
+          ]
+        }
+      ],
+      "explanation": "Оқу → оқыдым.",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-02",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Оқу — читать/учиться. Напиши: «Он читал / учился».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "оқыды",
+            "ол оқыды",
+            "Ол оқыды"
+          ]
+        }
+      ],
+      "explanation": "Оқу → оқыды.",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-03",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Оқу. Напиши: «Я не читал / не учился».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "оқымадым",
+            "мен оқымадым",
+            "Мен оқымадым"
+          ]
+        }
+      ],
+      "explanation": "Оқу → оқымадым.",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-04",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Есту — слышать. Напиши: «Я слышал».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "естідім",
+            "мен естідім",
+            "Мен естідім"
+          ]
+        }
+      ],
+      "explanation": "Есту → естідім.",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-05",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Есту — слышать. Напиши: «Он слышал».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "естіді",
+            "ол естіді",
+            "Ол естіді"
+          ]
+        }
+      ],
+      "explanation": "Есту → естіді.",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-06",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Есту. Напиши: «Я не слышал».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "естімедім",
+            "мен естімедім",
+            "Мен естімедім"
+          ]
+        }
+      ],
+      "explanation": "Есту → естімедім.",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-07",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Исправь: оқтым.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "оқыдым",
+            "Оқыдым"
+          ]
+        }
+      ],
+      "explanation": "Для оқу запоминаем оқыдым.",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-08",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Исправь: оқудым.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "оқыдым",
+            "Оқыдым"
+          ]
+        }
+      ],
+      "explanation": "Для оқу запоминаем оқыдым.",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-09",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Исправь: есттім.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "естідім",
+            "Естідім"
+          ]
+        }
+      ],
+      "explanation": "Для есту запоминаем естідім.",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-10",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Исправь: естудім.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "естідім",
+            "Естідім"
+          ]
+        }
+      ],
+      "explanation": "Для есту запоминаем естідім.",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-11",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Что значит «Оқыдым»? Напиши по-русски.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Я читал",
+            "я читал",
+            "Я учился",
+            "я учился",
+            "Я читал / учился",
+            "я читал / учился"
+          ]
+        }
+      ],
+      "explanation": "Оқыдым — «я читал / учился».",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    },
+    {
+      "id": "gold:4-2:except-12",
+      "origin": "research",
+      "topic": "verbs",
+      "title": "Оқу и есту",
+      "stimulus": "Что значит «Естідім»? Напиши по-русски.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Я слышал",
+            "я слышал"
+          ]
+        }
+      ],
+      "explanation": "Естідім — «я слышал».",
+      "rule_ids": [
+        "v2:4-2:except"
+      ],
+      "source_refs": [
+        "school-method",
+        "school-homework",
+        "research-full",
+        "research-errors",
+        "research-bank"
+      ]
+    }
+  ]
 }
