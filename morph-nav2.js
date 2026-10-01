@@ -298,11 +298,12 @@ function sectionEndsAt(row,stepIndex){
  return !!(first&&first.type==='subheading');
 }
 function sourcePracticeHtml(row,stepIndex){
- if(!sectionEndsAt(row,stepIndex))return '';
+ if(row.practiceMode==='observation_only'||!sectionEndsAt(row,stepIndex))return '';
  const heading=sectionHeadingFor(row,stepIndex);
  const C=root.FreePracticeContent;
  if(!heading||!C||!C.anchorsFor||!C.forBlock)return '';
  const allowed=new Set((row.practiceRoutes||[]).map(String));
+ if(!allowed.size)return '';
  const rows=(C.anchorsFor(heading)||[]).filter(x=>{
   const route=x.blockId+':'+(x.subcase||'');
   if(allowed.size&&!allowed.has(route))return false;
