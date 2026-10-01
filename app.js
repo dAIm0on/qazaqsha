@@ -2758,6 +2758,14 @@
    status:catalogTrainerStatus
  };
  renderRules();renderMaterials();
+ // Validate saved queues only after their lazy lesson banks have populated byId.
+ // Otherwise a reload discards the session (including the unfinished answer).
+ if(savedSession){
+   const resumeLessons=new Set([savedSession.courseBlock,savedSession.hwLesson,
+     savedSession.pathPracticeReturn&&savedSession.pathPracticeReturn.lessonId,
+     savedSession.view==='path'&&state.grammarPath&&state.grammarPath.lessonId]);
+   for(const id of resumeLessons)if(id)ensureV2(id);
+ }
  const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','course','phrase','transfer','contrast','numbers','remediation','words','exam','homework','chunks'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){
    variants=savedSession.variants||{};
