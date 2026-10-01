@@ -110,10 +110,11 @@ function build(){
  const byText=new Map(rows.map(l=>[l.text,l]));
  const need=['мектеп','қала','бала','үй','кітап','дос'];
  for(const text of need)if(!byText.get(text))return cards;
- const school=byText.get('мектеп'),city=byText.get('қала'),child=byText.get('бала');
+ const school=byText.get('мектеп'),city=byText.get('қала'),child=byText.get('бала'),friend=byText.get('дос');
  cards.push(meaningCard('mean:school:go','free.harmony.meaning_dat','direction',school,'Человек ещё не в школе и идёт туда. Какой смысл?','куда','где','куда'));
  cards.push(meaningCard('mean:city:go','free.harmony.meaning_dat','direction',city,'Человек едет в город и ещё не приехал. Какой смысл?','куда','где','куда'));
  cards.push(meaningCard('mean:child:give','free.harmony.meaning_dat','addressee',child,'Книгу дают ребёнку. Никто никуда не идёт. Какой смысл?','кому','куда','кому'));
+ cards.push(meaningCard('mean:friend:give','free.harmony.meaning_dat','addressee',friend,'Подарок дают другу. Никто никуда не идёт. Какой смысл?','кому','куда','кому'));
  cards.push(meaningCard('mean:school:in','free.voice.direction_place','meaning',school,'Человек уже находится в школе. Какой смысл?','где','куда','где'));
  cards.push(meaningCard('mean:city:in','free.voice.direction_place','meaning',city,'Человек уже в городе. Какой смысл?','где','куда','где'));
  const three=[['куда','DAT'],['где','LOC'],['откуда','ABL']];
