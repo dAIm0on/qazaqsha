@@ -8,8 +8,14 @@ const vm=require('node:vm');
 const Schema=require('./lesson-v2-schema.js');
 
 const lessonIds=['2-1','2-2','2-3'];
-const rawLessons=lessonIds.map(id=>JSON.parse(fs.readFileSync(path.join(__dirname,'lessons',id,'lesson.json'),'utf8')));
-const packages=rawLessons.map(Schema.validate);
+const compiledText=fs.readFileSync(path.join(__dirname,'compiled-lessons-v2.js'),'utf8');
+const compiledJson=compiledText.replace(/^.*?window\\.LESSON_V2_COMPILED\\s*=\\s*/s,'').replace(/;\\s*$/s,'');
+const compiledAll=JSON.parse(compiledJson);
+const packages=lessonIds.map(id=>{
+  const p=compiledAll.find(x=>x.lesson_id===id);
+  assert.ok(p,'compiled package missing '+id);
+  return Schema.validate(p);
+});
 const registered={};
 
 const mock={
