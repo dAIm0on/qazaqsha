@@ -9,7 +9,7 @@ const Schema=require('./lesson-v2-schema.js');
 
 const lessonIds=['2-1','2-2','2-3'];
 const compiledText=fs.readFileSync(path.join(__dirname,'compiled-lessons-v2.js'),'utf8');
-const compiledJson=compiledText.replace(/^.*?window\\.LESSON_V2_COMPILED\\s*=\\s*/s,'').replace(/;\\s*$/s,'');
+const compiledJson=compiledText.replace(/^.*?window\.LESSON_V2_COMPILED\s*=\s*/s,'').replace(/;\s*$/s,'');
 const compiledAll=JSON.parse(compiledJson);
 const packages=lessonIds.map(id=>{
   const p=compiledAll.find(x=>x.lesson_id===id);
