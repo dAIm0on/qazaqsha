@@ -129,7 +129,7 @@ test('K2.1-16 service worker caches both standalone trainer files',()=>{
   const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
   assert.ok(sw.includes('"harmony-letter-trainer.js"'));
   assert.ok(sw.includes('"personal-trainers.js"'));
-  assert.ok(/qazaq-offline-live-20261001-words-blur/.test(sw));
+  assert.ok(/qazaq-offline-live-20261001-offline-shell/.test(sw));
 });
 
 
