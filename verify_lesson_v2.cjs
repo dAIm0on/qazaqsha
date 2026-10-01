@@ -67,12 +67,17 @@ for(const blocked of fixtures.blocked_future)assert.equal(practiceBlob.includes(
 for(const q of [...p.original_exercises,...p.generated_questions]){
   if(q.topic==='verbs'&&q.stimulus.includes('+'))assert.ok(q.stimulus.includes('—'),q.id+' grammar prompt lacks translation');
 }
-ok('future grammar blocked + grammar practice can work without vocabulary');
+assert.ok(p.original_exercises.every(q=>q.topic==='verbs'),'all 71 school cards must explicitly use topic=verbs');
+const futureCheck=p.theory.find(x=>x.id==='theory:4-1:meaning').checks[0];
+for(const alias of ['да','иә','Иә','yes'])assert.ok(futureCheck.answers.includes(alias),'missing future alias '+alias);
+for(const rid of ['v2:4-1:stem','v2:4-1:pronoun-drop','v2:4-1:introductions','v2:4-1:also'])assert.ok(p.generated_questions.some(q=>(q.ruleIds||[]).includes(rid)),'missing authored practice '+rid);
+ok('future grammar blocked + explicit verbs topic + aliases + optional-practice coverage');
 
 assert.equal(p.original_exercises.length,71);
 assert.equal(p.homework.source_items.length,4);
 assert.equal(p.homework.exercise_ids.length,71);
 assert.ok(p.homework.external_tasks.some(x=>/PerehVremyaBezIsk/.test(x.url)));
+assert.ok(p.homework.source_items.some(x=>/24 часов/.test(x.text)));
 assert.equal(p.vocabulary.filter(x=>x.role==='target').length,10);
 const also=p.vocabulary.find(x=>x.id==='vocab:4-1:also');
 assert.deepEqual(also.forms,['да','де','та','те']);
@@ -99,8 +104,9 @@ const compiledAll=JSON.parse(compiledJson);
 const compiled41=compiledAll.find(x=>x.lesson_id==='4-1');
 assert.ok(compiled41,'compiled snapshot has no lesson 4-1');
 assert.deepEqual(compiled41,expectedCompiled);
-assert.equal(expectedCompiled.generated_questions.length,345);
-ok('compiler expands 322 generated forms into normalized runtime data');
+assert.equal(p.generated_questions.length,28);
+assert.equal(expectedCompiled.generated_questions.length,350);
+ok('compiler keeps 28 authored practice cards and expands 322 generated forms');
 
 const bad=JSON.parse(JSON.stringify(raw));
 bad.theory[0].source_refs=['missing-source'];
