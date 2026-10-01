@@ -9,7 +9,7 @@ const Schema=require('./lesson-v2-schema.js');
 function ok(m){console.log('OK',m);}
 
 const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20261001-lesson-4-1'"));
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20261001-v2-resume-p0'"));
 ok('SW pin words-error-lemma (error9 runtime kept)');
 
 const runtime=fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8');
