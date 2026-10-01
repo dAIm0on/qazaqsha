@@ -34,7 +34,8 @@
  let state=P.empty(),savedSession=null,storageAvailable=true,storageReadError=null;
  try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);}}
  catch(error){storageAvailable=false;storageReadError=error;}
- if(!state.prefs.lettersChosen&&typeof matchMedia==='function'&&matchMedia('(max-width:690px)').matches)state.prefs.letters=true;
+ // Letter row must always show on text-input surfaces (any width). Pref defaults on; mount no longer gates on max-width.
+ if(!state.prefs.lettersChosen)state.prefs.letters=true;
  if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
  window.ExplainDepth={
    get(id){const key=String(id||''),chosen=state.explainDepth&&state.explainDepth[key];if(chosen==='open')return true;if(chosen==='closed')return false;if(/^T2[4-7]_/.test(key)||/^T2[89]_|^T3[0-9]_|^T4[0-2]_/.test(key))return false;return true;},
@@ -79,41 +80,260 @@
    return 'practice';
  }
  function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}
- let kbScrollLock=false;
+ let kbScrollLock=false,typingFocus=false,vvBaseline=0,vvFocusPoll=null;
+ /* iOS Safari often shrinks window.innerHeight with the keyboard, so
+    innerHeight-vv.height≈0. Keep a closed-keyboard baseline and treat
+    focused typing + VV shrink vs baseline as open. */
+ function captureVvBaseline(force){
+   const vv=window.visualViewport;
+   if(!vv)return;
+   const off=Math.max(0,vv.offsetTop||0);
+   const gapLayout=window.innerHeight-vv.height-off;
+   if(force||(!typingFocus&&gapLayout<40)){
+     vvBaseline=Math.max(vvBaseline||0,window.innerHeight,vv.height+off);
+   }
+   if(!vvBaseline)vvBaseline=Math.max(window.innerHeight,vv.height);
+ }
+ function vvKeyboardGap(){
+   const vv=window.visualViewport;
+   if(!vv)return {open:false,vv:null,gap:0};
+   captureVvBaseline(false);
+   const off=Math.max(0,vv.offsetTop||0);
+   const gapLayout=window.innerHeight-vv.height-off;
+   const gapBase=Math.max(0,(vvBaseline||0)-vv.height-off);
+   const gap=Math.max(gapLayout,gapBase);
+   /* Threshold 80 normally; while a practice text field is focused, 50 is
+      enough (keyboard animation / accessory) so Слова gets typing-compact. */
+   const thresh=typingFocus?50:80;
+   const open=gap>thresh;
+   return {open,vv,gap,gapLayout,gapBase};
+ }
+ const IOS_KB_ACCESSORY=44; /* iOS QuickType / Done bar — keep Проверить above it */
+ function ensureTargetAboveDock(){
+   /* Compact only: scroll .typing-scroll so target/prompt stays above the dock.
+      Never page-level scrollIntoView (hides the prompt under the input). */
+   const sc=document.querySelector('.typing-scroll');
+   if(!sc)return;
+   const dock=document.querySelector('.typing-dock')||document.querySelector('#practice-dock')||document.querySelector('#path-form.typing-dock');
+   const target=sc.querySelector('.practice-prompt,#question-title,.stimulus,.phase-label')||sc.firstElementChild;
+   if(!dock||!target){try{sc.scrollTop=0;}catch{}return;}
+   const pad=6;
+   const scTop=sc.getBoundingClientRect().top;
+   let tRect=target.getBoundingClientRect();
+   const dockTop=dock.getBoundingClientRect().top;
+   /* prompt bottom must stay ≤ dock top (target NEVER under the input) */
+   if(tRect.bottom>dockTop-pad){
+     sc.scrollTop+=Math.ceil(tRect.bottom-(dockTop-pad));
+     tRect=target.getBoundingClientRect();
+   }
+   if(tRect.top<scTop+pad){
+     sc.scrollTop-=Math.ceil((scTop+pad)-tRect.top);
+   }
+ }
+ function scrollFieldAndStrip(field){
+   /* In typing-compact: only scroll .typing-scroll; forbid page scrollIntoView. */
+   if(document.documentElement.classList.contains('typing-compact')){
+     ensureTargetAboveDock();
+     return;
+   }
+   if(field)try{field.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
+   const strip=document.querySelector('.typing-strip');
+   if(strip){
+     try{strip.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
+   }
+ }
+ function clearTypingShellStyles(){
+   document.querySelectorAll('#answer-form,.path-paper:has(#path-form),.typing-dock,.practice-dock.typing-dock,#path-form.typing-dock,.typing-strip,.typing-scroll').forEach(el=>{
+     el.style.top='';el.style.left='';el.style.width='';el.style.height='';
+     el.style.bottom='';el.style.right='';el.style.position='';
+     el.style.paddingBottom='';el.style.maxHeight='';el.style.minHeight='';
+   });
+   document.documentElement.style.removeProperty('--typing-scroll-max');
+   document.documentElement.style.removeProperty('--dock-content-h');
+ }
+ function pinDockToVisualViewport(dock,vv,left,width){
+   /* Dock ONLY to visualViewport: top = vv.offsetTop + vv.height − barH.
+      barH = contentH + IOS_KB_ACCESSORY (~44). Gap below dock clears accessory;
+      do not pad/height-inflate the dock (would squash input/Проверить).
+      Never position:fixed; bottom:0 against the layout window. */
+   if(!dock||!vv)return 0;
+   dock.style.height='';
+   dock.style.paddingBottom='';
+   dock.style.bottom='auto';
+   dock.style.right='auto';
+   dock.style.left=left+'px';
+   dock.style.width=width+'px';
+   const contentH=Math.max(48,Math.round(dock.getBoundingClientRect().height||dock.offsetHeight||0));
+   const barH=contentH+IOS_KB_ACCESSORY;
+   const dockTop=vv.offsetTop+vv.height-barH;
+   dock.style.position='fixed';
+   dock.style.top=Math.round(dockTop)+'px';
+   return barH;
+ }
+ function anchorTypingStrips(open,vv){
+   if(!open||!vv){
+     clearTypingShellStyles();
+     return;
+   }
+   /* kb-compact9: NEVER position:fixed the whole #answer-form / .path-paper
+      (that orphans ←Назад / chrome). Only .typing-dock is VV-fixed:
+      top = vv.offsetTop + vv.height − barH (barH = contentH + ~44 accessory).
+      Scroll ONLY .typing-scroll. Do NOT lock html/body overflow:hidden.
+      Do NOT use position:fixed; bottom:0 against the layout window.
+      Under compact, hide .bottom-nav so it cannot cover Проверить. */
+   const left=Math.round(vv.offsetLeft||0);
+   const width=Math.round(vv.width);
+   const height=Math.round(vv.height);
+   const view=document.body.getAttribute('data-view');
+   function constrainTypingScroll(root,dockTop){
+     const sc=root&&root.querySelector('.typing-scroll');
+     if(!sc)return;
+     /* Keep chrome (practice-head / path crumb back) above the scroll body. */
+     const head=document.querySelector('.practice-head:not([hidden])')||root.querySelector('.path-crumb')||null;
+     let topEdge=Math.round(vv.offsetTop||0);
+     if(head){
+       const hr=head.getBoundingClientRect();
+       if(hr.height>0)topEdge=Math.max(topEdge,Math.round(hr.bottom));
+     }else{
+       const sr=sc.getBoundingClientRect();
+       if(sr.top>0)topEdge=Math.max(topEdge,Math.round(sr.top));
+     }
+     const maxH=Math.max(72,Math.round(dockTop-topEdge-8));
+     sc.style.maxHeight=maxH+'px';
+     document.documentElement.style.setProperty('--typing-scroll-max',maxH+'px');
+   }
+   if(view==='practice'){
+     const form=$('#answer-form');
+     const dock=form&&(form.querySelector('.typing-dock')||form.querySelector('#practice-dock'));
+     if(form&&dock){
+       document.querySelectorAll('#answer-form .typing-strip').forEach(strip=>{
+         strip.style.top='';strip.style.left='';strip.style.width='';strip.style.bottom='';strip.style.position='';
+       });
+       /* Form stays in normal flow — chrome/back remain reachable. */
+       form.style.position='';form.style.left='';form.style.top='';
+       form.style.width='';form.style.height='';form.style.bottom='';form.style.right='';
+       const barH=pinDockToVisualViewport(dock,vv,left,width);
+       const contentH=Math.max(48,Math.round(dock.getBoundingClientRect().height||0));
+       form.style.paddingBottom=contentH+'px'; /* in-flow spacer for fixed dock */
+       document.documentElement.style.setProperty('--dock-content-h',contentH+'px');
+       const dockTop=vv.offsetTop+vv.height-barH;
+       constrainTypingScroll(form,dockTop);
+     }
+   }
+   if(view==='path'){
+     const paper=document.querySelector('.path-paper:has(#path-form)');
+     const dock=paper&&(paper.querySelector('#path-form.typing-dock')||paper.querySelector('.typing-dock')||paper.querySelector('#path-form'));
+     if(paper&&dock){
+       document.querySelectorAll('#path-form .typing-strip').forEach(strip=>{
+         strip.style.top='';strip.style.left='';strip.style.width='';strip.style.bottom='';strip.style.position='';
+       });
+       paper.style.position='';paper.style.left='';paper.style.top='';
+       paper.style.width='';paper.style.height='';paper.style.bottom='';paper.style.right='';
+       const barH=pinDockToVisualViewport(dock,vv,left,width);
+       const contentH=Math.max(48,Math.round(dock.getBoundingClientRect().height||0));
+       paper.style.paddingBottom=contentH+'px';
+       document.documentElement.style.setProperty('--dock-content-h',contentH+'px');
+       const dockTop=vv.offsetTop+vv.height-barH;
+       constrainTypingScroll(paper,dockTop);
+     }
+   }
+   /* Morph / free-practice: strip docked with same VV formula + accessory. */
+   if(view==='morph'){
+     document.querySelectorAll('.typing-strip').forEach(strip=>{
+       strip.style.position='relative';strip.style.paddingBottom='';strip.style.height='';
+       const contentH=Math.max(strip.offsetHeight||0,Math.round(strip.getBoundingClientRect().height)||0);
+       const barH=contentH+IOS_KB_ACCESSORY;
+       const stripTop=vv.offsetTop+vv.height-barH;
+       strip.style.position='fixed';
+       strip.style.bottom='auto';
+       strip.style.top=Math.round(stripTop)+'px';
+       strip.style.left=left+'px';
+       strip.style.width=width+'px';
+     });
+   }
+ }
  function syncKbInset(){
    if(document.documentElement.hasAttribute('data-kbinset-lock'))return;
-   const vv=window.visualViewport;
-   const inset=vv?Math.max(0,window.innerHeight-vv.height-vv.offsetTop):0;
-   document.documentElement.style.setProperty('--kbinset',Math.round(inset)+'px');
-   const open=inset>80;
+   const info=vvKeyboardGap();
+   const open=info.open,vv=info.vv;
+   const inset=Math.max(0,Math.round(info.gap));
+   document.documentElement.style.setProperty('--kbinset',inset+'px');
    document.documentElement.classList.toggle('keyboard-open',open);
    document.body.classList.toggle('keyboard-open',open);
-   const dock=$('#practice-dock');
-   if(dock)document.documentElement.style.setProperty('--dockh',dock.offsetHeight+'px');
-   const tog=$('#issue-toggle');
-   if(tog)tog.hidden=open||(inset>48&&document.body.getAttribute('data-view')==='practice');
-   if(open&&!kbScrollLock&&document.body.getAttribute('data-view')==='practice'){
-     kbScrollLock=true;
-     const field=lastTextInput||$('#answer-0');
-     if(field&&(!dock||!dock.contains(field))){
-       const r=field.getBoundingClientRect();
-       const visBottom=window.innerHeight-inset-(dock?dock.offsetHeight:0)-8;
-       if(r.bottom>visBottom||r.top<8){try{field.scrollIntoView({block:'nearest'});}catch{}}
-     }
-     setTimeout(()=>{kbScrollLock=false;},220);
+   document.documentElement.classList.toggle('typing-compact',open);
+   document.body.classList.toggle('typing-compact',open);
+   const card=$('#exercise');
+   if(card)card.classList.toggle('typing-compact',open&&document.body.getAttribute('data-view')==='practice');
+   const paper=document.querySelector('#path-content .path-paper');
+   if(paper)paper.classList.toggle('typing-compact',open&&document.body.getAttribute('data-view')==='path');
+   /* Apply fixed layout first, then measure+dock (height changes with display:flex). */
+   anchorTypingStrips(open,vv);
+   if(open&&vv){
+     requestAnimationFrame(()=>{
+       anchorTypingStrips(true,window.visualViewport||vv);
+       const dock=$('.typing-dock')||$('#practice-dock')||$('.typing-strip');
+       if(dock)document.documentElement.style.setProperty('--dockh',(dock.offsetHeight+IOS_KB_ACCESSORY)+'px');
+       ensureTargetAboveDock();
+     });
    }
+   const dock=$('.typing-dock')||$('#practice-dock')||$('.typing-strip');
+   if(dock)document.documentElement.style.setProperty('--dockh',(open?dock.offsetHeight+IOS_KB_ACCESSORY:dock.offsetHeight)+'px');
+   const tog=$('#issue-toggle');
+   if(tog)tog.hidden=!!open;
+   if(open&&!kbScrollLock){
+     const view=document.body.getAttribute('data-view');
+     if(view==='practice'||view==='path'||view==='morph'){
+       kbScrollLock=true;
+       const field=lastTextInput||$('#answer-0')||$('#path-answer')||$('#morph-answer')||$('#stage7-answer')||$('#free-write');
+       scrollFieldAndStrip(field);
+       setTimeout(()=>{kbScrollLock=false;anchorTypingStrips(open,window.visualViewport);},220);
+     }
+   }
+ }
+ function isPracticeTypingField(t){
+   return !!(t&&t.matches&&t.matches('input[type=text],textarea')&&t.closest('#answer-form,#path-form,#morph-answer-form,#stage7-answer-form,[data-free-write-form]'));
+ }
+ function armTypingFocusPoll(){
+   if(vvFocusPoll)clearInterval(vvFocusPoll);
+   let n=0;
+   vvFocusPoll=setInterval(()=>{
+     syncKbInset();
+     if(++n>=24){clearInterval(vvFocusPoll);vvFocusPoll=null;}
+   },50);
  }
  if(window.visualViewport){
    window.visualViewport.addEventListener('resize',syncKbInset);
    window.visualViewport.addEventListener('scroll',syncKbInset);
  }
  window.addEventListener('resize',syncKbInset);
+ document.addEventListener('focusin',e=>{
+   const t=e.target;
+   if(!isPracticeTypingField(t))return;
+   lastTextInput=t;
+   typingFocus=true;
+   captureVvBaseline(true);
+   syncKbInset();
+   armTypingFocusPoll();
+   if(document.documentElement.classList.contains('typing-compact'))scrollFieldAndStrip(t);
+ });
+ document.addEventListener('focusout',e=>{
+   if(!isPracticeTypingField(e.target))return;
+   setTimeout(()=>{
+     const ae=document.activeElement;
+     if(isPracticeTypingField(ae))return;
+     typingFocus=false;
+     if(vvFocusPoll){clearInterval(vvFocusPoll);vvFocusPoll=null;}
+     syncKbInset();
+     captureVvBaseline(true);
+   },0);
+ });
+ captureVvBaseline(true);
  syncKbInset();
  function focusAnswer(){
-   const el=$('#answer-0');
-   if(el&&!el.disabled){try{el.focus({preventScroll:false});}catch{el.focus();}}
-   const dock=$('#practice-dock');
-   if(dock&&dock.scrollIntoView)try{dock.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
+   const el=$('#answer-0')||$('#path-answer');
+   if(el&&!el.disabled){try{el.focus({preventScroll:true});}catch{el.focus();}}
+   if(document.documentElement.classList.contains('typing-compact')){scrollFieldAndStrip(el);return;}
+   if(el)try{el.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}
  }
  function captureDraft(){
    const pathInput=$('#path-answer');
@@ -995,13 +1215,14 @@
    const sourceLabel=sourceUrl?`<a href="${esc(sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(source.title)}</a>`:esc(source.title);
    const location=placeLine(q);
    const hasText=(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='number-text'&&!classifierOptions(f));
-   const letters=hasText&&state.prefs.letters;
+   // Always mount Kazakh letter row for text fields — any viewport width, idle+focus (not only prefs/mobile).
+   const letters=hasText;
    const exam=mode==='exam';
    const hw=mode==='homework';
    const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
    const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
    const letterBar=letters?`<div class="letter-keyboard" lang="kk" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div>`:'';
-   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div><span class="mastery-label">${exam?'Экзамен':hw?'Домашка':esc(cfg.labels[records[q.id]?.mastery_level||'NEW'])}</span></div><form id="answer-form"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc(q.phase||(q.source.startsWith('hw')?'Вспомнить':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus):esc(q.stimulus)))}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div class="practice-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="retry-button" hidden>Ещё раз</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div>${letterBar}</div></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></form>`;
+   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div></div><form id="answer-form"><div class="typing-scroll"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc((q.phase&&q.phase!=='Вспомнить')?q.phase:(q.source.startsWith('hw')?'':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title" class="practice-prompt">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]&&!/вспомнить/i.test(reviewReasonMap[q.id])?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus):esc(q.stimulus)))}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></div><div class="practice-dock typing-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}</div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div><div class="typing-strip" id="typing-strip">${letterBar}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="retry-button" hidden>Ещё раз</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div></div></div></form>`;
    const goCard=()=>{if(checked)nextQuestion();else if(isVocabWordsMode()&&retrying&&$('#retry-button')&&!$('#retry-button').hidden)beginVocabRetry();else checkAnswer(q);};
    if(window._qazaqEnter)document.removeEventListener('keydown',window._qazaqEnter);
    window._qazaqEnter=e=>{
@@ -1022,7 +1243,7 @@
    $('#next-button').onclick=nextQuestion;
    if($('#retry-button'))$('#retry-button').onclick=e=>{e.preventDefault();beginVocabRetry();};
    $('#association-button').onclick=()=>openAssociation(q);
-   $$('#answer-form input[type=text]').forEach(el=>el.addEventListener('focus',()=>{lastTextInput=el;syncKbInset();const dock=$('#practice-dock');if(dock&&dock.scrollIntoView)try{dock.scrollIntoView({block:'nearest'});}catch{}}));
+   $$('#answer-form input[type=text]').forEach(el=>el.addEventListener('focus',()=>{lastTextInput=el;syncKbInset();if(document.documentElement.classList.contains('typing-compact'))scrollFieldAndStrip(el);else try{el.scrollIntoView({block:'nearest',inline:'nearest'});}catch{}}));
    $$('[data-letter]').forEach(b=>{
      b.addEventListener('pointerdown',e=>e.preventDefault());
      b.addEventListener('mousedown',e=>e.preventDefault());
@@ -1100,8 +1321,8 @@
    if($('#hint-button'))$('#hint-button').disabled=true;
    if(!$('.letter-keyboard')&&(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='number-text')){
      const keys=document.createElement('div');keys.className='letter-keyboard';keys.lang='kk';keys.innerHTML=[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}">${c}</button>`).join('');
-     const slot=$('.practice-composer .primary-slot');
-     if(slot)slot.before(keys);else box.after(keys);
+     const strip=$('#typing-strip');
+     if(strip)strip.prepend(keys);else{const slot=$('.practice-composer .primary-slot');if(slot)slot.before(keys);else box.after(keys);}
      keys.querySelectorAll('[data-letter]').forEach(b=>b.addEventListener('pointerdown',e=>{
        e.preventDefault();
        const target=lastTextInput||$('#answer-0');if(!target||target.disabled)return;
@@ -1159,7 +1380,7 @@
          if($('#ai-why'))$('#ai-why').onclick=()=>ask('explain_error');
          if($('#ai-rule'))$('#ai-rule').onclick=()=>ask('explain_rule',true);
        }
-       try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}
+       if(!document.documentElement.classList.contains('typing-compact')){try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}}else{const sc=document.querySelector('.typing-scroll');if(sc&&feedback){try{const d=feedback.getBoundingClientRect().bottom-sc.getBoundingClientRect().bottom;if(d>0)sc.scrollTop+=d+8;}catch{}}}
      }
      focusAnswer();return;
    }
@@ -1304,7 +1525,7 @@
      feedback.hidden=false;
      const fr=$('#feedback-retry');if(fr)fr.onclick=e=>{e.preventDefault();beginVocabRetry();};
      bindOffers(feedback);
-     try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}
+     if(!document.documentElement.classList.contains('typing-compact')){try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}}else{const sc=document.querySelector('.typing-scroll');if(sc&&feedback){try{const d=feedback.getBoundingClientRect().bottom-sc.getBoundingClientRect().bottom;if(d>0)sc.scrollTop+=d+8;}catch{}}}
    }else{
    feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Число уже сказало, сколько. Окончание множественного здесь лишнее.</p>':''}${morph}${result.correct?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}${(()=>{const raw=q.explanation||'';if(result.correct)return raw?'<p>'+esc(raw)+'</p>':'';const safe=(window.ExplainOpen&&window.ExplainOpen.safeWrongWhy)?window.ExplainOpen.safeWrongWhy(raw,q):(raw&&window.ExplainOpen&&window.ExplainOpen.spoilsOnWrong&&window.ExplainOpen.spoilsOnWrong(raw,q)?'':raw);return safe?'<p>'+esc(safe)+'</p>':'';})()}<p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
    }
@@ -1365,7 +1586,7 @@
      advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
    }
  }
- function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});focusAnswer();}
+ function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}focusAnswer();}
  function homeworkOpts(){
    const sessionGUnlocked=!!(window.Lesson31Pack?.sessionG?.().length)&&window.Lesson31Pack.sessionG().every(q=>records[q.id]?.seen);
    return {sessionGUnlocked,events:state.events};
@@ -1618,8 +1839,8 @@
    const v2Full=(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(les.id)&&ch.fullExplanation)?`<details class="path-full-v2"><summary>Полное объяснение блока</summary><p>${esc(studentCopy(ch.fullExplanation))}</p></details>`:'';
    const head=`${crumb(les,ch)}<p class="small">Урок ${esc(courseRow?courseRow.label:les.id)} · ${esc(courseRow?courseRow.name:les.title)}</p><p class="small">Глава ${les.chapters.findIndex(c=>c.id===ch.id)+1} из ${les.chapters.length} · ${esc(chTitle)}</p>${v2Full}`;
    const nextBeat=()=>{gp.beat++;save();renderPath();};
-   const letters=state.prefs.letters;
-   const kb=letters?`<div class="letter-keyboard" lang="kk">${[...'әғқңөұүһі'].map(ch=>'<button type="button" lang="kk" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`:'';
+   // Path ask: always show letter row (any width), matching practice text modes.
+   const kb=`<div class="letter-keyboard" lang="kk">${[...'әғқңөұүһі'].map(ch=>'<button type="button" lang="kk" data-letter="'+ch+'">'+ch+'</button>').join('')}</div>`;
    function beatPlain(b){
      if(!b)return '';
      const clip=s=>String(s||'').trim();
@@ -1720,11 +1941,11 @@
      bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='ask'){
-     root.innerHTML=`<div class="panel path-paper">${head}<p class="phase-label">${beat.type==='one_prod'?'Самостоятельно':'Проверь понимание'}</p>
-       <h2>${esc(faceTitle(beat.prompt))}</h2>
+     root.innerHTML=`<div class="panel path-paper">${head}<div class="typing-scroll"><p class="phase-label">${beat.type==='one_prod'?'Самостоятельно':'Проверь понимание'}</p>
+       <h2 class="practice-prompt">${esc(faceTitle(beat.prompt))}</h2>
        ${beat.stem?'<p class="stimulus" lang="kk">'+(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(beat.stem):esc(beat.stem))+'</p>':''}
-       <form id="path-form" class="practice-composer"><div class="composer-row"><input id="path-answer" type="text" lang="kk" enterkeyhint="enter" autocomplete="off" spellcheck="false"><button type="submit" class="primary-button" id="path-check">Проверить</button></div>${kb}
-         <div id="path-fb" class="feedback" hidden></div>
+       <div id="path-fb" class="feedback" hidden></div></div>
+       <form id="path-form" class="practice-composer typing-dock"><div class="composer-row"><input id="path-answer" type="text" lang="kk" enterkeyhint="enter" autocomplete="off" spellcheck="false"></div><div class="typing-strip">${kb}<button type="submit" class="primary-button" id="path-check">Проверить</button></div>
          <div class="lesson-actions">
            <button type="button" class="text-button chrome-back" id="path-back">← Назад</button>
            <button type="button" class="secondary-button" id="path-rule">Подсказка</button>
@@ -1737,6 +1958,7 @@
        const saved=gp.pathDraft;
        if(saved&&saved.chapterId===ch.id&&Number(saved.beat)===gp.beat&&(!saved.lessonId||saved.lessonId===les.id))input.value=saved.value||'';
        input.addEventListener('input',save);
+       input.addEventListener('focus',()=>{lastTextInput=input;syncKbInset();if(document.documentElement.classList.contains('typing-compact'))scrollFieldAndStrip(input);});
        input.focus();
      }
      $$('#path-form [data-letter]').forEach(b=>{b.addEventListener('pointerdown',e=>e.preventDefault());b.onclick=()=>{const s=input.selectionStart||input.value.length,end=input.selectionEnd||s;input.value=input.value.slice(0,s)+b.dataset.letter+input.value.slice(end);const n=s+b.dataset.letter.length;try{input.setSelectionRange(n,n);}catch{}input.dispatchEvent(new Event('input',{bubbles:true}));input.focus();};});
@@ -2403,7 +2625,7 @@
    if(position>0&&queue.length){
      cancelAdvance();abortTutor();draft=null;retrying=false;position--;
      render();
-     const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});
+     if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}
      focusAnswer();
      return;
    }

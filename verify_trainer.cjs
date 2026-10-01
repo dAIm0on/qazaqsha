@@ -983,7 +983,7 @@ const pack23=fs.readFileSync(path.join(__dirname,'lesson-pack-2-3.js'),'utf8');
 assert.ok(/"id": "hw23-4-kk"[\s\S]*?"әже"[\s\S]*?"апа"/.test(pack23));
 assert.ok(/"id": "hw23-5-kk"[\s\S]*?"апа"[\s\S]*?"әже"/.test(pack23));
 assert.ok(/_qazaqEnter/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
-assert.ok(/path-form" class="practice-composer"/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
+assert.ok(/path-form" class="practice-composer/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')),'path-form keeps practice-composer (+ typing-dock)');
 assert.ok(/id="path-go"/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(!/function showHint[\s\S]{0,900}callTutor/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')));
 assert.ok(/уже встречалась/.test(fs.readFileSync(path.join(__dirname,'functions','api','tutor.js'),'utf8')));
@@ -1405,7 +1405,7 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/const CACHE='qazaq-offline-live-20261001-error9-p0'/.test(openSw));
+assert.ok(/const CACHE='qazaq-offline-live-20260930-kb-compact9'/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
@@ -1994,7 +1994,7 @@ assert.ok(/Верно \$\{sessionCorrect\} из/.test(appVocabP1),'words P1 prog
 assert.ok(/countSessionAttempt/.test(appVocabP1),'words P1 skips session counter bump on wrong');
 assert.ok(/function vocabOfferHtml\(/.test(appVocabP1)&&/vocabRole==='used'/.test(appVocabP1),'words P1 no skill-separately mud; used may keep Другой пример');
 assert.ok(!/isVocabWordsMode\(\)[\s\S]{0,80}Проверить этот навык отдельно/.test(appVocabP1.split('function vocabOfferHtml')[1].split('function sameSkillOffers')[0]),'words offer path omits навык отдельно');
-assert.ok(/qazaq-offline-live-20261001-error9-p0/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE error9-p0');
+assert.ok(/qazaq-offline-live-20260930-kb-compact9/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
 ok('Vocab words P1: retry CTA, compact error, correct-only progress, no skill mud');
 
 ok('Astra step 9: wrong answer shows the attempt, the block, and an existing same-skill offer (no expected reveal)');
@@ -2016,7 +2016,126 @@ assert.ok(/#FF5A1F/.test(petCss),'sticker fill #FF5A1F');
 assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-index:22/.test(petCss),'sticker z-index below CTA');
 assert.ok(/tutor-sticker-dot/.test(tutorUiSrc)&&/\$\('#tutor-launch'\)\.onclick=\(e\)=>\{e\.preventDefault\(\);toggle\(\);\}/.test(tutorUiSrc)&&/function toggle\(\)\{[\s\S]*?close\(\);[\s\S]*?open\(\);/.test(tutorUiSrc),'tap sticker toggles ask');
 assert.ok(!/pet-idle\.png/.test(tutorUiSrc),'default companion is not pet-idle');
-assert.ok(/qazaq-offline-live-20261001-error9-p0/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE error9-p0');
+assert.ok(/kb-compact/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE kb-compact');
+assert.ok(/qazaq-offline-live-20260930-kb-compact9/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
+assert.ok(/html\.typing-compact \.question-actions/.test(theme)&&/html\.typing-compact \.secondary-actions/.test(theme)&&/html\.typing-compact \.lesson-actions/.test(theme),'typing-compact hides help wrappers broadly');
+assert.ok(/html\.typing-compact #hint-button/.test(theme)&&/html\.typing-compact #reveal-button/.test(theme)&&/html\.typing-compact #association-button/.test(theme),'typing-compact hides hint/idk/assoc buttons');
+assert.ok(/html\.typing-compact #path-rule/.test(theme)&&/html\.typing-compact #path-idk/.test(theme),'typing-compact hides path help');
+assert.ok(/html\.typing-compact \.session-line/.test(theme)&&/html\.typing-compact \.practice-head/.test(theme)&&/html\.typing-compact \.path-crumb/.test(theme)&&/html\.typing-compact \.morph-progress/.test(theme),'typing-compact hides progress chrome');
+assert.ok(/html\.typing-compact #issue-toggle/.test(theme)&&/html\.typing-compact #tutor-host/.test(theme)&&/html\.typing-compact \.tutor-sticker-dot/.test(theme),'typing-compact hides issue + orange sticker');
+assert.ok(/display:none!important/.test(theme.split('hide help/progress/issue/sticker')[1]||theme),'typing-compact hide block uses display:none!important');
+assert.ok(/body\.typing-compact \.question-actions/.test(theme)&&/\.typing-compact \.lesson-actions/.test(theme),'typing-compact also on body/card');
+
+/* P0 letter-row: always mounted for text modes; compact must not hide; any width. */
+assert.ok(/const letters=hasText;/.test(appSrc)||/const letters=hasText\b/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')),'practice mounts letter-keyboard whenever hasText (not prefs/width)');
+const appLetter=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(!/const letters=hasText&&state\.prefs\.letters/.test(appLetter),'practice letter row not gated on prefs.letters');
+assert.ok(/Path ask: always show letter row/.test(appLetter)||/const kb=`<div class="letter-keyboard"/.test(appLetter),'path ask always mounts letter-keyboard');
+assert.ok(!/matchMedia\('\(max-width:690px\)'\)\.matches\)state\.prefs\.letters=true/.test(appLetter),'letters default no longer mobile-only in app.js');
+const progSrc=fs.readFileSync(path.join(__dirname,'progress.js'),'utf8');
+assert.ok(/prefs:\{letters:true/.test(progSrc),'progress empty defaults letters:true');
+assert.ok(!/matchMedia\('\(max-width:690px\)'\)\.matches\)state\.prefs\.letters=true/.test(progSrc),'progress migrate letters default not mobile-only');
+assert.ok(!/html\.typing-compact[^,{]*\.letter-keyboard[^,{]*\{[^}]*display:\s*none/.test(theme.replace(/\s+/g,' ')),'typing-compact CSS must not display:none letter-keyboard');
+assert.ok(!/html\.typing-compact[^,{]*\.typing-strip[^,{]*\{[^}]*display:\s*none/.test(theme.replace(/\s+/g,' ')),'typing-compact CSS must not display:none typing-strip');
+assert.ok(!/html\.typing-compact[^,{]*\.morph-keys[^,{]*\{[^}]*display:\s*none/.test(theme.replace(/\s+/g,' ')),'typing-compact CSS must not display:none morph-keys');
+assert.ok(/letter-row always visible: typing-compact must NOT hide/.test(theme),'explicit CSS guard keeps letter-row visible in compact');
+assert.ok(/@media\(min-width:691px\)\{[\s\S]*?\.letter-keyboard[\s\S]*?display:flex/.test(theme),'wide viewport CSS keeps letter-keyboard flex/visible');
+ok('P0 letter-row always on text surfaces any width; compact does not hide');
+
+/* QA tip kb-compact5 keep: iOS VV detection. */
+const appKb5=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+assert.ok(/vvBaseline/.test(appKb5)&&/captureVvBaseline/.test(appKb5),'VV baseline for iOS innerHeight shrink');
+assert.ok(/typingFocus/.test(appKb5)&&/armTypingFocusPoll/.test(appKb5),'focus poll recompute while keyboard animates');
+assert.ok(/thresh=typingFocus\?50:80/.test(appKb5)||/typingFocus\?50:80/.test(appKb5),'focused threshold 50, else 80');
+assert.ok(/gapBase/.test(appKb5)&&/vvBaseline/.test(appKb5),'gap uses max\(layout, baseline\)');
+assert.ok(/vv\.offsetTop\+vv\.height-barH/.test(appKb5),'morph strip docks with vv.offsetTop+vv.height-barH');
+assert.ok(/focusout/.test(appKb5)&&/isPracticeTypingField/.test(appKb5),'focusout clears typingFocus on practice fields');
+const themeKb5=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
+assert.ok(/Do NOT add env\(safe-area-inset-bottom\)/.test(themeKb5),'compact strip docs: no safe-area pad');
+assert.ok(/qazaq-offline-live-20260930-kb-compact9/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
+ok('P0 kb-compact5: iOS VV baseline+focus poll kept');
+
+/* QA tip kb-compact6: scroll-body + dock — prompt scrollable, dock at VV bottom. */
+const appKb6=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+const themeKb6=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
+assert.ok(/typing-scroll/.test(appKb6),'practice mounts .typing-scroll scroll-body');
+assert.ok(/typing-dock/.test(appKb6),'practice/path mount .typing-dock');
+assert.ok(/clearTypingShellStyles/.test(appKb6),'clears VV shell inline styles on close');
+assert.ok(!/form\.style\.position='fixed'/.test(appKb6),'kb-compact8: practice form NOT position:fixed');
+assert.ok(!/paper\.style\.position='fixed'/.test(appKb6),'kb-compact8: path-paper NOT position:fixed');
+assert.ok(/html\.typing-compact \.typing-scroll/.test(themeKb6),'CSS targets .typing-scroll in compact');
+assert.ok(/overflow-y:auto/.test(themeKb6),'typing-scroll overflow-y auto');
+assert.ok(/-webkit-overflow-scrolling:touch/.test(themeKb6),'typing-scroll touch momentum scroll');
+assert.ok(/kb-compact8 guard/.test(themeKb6),'explicit guard against html/body overflow lock');
+assert.ok(/html\.typing-compact,html\.typing-compact body\{[\s\S]*?overflow:visible!important/.test(themeKb6),'html/body overflow visible in compact');
+assert.ok(/qazaq-offline-live-20260930-kb-compact9/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
+ok('P0 kb-compact6 keep: scroll-body + dock; prompt scrollable; no html/body overflow lock');
+
+/* QA tip kb-compact7: accessory clearance + dock VV formula; target above input. */
+const appKb7=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+const themeKb7=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
+assert.ok(/IOS_KB_ACCESSORY\s*=\s*44/.test(appKb7),'iOS accessory clearance constant 44');
+assert.ok(/pinDockToVisualViewport/.test(appKb7),'explicit pinDockToVisualViewport helper');
+assert.ok(/vv\.offsetTop\+vv\.height-barH/.test(appKb7),'dock top = vv.offsetTop + vv.height - barH');
+assert.ok(/barH\s*=\s*contentH\s*\+\s*IOS_KB_ACCESSORY/.test(appKb7),'barH includes accessory clearance');
+assert.ok(/ensureTargetAboveDock/.test(appKb7),'ensureTargetAboveDock keeps prompt above dock');
+assert.ok(/prompt bottom must stay/.test(appKb7)||/tRect\.bottom>dockTop/.test(appKb7),'scroll so prompt bottom ≤ dock top');
+assert.ok(/typing-compact[\s\S]{0,120}ensureTargetAboveDock|contains\('typing-compact'\)\{[\s\S]*?ensureTargetAboveDock/.test(appKb7),'compact path uses ensureTargetAboveDock, not page scrollIntoView');
+assert.ok(/html\.typing-compact,html\.typing-compact body\{[\s\S]*?overflow:visible!important/.test(themeKb7),'html/body never overflow:hidden under compact');
+assert.ok(/overflow:visible!important/.test(themeKb7)&&/kb-compact8 guard/.test(themeKb7),'html/body overflow visible + compact7 guard');
+assert.ok(/Never position:fixed; bottom:0 against the layout window/.test(themeKb7)||/Never position:fixed; bottom:0/.test(appKb7),'docs forbid layout-window bottom:0 dock');
+assert.ok(/qazaq-offline-live-20260930-kb-compact9/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
+ok('P0 kb-compact7: accessory+44 barH VV dock; target above input; no body overflow/scrollIntoView');
+
+/* QA tip kb-compact8 keep: chrome navigable; only dock VV-fixed; scroll .typing-scroll. */
+const appKb8=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+const themeKb8=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
+assert.ok(/kb-compact9/.test(appKb8)||/kb-compact8/.test(appKb8),'app documents kb-compact model');
+assert.ok(!/form\.style\.position='fixed'/.test(appKb8),'#answer-form never position:fixed in compact8');
+assert.ok(!/paper\.style\.position='fixed'/.test(appKb8),'.path-paper never position:fixed in compact8');
+assert.ok(/pinDockToVisualViewport/.test(appKb8),'dock still pinned via pinDockToVisualViewport');
+assert.ok(/vv\.offsetTop\+vv\.height-barH/.test(appKb8),'dock top = vv.offsetTop + vv.height - barH');
+assert.ok(/constrainTypingScroll/.test(appKb8),'constrainTypingScroll sizes .typing-scroll only');
+assert.ok(/--typing-scroll-max/.test(appKb8),'sets --typing-scroll-max for scroll body');
+assert.ok(/html\.typing-compact #pause-session/.test(themeKb8)&&/display:inline-flex!important/.test(themeKb8),'#pause-session kept visible in compact');
+assert.ok(/html\.typing-compact #path-back/.test(themeKb8)&&/display:inline-flex!important/.test(themeKb8),'#path-back kept visible in compact');
+assert.ok(/html\.typing-compact \.practice-head/.test(themeKb8)&&/display:grid!important/.test(themeKb8),'practice-head kept visible in compact');
+assert.ok(!/html\.typing-compact #path-back,\s*\nhtml\.typing-compact #hint-button/.test(themeKb8),'#path-back not in help hide list with hint');
+assert.ok(!/html\.typing-compact #path-back,/.test(themeKb8.split('Explicit chrome keep')[0]),'#path-back absent from pre-keep hide selectors');
+assert.ok(!/html\.typing-compact #pause-session,/.test(themeKb8.split('Explicit chrome keep')[0]),'#pause-session absent from pre-keep hide selectors');
+assert.ok(/html\.typing-compact \.typing-scroll/.test(themeKb8)&&/max-height:var\(--typing-scroll-max/.test(themeKb8),'typing-scroll max-height from CSS var');
+assert.ok(/NOT fixed — stay in normal flow/.test(themeKb8),'form/path-paper stay in normal flow');
+assert.ok(/kb-compact8 guard/.test(themeKb8),'kb-compact8 overflow guard present');
+assert.ok(/body\.keyboard-open\[data-view=practice\] #pause-session/.test(themeKb8)===false||/keep ←Назад/.test(themeKb8),'keyboard-open no longer hides #pause-session');
+assert.ok(!/body\.keyboard-open\[data-view=practice\] \.bottom-nav,/.test(themeKb8),'keyboard-open selector does not hide .bottom-nav (compact class does)');
+assert.ok(/qazaq-offline-live-20260930-kb-compact9/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact9');
+ok('P0 kb-compact8 keep: chrome/back reachable; only .typing-dock VV-fixed; scroll .typing-scroll');
+
+/* QA tip kb-compact9 Variant A: hide .bottom-nav under compact; keep chrome-back/practice-head;
+   sticker/help/progress stay hidden; dock still VV-pinned. */
+const appKb9=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
+const themeKb9=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
+assert.ok(/kb-compact9/.test(appKb9),'app documents kb-compact9');
+assert.ok(/hide \.bottom-nav/.test(appKb9)||/cannot cover/.test(appKb9),'app notes bottom-nav hide under compact');
+assert.ok(/pinDockToVisualViewport/.test(appKb9),'dock still pinned via pinDockToVisualViewport');
+assert.ok(/vv\.offsetTop\+vv\.height-barH/.test(appKb9),'dock top = vv.offsetTop + vv.height - barH');
+assert.ok(!/form\.style\.position='fixed'/.test(appKb9),'#answer-form never position:fixed');
+assert.ok(!/paper\.style\.position='fixed'/.test(appKb9),'.path-paper never position:fixed');
+/* bottom-nav HIDDEN under typing-compact (Variant A) */
+const bottomNavCompact=themeKb9.match(/html\.typing-compact \.bottom-nav,[\s\S]*?body\.typing-compact\[data-view=practice\] \.bottom-nav\{[\s\S]*?\}/);
+assert.ok(bottomNavCompact,'typing-compact .bottom-nav rule block present');
+assert.ok(/display:none!important/.test(bottomNavCompact[0]),'typing-compact hides .bottom-nav with display:none');
+assert.ok(!/display:grid!important/.test(bottomNavCompact[0]),'typing-compact must NOT force .bottom-nav display:grid');
+assert.ok(/html\.typing-compact \.practice-head/.test(themeKb9)&&/display:grid!important/.test(themeKb9),'practice-head kept visible');
+assert.ok(/html\.typing-compact #pause-session/.test(themeKb9)&&/html\.typing-compact #path-back/.test(themeKb9)&&/html\.typing-compact \.chrome-back/.test(themeKb9),'chrome-back / #pause-session / #path-back keep selectors');
+assert.ok(/html\.typing-compact #tutor-host/.test(themeKb9)&&/html\.typing-compact \.tutor-sticker-dot/.test(themeKb9),'sticker still targeted for hide');
+assert.ok(/html\.typing-compact #issue-toggle/.test(themeKb9)&&/html\.typing-compact \.session-line/.test(themeKb9)&&/html\.typing-compact \.morph-progress/.test(themeKb9),'issue/progress still hidden');
+assert.ok(/html\.typing-compact \.question-actions/.test(themeKb9)&&/html\.typing-compact #hint-button/.test(themeKb9),'help rows still hidden');
+assert.ok(/html\.typing-compact \.typing-dock/.test(themeKb9),'typing-dock still styled under compact');
+assert.ok(/kb-compact9/.test(themeKb9),'theme docs kb-compact9');
+assert.ok(/qazaq-offline-live-20260930-kb-compact9/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact9');
+ok('P0 kb-compact9: hide .bottom-nav under compact; keep chrome-back/practice-head; dock VV-pinned');
+
 assert.ok(/\.tutor-sheet\{[^}]*max-height:min\(78dvh,640px\)/.test(petCss.replace(/\s+/g,''))&&/overflow-y:auto/.test(petCss),'ask panel max-height + overflow-y:auto');
 assert.ok(/document\.body\.appendChild\(sheet\)/.test(tutorUiSrc),'ask sheet is body sibling (no 44px clip)');
 assert.ok(/\.chrome-back\{[^}]*min-height:44px/.test(theme.replace(/\s+/g,'')));
