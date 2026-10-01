@@ -120,7 +120,7 @@ function build(){
  for(const lemma of [city,school]){
   const forms=three.map(([label,id])=>{const built=formOf(lemma,[id]);return built?{label,word:built.word}:null;});
   if(forms.some(x=>!x))continue;
-  cards.push({cardId:'three:'+lemma.id,blockId:'free.voice.direction_place',subcase:'three',targetSkillIds:['meaning'],prerequisiteBlockIds:[],lemmaId:lemma.id,normalizedLemmaKey:lemma.text,split:'train',holdout:false,admissionStatus:'runtime_approved',exerciseType:'meaning',showExpectedBeforeAnswer:true,expected:forms.map(x=>x.word+' — '+x.label).join(', '),options:forms.map(x=>x.label),answer:'куда',promptSpec:{ru:lemma.gloss+': '+forms.map(x=>x.word+' — '+x.label).join('; ')+'. Какой смысл у первой формы?',hint:'Сначала смысл, потом конец.'},translationSpec:{lemma:lemma.text,lemmaRu:lemma.gloss||'',target:'куда, где или откуда',context:lemma.text,contextRu:lemma.gloss||''},feedbackRu:forms[0].word+' — куда.'});
+  cards.push({cardId:'three:'+lemma.id,blockId:'free.voice.direction_place',subcase:'three',targetSkillIds:['meaning'],prerequisiteBlockIds:[],lemmaId:lemma.id,normalizedLemmaKey:lemma.text,split:'train',holdout:false,admissionStatus:'runtime_approved',exerciseType:'meaning',showExpectedBeforeAnswer:true,expected:forms.map(x=>x.word+' — '+x.label).join(', '),options:forms.map(x=>x.label),answer:'куда',promptSpec:{ru:lemma.gloss+': '+forms.map(x=>x.word+' — '+x.label).join('; ')+'. Какой смысл у первой формы?',hint:'Сначала смысл, потом конец.'},translationSpec:{lemma:lemma.text,lemmaRu:lemma.gloss||'',target:'куда, где или откуда',context:lemma.text,contextRu:lemma.gloss||''},feedbackRu:forms[0].word+' — куда.',practiceLevels:['A','B','G','H','I']});
  }
  function addForm(lemma,sequence,blockId,subcase,skill,kind){
   const built=formOf(lemma,sequence);if(!built)return;
@@ -186,7 +186,7 @@ function addCoverage(cards, rows, byText, addForm){
  const city=byText.get('қала'), school=byText.get('мектеп');
  if(city)cards.push(meaningCard('mean:city:there','free.harmony.meaning_loc','place',city,'Человек уже в городе, не в дороге. Какой смысл?','где','куда','где'));
  if(school)cards.push(meaningCard('mean:school:there','free.harmony.meaning_loc','place',school,'Человек уже находится в школе. Какой смысл?','где','куда','где'));
- cards.push({cardId:'limit:u',blockId:'free.harmony.limits',subcase:'limits',targetSkillIds:['limits'],prerequisiteBlockIds:[],lemmaId:'n-су',normalizedLemmaKey:'су',split:'train',holdout:false,admissionStatus:'runtime_approved',exerciseType:'meaning',options:['только у этих слов','у любого слова на у'],answer:'только у этих слов',expected:'',showExpectedBeforeAnswer:false,promptSpec:{ru:'суға и тауға записаны у этих слов. Можно ли так с любым словом на у?',hint:'Класс записан у слова.'},translationSpec:{lemma:'су',lemmaRu:'вода',target:'куда',context:'су',contextRu:'вода'},feedbackRu:'Другие слова на у по одной букве не угадываем.'});
+ cards.push({cardId:'limit:u',blockId:'free.harmony.limits',subcase:'limits',targetSkillIds:['limits'],prerequisiteBlockIds:[],lemmaId:'n-су',normalizedLemmaKey:'су',split:'train',holdout:false,admissionStatus:'runtime_approved',exerciseType:'meaning',options:['только у этих слов','у любого слова на у'],answer:'только у этих слов',expected:'',showExpectedBeforeAnswer:false,promptSpec:{ru:'суға и тауға записаны у этих слов. Можно ли так с любым словом на у?',hint:'Класс записан у слова.'},translationSpec:{lemma:'су',lemmaRu:'вода',target:'куда',context:'су',contextRu:'вода'},feedbackRu:'Другие слова на у по одной букве не угадываем.',practiceLevels:['A','B','G']});
  for(const lemma of rows){
   addForm(lemma,['LOC'],'free.harmony.vowel_loc','vowel','LOC.vowel','vowel');
   addForm(lemma,['LOC'],'free.voice.loc_onset','onset','LOC.onset','onset');
@@ -235,7 +235,7 @@ function addCoverage(cards, rows, byText, addForm){
    if(keptGroup)cards.push(keptGroup);
   }
  }
- if(city)cards.push(meaningCard('pl:city','free.plural.meaning','several',city,'Нужно сказать не один город, а несколько. Какой смысл?','несколько','один','несколько'));
+ for(const lemma of rows)cards.push(meaningCard('pl:'+lemma.id,'free.plural.meaning','several',lemma,'Нужно сказать не один предмет, а несколько. Какой смысл?','несколько','один','несколько'));
  const verbs=E.data.lemmas.filter(l=>l.split==='train'&&l.pos==='verb');
  const verbMap=[['free.verbs.negative',['NEG'],'не делать','neg'],['free.verbs.past',['PAST'],'уже сделал','past'],['free.verbs.participle',['PTCP_GAN'],'предмет через действие','ptcp'],['free.verbs.condition',['COND'],'если','cond'],['free.verbs.connected',['CVB_IP'],'добавочное действие','cvb'],['free.verbs.combined',['NEG','PAST'],'не сделал','combined']];
  for(const lemma of verbs){
