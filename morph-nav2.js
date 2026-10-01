@@ -281,6 +281,37 @@ function summaryHtml(row){
  const nextBtn=nxt?'<button type="button" class="primary-button" data-nav2-lesson="'+esc(nxt.id)+'">Следующий урок: '+esc(nxt.number)+' '+esc(nxt.title)+'</button>':'<button type="button" class="primary-button" data-nav2="home">К разделу</button>';
  return '<p>Урок '+esc(row.number)+' на этом шаге закончен. Это не оценка знания.</p><ul class="morph-teach-list"><li>Шагов просмотрено: '+log.seen.length+'</li><li>Верно без помощи: '+log.unaided.length+'</li><li>С помощью: '+log.helped.length+'</li><li>Пропущено: '+log.skipped.length+'</li></ul><div class="morph-actions">'+back+nextBtn+'</div>';
 }
+function sectionHeadingFor(row,stepIndex){
+ let heading='';
+ for(let i=0;i<=stepIndex&&i<(row.steps||[]).length;i++){
+  for(const id of row.steps[i].sourceUnitIds||[]){
+   const b=sourceUnit(id);
+   if(b&&b.type==='subheading')heading=b.id;
+  }
+ }
+ return heading;
+}
+function sectionEndsAt(row,stepIndex){
+ const next=row.steps&&row.steps[stepIndex+1];
+ if(!next)return true;
+ const first=(next.sourceUnitIds||[]).map(sourceUnit).find(Boolean);
+ return !!(first&&first.type==='subheading');
+}
+function sourcePracticeHtml(row,stepIndex){
+ if(!sectionEndsAt(row,stepIndex))return '';
+ const heading=sectionHeadingFor(row,stepIndex);
+ const C=root.FreePracticeContent;
+ if(!heading||!C||!C.anchorsFor||!C.forBlock)return '';
+ const allowed=new Set((row.practiceRoutes||[]).map(String));
+ const rows=(C.anchorsFor(heading)||[]).filter(x=>{
+  const route=x.blockId+':'+(x.subcase||'');
+  if(allowed.size&&!allowed.has(route))return false;
+  try{return !!(C.forBlock(x.blockId,x.subcase||'')||[]).length;}catch(e){return false;}
+ });
+ if(!rows.length)return '';
+ const buttons=rows.map(x=>'<button type="button" class="secondary-button" data-free-block="'+esc(x.blockId)+'" data-free-subcase="'+esc(x.subcase||'')+'">'+esc(x.title||'Потренировать эту мысль')+'</button>').join('');
+ return '<div class="morph-nav2-section-practice" data-nav2-source-practice="'+esc(heading)+'"><p class="small">Практика именно этого объяснения — по желанию.</p><div class="morph-actions">'+buttons+'</div></div>';
+}
 function practiceReady(row){
  return row.id!=='nav2.1.1'&&row.sourceMappingStatus!=='BOUND_FILTER_GAP'&&row.sourceMappingStatus!=='NO_LICENSED_CARDS'&&!!row.practiceOpen;
 }
@@ -296,7 +327,8 @@ function learnBody(row){
  else if(task&&st().outcome==='wrong')actions='';
  else actions=last?'<button type="button" class="primary-button" data-nav2-finish>Закончить урок</button>':'<button type="button" class="primary-button" data-nav2-next>Дальше</button>';
  const toPractice=last&&practiceReady(row)&&st().outcome!=='wrong'?'<button type="button" class="secondary-button" data-nav2-explained>К самостоятельной практике</button>':'';
- return body+'<div class="morph-actions">'+actions+toPractice+'</div><p class="small">Шаг '+(st().step+1)+' из '+row.steps.length+' · '+esc(step.title||'')+'</p>';
+ const microPractice=sourcePracticeHtml(row,st().step||0);
+ return body+microPractice+'<div class="morph-actions">'+actions+toPractice+'</div><p class="small">Шаг '+(st().step+1)+' из '+row.steps.length+' · '+esc(step.title||'')+'</p>';
 }
 function practiceRouteLabel(route,index){
  const sub=String(route||'').split(':')[1]||'';
