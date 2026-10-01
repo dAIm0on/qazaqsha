@@ -152,7 +152,7 @@ mock.LessonV2Runtime.installAll();
 assert.ok(mock.LessonV2Runtime.byId('4-1'));
 assert.equal(mock.COURSE.questions.filter(q=>String(q.id).startsWith('gen:4-1:')).length,322);
 assert.equal(mock.COURSE.questions.filter(q=>q.origin==='school').length,71);
-assert.equal(mock.COURSE.questions.filter(q=>q.origin==='research').length,23);
+assert.equal(mock.COURSE.questions.filter(q=>q.origin==='research').length,28);
 assert.equal(mock.COURSE.questions.filter(q=>q.topic==='vocab').length,23);
 assert.equal(mock.GRAMMAR_CHAPTERS.LESSONS.find(x=>x.id==='4-1').chapters.length,p.theory.length);
 const chapterIds=mock.GRAMMAR_CHAPTERS.LESSONS.find(x=>x.id==='4-1').chapters.map(x=>x.id);
