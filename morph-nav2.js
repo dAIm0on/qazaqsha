@@ -74,6 +74,17 @@ function putLog(id,row){
 }
 function addOnly(list,id){return list.includes(id)?list:list.concat([id]);}
 function drop(list,id){return list.filter(x=>x!==id);}
+function savedStepFor(id,saved){
+ const row=lesson(id);
+ if(!row||!row.steps||!row.steps.length)return 0;
+ let key=saved&&saved.stepId||'';
+ if(key&&row.legacyStepAliases&&row.legacyStepAliases[key])key=row.legacyStepAliases[key];
+ if(key){
+  const i=row.steps.findIndex(s=>s.id===key||(s.sourceUnitIds||[]).includes(key));
+  if(i>=0)return i;
+ }
+ return Math.min(Math.max(0,Number(saved&&saved.step)||0),row.steps.length-1);
+}
 function save(s){try{sessionStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
 let state=null;
 function st(){if(!state)state=load();return state;}
@@ -83,7 +94,7 @@ function snapshot(){const s=st();return {screen:s.screen,lessonId:s.lessonId,ste
 function rememberPlace(){
  const s=st();
  const row=current();
- const step=row&&row.steps?row.steps[s.step]:null;
+ const step=row&&row.steps?row.steps[Math.min(Math.max(0,s.step||0),Math.max(0,row.steps.length-1))]:null;
  const cursors=Object.assign({},s.perLessonCursors);
  cursors[s.lessonId]={step:s.step,tab:s.tab,pick:s.pick,outcome:s.outcome,stepId:step?step.id:''};
  const drafts=Object.assign({},s.draftAnswers);
@@ -349,7 +360,7 @@ function html(){
 function bind(host,rerender){
  host.querySelectorAll('[data-nav2]').forEach(b=>b.addEventListener('click',()=>{
   const name=b.dataset.nav2;
-  if(name==='home'){const id=st().homeLessonId||st().lessonId;const saved=(st().perLessonCursors||{})[id]||{};go({screen:null,fromLesson:false,lessonId:id,step:saved.step||0,tab:saved.tab||'learn',pick:saved.pick||'',outcome:saved.outcome||'',nav:true});}
+  if(name==='home'){const id=st().homeLessonId||st().lessonId;const saved=(st().perLessonCursors||{})[id]||{};go({screen:null,fromLesson:false,lessonId:id,step:savedStepFor(id,saved),tab:saved.tab||'learn',pick:saved.pick||'',outcome:saved.outcome||'',nav:true});}
   else if(name==='map')go({screen:'map',fromLesson:false,find:'',nav:true});
   else if(name==='activities')go({screen:'activities',nav:true});
   rerender();
@@ -358,11 +369,12 @@ function bind(host,rerender){
  host.querySelectorAll('[data-nav2-lesson]').forEach(b=>b.addEventListener('click',()=>{
   const id=b.dataset.nav2Lesson;
   const saved=(st().perLessonCursors||{})[id]||{};
+  const savedStep=savedStepFor(id,saved);
   const fromSide=st().screen==='map'||st().screen==='alias'||st().screen==='activities'||st().screen==='reference';
   const fromBrowse=st().screen==='map'||st().screen==='part'||st().screen==='reference'||st().screen==='alias';
   const origin=fromSide?(st().excursionOrigin||null):null;
   const seen=Object.assign({},st().viewed);
-  const patch={screen:'lesson',lessonId:id,step:saved.step||0,tab:saved.tab||'learn',pick:saved.pick||'',outcome:saved.outcome||'',fromLesson:false,excursionOrigin:origin,viewed:seen,aliasDismissed:true,nav:true};
+  const patch={screen:'lesson',lessonId:id,step:savedStep,tab:saved.tab||'learn',pick:saved.pick||'',outcome:saved.outcome||'',fromLesson:false,excursionOrigin:origin,viewed:seen,aliasDismissed:true,nav:true};
   if(!fromBrowse)patch.homeLessonId=id;
   go(patch);
   rerender();
@@ -400,14 +412,14 @@ function bind(host,rerender){
   const row=current(),step=row.steps[st().step];
   const log=lessonLog(row.id);
   log.seen=addOnly(log.seen,step?step.id:String(st().step));
-  const explained=Object.assign({},st().explained);explained[row.id]=true;
-  go({step:st().step+1,pick:'',outcome:'',log:putLog(row.id,log),explained:explained});
+  go({step:Math.min(st().step+1,row.steps.length-1),pick:'',outcome:'',log:putLog(row.id,log)});
   rerender();
  }));
  host.querySelectorAll('[data-nav2-pick]').forEach(b=>b.addEventListener('click',()=>{
   const row=current(),step=row.steps[st().step];
+  const task=stepTry(step);
   const pick=b.dataset.nav2Pick;
-  const ok=pick===step.answer;
+  const ok=!!task&&pick===task.answer;
   const log=lessonLog(row.id);
   log.attempted=addOnly(log.attempted,step.id);
   log.skipped=drop(log.skipped,step.id);
@@ -461,13 +473,18 @@ function bind(host,rerender){
   if(root.FreePractice&&root.FreePractice.openBlock)root.FreePractice.openBlock(b.dataset.nav2Practice,b.dataset.nav2Sub||'');
   rerender();
  }));
+ host.querySelectorAll('[data-nav2-source-link]').forEach(b=>b.addEventListener('click',()=>{
+  const id=b.dataset.nav2SourceLink;
+  if(CHOICES[id])go({screen:'alias',aliasId:id,aliasChoices:CHOICES[id],bookmarkMessage:'Связанная тема разделена на несколько уроков. Выберите нужную.',nav:true});
+  rerender();
+ }));
 }
 function close(){go({screen:null,fromLesson:false});}
 function openBookmark(id){
  if(!id)return false;
  if(lesson(id)){
   const saved=(st().perLessonCursors||{})[id]||{};
-  go({screen:'lesson',lessonId:id,step:saved.step||0,tab:'learn',pick:saved.pick||'',outcome:saved.outcome||'',nav:true});
+  go({screen:'lesson',lessonId:id,step:savedStepFor(id,saved),tab:'learn',pick:saved.pick||'',outcome:saved.outcome||'',nav:true});
   return true;
  }
  if(CHOICES[id]){
