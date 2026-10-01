@@ -9549,7 +9549,7 @@ window.LESSON_V2_COMPILED = [
           {
             "bad": "Мен дәрігер",
             "good": "дәрігермін",
-            "why": "Без бирки фраза по курсу собрана неправильно."
+            "why": "Без личного окончания фраза по курсу собрана неправильно."
           }
         ],
         "limitations": [
@@ -9793,7 +9793,7 @@ window.LESSON_V2_COMPILED = [
           {
             "kazakh": "мұғалімсіз",
             "translation": "вы учитель",
-            "why": "край мягкий"
+            "why": "мягкое слово"
           }
         ],
         "contrastExamples": [
@@ -10067,7 +10067,7 @@ window.LESSON_V2_COMPILED = [
           {
             "bad": "жұмыссыз = вы работа",
             "good": "словарное слово",
-            "why": "Не путай бирку и готовую лексему."
+            "why": "Не путай личное окончание и готовую лексему."
           }
         ],
         "limitations": [
@@ -14944,7 +14944,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "contrastExamples": [
           {
-            "bad": "ақылды без бирки",
+            "bad": "ақылды без личного окончания",
             "good": "ақылдымын",
             "why": "Сказуемое тоже несёт лицо."
           }
@@ -15196,7 +15196,7 @@ window.LESSON_V2_COMPILED = [
           {
             "kazakh": "қызсыңдар",
             "translation": "вы девушки",
-            "why": "твёрдый ряд, сыңдар"
+            "why": "твёрдое слово, сыңдар"
           }
         ],
         "contrastExamples": [
@@ -15360,7 +15360,7 @@ window.LESSON_V2_COMPILED = [
           {
             "kazakh": "жігітсіңдер",
             "translation": "вы парни",
-            "why": "много уже в бирке"
+            "why": "множественность уже в окончании"
           }
         ],
         "contrastExamples": [
@@ -15438,7 +15438,7 @@ window.LESSON_V2_COMPILED = [
           {
             "kazakh": "кәсіпкерсіздер ме",
             "translation": "вы предприниматели?",
-            "why": "мягкий ряд, ме"
+            "why": "мягкое слово, ме"
           },
           {
             "kazakh": "студентсіңдер ме",
@@ -19300,7 +19300,7 @@ window.LESSON_V2_COMPILED = [
           {
             "kazakh": "бірінші",
             "translation": "первый",
-            "why": "Тот же бір, что «один». Справа наклейка. Не выдумывай новый корень как русское «первый»."
+            "why": "Тот же бір, что «один». Справа порядковый суффикс. Не выдумывай новый корень как русское «первый»."
           },
           {
             "kazakh": "екінші",
@@ -19310,7 +19310,7 @@ window.LESSON_V2_COMPILED = [
           {
             "kazakh": "алтыншы",
             "translation": "шестой",
-            "why": "Тот же алты. Справа одна наклейка. Пока не собираем длинные составные числа."
+            "why": "Тот же алты. Справа один порядковый суффикс. Пока не собираем длинные составные числа."
           }
         ],
         "contrastExamples": [
@@ -19387,7 +19387,7 @@ window.LESSON_V2_COMPILED = [
           {
             "kazakh": "екінші",
             "translation": "второй",
-            "why": "і — гласная. После гласной короткая наклейка нші, не екіыншы."
+            "why": "і — гласная. После гласной короткий порядковый суффикс нші, не екіыншы."
           },
           {
             "kazakh": "алтыншы",
@@ -19438,7 +19438,7 @@ window.LESSON_V2_COMPILED = [
           {
             "id": "23o5",
             "type": "fade",
-            "prompt": "екі: какая наклейка после гласной?",
+            "prompt": "екі: какой порядковый суффикс после гласной?",
             "answers": [
               "нші"
             ],
@@ -19548,24 +19548,24 @@ window.LESSON_V2_COMPILED = [
           {
             "kazakh": "жиырма бірінші",
             "translation": "21-й",
-            "why": "Наклейка на бір, жиырма голое."
+            "why": "Порядковый суффикс на бір, жиырма голое."
           },
           {
             "kazakh": "он екінші",
             "translation": "12-й",
-            "why": "Наклейка на екі, он голое."
+            "why": "Порядковый суффикс на екі, он голое."
           },
           {
             "kazakh": "жүзінші",
             "translation": "100-й",
-            "why": "Один кусок, наклейка на него."
+            "why": "Один кусок, порядковый суффикс на него."
           }
         ],
         "contrastExamples": [
           {
             "bad": "жиырмасыншы бірінші",
             "good": "жиырма бірінші",
-            "why": "Две наклейки. Нужна одна — на последнем куске."
+            "why": "Два порядковых суффикса. Нужен один — на последнем куске."
           }
         ],
         "limitations": [
@@ -19801,7 +19801,7 @@ window.LESSON_V2_COMPILED = [
           {
             "kazakh": "олар студент",
             "translation": "они студенты",
-            "why": "без личной бирки"
+            "why": "без личного окончания"
           },
           {
             "kazakh": "олар қазақ",
@@ -20561,7 +20561,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Көрші",
         "fields": [
           {
@@ -20586,7 +20586,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Көрші",
         "fields": [
           {
@@ -20611,7 +20611,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Көрші",
         "fields": [
           {
@@ -20636,7 +20636,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Көрші",
         "fields": [
           {
@@ -20661,7 +20661,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Көрші",
         "fields": [
           {
@@ -20686,7 +20686,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Көрші",
         "fields": [
           {
@@ -20711,7 +20711,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Көрші",
         "fields": [
           {
@@ -20727,7 +20727,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + көрші → Көрші. Ол/олар без бирки.",
+        "explanation": "Ол + көрші → Көрші. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:1-1-Ол-Көрші",
         "source_refs": [
@@ -20740,7 +20740,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Қазақ",
         "fields": [
           {
@@ -20765,7 +20765,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Қазақ",
         "fields": [
           {
@@ -20790,7 +20790,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Қазақ",
         "fields": [
           {
@@ -20815,7 +20815,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Қазақ",
         "fields": [
           {
@@ -20840,7 +20840,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Қазақ",
         "fields": [
           {
@@ -20865,7 +20865,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Қазақ",
         "fields": [
           {
@@ -20890,7 +20890,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Қазақ",
         "fields": [
           {
@@ -20906,7 +20906,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + қазақ → Қазақ. Ол/олар без бирки.",
+        "explanation": "Ол + қазақ → Қазақ. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:1-1-Ол-Қазақ",
         "source_refs": [
@@ -20919,7 +20919,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Маман",
         "fields": [
           {
@@ -20944,7 +20944,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Маман",
         "fields": [
           {
@@ -20969,7 +20969,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Маман",
         "fields": [
           {
@@ -20994,7 +20994,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Маман",
         "fields": [
           {
@@ -21019,7 +21019,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Маман",
         "fields": [
           {
@@ -21044,7 +21044,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Маман",
         "fields": [
           {
@@ -21069,7 +21069,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Маман",
         "fields": [
           {
@@ -21085,7 +21085,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + маман → Маман. Ол/олар без бирки.",
+        "explanation": "Ол + маман → Маман. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:1-1-Ол-Маман",
         "source_refs": [
@@ -21098,7 +21098,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Жомарт",
         "fields": [
           {
@@ -21123,7 +21123,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Жомарт",
         "fields": [
           {
@@ -21148,7 +21148,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Жомарт",
         "fields": [
           {
@@ -21173,7 +21173,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Жомарт",
         "fields": [
           {
@@ -21198,7 +21198,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Жомарт",
         "fields": [
           {
@@ -21223,7 +21223,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Жомарт",
         "fields": [
           {
@@ -21248,7 +21248,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Жомарт",
         "fields": [
           {
@@ -21264,7 +21264,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + жомарт → Жомарт. Ол/олар без бирки.",
+        "explanation": "Ол + жомарт → Жомарт. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:1-2-Ол-Жомарт",
         "source_refs": [
@@ -21277,7 +21277,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Семіз",
         "fields": [
           {
@@ -21302,7 +21302,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Семіз",
         "fields": [
           {
@@ -21327,7 +21327,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Семіз",
         "fields": [
           {
@@ -21352,7 +21352,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Семіз",
         "fields": [
           {
@@ -21377,7 +21377,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Семіз",
         "fields": [
           {
@@ -21402,7 +21402,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Семіз",
         "fields": [
           {
@@ -21427,7 +21427,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Семіз",
         "fields": [
           {
@@ -21443,7 +21443,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + семіз → Семіз. Ол/олар без бирки.",
+        "explanation": "Ол + семіз → Семіз. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:1-2-Ол-Семіз",
         "source_refs": [
@@ -21456,7 +21456,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Әдемі",
         "fields": [
           {
@@ -21481,7 +21481,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Әдемі",
         "fields": [
           {
@@ -21506,7 +21506,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Әдемі",
         "fields": [
           {
@@ -21531,7 +21531,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Әдемі",
         "fields": [
           {
@@ -21556,7 +21556,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Әдемі",
         "fields": [
           {
@@ -21581,7 +21581,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Әдемі",
         "fields": [
           {
@@ -21606,7 +21606,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Әдемі",
         "fields": [
           {
@@ -21622,7 +21622,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + әдемі → Әдемі. Ол/олар без бирки.",
+        "explanation": "Ол + әдемі → Әдемі. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:1-2-Ол-Әдемі",
         "source_refs": [
@@ -21635,7 +21635,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Әріптес",
         "fields": [
           {
@@ -21660,7 +21660,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Әріптес",
         "fields": [
           {
@@ -21676,7 +21676,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + әріптес → Әріптес. Ол/олар без бирки.",
+        "explanation": "Ол + әріптес → Әріптес. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:2-1-Ол-Әріптес",
         "source_refs": [
@@ -21689,7 +21689,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Әріптес",
         "fields": [
           {
@@ -21714,7 +21714,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Әріптес",
         "fields": [
           {
@@ -21739,7 +21739,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Әріптес",
         "fields": [
           {
@@ -21764,7 +21764,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Әріптес",
         "fields": [
           {
@@ -21789,7 +21789,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Әріптес",
         "fields": [
           {
@@ -21814,7 +21814,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Жау",
         "fields": [
           {
@@ -21839,7 +21839,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Жау",
         "fields": [
           {
@@ -21855,7 +21855,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + жау → Жау. Ол/олар без бирки.",
+        "explanation": "Ол + жау → Жау. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:2-1-Ол-Жау",
         "source_refs": [
@@ -21868,7 +21868,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Жау",
         "fields": [
           {
@@ -21893,7 +21893,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Жау",
         "fields": [
           {
@@ -21918,7 +21918,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Жау",
         "fields": [
           {
@@ -21943,7 +21943,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Жау",
         "fields": [
           {
@@ -21968,7 +21968,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Жау",
         "fields": [
           {
@@ -21993,7 +21993,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Заңгер",
         "fields": [
           {
@@ -22018,7 +22018,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Заңгер",
         "fields": [
           {
@@ -22034,7 +22034,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + заңгер → Заңгер. Ол/олар без бирки.",
+        "explanation": "Ол + заңгер → Заңгер. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:2-1-Ол-Заңгер",
         "source_refs": [
@@ -22047,7 +22047,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Заңгер",
         "fields": [
           {
@@ -22072,7 +22072,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Заңгер",
         "fields": [
           {
@@ -22097,7 +22097,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Заңгер",
         "fields": [
           {
@@ -22122,7 +22122,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Заңгер",
         "fields": [
           {
@@ -22147,7 +22147,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Заңгер",
         "fields": [
           {
@@ -22172,7 +22172,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Бай",
         "fields": [
           {
@@ -22188,7 +22188,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + бай → Бай. Ол/олар без бирки.",
+        "explanation": "Ол + бай → Бай. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:2-2-Ол-Бай",
         "source_refs": [
@@ -22201,7 +22201,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Бай",
         "fields": [
           {
@@ -22226,7 +22226,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Бай",
         "fields": [
           {
@@ -22251,7 +22251,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Бай",
         "fields": [
           {
@@ -22276,7 +22276,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Бай",
         "fields": [
           {
@@ -22301,7 +22301,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Бай",
         "fields": [
           {
@@ -22326,7 +22326,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Бай",
         "fields": [
           {
@@ -22351,7 +22351,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Қонақ",
         "fields": [
           {
@@ -22367,7 +22367,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + қонақ → Қонақ. Ол/олар без бирки.",
+        "explanation": "Ол + қонақ → Қонақ. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:2-2-Ол-Қонақ",
         "source_refs": [
@@ -22380,7 +22380,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Қонақ",
         "fields": [
           {
@@ -22405,7 +22405,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Қонақ",
         "fields": [
           {
@@ -22430,7 +22430,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Қонақ",
         "fields": [
           {
@@ -22455,7 +22455,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Қонақ",
         "fields": [
           {
@@ -22480,7 +22480,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Қонақ",
         "fields": [
           {
@@ -22505,7 +22505,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Қонақ",
         "fields": [
           {
@@ -22530,7 +22530,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Жұмыссыз",
         "fields": [
           {
@@ -22546,7 +22546,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + жұмыссыз → Жұмыссыз. Ол/олар без бирки.",
+        "explanation": "Ол + жұмыссыз → Жұмыссыз. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:2-2-Ол-Жұмыссыз",
         "source_refs": [
@@ -22559,7 +22559,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Жұмыссыз",
         "fields": [
           {
@@ -22584,7 +22584,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Жұмыссыз",
         "fields": [
           {
@@ -22609,7 +22609,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Жұмыссыз",
         "fields": [
           {
@@ -22634,7 +22634,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Жұмыссыз",
         "fields": [
           {
@@ -22659,7 +22659,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Жұмыссыз",
         "fields": [
           {
@@ -22684,7 +22684,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Жұмыссыз",
         "fields": [
           {
@@ -22709,7 +22709,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Жас",
         "fields": [
           {
@@ -22734,7 +22734,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Жас",
         "fields": [
           {
@@ -22759,7 +22759,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Жас",
         "fields": [
           {
@@ -22784,7 +22784,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Жас",
         "fields": [
           {
@@ -22809,7 +22809,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Жас",
         "fields": [
           {
@@ -22834,7 +22834,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Жас",
         "fields": [
           {
@@ -22850,7 +22850,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + жас → Жас. Ол/олар без бирки.",
+        "explanation": "Ол + жас → Жас. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:2-3-Ол-Жас",
         "source_refs": [
@@ -22863,7 +22863,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Жас",
         "fields": [
           {
@@ -22888,7 +22888,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Жігіт",
         "fields": [
           {
@@ -22913,7 +22913,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Жігіт",
         "fields": [
           {
@@ -22938,7 +22938,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Жігіт",
         "fields": [
           {
@@ -22963,7 +22963,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Жігіт",
         "fields": [
           {
@@ -22988,7 +22988,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Жігіт",
         "fields": [
           {
@@ -23013,7 +23013,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Жігіт",
         "fields": [
           {
@@ -23029,7 +23029,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + жігіт → Жігіт. Ол/олар без бирки.",
+        "explanation": "Ол + жігіт → Жігіт. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:2-3-Ол-Жігіт",
         "source_refs": [
@@ -23042,7 +23042,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Жігіт",
         "fields": [
           {
@@ -23067,7 +23067,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіз + Кедей",
         "fields": [
           {
@@ -23092,7 +23092,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Мен + Кедей",
         "fields": [
           {
@@ -23117,7 +23117,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сен + Кедей",
         "fields": [
           {
@@ -23142,7 +23142,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сендер + Кедей",
         "fields": [
           {
@@ -23167,7 +23167,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Біз + Кедей",
         "fields": [
           {
@@ -23192,7 +23192,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Ол + Кедей",
         "fields": [
           {
@@ -23208,7 +23208,7 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Ол + кедей → Кедей. Ол/олар без бирки.",
+        "explanation": "Ол + кедей → Кедей. Ол/олар без личного окончания.",
         "lessonId": "2-3",
         "source_item": "wb:2-3:form:2-3-Ол-Кедей",
         "source_refs": [
@@ -23221,7 +23221,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "person",
         "kind": "fields",
-        "title": "Напиши форму (ол — без бирки)",
+        "title": "Напиши форму (ол — без личного окончания)",
         "stimulus": "Сіздер + Кедей",
         "fields": [
           {
