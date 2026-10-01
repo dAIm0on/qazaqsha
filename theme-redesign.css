@@ -861,34 +861,21 @@ html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
   #today-content .ia-stack,#today-content .ia-quiet{grid-column:1}
 }
 
-/* Vocab words P0 lemma: orange lemma banner + strikethrough attempt + Ещё раз; no bottom AI */
+/* Vocab words P0 lemma2: orange #FF5A1F h3 sticker = эталон; strike attempt; one bottom Ещё раз */
 #retry-button,
-#feedback-retry,
-.vocab-retry-wrap .primary-button,
 #reveal-button.vocab-idk,
 #reveal-button[data-vocab-idk]{
   min-width:44px;min-height:44px;
 }
-.vocab-retry-wrap{margin:12px 0 4px}
 .feedback.error[data-vocab-compact] .vocab-attempt{margin:6px 0 10px}
 .feedback.error[data-vocab-compact] .vocab-attempt-strike{
   text-decoration:line-through;
   text-decoration-thickness:2px;
   color:var(--muted,#6A645C);
 }
-.feedback.error[data-vocab-compact] .vocab-lemma-banner{
-  display:flex;align-items:flex-start;gap:10px;
-  margin:8px 0 12px;padding:12px 14px;
-  border-radius:14px;
-  background:color-mix(in srgb,#FF5A1F 14%,var(--surface,#FFFAF4));
-  border:1px solid color-mix(in srgb,#FF5A1F 45%,transparent);
-}
-.feedback.error[data-vocab-compact] .vocab-lemma-sticker{
-  flex:0 0 12px;width:12px;height:12px;margin-top:6px;border-radius:50%;
-  background:#FF5A1F;box-shadow:0 0 0 4px color-mix(in srgb,#FF5A1F 22%,transparent);
-}
-.feedback.error[data-vocab-compact] .vocab-lemma{
-  margin:0;font-size:1.08em;line-height:1.35;
+/* h3 already paints as solid #FF5A1F sticker via .feedback.error h3 — keep lemma readable */
+.feedback.error[data-vocab-compact] h3.vocab-lemma-sticker-pill{
+  font-style:normal; /* lemma should read clear, not italic display */
 }
 .primary-slot>#retry-button{width:100%}
 

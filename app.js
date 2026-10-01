@@ -607,14 +607,14 @@
  function vocabUserLine(answers){
    return (answers||[]).map(a=>String(a==null?'':a).trim()).filter(Boolean).join(' · ');
  }
- /** P0 words-error-lemma: orange lemma banner + optional strikethrough attempt + Ещё раз. No AI / skill-links. */
+ /** P0 words-error-lemma2: orange #FF5A1F h3 sticker carries эталон; strike attempt; only bottom Ещё раз. No AI / skill-links. */
  function vocabWrongFeedbackHtml(lemma,userLine,opts){
    const o=opts||{};
-   const title=o.title||'Пока не всё верно';
    const attempt=userLine?('<p class="vocab-attempt"><span class="vocab-attempt-strike">'+esc(userLine)+'</span></p>'):'';
-   const banner='<div class="vocab-lemma-banner" role="status"><span class="vocab-lemma-sticker" aria-hidden="true"></span><p class="vocab-lemma" lang="kk"><strong>Ответ:</strong> '+esc(lemma||'')+'</p></div>';
+   /* .feedback.error h3 IS the solid #FF5A1F skewed sticker — put lemma there (not «Пока не всё верно»). */
+   const sticker='<h3 lang="kk" class="vocab-lemma-sticker-pill">Ответ: '+esc(lemma||'')+'</h3>';
    const note=o.note!=null?o.note:'<p class="small">Эта карточка появится снова.</p>';
-   return '<h3>'+esc(title)+'</h3>'+attempt+banner+note+'<div class="vocab-retry-wrap"><button type="button" class="primary-button" id="feedback-retry">Ещё раз</button></div>';
+   return sticker+attempt+note;
  }
  function paintVocabLemmaFeedback(feedback,q,answers,opts){
    if(!feedback)return;
@@ -624,7 +624,7 @@
    feedback.setAttribute('data-vocab-compact','1');
    feedback.innerHTML=vocabWrongFeedbackHtml(lemma,userLine,opts);
    feedback.hidden=false;
-   const fr=$('#feedback-retry');if(fr)fr.onclick=e=>{e.preventDefault();beginVocabRetry();};
+   /* Only lower primary #retry-button (≥44) — no inner #feedback-retry. */
    $('#check-button').hidden=true;if($('#retry-button')){$('#retry-button').hidden=false;$('#retry-button').textContent='Ещё раз';}
    if(!document.documentElement.classList.contains('typing-compact')){try{feedback.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}catch{try{feedback.scrollIntoView(true);}catch{}}}else{const sc=document.querySelector('.typing-scroll');if(sc&&feedback){try{const d=feedback.getBoundingClientRect().bottom-sc.getBoundingClientRect().bottom;if(d>0)sc.scrollTop+=d+8;}catch{}}}
  }
@@ -1403,7 +1403,7 @@
      if(isVocabWordsMode()){
        const feedback=$('#feedback');
        const errors=window.ErrorDiagnostics.diagnose(q,answers,result,Date.now());
-       // P0: orange lemma banner + strikethrough attempt; no AI / Why / skill-links. Error ≠ correct.
+       // P0: strike + orange h3 lemma sticker; bottom Ещё раз only; no AI / Why / skill-links. Error ≠ correct.
        paintVocabLemmaFeedback(feedback,q,answers,{});
        if(window.AiTutor){window.AiTutor.noteAnswer(q,answers,result,hinted,errors,Date.now());}
        if(window.TutorUI){
@@ -1548,7 +1548,7 @@
    const morph=!result.correct?morphemeRow(errors,answerLine,answers.join(' ')):'';
    const vocabWrong=isVocabWordsMode()&&!result.correct;
    if(vocabWrong){
-     // P0: line-through attempt + orange #FF5A1F lemma banner + Ещё раз; no Why/правило/skill-links.
+     // P0: strike attempt + orange #FF5A1F h3 sticker with lemma; bottom Ещё раз only; no Why/правило/skill-links.
      paintVocabLemmaFeedback(feedback,q,answers,{});
    }else{
    feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Число уже сказало, сколько. Окончание множественного здесь лишнее.</p>':''}${morph}${result.correct?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}${(()=>{const raw=q.explanation||'';if(result.correct)return raw?'<p>'+esc(raw)+'</p>':'';const safe=(window.ExplainOpen&&window.ExplainOpen.safeWrongWhy)?window.ExplainOpen.safeWrongWhy(raw,q):(raw&&window.ExplainOpen&&window.ExplainOpen.spoilsOnWrong&&window.ExplainOpen.spoilsOnWrong(raw,q)?'':raw);return safe?'<p>'+esc(safe)+'</p>':'';})()}<p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
