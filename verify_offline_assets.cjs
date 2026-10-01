@@ -1,0 +1,13 @@
+const fs = require('fs');
+const assert = require('assert');
+const sw = fs.readFileSync('sw.js', 'utf8');
+const assets = JSON.parse(sw.match(/ASSETS=(\[.*?\]);/)[1]);
+const banned = ['lesson42-pack.js', 'lesson42-homework.js', 'lesson-pack-4-2.js', 'nonpast-engine.js'];
+for (const name of banned) assert.ok(!assets.includes(name), name + ' must stay out of the service worker');
+assert.ok(fs.existsSync('tools/build_offline.py'), 'offline list generator is missing');
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20261001-offline-shell'"));
+const html = fs.readFileSync('index.html', 'utf8');
+for (const match of html.matchAll(/src="([^"]+)"/g)) assert.ok(assets.includes(match[1]), match[1]);
+for (const name of assets) assert.ok(fs.existsSync(name), name);
+assert.ok(assets.includes('index.html') && assets.includes('icon-512.png'));
+console.log('VERIFY_OFFLINE_ASSETS_OK', assets.length);
