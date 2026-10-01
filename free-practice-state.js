@@ -4,7 +4,7 @@
 const Q=typeof module!=='undefined'&&module.exports?require('./free-practice-queue.js'):root.FreePracticeQueue;
 const cfg=typeof module!=='undefined'&&module.exports?require('./free-practice-config.js'):root.FreePracticeConfig;
 function empty(seed){
- return {schemaVersion:1,contentVersion:cfg.config.version,revision:0,currentCycle:1,selectedBlockIds:[],explainedBlockIds:[],theoryCursor:null,preferences:{supportLevel:'supported',introSeen:false,repeatNotice:false},seed:(seed>>>0)||1,seedStep:0,currentCard:null,exhaustReason:'',history:[],recentError:null,ownerId:null,lastUpdated:0};
+ return {schemaVersion:1,contentVersion:cfg.config.version,revision:0,currentCycle:1,selectedBlockIds:[],explainedBlockIds:[],theoryCursor:null,preferences:{supportLevel:'try_myself',introSeen:false,repeatNotice:false},seed:(seed>>>0)||1,seedStep:0,currentCard:null,exhaustReason:'',history:[],recentError:null,ownerId:null,lastUpdated:0};
 }
 function migrate(raw){
  if(!raw||raw.schemaVersion!==1)return empty();
