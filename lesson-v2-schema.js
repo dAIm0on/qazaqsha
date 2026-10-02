@@ -66,6 +66,11 @@
        kazakh:str(e.kazakh,'reference.example.kazakh',500),
        translation:str(e.translation,'reference.example.translation',700),
        why:e.why?str(e.why,'reference.example.why',1000):''
+     })),
+     rows:list(r.rows||[],'reference.rows',0,80).map(row=>({
+       kazakh:str(row.kazakh,'reference.row.kazakh',500),
+       translation:str(row.translation,'reference.row.translation',700),
+       note:row.note?str(row.note,'reference.row.note',1200):''
      }))
    };
    if(r.core_anchor)out.core_anchor=id(r.core_anchor,'reference.core_anchor');
