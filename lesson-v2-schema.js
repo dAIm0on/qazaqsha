@@ -42,6 +42,18 @@
    const sourceInput=q.source_refs||q.sourceRefs;if(sourceInput)out.source_refs=strings(sourceInput,'exercise.source_refs',0,20).map(x=>id(x,'source_ref'));
    if(q.diagnostic_codes)out.diagnostic_codes=strings(q.diagnostic_codes,'exercise.diagnostic_codes',0,20).map(x=>id(x,'diagnostic_code'));
    if(q.note)out.note=str(q.note,'exercise.note',1600);
+   if(q.translation)out.translation=str(q.translation,'exercise.translation',1200);
+   if(q.stage)out.stage=str(q.stage,'exercise.stage',40);
+   if(q.error_key)out.error_key=id(q.error_key,'exercise.error_key');
+   if(q.reference_id)out.reference_id=id(q.reference_id,'exercise.reference_id');
+   if(q.translation_visibility)out.translation_visibility=str(q.translation_visibility,'exercise.translation_visibility',40);
+   if(q.item_type)out.item_type=str(q.item_type,'exercise.item_type',60);
+   if(q.direction)out.direction=str(q.direction,'exercise.direction',60);
+   if(q.plural_instruction)out.plural_instruction=str(q.plural_instruction,'exercise.plural_instruction',60);
+   if(q.is_core!=null)out.is_core=!!q.is_core;
+   if(q.recall_eligible!=null)out.recall_eligible=!!q.recall_eligible;
+   if(q.production_eligible!=null)out.production_eligible=!!q.production_eligible;
+   if(q.contrast_group)out.contrast_group=id(q.contrast_group,'exercise.contrast_group');
    return out;
  }
  function theory(t){
@@ -58,6 +70,24 @@
      source_refs:strings(t.source_refs||[],'theory.source_refs',1,30).map(x=>id(x,'source_ref')),
      checks:list(t.checks||[],'theory.checks',1,8).map(c=>({id:id(c.id,'check.id'),type:str(c.type||'one_prod','check.type',40),prompt:str(c.prompt,'check.prompt',700),answers:strings(c.answers,'check.answers',1,20),error_key:id(c.error_key||'other','check.error_key'),rule_line:c.rule_line?str(c.rule_line,'check.rule_line',1000):''}))
    };
+   return out;
+ }
+ function reference(r){
+   if(!obj(r))fail('reference object');
+   const out={
+     id:id(r.id,'reference.id'),
+     title:str(r.title,'reference.title',240),
+     version:str(r.version||'1','reference.version',40),
+     rule_ids:strings(r.rule_ids||[],'reference.rule_ids',1,40).map(x=>id(x,'reference.rule_id')),
+     quick_lines:strings(r.quick_lines||[],'reference.quick_lines',1,80),
+     full_lines:strings(r.full_lines||r.quick_lines||[],'reference.full_lines',1,160),
+     examples:list(r.examples||[],'reference.examples',0,30).map(e=>({
+       kazakh:str(e.kazakh,'reference.example.kazakh',500),
+       translation:str(e.translation,'reference.example.translation',700),
+       why:e.why?str(e.why,'reference.example.why',1200):''
+     }))
+   };
+   if(r.section)out.section=id(r.section,'reference.section');
    return out;
  }
  function vocabulary(w,lessonId){
@@ -161,6 +191,7 @@
      scope:{allowed:strings(raw.scope&&raw.scope.allowed||[],'scope.allowed',1,100),blocked_future:strings(raw.scope&&raw.scope.blocked_future||[],'scope.blocked_future',0,100)},
      rules:list(raw.rules,'rules',1,100).map(r=>({id:id(r.id,'rule.id'),title:str(r.title,'rule.title',240)})),
      theory:list(raw.theory,'theory',1,100).map(theory),
+     references:list(raw.references||[],'references',0,100).map(reference),
      vocabulary:list(raw.vocabulary||[],'vocabulary',0,500).map(w=>vocabulary(w,lessonId)),
      original_exercises:list(raw.original_exercises||[],'original_exercises',0,1000).map(q=>exercise(q,lessonId)),
      practice_generators:list(raw.practice_generators||[],'practice_generators',0,50).map(generator),
@@ -172,6 +203,7 @@
      if(!ruleIds.has(t.rule_id))fail('theory rule_id не найден: '+t.rule_id);
      for(const ref of t.source_refs)if(!sourceIds.has(ref))fail('theory source_ref не найден: '+ref);
    }
+   for(const ref of out.references)for(const rid of ref.rule_ids)if(!ruleIds.has(rid))fail('reference rule_id не найден: '+rid);
    for(const w of out.vocabulary)for(const ref of w.source_refs)if(!sourceIds.has(ref))fail('vocab source_ref не найден: '+ref);
    for(const q of out.original_exercises){
      for(const ref of q.source_refs||[])if(!sourceIds.has(ref))fail('exercise source_ref не найден: '+ref);
@@ -180,7 +212,7 @@
    for(const c of out.corrections)if(!sourceIds.has(c.source_ref))fail('correction source_ref не найден: '+c.source_ref);
    const ids=new Set();
    const take=(x,label)=>{if(ids.has(x))fail('duplicate id '+x+' ('+label+')');ids.add(x);};
-   out.rules.forEach(x=>take(x.id,'rule'));out.theory.forEach(x=>take(x.id,'theory'));out.vocabulary.forEach(x=>take(x.id,'vocabulary'));out.original_exercises.forEach(x=>take(x.id,'exercise'));out.practice_generators.forEach(x=>take(x.id,'generator'));out.corrections.forEach(x=>take(x.id,'correction'));
+   out.rules.forEach(x=>take(x.id,'rule'));out.theory.forEach(x=>take(x.id,'theory'));out.references.forEach(x=>take(x.id+':'+x.version,'reference'));out.vocabulary.forEach(x=>take(x.id,'vocabulary'));out.original_exercises.forEach(x=>take(x.id,'exercise'));out.practice_generators.forEach(x=>take(x.id,'generator'));out.corrections.forEach(x=>take(x.id,'correction'));
    out.generated_questions=list(raw.generated_questions||[],'generated_questions',0,5000).map(q=>exercise(q,lessonId));
    out.generated_questions.forEach(x=>{
      take(x.id,'generated question');
