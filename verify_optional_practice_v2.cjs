@@ -69,26 +69,33 @@ assert.ok(p21.length>0,'2-1 optional practice should not be blocked by topic=per
 assert.ok(p21.every(id=>question(id)&&question(id).topic==='person'));
 assert.equal(new Set(p21).size,p21.length);
 
-// 2-2 proves legacy/non-verb banks without question.ruleIds are reachable through stage rule_ids -> core_ids.
+// 2-2 canonical S1-S8 bank carries direct ruleIds. Optional practice must select
+// the requested rule without leaking unrelated future rules.
 const r22='v2:2-2:sizder';
 const stage22=stageCoreFor('2-2',r22);
 const direct22=directFor('2-2',r22);
-assert.ok(stage22.size>0,'2-2 fixture needs stage mapping');
-assert.deepEqual(Array.from(mock.LessonV2Runtime.practiceForRule('2-2','v2:2-2:biz',12)),[],'early multi-rule stage must not leak future sender/sizder material');
-assert.equal(direct22.size,0,'2-2 fixture must exercise stage-only fallback');
+assert.ok(stage22.size>0,'2-2 canonical stages need sizder coverage');
+assert.ok(direct22.size>0,'2-2 canonical bank must carry direct ruleIds');
+const p22biz=mock.LessonV2Runtime.practiceForRule('2-2','v2:2-2:biz',12);
+assert.ok(p22biz.length>0,'2-2 biz optional practice should produce cards');
+assert.ok(p22biz.every(id=>question(id)&&(question(id).ruleIds||[]).includes('v2:2-2:biz')),'early biz practice must come from direct biz-tagged items');
 const p22=mock.LessonV2Runtime.practiceForRule('2-2',r22,999);
-assert.ok(p22.length>0,'2-2 stage-only optional practice should produce cards');
+assert.ok(p22.length>0,'2-2 sizder optional practice should produce cards');
 assert.ok(p22.every(id=>stage22.has(id)||direct22.has(id)));
-assert.ok(p22.some(id=>stage22.has(id)));
+assert.ok(p22.some(id=>direct22.has(id)));
 
-// 2-3 proves the same contract works for a different grammar topic.
+// 2-3 canonical ordinal bank also carries direct ruleIds.
 const r23='v2:2-3:ordp';
 const stage23=stageCoreFor('2-3',r23);
-assert.ok(stage23.size>0,'2-3 ordinal stage mapping missing');
-assert.deepEqual(Array.from(mock.LessonV2Runtime.practiceForRule('2-3','v2:2-3:ord',12)),[],'early ordinal chapter must not leak comp/ordp stage material');
+const direct23=directFor('2-3',r23);
+assert.ok(stage23.size>0,'2-3 ordinal-person stage mapping missing');
+assert.ok(direct23.size>0,'2-3 canonical ordinal-person items need direct ruleIds');
+const p23ord=mock.LessonV2Runtime.practiceForRule('2-3','v2:2-3:ord',12);
+assert.ok(p23ord.length>0,'2-3 ordinal optional practice should produce cards');
+assert.ok(p23ord.every(id=>question(id)&&(question(id).ruleIds||[]).includes('v2:2-3:ord')),'early ordinal practice must stay on ordinal-tagged items');
 const p23=mock.LessonV2Runtime.practiceForRule('2-3',r23,12);
-assert.ok(p23.length>0,'2-3 optional practice should produce cards');
-assert.ok(p23.every(id=>question(id)&&['person','numbers'].includes(question(id).topic)));
+assert.ok(p23.length>0,'2-3 ordinal-person optional practice should produce cards');
+assert.ok(p23.every(id=>question(id)&&question(id).topic==='rules'));
 
 // 3-x regression: direct non-verb ruleIds must work for possessive/person banks too.
 const p31=mock.LessonV2Runtime.practiceForRule('3-1','v2:3-1:poss',12);
@@ -102,6 +109,32 @@ assert.ok(p32.every(id=>question(id)&&question(id).topic==='possessive'));
 const p33=mock.LessonV2Runtime.practiceForRule('3-3','v2:3-3:who-whose',12);
 assert.ok(p33.length>0,'3-3 person optional practice should produce cards');
 assert.ok(p33.every(id=>question(id)&&question(id).topic==='person'));
+
+// Stage-only fallback remains supported for legacy/non-direct banks.
+const p22installed=mock.LessonV2Runtime.byId('2-2');
+mock.COURSE.questions.push({
+  id:'fixture-stage-only-nonverb',
+  lessonId:'2-2',
+  topic:'person',
+  ruleIds:[],
+  stimulus:'Біз + жаңа сөз',
+  fields:[{label:'Ответ',kind:'text',answers:['форма']}]
+});
+p22installed.stages.push({
+  id:'fixture-stage-only',
+  title:'fixture stage-only',
+  kind:'learning',
+  core_ids:['fixture-stage-only-nonverb'],
+  required_independent_ids:['fixture-stage-only-nonverb'],
+  rule_ids:['v2:fixture:stage-only'],
+  min_independent_ratio:0.8,
+  max_presentations:4,
+  final:false
+});
+assert.deepEqual(
+  Array.from(mock.LessonV2Runtime.practiceForRule('2-2','v2:fixture:stage-only',12)),
+  ['fixture-stage-only-nonverb']
+);
 
 // Direct non-verb fallback must work even when no stage mentions the rule.
 mock.COURSE.questions.push({
@@ -140,11 +173,11 @@ assert.equal(JSON.stringify(registered),beforeStages);
 
 // Learning tracks must reflect their real topic instead of classifying every v2 stage as verbs.
 const tracks22=mock.LEARNING.lessons.filter(x=>x.courseLesson==='2-2');
-assert.ok(tracks22.length>0);
+assert.equal(tracks22.length,8,'2-2 must expose S1-S8 learning tracks');
 assert.ok(tracks22.every(x=>x.topic==='person'),'2-2 tracks should be person, not verbs');
-const ordTrack=mock.LEARNING.lessons.find(x=>x.id==='v2-track-stage-2-3-ord');
-assert.ok(ordTrack,'2-3 ordinal track missing');
-assert.equal(ordTrack.topic,'numbers');
+const tracks23=mock.LEARNING.lessons.filter(x=>x.courseLesson==='2-3');
+assert.equal(tracks23.length,8,'2-3 must expose S1-S8 learning tracks');
+assert.ok(tracks23.every(x=>x.topic==='rules'),'2-3 canonical tracks should use rules topic');
 const track31=mock.LEARNING.lessons.find(x=>x.id==='v2-track-stage-3-1-1-1');
 assert.ok(track31,'3-1 first track missing');
 assert.equal(track31.topic,'possessive');
