@@ -210,7 +210,7 @@ assert.ok(!afterOpen.completed.includes('2-1:2-1-glue'));
 ok('save-then-open mid-path: persist keeps legacy rev; load migrates to v2-theory-2-1-emes');
 
 // Recovery: already-stamped target + legacy ids (broken tip state) still migrates on open
-const premature={phase:'beat',chapterId:'2-1-emes',beat:0,contentRevision:'2-1.r1',updatedAt:2};
+const premature={phase:'beat',chapterId:'2-1-emes',beat:0,contentRevision:'2-1.r2',updatedAt:2};
 const recovered=simulateLoadResilient(premature,midCompleted);
 assert.equal(recovered.chapterId,'v2-theory-2-1-emes');
 assert.ok(recovered.completed.includes('2-1:v2-theory-2-1-glue'));
@@ -222,7 +222,7 @@ const persistCurrent=simulatePersist({phase:'beat',chapterId:'v2-theory-2-1-emes
 assert.equal(persistCurrent.contentRevision,'2-1.r2');
 ok('persist stamps target when chapter ids already current');
 
-const prematureDone=simulateLoadResilient({phase:'done',chapterId:null,contentRevision:'2-1.r1',updatedAt:2},{
+const prematureDone=simulateLoadResilient({phase:'done',chapterId:null,contentRevision:'2-1.r2',updatedAt:2},{
   '2-1:2-1-glue':true,'2-1:2-1-pron':true,'2-1:2-1-clause':true,'2-1:2-1-men':true,'2-1:2-1-sen':true,
   '2-1:2-1-siz':true,'2-1:2-1-emes':true,'2-1:2-1-ba':true,'2-1:2-1-siz2':true,'2-1:2-1-checkpoint':true
 });
