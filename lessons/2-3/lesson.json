@@ -5575,7 +5575,17 @@
       "external_test"
     ]
   },
-  "migrations": [],
+  "migrations": [
+    {
+      "from_revision": "2-3.r1",
+      "to_revision": "2-3.r2",
+      "question_ids": {},
+      "chapter_ids": {},
+      "stage_ids": {},
+      "vocab_ids": {},
+      "drop_question_ids": []
+    }
+  ],
   "references": [
     {
       "id": "ref:2-3:person",
