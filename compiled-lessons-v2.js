@@ -735,6 +735,7 @@ window.LESSON_V2_COMPILED = [
         ]
       }
     ],
+    "references": [],
     "vocabulary": [
       {
         "id": "vocab:1-1:adam",
@@ -2147,6 +2148,7 @@ window.LESSON_V2_COMPILED = [
         ]
       }
     ],
+    "references": [],
     "vocabulary": [
       {
         "id": "vocab:1-2:nol",
@@ -5926,6 +5928,7 @@ window.LESSON_V2_COMPILED = [
         ]
       }
     ],
+    "references": [],
     "vocabulary": [
       {
         "id": "vocab:1-3:dos",
@@ -9241,7 +9244,7 @@ window.LESSON_V2_COMPILED = [
   {
     "schema_version": 2,
     "lesson_id": "2-1",
-    "content_revision": "2-1.r1",
+    "content_revision": "2-1.r2",
     "title": "Урок 2–1 · Мен, сен, сіз; емес; ба, бе",
     "label": "2–1",
     "name": "Мен, сен, сіз; емес; ба, бе",
@@ -9251,7 +9254,7 @@ window.LESSON_V2_COMPILED = [
       "preview_head": "",
       "preview_url": "",
       "approved_at": "",
-      "note": "2026-10-01 teaching rework 2-1→2-3; pending preview QA. No merge/deploy."
+      "note": "2026-10-02 LESSONS FIX step 9; canonical CORE/practice/references implemented; pending preview QA."
     },
     "sources": [
       {
@@ -9309,7 +9312,7 @@ window.LESSON_V2_COMPILED = [
     "rules": [
       {
         "id": "v2:2-1:glue",
-        "title": "Три формы этого урока"
+        "title": "Основа и порядок сборки формы"
       },
       {
         "id": "v2:2-1:pron",
@@ -9352,47 +9355,50 @@ window.LESSON_V2_COMPILED = [
       {
         "id": "theory:2-1:glue",
         "rule_id": "v2:2-1:glue",
-        "title": "Три формы этого урока",
-        "meaning": "В этом уроке нужно научиться строить три короткие формы: «я/ты/вы — кто-то», «я/ты/вы не кто-то» и вопрос «ты/вы кто-то?». Каждая следующая форма использует уже знакомую предыдущую.",
-        "fullExplanation": "Утверждение получает личное окончание: Мен дәрігермін. В отрицании появляется отдельное слово емес, и личное окончание ставится уже на него: Мен дәрігер емеспін. В вопросе в конце добавляется вопросительная частица: Сен дәрігерсің бе? В этом уроке для вопросов используются только ба/бе; полный выбор частиц будет позже. Личное окончание не должно одновременно оставаться и на основном слове, и на емес.",
-        "shortHint": "Утверждение — окончание на слове. Отрицание — окончание на емес. Вопрос — ба/бе в конце.",
+        "title": "С чего начинать: смысл → основа → форма",
+        "meaning": "Перед любым окончанием сначала пойми смысл фразы, затем найди основу слова и только потом выбирай форму. Так не нужно угадывать окончание по примеру.",
+        "fullExplanation": "Основа — слово без нового окончания, которое мы сейчас хотим добавить. Сначала реши, кто говорит: мен — я, сен — ты, сіз — Вы одному человеку уважительно. Затем найди основу: например, дәрігер — врач. После этого выбери личное окончание. Для мен нужно две проверки: твёрдый/мягкий ряд выбирает Ы/І, а последний звук основы выбирает П/Б/М. Для сен и сіз достаточно выбрать твёрдый или мягкий ряд. В отрицании сначала ставится емес — не является, и личное окончание относится уже к емес. В вопросе сначала полностью собирается форма, затем отдельно добавляется ба/бе. Порядок всегда один: смысл → основа → правило → готовая форма.",
+        "shortHint": "Сначала смысл и основа. Потом ряд, последний звук и окончание.",
         "decisionSteps": [
-          "Сначала выбери: мен, сен или сіз.",
-          "Для утверждения поставь нужное личное окончание на главное слово.",
-          "Для отрицания оставь главное слово без личного окончания, добавь емес и поставь окончание на емес.",
-          "Для вопроса добавь в конце ба или бе."
+          "Определи, кто говорит: я, ты или Вы одному человеку уважительно.",
+          "Найди основу — слово без нового окончания.",
+          "Определи твёрдый или мягкий ряд.",
+          "Если это мен, посмотри последний звук основы и выбери П/Б/М.",
+          "Добавь личное окончание.",
+          "Если нужно отрицание, добавь емес и перенеси личное окончание на него.",
+          "Если нужен вопрос, сначала собери форму целиком и только потом добавь ба/бе."
         ],
         "examples": [
           {
-            "kazakh": "Мен дәрігермін",
+            "kazakh": "дәрігермін",
             "translation": "я врач",
-            "why": "мен + дәрігер, лицо на слове"
+            "why": "дәрігер — основа; мягкий ряд; для мен после Р нужна М-серия → -мін."
           },
           {
-            "kazakh": "Мен дәрігер емеспін",
+            "kazakh": "доспын",
+            "translation": "я друг",
+            "why": "дос — основа; С глухая → П-серия → -пын."
+          },
+          {
+            "kazakh": "дәрігер емеспін",
             "translation": "я не врач",
-            "why": "окончание на емес"
-          },
-          {
-            "kazakh": "Сен дәрігерсің бе?",
-            "translation": "ты врач?",
-            "why": "вопрос ба/бе этого урока"
+            "why": "в отрицании личное окончание стоит на емес."
           }
         ],
         "contrastExamples": [
           {
             "bad": "Мен дәрігермін емеспін",
             "good": "Мен дәрігер емеспін",
-            "why": "Не оставляй лицо и на основе, и на емес."
+            "why": "Личное окончание ставится один раз: в отрицании оно относится к емес."
           }
         ],
         "limitations": [
           "Здесь не строим формы «мы», «вы ко многим» и «они». Не открываем полную таблицу вопросительных частиц."
         ],
         "commonConfusions": [
-          "двойное окончание",
-          "вопрос без частицы",
-          "попытка сразу использовать формы следующих уроков."
+          "пытаться выбирать окончание без основы",
+          "смотреть только на последнюю букву и забывать ряд",
+          "оставлять личное окончание и на основном слове, и на емес"
         ],
         "source_refs": [
           "school-method",
@@ -9556,7 +9562,7 @@ window.LESSON_V2_COMPILED = [
           "Не разбираем другие типы сказуемого и падежные формы. Только простые именные/прилагательные формы курса."
         ],
         "commonConfusions": [
-          "голое слово после мен",
+          "слово без личного окончания после мен",
           "перенос ударения на окончание."
         ],
         "source_refs": [
@@ -9979,7 +9985,7 @@ window.LESSON_V2_COMPILED = [
         "contrastExamples": [
           {
             "bad": "открыть па/пе сейчас",
-            "good": "ба/бе как кусок 2-1",
+            "good": "ба/бе как часть 2-1",
             "why": "Полная таблица не этого урока."
           }
         ],
@@ -10258,6 +10264,143 @@ window.LESSON_V2_COMPILED = [
             "rule_line": ""
           }
         ]
+      }
+    ],
+    "references": [
+      {
+        "id": "ref:2-1:base",
+        "title": "Как собирать форму",
+        "rule_ids": [
+          "v2:2-1:glue",
+          "v2:2-1:clause",
+          "v2:2-1:checkpoint"
+        ],
+        "quick": "1. Определи смысл и лицо.\n2. Найди основу — слово без нового окончания.\n3. Выбери твёрдый/мягкий ряд.\n4. Если правило требует, посмотри последний звук.\n5. Добавь окончание.\n6. Отрицание и вопрос добавляй только после сборки основной формы.",
+        "full": "Главное: ряд и последний звук — две разные проверки. Ряд выбирает Ы/І или А/Е. Последний звук в формах мен выбирает П/Б/М. В отрицании следующим словом становится емес, поэтому личное окончание ставится уже на него.",
+        "examples": [
+          {
+            "kazakh": "студентпін",
+            "translation": "я студент",
+            "why": "мягкий ряд + Т → П-серия."
+          },
+          {
+            "kazakh": "қызбын",
+            "translation": "я девушка",
+            "why": "твёрдый ряд + З → Б-серия."
+          },
+          {
+            "kazakh": "адаммын",
+            "translation": "я человек",
+            "why": "твёрдый ряд + М → М-серия."
+          }
+        ],
+        "rows": [],
+        "core_anchor": "theory:2-1:glue"
+      },
+      {
+        "id": "ref:2-1:person",
+        "title": "Кто говорит и какое окончание",
+        "rule_ids": [
+          "v2:2-1:pron",
+          "v2:2-1:men",
+          "v2:2-1:sen",
+          "v2:2-1:siz",
+          "v2:2-1:siz-word"
+        ],
+        "quick": "МЕН: глухой или конечные Б/В/Г/Д → -пын/-пін; Ж/З → -бын/-бін; остальные → -мын/-мін.\nСЕН: -сың/-сің.\nСІЗ: -сыз/-сіз.",
+        "full": "Для мен сначала выбери твёрдый/мягкий ряд, затем П/Б/М по последнему звуку основы. Для сен и сіз П/Б/М не выбирается: нужен только вариант по ряду.",
+        "examples": [
+          {
+            "kazakh": "доспын",
+            "translation": "я друг",
+            "why": "С глухая → П."
+          },
+          {
+            "kazakh": "қызбын",
+            "translation": "я девушка",
+            "why": "З → Б."
+          },
+          {
+            "kazakh": "дәрігермін",
+            "translation": "я врач",
+            "why": "Р → М; мягкий ряд → І."
+          }
+        ],
+        "rows": [
+          {
+            "kazakh": "мен",
+            "translation": "я",
+            "note": "П/Б/М + Ы/І"
+          },
+          {
+            "kazakh": "сен",
+            "translation": "ты",
+            "note": "-сың/-сің"
+          },
+          {
+            "kazakh": "сіз",
+            "translation": "Вы одному человеку уважительно",
+            "note": "-сыз/-сіз"
+          }
+        ],
+        "core_anchor": "theory:2-1:men"
+      },
+      {
+        "id": "ref:2-1:neg",
+        "title": "Как сделать отрицание",
+        "rule_ids": [
+          "v2:2-1:emes"
+        ],
+        "quick": "Смысловое слово + емес + личное окончание.\nЛичное окончание ставится один раз — на емес.",
+        "full": "Сначала оставь основное слово без личного окончания. Затем добавь емес — «не является / не такой» и поставь на него окончание нужного лица.",
+        "examples": [
+          {
+            "kazakh": "сен мұғалім емессің",
+            "translation": "ты не учитель",
+            "why": "личное окончание только на емес."
+          }
+        ],
+        "rows": [
+          {
+            "kazakh": "емеспін",
+            "translation": "я не…",
+            "note": "мен"
+          },
+          {
+            "kazakh": "емессің",
+            "translation": "ты не…",
+            "note": "сен"
+          },
+          {
+            "kazakh": "емессіз",
+            "translation": "Вы не…",
+            "note": "сіз"
+          }
+        ],
+        "core_anchor": "theory:2-1:emes"
+      },
+      {
+        "id": "ref:2-1:question",
+        "title": "Как задать вопрос",
+        "rule_ids": [
+          "v2:2-1:ba"
+        ],
+        "quick": "В 2–1 используются ба/бе.\nСначала полностью собери утверждение или отрицание. Потом добавь частицу отдельно.\nТвёрдый ряд → ба. Мягкий ряд → бе.",
+        "full": "Полная таблица па/пе, ба/бе, ма/ме будет в 2–3. В 2–1 не нужно угадывать будущие варианты.",
+        "examples": [
+          {
+            "kazakh": "сен оқушысың ба?",
+            "translation": "ты ученик?",
+            "why": "твёрдый ряд → ба."
+          },
+          {
+            "kazakh": "сіз заңгерсіз бе?",
+            "translation": "Вы юрист?",
+            "why": "мягкий ряд → бе."
+          }
+        ],
+        "rows": [],
+        "core_anchor": "theory:2-1:ba"
       }
     ],
     "vocabulary": [
@@ -10650,7 +10793,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-2",
@@ -10679,7 +10826,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-3",
@@ -10708,7 +10859,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-4",
@@ -10737,7 +10892,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-5",
@@ -10766,7 +10925,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-6",
@@ -10795,7 +10958,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-7",
@@ -10824,7 +10991,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-8",
@@ -10853,7 +11024,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-9",
@@ -10882,7 +11057,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-10",
@@ -10911,7 +11090,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-11",
@@ -10940,7 +11123,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-12",
@@ -10969,7 +11156,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-13",
@@ -10998,7 +11189,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-14",
@@ -11027,7 +11222,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-15",
@@ -11056,7 +11255,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-16",
@@ -11085,7 +11288,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-17",
@@ -11114,7 +11321,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-form-18",
@@ -11143,7 +11354,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-1-mugalim-siz",
@@ -11172,7 +11387,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-1-mugalim-men",
@@ -11201,7 +11420,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-1-oqushy-sen",
@@ -11230,7 +11453,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-1-oqushy-siz",
@@ -11259,7 +11486,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-1-zanger-sen",
@@ -11288,7 +11519,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-1-zanger-men",
@@ -11317,7 +11552,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-2-qyz-men",
@@ -11346,7 +11585,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-2-qyz-sen",
@@ -11375,7 +11618,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-2-student-siz",
@@ -11404,7 +11651,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-2-student-men",
@@ -11433,7 +11684,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-2-adam-siz",
@@ -11462,7 +11717,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fill-2-2-adam-sen",
@@ -11491,7 +11750,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:person",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-tr-1",
@@ -11520,7 +11783,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-tr-2",
@@ -11549,7 +11816,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-tr-3",
@@ -11578,7 +11849,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-tr-4",
@@ -11607,7 +11882,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-tr-5",
@@ -11636,7 +11915,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-tr-6",
@@ -11665,7 +11948,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-tr-7",
@@ -11694,7 +11981,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-tr-8",
@@ -11723,7 +12014,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-tr-9",
@@ -11752,7 +12047,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-tr-10",
@@ -11781,7 +12080,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-neg-1",
@@ -11815,7 +12118,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-neg-2",
@@ -11850,7 +12157,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-neg-3",
@@ -11884,7 +12195,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-neg-4",
@@ -11918,7 +12233,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-neg-5",
@@ -11953,7 +12272,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-neg-6",
@@ -11987,7 +12310,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-neg-7",
@@ -12021,7 +12348,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-neg-8",
@@ -12055,7 +12386,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-neg-9",
@@ -12089,7 +12424,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-neg-10",
@@ -12123,7 +12462,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-aff-1",
@@ -12157,7 +12500,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-aff-2",
@@ -12191,7 +12538,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-aff-3",
@@ -12226,7 +12577,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-aff-4",
@@ -12260,7 +12615,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-aff-5",
@@ -12294,7 +12653,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-aff-6",
@@ -12328,7 +12691,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-aff-7",
@@ -12362,7 +12729,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-aff-8",
@@ -12396,7 +12767,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-aff-9",
@@ -12430,7 +12805,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-aff-10",
@@ -12464,7 +12843,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-qa-1",
@@ -12499,7 +12882,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:question",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-qa-2",
@@ -12534,7 +12921,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:question",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-qa-3",
@@ -12569,7 +12960,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:question",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-qa-4",
@@ -12604,7 +12999,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:question",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-qa-5",
@@ -12639,7 +13038,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:question",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-qa-6",
@@ -12674,7 +13077,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:question",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-qa-7",
@@ -12709,7 +13116,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:question",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-qa-8",
@@ -12744,7 +13155,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:question",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-qa-9",
@@ -12779,7 +13194,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:question",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-qa-10",
@@ -12814,7 +13233,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "reference_id": "ref:2-1:question",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fix-1",
@@ -12851,7 +13274,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fix-2",
@@ -12887,7 +13314,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fix-3",
@@ -12923,7 +13354,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fix-4",
@@ -12959,7 +13394,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fix-5",
@@ -12993,7 +13432,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "reference_id": "ref:2-1:neg",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fix-6",
@@ -13029,7 +13472,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fix-7",
@@ -13063,7 +13510,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fix-8",
@@ -13097,7 +13548,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fix-9",
@@ -13133,7 +13588,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e21-fix-10",
@@ -13167,7 +13626,11 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "reference_id": "ref:2-1:base",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-aqyldy-ru",
@@ -13190,7 +13653,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-aqyldy-kk",
@@ -13213,7 +13679,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zhomart-ru",
@@ -13236,7 +13705,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zhomart-kk",
@@ -13259,7 +13731,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-saran-ru",
@@ -13282,7 +13757,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-saran-kk",
@@ -13305,7 +13783,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-bai-ru",
@@ -13328,7 +13809,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-bai-kk",
@@ -13351,7 +13835,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-kedei-ru",
@@ -13374,7 +13861,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-kedei-kk",
@@ -13397,7 +13887,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zhas-ru",
@@ -13420,7 +13913,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zhas-kk",
@@ -13443,7 +13939,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zeinetker-ru",
@@ -13466,7 +13965,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zeinetker-kk",
@@ -13489,7 +13991,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-esepshi-ru",
@@ -13512,7 +14017,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-esepshi-kk",
@@ -13535,7 +14043,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zhumyssyz-ru",
@@ -13558,7 +14069,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zhumyssyz-kk",
@@ -13581,7 +14095,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zhumysshy-ru",
@@ -13604,7 +14121,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zhumysshy-kk",
@@ -13627,7 +14147,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-bastyq-ru",
@@ -13650,7 +14173,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-bastyq-kk",
@@ -13673,7 +14199,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zholserik-ru",
@@ -13696,7 +14225,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zholserik-kk",
@@ -13719,7 +14251,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-aqyn-ru",
@@ -13742,7 +14277,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-aqyn-kk",
@@ -13765,7 +14303,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-jazushy-ru",
@@ -13788,7 +14329,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-jazushy-kk",
@@ -13811,7 +14355,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zhurgizushi-ru",
@@ -13834,7 +14381,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-zhurgizushi-kk",
@@ -13857,7 +14407,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-kasipker-ru",
@@ -13880,7 +14433,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-kasipker-kk",
@@ -13903,7 +14459,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-oqyrman-ru",
@@ -13926,7 +14485,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-oqyrman-kk",
@@ -13949,7 +14511,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-aspaz-ru",
@@ -13972,7 +14537,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-aspaz-kk",
@@ -13995,7 +14563,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-salem-ru",
@@ -14018,7 +14589,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-salem-kk",
@@ -14041,7 +14615,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-salemetsiz-be-ru",
@@ -14064,7 +14641,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-salemetsiz-be-kk",
@@ -14087,7 +14667,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-salemetsizder-me-ru",
@@ -14110,7 +14693,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-salemetsizder-me-kk",
@@ -14133,7 +14719,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-assalaumagaleikum-ru",
@@ -14156,7 +14745,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-assalaumagaleikum-kk",
@@ -14179,7 +14771,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-uagaleikumassalam-ru",
@@ -14202,7 +14797,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "v2-2-1-vocab-uagaleikumassalam-kk",
@@ -14225,7 +14823,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "hw:2-1:source:3",
         "source_refs": [
           "school-homework"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       }
     ],
     "practice_generators": [],
@@ -14800,7 +15401,7 @@ window.LESSON_V2_COMPILED = [
   {
     "schema_version": 2,
     "lesson_id": "2-2",
-    "content_revision": "2-2.r1",
+    "content_revision": "2-2.r2",
     "title": "Урок 2–2 · Біз, сендер, сіздер; прилагательное",
     "label": "2–2",
     "name": "Біз, сендер, сіздер; прилагательное",
@@ -14810,7 +15411,7 @@ window.LESSON_V2_COMPILED = [
       "preview_head": "",
       "preview_url": "",
       "approved_at": "",
-      "note": "2026-10-01 teaching rework 2-1→2-3; pending preview QA. No merge/deploy."
+      "note": "2026-10-02 LESSONS FIX step 9; canonical CORE/practice/references implemented; pending preview QA."
     },
     "sources": [
       {
@@ -15744,6 +16345,151 @@ window.LESSON_V2_COMPILED = [
         ]
       }
     ],
+    "references": [
+      {
+        "id": "ref:2-2:person",
+        "title": "Личные окончания: шесть лиц",
+        "rule_ids": [
+          "v2:2-2:adj",
+          "v2:2-2:biz",
+          "v2:2-2:mn",
+          "v2:2-2:noextra",
+          "v2:2-2:checkpoint"
+        ],
+        "quick": "БІЗ: глухой или конечные Б/В/Г/Д → -пыз/-піз; М/Н/Ң/Ж/З → -быз/-біз; остальные → -мыз/-міз.\nПосле М/Н/Ң у біз всегда Б-серия.\nСЕНДЕР: -сыңдар/-сіңдер.\nСІЗДЕР: -сыздар/-сіздер.",
+        "full": "Сначала повтори правило 2–1, затем добавь новые лица. Для біз логика похожа на мен, но после М/Н/Ң нужна Б-серия: ғалымбыз, мұғалімбіз, адамбыз. У сендер/сіздер не нужно дополнительно ставить множественное окончание на основу.",
+        "examples": [
+          {
+            "kazakh": "ғалымбыз",
+            "translation": "мы учёные",
+            "why": "М → Б-серия у біз."
+          },
+          {
+            "kazakh": "мұғалімбіз",
+            "translation": "мы учителя",
+            "why": "М → Б-серия; мягкий ряд → І."
+          },
+          {
+            "kazakh": "ақылдымыз",
+            "translation": "мы умные",
+            "why": "прилагательное-сказуемое получает личное окончание."
+          }
+        ],
+        "rows": [
+          {
+            "kazakh": "біз",
+            "translation": "мы",
+            "note": "-пыз/-быз/-мыз или -піз/-біз/-міз"
+          },
+          {
+            "kazakh": "сендер",
+            "translation": "вы, несколько людей неформально",
+            "note": "-сыңдар/-сіңдер"
+          },
+          {
+            "kazakh": "сіздер",
+            "translation": "вы, несколько людей уважительно",
+            "note": "-сыздар/-сіздер"
+          }
+        ],
+        "core_anchor": "theory:2-2:biz"
+      },
+      {
+        "id": "ref:2-2:address",
+        "title": "Ты / Вы / несколько",
+        "rule_ids": [
+          "v2:2-2:sender",
+          "v2:2-2:sizder"
+        ],
+        "quick": "Один неформально → сен.\nОдин уважительно → сіз.\nНесколько неформально → сендер.\nНесколько уважительно → сіздер.",
+        "full": "Сначала реши, один человек или несколько. Затем — неформально или уважительно. Только после этого выбирай личное окончание.",
+        "examples": [],
+        "rows": [
+          {
+            "kazakh": "сен",
+            "translation": "ты, один неформально",
+            "note": "-сың/-сің"
+          },
+          {
+            "kazakh": "сіз",
+            "translation": "Вы, один уважительно",
+            "note": "-сыз/-сіз"
+          },
+          {
+            "kazakh": "сендер",
+            "translation": "вы, несколько неформально",
+            "note": "-сыңдар/-сіңдер"
+          },
+          {
+            "kazakh": "сіздер",
+            "translation": "вы, несколько уважительно",
+            "note": "-сыздар/-сіздер"
+          }
+        ],
+        "core_anchor": "theory:2-2:sender"
+      },
+      {
+        "id": "ref:2-2:question",
+        "title": "Вопрос после готовой формы",
+        "rule_ids": [
+          "v2:2-2:rq"
+        ],
+        "quick": "Если готовая форма заканчивается на М/Н/Ң/Ж/З → ба/бе.\nЕсли заканчивается на Р → ма/ме.\nСначала собери форму, потом смотри на её последний звук.",
+        "full": "В 2–2 открывается ма/ме после Р. Полная таблица с па/пе будет в 2–3. Вопросительная частица пишется отдельно.",
+        "examples": [
+          {
+            "kazakh": "біз дәрігерміз бе?",
+            "translation": "мы врачи?",
+            "why": "готовая форма заканчивается на З → бе."
+          },
+          {
+            "kazakh": "сендер жазушысыңдар ма?",
+            "translation": "вы писатели?",
+            "why": "готовая форма заканчивается на Р → ма."
+          }
+        ],
+        "rows": [],
+        "core_anchor": "theory:2-2:rq"
+      },
+      {
+        "id": "ref:2-2:ready",
+        "title": "Готовые приветствия и прощания",
+        "rule_ids": [
+          "v2:2-2:hi"
+        ],
+        "quick": "Эти формы пока запоминаем целиком. Их внутренняя глагольная грамматика будет позже.",
+        "full": "Выбирай форму по адресату: один/несколько и неформально/уважительно.",
+        "examples": [],
+        "rows": [
+          {
+            "kazakh": "сәлем",
+            "translation": "привет",
+            "note": "неформально"
+          },
+          {
+            "kazakh": "сәлеметсіз бе",
+            "translation": "здравствуйте одному человеку уважительно",
+            "note": "готовая форма"
+          },
+          {
+            "kazakh": "сәлеметсіздер ме",
+            "translation": "здравствуйте нескольким людям уважительно",
+            "note": "готовая форма"
+          },
+          {
+            "kazakh": "сау бол",
+            "translation": "до свидания одному человеку неформально",
+            "note": "готовая форма"
+          },
+          {
+            "kazakh": "сау болыңыз",
+            "translation": "до свидания одному человеку уважительно",
+            "note": "готовая форма"
+          }
+        ],
+        "core_anchor": "theory:2-2:hi"
+      }
+    ],
     "vocabulary": [
       {
         "id": "vocab:2-2:korshi",
@@ -15979,7 +16725,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-2",
@@ -16003,7 +16752,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-3",
@@ -16027,7 +16779,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-4",
@@ -16051,7 +16806,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-5",
@@ -16075,7 +16833,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-6",
@@ -16099,7 +16860,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-7",
@@ -16123,7 +16887,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-8",
@@ -16147,7 +16914,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-9",
@@ -16171,7 +16941,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-10",
@@ -16195,7 +16968,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-11",
@@ -16219,7 +16995,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-12",
@@ -16243,7 +17022,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-13",
@@ -16267,7 +17049,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-14",
@@ -16291,7 +17076,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-15",
@@ -16315,7 +17103,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-16",
@@ -16339,7 +17130,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-17",
@@ -16363,7 +17157,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-18",
@@ -16387,7 +17184,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-19",
@@ -16411,7 +17211,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-20",
@@ -16435,7 +17238,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-21",
@@ -16459,7 +17265,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-22",
@@ -16483,7 +17292,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-23",
@@ -16507,7 +17319,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-24",
@@ -16531,7 +17346,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-25",
@@ -16555,7 +17373,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-26",
@@ -16579,7 +17400,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-27",
@@ -16603,7 +17427,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-28",
@@ -16627,7 +17454,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-29",
@@ -16651,7 +17481,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-30",
@@ -16675,7 +17508,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-31",
@@ -16699,7 +17535,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-32",
@@ -16723,7 +17562,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-33",
@@ -16747,7 +17589,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-34",
@@ -16771,7 +17616,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-35",
@@ -16795,7 +17643,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-36",
@@ -16819,7 +17670,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-37",
@@ -16843,7 +17697,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-38",
@@ -16867,7 +17724,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-39",
@@ -16891,7 +17751,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-40",
@@ -16915,7 +17778,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-41",
@@ -16939,7 +17805,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-42",
@@ -16963,7 +17832,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-43",
@@ -16987,7 +17859,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-44",
@@ -17011,7 +17886,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-45",
@@ -17035,7 +17913,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-46",
@@ -17059,7 +17940,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-47",
@@ -17083,7 +17967,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-48",
@@ -17107,7 +17994,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-49",
@@ -17131,7 +18021,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-50",
@@ -17155,7 +18048,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-51",
@@ -17179,7 +18075,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-52",
@@ -17203,7 +18102,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-53",
@@ -17227,7 +18129,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-54",
@@ -17251,7 +18156,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-55",
@@ -17275,7 +18183,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-56",
@@ -17299,7 +18210,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-57",
@@ -17323,7 +18237,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-58",
@@ -17347,7 +18264,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-59",
@@ -17371,7 +18291,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-60",
@@ -17395,7 +18318,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-61",
@@ -17419,7 +18345,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-62",
@@ -17443,7 +18372,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-63",
@@ -17467,7 +18399,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-64",
@@ -17491,7 +18426,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-65",
@@ -17515,7 +18453,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-66",
@@ -17539,7 +18480,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-67",
@@ -17563,7 +18507,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-68",
@@ -17587,7 +18534,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-69",
@@ -17611,7 +18561,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-70",
@@ -17635,7 +18588,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-71",
@@ -17659,7 +18615,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-form-72",
@@ -17683,7 +18642,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-3-1-1",
@@ -17707,7 +18669,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:3-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-3-1-2",
@@ -17731,7 +18696,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:3-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-3-1-3",
@@ -17755,7 +18723,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:3-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-3-1-4",
@@ -17779,7 +18750,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:3-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-3-1-5",
@@ -17803,7 +18777,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:3-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-3-2-1",
@@ -17827,7 +18804,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:3-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-3-2-2",
@@ -17851,7 +18831,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:3-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-3-2-3",
@@ -17875,7 +18858,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:3-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-3-2-4",
@@ -17899,7 +18885,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:3-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-3-2-5",
@@ -17923,7 +18912,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:3-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-4-1-1",
@@ -17955,7 +18947,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:4-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-4-1-2",
@@ -17987,7 +18982,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:4-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-4-1-3",
@@ -18019,7 +19017,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:4-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-4-1-4",
@@ -18051,7 +19052,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:4-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-4-1-5",
@@ -18083,7 +19087,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:4-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-4-2-1",
@@ -18115,7 +19122,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:4-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-4-2-2",
@@ -18146,7 +19156,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:4-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-4-2-3",
@@ -18179,7 +19192,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:4-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-4-2-4",
@@ -18213,7 +19229,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:4-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-4-2-5",
@@ -18245,7 +19264,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:4-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-5-1",
@@ -18277,7 +19299,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:5-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-5-2",
@@ -18309,7 +19334,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:5-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-5-3",
@@ -18341,7 +19369,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:5-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-5-4",
@@ -18374,7 +19405,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "В ключе сборника исправление повторяет кәсіпкерлер. Методичка: при сіздер второе множественное не ставится. Верно: Сіздер кәсіпкер емессіздер ме?"
+        "note": "В ключе сборника исправление повторяет кәсіпкерлер. Методичка: при сіздер второе множественное не ставится. Верно: Сіздер кәсіпкер емессіздер ме?",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-5-5",
@@ -18406,7 +19440,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:5-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-5-6",
@@ -18440,7 +19477,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:5-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-5-7",
@@ -18473,7 +19513,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:5-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-5-8",
@@ -18506,7 +19549,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Ключ сборника повторяет форму с окончанием и на құрбы, и на емес. Верно одно окончание, на емес: Сендер құрбы емессіңдер."
+        "note": "Ключ сборника повторяет форму с окончанием и на құрбы, и на емес. Верно одно окончание, на емес: Сендер құрбы емессіңдер.",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-5-9",
@@ -18538,7 +19584,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:5-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e22-5-10",
@@ -18571,7 +19620,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-2:5-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       }
     ],
     "practice_generators": [],
@@ -19147,7 +20199,7 @@ window.LESSON_V2_COMPILED = [
   {
     "schema_version": 2,
     "lesson_id": "2-3",
-    "content_revision": "2-3.r1",
+    "content_revision": "2-3.r2",
     "title": "Урок 2–3 · Ол / олар, вопрос, порядковые",
     "label": "2–3",
     "name": "Ол / олар, вопрос, порядковые",
@@ -19157,7 +20209,7 @@ window.LESSON_V2_COMPILED = [
       "preview_head": "",
       "preview_url": "",
       "approved_at": "",
-      "note": "2026-10-01 teaching rework 2-1→2-3; pending preview QA. No merge/deploy."
+      "note": "2026-10-02 LESSONS FIX step 9; canonical CORE/practice/references implemented; pending preview QA."
     },
     "sources": [
       {
@@ -19283,6 +20335,342 @@ window.LESSON_V2_COMPILED = [
       }
     ],
     "theory": [
+      {
+        "id": "theory:2-3:ol",
+        "rule_id": "v2:2-3:ol",
+        "title": "Ол: личного окончания нет",
+        "meaning": "Ол может означать «он», «она», «оно/это». В простых фразах этого урока после сказуемого личное окончание не ставится.",
+        "fullExplanation": "Методичка формулирует это прямо: для ол личное окончание ставить не нужно. Ол қазақ — он/она казах; Ол қыз — она девушка. Казахский язык здесь не меняет форму по грамматическому роду, поэтому одно ол используется там, где по-русски «он/она/оно». Нельзя переносить окончания мен/сен/сіз на третье лицо.",
+        "shortHint": "ол → сказуемое без личного окончания.",
+        "decisionSteps": [
+          "Если подлежащее ол, не выбирай личное окончание.",
+          "Поставь нужное существительное/прилагательное в обычной форме.",
+          "Не добавляй -мын, -сың, -сыз и другие личные окончания."
+        ],
+        "examples": [
+          {
+            "kazakh": "ол мұғалім",
+            "translation": "он учитель",
+            "why": "без мын"
+          },
+          {
+            "kazakh": "ол қыз",
+            "translation": "она девушка",
+            "why": "рода нет"
+          },
+          {
+            "kazakh": "ол дәрігер",
+            "translation": "он врач",
+            "why": "то же слово без личного окончания"
+          }
+        ],
+        "contrastExamples": [
+          {
+            "bad": "ол мұғаліммін",
+            "good": "ол мұғалім",
+            "why": "личное окончание мын — это «я», не «он»."
+          }
+        ],
+        "limitations": [
+          "Не вводим падежные формы ол."
+        ],
+        "commonConfusions": [
+          "ол ...мын",
+          "попытка выбрать мужское/женское окончание."
+        ],
+        "source_refs": [
+          "school-method",
+          "research-t12"
+        ],
+        "checks": [
+          {
+            "id": "23l1",
+            "type": "one_prod",
+            "prompt": "«Он специалист»",
+            "answers": [
+              "Ол маман"
+            ],
+            "error_key": "ol_no_ending",
+            "rule_line": ""
+          },
+          {
+            "id": "23l2",
+            "type": "trap_choice",
+            "prompt": "Запрет",
+            "answers": [
+              "ол мұғаліммін"
+            ],
+            "error_key": "ol_no_ending",
+            "rule_line": ""
+          },
+          {
+            "id": "23l4",
+            "type": "one_prod",
+            "prompt": "Она девушка",
+            "answers": [
+              "ол қыз"
+            ],
+            "error_key": "ol_no_ending",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:2-3:olar",
+        "rule_id": "v2:2-3:olar",
+        "title": "Олар: «они» и множественное в упражнениях",
+        "meaning": "Олар — «они». Личного окончания у сказуемого нет; множественное окончание на сказуемом в упражнениях ставим только тогда, когда задание прямо просит.",
+        "fullExplanation": "Методичка допускает Олар есепші и Олар есепшілер: местоимение олар уже показывает множественность. С прилагательными и порядковыми в учебных примерах множественное обычно не ставится: Олар семіз, Олар қырқыншы. Чтобы новичок не угадывал тонкости живой речи, курс даёт практическое правило: если в задании про олар не написано «ставьте множественное окончание», оставляй сказуемое без него. Если написано — ставь: Олар жұмысшылар. Емес никогда не получает множественное: Олар жүргізушілер емес, не еместер. Если само существительное является множественным подлежащим без олар, множественное показывается на нём: Студенттер ақылды.",
+        "shortHint": "олар без личного окончания; множественное на сказуемом — только по прямой инструкции задания.",
+        "decisionSteps": [
+          "Олар → личного окончания нет.",
+          "Если задание не просит множественное на сказуемом, оставь его без -лар.",
+          "Если задание прямо просит — добавь множественное к существительному.",
+          "При отрицании емес остаётся без множественного.",
+          "Если множественное существительное само является подлежащим, ставь множественное на нём."
+        ],
+        "examples": [
+          {
+            "kazakh": "олар семіз",
+            "translation": "они толстые",
+            "why": "не семіздер"
+          },
+          {
+            "kazakh": "олар студент",
+            "translation": "они студенты",
+            "why": "без личного окончания"
+          },
+          {
+            "kazakh": "олар қазақ",
+            "translation": "они казахи",
+            "why": "то же слово без личного окончания"
+          }
+        ],
+        "contrastExamples": [
+          {
+            "bad": "олар семіздер",
+            "good": "олар семіз",
+            "why": "В этом уроке на прилагательном голая основа, пока задание не просит множественное."
+          }
+        ],
+        "limitations": [
+          "Не пытаемся вывести полное правило живого употребления множественного сказуемого после олар; используем учебный алгоритм методички."
+        ],
+        "commonConfusions": [
+          "олар семіздер без запроса",
+          "еместер",
+          "личное окончание после олар."
+        ],
+        "source_refs": [
+          "school-method",
+          "school-exercises",
+          "research-t12"
+        ],
+        "checks": [
+          {
+            "id": "23l3",
+            "type": "one_prod",
+            "prompt": "«Они толстые»",
+            "answers": [
+              "Олар семіз"
+            ],
+            "error_key": "ol_no_ending",
+            "rule_line": ""
+          },
+          {
+            "id": "23r2",
+            "type": "one_prod",
+            "prompt": "Они студенты",
+            "answers": [
+              "олар студент"
+            ],
+            "error_key": "ol_no_ending",
+            "rule_line": ""
+          },
+          {
+            "id": "23r3",
+            "type": "know_if",
+            "prompt": "У олар личное окончание мын?",
+            "answers": [
+              "нет"
+            ],
+            "error_key": "ol_no_ending",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:2-3:q",
+        "rule_id": "v2:2-3:q",
+        "title": "Полная таблица вопросительных частиц",
+        "meaning": "Теперь открывается полный выбор па/пе, ба/бе, ма/ме. Начальная согласная зависит от последнего звука последнего слова; а/е — от твёрдости/мягкости.",
+        "fullExplanation": "Если последнее слово заканчивается на глухой к, қ, п, с, т, ф, х, һ, ц, ш, щ или на конечные б, в, г, д, выбирается па/пе. После м, н, ң, ж, з — ба/бе. Во всех остальных случаях, включая гласные, л, р, у, й, — ма/ме. Твёрдое последнее слово выбирает а, мягкое — е. Частица пишется отдельно и ставится в самом конце закрытого вопроса.",
+        "shortHint": "последний звук: глухой→П, м/н/ң/ж/з→Б, остальное→М; затем а/е.",
+        "decisionSteps": [
+          "Сначала собери всю фразу без вопросительной частицы.",
+          "Посмотри на последний звук последнего слова.",
+          "Глухой + конечные б/в/г/д → П.",
+          "м/н/ң/ж/з → Б.",
+          "Остальное → М.",
+          "Твёрдое → а, мягкое → е."
+        ],
+        "examples": [
+          {
+            "kazakh": "ол қонақ па",
+            "translation": "он гость?",
+            "why": "қ глухая"
+          },
+          {
+            "kazakh": "ол жігіт пе",
+            "translation": "он парень?",
+            "why": "т глухая, мягкое"
+          },
+          {
+            "kazakh": "сараңмын ба",
+            "translation": "я скупой?",
+            "why": "н → ба, не па"
+          }
+        ],
+        "contrastExamples": [
+          {
+            "bad": "ол қонақ ба",
+            "good": "ол қонақ па",
+            "why": "Голая основа на қ — па, не ба."
+          }
+        ],
+        "limitations": [
+          "Открытые вопросы кім/не/қайда и разговорные варианты не входят в этот урок."
+        ],
+        "commonConfusions": [
+          "смотреть на первое слово",
+          "применять только знакомое ба/бе",
+          "писать частицу слитно."
+        ],
+        "source_refs": [
+          "school-method",
+          "research-t14"
+        ],
+        "checks": [
+          {
+            "id": "23q1",
+            "type": "fade",
+            "prompt": "Ол маман ...?",
+            "answers": [
+              "ба"
+            ],
+            "error_key": "ba_me",
+            "rule_line": ""
+          },
+          {
+            "id": "23q2",
+            "type": "one_prod",
+            "prompt": "Он гость?",
+            "answers": [
+              "ол қонақ па",
+              "ол қонақ па?"
+            ],
+            "error_key": "ba_me",
+            "rule_line": ""
+          },
+          {
+            "id": "23q3",
+            "type": "know_if",
+            "prompt": "После мын частица па?",
+            "answers": [
+              "нет",
+              "ба"
+            ],
+            "error_key": "ba_me",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:2-3:qstem",
+        "rule_id": "v2:2-3:qstem",
+        "title": "Частица смотрит на последнее слово готовой фразы",
+        "meaning": "Выбор частицы определяется не местоимением слева, а тем словом, которое реально стоит последним перед вопросительной частицей.",
+        "fullExplanation": "У ол/олар личного окончания нет, поэтому последним может оказаться сама основа: Ол қонақ па?, Олар ақылды ма? Если перед вопросом стоит без суффикса емес, смотрим на его последний звук с: Олар туыстар емес пе? Если справа есть личное окончание, смотрим уже на его последнюю букву: Сен әріптессің бе?, Сіздер дәрігер емессіздер ме? Поэтому нельзя один раз выбрать частицу по подлежащему и использовать её для всех вопросов.",
+        "shortHint": "сначала готовая фраза, потом смотри на её последнее слово.",
+        "decisionSteps": [
+          "Напиши утверждение/отрицание полностью.",
+          "Найди последнее слово прямо перед будущей частицей.",
+          "Возьми его последний звук.",
+          "Примени полную таблицу П/Б/М.",
+          "Проверь гармонию самого последнего слова."
+        ],
+        "examples": [
+          {
+            "kazakh": "ол қонақ па",
+            "translation": "он гость?",
+            "why": "қ"
+          },
+          {
+            "kazakh": "ол жігіт пе",
+            "translation": "он парень?",
+            "why": "т"
+          },
+          {
+            "kazakh": "ол адам ба",
+            "translation": "он человек?",
+            "why": "м"
+          }
+        ],
+        "contrastExamples": [
+          {
+            "bad": "ол қонақ ба потому что «вопрос»",
+            "good": "ол қонақ па",
+            "why": "Смотри қ, не привычку ба."
+          }
+        ],
+        "limitations": [
+          "Не рассматриваем разговорное встраивание вопросительной частицы внутрь слова."
+        ],
+        "commonConfusions": [
+          "смотреть на ол/олар",
+          "после голого емес ставить бе/ме",
+          "забывать, что личное окончание может быть последним."
+        ],
+        "source_refs": [
+          "school-method",
+          "school-exercises",
+          "research-t14"
+        ],
+        "checks": [
+          {
+            "id": "23qs1",
+            "type": "one_prod",
+            "prompt": "Ол семіз.",
+            "answers": [
+              "Ол семіз бе?"
+            ],
+            "error_key": "ba_me",
+            "rule_line": ""
+          },
+          {
+            "id": "23qs2",
+            "type": "one_prod",
+            "prompt": "Он парень?",
+            "answers": [
+              "ол жігіт пе",
+              "ол жігіт пе?"
+            ],
+            "error_key": "ba_me",
+            "rule_line": ""
+          },
+          {
+            "id": "23qs3",
+            "type": "one_prod",
+            "prompt": "Он человек?",
+            "answers": [
+              "ол адам ба",
+              "ол адам ба?"
+            ],
+            "error_key": "ba_me",
+            "rule_line": ""
+          }
+        ]
+      },
       {
         "id": "theory:2-3:ord",
         "rule_id": "v2:2-3:ord",
@@ -19548,17 +20936,17 @@ window.LESSON_V2_COMPILED = [
           {
             "kazakh": "жиырма бірінші",
             "translation": "21-й",
-            "why": "Порядковый суффикс на бір, жиырма голое."
+            "why": "Порядковый суффикс на бір, жиырма без суффикса."
           },
           {
             "kazakh": "он екінші",
             "translation": "12-й",
-            "why": "Порядковый суффикс на екі, он голое."
+            "why": "Порядковый суффикс на екі, он без суффикса."
           },
           {
             "kazakh": "жүзінші",
             "translation": "100-й",
-            "why": "Один кусок, порядковый суффикс на него."
+            "why": "Один часть, порядковый суффикс на него."
           }
         ],
         "contrastExamples": [
@@ -19595,7 +20983,7 @@ window.LESSON_V2_COMPILED = [
             "type": "know_lever",
             "prompt": "Куда клеим порядковый суффикс в составном числе?",
             "answers": [
-              "на последний кусок",
+              "на последний часть",
               "на последнее",
               "справа на последний"
             ],
@@ -19699,342 +21087,6 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "theory:2-3:ol",
-        "rule_id": "v2:2-3:ol",
-        "title": "Ол: личного окончания нет",
-        "meaning": "Ол может означать «он», «она», «оно/это». В простых фразах этого урока после сказуемого личное окончание не ставится.",
-        "fullExplanation": "Методичка формулирует это прямо: для ол личное окончание ставить не нужно. Ол қазақ — он/она казах; Ол қыз — она девушка. Казахский язык здесь не меняет форму по грамматическому роду, поэтому одно ол используется там, где по-русски «он/она/оно». Нельзя переносить окончания мен/сен/сіз на третье лицо.",
-        "shortHint": "ол → сказуемое без личного окончания.",
-        "decisionSteps": [
-          "Если подлежащее ол, не выбирай личное окончание.",
-          "Поставь нужное существительное/прилагательное в обычной форме.",
-          "Не добавляй -мын, -сың, -сыз и другие личные окончания."
-        ],
-        "examples": [
-          {
-            "kazakh": "ол мұғалім",
-            "translation": "он учитель",
-            "why": "без мын"
-          },
-          {
-            "kazakh": "ол қыз",
-            "translation": "она девушка",
-            "why": "рода нет"
-          },
-          {
-            "kazakh": "ол дәрігер",
-            "translation": "он врач",
-            "why": "то же голое слово"
-          }
-        ],
-        "contrastExamples": [
-          {
-            "bad": "ол мұғаліммін",
-            "good": "ол мұғалім",
-            "why": "личное окончание мын — это «я», не «он»."
-          }
-        ],
-        "limitations": [
-          "Не вводим падежные формы ол."
-        ],
-        "commonConfusions": [
-          "ол ...мын",
-          "попытка выбрать мужское/женское окончание."
-        ],
-        "source_refs": [
-          "school-method",
-          "research-t12"
-        ],
-        "checks": [
-          {
-            "id": "23l1",
-            "type": "one_prod",
-            "prompt": "«Он специалист»",
-            "answers": [
-              "Ол маман"
-            ],
-            "error_key": "ol_no_ending",
-            "rule_line": ""
-          },
-          {
-            "id": "23l2",
-            "type": "trap_choice",
-            "prompt": "Запрет",
-            "answers": [
-              "ол мұғаліммін"
-            ],
-            "error_key": "ol_no_ending",
-            "rule_line": ""
-          },
-          {
-            "id": "23l4",
-            "type": "one_prod",
-            "prompt": "Она девушка",
-            "answers": [
-              "ол қыз"
-            ],
-            "error_key": "ol_no_ending",
-            "rule_line": ""
-          }
-        ]
-      },
-      {
-        "id": "theory:2-3:olar",
-        "rule_id": "v2:2-3:olar",
-        "title": "Олар: «они» и множественное в упражнениях",
-        "meaning": "Олар — «они». Личного окончания у сказуемого нет; множественное окончание на сказуемом в упражнениях ставим только тогда, когда задание прямо просит.",
-        "fullExplanation": "Методичка допускает Олар есепші и Олар есепшілер: местоимение олар уже показывает множественность. С прилагательными и порядковыми в учебных примерах множественное обычно не ставится: Олар семіз, Олар қырқыншы. Чтобы новичок не угадывал тонкости живой речи, курс даёт практическое правило: если в задании про олар не написано «ставьте множественное окончание», оставляй сказуемое без него. Если написано — ставь: Олар жұмысшылар. Емес никогда не получает множественное: Олар жүргізушілер емес, не еместер. Если само существительное является множественным подлежащим без олар, множественное показывается на нём: Студенттер ақылды.",
-        "shortHint": "олар без личного окончания; множественное на сказуемом — только по прямой инструкции задания.",
-        "decisionSteps": [
-          "Олар → личного окончания нет.",
-          "Если задание не просит множественное на сказуемом, оставь его без -лар.",
-          "Если задание прямо просит — добавь множественное к существительному.",
-          "При отрицании емес остаётся без множественного.",
-          "Если множественное существительное само является подлежащим, ставь множественное на нём."
-        ],
-        "examples": [
-          {
-            "kazakh": "олар семіз",
-            "translation": "они толстые",
-            "why": "не семіздер"
-          },
-          {
-            "kazakh": "олар студент",
-            "translation": "они студенты",
-            "why": "без личного окончания"
-          },
-          {
-            "kazakh": "олар қазақ",
-            "translation": "они казахи",
-            "why": "то же голое слово"
-          }
-        ],
-        "contrastExamples": [
-          {
-            "bad": "олар семіздер",
-            "good": "олар семіз",
-            "why": "В этом уроке на прилагательном голая основа, пока задание не просит множественное."
-          }
-        ],
-        "limitations": [
-          "Не пытаемся вывести полное правило живого употребления множественного сказуемого после олар; используем учебный алгоритм методички."
-        ],
-        "commonConfusions": [
-          "олар семіздер без запроса",
-          "еместер",
-          "личное окончание после олар."
-        ],
-        "source_refs": [
-          "school-method",
-          "school-exercises",
-          "research-t12"
-        ],
-        "checks": [
-          {
-            "id": "23l3",
-            "type": "one_prod",
-            "prompt": "«Они толстые»",
-            "answers": [
-              "Олар семіз"
-            ],
-            "error_key": "ol_no_ending",
-            "rule_line": ""
-          },
-          {
-            "id": "23r2",
-            "type": "one_prod",
-            "prompt": "Они студенты",
-            "answers": [
-              "олар студент"
-            ],
-            "error_key": "ol_no_ending",
-            "rule_line": ""
-          },
-          {
-            "id": "23r3",
-            "type": "know_if",
-            "prompt": "У олар личное окончание мын?",
-            "answers": [
-              "нет"
-            ],
-            "error_key": "ol_no_ending",
-            "rule_line": ""
-          }
-        ]
-      },
-      {
-        "id": "theory:2-3:q",
-        "rule_id": "v2:2-3:q",
-        "title": "Полная таблица вопросительных частиц",
-        "meaning": "Теперь открывается полный выбор па/пе, ба/бе, ма/ме. Начальная согласная зависит от последнего звука последнего слова; а/е — от твёрдости/мягкости.",
-        "fullExplanation": "Если последнее слово заканчивается на глухой к, қ, п, с, т, ф, х, һ, ц, ш, щ или на конечные б, в, г, д, выбирается па/пе. После м, н, ң, ж, з — ба/бе. Во всех остальных случаях, включая гласные, л, р, у, й, — ма/ме. Твёрдое последнее слово выбирает а, мягкое — е. Частица пишется отдельно и ставится в самом конце закрытого вопроса.",
-        "shortHint": "последний звук: глухой→П, м/н/ң/ж/з→Б, остальное→М; затем а/е.",
-        "decisionSteps": [
-          "Сначала собери всю фразу без вопросительной частицы.",
-          "Посмотри на последний звук последнего слова.",
-          "Глухой + конечные б/в/г/д → П.",
-          "м/н/ң/ж/з → Б.",
-          "Остальное → М.",
-          "Твёрдое → а, мягкое → е."
-        ],
-        "examples": [
-          {
-            "kazakh": "ол қонақ па",
-            "translation": "он гость?",
-            "why": "қ глухая"
-          },
-          {
-            "kazakh": "ол жігіт пе",
-            "translation": "он парень?",
-            "why": "т глухая, мягкое"
-          },
-          {
-            "kazakh": "сараңмын ба",
-            "translation": "я скупой?",
-            "why": "н → ба, не па"
-          }
-        ],
-        "contrastExamples": [
-          {
-            "bad": "ол қонақ ба",
-            "good": "ол қонақ па",
-            "why": "Голая основа на қ — па, не ба."
-          }
-        ],
-        "limitations": [
-          "Открытые вопросы кім/не/қайда и разговорные варианты не входят в этот урок."
-        ],
-        "commonConfusions": [
-          "смотреть на первое слово",
-          "применять только знакомое ба/бе",
-          "писать частицу слитно."
-        ],
-        "source_refs": [
-          "school-method",
-          "research-t14"
-        ],
-        "checks": [
-          {
-            "id": "23q1",
-            "type": "fade",
-            "prompt": "Ол маман ...?",
-            "answers": [
-              "ба"
-            ],
-            "error_key": "ba_me",
-            "rule_line": ""
-          },
-          {
-            "id": "23q2",
-            "type": "one_prod",
-            "prompt": "Он гость?",
-            "answers": [
-              "ол қонақ па",
-              "ол қонақ па?"
-            ],
-            "error_key": "ba_me",
-            "rule_line": ""
-          },
-          {
-            "id": "23q3",
-            "type": "know_if",
-            "prompt": "После мын частица па?",
-            "answers": [
-              "нет",
-              "ба"
-            ],
-            "error_key": "ba_me",
-            "rule_line": ""
-          }
-        ]
-      },
-      {
-        "id": "theory:2-3:qstem",
-        "rule_id": "v2:2-3:qstem",
-        "title": "Частица смотрит на последнее слово готовой фразы",
-        "meaning": "Выбор частицы определяется не местоимением слева, а тем словом, которое реально стоит последним перед вопросительной частицей.",
-        "fullExplanation": "У ол/олар личного окончания нет, поэтому последним может оказаться сама основа: Ол қонақ па?, Олар ақылды ма? Если перед вопросом стоит голое емес, смотрим на его последний звук с: Олар туыстар емес пе? Если справа есть личное окончание, смотрим уже на его последнюю букву: Сен әріптессің бе?, Сіздер дәрігер емессіздер ме? Поэтому нельзя один раз выбрать частицу по подлежащему и использовать её для всех вопросов.",
-        "shortHint": "сначала готовая фраза, потом смотри на её последнее слово.",
-        "decisionSteps": [
-          "Напиши утверждение/отрицание полностью.",
-          "Найди последнее слово прямо перед будущей частицей.",
-          "Возьми его последний звук.",
-          "Примени полную таблицу П/Б/М.",
-          "Проверь гармонию самого последнего слова."
-        ],
-        "examples": [
-          {
-            "kazakh": "ол қонақ па",
-            "translation": "он гость?",
-            "why": "қ"
-          },
-          {
-            "kazakh": "ол жігіт пе",
-            "translation": "он парень?",
-            "why": "т"
-          },
-          {
-            "kazakh": "ол адам ба",
-            "translation": "он человек?",
-            "why": "м"
-          }
-        ],
-        "contrastExamples": [
-          {
-            "bad": "ол қонақ ба потому что «вопрос»",
-            "good": "ол қонақ па",
-            "why": "Смотри қ, не привычку ба."
-          }
-        ],
-        "limitations": [
-          "Не рассматриваем разговорное встраивание вопросительной частицы внутрь слова."
-        ],
-        "commonConfusions": [
-          "смотреть на ол/олар",
-          "после голого емес ставить бе/ме",
-          "забывать, что личное окончание может быть последним."
-        ],
-        "source_refs": [
-          "school-method",
-          "school-exercises",
-          "research-t14"
-        ],
-        "checks": [
-          {
-            "id": "23qs1",
-            "type": "one_prod",
-            "prompt": "Ол семіз.",
-            "answers": [
-              "Ол семіз бе?"
-            ],
-            "error_key": "ba_me",
-            "rule_line": ""
-          },
-          {
-            "id": "23qs2",
-            "type": "one_prod",
-            "prompt": "Он парень?",
-            "answers": [
-              "ол жігіт пе",
-              "ол жігіт пе?"
-            ],
-            "error_key": "ba_me",
-            "rule_line": ""
-          },
-          {
-            "id": "23qs3",
-            "type": "one_prod",
-            "prompt": "Он человек?",
-            "answers": [
-              "ол адам ба",
-              "ол адам ба?"
-            ],
-            "error_key": "ba_me",
-            "rule_line": ""
-          }
-        ]
-      },
-      {
         "id": "theory:2-3:bye",
         "rule_id": "v2:2-3:bye",
         "title": "Сау бол: четыре адресата",
@@ -20129,6 +21181,186 @@ window.LESSON_V2_COMPILED = [
             "rule_line": ""
           }
         ]
+      }
+    ],
+    "references": [
+      {
+        "id": "ref:2-3:person",
+        "title": "Ол / олар: личного окончания нет",
+        "rule_ids": [
+          "v2:2-3:ol"
+        ],
+        "quick": "Ол означает «он / она». В простых фразах 2–3 личное окончание после сказуемого не ставится.",
+        "full": "Сначала сравни с уже знакомыми лицами: мен/біз/сен/сендер/сіз/сіздер получают личное окончание; ол — нет.",
+        "examples": [
+          {
+            "kazakh": "ол көрші",
+            "translation": "он / она сосед / соседка",
+            "why": "третье лицо — без личного окончания."
+          },
+          {
+            "kazakh": "ол маман емес",
+            "translation": "он / она не специалист",
+            "why": "после емес личного окончания тоже нет."
+          }
+        ],
+        "rows": [
+          {
+            "kazakh": "ол",
+            "translation": "он / она",
+            "note": "личное окончание ∅"
+          }
+        ],
+        "core_anchor": "theory:2-3:ol"
+      },
+      {
+        "id": "ref:2-3:olar",
+        "title": "Олар и множественное число",
+        "rule_ids": [
+          "v2:2-3:olar"
+        ],
+        "quick": "Олар означает «они» и не получает личного окончания.\nВ базовой практике отдельный показатель множественного не добавляем, если задание специально его не требует.",
+        "full": "Существительное может получить множественное окончание, когда это прямо требуется смыслом/заданием. Нельзя превращать это в глобальный запрет. Прилагательное в базовой модели остаётся без множественного окончания. Емес не получает множественного окончания.",
+        "examples": [
+          {
+            "kazakh": "олар есепші",
+            "translation": "они бухгалтеры",
+            "why": "базовая модель без дополнительного множественного."
+          },
+          {
+            "kazakh": "олар есепшілер",
+            "translation": "они бухгалтеры",
+            "why": "допустимо, если задание специально требует множественное."
+          },
+          {
+            "kazakh": "олар дәрігер емес",
+            "translation": "они не врачи",
+            "why": "емес остаётся без множественного окончания."
+          }
+        ],
+        "rows": [
+          {
+            "kazakh": "олар",
+            "translation": "они",
+            "note": "личное окончание ∅"
+          }
+        ],
+        "core_anchor": "theory:2-3:olar"
+      },
+      {
+        "id": "ref:2-3:question",
+        "title": "Полная система вопросительных частиц",
+        "rule_ids": [
+          "v2:2-3:q",
+          "v2:2-3:qstem"
+        ],
+        "quick": "Сначала полностью собери форму.\nГлухие К/Қ/П/С/Т/Ф/Х/Һ/Ц/Ш/Щ и конечные Б/В/Г/Д → па/пе.\nМ/Н/Ң/Ж/З → ба/бе.\nОстальные → ма/ме.\nТвёрдый ряд → А; мягкий → Е.",
+        "full": "Смотри на последний звук готового последнего слова, а не на исходную основу. Поэтому в отрицании вопрос выбирается по емес.",
+        "examples": [
+          {
+            "kazakh": "ол қонақ па?",
+            "translation": "он / она гость?",
+            "why": "Қ глухая → П-серия."
+          },
+          {
+            "kazakh": "ол семіз бе?",
+            "translation": "он / она полный / полная?",
+            "why": "З → Б-серия."
+          },
+          {
+            "kazakh": "ол жүргізуші ме?",
+            "translation": "он / она водитель?",
+            "why": "гласная → М-серия."
+          },
+          {
+            "kazakh": "ол маман емес пе?",
+            "translation": "он / она не специалист?",
+            "why": "последнее слово емес заканчивается на С."
+          }
+        ],
+        "rows": [],
+        "core_anchor": "theory:2-3:q"
+      },
+      {
+        "id": "ref:2-3:ordinal",
+        "title": "Порядковые числа",
+        "rule_ids": [
+          "v2:2-3:ord",
+          "v2:2-3:suf",
+          "v2:2-3:ex",
+          "v2:2-3:comp",
+          "v2:2-3:ordp"
+        ],
+        "quick": "Порядковое отвечает «который по счёту?».\nПосле согласной → -ыншы/-інші.\nПосле гласной → -ншы/-нші.\n20-й → жиырмасыншы.\n40-й → қырқыншы.\nВ составном числе суффикс только на последнем слове.",
+        "full": "Сначала собери обычное число. Затем преврати только последнее слово в порядковое. После готового порядкового при необходимости добавь личное окончание; вопросительную частицу выбирай уже по последнему звуку готовой формы.",
+        "examples": [
+          {
+            "kazakh": "екі жүз отыз бесінші",
+            "translation": "двести тридцать пятый / пятая",
+            "why": "порядковый суффикс только на последнем слове."
+          },
+          {
+            "kazakh": "біріншімін",
+            "translation": "я первый / первая",
+            "why": "сначала бірінші, затем личное окончание -мін."
+          }
+        ],
+        "rows": [
+          {
+            "kazakh": "бірінші",
+            "translation": "первый / первая",
+            "note": "после согласной"
+          },
+          {
+            "kazakh": "екінші",
+            "translation": "второй / вторая",
+            "note": "после гласной"
+          },
+          {
+            "kazakh": "жиырмасыншы",
+            "translation": "двадцатый / двадцатая",
+            "note": "запомнить отдельно"
+          },
+          {
+            "kazakh": "қырқыншы",
+            "translation": "сороковой / сороковая",
+            "note": "запомнить отдельно"
+          }
+        ],
+        "core_anchor": "theory:2-3:ord"
+      },
+      {
+        "id": "ref:2-3:ready",
+        "title": "Прощания",
+        "rule_ids": [
+          "v2:2-3:bye"
+        ],
+        "quick": "Форму выбираем по адресату: один/несколько и неформально/уважительно.",
+        "full": "Эти формы пока используем как готовые фразы; их глагольная грамматика будет позже.",
+        "examples": [],
+        "rows": [
+          {
+            "kazakh": "сау бол",
+            "translation": "до свидания одному человеку неформально",
+            "note": "готовая форма"
+          },
+          {
+            "kazakh": "сау болыңдар",
+            "translation": "до свидания нескольким людям неформально",
+            "note": "готовая форма"
+          },
+          {
+            "kazakh": "сау болыңыз",
+            "translation": "до свидания одному человеку уважительно",
+            "note": "готовая форма"
+          },
+          {
+            "kazakh": "сау болыңыздар",
+            "translation": "до свидания нескольким людям уважительно",
+            "note": "готовая форма"
+          }
+        ],
+        "core_anchor": "theory:2-3:bye"
       }
     ],
     "vocabulary": [
@@ -20579,7 +21811,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-2",
@@ -20604,7 +21839,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-3",
@@ -20629,7 +21867,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-4",
@@ -20654,7 +21895,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-5",
@@ -20679,7 +21923,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-6",
@@ -20704,7 +21951,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-7",
@@ -20733,7 +21983,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-8",
@@ -20758,7 +22011,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-9",
@@ -20783,7 +22039,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-10",
@@ -20808,7 +22067,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-11",
@@ -20833,7 +22095,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-12",
@@ -20858,7 +22123,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-13",
@@ -20883,7 +22151,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-14",
@@ -20912,7 +22183,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-15",
@@ -20937,7 +22211,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-16",
@@ -20962,7 +22239,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-17",
@@ -20987,7 +22267,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-18",
@@ -21012,7 +22295,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-19",
@@ -21037,7 +22323,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-20",
@@ -21062,7 +22351,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-21",
@@ -21091,7 +22383,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-22",
@@ -21116,7 +22411,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-23",
@@ -21141,7 +22439,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-24",
@@ -21166,7 +22467,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-25",
@@ -21191,7 +22495,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-26",
@@ -21216,7 +22523,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-27",
@@ -21241,7 +22551,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-28",
@@ -21270,7 +22583,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-29",
@@ -21295,7 +22611,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-30",
@@ -21320,7 +22639,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-31",
@@ -21345,7 +22667,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-32",
@@ -21370,7 +22695,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-33",
@@ -21395,7 +22723,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-34",
@@ -21420,7 +22751,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-35",
@@ -21449,7 +22783,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-36",
@@ -21474,7 +22811,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-37",
@@ -21499,7 +22839,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-38",
@@ -21524,7 +22867,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-39",
@@ -21549,7 +22895,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-40",
@@ -21574,7 +22923,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-41",
@@ -21599,7 +22951,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-42",
@@ -21628,7 +22983,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-43",
@@ -21653,7 +23011,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-44",
@@ -21682,7 +23043,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-45",
@@ -21707,7 +23071,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-46",
@@ -21732,7 +23099,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-47",
@@ -21757,7 +23127,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-48",
@@ -21782,7 +23155,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-49",
@@ -21807,7 +23183,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-50",
@@ -21832,7 +23211,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-51",
@@ -21861,7 +23243,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-52",
@@ -21886,7 +23271,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-53",
@@ -21911,7 +23299,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-54",
@@ -21936,7 +23327,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-55",
@@ -21961,7 +23355,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-56",
@@ -21986,7 +23383,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-57",
@@ -22011,7 +23411,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-58",
@@ -22040,7 +23443,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-59",
@@ -22065,7 +23471,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-60",
@@ -22090,7 +23499,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-61",
@@ -22115,7 +23527,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-62",
@@ -22140,7 +23555,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-63",
@@ -22165,7 +23583,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-64",
@@ -22194,7 +23615,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-65",
@@ -22219,7 +23643,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-66",
@@ -22244,7 +23671,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-67",
@@ -22269,7 +23699,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-68",
@@ -22294,7 +23727,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-69",
@@ -22319,7 +23755,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-70",
@@ -22344,7 +23783,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-71",
@@ -22373,7 +23815,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-72",
@@ -22398,7 +23843,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-73",
@@ -22423,7 +23871,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-74",
@@ -22448,7 +23899,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-75",
@@ -22473,7 +23927,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-76",
@@ -22498,7 +23955,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-77",
@@ -22523,7 +23983,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-78",
@@ -22552,7 +24015,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-79",
@@ -22577,7 +24043,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-80",
@@ -22602,7 +24071,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-81",
@@ -22627,7 +24099,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-82",
@@ -22652,7 +24127,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-83",
@@ -22677,7 +24155,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-84",
@@ -22702,7 +24183,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-85",
@@ -22727,7 +24211,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-86",
@@ -22752,7 +24239,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-87",
@@ -22777,7 +24267,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-88",
@@ -22802,7 +24295,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-89",
@@ -22827,7 +24323,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-90",
@@ -22856,7 +24355,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-91",
@@ -22881,7 +24383,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-92",
@@ -22906,7 +24411,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-93",
@@ -22931,7 +24439,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-94",
@@ -22956,7 +24467,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-95",
@@ -22981,7 +24495,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-96",
@@ -23006,7 +24523,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-97",
@@ -23035,7 +24555,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-98",
@@ -23060,7 +24583,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-99",
@@ -23085,7 +24611,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-100",
@@ -23110,7 +24639,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-101",
@@ -23135,7 +24667,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-102",
@@ -23160,7 +24695,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-103",
@@ -23185,7 +24723,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-104",
@@ -23214,7 +24755,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-form-105",
@@ -23239,7 +24783,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Для ол принимается голое слово или «ол …»."
+        "note": "Для ол принимается слово без личного окончания или «ол …».",
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ask-1",
@@ -23265,7 +24812,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ask:1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ask-2",
@@ -23289,7 +24839,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ask:2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ask-3",
@@ -23313,7 +24866,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ask:3",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ask-4",
@@ -23337,7 +24893,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ask:4",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ask-5",
@@ -23363,7 +24922,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ask:5",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ask-6",
@@ -23389,7 +24951,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ask:6",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ask-7",
@@ -23413,7 +24978,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ask:7",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ask-8",
@@ -23437,7 +25005,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ask:8",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ask-9",
@@ -23461,7 +25032,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ask:9",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ask-10",
@@ -23485,7 +25059,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ask:10",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "practice",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ord-1",
@@ -23511,7 +25088,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ord:4-1-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ordq-1",
@@ -23537,7 +25117,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ord:4-2-1",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ord-2",
@@ -23563,7 +25146,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ord:4-1-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ordq-2",
@@ -23589,7 +25175,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ord:4-2-2",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ord-3",
@@ -23614,7 +25203,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ord:4-1-3",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ordq-3",
@@ -23639,7 +25231,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ord:4-2-3",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ord-4",
@@ -23665,7 +25260,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ord:4-1-4",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ordq-4",
@@ -23691,7 +25289,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ord:4-2-4",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ord-5",
@@ -23717,7 +25318,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ord:4-1-5",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-ordq-5",
@@ -23743,7 +25347,10 @@ window.LESSON_V2_COMPILED = [
         "source_item": "wb:2-3:ord:4-2-5",
         "source_refs": [
           "school-exercises"
-        ]
+        ],
+        "item_type": "full_form",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-fix-1",
@@ -23775,7 +25382,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении."
+        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении.",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-fix-2",
@@ -23811,7 +25421,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении."
+        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении.",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-fix-3",
@@ -23843,7 +25456,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении."
+        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении.",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-fix-4",
@@ -23876,7 +25492,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении."
+        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении.",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-fix-5",
@@ -23908,7 +25527,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении."
+        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении.",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-fix-6",
@@ -23941,7 +25563,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении."
+        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении.",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-fix-7",
@@ -23976,7 +25601,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении."
+        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении.",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-fix-8",
@@ -24009,7 +25637,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении."
+        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении.",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-fix-9",
@@ -24041,7 +25672,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении."
+        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении.",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       },
       {
         "id": "e23-fix-10",
@@ -24074,7 +25708,10 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении."
+        "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении.",
+        "item_type": "error_diagnosis",
+        "recall_eligible": true,
+        "production_eligible": true
       }
     ],
     "practice_generators": [],
@@ -25280,6 +26917,7 @@ window.LESSON_V2_COMPILED = [
         ]
       }
     ],
+    "references": [],
     "vocabulary": [
       {
         "id": "vocab:3-1:bas",
@@ -29740,6 +31378,7 @@ window.LESSON_V2_COMPILED = [
         ]
       }
     ],
+    "references": [],
     "vocabulary": [
       {
         "id": "vocab:3-2:synyp",
@@ -34278,6 +35917,7 @@ window.LESSON_V2_COMPILED = [
         ]
       }
     ],
+    "references": [],
     "vocabulary": [
       {
         "id": "vocab:3-3:kelu",
@@ -39199,6 +40839,7 @@ window.LESSON_V2_COMPILED = [
         ]
       }
     ],
+    "references": [],
     "vocabulary": [
       {
         "id": "vocab:4-1:tusinu",
@@ -42602,7 +44243,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:3:negative",
@@ -42625,7 +44267,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:1sg:affirmative",
@@ -42648,7 +44291,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:1sg:negative",
@@ -42671,7 +44315,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:1pl:affirmative",
@@ -42694,7 +44339,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:1pl:negative",
@@ -42717,7 +44363,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:2sg:affirmative",
@@ -42740,7 +44387,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:2sg:negative",
@@ -42763,7 +44411,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:2pl:affirmative",
@@ -42786,7 +44435,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:2pl:negative",
@@ -42809,7 +44459,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:2pol:affirmative",
@@ -42832,7 +44483,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:2pol:negative",
@@ -42855,7 +44507,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:2polpl:affirmative",
@@ -42878,7 +44531,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kelu:2polpl:negative",
@@ -42901,7 +44555,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:3:affirmative",
@@ -42924,7 +44579,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:3:negative",
@@ -42947,7 +44603,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:1sg:affirmative",
@@ -42970,7 +44627,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:1sg:negative",
@@ -42993,7 +44651,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:1pl:affirmative",
@@ -43016,7 +44675,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:1pl:negative",
@@ -43039,7 +44699,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:2sg:affirmative",
@@ -43062,7 +44723,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:2sg:negative",
@@ -43085,7 +44747,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:2pl:affirmative",
@@ -43108,7 +44771,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:2pl:negative",
@@ -43131,7 +44795,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:2pol:affirmative",
@@ -43154,7 +44819,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:2pol:negative",
@@ -43177,7 +44843,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:2polpl:affirmative",
@@ -43200,7 +44867,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ketu:2polpl:negative",
@@ -43223,7 +44891,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:3:affirmative",
@@ -43246,7 +44915,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:3:negative",
@@ -43269,7 +44939,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:1sg:affirmative",
@@ -43292,7 +44963,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:1sg:negative",
@@ -43315,7 +44987,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:1pl:affirmative",
@@ -43338,7 +45011,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:1pl:negative",
@@ -43361,7 +45035,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:2sg:affirmative",
@@ -43384,7 +45059,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:2sg:negative",
@@ -43407,7 +45083,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:2pl:affirmative",
@@ -43430,7 +45107,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:2pl:negative",
@@ -43453,7 +45131,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:2pol:affirmative",
@@ -43476,7 +45155,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:2pol:negative",
@@ -43499,7 +45179,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:2polpl:affirmative",
@@ -43522,7 +45203,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:kiru:2polpl:negative",
@@ -43545,7 +45227,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:3:affirmative",
@@ -43569,7 +45252,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:3:negative",
@@ -43593,7 +45277,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:1sg:affirmative",
@@ -43617,7 +45302,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:1sg:negative",
@@ -43641,7 +45327,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:1pl:affirmative",
@@ -43665,7 +45352,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:1pl:negative",
@@ -43689,7 +45377,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:2sg:affirmative",
@@ -43713,7 +45402,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:2sg:negative",
@@ -43737,7 +45427,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:2pl:affirmative",
@@ -43761,7 +45452,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:2pl:negative",
@@ -43785,7 +45477,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:2pol:affirmative",
@@ -43809,7 +45502,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:2pol:negative",
@@ -43833,7 +45527,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:2polpl:affirmative",
@@ -43857,7 +45552,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:shygu:2polpl:negative",
@@ -43881,7 +45577,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:3:affirmative",
@@ -43904,7 +45601,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:3:negative",
@@ -43927,7 +45625,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:1sg:affirmative",
@@ -43950,7 +45649,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:1sg:negative",
@@ -43973,7 +45673,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:1pl:affirmative",
@@ -43996,7 +45697,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:1pl:negative",
@@ -44019,7 +45721,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:2sg:affirmative",
@@ -44042,7 +45745,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:2sg:negative",
@@ -44065,7 +45769,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:2pl:affirmative",
@@ -44088,7 +45793,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:2pl:negative",
@@ -44111,7 +45817,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:2pol:affirmative",
@@ -44134,7 +45841,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:2pol:negative",
@@ -44157,7 +45865,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:2polpl:affirmative",
@@ -44180,7 +45889,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:izdeu:2polpl:negative",
@@ -44203,7 +45913,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:3:affirmative",
@@ -44227,7 +45938,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:3:negative",
@@ -44251,7 +45963,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:1sg:affirmative",
@@ -44275,7 +45988,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:1sg:negative",
@@ -44299,7 +46013,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:1pl:affirmative",
@@ -44323,7 +46038,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:1pl:negative",
@@ -44347,7 +46063,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:2sg:affirmative",
@@ -44371,7 +46088,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:2sg:negative",
@@ -44395,7 +46113,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:2pl:affirmative",
@@ -44419,7 +46138,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:2pl:negative",
@@ -44443,7 +46163,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:2pol:affirmative",
@@ -44467,7 +46188,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:2pol:negative",
@@ -44491,7 +46213,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:2polpl:affirmative",
@@ -44515,7 +46238,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tabu:2polpl:negative",
@@ -44539,7 +46263,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:3:affirmative",
@@ -44563,7 +46288,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:3:negative",
@@ -44587,7 +46313,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:1sg:affirmative",
@@ -44611,7 +46338,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:1sg:negative",
@@ -44635,7 +46363,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:1pl:affirmative",
@@ -44659,7 +46388,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:1pl:negative",
@@ -44683,7 +46413,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:2sg:affirmative",
@@ -44707,7 +46438,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:2sg:negative",
@@ -44731,7 +46463,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:2pl:affirmative",
@@ -44755,7 +46488,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:2pl:negative",
@@ -44779,7 +46513,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:2pol:affirmative",
@@ -44803,7 +46538,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:2pol:negative",
@@ -44827,7 +46563,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:2polpl:affirmative",
@@ -44851,7 +46588,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:asygu:2polpl:negative",
@@ -44875,7 +46613,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:3:affirmative",
@@ -44899,7 +46638,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:3:negative",
@@ -44923,7 +46663,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:1sg:affirmative",
@@ -44947,7 +46688,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:1sg:negative",
@@ -44971,7 +46713,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:1pl:affirmative",
@@ -44995,7 +46738,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:1pl:negative",
@@ -45019,7 +46763,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:2sg:affirmative",
@@ -45043,7 +46788,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:2sg:negative",
@@ -45067,7 +46813,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:2pl:affirmative",
@@ -45091,7 +46838,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:2pl:negative",
@@ -45115,7 +46863,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:2pol:affirmative",
@@ -45139,7 +46888,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:2pol:negative",
@@ -45163,7 +46913,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:2polpl:affirmative",
@@ -45187,7 +46938,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:keshigu:2polpl:negative",
@@ -45211,7 +46963,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:3:affirmative",
@@ -45234,7 +46987,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:3:negative",
@@ -45257,7 +47011,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:1sg:affirmative",
@@ -45280,7 +47035,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:1sg:negative",
@@ -45303,7 +47059,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:1pl:affirmative",
@@ -45326,7 +47083,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:1pl:negative",
@@ -45349,7 +47107,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:2sg:affirmative",
@@ -45372,7 +47131,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:2sg:negative",
@@ -45395,7 +47155,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:2pl:affirmative",
@@ -45418,7 +47179,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:2pl:negative",
@@ -45441,7 +47203,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:2pol:affirmative",
@@ -45464,7 +47227,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:2pol:negative",
@@ -45487,7 +47251,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:2polpl:affirmative",
@@ -45510,7 +47275,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhazu:2polpl:negative",
@@ -45533,7 +47299,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:3:affirmative",
@@ -45556,7 +47323,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:3:negative",
@@ -45579,7 +47347,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:1sg:affirmative",
@@ -45602,7 +47371,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:1sg:negative",
@@ -45625,7 +47395,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:1pl:affirmative",
@@ -45648,7 +47419,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:1pl:negative",
@@ -45671,7 +47443,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:2sg:affirmative",
@@ -45694,7 +47467,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:2sg:negative",
@@ -45717,7 +47491,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:2pl:affirmative",
@@ -45740,7 +47515,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:2pl:negative",
@@ -45763,7 +47539,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:2pol:affirmative",
@@ -45786,7 +47563,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:2pol:negative",
@@ -45809,7 +47587,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:2polpl:affirmative",
@@ -45832,7 +47611,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:soyleu:2polpl:negative",
@@ -45855,7 +47635,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:3:affirmative",
@@ -45878,7 +47659,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:3:negative",
@@ -45901,7 +47683,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:1sg:affirmative",
@@ -45924,7 +47707,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:1sg:negative",
@@ -45947,7 +47731,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:1pl:affirmative",
@@ -45970,7 +47755,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:1pl:negative",
@@ -45993,7 +47779,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:2sg:affirmative",
@@ -46016,7 +47803,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:2sg:negative",
@@ -46039,7 +47827,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:2pl:affirmative",
@@ -46062,7 +47851,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:2pl:negative",
@@ -46085,7 +47875,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:2pol:affirmative",
@@ -46108,7 +47899,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:2pol:negative",
@@ -46131,7 +47923,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:2polpl:affirmative",
@@ -46154,7 +47947,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:alu:2polpl:negative",
@@ -46177,7 +47971,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:3:affirmative",
@@ -46200,7 +47995,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:3:negative",
@@ -46223,7 +48019,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:1sg:affirmative",
@@ -46246,7 +48043,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:1sg:negative",
@@ -46269,7 +48067,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:1pl:affirmative",
@@ -46292,7 +48091,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:1pl:negative",
@@ -46315,7 +48115,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:2sg:affirmative",
@@ -46338,7 +48139,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:2sg:negative",
@@ -46361,7 +48163,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:2pl:affirmative",
@@ -46384,7 +48187,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:2pl:negative",
@@ -46407,7 +48211,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:2pol:affirmative",
@@ -46430,7 +48235,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:2pol:negative",
@@ -46453,7 +48259,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:2polpl:affirmative",
@@ -46476,7 +48283,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:beru:2polpl:negative",
@@ -46499,7 +48307,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:3:affirmative",
@@ -46522,7 +48331,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:3:negative",
@@ -46545,7 +48355,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:1sg:affirmative",
@@ -46568,7 +48379,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:1sg:negative",
@@ -46591,7 +48403,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:1pl:affirmative",
@@ -46614,7 +48427,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:1pl:negative",
@@ -46637,7 +48451,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:2sg:affirmative",
@@ -46660,7 +48475,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:2sg:negative",
@@ -46683,7 +48499,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:2pl:affirmative",
@@ -46706,7 +48523,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:2pl:negative",
@@ -46729,7 +48547,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:2pol:affirmative",
@@ -46752,7 +48571,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:2pol:negative",
@@ -46775,7 +48595,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:2polpl:affirmative",
@@ -46798,7 +48619,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:koru:2polpl:negative",
@@ -46821,7 +48643,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:3:affirmative",
@@ -46844,7 +48667,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:3:negative",
@@ -46867,7 +48691,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:1sg:affirmative",
@@ -46890,7 +48715,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:1sg:negative",
@@ -46913,7 +48739,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:1pl:affirmative",
@@ -46936,7 +48763,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:1pl:negative",
@@ -46959,7 +48787,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:2sg:affirmative",
@@ -46982,7 +48811,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:2sg:negative",
@@ -47005,7 +48835,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:2pl:affirmative",
@@ -47028,7 +48859,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:2pl:negative",
@@ -47051,7 +48883,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:2pol:affirmative",
@@ -47074,7 +48907,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:2pol:negative",
@@ -47097,7 +48931,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:2polpl:affirmative",
@@ -47120,7 +48955,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:qarau:2polpl:negative",
@@ -47143,7 +48979,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:3:affirmative",
@@ -47166,7 +49003,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:3:negative",
@@ -47189,7 +49027,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:1sg:affirmative",
@@ -47212,7 +49051,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:1sg:negative",
@@ -47235,7 +49075,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:1pl:affirmative",
@@ -47258,7 +49099,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:1pl:negative",
@@ -47281,7 +49123,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:2sg:affirmative",
@@ -47304,7 +49147,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:2sg:negative",
@@ -47327,7 +49171,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:2pl:affirmative",
@@ -47350,7 +49195,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:2pl:negative",
@@ -47373,7 +49219,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:2pol:affirmative",
@@ -47396,7 +49243,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:2pol:negative",
@@ -47419,7 +49267,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:2polpl:affirmative",
@@ -47442,7 +49291,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tusinu:2polpl:negative",
@@ -47465,7 +49315,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:3:affirmative",
@@ -47488,7 +49339,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:3:negative",
@@ -47511,7 +49363,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:1sg:affirmative",
@@ -47534,7 +49387,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:1sg:negative",
@@ -47557,7 +49411,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:1pl:affirmative",
@@ -47580,7 +49435,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:1pl:negative",
@@ -47603,7 +49459,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:2sg:affirmative",
@@ -47626,7 +49483,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:2sg:negative",
@@ -47649,7 +49507,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:2pl:affirmative",
@@ -47672,7 +49531,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:2pl:negative",
@@ -47695,7 +49555,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:2pol:affirmative",
@@ -47718,7 +49579,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:2pol:negative",
@@ -47741,7 +49603,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:2polpl:affirmative",
@@ -47764,7 +49627,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:baru:2polpl:negative",
@@ -47787,7 +49651,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:3:affirmative",
@@ -47810,7 +49675,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:3:negative",
@@ -47833,7 +49699,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:1sg:affirmative",
@@ -47856,7 +49723,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:1sg:negative",
@@ -47879,7 +49747,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:1pl:affirmative",
@@ -47902,7 +49771,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:1pl:negative",
@@ -47925,7 +49795,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:2sg:affirmative",
@@ -47948,7 +49819,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:2sg:negative",
@@ -47971,7 +49843,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:2pl:affirmative",
@@ -47994,7 +49867,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:2pl:negative",
@@ -48017,7 +49891,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:2pol:affirmative",
@@ -48040,7 +49915,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:2pol:negative",
@@ -48063,7 +49939,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:2polpl:affirmative",
@@ -48086,7 +49963,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhuru:2polpl:negative",
@@ -48109,7 +49987,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:3:affirmative",
@@ -48132,7 +50011,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:3:negative",
@@ -48155,7 +50035,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:1sg:affirmative",
@@ -48178,7 +50059,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:1sg:negative",
@@ -48201,7 +50083,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:1pl:affirmative",
@@ -48224,7 +50107,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:1pl:negative",
@@ -48247,7 +50131,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:2sg:affirmative",
@@ -48270,7 +50155,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:2sg:negative",
@@ -48293,7 +50179,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:2pl:affirmative",
@@ -48316,7 +50203,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:2pl:negative",
@@ -48339,7 +50227,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:2pol:affirmative",
@@ -48362,7 +50251,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:2pol:negative",
@@ -48385,7 +50275,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:2polpl:affirmative",
@@ -48408,7 +50299,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhatu:2polpl:negative",
@@ -48431,7 +50323,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:3:affirmative",
@@ -48454,7 +50347,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:3:negative",
@@ -48477,7 +50371,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:1sg:affirmative",
@@ -48500,7 +50395,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:1sg:negative",
@@ -48523,7 +50419,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:1pl:affirmative",
@@ -48546,7 +50443,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:1pl:negative",
@@ -48569,7 +50467,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:2sg:affirmative",
@@ -48592,7 +50491,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:2sg:negative",
@@ -48615,7 +50515,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:2pl:affirmative",
@@ -48638,7 +50539,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:2pl:negative",
@@ -48661,7 +50563,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:2pol:affirmative",
@@ -48684,7 +50587,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:2pol:negative",
@@ -48707,7 +50611,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:2polpl:affirmative",
@@ -48730,7 +50635,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:otyru:2polpl:negative",
@@ -48753,7 +50659,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:3:affirmative",
@@ -48776,7 +50683,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:3:negative",
@@ -48799,7 +50707,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:1sg:affirmative",
@@ -48822,7 +50731,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:1sg:negative",
@@ -48845,7 +50755,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:1pl:affirmative",
@@ -48868,7 +50779,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:1pl:negative",
@@ -48891,7 +50803,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:2sg:affirmative",
@@ -48914,7 +50827,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:2sg:negative",
@@ -48937,7 +50851,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:2pl:affirmative",
@@ -48960,7 +50875,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:2pl:negative",
@@ -48983,7 +50899,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:2pol:affirmative",
@@ -49006,7 +50923,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:2pol:negative",
@@ -49029,7 +50947,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:2polpl:affirmative",
@@ -49052,7 +50971,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:turu:2polpl:negative",
@@ -49075,7 +50995,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:3:affirmative",
@@ -49098,7 +51019,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:3:negative",
@@ -49121,7 +51043,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:1sg:affirmative",
@@ -49144,7 +51067,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:1sg:negative",
@@ -49167,7 +51091,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:1pl:affirmative",
@@ -49190,7 +51115,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:1pl:negative",
@@ -49213,7 +51139,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:2sg:affirmative",
@@ -49236,7 +51163,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:2sg:negative",
@@ -49259,7 +51187,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:2pl:affirmative",
@@ -49282,7 +51211,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:2pl:negative",
@@ -49305,7 +51235,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:2pol:affirmative",
@@ -49328,7 +51259,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:2pol:negative",
@@ -49351,7 +51283,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:2polpl:affirmative",
@@ -49374,7 +51307,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:linker",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:ashu:2polpl:negative",
@@ -49397,7 +51331,8 @@ window.LESSON_V2_COMPILED = [
         "ruleIds": [
           "v2:4-1:negative",
           "v2:4-1:person"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:3:affirmative",
@@ -49421,7 +51356,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:3:negative",
@@ -49445,7 +51381,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:1sg:affirmative",
@@ -49469,7 +51406,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:1sg:negative",
@@ -49493,7 +51431,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:1pl:affirmative",
@@ -49517,7 +51456,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:1pl:negative",
@@ -49541,7 +51481,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:2sg:affirmative",
@@ -49565,7 +51506,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:2sg:negative",
@@ -49589,7 +51531,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:2pl:affirmative",
@@ -49613,7 +51556,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:2pl:negative",
@@ -49637,7 +51581,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:2pol:affirmative",
@@ -49661,7 +51606,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:2pol:negative",
@@ -49685,7 +51631,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:2polpl:affirmative",
@@ -49709,7 +51656,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:zhabu:2polpl:negative",
@@ -49733,7 +51681,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:3:affirmative",
@@ -49757,7 +51706,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:3:negative",
@@ -49781,7 +51731,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:1sg:affirmative",
@@ -49805,7 +51756,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:1sg:negative",
@@ -49829,7 +51781,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:1pl:affirmative",
@@ -49853,7 +51806,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:1pl:negative",
@@ -49877,7 +51831,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:2sg:affirmative",
@@ -49901,7 +51856,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:2sg:negative",
@@ -49925,7 +51881,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:2pl:affirmative",
@@ -49949,7 +51906,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:2pl:negative",
@@ -49973,7 +51931,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:2pol:affirmative",
@@ -49997,7 +51956,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:2pol:negative",
@@ -50021,7 +51981,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:2polpl:affirmative",
@@ -50045,7 +52006,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:linker",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       },
       {
         "id": "gen:4-1:nonpast-core:tigu:2polpl:negative",
@@ -50069,7 +52031,8 @@ window.LESSON_V2_COMPILED = [
           "v2:4-1:negative",
           "v2:4-1:person",
           "v2:4-1:alternation"
-        ]
+        ],
+        "item_type": "prod"
       }
     ],
     "stages": [
@@ -51359,6 +53322,7 @@ window.LESSON_V2_COMPILED = [
         ]
       }
     ],
+    "references": [],
     "vocabulary": [
       {
         "id": "vocab:4-2:tusinu",
