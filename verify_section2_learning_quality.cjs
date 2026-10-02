@@ -6,6 +6,10 @@ const fs=require('node:fs');
 const path=require('node:path');
 const Schema=require('./lesson-v2-schema.js');
 
+const compiledText=fs.readFileSync(path.join(__dirname,'compiled-lessons-v2.js'),'utf8');
+const compiledJson=compiledText.replace(/^.*?window\.LESSON_V2_COMPILED\s*=\s*/s,'').replace(/;\s*$/s,'');
+const all=JSON.parse(compiledJson);
+
 const expected={
   '2-1':{
     revision:'2-1.r2',core:10,refs:4,canonicalPractice:79,prereq:['1-3'],
@@ -71,9 +75,9 @@ function assertNoProductionLeak(p){
 }
 
 for(const [lessonId,e] of Object.entries(expected)){
-  const file=path.join(__dirname,'lessons',lessonId,'lesson.json');
-  const raw=JSON.parse(fs.readFileSync(file,'utf8'));
-  const p=Schema.validate(raw);
+  const compiled=all.find(x=>x.lesson_id===lessonId);
+  assert.ok(compiled,'compiled package missing '+lessonId);
+  const p=Schema.validate(compiled);
 
   assert.equal(p.content_revision,e.revision,lessonId+' revision');
   assert.equal(p.status,'reviewed',lessonId+' must stay reviewed until black-box approval');
