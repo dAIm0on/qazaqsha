@@ -2297,7 +2297,7 @@
      const fmtCoreLine=line=>{
        const text=String(line||'');
        const m=text.match(/^(.+?)\s+—\s+(.+)$/);
-       if(m&&/[әғқңөұүһі]/i.test(m[1]))return seeText(m[1])+' — <em>'+seeText(m[2])+'</em>';
+       if(m&&String(m[1]).trim().length<=90&&!/[.!?]$/.test(String(m[1]).trim()))return seeText(m[1])+' — <em>'+seeText(m[2])+'</em>';
        return seeText(text);
      };
      const blocks=String(beat.b||'').split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
@@ -2407,7 +2407,7 @@
          const fmtRefLine=line=>{
            const text=String(line||'');
            const m=text.match(/^(.+?)\s+—\s+(.+)$/);
-           if(m&&/[әғқңөұүһі]/i.test(m[1]))return seeText(m[1])+' — <em>'+seeText(m[2])+'</em>';
+           if(m&&String(m[1]).trim().length<=90&&!/[.!?]$/.test(String(m[1]).trim()))return seeText(m[1])+' — <em>'+seeText(m[2])+'</em>';
            return seeText(text);
          };
          const blocks=String(ref.body).split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
