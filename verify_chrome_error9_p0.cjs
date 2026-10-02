@@ -9,8 +9,8 @@ const Schema=require('./lesson-v2-schema.js');
 function ok(m){console.log('OK',m);}
 
 const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20261001-module4-accept'"));
-ok('SW pin words-error-lemma (error9 runtime kept)');
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20261002-section2-canonical'"));
+ok('SW cache bumped for section2 canonical while Error9 runtime stays pinned');
 
 const runtime=fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8');
 assert.ok(runtime.includes('function ensure('));

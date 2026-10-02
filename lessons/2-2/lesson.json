@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "lesson_id": "2-2",
-  "content_revision": "2-2.r1",
+  "content_revision": "2-2.r2",
   "title": "Урок 2–2 · Біз, сендер, сіздер; прилагательное",
   "label": "2–2",
   "name": "Біз, сендер, сіздер; прилагательное",
@@ -11,7 +11,7 @@
     "preview_head": "",
     "preview_url": "",
     "approved_at": "",
-    "note": "2026-10-01 teaching rework 2-1→2-3; pending preview QA. No merge/deploy."
+    "note": "2026-10-02 LESSONS FIX canonical core + S1-S8 practice + contextual references. Pending preview QA; no merge/deploy."
   },
   "prerequisites": {
     "lessons": [
@@ -78,6 +78,22 @@
     {
       "id": "v2:2-2:checkpoint",
       "title": "Итог 2-2"
+    },
+    {
+      "id": "v2:2-2:recall",
+      "title": "Короткое восстановление 2–1"
+    },
+    {
+      "id": "v2:2-2:address",
+      "title": "Как выбрать сен / сіз / сендер / сіздер"
+    },
+    {
+      "id": "v2:2-2:map",
+      "title": "Единая карта шести лиц"
+    },
+    {
+      "id": "v2:2-2:neg",
+      "title": "Отрицание для шести лиц"
     }
   ],
   "theory": [
@@ -3489,347 +3505,2002 @@
       "source_refs": [
         "school-exercises"
       ]
+    },
+    {
+      "id": "canon:2-2:p22-001",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-001",
+      "stimulus": "Собери форму мен + ақын — я + поэт.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ақынмын"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: ақынмын — я поэт.",
+      "source_item": "P22-001",
+      "rule_ids": [
+        "v2:2-2:recall"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-002",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-002",
+      "stimulus": "Собери форму сен + аспаз — ты + повар.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "аспазсың"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: аспазсың — ты повар.",
+      "source_item": "P22-002",
+      "rule_ids": [
+        "v2:2-2:recall"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-003",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-003",
+      "stimulus": "Собери форму сіз + жолсерік — Вы + проводник.",
+      "fields": [
+        {
+          "label": "Все формы",
+          "kind": "set-text",
+          "answers": [
+            "жолсеріксіз",
+            "Если две из трёх форм не строятся, показать быстрый переход к справочнику 2–1, а не повторять весь урок"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: жолсеріксіз — Вы проводник.\n\n\nЕсли две из трёх форм не строятся, показать быстрый переход к справочнику 2–1, а не повторять весь урок.",
+      "source_item": "P22-003",
+      "rule_ids": [
+        "v2:2-2:recall"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-010",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-010",
+      "stimulus": "Где личное окончание НЕ нужно?\nВарианты: ақылды жазушы — умный писатель | мен ақылдымын — я умный / умная",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "select",
+          "answers": [
+            "ақылды жазушы — умный писатель"
+          ],
+          "options": [
+            "ақылды жазушы — умный писатель",
+            "мен ақылдымын — я умный / умная"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: A.",
+      "source_item": "P22-010",
+      "rule_ids": [
+        "v2:2-2:adj"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-011",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-011",
+      "stimulus": "В форме сен әдемісің — ты красивая / красивый слово әдемі — красивый / красивая является описанием существительного или сказуемым?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сказуемым"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сказуемым.",
+      "source_item": "P22-011",
+      "rule_ids": [
+        "v2:2-2:adj"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-012",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-012",
+      "stimulus": "Собери: мен + ақылды — я + умный / умная.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ақылдымын"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: ақылдымын — я умный / умная.",
+      "source_item": "P22-012",
+      "rule_ids": [
+        "v2:2-2:adj"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-013",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-013",
+      "stimulus": "Собери: сен + сұлу — ты + красивый / красивая.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сұлусың"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сұлусың — ты красивый / красивая.",
+      "source_item": "P22-013",
+      "rule_ids": [
+        "v2:2-2:adj"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-014",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S6 · P22-014",
+      "stimulus": "Исправлять или оставить? Ақылды жазушымын — я умный писатель.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "оставить"
+          ]
+        }
+      ],
+      "explanation": "Личное окончание стоит один раз на последнем слове жазушы — писатель; ақылды — умный остаётся определением.",
+      "source_item": "P22-014",
+      "rule_ids": [
+        "v2:2-2:adj"
+      ],
+      "note": "LESSONS FIX canonical practice; S6"
+    },
+    {
+      "id": "canon:2-2:p22-020",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S2 · P22-020",
+      "stimulus": "бастық — начальник заканчивается на Қ. Для біз — мы нужна П, Б или М?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "П"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: П.",
+      "source_item": "P22-020",
+      "rule_ids": [
+        "v2:2-2:biz"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-2:p22-021",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S2 · P22-021",
+      "stimulus": "ақын — поэт заканчивается на Н. Для біз — мы нужна П, Б или М?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Б"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Б.",
+      "source_item": "P22-021",
+      "rule_ids": [
+        "v2:2-2:biz",
+        "v2:2-2:mn"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-2:p22-022",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S2 · P22-022",
+      "stimulus": "мұғалім — учитель заканчивается на М. Для біз — мы нужна П, Б или М?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Б"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Б.",
+      "source_item": "P22-022",
+      "rule_ids": [
+        "v2:2-2:biz",
+        "v2:2-2:mn"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-2:p22-023",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S2 · P22-023",
+      "stimulus": "жүргізуші — водитель заканчивается на гласную. Для біз — мы нужна П, Б или М?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "М"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: М.",
+      "source_item": "P22-023",
+      "rule_ids": [
+        "v2:2-2:biz"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-2:p22-024",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S3 · P22-024",
+      "stimulus": "біз + бастық — мы + начальник. Впиши только окончание.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "-пыз"
+          ]
+        }
+      ],
+      "explanation": "бастықпыз — мы начальники.",
+      "source_item": "P22-024",
+      "rule_ids": [
+        "v2:2-2:biz"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-2:p22-025",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S3 · P22-025",
+      "stimulus": "біз + мұғалім — мы + учитель. Впиши только окончание.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "-біз"
+          ]
+        }
+      ],
+      "explanation": "мұғалімбіз — мы учителя.",
+      "source_item": "P22-025",
+      "rule_ids": [
+        "v2:2-2:biz",
+        "v2:2-2:mn"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-2:p22-026",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S3 · P22-026",
+      "stimulus": "біз + ақын — мы + поэт. Впиши только окончание.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "-быз"
+          ]
+        }
+      ],
+      "explanation": "ақынбыз — мы поэты.",
+      "source_item": "P22-026",
+      "rule_ids": [
+        "v2:2-2:biz",
+        "v2:2-2:mn"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-2:p22-027",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-027",
+      "stimulus": "Собери: біз + әдемі — мы + красивые.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "әдеміміз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: әдеміміз — мы красивые.",
+      "source_item": "P22-027",
+      "rule_ids": [
+        "v2:2-2:biz"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-028",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-028",
+      "stimulus": "Собери: біз + оқырман — мы + читатели.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "оқырманбыз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: оқырманбыз — мы читатели.",
+      "source_item": "P22-028",
+      "rule_ids": [
+        "v2:2-2:biz",
+        "v2:2-2:mn"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-029",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S6 · P22-029",
+      "stimulus": "Исправь: Біз мұғалімміз — мы учителя.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз мұғалімбіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз мұғалімбіз — мы учителя.",
+      "source_item": "P22-029",
+      "rule_ids": [
+        "v2:2-2:mn"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E22_BIZ_MNNG."
+      ]
+    },
+    {
+      "id": "canon:2-2:p22-030",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S6 · P22-030",
+      "stimulus": "Исправь: Біз ақынмыз — мы поэты.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз ақынбыз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз ақынбыз — мы поэты.",
+      "source_item": "P22-030",
+      "rule_ids": [
+        "v2:2-2:mn"
+      ],
+      "note": "LESSONS FIX canonical practice; S6"
+    },
+    {
+      "id": "canon:2-2:p22-035",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-035",
+      "stimulus": "Какая форма является основной для упражнений 2–2?\nВарианты: біз студентпіз — мы студенты | біз студенттерміз — мы студенты",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "select",
+          "answers": [
+            "біз студентпіз — мы студенты"
+          ],
+          "options": [
+            "біз студентпіз — мы студенты",
+            "біз студенттерміз — мы студенты"
+          ]
+        }
+      ],
+      "explanation": "Источник допускает обе формы, но в упражнениях выбирает вариант без отдельного множественного окончания.",
+      "source_item": "P22-035",
+      "rule_ids": [
+        "v2:2-2:noextra"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-036",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S6 · P22-036",
+      "stimulus": "Нужно ли автоматически считать біз студенттерміз — мы студенты абсолютной грамматической ошибкой?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "нет"
+          ]
+        }
+      ],
+      "explanation": "Исходная методичка называет форму допустимой, но менее предпочтительной в этом учебном контексте.",
+      "source_item": "P22-036",
+      "rule_ids": [
+        "v2:2-2:noextra"
+      ],
+      "note": "LESSONS FIX canonical practice; S6"
+    },
+    {
+      "id": "canon:2-2:p22-040",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S2 · P22-040",
+      "stimulus": "сендер + жомарт — вы + щедрые. Выбери окончание.\nВарианты: -сыңдар | -сіңдер",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "select",
+          "answers": [
+            "-сыңдар"
+          ],
+          "options": [
+            "-сыңдар",
+            "-сіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: -сыңдар.",
+      "source_item": "P22-040",
+      "rule_ids": [
+        "v2:2-2:sender"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-2:p22-041",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S2 · P22-041",
+      "stimulus": "сендер + әдемі — вы + красивые. Выбери окончание.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "-сіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: -сіңдер.",
+      "source_item": "P22-041",
+      "rule_ids": [
+        "v2:2-2:sender"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-2:p22-042",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S3 · P22-042",
+      "stimulus": "сендер + жігіт — вы + парни. Впиши только окончание.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "-сіңдер"
+          ]
+        }
+      ],
+      "explanation": "жігітсіңдер — вы парни.",
+      "source_item": "P22-042",
+      "rule_ids": [
+        "v2:2-2:sender"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-2:p22-043",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-043",
+      "stimulus": "Собери: сендер + ақылды — вы + умные.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ақылдысыңдар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: ақылдысыңдар — вы умные.",
+      "source_item": "P22-043",
+      "rule_ids": [
+        "v2:2-2:sender"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-044",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-044",
+      "stimulus": "Собери: сендер + жүргізуші — вы + водители.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "жүргізушісіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: жүргізушісіңдер — вы водители.",
+      "source_item": "P22-044",
+      "rule_ids": [
+        "v2:2-2:sender"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-045",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S6 · P22-045",
+      "stimulus": "Исправь по учебной модели 2–2: Сендер студенттерсіңдер — вы студенты.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер студентсіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер студентсіңдер — вы студенты.",
+      "source_item": "P22-045",
+      "rule_ids": [
+        "v2:2-2:sender"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E22_EXTRA_PLURAL_SENDER."
+      ]
+    },
+    {
+      "id": "canon:2-2:p22-050",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S2 · P22-050",
+      "stimulus": "сіздер + бай — вы + богатые. Выбери окончание.\nВарианты: -сыздар | -сіздер",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "select",
+          "answers": [
+            "-сыздар"
+          ],
+          "options": [
+            "-сыздар",
+            "-сіздер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: -сыздар.",
+      "source_item": "P22-050",
+      "rule_ids": [
+        "v2:2-2:sizder"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-2:p22-051",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S2 · P22-051",
+      "stimulus": "сіздер + кедей — вы + бедные. Выбери окончание.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "-сіздер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: -сіздер.",
+      "source_item": "P22-051",
+      "rule_ids": [
+        "v2:2-2:sizder"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-2:p22-052",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S3 · P22-052",
+      "stimulus": "сіздер + ғалым — вы + учёные. Впиши окончание.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "-сыздар"
+          ]
+        }
+      ],
+      "explanation": "ғалымсыздар — вы учёные.",
+      "source_item": "P22-052",
+      "rule_ids": [
+        "v2:2-2:sizder"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-2:p22-053",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-053",
+      "stimulus": "Собери: сіздер + зейнеткер — вы + пенсионеры.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "зейнеткерсіздер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: зейнеткерсіздер — вы пенсионеры.",
+      "source_item": "P22-053",
+      "rule_ids": [
+        "v2:2-2:sizder"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-054",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-054",
+      "stimulus": "Собери: сіздер + жұмысшы — вы + рабочие.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "жұмысшысыздар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: жұмысшысыздар — вы рабочие.",
+      "source_item": "P22-054",
+      "rule_ids": [
+        "v2:2-2:sizder"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-055",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S6 · P22-055",
+      "stimulus": "Исправь: Сіздер жассыңдар — вы молодые, уважительно.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сіздер жассыздар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сіздер жассыздар — вы молодые, уважительно.",
+      "source_item": "P22-055",
+      "rule_ids": [
+        "v2:2-2:sizder"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E22_PERSON_MISMATCH."
+      ]
+    },
+    {
+      "id": "canon:2-2:p22-060",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-060",
+      "stimulus": "Один близкий человек, неформально. Какое местоимение?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сен"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сен — ты.",
+      "source_item": "P22-060",
+      "rule_ids": [
+        "v2:2-2:address"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-061",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-061",
+      "stimulus": "Один человек уважительно. Какое местоимение?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сіз — Вы одному уважительно.",
+      "source_item": "P22-061",
+      "rule_ids": [
+        "v2:2-2:address"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-062",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-062",
+      "stimulus": "Несколько людей, к каждому на «ты». Какое местоимение?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сендер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сендер — вы, несколько неформально.",
+      "source_item": "P22-062",
+      "rule_ids": [
+        "v2:2-2:address"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-063",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-063",
+      "stimulus": "Несколько людей уважительно. Какое местоимение?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сіздер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сіздер — вы, несколько уважительно.",
+      "source_item": "P22-063",
+      "rule_ids": [
+        "v2:2-2:address"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-064",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S5 · P22-064",
+      "stimulus": "Переведи: «Вы, друзья, щедрые»; обращение к нескольким знакомым неформально.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер жомартсыңдар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер жомартсыңдар — вы щедрые.",
+      "source_item": "P22-064",
+      "rule_ids": [
+        "v2:2-2:address",
+        "v2:2-2:sender"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-2:p22-065",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S5 · P22-065",
+      "stimulus": "Переведи: «Вы умные»; уважительное обращение к нескольким людям.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сіздер ақылдысыздар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сіздер ақылдысыздар — вы умные, уважительно.",
+      "source_item": "P22-065",
+      "rule_ids": [
+        "v2:2-2:address",
+        "v2:2-2:sizder"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-2:p22-070",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-070",
+      "stimulus": "Собери форму для біз + аспаз — мы + повар.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "аспазбыз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: аспазбыз — мы повара.",
+      "source_item": "P22-070",
+      "rule_ids": [
+        "v2:2-2:map"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-071",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-071",
+      "stimulus": "Собери форму для сендер + аспаз — вы + повар.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "аспазсыңдар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: аспазсыңдар — вы повара, неформально.",
+      "source_item": "P22-071",
+      "rule_ids": [
+        "v2:2-2:map"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-072",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S4 · P22-072",
+      "stimulus": "Собери форму для сіздер + аспаз — вы + повар.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "аспазсыздар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: аспазсыздар — вы повара, уважительно.",
+      "source_item": "P22-072",
+      "rule_ids": [
+        "v2:2-2:map"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-2:p22-073",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S7 · P22-073",
+      "stimulus": "Без таблицы в стимуле собери все шесть форм слова әдемі — красивый / красивая для мен, біз, сен, сендер, сіз, сіздер.",
+      "fields": [
+        {
+          "label": "Все формы",
+          "kind": "set-text",
+          "answers": [
+            "мен әдемімін",
+            "біз әдеміміз",
+            "сен әдемісің",
+            "сендер әдемісіңдер",
+            "сіз әдемісіз",
+            "сіздер әдемісіздер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: мен әдемімін — я красивый / красивая;\nбіз әдеміміз — мы красивые;\nсен әдемісің — ты красивый / красивая;\nсендер әдемісіңдер — вы красивые, неформально;\nсіз әдемісіз — Вы красивый / красивая;\nсіздер әдемісіздер — вы красивые, уважительно.",
+      "source_item": "P22-073",
+      "rule_ids": [
+        "v2:2-2:map"
+      ],
+      "note": "LESSONS FIX canonical practice; S7"
+    },
+    {
+      "id": "canon:2-2:p22-080",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S3 · P22-080",
+      "stimulus": "біз сараң ... — мы не скупые. Впиши форму емес — не является с окончанием.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "емеспіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: емеспіз — мы не….",
+      "source_item": "P22-080",
+      "rule_ids": [
+        "v2:2-2:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-2:p22-081",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S3 · P22-081",
+      "stimulus": "сендер аспаз ... — вы не повара. Впиши форму емес — не является с окончанием.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "емессіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: емессіңдер — вы не…, несколько неформально.",
+      "source_item": "P22-081",
+      "rule_ids": [
+        "v2:2-2:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-2:p22-082",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S3 · P22-082",
+      "stimulus": "сіздер жолсерік ... — вы не проводники. Впиши форму емес — не является с окончанием.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "емессіздер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: емессіздер — вы не…, несколько уважительно.",
+      "source_item": "P22-082",
+      "rule_ids": [
+        "v2:2-2:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-2:p22-083",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S5 · P22-083",
+      "stimulus": "Переведи: «Мы не бедные».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз кедей емеспіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз кедей емеспіз — мы не бедные.",
+      "source_item": "P22-083",
+      "rule_ids": [
+        "v2:2-2:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-2:p22-084",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S5 · P22-084",
+      "stimulus": "Переведи: «Вы, несколько неформально, не начальники».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер бастық емессіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер бастық емессіңдер — вы не начальники.",
+      "source_item": "P22-084",
+      "rule_ids": [
+        "v2:2-2:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-2:p22-085",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S5 · P22-085",
+      "stimulus": "Переведи: «Вы, несколько уважительно, не повара».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сіздер аспаз емессіздер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сіздер аспаз емессіздер — вы не повара, уважительно.",
+      "source_item": "P22-085",
+      "rule_ids": [
+        "v2:2-2:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-2:p22-086",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S6 · P22-086",
+      "stimulus": "Исправь: Сендер құрбысыңдар емессіңдер — вы не подруги.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер құрбы емессіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер құрбы емессіңдер — вы не подруги.",
+      "source_item": "P22-086",
+      "rule_ids": [
+        "v2:2-2:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E22_NEG_DOUBLE_ENDING."
+      ]
+    },
+    {
+      "id": "canon:2-2:p22-090",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S2 · P22-090",
+      "stimulus": "сендер жазушысыңдар — вы писатели заканчивается на Р. Какая серия вопроса?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "М"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: М.",
+      "source_item": "P22-090",
+      "rule_ids": [
+        "v2:2-2:rq"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-2:p22-091",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S2 · P22-091",
+      "stimulus": "біз жұмысшымыз — мы рабочие заканчивается на З. Какая серия вопроса?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Б"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Б.",
+      "source_item": "P22-091",
+      "rule_ids": [
+        "v2:2-2:rq"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-2:p22-092",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S3 · P22-092",
+      "stimulus": "Сендер жассыңдар ...? — вы молодые?. Впиши частицу.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ма"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: ма.",
+      "source_item": "P22-092",
+      "rule_ids": [
+        "v2:2-2:rq"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-2:p22-093",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S3 · P22-093",
+      "stimulus": "Сіздер кәсіпкерсіздер ...? — вы бизнесмены?. Впиши частицу.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ме"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: ме.",
+      "source_item": "P22-093",
+      "rule_ids": [
+        "v2:2-2:rq"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-2:p22-094",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S3 · P22-094",
+      "stimulus": "Біз дәрігерміз ...? — мы врачи?. Впиши частицу.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "бе"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: бе.",
+      "source_item": "P22-094",
+      "rule_ids": [
+        "v2:2-2:rq"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-2:p22-095",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S5 · P22-095",
+      "stimulus": "Переведи: «Вы, несколько неформально, юристы?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер заңгерсіңдер ме?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер заңгерсіңдер ме? — вы юристы?.",
+      "source_item": "P22-095",
+      "rule_ids": [
+        "v2:2-2:rq"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-2:p22-096",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S5 · P22-096",
+      "stimulus": "Переведи: «Вы, несколько уважительно, не повара?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сіздер аспаз емессіздер ме?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сіздер аспаз емессіздер ме? — вы не повара?.",
+      "source_item": "P22-096",
+      "rule_ids": [
+        "v2:2-2:rq",
+        "v2:2-2:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-2:p22-097",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S6 · P22-097",
+      "stimulus": "Исправь: Сендер жазушысыңдар ба? — вы писатели?.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер жазушысыңдар ма?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер жазушысыңдар ма? — вы писатели?.",
+      "source_item": "P22-097",
+      "rule_ids": [
+        "v2:2-2:rq"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E22_Q_AFTER_R."
+      ]
+    },
+    {
+      "id": "canon:2-2:p22-100",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-100",
+      "stimulus": "Как поздороваться неформально между друзьями?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сәлем"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сәлем — привет.",
+      "source_item": "P22-100",
+      "rule_ids": [
+        "v2:2-2:hi"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-101",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-101",
+      "stimulus": "Как сказать «здравствуйте» одному человеку уважительно?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сәлеметсіз бе"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сәлеметсіз бе — здравствуйте, одному человеку уважительно.",
+      "source_item": "P22-101",
+      "rule_ids": [
+        "v2:2-2:hi"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-102",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-102",
+      "stimulus": "Как сказать «здравствуйте» нескольким людям уважительно?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сәлеметсіздер ме"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сәлеметсіздер ме — здравствуйте, нескольким людям уважительно.",
+      "source_item": "P22-102",
+      "rule_ids": [
+        "v2:2-2:hi"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-103",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-103",
+      "stimulus": "Как попрощаться с одним близким человеком?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сау бол"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сау бол — до свидания, одному человеку неформально.",
+      "source_item": "P22-103",
+      "rule_ids": [
+        "v2:2-2:hi"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-104",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-104",
+      "stimulus": "Как попрощаться с несколькими людьми неформально?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сау болыңдар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сау болыңдар — до свидания, нескольким людям неформально.",
+      "source_item": "P22-104",
+      "rule_ids": [
+        "v2:2-2:hi"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-105",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-105",
+      "stimulus": "Как попрощаться с одним человеком уважительно?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сау болыңыз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сау болыңыз — до свидания, одному человеку уважительно.",
+      "source_item": "P22-105",
+      "rule_ids": [
+        "v2:2-2:hi"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-106",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S1 · P22-106",
+      "stimulus": "Как попрощаться с несколькими людьми уважительно?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сау болыңыздар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сау болыңыздар — до свидания, нескольким людям уважительно.",
+      "source_item": "P22-106",
+      "rule_ids": [
+        "v2:2-2:hi"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-2:p22-m01",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M01",
+      "stimulus": "Переведи: «Мы умные».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз ақылдымыз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз ақылдымыз — мы умные.",
+      "source_item": "P22-M01",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m02",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M02",
+      "stimulus": "Переведи: «Мы начальники».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз бастықпыз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз бастықпыз — мы начальники.",
+      "source_item": "P22-M02",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m03",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M03",
+      "stimulus": "Переведи: «Мы учителя».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз мұғалімбіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз мұғалімбіз — мы учителя.",
+      "source_item": "P22-M03",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m04",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M04",
+      "stimulus": "Переведи: «Мы поэты».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз ақынбыз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз ақынбыз — мы поэты.",
+      "source_item": "P22-M04",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m05",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M05",
+      "stimulus": "Переведи: «Вы водители»; несколько людей неформально.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер жүргізушісіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер жүргізушісіңдер — вы водители.",
+      "source_item": "P22-M05",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m06",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M06",
+      "stimulus": "Переведи: «Вы умные»; несколько людей уважительно.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сіздер ақылдысыздар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сіздер ақылдысыздар — вы умные, уважительно.",
+      "source_item": "P22-M06",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m07",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M07",
+      "stimulus": "Переведи: «Мы не скупые».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз сараң емеспіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз сараң емеспіз — мы не скупые.",
+      "source_item": "P22-M07",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m08",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M08",
+      "stimulus": "Переведи: «Вы не повара»; несколько людей неформально.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер аспаз емессіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер аспаз емессіңдер — вы не повара.",
+      "source_item": "P22-M08",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m09",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M09",
+      "stimulus": "Переведи: «Вы не проводники»; несколько людей уважительно.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сіздер жолсерік емессіздер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сіздер жолсерік емессіздер — вы не проводники, уважительно.",
+      "source_item": "P22-M09",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m10",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M10",
+      "stimulus": "Переведи: «Вы молодые?»; несколько людей неформально.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер жассыңдар ма?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер жассыңдар ма? — вы молодые?.",
+      "source_item": "P22-M10",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m11",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M11",
+      "stimulus": "Переведи: «Мы рабочие?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз жұмысшымыз ба?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз жұмысшымыз ба? — мы рабочие?.",
+      "source_item": "P22-M11",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m12",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M12",
+      "stimulus": "Переведи: «Вы не повара?»; несколько людей уважительно.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сіздер аспаз емессіздер ме?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сіздер аспаз емессіздер ме? — вы не повара?.",
+      "source_item": "P22-M12",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m13",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M13",
+      "stimulus": "Исправь: Біз мұғалімміз — мы учителя.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз мұғалімбіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз мұғалімбіз — мы учителя.",
+      "source_item": "P22-M13",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m14",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M14",
+      "stimulus": "Исправь: Сіздер жассыңдар — вы молодые, уважительно.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сіздер жассыздар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сіздер жассыздар — вы молодые, уважительно.",
+      "source_item": "P22-M14",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m15",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M15",
+      "stimulus": "Исправь: Сендер құрбысыңдар емессіңдер — вы не подруги.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер құрбы емессіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер құрбы емессіңдер — вы не подруги.",
+      "source_item": "P22-M15",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m16",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M16",
+      "stimulus": "Исправь: Сендер жазушысыңдар ба? — вы писатели?.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер жазушысыңдар ма?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер жазушысыңдар ма? — вы писатели?.",
+      "source_item": "P22-M16",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m17",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M17",
+      "stimulus": "Выбери готовую фразу для уважительного приветствия нескольких людей.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сәлеметсіздер ме"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сәлеметсіздер ме — здравствуйте, нескольким людям уважительно.",
+      "source_item": "P22-M17",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-2:p22-m18",
+      "origin": "canonical",
+      "topic": "person",
+      "title": "S8 · P22-M18",
+      "stimulus": "Выбери готовую фразу для уважительного прощания с несколькими людьми.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сау болыңыздар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сау болыңыздар — до свидания, нескольким людям уважительно.",
+      "source_item": "P22-M18",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
     }
   ],
   "practice_generators": [],
   "stages": [
     {
-      "id": "stage:2-2:1-1",
-      "title": "Сборник 1-1. Оқырман, зейнеткер, бастық",
+      "id": "stage:2-2:S1",
+      "title": "S1 · Каноническая практика",
       "kind": "learning",
       "core_ids": [
-        "e22-form-1",
-        "e22-form-2",
-        "e22-form-3",
-        "e22-form-4",
-        "e22-form-5",
-        "e22-form-6",
-        "e22-form-7",
-        "e22-form-8",
-        "e22-form-9",
-        "e22-form-10",
-        "e22-form-11",
-        "e22-form-12",
-        "e22-form-13",
-        "e22-form-14",
-        "e22-form-15",
-        "e22-form-16",
-        "e22-form-17",
-        "e22-form-18"
+        "canon:2-2:p22-010",
+        "canon:2-2:p22-011",
+        "canon:2-2:p22-035",
+        "canon:2-2:p22-060",
+        "canon:2-2:p22-061",
+        "canon:2-2:p22-062",
+        "canon:2-2:p22-063",
+        "canon:2-2:p22-100",
+        "canon:2-2:p22-101",
+        "canon:2-2:p22-102",
+        "canon:2-2:p22-103",
+        "canon:2-2:p22-104",
+        "canon:2-2:p22-105",
+        "canon:2-2:p22-106"
       ],
       "required_independent_ids": [
-        "e22-form-1",
-        "e22-form-2",
-        "e22-form-3",
-        "e22-form-4",
-        "e22-form-5",
-        "e22-form-6",
-        "e22-form-7",
-        "e22-form-8",
-        "e22-form-9",
-        "e22-form-10",
-        "e22-form-11",
-        "e22-form-12",
-        "e22-form-13",
-        "e22-form-14",
-        "e22-form-15",
-        "e22-form-16",
-        "e22-form-17",
-        "e22-form-18"
-      ],
-      "rule_ids": [
-        "v2:2-2:biz",
-        "v2:2-2:sender",
-        "v2:2-2:sizder"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-2:1-2",
-      "title": "Сборник 1-2. Жолсерік, аспаз, ақылды",
-      "kind": "learning",
-      "core_ids": [
-        "e22-form-19",
-        "e22-form-20",
-        "e22-form-21",
-        "e22-form-22",
-        "e22-form-23",
-        "e22-form-24",
-        "e22-form-25",
-        "e22-form-26",
-        "e22-form-27",
-        "e22-form-28",
-        "e22-form-29",
-        "e22-form-30",
-        "e22-form-31",
-        "e22-form-32",
-        "e22-form-33",
-        "e22-form-34",
-        "e22-form-35",
-        "e22-form-36"
-      ],
-      "required_independent_ids": [
-        "e22-form-19",
-        "e22-form-20",
-        "e22-form-21",
-        "e22-form-22",
-        "e22-form-23",
-        "e22-form-24",
-        "e22-form-25",
-        "e22-form-26",
-        "e22-form-27",
-        "e22-form-28",
-        "e22-form-29",
-        "e22-form-30",
-        "e22-form-31",
-        "e22-form-32",
-        "e22-form-33",
-        "e22-form-34",
-        "e22-form-35",
-        "e22-form-36"
+        "canon:2-2:p22-010",
+        "canon:2-2:p22-011",
+        "canon:2-2:p22-035",
+        "canon:2-2:p22-060",
+        "canon:2-2:p22-061",
+        "canon:2-2:p22-062",
+        "canon:2-2:p22-063",
+        "canon:2-2:p22-100",
+        "canon:2-2:p22-101",
+        "canon:2-2:p22-102",
+        "canon:2-2:p22-103",
+        "canon:2-2:p22-104",
+        "canon:2-2:p22-105",
+        "canon:2-2:p22-106"
       ],
       "rule_ids": [
         "v2:2-2:adj",
-        "v2:2-2:biz",
-        "v2:2-2:sender",
-        "v2:2-2:sizder"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-2:2-1",
-      "title": "Сборник 2-1. Ақын, сұлу, жүргізуші",
-      "kind": "learning",
-      "core_ids": [
-        "e22-form-37",
-        "e22-form-38",
-        "e22-form-39",
-        "e22-form-40",
-        "e22-form-41",
-        "e22-form-42",
-        "e22-form-43",
-        "e22-form-44",
-        "e22-form-45",
-        "e22-form-46",
-        "e22-form-47",
-        "e22-form-48",
-        "e22-form-49",
-        "e22-form-50",
-        "e22-form-51",
-        "e22-form-52",
-        "e22-form-53",
-        "e22-form-54"
-      ],
-      "required_independent_ids": [
-        "e22-form-37",
-        "e22-form-38",
-        "e22-form-39",
-        "e22-form-40",
-        "e22-form-41",
-        "e22-form-42",
-        "e22-form-43",
-        "e22-form-44",
-        "e22-form-45",
-        "e22-form-46",
-        "e22-form-47",
-        "e22-form-48",
-        "e22-form-49",
-        "e22-form-50",
-        "e22-form-51",
-        "e22-form-52",
-        "e22-form-53",
-        "e22-form-54"
-      ],
-      "rule_ids": [
-        "v2:2-2:biz",
-        "v2:2-2:sender",
-        "v2:2-2:sizder"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-2:2-2",
-      "title": "Сборник 2-2. Есепші, жас, жұмыссыз",
-      "kind": "learning",
-      "core_ids": [
-        "e22-form-55",
-        "e22-form-56",
-        "e22-form-57",
-        "e22-form-58",
-        "e22-form-59",
-        "e22-form-60",
-        "e22-form-61",
-        "e22-form-62",
-        "e22-form-63",
-        "e22-form-64",
-        "e22-form-65",
-        "e22-form-66",
-        "e22-form-67",
-        "e22-form-68",
-        "e22-form-69",
-        "e22-form-70",
-        "e22-form-71",
-        "e22-form-72"
-      ],
-      "required_independent_ids": [
-        "e22-form-55",
-        "e22-form-56",
-        "e22-form-57",
-        "e22-form-58",
-        "e22-form-59",
-        "e22-form-60",
-        "e22-form-61",
-        "e22-form-62",
-        "e22-form-63",
-        "e22-form-64",
-        "e22-form-65",
-        "e22-form-66",
-        "e22-form-67",
-        "e22-form-68",
-        "e22-form-69",
-        "e22-form-70",
-        "e22-form-71",
-        "e22-form-72"
-      ],
-      "rule_ids": [
-        "v2:2-2:biz",
-        "v2:2-2:mn",
-        "v2:2-2:sender",
-        "v2:2-2:sizder"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-2:3-1",
-      "title": "Сборник 3-1. Перевод на казахский",
-      "kind": "learning",
-      "core_ids": [
-        "e22-3-1-1",
-        "e22-3-1-2",
-        "e22-3-1-3",
-        "e22-3-1-4",
-        "e22-3-1-5"
-      ],
-      "required_independent_ids": [
-        "e22-3-1-1",
-        "e22-3-1-2",
-        "e22-3-1-3",
-        "e22-3-1-4",
-        "e22-3-1-5"
-      ],
-      "rule_ids": [
-        "v2:2-2:biz",
-        "v2:2-2:sender",
-        "v2:2-2:sizder"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-2:3-2",
-      "title": "Сборник 3-2. Перевод с емес",
-      "kind": "learning",
-      "core_ids": [
-        "e22-3-2-1",
-        "e22-3-2-2",
-        "e22-3-2-3",
-        "e22-3-2-4",
-        "e22-3-2-5"
-      ],
-      "required_independent_ids": [
-        "e22-3-2-1",
-        "e22-3-2-2",
-        "e22-3-2-3",
-        "e22-3-2-4",
-        "e22-3-2-5"
-      ],
-      "rule_ids": [
-        "v2:2-2:checkpoint"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-2:4-1",
-      "title": "Сборник 4-1. Отрицание",
-      "kind": "learning",
-      "core_ids": [
-        "e22-4-1-1",
-        "e22-4-1-2",
-        "e22-4-1-3",
-        "e22-4-1-4",
-        "e22-4-1-5"
-      ],
-      "required_independent_ids": [
-        "e22-4-1-1",
-        "e22-4-1-2",
-        "e22-4-1-3",
-        "e22-4-1-4",
-        "e22-4-1-5"
-      ],
-      "rule_ids": [
-        "v2:2-2:checkpoint"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-2:4-2",
-      "title": "Сборник 4-2. Утверждение",
-      "kind": "learning",
-      "core_ids": [
-        "e22-4-2-1",
-        "e22-4-2-2",
-        "e22-4-2-3",
-        "e22-4-2-4",
-        "e22-4-2-5"
-      ],
-      "required_independent_ids": [
-        "e22-4-2-1",
-        "e22-4-2-2",
-        "e22-4-2-3",
-        "e22-4-2-4",
-        "e22-4-2-5"
-      ],
-      "rule_ids": [
-        "v2:2-2:checkpoint"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-2:5-1",
-      "title": "Сборник 5-1. Исправь и переведи",
-      "kind": "learning",
-      "core_ids": [
-        "e22-5-1",
-        "e22-5-2",
-        "e22-5-3",
-        "e22-5-4",
-        "e22-5-5"
-      ],
-      "required_independent_ids": [
-        "e22-5-1",
-        "e22-5-2",
-        "e22-5-3",
-        "e22-5-4",
-        "e22-5-5"
-      ],
-      "rule_ids": [
-        "v2:2-2:mn",
         "v2:2-2:noextra",
+        "v2:2-2:address",
+        "v2:2-2:hi"
+      ],
+      "min_independent_ratio": 0.7,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-2:S2",
+      "title": "S2 · Каноническая практика",
+      "kind": "learning",
+      "core_ids": [
+        "canon:2-2:p22-020",
+        "canon:2-2:p22-021",
+        "canon:2-2:p22-022",
+        "canon:2-2:p22-023",
+        "canon:2-2:p22-040",
+        "canon:2-2:p22-041",
+        "canon:2-2:p22-050",
+        "canon:2-2:p22-051",
+        "canon:2-2:p22-090",
+        "canon:2-2:p22-091"
+      ],
+      "required_independent_ids": [
+        "canon:2-2:p22-020",
+        "canon:2-2:p22-021",
+        "canon:2-2:p22-022",
+        "canon:2-2:p22-023",
+        "canon:2-2:p22-040",
+        "canon:2-2:p22-041",
+        "canon:2-2:p22-050",
+        "canon:2-2:p22-051",
+        "canon:2-2:p22-090",
+        "canon:2-2:p22-091"
+      ],
+      "rule_ids": [
+        "v2:2-2:biz",
+        "v2:2-2:mn",
+        "v2:2-2:sender",
+        "v2:2-2:sizder",
+        "v2:2-2:rq"
+      ],
+      "min_independent_ratio": 0.7,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-2:S3",
+      "title": "S3 · Каноническая практика",
+      "kind": "learning",
+      "core_ids": [
+        "canon:2-2:p22-024",
+        "canon:2-2:p22-025",
+        "canon:2-2:p22-026",
+        "canon:2-2:p22-042",
+        "canon:2-2:p22-052",
+        "canon:2-2:p22-080",
+        "canon:2-2:p22-081",
+        "canon:2-2:p22-082",
+        "canon:2-2:p22-092",
+        "canon:2-2:p22-093",
+        "canon:2-2:p22-094"
+      ],
+      "required_independent_ids": [
+        "canon:2-2:p22-024",
+        "canon:2-2:p22-025",
+        "canon:2-2:p22-026",
+        "canon:2-2:p22-042",
+        "canon:2-2:p22-052",
+        "canon:2-2:p22-080",
+        "canon:2-2:p22-081",
+        "canon:2-2:p22-082",
+        "canon:2-2:p22-092",
+        "canon:2-2:p22-093",
+        "canon:2-2:p22-094"
+      ],
+      "rule_ids": [
+        "v2:2-2:biz",
+        "v2:2-2:mn",
+        "v2:2-2:sender",
+        "v2:2-2:sizder",
+        "v2:2-2:neg",
         "v2:2-2:rq"
       ],
       "min_independent_ratio": 0.8,
@@ -3837,22 +5508,184 @@
       "final": false
     },
     {
-      "id": "stage:2-2:5-2",
-      "title": "Сборник 5-2. Исправь и переведи",
-      "kind": "checkpoint",
+      "id": "stage:2-2:S4",
+      "title": "S4 · Каноническая практика",
+      "kind": "learning",
       "core_ids": [
-        "e22-5-6",
-        "e22-5-7",
-        "e22-5-8",
-        "e22-5-9",
-        "e22-5-10"
+        "canon:2-2:p22-001",
+        "canon:2-2:p22-002",
+        "canon:2-2:p22-003",
+        "canon:2-2:p22-012",
+        "canon:2-2:p22-013",
+        "canon:2-2:p22-027",
+        "canon:2-2:p22-028",
+        "canon:2-2:p22-043",
+        "canon:2-2:p22-044",
+        "canon:2-2:p22-053",
+        "canon:2-2:p22-054",
+        "canon:2-2:p22-070",
+        "canon:2-2:p22-071",
+        "canon:2-2:p22-072"
       ],
       "required_independent_ids": [
-        "e22-5-6",
-        "e22-5-7",
-        "e22-5-8",
-        "e22-5-9",
-        "e22-5-10"
+        "canon:2-2:p22-001",
+        "canon:2-2:p22-002",
+        "canon:2-2:p22-003",
+        "canon:2-2:p22-012",
+        "canon:2-2:p22-013",
+        "canon:2-2:p22-027",
+        "canon:2-2:p22-028",
+        "canon:2-2:p22-043",
+        "canon:2-2:p22-044",
+        "canon:2-2:p22-053",
+        "canon:2-2:p22-054",
+        "canon:2-2:p22-070",
+        "canon:2-2:p22-071",
+        "canon:2-2:p22-072"
+      ],
+      "rule_ids": [
+        "v2:2-2:recall",
+        "v2:2-2:adj",
+        "v2:2-2:biz",
+        "v2:2-2:mn",
+        "v2:2-2:sender",
+        "v2:2-2:sizder",
+        "v2:2-2:map"
+      ],
+      "min_independent_ratio": 0.8,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-2:S5",
+      "title": "S5 · Каноническая практика",
+      "kind": "learning",
+      "core_ids": [
+        "canon:2-2:p22-064",
+        "canon:2-2:p22-065",
+        "canon:2-2:p22-083",
+        "canon:2-2:p22-084",
+        "canon:2-2:p22-085",
+        "canon:2-2:p22-095",
+        "canon:2-2:p22-096"
+      ],
+      "required_independent_ids": [
+        "canon:2-2:p22-064",
+        "canon:2-2:p22-065",
+        "canon:2-2:p22-083",
+        "canon:2-2:p22-084",
+        "canon:2-2:p22-085",
+        "canon:2-2:p22-095",
+        "canon:2-2:p22-096"
+      ],
+      "rule_ids": [
+        "v2:2-2:address",
+        "v2:2-2:sender",
+        "v2:2-2:sizder",
+        "v2:2-2:neg",
+        "v2:2-2:rq"
+      ],
+      "min_independent_ratio": 0.8,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-2:S6",
+      "title": "S6 · Каноническая практика",
+      "kind": "learning",
+      "core_ids": [
+        "canon:2-2:p22-014",
+        "canon:2-2:p22-029",
+        "canon:2-2:p22-030",
+        "canon:2-2:p22-036",
+        "canon:2-2:p22-045",
+        "canon:2-2:p22-055",
+        "canon:2-2:p22-086",
+        "canon:2-2:p22-097"
+      ],
+      "required_independent_ids": [
+        "canon:2-2:p22-014",
+        "canon:2-2:p22-029",
+        "canon:2-2:p22-030",
+        "canon:2-2:p22-036",
+        "canon:2-2:p22-045",
+        "canon:2-2:p22-055",
+        "canon:2-2:p22-086",
+        "canon:2-2:p22-097"
+      ],
+      "rule_ids": [
+        "v2:2-2:adj",
+        "v2:2-2:mn",
+        "v2:2-2:noextra",
+        "v2:2-2:sender",
+        "v2:2-2:sizder",
+        "v2:2-2:neg",
+        "v2:2-2:rq"
+      ],
+      "min_independent_ratio": 0.8,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-2:S7",
+      "title": "S7 · Каноническая практика",
+      "kind": "learning",
+      "core_ids": [
+        "canon:2-2:p22-073"
+      ],
+      "required_independent_ids": [
+        "canon:2-2:p22-073"
+      ],
+      "rule_ids": [
+        "v2:2-2:map"
+      ],
+      "min_independent_ratio": 0.8,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-2:S8",
+      "title": "S8 · Смешанное самостоятельное закрепление",
+      "kind": "checkpoint",
+      "core_ids": [
+        "canon:2-2:p22-m01",
+        "canon:2-2:p22-m02",
+        "canon:2-2:p22-m03",
+        "canon:2-2:p22-m04",
+        "canon:2-2:p22-m05",
+        "canon:2-2:p22-m06",
+        "canon:2-2:p22-m07",
+        "canon:2-2:p22-m08",
+        "canon:2-2:p22-m09",
+        "canon:2-2:p22-m10",
+        "canon:2-2:p22-m11",
+        "canon:2-2:p22-m12",
+        "canon:2-2:p22-m13",
+        "canon:2-2:p22-m14",
+        "canon:2-2:p22-m15",
+        "canon:2-2:p22-m16",
+        "canon:2-2:p22-m17",
+        "canon:2-2:p22-m18"
+      ],
+      "required_independent_ids": [
+        "canon:2-2:p22-m01",
+        "canon:2-2:p22-m02",
+        "canon:2-2:p22-m03",
+        "canon:2-2:p22-m04",
+        "canon:2-2:p22-m05",
+        "canon:2-2:p22-m06",
+        "canon:2-2:p22-m07",
+        "canon:2-2:p22-m08",
+        "canon:2-2:p22-m09",
+        "canon:2-2:p22-m10",
+        "canon:2-2:p22-m11",
+        "canon:2-2:p22-m12",
+        "canon:2-2:p22-m13",
+        "canon:2-2:p22-m14",
+        "canon:2-2:p22-m15",
+        "canon:2-2:p22-m16",
+        "canon:2-2:p22-m17",
+        "canon:2-2:p22-m18"
       ],
       "rule_ids": [
         "v2:2-2:checkpoint"
@@ -4025,5 +5858,219 @@
       "external_test"
     ]
   },
-  "migrations": []
+  "migrations": [
+    {
+      "from_revision": "2-2.r1",
+      "to_revision": "2-2.r2",
+      "question_ids": {},
+      "chapter_ids": {},
+      "stage_ids": {
+        "stage:2-2:1-1": "stage:2-2:S1",
+        "stage:2-2:1-2": "stage:2-2:S1",
+        "stage:2-2:2-1": "stage:2-2:S1",
+        "stage:2-2:2-2": "stage:2-2:S1",
+        "stage:2-2:3-1": "stage:2-2:S1",
+        "stage:2-2:3-2": "stage:2-2:S1",
+        "stage:2-2:4-1": "stage:2-2:S1",
+        "stage:2-2:4-2": "stage:2-2:S1",
+        "stage:2-2:5-1": "stage:2-2:S1",
+        "stage:2-2:5-2": "stage:2-2:S1"
+      },
+      "vocab_ids": {},
+      "drop_question_ids": []
+    }
+  ],
+  "canonical_core": [
+    {
+      "id": "theory:2-2:adj",
+      "title": "Восстановление 2–1 и прилагательное",
+      "body": "УРОК 2–2 — БІЗ, СЕНДЕР, СІЗДЕР И ПРИЛАГАТЕЛЬНЫЕ: РАСШИРЯЕМ ОДНУ СИСТЕМУ\n\n\nСтатус документа\nЭто канонический CORE урока 2–2. Он продолжает 2–1 и не должен преподаваться как отдельная новая система. Его можно делить на удобные экраны, но нельзя сокращать до карточек, убирать сравнительные таблицы или заменять правила примерами.\n\n\nЦель урока\nПосле урока ты сможешь самостоятельно построить:\n— біз ақынбыз — мы поэты;\n— сендер ақылдысыңдар — вы умные, несколько людей на «ты»;\n— сіздер дәрігер емессіздер — вы не врачи, несколько людей уважительно;\n— сендер жассыңдар ма? — вы молодые?.\n\n\nГлавная идея урока\nВ 2–1 ты уже научилась строить мен — я, сен — ты и сіз — Вы одному человеку уважительно.\n\n\nТеперь мы не начинаем заново. Мы расширяем ту же карту:\nбіз — мы;\nсендер — вы, несколько людей, к каждому на «ты»;\nсіздер — вы, несколько людей уважительно.\n\n\nЧто уже нужно знать\nПеред 2–2 нужно уметь:\n— находить основу;\n— определять твёрдый/мягкий ряд;\n— строить формы мен — я, сен — ты, сіз — Вы одному уважительно;\n— строить отрицание с емес — не является / не такой;\n— добавлять ба/бе в закрытом вопросе в рамках 2–1.\n\n\nЕсли какой-то пункт забыт, справочник 2–1 должен открываться без выхода из текущего урока.\n\n1. Короткое восстановление 2–1\n\n\nСравни:\nмен ақынмын — я поэт;\nсен ақынсың — ты поэт;\nсіз ақынсыз — Вы поэт.\n\n\nЗдесь уже работают три знакомых механизма:\n— кто говорит;\n— какой ряд у основы;\n— для мен — я какой последний звук основы выбирает П/Б/М.\n\n\nПеред новой теорией — три коротких задания на восстановление, без новой лекции.\n\n2. Прилагательное может быть сказуемым\n\n\nДо этого много примеров были с существительными:\nмен жазушымын — я писатель.\n\n\nНо личные окончания могут присоединяться и к прилагательным:\nмен ақылдымын — я умный / умная.\n\n\nЭто не новая таблица окончаний. Механизм лица тот же.\n\n\nВажно различить две роли.\n\n\nПрилагательное перед существительным:\nақылды жазушы — умный писатель.\nЗдесь ақылды — умный просто описывает слово жазушы — писатель. Личное окончание на прилагательном не нужно.\n\n\nПрилагательное как сказуемое:\nмен ақылдымын — я умный / умная.\nЗдесь ақылды — умный / умная сообщает, какой я, поэтому получает личное окончание.\n\n\nЕщё пара:\nсұлу қыз — красивая девушка.\nсен сұлусың — ты красивая / красивый.\n\n\nАлгоритм\n1. Определи, прилагательное просто стоит перед существительным или само является сказуемым.\n2. Если оно само отвечает на смысл «я/ты/Вы какой?», к нему добавляется уже знакомое личное окончание.\n3. Выбирай окончание тем же способом, что в 2–1.",
+      "rule_ids": [
+        "v2:2-2:recall",
+        "v2:2-2:adj"
+      ]
+    },
+    {
+      "id": "theory:2-2:biz",
+      "title": "Біз: формы «мы»",
+      "body": "3. БІЗ — мы\n\n\nбіз — мы.\n\n\nИсходная методичка даёт удобную связь:\nформы біз — мы строятся по тому же общему принципу, что и мен — я, но личное окончание заканчивается на З.\n\n\nОсновные варианты:\n-пыз / -піз;\n-быз / -біз;\n-мыз / -міз.\n\n\nНо есть важное отличие от мен — я: после М, Н, Ң для біз — мы используется Б-серия.\n\n\nТаблица БІЗ\n\n\nПоследний звук основы | твёрдый ряд | мягкий ряд\nГлухие К, Қ, П, С, Т, Ф, Х, Һ, Ц, Ш, Щ; а также конечные Б, В, Г, Д в схеме курса | -пыз | -піз\nМ, Н, Ң, Ж, З | -быз | -біз\nВсе остальные | -мыз | -міз\n\n\nАлгоритм БІЗ\nШаг 1. Убедись, что нужна форма біз — мы.\nШаг 2. Найди основу.\nШаг 3. Определи ряд: Ы или І.\nШаг 4. Посмотри на последний звук основы.\nШаг 5. Выбери П, Б или М по таблице БІЗ.\nШаг 6. Добавь З в конце личного окончания.\nШаг 7. Собери форму целиком.\n\n\nРазбор 1\nбастық — начальник.\nПоследний звук Қ — глухой → П.\nСлово твёрдого ряда → Ы.\nПолучаем -пыз.\nбіз бастықпыз — мы начальники.\n\n\nРазбор 2\nақын — поэт.\nПоследний звук Н → для біз — мы нужна Б-серия.\nСлово твёрдого ряда → Ы.\nПолучаем -быз.\nбіз ақынбыз — мы поэты.\n\n\nРазбор 3\nмұғалім — учитель.\nПоследний звук М → для біз — мы нужна Б-серия.\nСлово мягкого ряда → І.\nПолучаем -біз.\nбіз мұғалімбіз — мы учителя.\n\n\nРазбор 4\nжүргізуші — водитель.\nПоследний звук І — гласный → М-серия.\nСлово мягкого ряда → І.\nПолучаем -міз.\nбіз жүргізушіміз — мы водители.",
+      "rule_ids": [
+        "v2:2-2:biz"
+      ]
+    },
+    {
+      "id": "theory:2-2:mn",
+      "title": "После м/н/ң у біз нужна Б",
+      "body": "4. Почему МЕН — я и БІЗ — мы иногда отличаются после М/Н/Ң\n\n\nСравни одну основу:\nғалым — учёный.\n\n\nмен ғалыммын — я учёный.\nбіз ғалымбыз — мы учёные.\n\n\nДля мен — я после М работает М-серия.\nДля біз — мы после М/Н/Ң источник курса отдельно требует Б-серию.\n\n\nЕщё:\nмен ақынмын — я поэт.\nбіз ақынбыз — мы поэты.\n\n\nНе пытайся механически заменить только Н на З в уже готовой форме мен — я. Сначала посмотри на основу и примени таблицу біз — мы.",
+      "rule_ids": [
+        "v2:2-2:mn"
+      ]
+    },
+    {
+      "id": "theory:2-2:noextra",
+      "title": "Множественное с БІЗ",
+      "body": "5. Нужно ли ставить множественное окончание с БІЗ\n\n\nИсточник курса даёт два варианта:\nбіз студентпіз — мы студенты;\nбіз студенттерміз — мы студенты.\n\n\nВ методичке оба названы допустимыми, но первый вариант — без отдельного множественного окончания на существительном — выбран как основной для упражнений.\n\n\nПоэтому в Qazaqsha 2–2:\nосновная учебная форма:\nбіз студентпіз — мы студенты.\n\n\nФорма:\nбіз студенттерміз — мы студенты\nне должна автоматически помечаться как безусловно неграмотная, если задание не проверяет именно учебную норму этого блока.\n\n\nЧто нужно понять:\nбіз — мы и личное окончание уже сообщают, что речь идёт не об одном человеке.",
+      "rule_ids": [
+        "v2:2-2:noextra"
+      ]
+    },
+    {
+      "id": "theory:2-2:sender",
+      "title": "Сендер: -сыңдар/-сіңдер",
+      "body": "6. СЕНДЕР — вы, несколько людей на «ты»\n\n\nсендер — вы, несколько людей, к каждому на «ты».\n\n\nФормы:\n-сыңдар — твёрдый ряд;\n-сіңдер — мягкий ряд.\n\n\nИсточник предлагает запоминать это как расширение знакомого сен — ты:\n-сың / -сің → -сыңдар / -сіңдер.\n\n\nАлгоритм СЕНДЕР\nШаг 1. Убедись, что обращаешься к нескольким людям неформально.\nШаг 2. Найди основу.\nШаг 3. Определи ряд.\nШаг 4. Твёрдый → -сыңдар. Мягкий → -сіңдер.\nШаг 5. Собери форму.\n\n\nПримеры:\nсендер жомартсыңдар — вы щедрые.\nсендер жігітсіңдер — вы парни.\nсендер әдемісіңдер — вы красивые.\nсендер ақылдысыңдар — вы умные.\n\n7. Почему в модели курса не ставим второе множественное окончание с СЕНДЕР\n\n\nИсточник 2–2 специально противопоставляет:\nсендер студентсіңдер — вы студенты — учебная норма этого блока;\nсендер студенттерсіңдер — вы студенты — в исходной методичке отмечено как ошибка для этой модели.\n\n\nЛогика курса:\nсендер — вы, несколько людей на «ты» и окончание -сыңдар/-сіңдер уже выражают множественность адресата.\n\n\nПоэтому в упражнениях 2–2 не добавляем ещё -лар/-лер/-дар/-дер/-тар/-тер на сказуемое с сендер — вы, несколько людей на «ты».",
+      "rule_ids": [
+        "v2:2-2:sender",
+        "v2:2-2:noextra"
+      ]
+    },
+    {
+      "id": "theory:2-2:sizder",
+      "title": "Сіздер: -сыздар/-сіздер",
+      "body": "8. СІЗДЕР — вы, несколько людей уважительно\n\n\nсіздер — вы, несколько людей уважительно.\n\n\nФормы:\n-сыздар — твёрдый ряд;\n-сіздер — мягкий ряд.\n\n\nЭто расширение знакомого сіз — Вы одному человеку уважительно:\n-сыз / -сіз → -сыздар / -сіздер.\n\n\nАлгоритм СІЗДЕР\nШаг 1. Убедись, что обращаешься уважительно к нескольким людям.\nШаг 2. Найди основу.\nШаг 3. Определи ряд.\nШаг 4. Твёрдый → -сыздар. Мягкий → -сіздер.\nШаг 5. Собери форму.\n\n\nПримеры:\nсіздер ғалымсыздар — вы учёные, уважительно.\nсіздер кедейсіздер — вы бедные, уважительно.\nсіздер жұмысшысыздар — вы рабочие, уважительно.\nсіздер зейнеткерсіздер — вы пенсионеры, уважительно.\n\n\nВ модели курса с сіздер — вы, несколько людей уважительно отдельное множественное окончание на сказуемом также не добавляем.\n\n9. Как выбрать между СЕН, СІЗ, СЕНДЕР и СІЗДЕР\n\n\nсен — ты, один человек неформально.\nсіз — Вы, один человек уважительно.\nсендер — вы, несколько людей неформально.\nсіздер — вы, несколько людей уважительно.\n\n\nДве проверки:\n1. Один человек или несколько?\n2. Неформально или уважительно?\n\n\nЭто сначала выбор местоимения, а уже потом выбор окончания.",
+      "rule_ids": [
+        "v2:2-2:sizder",
+        "v2:2-2:address"
+      ]
+    },
+    {
+      "id": "theory:2-2:map",
+      "title": "Единая таблица шести лиц",
+      "body": "10. Единая таблица шести лиц\n\n\nКто говорит | твёрдый ряд | мягкий ряд | дополнительная проверка\n\n\nмен — я | -пын/-бын/-мын | -пін/-бін/-мін | последний звук выбирает П/Б/М по таблице мен\nбіз — мы | -пыз/-быз/-мыз | -піз/-біз/-міз | последний звук выбирает П/Б/М по таблице біз; после М/Н/Ң → Б\nсен — ты | -сың | -сің | только ряд\nсендер — вы, несколько неформально | -сыңдар | -сіңдер | только ряд\nсіз — Вы, один уважительно | -сыз | -сіз | только ряд\nсіздер — вы, несколько уважительно | -сыздар | -сіздер | только ряд\n\n\nОдин пример на одной основе:\nаспаз — повар.\n\n\nмен аспазбын — я повар.\nбіз аспазбыз — мы повара.\nсен аспазсың — ты повар.\nсендер аспазсыңдар — вы повара, неформально.\nсіз аспазсыз — Вы повар, уважительно.\nсіздер аспазсыздар — вы повара, уважительно.",
+      "rule_ids": [
+        "v2:2-2:map"
+      ]
+    },
+    {
+      "id": "theory:2-2:neg",
+      "title": "Отрицание для шести лиц",
+      "body": "11. Отрицание теперь работает для всех шести лиц\n\n\nГлавное правило из 2–1 не меняется:\nсмысловое слово + емес — не является / не такой + личное окончание.\n\n\nЛичное окончание ставится один раз — на емес — не является / не такой.\n\n\nПолная серия:\nемеспін — я не…;\nемеспіз — мы не…;\nемессің — ты не…;\nемессіңдер — вы не…, несколько неформально;\nемессіз — Вы не…, один уважительно;\nемессіздер — вы не…, несколько уважительно.\n\n\nПримеры:\nбіз сараң емеспіз — мы не скупые.\nсендер аспаз емессіңдер — вы не повара, неформально.\nсіздер дәрігер емессіздер — вы не врачи, уважительно.\nсіз зейнеткер емессіз — Вы не пенсионер.\n\n\nНеверная сборка:\nсендер құрбысыңдар емессіңдер — вы не подруги.\nЗдесь личное окончание появилось дважды.\n\n\nПравильно:\nсендер құрбы емессіңдер — вы не подруги.",
+      "rule_ids": [
+        "v2:2-2:neg"
+      ]
+    },
+    {
+      "id": "theory:2-2:rq",
+      "title": "После -р вопрос получает ма/ме",
+      "body": "12. Вопрос в 2–2: добавляем МА/МЕ после Р\n\n\nВ 2–1 были формы, заканчивающиеся на Н, Ң или З, поэтому в обязательных вопросах хватало ба/бе.\n\n\nТеперь появились сендер — вы, несколько неформально и сіздер — вы, несколько уважительно.\nИх личные окончания заканчиваются на Р:\n-сыңдар / -сіңдер;\n-сыздар / -сіздер.\n\n\nПосле Р в системе курса используется ма/ме.\n\n\nУсечённая таблица вопроса 2–2\n\n\nПоследний звук готовой формы | частица\nМ, Н, Ң, Ж, З | ба/бе\nР | ма/ме\n\n\nПолная таблица с па/пе будет в 2–3.\n\n\nАлгоритм вопроса 2–2\n1. Сначала полностью собери утверждение или отрицание.\n2. Найди последнее слово перед вопросительной частицей.\n3. Посмотри на его последний звук.\n4. Если это Р → ма/ме.\n5. Если форма заканчивается на Н, Ң, Ж, З или М в рамках уже открытой таблицы → ба/бе.\n6. Выбери А/Е по ряду готовой формы.\n7. Напиши частицу отдельно.\n\n\nПримеры:\nмен жаспын ба? — я молодой / молодая?.\nбіз дәрігерміз бе? — мы врачи?.\nсен есепшісің бе? — ты бухгалтер?.\nсендер жазушысыңдар ма? — вы писатели?.\nсіз оқырмансыз ба? — Вы читатель?.\nсіздер кәсіпкерсіздер ме? — вы бизнесмены?.\n\n\nОтрицание работает так же:\nбіз сараң емеспіз бе? — мы не скупые?.\nсіздер аспаз емессіздер ме? — вы не повара?.",
+      "rule_ids": [
+        "v2:2-2:rq"
+      ]
+    },
+    {
+      "id": "theory:2-2:hi",
+      "title": "Приветствия и прощания как готовые фразы",
+      "body": "13. Приветствия: готовые речевые формы\n\n\nЭти выражения нужны для общения, но не все части внутри них уже изучены грамматически. Поэтому сейчас их учим как готовые фразы, а не заставляем выводить неизвестные окончания.\n\n\nсәлем — привет, неформально.\n\n\nсәлеметсіз бе — здравствуйте, к одному человеку уважительно.\n\n\nсәлеметсіздер ме — здравствуйте, к нескольким людям уважительно.\n\n\nассалаумағалейкум — здравствуйте; в материале курса — приветствие между мужчинами.\n\n\nуағалейкумассалам — ответ на предыдущее приветствие.\n\n\nВажно:\nсәлеметсіз бе — здравствуйте одному человеку уважительно и сәлеметсіздер ме — здравствуйте нескольким людям уважительно можно связать с уже знакомым различием сіз — Вы одному уважительно / сіздер — вы нескольким уважительно, но не нужно разбирать всю историю формы.\n\n14. Прощания из домашней работы: пока готовые фразы\n\n\nВ домашней работе 2–2 появляются четыре формы:\n\n\nсау бол — до свидания, одному человеку неформально.\n\n\nсау болыңдар — до свидания, нескольким людям неформально.\n\n\nсау болыңыз — до свидания, одному человеку уважительно.\n\n\nсау болыңыздар — до свидания, нескольким людям уважительно.\n\n\nПочему сейчас не разбираем окончания внутри болыңдар — будьте здоровы, несколько неформально и болыңыздар — будьте здоровы, несколько уважительно?\nПотому что это другая грамматическая тема. В 2–2 задача только правильно выбрать готовую фразу по количеству людей и степени уважения.",
+      "rule_ids": [
+        "v2:2-2:hi"
+      ]
+    },
+    {
+      "id": "theory:2-2:checkpoint",
+      "title": "Итог 2-2",
+      "body": "15. Полный словарь 2–2 из источника\n\n\nәдемі / сұлу — красивый / красивая;\nақылды — умный / умная;\nжомарт — щедрый / щедрая;\nсараң — скупой / скупая;\nбай — богатый / богатая;\nкедей — бедный / бедная;\nжас — молодой / молодая;\nзейнеткер — пенсионер;\nесепші — бухгалтер;\nжұмыссыз — безработный / безработная;\nжұмысшы — рабочий;\nбастық — начальник;\nжолсерік — проводник;\nақын — поэт;\nжазушы — писатель;\nжүргізуші — водитель;\nкәсіпкер — бизнесмен / предприниматель;\nоқырман — читатель;\nаспаз — повар.\n\n\nКаждое слово при использовании в теории или практике всё равно получает перевод рядом, даже если оно уже было в этом списке.\n\n16. Типичные ошибки 2–2\n\n\nОшибка 1\nбіз мұғалімміз — мы учителя.\nЧто пошло не так: для біз — мы после М нужна Б-серия.\nПравильно:\nбіз мұғалімбіз — мы учителя.\n\n\nОшибка 2\nбіз ақынмыз — мы поэты.\nПосле Н для біз — мы нужна Б-серия.\nПравильно:\nбіз ақынбыз — мы поэты.\n\n\nОшибка 3\nсендер студенттерсіңдер — вы студенты.\nВ модели 2–2 множественность уже выражена сендер — вы, несколько неформально и окончанием -сыңдар/-сіңдер.\nУчебная форма:\nсендер студентсіңдер — вы студенты.\n\n\nОшибка 4\nсіздер жассыңдар — вы молодые, уважительно.\nЗдесь окончание сендер — вы, несколько неформально не совпадает с местоимением сіздер — вы, несколько уважительно.\nПравильно:\nсіздер жассыздар — вы молодые, уважительно.\n\n\nОшибка 5\nсендер құрбысыңдар емессіңдер — вы не подруги.\nЛичное окончание поставлено дважды.\nПравильно:\nсендер құрбы емессіңдер — вы не подруги.\n\n\nОшибка 6\nсендер жазушысыңдар ба? — вы писатели?.\nГотовая форма заканчивается на Р, поэтому нужна М-серия вопросительной частицы.\nПравильно:\nсендер жазушысыңдар ма? — вы писатели?.\n\n17. Что в 2–2 сознательно пока не изучается полностью\n\n\nПолная таблица вопросительных частиц с па/пе будет в 2–3.\n\n\nол — он / она и олар — они ещё не входят в обязательное самостоятельное производство.\n\n\nМорфология форм сау болыңдар — до свидания нескольким неформально, сау болыңыз — до свидания одному уважительно и сау болыңыздар — до свидания нескольким уважительно не выводится из личных окончаний 2–2: эти фразы пока запоминаются целиком.\n\n18. Итоговая карта 2–2\n\n\nЕсли нужно сказать «мы X»:\n1. біз — мы.\n2. Найди основу.\n3. Определи ряд.\n4. Посмотри последний звук.\n5. Для М/Н/Ң/Ж/З используй Б-серию; для глухих — П; для остальных — М.\n6. Собери -пыз/-піз, -быз/-біз или -мыз/-міз.\n\n\nЕсли обращаешься к нескольким людям неформально:\nсендер — вы, несколько на «ты» + -сыңдар/-сіңдер.\n\n\nЕсли обращаешься к нескольким людям уважительно:\nсіздер — вы, несколько уважительно + -сыздар/-сіздер.\n\n\nЕсли сказуемое — прилагательное:\nиспользуй те же личные окончания.\n\n\nЕсли нужно отрицание:\nсмысловое слово + емес — не является / не такой + личное окончание.\n\n\nЕсли готовая форма заканчивается на Р и нужен закрытый вопрос:\nдобавь отдельно ма/ме.\n\n19. Критерий завершения 2–2\n\n\nУрок считается освоенным, если ученик без готового ответа:\n— различает прилагательное перед существительным и прилагательное-сказуемое;\n— строит біз — мы на П-, Б- и М-серии;\n— отдельно правильно обрабатывает основы на М/Н/Ң;\n— строит сендер — вы, несколько неформально;\n— строит сіздер — вы, несколько уважительно;\n— выбирает между сен — ты, сіз — Вы одному уважительно, сендер — вы нескольким неформально и сіздер — вы нескольким уважительно;\n— строит отрицание для разных лиц;\n— выбирает ба/бе или ма/ме по уже открытой усечённой таблице;\n— исправляет типичные ошибки;\n— выполняет несколько RU→KK без вариантов ответа.\n\n20. Внешнее закрепление после 2–2\n\n\nBatylBol — «Личные окончания — 1 и 2 лицо»:\nhttps://batylbol.kz/test/LichnyeLitso1-2.html\n\n\nЭто дополнительное закрепление после внутренней практики Qazaqsha, а не замена теории.\n\n21. Источниковая граница\n\n\nСохранено из исходника:\n— прилагательное как сказуемое;\n— прилагательное перед существительным;\n— біз — мы и таблица -пыз/-піз, -быз/-біз, -мыз/-міз;\n— отдельное правило после М/Н/Ң;\n— политика множественного окончания с біз — мы;\n— сендер — вы нескольким неформально и -сыңдар/-сіңдер;\n— сіздер — вы нескольким уважительно и -сыздар/-сіздер;\n— отрицание;\n— вопрос ма/ме после Р;\n— приветствия;\n— словарь;\n— формы прощания из домашней работы;\n— BatylBol 2–2.\n\n\nПедагогически переработано:\n— 2–2 явно продолжает 2–1;\n— дана единая таблица шести лиц;\n— правило біз — мы не сводится к механической замене Н→З;\n— прилагательное не получает отдельную «новую систему»;\n— вопросы строятся после полной сборки формы;\n— прощания честно маркированы как готовые фразы;\n— противоречивые ответы исходных упражнений не выдаются как норма;\n— весь казахский learner-visible текст сопровождается русским переводом курсивом.",
+      "rule_ids": [
+        "v2:2-2:checkpoint"
+      ]
+    }
+  ],
+  "references": [
+    {
+      "id": "ref-base",
+      "title": "Как собирать форму",
+      "body": "1. REF_BASE — КАК СОБИРАТЬ ФОРМУ\n\n\nQUICK\n\n\nШаг 1. Определи смысл.\nКто говорит? Что нужно построить: утверждение, отрицание или вопрос?\n\n\nШаг 2. Найди основу или текущую форму.\nСледующий элемент добавляется к конкретному последнему слову, а не «ко всему предложению».\n\n\nШаг 3. Определи ряд.\nТвёрдый ряд выбирает Ы/А.\nМягкий ряд выбирает І/Е.\n\n\nШаг 4. Если правило требует — посмотри последний звук.\nОн может выбирать П, Б или М.\n\n\nШаг 5. Добавь нужный элемент.\nСначала личное окончание.\nПотом, если нужно, отрицание/вопрос по правилам текущего урока.\n\n\nГлавная мысль:\nряд и последний звук — две разные проверки.\n\n\nКонтрастный пример:\nстудент — студент → мягкий ряд → І.\nПоследний звук Т → П.\nстудентпін — я студент.\n\n\nқыз — девушка → твёрдый ряд → Ы.\nПоследний звук З → Б.\nқызбын — я девушка.\n\n\nFULL\n\n\nОснова — это слово без нового окончания, которое мы сейчас хотим добавить.\n\n\nТекущая форма — это последнее слово/форма, к которой сейчас присоединяется следующий элемент.\n\n\nПример с отрицанием:\nдәрігер — врач.\nЧтобы сказать «я не врач», добавляем емес — не является.\nТеперь личное окончание относится уже к емес — не является:\nдәрігер емеспін — я не врач.\n\n\nПоэтому всегда спрашивай:\n«К какому слову я сейчас добавляю следующий кусок?»",
+      "rule_ids": [
+        "v2:2-2:recall",
+        "v2:2-2:adj"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-2:recall",
+        "v2:2-2:adj"
+      ]
+    },
+    {
+      "id": "ref-person",
+      "title": "Кто говорит и какое окончание",
+      "body": "3. REF_PERSON — ВЕРСИЯ 2–2\n\n\nДобавляются новые строки.\n\n\nКто | твёрдый ряд | мягкий ряд | что проверить\n\n\nмен — я | -пын/-бын/-мын | -пін/-бін/-мін | таблица мен\nбіз — мы | -пыз/-быз/-мыз | -піз/-біз/-міз | таблица біз; после М/Н/Ң → Б\nсен — ты | -сың | -сің | ряд\nсендер — вы, несколько неформально | -сыңдар | -сіңдер | ряд\nсіз — Вы, один уважительно | -сыз | -сіз | ряд\nсіздер — вы, несколько уважительно | -сыздар | -сіздер | ряд\n\n\nБІЗ: как выбрать П/Б/М\n\n\nПоследний звук основы | твёрдый | мягкий\nГлухие К, Қ, П, С, Т, Ф, Х, Һ, Ц, Ш, Щ; а также конечные Б, В, Г, Д в схеме курса | -пыз | -піз\nМ, Н, Ң, Ж, З | -быз | -біз\nВсе остальные | -мыз | -міз\n\n\nОчень важно:\nмен ғалыммын — я учёный.\nбіз ғалымбыз — мы учёные.\n\n\nПосле М/Н/Ң для біз — мы нужна Б-серия.\n\n\nСЕНДЕР:\nтвёрдый → -сыңдар.\nмягкий → -сіңдер.\n\n\nСІЗДЕР:\nтвёрдый → -сыздар.\nмягкий → -сіздер.\n\n\nПрилагательное-сказуемое использует те же личные окончания:\nбіз ақылдымыз — мы умные.\n\n\nПрилагательное перед существительным личного окончания на себе не получает:\nақылды жазушы — умный писатель.",
+      "rule_ids": [
+        "v2:2-2:biz",
+        "v2:2-2:mn",
+        "v2:2-2:sender",
+        "v2:2-2:sizder",
+        "v2:2-2:map"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-2:biz",
+        "v2:2-2:mn",
+        "v2:2-2:sender",
+        "v2:2-2:sizder",
+        "v2:2-2:map"
+      ]
+    },
+    {
+      "id": "ref-address",
+      "title": "Ты / Вы / несколько",
+      "body": "5. REF_ADDRESS — ТЫ / ВЫ / НЕСКОЛЬКО\n\n\nСначала ответь на два вопроса:\n1. Один человек или несколько?\n2. Неформально или уважительно?\n\n\nОдин + неформально:\nсен — ты.\n\n\nОдин + уважительно:\nсіз — Вы.\n\n\nНесколько + неформально:\nсендер — вы, несколько людей на «ты».\n\n\nНесколько + уважительно:\nсіздер — вы, несколько людей уважительно.",
+      "rule_ids": [
+        "v2:2-2:address"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-2:address"
+      ]
+    },
+    {
+      "id": "ref-neg",
+      "title": "Отрицание",
+      "body": "7. REF_NEG — ВЕРСИЯ 2–2\n\n\nПолная серия шести лиц:\n\n\nемеспін — я не….\nемеспіз — мы не….\nемессің — ты не….\nемессіңдер — вы не…, несколько неформально.\nемессіз — Вы не…, один уважительно.\nемессіздер — вы не…, несколько уважительно.\n\n\nПример:\nсендер аспаз емессіңдер — вы не повара.",
+      "rule_ids": [
+        "v2:2-2:neg"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-2:neg"
+      ]
+    },
+    {
+      "id": "ref-question",
+      "title": "Вопрос",
+      "body": "10. REF_QUESTION — ВЕРСИЯ 2–2\n\n\nТеперь есть две открытые группы:\n\n\nЕсли готовая форма заканчивается на М, Н, Ң, Ж, З:\nба/бе.\n\n\nЕсли готовая форма заканчивается на Р:\nма/ме.\n\n\nАлгоритм:\n1. Собери форму.\n2. Найди последнее слово.\n3. Посмотри его последний звук.\n4. Выбери Б или М.\n5. Выбери А/Е по ряду.\n6. Напиши частицу отдельно.\n\n\nПримеры:\nбіз дәрігерміз бе? — мы врачи?.\nсендер жазушысыңдар ма? — вы писатели?.",
+      "rule_ids": [
+        "v2:2-2:rq"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-2:rq"
+      ]
+    },
+    {
+      "id": "ref-ready",
+      "title": "Готовые фразы",
+      "body": "14. REF_READY_PHRASES — ГОТОВЫЕ ФРАЗЫ\n\n\nПриветствия:\n\n\nсәлем — привет, неформально.\n\n\nсәлеметсіз бе — здравствуйте одному человеку уважительно.\n\n\nсәлеметсіздер ме — здравствуйте нескольким людям уважительно.\n\n\nассалаумағалейкум — здравствуйте; в материале курса — приветствие между мужчинами.\n\n\nуағалейкумассалам — ответ на предыдущее приветствие.\n\n\nПрощания:\n\n\nсау бол — до свидания одному человеку неформально.\n\n\nсау болыңдар — до свидания нескольким людям неформально.\n\n\nсау болыңыз — до свидания одному человеку уважительно.\n\n\nсау болыңыздар — до свидания нескольким людям уважительно.\n\n\nПримечание ученику:\nэти формы пока запоминаем целиком. Почему внутри них именно такие глагольные окончания, будет отдельной темой позже.",
+      "rule_ids": [
+        "v2:2-2:hi"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-2:hi"
+      ]
+    }
+  ],
+  "practice_policy": {
+    "stages": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8"
+    ],
+    "no_answer_before_attempt": true,
+    "translation_every_occurrence": true,
+    "repair_min_intervening": 3,
+    "repair_preferred_intervening": 4,
+    "final_reference_default": "closed",
+    "notes": [
+      "Ошибка возвращается позже на другом примере.",
+      "S3–S8 не показывают готовый ответ до первой попытки.",
+      "Справочник в финальной проверке считается assisted evidence."
+    ]
+  }
 }

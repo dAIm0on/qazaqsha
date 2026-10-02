@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "lesson_id": "2-3",
-  "content_revision": "2-3.r1",
+  "content_revision": "2-3.r2",
   "title": "Урок 2–3 · Ол / олар, вопрос, порядковые",
   "label": "2–3",
   "name": "Ол / олар, вопрос, порядковые",
@@ -11,7 +11,7 @@
     "preview_head": "",
     "preview_url": "",
     "approved_at": "",
-    "note": "2026-10-01 teaching rework 2-1→2-3; pending preview QA. No merge/deploy."
+    "note": "2026-10-02 LESSONS FIX canonical core + S1-S8 practice + contextual references. Pending preview QA; no merge/deploy."
   },
   "prerequisites": {
     "lessons": [
@@ -84,6 +84,26 @@
     {
       "id": "v2:2-3:bye",
       "title": "Сау бол: четыре адресата"
+    },
+    {
+      "id": "v2:2-3:recall",
+      "title": "Короткая активация шести лиц"
+    },
+    {
+      "id": "v2:2-3:neg",
+      "title": "Отрицание с ол / олар"
+    },
+    {
+      "id": "v2:2-3:map",
+      "title": "Полная карта восьми лиц"
+    },
+    {
+      "id": "v2:2-3:ordq",
+      "title": "Порядковое + вопрос"
+    },
+    {
+      "id": "v2:2-3:wrap",
+      "title": "Итог и границы 2–3"
     }
   ],
   "theory": [
@@ -4551,365 +4571,2170 @@
         "school-exercises"
       ],
       "note": "Если уже верно — перепиши как есть. Ключи с известной дырой помечены в объяснении."
+    },
+    {
+      "id": "canon:2-3:p23-001",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-001",
+      "stimulus": "Собери біз + көрші — мы + сосед.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "көршіміз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: көршіміз — мы соседи.",
+      "source_item": "P23-001",
+      "rule_ids": [
+        "v2:2-3:recall"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-002",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-002",
+      "stimulus": "Собери сендер + қазақ — вы + казахи, неформально.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "қазақсыңдар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: қазақсыңдар — вы казахи, неформально.",
+      "source_item": "P23-002",
+      "rule_ids": [
+        "v2:2-3:recall"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-003",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-003",
+      "stimulus": "Собери сіздер + маман — вы + специалисты, уважительно.",
+      "fields": [
+        {
+          "label": "Все формы",
+          "kind": "set-text",
+          "answers": [
+            "мамансыздар",
+            "Если активация провалена, предложить справочник 2–2 без сброса 2–3"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: мамансыздар — вы специалисты, уважительно.\n\n\nЕсли активация провалена, предложить справочник 2–2 без сброса 2–3.",
+      "source_item": "P23-003",
+      "rule_ids": [
+        "v2:2-3:recall"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-010",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-010",
+      "stimulus": "Нужно ли личное окончание в форме ол маман — он / она специалист?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "нет"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: нет.",
+      "source_item": "P23-010",
+      "rule_ids": [
+        "v2:2-3:ol"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-011",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S2 · P23-011",
+      "stimulus": "Какая форма правильна?\nA) ол қазақ — он / она казах / казашка\nB) ол қазақпын — он / она казах / казашка",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "A"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: A.",
+      "source_item": "P23-011",
+      "rule_ids": [
+        "v2:2-3:ol"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-3:p23-012",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-012",
+      "stimulus": "Собери ол + қыз — она + девушка.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ол қыз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: ол қыз — она девушка.",
+      "source_item": "P23-012",
+      "rule_ids": [
+        "v2:2-3:ol"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-013",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-013",
+      "stimulus": "Собери ол + семіз — он / она + полный / полная.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ол семіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: ол семіз — он / она полный / полная.",
+      "source_item": "P23-013",
+      "rule_ids": [
+        "v2:2-3:ol"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-014",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S6 · P23-014",
+      "stimulus": "Исправь Ол маманмын — он / она специалист.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Ол маман"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Ол маман — он / она специалист.",
+      "source_item": "P23-014",
+      "rule_ids": [
+        "v2:2-3:ol"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E23_THIRD_PERSON_ENDING."
+      ]
+    },
+    {
+      "id": "canon:2-3:p23-020",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-020",
+      "stimulus": "Нужно ли личное окончание в форме олар маман — они специалисты?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "нет"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: нет.",
+      "source_item": "P23-020",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-021",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-021",
+      "stimulus": "Собери олар + семіз — они + полные.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "олар семіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: олар семіз — они полные.",
+      "source_item": "P23-021",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-022",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-022",
+      "stimulus": "Собери олар + қырқыншы — они + сороковые.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "олар қырқыншы"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: олар қырқыншы — они сороковые.",
+      "source_item": "P23-022",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-023",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S6 · P23-023",
+      "stimulus": "Исправь Олар маманбыз — они специалисты.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар маман"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар маман — они специалисты.",
+      "source_item": "P23-023",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S6"
+    },
+    {
+      "id": "canon:2-3:p23-030",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-030",
+      "stimulus": "Если задание просто говорит «Они бухгалтеры» и не требует множественного показателя, какой вариант является базовым в упражнениях 2–3?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар есепші"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар есепші — они бухгалтеры.",
+      "source_item": "P23-030",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-031",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-031",
+      "stimulus": "Источник допускает олар есепшілер — они бухгалтеры?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "да"
+          ]
+        }
+      ],
+      "explanation": "Но обязательная практика 2–3 без специального указания использует форму без множественного показателя.",
+      "source_item": "P23-031",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-032",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S2 · P23-032",
+      "stimulus": "В задании сказано «Они рабочие. Поставьте множественное окончание». Что выбрать?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "олар жұмысшылар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: олар жұмысшылар — они рабочие.",
+      "source_item": "P23-032",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-3:p23-033",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S2 · P23-033",
+      "stimulus": "«Они толстые», специального требования множественного нет.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "олар семіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: олар семіз — они полные.",
+      "source_item": "P23-033",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-3:p23-034",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S2 · P23-034",
+      "stimulus": "Чем различаются?\nA) олар сұлу — они красивые\nB) олар сұлулар — они красавицы",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "A"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: A — прилагательное; B — существительное по смыслу.",
+      "source_item": "P23-034",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-3:p23-035",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S6 · P23-035",
+      "stimulus": "В учебном задании без специального требования исправь Олар семіздер — они полные.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар семіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар семіз — они полные.",
+      "source_item": "P23-035",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E23_OLAR_ADJ_PLURAL."
+      ]
+    },
+    {
+      "id": "canon:2-3:p23-040",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S3 · P23-040",
+      "stimulus": "ол маман ... — он / она не специалист. Впиши отрицание.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "емес"
+          ]
+        }
+      ],
+      "explanation": "ол маман емес — он / она не специалист.",
+      "source_item": "P23-040",
+      "rule_ids": [
+        "v2:2-3:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-3:p23-041",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-041",
+      "stimulus": "Собери олар + жомарт + отрицание — они не щедрые.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "олар жомарт емес"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: олар жомарт емес — они не щедрые.",
+      "source_item": "P23-041",
+      "rule_ids": [
+        "v2:2-3:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-042",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-042",
+      "stimulus": "Задание требует множественный показатель: «Они не водители».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "олар жүргізушілер емес"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: олар жүргізушілер емес — они не водители.",
+      "source_item": "P23-042",
+      "rule_ids": [
+        "v2:2-3:neg",
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-043",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S6 · P23-043",
+      "stimulus": "Исправь Олар дәрігер еместер — они не врачи.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар дәрігер емес"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар дәрігер емес — они не врачи.",
+      "source_item": "P23-043",
+      "rule_ids": [
+        "v2:2-3:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E23_EMES_PLURAL."
+      ]
+    },
+    {
+      "id": "canon:2-3:p23-050",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-050",
+      "stimulus": "У каких двух местоимений в этой именной конструкции нет личного окончания?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ол"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: ол — он / она и олар — они.",
+      "source_item": "P23-050",
+      "rule_ids": [
+        "v2:2-3:map"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-051",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S7 · P23-051",
+      "stimulus": "Собери восемь форм слова көрші — сосед / соседка для мен, біз, сен, сендер, сіз, сіздер, ол, олар.",
+      "fields": [
+        {
+          "label": "Все формы",
+          "kind": "set-text",
+          "answers": [
+            "мен көршімін",
+            "біз көршіміз",
+            "сен көршісің",
+            "сендер көршісіңдер",
+            "сіз көршісіз",
+            "сіздер көршісіздер",
+            "ол көрші",
+            "олар көрші"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: мен көршімін — я сосед / соседка;\nбіз көршіміз — мы соседи;\nсен көршісің — ты сосед / соседка;\nсендер көршісіңдер — вы соседи, неформально;\nсіз көршісіз — Вы сосед / соседка, уважительно;\nсіздер көршісіздер — вы соседи, уважительно;\nол көрші — он / она сосед / соседка;\nолар көрші — они соседи.",
+      "source_item": "P23-051",
+      "rule_ids": [
+        "v2:2-3:map"
+      ],
+      "note": "LESSONS FIX canonical practice; S7"
+    },
+    {
+      "id": "canon:2-3:p23-060",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S2 · P23-060",
+      "stimulus": "қонақ — гость заканчивается на Қ. Какая серия вопросительной частицы?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "П"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: П.",
+      "source_item": "P23-060",
+      "rule_ids": [
+        "v2:2-3:q"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-3:p23-061",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S2 · P23-061",
+      "stimulus": "семіз — полный / полная заканчивается на З. Какая серия?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Б"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Б.",
+      "source_item": "P23-061",
+      "rule_ids": [
+        "v2:2-3:q"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-3:p23-062",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S2 · P23-062",
+      "stimulus": "жүргізуші — водитель заканчивается на гласную. Какая серия?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "М"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: М.",
+      "source_item": "P23-062",
+      "rule_ids": [
+        "v2:2-3:q"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-3:p23-063",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S2 · P23-063",
+      "stimulus": "емес — не является заканчивается на С. Какая серия?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "П"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: П.",
+      "source_item": "P23-063",
+      "rule_ids": [
+        "v2:2-3:q"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-3:p23-064",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S3 · P23-064",
+      "stimulus": "ол қонақ ...? — он / она гость?.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "па"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: па.",
+      "source_item": "P23-064",
+      "rule_ids": [
+        "v2:2-3:q"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-3:p23-065",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S3 · P23-065",
+      "stimulus": "ол семіз ...? — он / она полный / полная?.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "бе"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: бе.",
+      "source_item": "P23-065",
+      "rule_ids": [
+        "v2:2-3:q"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-3:p23-066",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S3 · P23-066",
+      "stimulus": "ол жүргізуші ...? — он / она водитель?.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ме"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: ме.",
+      "source_item": "P23-066",
+      "rule_ids": [
+        "v2:2-3:q"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-3:p23-067",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S3 · P23-067",
+      "stimulus": "ол маман емес ...? — он / она не специалист?.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "пе"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: пе.",
+      "source_item": "P23-067",
+      "rule_ids": [
+        "v2:2-3:q"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-3:p23-070",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-070",
+      "stimulus": "В вопросе с отрицанием ол маман емес ...? — он / она не специалист? на какой последний звук нужно смотреть?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "на С в слове емес"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: на С в слове емес — не является.",
+      "source_item": "P23-070",
+      "rule_ids": [
+        "v2:2-3:qstem"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-071",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-071",
+      "stimulus": "В форме сендер қонақсыңдар ...? — вы гости? на что смотрим?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "на последний звук Р готовой формы қонақсыңдар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: на последний звук Р готовой формы қонақсыңдар — вы гости.",
+      "source_item": "P23-071",
+      "rule_ids": [
+        "v2:2-3:qstem"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-072",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S5 · P23-072",
+      "stimulus": "Переведи «Они умные?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар ақылды ма?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар ақылды ма? — они умные?.",
+      "source_item": "P23-072",
+      "rule_ids": [
+        "v2:2-3:q",
+        "v2:2-3:qstem"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-3:p23-073",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S5 · P23-073",
+      "stimulus": "Переведи «Он поэт?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Ол ақын ба?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Ол ақын ба? — он поэт?.",
+      "source_item": "P23-073",
+      "rule_ids": [
+        "v2:2-3:q",
+        "v2:2-3:qstem"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-3:p23-074",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S5 · P23-074",
+      "stimulus": "Переведи «Они не родственники?»; поставить множественный показатель на существительном.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар туыстар емес пе?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар туыстар емес пе? — они не родственники?.",
+      "source_item": "P23-074",
+      "rule_ids": [
+        "v2:2-3:q",
+        "v2:2-3:qstem",
+        "v2:2-3:neg"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-3:p23-075",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S6 · P23-075",
+      "stimulus": "Исправь Ол қонақ ба? — он / она гость?.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Ол қонақ па?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Ол қонақ па? — он / она гость?.",
+      "source_item": "P23-075",
+      "rule_ids": [
+        "v2:2-3:q"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E23_Q_SERIES."
+      ]
+    },
+    {
+      "id": "canon:2-3:p23-076",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S6 · P23-076",
+      "stimulus": "Исправь Ол маман емес ме? — он / она не специалист?.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Ол маман емес пе?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Ол маман емес пе? — он / она не специалист?.",
+      "source_item": "P23-076",
+      "rule_ids": [
+        "v2:2-3:qstem"
+      ],
+      "note": "LESSONS FIX canonical practice; S6"
+    },
+    {
+      "id": "canon:2-3:p23-080",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-080",
+      "stimulus": "Что обозначает порядковое числительное?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "место в порядке"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: место в порядке — «который по счёту?».",
+      "source_item": "P23-080",
+      "rule_ids": [
+        "v2:2-3:ord"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-081",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-081",
+      "stimulus": "Что является порядковым?\nA) бір — один\nB) бірінші — первый / первая",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "B"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: B.",
+      "source_item": "P23-081",
+      "rule_ids": [
+        "v2:2-3:ord"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-090",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S2 · P23-090",
+      "stimulus": "бір — один заканчивается на согласную. Какую группу суффиксов выбирать?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "-ыншы/-інші"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: -ыншы/-інші.",
+      "source_item": "P23-090",
+      "rule_ids": [
+        "v2:2-3:suf"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-3:p23-091",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S2 · P23-091",
+      "stimulus": "алты — шесть заканчивается на гласную. Какую группу?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "-ншы/-нші"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: -ншы/-нші.",
+      "source_item": "P23-091",
+      "rule_ids": [
+        "v2:2-3:suf"
+      ],
+      "note": "LESSONS FIX canonical practice; S2"
+    },
+    {
+      "id": "canon:2-3:p23-092",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S3 · P23-092",
+      "stimulus": "бір — один. Впиши показатель порядка.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "-інші"
+          ]
+        }
+      ],
+      "explanation": "бірінші — первый / первая.",
+      "source_item": "P23-092",
+      "rule_ids": [
+        "v2:2-3:suf"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-3:p23-093",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S3 · P23-093",
+      "stimulus": "алты — шесть. Впиши показатель порядка.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "-ншы"
+          ]
+        }
+      ],
+      "explanation": "алтыншы — шестой / шестая.",
+      "source_item": "P23-093",
+      "rule_ids": [
+        "v2:2-3:suf"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-3:p23-094",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-094",
+      "stimulus": "Собери порядковое от он — десять.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "оныншы"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: оныншы — десятый / десятая.",
+      "source_item": "P23-094",
+      "rule_ids": [
+        "v2:2-3:suf"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-095",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-095",
+      "stimulus": "Собери порядковое от екі — два.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "екінші"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: екінші — второй / вторая.",
+      "source_item": "P23-095",
+      "rule_ids": [
+        "v2:2-3:suf"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-100",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-100",
+      "stimulus": "Какой вариант даёт исходный курс для «двадцатый»?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "жиырмасыншы"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: жиырмасыншы — двадцатый / двадцатая.",
+      "source_item": "P23-100",
+      "rule_ids": [
+        "v2:2-3:ex"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-101",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S6 · P23-101",
+      "stimulus": "Исправь жиырманшы — двадцатый / двадцатая.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "жиырмасыншы"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: жиырмасыншы — двадцатый / двадцатая.",
+      "source_item": "P23-101",
+      "rule_ids": [
+        "v2:2-3:ex"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E23_ORD_20."
+      ]
+    },
+    {
+      "id": "canon:2-3:p23-102",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-102",
+      "stimulus": "Какой вариант даёт исходный курс для «сороковой»?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "қырқыншы"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: қырқыншы — сороковой / сороковая.",
+      "source_item": "P23-102",
+      "rule_ids": [
+        "v2:2-3:ex"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-103",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S6 · P23-103",
+      "stimulus": "Исправь қырықыншы — сороковой / сороковая.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "қырқыншы"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: қырқыншы — сороковой / сороковая.",
+      "source_item": "P23-103",
+      "rule_ids": [
+        "v2:2-3:ex"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E23_ORD_40."
+      ]
+    },
+    {
+      "id": "canon:2-3:p23-110",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-110",
+      "stimulus": "К какой части составного числа добавляется показатель порядка?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "только к последнему слову"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: только к последнему слову.",
+      "source_item": "P23-110",
+      "rule_ids": [
+        "v2:2-3:comp"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-111",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-111",
+      "stimulus": "Сделай порядковым екі жүз отыз бес — двести тридцать пять.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "екі жүз отыз бесінші"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: екі жүз отыз бесінші — двести тридцать пятый / пятая.",
+      "source_item": "P23-111",
+      "rule_ids": [
+        "v2:2-3:comp"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-112",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-112",
+      "stimulus": "Сделай порядковым қырық бір — сорок один.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "қырық бірінші"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: қырық бірінші — сорок первый / первая.",
+      "source_item": "P23-112",
+      "rule_ids": [
+        "v2:2-3:comp"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-113",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-113",
+      "stimulus": "Сделай порядковым бес жүз жиырма — пятьсот двадцать.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "бес жүз жиырмасыншы"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: бес жүз жиырмасыншы — пятьсот двадцатый / двадцатая.",
+      "source_item": "P23-113",
+      "rule_ids": [
+        "v2:2-3:comp",
+        "v2:2-3:ex"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-114",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S6 · P23-114",
+      "stimulus": "Исправь екінші жүзінші отызыншы бесінші — двести тридцать пятый / пятая.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "екі жүз отыз бесінші"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: екі жүз отыз бесінші — двести тридцать пятый / пятая.",
+      "source_item": "P23-114",
+      "rule_ids": [
+        "v2:2-3:comp"
+      ],
+      "note": "LESSONS FIX canonical practice; S6",
+      "diagnostic_codes": [
+        "E23_ORD_EVERY_WORD."
+      ]
+    },
+    {
+      "id": "canon:2-3:p23-120",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-120",
+      "stimulus": "Собери мен + бірінші — я + первый / первая.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "біріншімін"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: біріншімін — я первый / первая.",
+      "source_item": "P23-120",
+      "rule_ids": [
+        "v2:2-3:ordp"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-121",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S4 · P23-121",
+      "stimulus": "Собери сен + алтыншы — ты + шестой / шестая.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "алтыншысың"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: алтыншысың — ты шестой / шестая.",
+      "source_item": "P23-121",
+      "rule_ids": [
+        "v2:2-3:ordp"
+      ],
+      "note": "LESSONS FIX canonical practice; S4"
+    },
+    {
+      "id": "canon:2-3:p23-122",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S5 · P23-122",
+      "stimulus": "Переведи «Мы двадцатые».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз жиырмасыншымыз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз жиырмасыншымыз — мы двадцатые.",
+      "source_item": "P23-122",
+      "rule_ids": [
+        "v2:2-3:ordp",
+        "v2:2-3:ex"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-3:p23-123",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S5 · P23-123",
+      "stimulus": "Переведи «Вы, несколько неформально, сорок вторые».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер қырық екіншісіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер қырық екіншісіңдер — вы сорок вторые.",
+      "source_item": "P23-123",
+      "rule_ids": [
+        "v2:2-3:ordp",
+        "v2:2-3:comp"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-3:p23-124",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S5 · P23-124",
+      "stimulus": "Переведи «Вы, один уважительно, триста шестьдесят третий / третья».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сіз үш жүз алпыс үшіншісіз"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сіз үш жүз алпыс үшіншісіз — Вы триста шестьдесят третий / третья.",
+      "source_item": "P23-124",
+      "rule_ids": [
+        "v2:2-3:ordp",
+        "v2:2-3:comp"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-3:p23-130",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S3 · P23-130",
+      "stimulus": "жетіншісің — ты седьмой / седьмая. Какая вопросительная частица?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "бе"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: бе.",
+      "source_item": "P23-130",
+      "rule_ids": [
+        "v2:2-3:ordq",
+        "v2:2-3:q"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-3:p23-131",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S3 · P23-131",
+      "stimulus": "тоғызыншы — девятый / девятая. Какая частица?",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "ма"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: ма.",
+      "source_item": "P23-131",
+      "rule_ids": [
+        "v2:2-3:ordq",
+        "v2:2-3:q"
+      ],
+      "note": "LESSONS FIX canonical practice; S3"
+    },
+    {
+      "id": "canon:2-3:p23-132",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S5 · P23-132",
+      "stimulus": "Переведи «Ты сто сорок седьмой / седьмая?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сен жүз қырық жетіншісің бе?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сен жүз қырық жетіншісің бе? — ты сто сорок седьмой / седьмая?.",
+      "source_item": "P23-132",
+      "rule_ids": [
+        "v2:2-3:ordq",
+        "v2:2-3:ordp",
+        "v2:2-3:comp"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-3:p23-133",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S5 · P23-133",
+      "stimulus": "Переведи «Они девятые?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар тоғызыншы ма?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар тоғызыншы ма? — они девятые?.",
+      "source_item": "P23-133",
+      "rule_ids": [
+        "v2:2-3:ordq",
+        "v2:2-3:olar"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-3:p23-134",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S5 · P23-134",
+      "stimulus": "Переведи «Мы шестьсот двадцатые?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз алты жүз жиырмасыншымыз ба?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз алты жүз жиырмасыншымыз ба? — мы шестьсот двадцатые?.",
+      "source_item": "P23-134",
+      "rule_ids": [
+        "v2:2-3:ordq",
+        "v2:2-3:ordp",
+        "v2:2-3:ex"
+      ],
+      "note": "LESSONS FIX canonical practice; S5"
+    },
+    {
+      "id": "canon:2-3:p23-140",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-140",
+      "stimulus": "Выбери форму для одного человека неформально.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сау бол"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сау бол — до свидания, одному человеку неформально.",
+      "source_item": "P23-140",
+      "rule_ids": [
+        "v2:2-3:bye"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-141",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S1 · P23-141",
+      "stimulus": "Выбери форму для нескольких людей уважительно.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "сау болыңыздар"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: сау болыңыздар — до свидания, нескольким людям уважительно.",
+      "source_item": "P23-141",
+      "rule_ids": [
+        "v2:2-3:bye"
+      ],
+      "note": "LESSONS FIX canonical practice; S1"
+    },
+    {
+      "id": "canon:2-3:p23-m01",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M01",
+      "stimulus": "Переведи «Он специалист».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Ол маман"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Ол маман — он специалист.",
+      "source_item": "P23-M01",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m02",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M02",
+      "stimulus": "Переведи «Они умные».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар ақылды"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар ақылды — они умные.",
+      "source_item": "P23-M02",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m03",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M03",
+      "stimulus": "Переведи «Они не щедрые».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар жомарт емес"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар жомарт емес — они не щедрые.",
+      "source_item": "P23-M03",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m04",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M04",
+      "stimulus": "Переведи «Он гость?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Ол қонақ па?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Ол қонақ па? — он гость?.",
+      "source_item": "P23-M04",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m05",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M05",
+      "stimulus": "Переведи «Они умные?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар ақылды ма?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар ақылды ма? — они умные?.",
+      "source_item": "P23-M05",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m06",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M06",
+      "stimulus": "Переведи «Он не специалист?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Ол маман емес пе?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Ол маман емес пе? — он не специалист?.",
+      "source_item": "P23-M06",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m07",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M07",
+      "stimulus": "Сделай порядковым «12».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "он екінші"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: он екінші — двенадцатый / двенадцатая.",
+      "source_item": "P23-M07",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m08",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M08",
+      "stimulus": "Сделай порядковым «41».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "қырық бірінші"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: қырық бірінші — сорок первый / первая.",
+      "source_item": "P23-M08",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m09",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M09",
+      "stimulus": "Сделай порядковым «190».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "жүз тоқсаныншы"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: жүз тоқсаныншы — сто девяностый / девяностая.",
+      "source_item": "P23-M09",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m10",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M10",
+      "stimulus": "Сделай порядковым «520».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "бес жүз жиырмасыншы"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: бес жүз жиырмасыншы — пятьсот двадцатый / двадцатая.",
+      "source_item": "P23-M10",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m11",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M11",
+      "stimulus": "Переведи «Я двадцатый / двадцатая».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Мен жиырмасыншымын"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Мен жиырмасыншымын — я двадцатый / двадцатая.",
+      "source_item": "P23-M11",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m12",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M12",
+      "stimulus": "Переведи «Вы сорок вторые»; несколько неформально.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Сендер қырық екіншісіңдер"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Сендер қырық екіншісіңдер — вы сорок вторые.",
+      "source_item": "P23-M12",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m13",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M13",
+      "stimulus": "Переведи «Они тысяча двадцатые».",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар бір мың жиырмасыншы"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар бір мың жиырмасыншы — они тысяча двадцатые.",
+      "source_item": "P23-M13",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m14",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M14",
+      "stimulus": "Переведи «Мы шестьсот двадцатые?»",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Біз алты жүз жиырмасыншымыз ба?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Біз алты жүз жиырмасыншымыз ба? — мы шестьсот двадцатые?.",
+      "source_item": "P23-M14",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m15",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M15",
+      "stimulus": "Исправь Ол қазақпын — он казах.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Ол қазақ"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Ол қазақ — он казах.",
+      "source_item": "P23-M15",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m16",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M16",
+      "stimulus": "Исправь Олар жиырманшы ма? — они двадцатые?.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Олар жиырмасыншы ма?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Олар жиырмасыншы ма? — они двадцатые?.",
+      "source_item": "P23-M16",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m17",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M17",
+      "stimulus": "Исправь Қонақтар емес ме? — они не гости?.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Қонақтар емес пе?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Қонақтар емес пе? — они не гости?.",
+      "source_item": "P23-M17",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m18",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M18",
+      "stimulus": "Исправь Семізбін ба? — я полный / полная?.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Семізбін бе?"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Семізбін бе? — я полный / полная?.",
+      "source_item": "P23-M18",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m19",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M19",
+      "stimulus": "Исправь Екінші жүзінші отызыншы бесінші — двести тридцать пятый / пятая.",
+      "fields": [
+        {
+          "label": "Ответ",
+          "kind": "text",
+          "answers": [
+            "Екі жүз отыз бесінші"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: Екі жүз отыз бесінші — двести тридцать пятый / пятая.",
+      "source_item": "P23-M19",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
+    },
+    {
+      "id": "canon:2-3:p23-m20",
+      "origin": "canonical",
+      "topic": "rules",
+      "title": "S8 · P23-M20",
+      "stimulus": "Собери все восемь форм слова маман — специалист.",
+      "fields": [
+        {
+          "label": "Все формы",
+          "kind": "set-text",
+          "answers": [
+            "мен маманмын",
+            "біз маманбыз",
+            "сен мамансың",
+            "сендер мамансыңдар",
+            "сіз мамансыз",
+            "сіздер мамансыздар",
+            "ол маман",
+            "олар маман"
+          ]
+        }
+      ],
+      "explanation": "Правильный ответ: мен маманмын — я специалист;\nбіз маманбыз — мы специалисты;\nсен мамансың — ты специалист;\nсендер мамансыңдар — вы специалисты, неформально;\nсіз мамансыз — Вы специалист, уважительно;\nсіздер мамансыздар — вы специалисты, уважительно;\nол маман — он / она специалист;\nолар маман — они специалисты.",
+      "source_item": "P23-M20",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ],
+      "note": "LESSONS FIX canonical practice; S8"
     }
   ],
   "practice_generators": [],
   "stages": [
     {
-      "id": "stage:2-3:1-1",
-      "title": "Сборник 1-1. Көрші, қазақ, маман",
+      "id": "stage:2-3:S1",
+      "title": "S1 · Каноническая практика",
       "kind": "learning",
       "core_ids": [
-        "e23-form-1",
-        "e23-form-2",
-        "e23-form-3",
-        "e23-form-4",
-        "e23-form-5",
-        "e23-form-6",
-        "e23-form-7",
-        "e23-form-8",
-        "e23-form-9",
-        "e23-form-10",
-        "e23-form-11",
-        "e23-form-12",
-        "e23-form-13",
-        "e23-form-14",
-        "e23-form-15",
-        "e23-form-16",
-        "e23-form-17",
-        "e23-form-18",
-        "e23-form-19",
-        "e23-form-20",
-        "e23-form-21"
+        "canon:2-3:p23-010",
+        "canon:2-3:p23-020",
+        "canon:2-3:p23-030",
+        "canon:2-3:p23-031",
+        "canon:2-3:p23-050",
+        "canon:2-3:p23-070",
+        "canon:2-3:p23-071",
+        "canon:2-3:p23-080",
+        "canon:2-3:p23-081",
+        "canon:2-3:p23-100",
+        "canon:2-3:p23-102",
+        "canon:2-3:p23-110",
+        "canon:2-3:p23-140",
+        "canon:2-3:p23-141"
       ],
       "required_independent_ids": [
-        "e23-form-1",
-        "e23-form-2",
-        "e23-form-3",
-        "e23-form-4",
-        "e23-form-5",
-        "e23-form-6",
-        "e23-form-7",
-        "e23-form-8",
-        "e23-form-9",
-        "e23-form-10",
-        "e23-form-11",
-        "e23-form-12",
-        "e23-form-13",
-        "e23-form-14",
-        "e23-form-15",
-        "e23-form-16",
-        "e23-form-17",
-        "e23-form-18",
-        "e23-form-19",
-        "e23-form-20",
-        "e23-form-21"
+        "canon:2-3:p23-010",
+        "canon:2-3:p23-020",
+        "canon:2-3:p23-030",
+        "canon:2-3:p23-031",
+        "canon:2-3:p23-050",
+        "canon:2-3:p23-070",
+        "canon:2-3:p23-071",
+        "canon:2-3:p23-080",
+        "canon:2-3:p23-081",
+        "canon:2-3:p23-100",
+        "canon:2-3:p23-102",
+        "canon:2-3:p23-110",
+        "canon:2-3:p23-140",
+        "canon:2-3:p23-141"
       ],
       "rule_ids": [
         "v2:2-3:ol",
-        "v2:2-3:olar"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-3:1-2",
-      "title": "Сборник 1-2. Жомарт, семіз, әдемі",
-      "kind": "learning",
-      "core_ids": [
-        "e23-form-22",
-        "e23-form-23",
-        "e23-form-24",
-        "e23-form-25",
-        "e23-form-26",
-        "e23-form-27",
-        "e23-form-28",
-        "e23-form-29",
-        "e23-form-30",
-        "e23-form-31",
-        "e23-form-32",
-        "e23-form-33",
-        "e23-form-34",
-        "e23-form-35",
-        "e23-form-36",
-        "e23-form-37",
-        "e23-form-38",
-        "e23-form-39",
-        "e23-form-40",
-        "e23-form-41",
-        "e23-form-42"
-      ],
-      "required_independent_ids": [
-        "e23-form-22",
-        "e23-form-23",
-        "e23-form-24",
-        "e23-form-25",
-        "e23-form-26",
-        "e23-form-27",
-        "e23-form-28",
-        "e23-form-29",
-        "e23-form-30",
-        "e23-form-31",
-        "e23-form-32",
-        "e23-form-33",
-        "e23-form-34",
-        "e23-form-35",
-        "e23-form-36",
-        "e23-form-37",
-        "e23-form-38",
-        "e23-form-39",
-        "e23-form-40",
-        "e23-form-41",
-        "e23-form-42"
-      ],
-      "rule_ids": [
-        "v2:2-3:ol",
-        "v2:2-3:olar"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-3:2-1",
-      "title": "Сборник 2-1. Әріптес, жау, заңгер",
-      "kind": "learning",
-      "core_ids": [
-        "e23-form-43",
-        "e23-form-44",
-        "e23-form-45",
-        "e23-form-46",
-        "e23-form-47",
-        "e23-form-48",
-        "e23-form-49",
-        "e23-form-50",
-        "e23-form-51",
-        "e23-form-52",
-        "e23-form-53",
-        "e23-form-54",
-        "e23-form-55",
-        "e23-form-56",
-        "e23-form-57",
-        "e23-form-58",
-        "e23-form-59",
-        "e23-form-60",
-        "e23-form-61",
-        "e23-form-62",
-        "e23-form-63"
-      ],
-      "required_independent_ids": [
-        "e23-form-43",
-        "e23-form-44",
-        "e23-form-45",
-        "e23-form-46",
-        "e23-form-47",
-        "e23-form-48",
-        "e23-form-49",
-        "e23-form-50",
-        "e23-form-51",
-        "e23-form-52",
-        "e23-form-53",
-        "e23-form-54",
-        "e23-form-55",
-        "e23-form-56",
-        "e23-form-57",
-        "e23-form-58",
-        "e23-form-59",
-        "e23-form-60",
-        "e23-form-61",
-        "e23-form-62",
-        "e23-form-63"
-      ],
-      "rule_ids": [
-        "v2:2-3:ol"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-3:2-2",
-      "title": "Сборник 2-2. Бай, қонақ, жұмыссыз",
-      "kind": "learning",
-      "core_ids": [
-        "e23-form-64",
-        "e23-form-65",
-        "e23-form-66",
-        "e23-form-67",
-        "e23-form-68",
-        "e23-form-69",
-        "e23-form-70",
-        "e23-form-71",
-        "e23-form-72",
-        "e23-form-73",
-        "e23-form-74",
-        "e23-form-75",
-        "e23-form-76",
-        "e23-form-77",
-        "e23-form-78",
-        "e23-form-79",
-        "e23-form-80",
-        "e23-form-81",
-        "e23-form-82",
-        "e23-form-83",
-        "e23-form-84"
-      ],
-      "required_independent_ids": [
-        "e23-form-64",
-        "e23-form-65",
-        "e23-form-66",
-        "e23-form-67",
-        "e23-form-68",
-        "e23-form-69",
-        "e23-form-70",
-        "e23-form-71",
-        "e23-form-72",
-        "e23-form-73",
-        "e23-form-74",
-        "e23-form-75",
-        "e23-form-76",
-        "e23-form-77",
-        "e23-form-78",
-        "e23-form-79",
-        "e23-form-80",
-        "e23-form-81",
-        "e23-form-82",
-        "e23-form-83",
-        "e23-form-84"
-      ],
-      "rule_ids": [
-        "v2:2-3:olar"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-3:2-3",
-      "title": "Сборник 2-3. Жас, жігіт, кедей",
-      "kind": "learning",
-      "core_ids": [
-        "e23-form-85",
-        "e23-form-86",
-        "e23-form-87",
-        "e23-form-88",
-        "e23-form-89",
-        "e23-form-90",
-        "e23-form-91",
-        "e23-form-92",
-        "e23-form-93",
-        "e23-form-94",
-        "e23-form-95",
-        "e23-form-96",
-        "e23-form-97",
-        "e23-form-98",
-        "e23-form-99",
-        "e23-form-100",
-        "e23-form-101",
-        "e23-form-102",
-        "e23-form-103",
-        "e23-form-104",
-        "e23-form-105"
-      ],
-      "required_independent_ids": [
-        "e23-form-85",
-        "e23-form-86",
-        "e23-form-87",
-        "e23-form-88",
-        "e23-form-89",
-        "e23-form-90",
-        "e23-form-91",
-        "e23-form-92",
-        "e23-form-93",
-        "e23-form-94",
-        "e23-form-95",
-        "e23-form-96",
-        "e23-form-97",
-        "e23-form-98",
-        "e23-form-99",
-        "e23-form-100",
-        "e23-form-101",
-        "e23-form-102",
-        "e23-form-103",
-        "e23-form-104",
-        "e23-form-105"
-      ],
-      "rule_ids": [
-        "v2:2-3:ol",
-        "v2:2-3:olar"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-3:ask",
-      "title": "Сборник 3. Вопросительная частица",
-      "kind": "learning",
-      "core_ids": [
-        "e23-ask-1",
-        "e23-ask-2",
-        "e23-ask-3",
-        "e23-ask-4",
-        "e23-ask-5",
-        "e23-ask-6",
-        "e23-ask-7",
-        "e23-ask-8",
-        "e23-ask-9",
-        "e23-ask-10"
-      ],
-      "required_independent_ids": [
-        "e23-ask-1",
-        "e23-ask-2",
-        "e23-ask-3",
-        "e23-ask-4",
-        "e23-ask-5",
-        "e23-ask-6",
-        "e23-ask-7",
-        "e23-ask-8",
-        "e23-ask-9",
-        "e23-ask-10"
-      ],
-      "rule_ids": [
-        "v2:2-3:q",
-        "v2:2-3:qstem"
-      ],
-      "min_independent_ratio": 0.8,
-      "max_presentations": 24,
-      "final": false
-    },
-    {
-      "id": "stage:2-3:ord",
-      "title": "Сборник 4. Порядковые",
-      "kind": "learning",
-      "core_ids": [
-        "e23-ord-1",
-        "e23-ordq-1",
-        "e23-ord-2",
-        "e23-ordq-2",
-        "e23-ord-3",
-        "e23-ordq-3",
-        "e23-ord-4",
-        "e23-ordq-4",
-        "e23-ord-5",
-        "e23-ordq-5"
-      ],
-      "required_independent_ids": [
-        "e23-ord-1",
-        "e23-ordq-1",
-        "e23-ord-2",
-        "e23-ordq-2",
-        "e23-ord-3",
-        "e23-ordq-3",
-        "e23-ord-4",
-        "e23-ordq-4",
-        "e23-ord-5",
-        "e23-ordq-5"
-      ],
-      "rule_ids": [
+        "v2:2-3:olar",
+        "v2:2-3:map",
+        "v2:2-3:qstem",
         "v2:2-3:ord",
+        "v2:2-3:ex",
         "v2:2-3:comp",
+        "v2:2-3:bye"
+      ],
+      "min_independent_ratio": 0.7,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-3:S2",
+      "title": "S2 · Каноническая практика",
+      "kind": "learning",
+      "core_ids": [
+        "canon:2-3:p23-011",
+        "canon:2-3:p23-032",
+        "canon:2-3:p23-033",
+        "canon:2-3:p23-034",
+        "canon:2-3:p23-060",
+        "canon:2-3:p23-061",
+        "canon:2-3:p23-062",
+        "canon:2-3:p23-063",
+        "canon:2-3:p23-090",
+        "canon:2-3:p23-091"
+      ],
+      "required_independent_ids": [
+        "canon:2-3:p23-011",
+        "canon:2-3:p23-032",
+        "canon:2-3:p23-033",
+        "canon:2-3:p23-034",
+        "canon:2-3:p23-060",
+        "canon:2-3:p23-061",
+        "canon:2-3:p23-062",
+        "canon:2-3:p23-063",
+        "canon:2-3:p23-090",
+        "canon:2-3:p23-091"
+      ],
+      "rule_ids": [
+        "v2:2-3:ol",
+        "v2:2-3:olar",
+        "v2:2-3:q",
+        "v2:2-3:suf"
+      ],
+      "min_independent_ratio": 0.7,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-3:S3",
+      "title": "S3 · Каноническая практика",
+      "kind": "learning",
+      "core_ids": [
+        "canon:2-3:p23-040",
+        "canon:2-3:p23-064",
+        "canon:2-3:p23-065",
+        "canon:2-3:p23-066",
+        "canon:2-3:p23-067",
+        "canon:2-3:p23-092",
+        "canon:2-3:p23-093",
+        "canon:2-3:p23-130",
+        "canon:2-3:p23-131"
+      ],
+      "required_independent_ids": [
+        "canon:2-3:p23-040",
+        "canon:2-3:p23-064",
+        "canon:2-3:p23-065",
+        "canon:2-3:p23-066",
+        "canon:2-3:p23-067",
+        "canon:2-3:p23-092",
+        "canon:2-3:p23-093",
+        "canon:2-3:p23-130",
+        "canon:2-3:p23-131"
+      ],
+      "rule_ids": [
+        "v2:2-3:neg",
+        "v2:2-3:q",
+        "v2:2-3:suf",
+        "v2:2-3:ordq"
+      ],
+      "min_independent_ratio": 0.8,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-3:S4",
+      "title": "S4 · Каноническая практика",
+      "kind": "learning",
+      "core_ids": [
+        "canon:2-3:p23-001",
+        "canon:2-3:p23-002",
+        "canon:2-3:p23-003",
+        "canon:2-3:p23-012",
+        "canon:2-3:p23-013",
+        "canon:2-3:p23-021",
+        "canon:2-3:p23-022",
+        "canon:2-3:p23-041",
+        "canon:2-3:p23-042",
+        "canon:2-3:p23-094",
+        "canon:2-3:p23-095",
+        "canon:2-3:p23-111",
+        "canon:2-3:p23-112",
+        "canon:2-3:p23-113",
+        "canon:2-3:p23-120",
+        "canon:2-3:p23-121"
+      ],
+      "required_independent_ids": [
+        "canon:2-3:p23-001",
+        "canon:2-3:p23-002",
+        "canon:2-3:p23-003",
+        "canon:2-3:p23-012",
+        "canon:2-3:p23-013",
+        "canon:2-3:p23-021",
+        "canon:2-3:p23-022",
+        "canon:2-3:p23-041",
+        "canon:2-3:p23-042",
+        "canon:2-3:p23-094",
+        "canon:2-3:p23-095",
+        "canon:2-3:p23-111",
+        "canon:2-3:p23-112",
+        "canon:2-3:p23-113",
+        "canon:2-3:p23-120",
+        "canon:2-3:p23-121"
+      ],
+      "rule_ids": [
+        "v2:2-3:recall",
+        "v2:2-3:ol",
+        "v2:2-3:olar",
+        "v2:2-3:neg",
+        "v2:2-3:suf",
+        "v2:2-3:comp",
+        "v2:2-3:ex",
         "v2:2-3:ordp"
       ],
       "min_independent_ratio": 0.8,
@@ -4917,36 +6742,151 @@
       "final": false
     },
     {
-      "id": "stage:2-3:fix",
-      "title": "Сборник 5. Проверка ошибок",
-      "kind": "checkpoint",
+      "id": "stage:2-3:S5",
+      "title": "S5 · Каноническая практика",
+      "kind": "learning",
       "core_ids": [
-        "e23-fix-1",
-        "e23-fix-2",
-        "e23-fix-3",
-        "e23-fix-4",
-        "e23-fix-5",
-        "e23-fix-6",
-        "e23-fix-7",
-        "e23-fix-8",
-        "e23-fix-9",
-        "e23-fix-10"
+        "canon:2-3:p23-072",
+        "canon:2-3:p23-073",
+        "canon:2-3:p23-074",
+        "canon:2-3:p23-122",
+        "canon:2-3:p23-123",
+        "canon:2-3:p23-124",
+        "canon:2-3:p23-132",
+        "canon:2-3:p23-133",
+        "canon:2-3:p23-134"
       ],
       "required_independent_ids": [
-        "e23-fix-1",
-        "e23-fix-2",
-        "e23-fix-3",
-        "e23-fix-4",
-        "e23-fix-5",
-        "e23-fix-6",
-        "e23-fix-7",
-        "e23-fix-8",
-        "e23-fix-9",
-        "e23-fix-10"
+        "canon:2-3:p23-072",
+        "canon:2-3:p23-073",
+        "canon:2-3:p23-074",
+        "canon:2-3:p23-122",
+        "canon:2-3:p23-123",
+        "canon:2-3:p23-124",
+        "canon:2-3:p23-132",
+        "canon:2-3:p23-133",
+        "canon:2-3:p23-134"
       ],
       "rule_ids": [
+        "v2:2-3:q",
+        "v2:2-3:qstem",
+        "v2:2-3:neg",
+        "v2:2-3:ordp",
         "v2:2-3:ex",
-        "v2:2-3:q"
+        "v2:2-3:comp",
+        "v2:2-3:ordq",
+        "v2:2-3:olar"
+      ],
+      "min_independent_ratio": 0.8,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-3:S6",
+      "title": "S6 · Каноническая практика",
+      "kind": "learning",
+      "core_ids": [
+        "canon:2-3:p23-014",
+        "canon:2-3:p23-023",
+        "canon:2-3:p23-035",
+        "canon:2-3:p23-043",
+        "canon:2-3:p23-075",
+        "canon:2-3:p23-076",
+        "canon:2-3:p23-101",
+        "canon:2-3:p23-103",
+        "canon:2-3:p23-114"
+      ],
+      "required_independent_ids": [
+        "canon:2-3:p23-014",
+        "canon:2-3:p23-023",
+        "canon:2-3:p23-035",
+        "canon:2-3:p23-043",
+        "canon:2-3:p23-075",
+        "canon:2-3:p23-076",
+        "canon:2-3:p23-101",
+        "canon:2-3:p23-103",
+        "canon:2-3:p23-114"
+      ],
+      "rule_ids": [
+        "v2:2-3:ol",
+        "v2:2-3:olar",
+        "v2:2-3:neg",
+        "v2:2-3:q",
+        "v2:2-3:qstem",
+        "v2:2-3:ex",
+        "v2:2-3:comp"
+      ],
+      "min_independent_ratio": 0.8,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-3:S7",
+      "title": "S7 · Каноническая практика",
+      "kind": "learning",
+      "core_ids": [
+        "canon:2-3:p23-051"
+      ],
+      "required_independent_ids": [
+        "canon:2-3:p23-051"
+      ],
+      "rule_ids": [
+        "v2:2-3:map"
+      ],
+      "min_independent_ratio": 0.8,
+      "max_presentations": 24,
+      "final": false
+    },
+    {
+      "id": "stage:2-3:S8",
+      "title": "S8 · Смешанное самостоятельное закрепление",
+      "kind": "checkpoint",
+      "core_ids": [
+        "canon:2-3:p23-m01",
+        "canon:2-3:p23-m02",
+        "canon:2-3:p23-m03",
+        "canon:2-3:p23-m04",
+        "canon:2-3:p23-m05",
+        "canon:2-3:p23-m06",
+        "canon:2-3:p23-m07",
+        "canon:2-3:p23-m08",
+        "canon:2-3:p23-m09",
+        "canon:2-3:p23-m10",
+        "canon:2-3:p23-m11",
+        "canon:2-3:p23-m12",
+        "canon:2-3:p23-m13",
+        "canon:2-3:p23-m14",
+        "canon:2-3:p23-m15",
+        "canon:2-3:p23-m16",
+        "canon:2-3:p23-m17",
+        "canon:2-3:p23-m18",
+        "canon:2-3:p23-m19",
+        "canon:2-3:p23-m20"
+      ],
+      "required_independent_ids": [
+        "canon:2-3:p23-m01",
+        "canon:2-3:p23-m02",
+        "canon:2-3:p23-m03",
+        "canon:2-3:p23-m04",
+        "canon:2-3:p23-m05",
+        "canon:2-3:p23-m06",
+        "canon:2-3:p23-m07",
+        "canon:2-3:p23-m08",
+        "canon:2-3:p23-m09",
+        "canon:2-3:p23-m10",
+        "canon:2-3:p23-m11",
+        "canon:2-3:p23-m12",
+        "canon:2-3:p23-m13",
+        "canon:2-3:p23-m14",
+        "canon:2-3:p23-m15",
+        "canon:2-3:p23-m16",
+        "canon:2-3:p23-m17",
+        "canon:2-3:p23-m18",
+        "canon:2-3:p23-m19",
+        "canon:2-3:p23-m20"
+      ],
+      "rule_ids": [
+        "v2:2-3:wrap"
       ],
       "min_independent_ratio": 0.8,
       "max_presentations": 24,
@@ -5170,5 +7110,264 @@
       "external_test"
     ]
   },
-  "migrations": []
+  "migrations": [
+    {
+      "from_revision": "2-3.r1",
+      "to_revision": "2-3.r2",
+      "question_ids": {},
+      "chapter_ids": {},
+      "stage_ids": {
+        "stage:2-3:1-1": "stage:2-3:S1",
+        "stage:2-3:1-2": "stage:2-3:S1",
+        "stage:2-3:2-1": "stage:2-3:S1",
+        "stage:2-3:2-2": "stage:2-3:S1",
+        "stage:2-3:2-3": "stage:2-3:S1",
+        "stage:2-3:ask": "stage:2-3:S1",
+        "stage:2-3:ord": "stage:2-3:S1",
+        "stage:2-3:fix": "stage:2-3:S1"
+      },
+      "vocab_ids": {},
+      "drop_question_ids": []
+    }
+  ],
+  "canonical_core": [
+    {
+      "id": "theory:2-3:recall",
+      "title": "Короткая активация шести лиц",
+      "body": "УРОК 2–3 — ОЛ, ОЛАР, ПОЛНАЯ СИСТЕМА ВОПРОСА И ПОРЯДКОВЫЕ ЧИСЛИТЕЛЬНЫЕ\n\n\nСтатус документа\nЭто канонический CORE урока 2–3. Он завершает систему раздела 2. Его можно делить на удобные экраны, но нельзя сокращать до карточек, выбрасывать таблицы, переставлять prerequisite или заменять правило примерами.\n\n\nЦель урока\nПосле урока ты сможешь самостоятельно построить:\n— ол маман — он / она специалист;\n— олар ақылды — они умные;\n— ол қонақ па? — он / она гость?;\n— олар туыстар емес пе? — они не родственники?;\n— мен жиырмасыншымын — я двадцатый / двадцатая;\n— сен жүз қырық жетіншісің бе? — ты сто сорок седьмой / седьмая?.\n\n\nГлавная идея урока\n2–1 и 2–2 научили строить шесть лиц:\nмен — я;\nбіз — мы;\nсен — ты;\nсендер — вы, несколько неформально;\nсіз — Вы, один уважительно;\nсіздер — вы, несколько уважительно.\n\n\nТеперь добавляются:\nол — он / она;\nолар — они.\n\n\nПосле этого мы закрываем полную систему вопросительных частиц и отдельно изучаем порядковые числительные.\n\n\nЧто уже нужно знать\nПеред 2–3 нужно уметь:\n— находить основу и текущую форму;\n— определять ряд;\n— строить шесть личных форм 2–1/2–2;\n— строить отрицание с емес — не является / не такой;\n— использовать ба/бе и ма/ме в открытой части вопросительной системы;\n— читать и собирать обычные числительные из предыдущих уроков.\n\n1. Короткая активация шести лиц\n\n\nПеред новой теорией нужно восстановить систему на одном знакомом слове.\n\n\nаспаз — повар.\n\n\nмен аспазбын — я повар.\nбіз аспазбыз — мы повара.\nсен аспазсың — ты повар.\nсендер аспазсыңдар — вы повара, несколько неформально.\nсіз аспазсыз — Вы повар, уважительно.\nсіздер аспазсыздар — вы повара, несколько уважительно.\n\n\nЭто не новая лекция. Если система не вспоминается, открывается справочник 2–2.",
+      "rule_ids": [
+        "v2:2-3:recall"
+      ]
+    },
+    {
+      "id": "theory:2-3:ol",
+      "title": "Ол: личного окончания нет",
+      "body": "2. ОЛ — он / она\n\n\nол — он / она.\n\n\nВ именной фразе этого урока с ол — он / она личное окончание не добавляется.\n\n\nСравни:\nмен қазақпын — я казах / казашка.\nсен қазақсың — ты казах / казашка.\nсіз қазақсыз — Вы казах / казашка.\nол қазақ — он / она казах / казашка.\n\n\nЕщё:\nол қыз — она девушка.\nол маман — он / она специалист.\nол семіз — он / она полный / полная.\n\n\nГлавное правило\nДля ол — он / она в этой конструкции личное окончание равно нулю: ничего не добавляем.\n\n\nНеверно:\nол маманмын — он / она специалист.\n\n\nПравильно:\nол маман — он / она специалист.",
+      "rule_ids": [
+        "v2:2-3:ol"
+      ]
+    },
+    {
+      "id": "theory:2-3:olar",
+      "title": "Олар: «они» и множественное в упражнениях",
+      "body": "3. ОЛАР — они\n\n\nолар — они.\n\n\nДля олар — они личное окончание тоже не добавляется.\n\n\nПримеры:\nолар есепші — они бухгалтеры.\nолар семіз — они полные.\nолар қырқыншы — они сороковые.\n\n\nГлавное правило:\nол — он / она и олар — они закрывают таблицу лиц, но личного окончания после сказуемого у них нет.\n\n4. Нужен ли показатель множественного числа с ОЛАР\n\n\nЗдесь источник специально предупреждает, что для новичка правило не стоит упрощать до «всегда ставь» или «никогда не ставь».\n\n\nСуществительное-сказуемое может встречаться без отдельного показателя множественного:\nолар есепші — они бухгалтеры.\n\n\nИсточник также допускает:\nолар есепшілер — они бухгалтеры.\n\n\nПрилагательное в основной модели обычно остаётся без множественного показателя:\nолар семіз — они полные.\n\n\nПорядковое числительное также:\nолар қырқыншы — они сороковые.\n\n\nИсточник показывает смысловое различие:\nолар сұлу — они красивые;\nолар сұлулар — они красавицы.\n\n\nолар бай — они богатые;\nолар байлар — они богачи.\n\n\nУчебное правило 2–3\nЕсли задание не говорит специально поставить множественное окончание, в упражнениях с олар — они его не добавляем.\n\n\nЭто правило для начальной практики, а не утверждение, что формы с множественным показателем невозможны.",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ]
+    },
+    {
+      "id": "theory:2-3:neg",
+      "title": "Отрицание с ОЛ и ОЛАР",
+      "body": "5. Отрицание с ОЛ и ОЛАР\n\n\nПринцип емес — не является / не такой остаётся тем же, но в третьем лице личного окончания нет.\n\n\nол маман емес — он / она не специалист.\nол семіз емес — он / она не полный / полная.\nолар жомарт емес — они не щедрые.\nолар жүргізушілер емес — они не водители — если задание отдельно требует множественный показатель на существительном.\n\n\nВажно:\nк емес — не является / не такой не добавляем множественное окончание.\n\n\nНеверно:\nолар дәрігер еместер — они не врачи.\n\n\nВ модели курса:\nолар дәрігер емес — они не врачи.\nЕсли задание требует множественный показатель на существительном:\nолар дәрігерлер емес — они не врачи.",
+      "rule_ids": [
+        "v2:2-3:neg"
+      ]
+    },
+    {
+      "id": "theory:2-3:map",
+      "title": "Полная карта восьми местоимений",
+      "body": "6. Полная карта восьми местоимений\n\n\nКто | личное окончание\n\n\nмен — я | -пын/-пін, -бын/-бін, -мын/-мін\nбіз — мы | -пыз/-піз, -быз/-біз, -мыз/-міз\nсен — ты | -сың/-сің\nсендер — вы, несколько неформально | -сыңдар/-сіңдер\nсіз — Вы, один уважительно | -сыз/-сіз\nсіздер — вы, несколько уважительно | -сыздар/-сіздер\nол — он / она | ∅ — личного окончания нет\nолар — они | ∅ — личного окончания нет\n\n\nПример на слове көрші — сосед:\n\n\nмен көршімін — я сосед / соседка.\nбіз көршіміз — мы соседи.\nсен көршісің — ты сосед / соседка.\nсендер көршісіңдер — вы соседи, неформально.\nсіз көршісіз — Вы сосед / соседка, уважительно.\nсіздер көршісіздер — вы соседи, уважительно.\nол көрші — он / она сосед / соседка.\nолар көрші — они соседи.",
+      "rule_ids": [
+        "v2:2-3:map"
+      ]
+    },
+    {
+      "id": "theory:2-3:q",
+      "title": "Полная таблица вопросительных частиц",
+      "body": "7. Теперь открываем полную систему вопросительных частиц\n\n\nВ 2–1 использовались ба/бе.\nВ 2–2 добавились ма/ме после Р.\nТеперь открывается вся таблица.\n\n\nПоследний звук последнего слова | вопросительная частица\n\n\nГлухие К, Қ, П, С, Т, Ф, Х, Һ, Ц, Ш, Щ; а также конечные Б, В, Г, Д в схеме курса | па/пе\nМ, Н, Ң, Ж, З | ба/бе\nВсе остальные | ма/ме\n\n\nВ каждой строке вторая проверка — ряд:\nтвёрдый ряд → А;\nмягкий ряд → Е.",
+      "rule_ids": [
+        "v2:2-3:q"
+      ]
+    },
+    {
+      "id": "theory:2-3:qstem",
+      "title": "Частица смотрит на последнее слово готовой фразы",
+      "body": "8. Вопрос выбирается по готовой последней форме\n\n\nЭто главный алгоритм.\n\n\nШаг 1. Сначала собери утверждение.\nШаг 2. Если нужно, сделай отрицание.\nШаг 3. Найди последнее слово перед вопросительной частицей.\nШаг 4. Посмотри на его последний звук.\nШаг 5. Выбери П, Б или М по полной таблице.\nШаг 6. Выбери А или Е по ряду.\nШаг 7. Напиши частицу отдельно.\n\n\nВажно:\nмы смотрим не на местоимение, а на готовое последнее слово.\n\n9. Полная система вопроса на примерах\n\n\nПример ПА/ПЕ\nол қонақ — он / она гость.\nПоследний звук Қ — глухой.\nНужна П-серия.\nСлово твёрдого ряда.\nол қонақ па? — он / она гость?.\n\n\nол маман емес — он / она не специалист.\nПоследнее слово емес — не является, последний звук С — глухой.\nСлово мягкого ряда.\nол маман емес пе? — он / она не специалист?.\n\n\nПример БА/БЕ\nол семіз — он / она полный / полная.\nПоследний звук З → Б.\nМягкий ряд → Е.\nол семіз бе? — он / она полный / полная?.\n\n\nмен жазушымын — я писатель.\nПоследний звук Н → Б.\nТвёрдый ряд → А.\nмен жазушымын ба? — я писатель?.\n\n\nПример МА/МЕ\nол жүргізуші — он / она водитель.\nПоследний звук І → «остальные» → М.\nМягкий ряд → Е.\nол жүргізуші ме? — он / она водитель?.\n\n\nсендер қонақсыңдар — вы гости, неформально.\nПоследний звук Р → М.\nТвёрдый ряд → А.\nсендер қонақсыңдар ма? — вы гости?.",
+      "rule_ids": [
+        "v2:2-3:qstem"
+      ]
+    },
+    {
+      "id": "theory:2-3:ord",
+      "title": "Порядковое: который по счёту",
+      "body": "10. Что такое порядковое числительное\n\n\nПорядковое числительное отвечает на вопрос «который по счёту?».\n\n\nОбычное число:\nбір — один.\n\n\nПорядковое:\nбірінші — первый / первая.\n\n\nОбычное число:\nон — десять.\n\n\nПорядковое:\nоныншы — десятый / десятая.\n\n\nСначала всегда нужно правильно собрать само число. Только потом добавлять показатель порядка.",
+      "rule_ids": [
+        "v2:2-3:ord"
+      ]
+    },
+    {
+      "id": "theory:2-3:suf",
+      "title": "Как выбрать -ыншы/-інші или -ншы/-нші",
+      "body": "11. Как выбрать суффикс порядкового числительного\n\n\nЕсть две проверки:\n1. Чем заканчивается последнее слово числительного: согласной или гласной?\n2. Какой ряд нужен?\n\n\nЕсли числительное заканчивается на согласную:\n-ыншы / -інші.\n\n\nЕсли заканчивается на гласную:\n-ншы / -нші.\n\n\nПримеры после согласной:\nбірінші — первый / первая.\nоныншы — десятый / десятая.\n\n\nПримеры после гласной:\nекінші — второй / вторая.\nалтыншы — шестой / шестая.\n\n\nАлгоритм\nШаг 1. Собери обычное число.\nШаг 2. Посмотри на последнее слово числа.\nШаг 3. Оно заканчивается на согласную или гласную?\nШаг 4. Выбери -ыншы/-інші или -ншы/-нші.\nШаг 5. Выбери твёрдый или мягкий вариант.\nШаг 6. Добавь суффикс к последнему слову.",
+      "rule_ids": [
+        "v2:2-3:suf"
+      ]
+    },
+    {
+      "id": "theory:2-3:ex",
+      "title": "Два исключения: жиырмасыншы, қырқыншы",
+      "body": "12. Две формы из источника нужно запомнить отдельно\n\n\nжиырма — двадцать → жиырмасыншы — двадцатый / двадцатая.\n\n\nНе:\nжиырманшы — двадцатый / двадцатая — в исходном курсе эта форма отмечена как неверная.\n\n\nқырық — сорок → қырқыншы — сороковой / сороковая.\n\n\nЗдесь Ы выпадает.\n\n\nЭти две формы не нужно заставлять ученика «выводить» из общего правила. Они маркируются как формы для отдельного запоминания.",
+      "rule_ids": [
+        "v2:2-3:ex"
+      ]
+    },
+    {
+      "id": "theory:2-3:comp",
+      "title": "В составном числе суффикс только справа",
+      "body": "13. Составное порядковое число\n\n\nВ составном числе показатель порядка ставится только на последнее слово.\n\n\nекі жүз отыз бес — двести тридцать пять.\n\n\nекі жүз отыз бесінші — двести тридцать пятый / пятая.\n\n\nНе нужно добавлять показатель порядка к каждой части числа.\n\n\nЕщё:\nқырық бір — сорок один → қырық бірінші — сорок первый / первая.\n\n\nжүз тоқсан — сто девяносто → жүз тоқсаныншы — сто девяностый / девяностая.",
+      "rule_ids": [
+        "v2:2-3:comp"
+      ]
+    },
+    {
+      "id": "theory:2-3:ordp",
+      "title": "Личное окончание после готового порядкового",
+      "body": "14. К порядковому можно добавить личное окончание\n\n\nПосле того как порядковая форма уже готова, к ней можно применить знакомую систему лиц.\n\n\nбірінші — первый / первая.\nбіріншімін — я первый / первая.\n\n\nалтыншы — шестой / шестая.\nалтыншысың — ты шестой / шестая.\n\n\nжиырмасыншы — двадцатый / двадцатая.\nжиырмасыншымыз — мы двадцатые.\n\n\nГлавная последовательность:\nобычное число → порядковая форма → личное окончание.\n\n\nНе нужно создавать новую таблицу «личных окончаний порядковых». Используется уже изученная система.",
+      "rule_ids": [
+        "v2:2-3:ordp"
+      ]
+    },
+    {
+      "id": "theory:2-3:ordq",
+      "title": "Порядковое + вопрос",
+      "body": "15. Порядковое + вопрос\n\n\nСначала:\nобычное число → порядковое → личная форма, если она нужна.\n\n\nТолько потом добавляется вопросительная частица по последнему звуку готовой формы.\n\n\nПример:\nсен жүз қырық жетіншісің — ты сто сорок седьмой / седьмая.\nГотовая форма заканчивается на Ң.\nПо таблице нужна Б-серия.\nФорма мягкого ряда → БЕ.\nсен жүз қырық жетіншісің бе? — ты сто сорок седьмой / седьмая?.\n\n\nПример:\nолар тоғызыншы — они девятые.\nГотовая форма заканчивается на Ы.\nЭто «остальные» → М.\nТвёрдый ряд → МА.\nолар тоғызыншы ма? — они девятые?.",
+      "rule_ids": [
+        "v2:2-3:ordq"
+      ]
+    },
+    {
+      "id": "theory:2-3:bye",
+      "title": "Слова и готовые прощания",
+      "body": "16. Слова 2–3 из источника\n\n\nкөрші — сосед / соседка;\nәріптес — коллега;\nжау — враг;\nқонақ — гость;\nтуыс — родственник / родственница;\nмаман — специалист;\nтаныс — знакомый / знакомая;\nқазақ — казах / казашка;\nорыс — русский / русская;\nсеміз — полный / полная.\n\n\nВ исходных упражнениях также повторяются слова прошлых уроков. При каждом появлении перевод всё равно показывается рядом.\n\n17. Прощания: короткое повторение, не новая грамматика\n\n\nсау бол — до свидания, одному человеку неформально.\nсау болыңдар — до свидания, нескольким людям неформально.\nсау болыңыз — до свидания, одному человеку уважительно.\nсау болыңыздар — до свидания, нескольким людям уважительно.\n\n\nВ 2–3 это только повторение готовых форм. Их внутренняя глагольная морфология не становится новой обязательной темой.",
+      "rule_ids": [
+        "v2:2-3:bye"
+      ]
+    },
+    {
+      "id": "theory:2-3:wrap",
+      "title": "Ошибки, границы и итог раздела 2",
+      "body": "18. Типичные ошибки 2–3\n\n\nОшибка 1\nол маманмын — он / она специалист.\nОшибка: у ол — он / она личного окончания нет.\nПравильно:\nол маман — он / она специалист.\n\n\nОшибка 2\nолар семіздер — они полные.\nДля учебной модели прилагательное с олар — они обычно остаётся без множественного показателя.\nПравильно:\nолар семіз — они полные.\n\n\nОшибка 3\nол қонақ ба? — он / она гость?.\nПоследний звук Қ — глухой, поэтому нужна П-серия.\nПравильно:\nол қонақ па? — он / она гость?.\n\n\nОшибка 4\nол маман емес ме? — он / она не специалист?.\nПоследнее слово емес — не является заканчивается на С, поэтому нужна П-серия.\nПравильно:\nол маман емес пе? — он / она не специалист?.\n\n\nОшибка 5\nжиырманшы — двадцатый / двадцатая.\nВ исходном курсе нужно запомнить:\nжиырмасыншы — двадцатый / двадцатая.\n\n\nОшибка 6\nқырықыншы — сороковой / сороковая.\nВ исходном курсе:\nқырқыншы — сороковой / сороковая.\n\n\nОшибка 7\nекінші жүзінші отызыншы бесінші — двести тридцать пятый / пятая.\nПоказатель порядка не ставится на каждое слово.\nПравильно:\nекі жүз отыз бесінші — двести тридцать пятый / пятая.\n\n19. Что в 2–3 сознательно ограничено\n\n\nНюансы множественного сказуемого с олар — они в реальном языке шире начального курса. В обязательной практике действует правило источника: не ставить множественный показатель, если задание отдельно этого не требует.\n\n\nПорядковые числительные здесь изучаются в пределах исходной методички: образование, две отдельно запоминаемые формы, составные числа и добавление уже знакомых личных окончаний.\n\n\nНовые типы глагольных окончаний в формах прощания не изучаются.\n\n20. Итоговая карта раздела 2\n\n\nЛичные формы:\nмен — я;\nбіз — мы;\nсен — ты;\nсендер — вы, несколько неформально;\nсіз — Вы, один уважительно;\nсіздер — вы, несколько уважительно;\nол — он / она — без личного окончания;\nолар — они — без личного окончания.\n\n\nОтрицание:\nсмысловая часть + емес — не является / не такой + личное окончание там, где оно нужно по лицу.\n\n\nВопрос:\nсобери готовую форму → посмотри на последний звук последнего слова → П/Б/М → А/Е.\n\n\nПорядковое:\nсобери обычное число → посмотри на последнее слово → добавь показатель порядка → при необходимости добавь личное окончание → при необходимости вопросительную частицу.\n\n21. Критерий завершения 2–3\n\n\nУрок освоен, если ученик без готового ответа:\n— строит ол — он / она и олар — они без личного окончания;\n— понимает учебную политику множественного с олар — они;\n— строит отрицание третьего лица;\n— выбирает па/пе, ба/бе или ма/ме по последнему звуку готовой формы;\n— строит вопрос после утвердительной и отрицательной формы;\n— строит порядковые после согласной и гласной;\n— помнит жиырмасыншы — двадцатый / двадцатая и қырқыншы — сороковой / сороковая;\n— ставит показатель порядка только на последнее слово составного числа;\n— добавляет знакомое личное окончание после готового порядкового;\n— строит вопрос с порядковой формой;\n— исправляет разные типы ошибок;\n— выполняет смешанный RU→KK без вариантов ответа.\n\n22. Внешнее закрепление после 2–3\n\n\nBatylBol — «Личные окончания — полностью»:\nhttps://batylbol.kz/test/Lichnye.html\n\n\nBatylBol — «Вопросительные частицы»:\nhttps://batylbol.kz/test/VoprositelnyeChastitsy.html\n\n\nВ исходной домашней работе именно эти два тренажёра обязательны после 2–3.\n\n\nОтдельного подтверждённого BatylBol именно на порядковые числительные в исходной домашней работе нет.\n\n23. Источниковая граница\n\n\nИз исходной методички сохранено:\n— порядковые -ыншы/-інші, -ншы/-нші;\n— жиырмасыншы — двадцатый / двадцатая;\n— қырқыншы — сороковой / сороковая;\n— показатель порядка только на последнем слове составного числа;\n— личные окончания после порядковых;\n— ол — он / она и олар — они без личного окончания;\n— нюансы множественного с олар — они;\n— емес — не является / не такой в третьем лице;\n— полная таблица па/пе, ба/бе, ма/ме;\n— готовые формы прощания;\n— словарь;\n— два BatylBol-тренажёра.\n\n\nПедагогически переработано:\n— порядок блоков изменён: сначала закрываем систему лиц через ол/олар, затем полную систему вопроса, затем порядковые;\n— добавлен единый алгоритм «готовая последняя форма → последний звук → вопросительная частица»;\n— нюанс множественного с олар оформлен как учебная политика, а не абсолютный запрет;\n— порядковые отделены в самостоятельный подмодуль;\n— все казахские learner-visible формы сопровождаются русским переводом курсивом;\n— противоречия и ошибки исходных ответов не переносятся молча и фиксируются отдельно в QA.",
+      "rule_ids": [
+        "v2:2-3:wrap"
+      ]
+    }
+  ],
+  "references": [
+    {
+      "id": "ref-base",
+      "title": "Как собирать форму",
+      "body": "1. REF_BASE — КАК СОБИРАТЬ ФОРМУ\n\n\nQUICK\n\n\nШаг 1. Определи смысл.\nКто говорит? Что нужно построить: утверждение, отрицание или вопрос?\n\n\nШаг 2. Найди основу или текущую форму.\nСледующий элемент добавляется к конкретному последнему слову, а не «ко всему предложению».\n\n\nШаг 3. Определи ряд.\nТвёрдый ряд выбирает Ы/А.\nМягкий ряд выбирает І/Е.\n\n\nШаг 4. Если правило требует — посмотри последний звук.\nОн может выбирать П, Б или М.\n\n\nШаг 5. Добавь нужный элемент.\nСначала личное окончание.\nПотом, если нужно, отрицание/вопрос по правилам текущего урока.\n\n\nГлавная мысль:\nряд и последний звук — две разные проверки.\n\n\nКонтрастный пример:\nстудент — студент → мягкий ряд → І.\nПоследний звук Т → П.\nстудентпін — я студент.\n\n\nқыз — девушка → твёрдый ряд → Ы.\nПоследний звук З → Б.\nқызбын — я девушка.\n\n\nFULL\n\n\nОснова — это слово без нового окончания, которое мы сейчас хотим добавить.\n\n\nТекущая форма — это последнее слово/форма, к которой сейчас присоединяется следующий элемент.\n\n\nПример с отрицанием:\nдәрігер — врач.\nЧтобы сказать «я не врач», добавляем емес — не является.\nТеперь личное окончание относится уже к емес — не является:\nдәрігер емеспін — я не врач.\n\n\nПоэтому всегда спрашивай:\n«К какому слову я сейчас добавляю следующий кусок?»",
+      "rule_ids": [],
+      "unlock_rule_ids": [
+        "v2:2-3:recall",
+        "v2:2-3:qstem"
+      ]
+    },
+    {
+      "id": "ref-person",
+      "title": "Кто говорит и какое окончание",
+      "body": "4. REF_PERSON — ВЕРСИЯ 2–3\n\n\nПолная карта:\n\n\nмен — я → личное окончание по таблице мен.\nбіз — мы → личное окончание по таблице біз.\nсен — ты → -сың/-сің.\nсендер — вы, несколько неформально → -сыңдар/-сіңдер.\nсіз — Вы, один уважительно → -сыз/-сіз.\nсіздер — вы, несколько уважительно → -сыздар/-сіздер.\nол — он / она → ∅, личного окончания нет.\nолар — они → ∅, личного окончания нет.\n\n\nОдин пример на слове көрші — сосед / соседка:\n\n\nмен көршімін — я сосед / соседка.\nбіз көршіміз — мы соседи.\nсен көршісің — ты сосед / соседка.\nсендер көршісіңдер — вы соседи, неформально.\nсіз көршісіз — Вы сосед / соседка, уважительно.\nсіздер көршісіздер — вы соседи, уважительно.\nол көрші — он / она сосед / соседка.\nолар көрші — они соседи.",
+      "rule_ids": [
+        "v2:2-3:ol",
+        "v2:2-3:map",
+        "v2:2-3:recall"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-3:ol",
+        "v2:2-3:olar",
+        "v2:2-3:map",
+        "v2:2-3:recall"
+      ]
+    },
+    {
+      "id": "ref-neg",
+      "title": "Отрицание",
+      "body": "8. REF_NEG — ВЕРСИЯ 2–3\n\n\nДля ол — он / она и олар — они личного окончания нет.\n\n\nол маман емес — он / она не специалист.\nолар жомарт емес — они не щедрые.\n\n\nНе добавляй множественное окончание к емес — не является.",
+      "rule_ids": [
+        "v2:2-3:neg"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-3:neg"
+      ]
+    },
+    {
+      "id": "ref-question",
+      "title": "Вопрос",
+      "body": "11. REF_QUESTION — ВЕРСИЯ 2–3\n\n\nПолная таблица:\n\n\nПоследний звук готового последнего слова | частица\n\n\nГлухие К, Қ, П, С, Т, Ф, Х, Һ, Ц, Ш, Щ; а также конечные Б, В, Г, Д в схеме курса | па/пе\nМ, Н, Ң, Ж, З | ба/бе\nВсе остальные | ма/ме\n\n\nЗатем выбери гласную:\nтвёрдый ряд → А.\nмягкий ряд → Е.\n\n\nАлгоритм:\n1. Собери утверждение.\n2. Если нужно — сделай отрицание.\n3. Найди последнее слово перед вопросительной частицей.\n4. Посмотри его последний звук.\n5. Выбери П/Б/М.\n6. Выбери А/Е.\n7. Напиши частицу отдельно.\n\n\nКонтраст:\nол қонақ па? — он / она гость?.\nол семіз бе? — он / она полный / полная?.\nол жүргізуші ме? — он / она водитель?.\n\n\nОтрицание:\nол маман емес пе? — он / она не специалист?.\n\n\nПочему пе?\nПотому что последнее слово емес — не является заканчивается на С.",
+      "rule_ids": [
+        "v2:2-3:q",
+        "v2:2-3:qstem"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-3:q",
+        "v2:2-3:qstem",
+        "v2:2-3:ordq"
+      ]
+    },
+    {
+      "id": "ref-olar",
+      "title": "Олар и множественное число",
+      "body": "12. REF_OLAR_PLURAL — ОЛАР И МНОЖЕСТВЕННОЕ\n\n\nолар — они не получает личного окончания.\n\n\nВ базовой практике:\nолар есепші — они бухгалтеры.\nолар семіз — они полные.\n\n\nЕсли задание специально требует показатель множественного:\nолар есепшілер — они бухгалтеры.\n\n\nСмысл может меняться:\nолар сұлу — они красивые.\nолар сұлулар — они красавицы.\n\n\nВ отрицании:\nолар дәрігер емес — они не врачи.\n\n\nЕсли множественное специально требуется на существительном:\nолар дәрігерлер емес — они не врачи.\n\n\nНе ставь множественное окончание на емес — не является.",
+      "rule_ids": [
+        "v2:2-3:olar"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-3:olar"
+      ]
+    },
+    {
+      "id": "ref-ordinal",
+      "title": "Порядковые числа",
+      "body": "13. REF_ORDINAL — ПОРЯДКОВЫЕ ЧИСЛИТЕЛЬНЫЕ\n\n\nСмысл:\nпорядковое отвечает «который по счёту?»\n\n\nбір — один → бірінші — первый / первая.\n\n\nПосле согласной:\n-ыншы / -інші.\n\n\nПосле гласной:\n-ншы / -нші.\n\n\nАлгоритм:\n1. Собери обычное число.\n2. Посмотри на последнее слово числа.\n3. Оно заканчивается на согласную или гласную?\n4. Выбери группу суффикса.\n5. Выбери твёрдый/мягкий вариант.\n6. Добавь суффикс только к последнему слову.\n\n\nПримеры:\nон — десять → оныншы — десятый / десятая.\nекі — два → екінші — второй / вторая.\nалты — шесть → алтыншы — шестой / шестая.\n\n\nЗапомнить отдельно:\nжиырма — двадцать → жиырмасыншы — двадцатый / двадцатая.\nқырық — сорок → қырқыншы — сороковой / сороковая.\n\n\nСоставное число:\nекі жүз отыз бес — двести тридцать пять\n→ екі жүз отыз бесінші — двести тридцать пятый / пятая.\n\n\nЛичное окончание добавляется после готового порядкового:\nбіріншімін — я первый / первая.\nалтыншысың — ты шестой / шестая.\n\n\nЕсли нужен вопрос:\nсначала собери порядковое → добавь личное окончание → затем выбери вопросительную частицу по последнему звуку готовой формы.",
+      "rule_ids": [
+        "v2:2-3:ord",
+        "v2:2-3:suf",
+        "v2:2-3:ex",
+        "v2:2-3:comp",
+        "v2:2-3:ordp",
+        "v2:2-3:ordq"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-3:ord",
+        "v2:2-3:suf",
+        "v2:2-3:ex",
+        "v2:2-3:comp",
+        "v2:2-3:ordp",
+        "v2:2-3:ordq"
+      ]
+    },
+    {
+      "id": "ref-ready",
+      "title": "Готовые фразы",
+      "body": "14. REF_READY_PHRASES — ГОТОВЫЕ ФРАЗЫ\n\n\nПриветствия:\n\n\nсәлем — привет, неформально.\n\n\nсәлеметсіз бе — здравствуйте одному человеку уважительно.\n\n\nсәлеметсіздер ме — здравствуйте нескольким людям уважительно.\n\n\nассалаумағалейкум — здравствуйте; в материале курса — приветствие между мужчинами.\n\n\nуағалейкумассалам — ответ на предыдущее приветствие.\n\n\nПрощания:\n\n\nсау бол — до свидания одному человеку неформально.\n\n\nсау болыңдар — до свидания нескольким людям неформально.\n\n\nсау болыңыз — до свидания одному человеку уважительно.\n\n\nсау болыңыздар — до свидания нескольким людям уважительно.\n\n\nПримечание ученику:\nэти формы пока запоминаем целиком. Почему внутри них именно такие глагольные окончания, будет отдельной темой позже.",
+      "rule_ids": [
+        "v2:2-3:bye"
+      ],
+      "unlock_rule_ids": [
+        "v2:2-3:bye"
+      ]
+    }
+  ],
+  "practice_policy": {
+    "stages": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8"
+    ],
+    "no_answer_before_attempt": true,
+    "translation_every_occurrence": true,
+    "repair_min_intervening": 3,
+    "repair_preferred_intervening": 4,
+    "final_reference_default": "closed",
+    "notes": [
+      "Ошибка возвращается позже на другом примере.",
+      "S3–S8 не показывают готовый ответ до первой попытки.",
+      "Справочник в финальной проверке считается assisted evidence."
+    ]
+  }
 }
