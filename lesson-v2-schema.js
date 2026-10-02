@@ -145,6 +145,36 @@
    if(!obj(c))fail('correction object');
    return {id:id(c.id,'correction.id'),source_ref:id(c.source_ref,'correction.source_ref'),source_item_id:str(c.source_item_id,'correction.source_item_id',160),original:str(c.original,'correction.original',1200),corrected:str(c.corrected,'correction.corrected',1200),reason:str(c.reason,'correction.reason',3000),status:c.status==='reviewed'?'reviewed':'draft',qa_fixture_id:id(c.qa_fixture_id,'correction.qa_fixture_id')};
  }
+ function canonicalCore(c){
+   if(!obj(c))fail('canonical_core object');
+   return {
+     id:id(c.id,'canonical_core.id'),
+     title:str(c.title,'canonical_core.title',300),
+     body:str(c.body,'canonical_core.body',50000),
+     rule_ids:strings(c.rule_ids||[],'canonical_core.rule_ids',0,40).map(x=>id(x,'rule_id')),
+     source_refs:strings(c.source_refs||[],'canonical_core.source_refs',0,30).map(x=>id(x,'source_ref'))
+   };
+ }
+ function reference(r){
+   if(!obj(r))fail('reference object');
+   return {
+     id:id(r.id,'reference.id'),
+     title:str(r.title,'reference.title',300),
+     body:str(r.body,'reference.body',50000),
+     rule_ids:strings(r.rule_ids||[],'reference.rule_ids',1,60).map(x=>id(x,'rule_id')),
+     unlock_rule_ids:strings(r.unlock_rule_ids||r.rule_ids||[],'reference.unlock_rule_ids',0,60).map(x=>id(x,'rule_id')),
+     source_refs:strings(r.source_refs||[],'reference.source_refs',0,30).map(x=>id(x,'source_ref')),
+     core_anchor:r.core_anchor?str(r.core_anchor,'reference.core_anchor',200):''
+   };
+ }
+ function practicePolicy(v){
+   if(v==null)return null;
+   if(!obj(v))fail('practice_policy должен быть object');
+   let raw;
+   try{raw=JSON.stringify(v);}catch(_){fail('practice_policy JSON');}
+   if(raw.length>50000)fail('practice_policy слишком большой');
+   return JSON.parse(raw);
+ }
  function idMap(v,label){
    if(v==null)return {};
    if(!obj(v))fail(label+' должен быть object');
@@ -223,6 +253,9 @@
      references:list(raw.references||[],'references',0,50).map(reference),
      practice_policy:practicePolicy(raw.practice_policy),
      corrections:list(raw.corrections||[],'corrections',0,100).map(correction),
+     canonical_core:list(raw.canonical_core||[],'canonical_core',0,120).map(canonicalCore),
+     references:list(raw.references||[],'references',0,80).map(reference),
+     practice_policy:practicePolicy(raw.practice_policy),
      migrations:list(raw.migrations||[],'migrations',0,50).map(m=>migration(m,raw.content_revision))
    };
    const sourceIds=new Set(out.sources.map(s=>s.id)),ruleIds=new Set(out.rules.map(r=>r.id));
@@ -241,9 +274,18 @@
      for(const rid of q.ruleIds||[])if(!ruleIds.has(rid))fail('exercise rule_id не найден: '+rid);
    }
    for(const c of out.corrections)if(!sourceIds.has(c.source_ref))fail('correction source_ref не найден: '+c.source_ref);
+   for(const c of out.canonical_core){
+     for(const rid of c.rule_ids)if(!ruleIds.has(rid))fail('canonical_core rule_id не найден: '+rid);
+     for(const ref of c.source_refs)if(!sourceIds.has(ref))fail('canonical_core source_ref не найден: '+ref);
+   }
+   for(const r of out.references){
+     for(const rid of r.rule_ids)if(!ruleIds.has(rid))fail('reference rule_id не найден: '+rid);
+     for(const rid of r.unlock_rule_ids)if(!ruleIds.has(rid))fail('reference unlock_rule_id не найден: '+rid);
+     for(const ref of r.source_refs)if(!sourceIds.has(ref))fail('reference source_ref не найден: '+ref);
+   }
    const ids=new Set();
    const take=(x,label)=>{if(ids.has(x))fail('duplicate id '+x+' ('+label+')');ids.add(x);};
-   out.rules.forEach(x=>take(x.id,'rule'));out.theory.forEach(x=>take(x.id,'theory'));out.vocabulary.forEach(x=>take(x.id,'vocabulary'));out.original_exercises.forEach(x=>take(x.id,'exercise'));out.practice_generators.forEach(x=>take(x.id,'generator'));out.corrections.forEach(x=>take(x.id,'correction'));
+   out.rules.forEach(x=>take(x.id,'rule'));out.theory.forEach(x=>take(x.id,'theory'));out.vocabulary.forEach(x=>take(x.id,'vocabulary'));out.original_exercises.forEach(x=>take(x.id,'exercise'));out.practice_generators.forEach(x=>take(x.id,'generator'));out.corrections.forEach(x=>take(x.id,'correction'));out.canonical_core.forEach(x=>take(x.id,'canonical_core'));out.references.forEach(x=>take(x.id,'reference'));
    out.generated_questions=list(raw.generated_questions||[],'generated_questions',0,5000).map(q=>exercise(q,lessonId));
    out.generated_questions.forEach(x=>{
      take(x.id,'generated question');
