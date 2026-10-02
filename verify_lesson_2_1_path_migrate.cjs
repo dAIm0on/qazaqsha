@@ -120,7 +120,7 @@ const legacyDone=simulateLoad({phase:'done',chapterId:null,updatedAt:1}, {
   '2-1:2-1-siz':true,'2-1:2-1-emes':true,'2-1:2-1-ba':true,'2-1:2-1-siz2':true,'2-1:2-1-checkpoint':true
 });
 assert.equal(legacyDone.phase,'beat');
-assert.equal(legacyDone.chapterId,'v2-theory-2-1-glue');
+assert.equal(legacyDone.chapterId,'v2-theory-2-1-clause');
 assert.equal(legacyDone.pathNeedsReplay,true);
 assert.deepEqual(legacyDone.completed,[]);
 ok('legacy done resets to first v2 theory chapter');
@@ -239,7 +239,7 @@ const prematureDone=simulateLoadResilient({phase:'done',chapterId:null,contentRe
   '2-1:2-1-siz':true,'2-1:2-1-emes':true,'2-1:2-1-ba':true,'2-1:2-1-siz2':true,'2-1:2-1-checkpoint':true
 });
 assert.equal(prematureDone.phase,'beat');
-assert.equal(prematureDone.chapterId,'v2-theory-2-1-glue');
+assert.equal(prematureDone.chapterId,'v2-theory-2-1-clause');
 assert.equal(prematureDone.pathNeedsReplay,true);
 assert.deepEqual(prematureDone.completed,[]);
 ok('premature stamp + legacy done still resets to first v2 theory');
