@@ -14862,6 +14862,15 @@ window.LESSON_V2_COMPILED = [
         "stage_ids": {},
         "vocab_ids": {},
         "drop_question_ids": []
+      },
+      {
+        "from_revision": "2-1.r1",
+        "to_revision": "2-1.r2",
+        "question_ids": {},
+        "chapter_ids": {},
+        "stage_ids": {},
+        "vocab_ids": {},
+        "drop_question_ids": []
       }
     ],
     "generated_questions": [],
@@ -19659,7 +19668,17 @@ window.LESSON_V2_COMPILED = [
         "qa_fixture_id": "fixture:2-2:bad-key:bolynyzdar"
       }
     ],
-    "migrations": [],
+    "migrations": [
+      {
+        "from_revision": "2-2.r1",
+        "to_revision": "2-2.r2",
+        "question_ids": {},
+        "chapter_ids": {},
+        "stage_ids": {},
+        "vocab_ids": {},
+        "drop_question_ids": []
+      }
+    ],
     "generated_questions": [],
     "stages": [
       {
@@ -25747,7 +25766,17 @@ window.LESSON_V2_COMPILED = [
         "qa_fixture_id": "fixture:2-3:bad-key:bolynyzdar"
       }
     ],
-    "migrations": [],
+    "migrations": [
+      {
+        "from_revision": "2-3.r1",
+        "to_revision": "2-3.r2",
+        "question_ids": {},
+        "chapter_ids": {},
+        "stage_ids": {},
+        "vocab_ids": {},
+        "drop_question_ids": []
+      }
+    ],
     "generated_questions": [],
     "stages": [
       {
