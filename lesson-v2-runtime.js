@@ -38,6 +38,17 @@
  }
  function stableSlug(v){return String(v||'').replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,100);}
  function pathLesson(p){
+   if(Array.isArray(p.canonical_core)&&p.canonical_core.length){
+     const chapters=p.canonical_core.map((c,i)=>({
+       id:'v2-core-'+stableSlug(c.id||('section-'+(i+1))),
+       title:c.title||('Шаг '+(i+1)),
+       rule_ids:(c.rule_ids||[]).slice(),
+       fullExplanation:c.body||'',
+       source_refs:[],
+       beats:[{k:'core',t:c.title||('Шаг '+(i+1)),b:c.body||''}]
+     }));
+     return {id:p.lesson_id,title:p.name||p.title,chapters};
+   }
    const chapters=(p.theory||[]).map((t,i)=>{
      const beats=[
        {k:'goal',t:t.meaning},
@@ -201,7 +212,7 @@
    for(const r of raw.rules||[])if(r&&r.id&&!catalog.rules.some(x=>x.id===r.id))catalog.rules.push({id:r.id,title:r.title,lesson_first_seen:id});
    if(!catalog.lessons.some(x=>x.id===id))catalog.lessons.push({id,title:raw.title,active:true,status:raw.status,depends_on:((raw.prerequisites&&raw.prerequisites.lessons)||[]).slice(),rules:(raw.rules||[]).map(r=>r.id),sources:(raw.sources||[]).filter(s=>s&&s.url).map(s=>s.url)});
    // Light grammar shell so path hub lists chapters without materializing exercise banks.
-   const light={lesson_id:id,title:raw.title,name:raw.name||raw.title,theory:raw.theory||[],rules:raw.rules||[]};
+   const light={lesson_id:id,title:raw.title,name:raw.name||raw.title,theory:raw.theory||[],canonical_core:raw.canonical_core||[],rules:raw.rules||[]};
    const gLesson=pathLesson(light);const at=chapters.LESSONS.findIndex(x=>x.id===id);if(at<0)chapters.LESSONS.push(gLesson);else chapters.LESSONS[at]=gLesson;
    shells.set(id,{lesson_id:id,content_revision:raw.content_revision,status:raw.status});return shells.get(id);
  }
@@ -223,7 +234,7 @@
    const existing=new Set((learning.lessons||[]).map(x=>x.id));for(const l of [...learningTracks(p,course.questions),...bankTracks(p)])if(!existing.has(l.id)){learning.lessons.push(l);existing.add(l.id);}
    if(root.CourseProgress&&root.CourseProgress.registerStages)root.CourseProgress.registerStages(p.lesson_id,stagePlans(p));
    // Keep metadata only in installed map; questions live in COURSE, theory in GRAMMAR_CHAPTERS.
-   const kept={lesson_id:p.lesson_id,content_revision:p.content_revision,status:p.status,title:p.title,name:p.name||p.title,release:p.release||null,homework:p.homework,migrations:p.migrations||[],sources:p.sources,rules:p.rules,stages:p.stages,vocab_bindings:vocabBindings,practice_bank:p.practice_bank?{prefix:p.practice_bank.prefix,counts:p.practice_bank.counts,homework_intersection:p.practice_bank.homework_intersection,ids:p.practice_bank.items.map(q=>q.id)}:null,vocabulary:(p.vocabulary||[]).map(v=>({id:v.id,lemma:v.lemma,forms:v.forms.slice()}))};
+   const kept={lesson_id:p.lesson_id,content_revision:p.content_revision,status:p.status,title:p.title,name:p.name||p.title,release:p.release||null,homework:p.homework,migrations:p.migrations||[],sources:p.sources,rules:p.rules,stages:p.stages,vocab_bindings:vocabBindings,practice_bank:p.practice_bank?{prefix:p.practice_bank.prefix,counts:p.practice_bank.counts,homework_intersection:p.practice_bank.homework_intersection,ids:p.practice_bank.items.map(q=>q.id)}:null,vocabulary:(p.vocabulary||[]).map(v=>({id:v.id,lemma:v.lemma,forms:v.forms.slice()})),canonical_core:p.canonical_core||[],references:p.references||[],practice_policy:p.practice_policy||null};
    installed.set(p.lesson_id,kept);
    releaseHeavy(raw);
    return kept;
@@ -283,6 +294,17 @@
    const raw=(root.LESSON_V2_COMPILED||[]).find(x=>x&&x.lesson_id===id);
    return homeworkMeta(raw);
  }
+ function referenceForRule(lessonId,ruleId){
+   const p=installed.get(lessonId);
+   if(!p||!ruleId)return null;
+   const rows=p.references||[];
+   return rows.find(r=>(r.rule_ids||[]).includes(ruleId))||null;
+ }
+ function referenceById(lessonId,referenceId){
+   const p=installed.get(lessonId);
+   if(!p||!referenceId)return null;
+   return (p.references||[]).find(r=>r.id===referenceId)||null;
+ }
  function practiceForRule(lessonId,ruleId,limit=12){
    const p=installed.get(lessonId);
    if(!p||!root.COURSE||!ruleId)return [];
@@ -326,7 +348,7 @@
    }
    return picked;
  }
- const api={installAll,installOne,installShells,ensure,byId,isV2,homework,homeworkWordQuestionIds,homeworkWordCoverage,practiceForRule,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
+ const api={installAll,installOne,installShells,ensure,byId,isV2,homework,homeworkWordQuestionIds,homeworkWordCoverage,practiceForRule,referenceForRule,referenceById,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
  root.LessonV2Runtime=api;
  // P0 Chrome Error 9: do not materialize every lesson pack (4-1 has 345 generated Qs) at boot.
  // Shells keep path/learn navigation; ensure(id) hydrates exercises on first open.
