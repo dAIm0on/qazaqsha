@@ -2293,6 +2293,18 @@
      root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">КАК ПРИМЕРНО ПОЧУВСТВОВАТЬ</p><h2 lang="kk">${seeText(beat.letter)}</h2><p><strong>Русский якорь:</strong> ${seeText(beat.anchor)}</p><p>${seeText(beat.art)}</p><p lang="kk">${seeText(beat.ex)}</p><p class="small">${seeText(beat.warn)}</p>${nav('path-next','Дальше')}</div>`;
      bindNav('path-next',nextBeat);return;
    }
+   if(beat.k==='core'){
+     const blocks=String(beat.b||'').split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
+     const html=blocks.map(block=>{
+       const lines=block.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+       const tableish=lines.length>1&&lines.some(x=>x.includes('|'));
+       if(tableish)return '<pre class="path-core-table">'+esc(lines.join('\n'))+'</pre>';
+       if(lines.length>1)return '<p>'+lines.map(x=>seeText(x)).join('<br>')+'</p>';
+       return '<p>'+seeText(block)+'</p>';
+     }).join('');
+     root.innerHTML=`<div class="panel path-paper path-core">${head}<h2>${seeText(beat.t)}</h2><div class="path-core-body">${html}</div>${nav('path-next','Дальше')}</div>`;
+     bindNav('path-next',nextBeat);return;
+   }
    if(beat.k==='why'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>${seeText(beat.t)}</h2><p>${seeText(beat.b)}</p>${nav('path-next','Дальше')}</div>`;
      bindNav('path-next',nextBeat);return;
@@ -2383,6 +2395,19 @@
      };
      $('#path-rule').onclick=()=>{
        pathPeek=true;
+       const ruleId=(ch.rule_ids||[])[0]||'';
+       const ref=window.LessonV2Runtime&&window.LessonV2Runtime.referenceForRule?window.LessonV2Runtime.referenceForRule(les.id,ruleId):null;
+       if(ref&&ref.body){
+         const blocks=String(ref.body).split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
+         const html=blocks.map(block=>{
+           const lines=block.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+           const tableish=lines.length>1&&lines.some(x=>x.includes('|'));
+           if(tableish)return '<pre class="path-reference-table">'+esc(lines.join('\n'))+'</pre>';
+           return '<p>'+lines.map(x=>seeText(x)).join('<br>')+'</p>';
+         }).join('');
+         showPathFb('hinted','<div class="path-reference"><h3>'+seeText(ref.title||'Правило')+'</h3>'+html+'</div>');
+         return;
+       }
        const local=hintLine();
        showPathFb('hinted','<p>'+seeText(local)+'</p>');
      };
