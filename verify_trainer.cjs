@@ -1665,7 +1665,7 @@ assert.equal(dueQ.filter(x=>x==='due').length,1);
 assert.equal(core.pauseReady({recall_review_successes:1,last_successful_review:1,fsrs:{scheduled_days:21},next_review:100},100),true);
 assert.equal(core.pauseReady(recNew,1),false);
 const appLearn=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
-assert.ok(/if\(hinted\|\|!result\.correct\)sessionUnaided\[q\.id\]=0/.test(appLearn));
+assert.ok(/if\(hinted\|\|rulePeeked\|\|!result\.correct\)sessionUnaided\[q\.id\]=0/.test(appLearn));
 assert.ok(/sessionUnaided\[q\.id\]=\(sessionUnaided\[q\.id\]\|\|0\)\+1/.test(appLearn));
 ok('P0 A: learning needs 3 unaided blinds; due leaves after 1 Good; global consolidate stays 2');
 
