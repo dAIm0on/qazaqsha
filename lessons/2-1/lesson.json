@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "lesson_id": "2-1",
-  "content_revision": "2-1.r1",
+  "content_revision": "2-1.r2",
   "title": "Урок 2–1 · Мен, сен, сіз; емес; ба, бе",
   "label": "2–1",
   "name": "Мен, сен, сіз; емес; ба, бе",
@@ -11,7 +11,7 @@
     "preview_head": "",
     "preview_url": "",
     "approved_at": "",
-    "note": "2026-10-01 teaching rework 2-1→2-3; pending preview QA. No merge/deploy."
+    "note": "2026-10-02 LESSONS FIX step 9; canonical CORE/practice/references implemented; pending preview QA."
   },
   "prerequisites": {
     "lessons": [
@@ -43,7 +43,7 @@
   "rules": [
     {
       "id": "v2:2-1:glue",
-      "title": "Три формы этого урока"
+      "title": "Основа и порядок сборки формы"
     },
     {
       "id": "v2:2-1:pron",
@@ -86,38 +86,41 @@
     {
       "id": "theory:2-1:glue",
       "rule_id": "v2:2-1:glue",
-      "title": "Три формы этого урока",
-      "meaning": "В этом уроке нужно научиться строить три короткие формы: «я/ты/вы — кто-то», «я/ты/вы не кто-то» и вопрос «ты/вы кто-то?». Каждая следующая форма использует уже знакомую предыдущую.",
-      "fullExplanation": "Утверждение получает личное окончание: Мен дәрігермін. В отрицании появляется отдельное слово емес, и личное окончание ставится уже на него: Мен дәрігер емеспін. В вопросе в конце добавляется вопросительная частица: Сен дәрігерсің бе? В этом уроке для вопросов используются только ба/бе; полный выбор частиц будет позже. Личное окончание не должно одновременно оставаться и на основном слове, и на емес.",
-      "shortHint": "Утверждение — окончание на слове. Отрицание — окончание на емес. Вопрос — ба/бе в конце.",
+      "title": "С чего начинать: смысл → основа → форма",
+      "meaning": "Перед любым окончанием сначала пойми смысл фразы, затем найди основу слова и только потом выбирай форму. Так не нужно угадывать окончание по примеру.",
+      "fullExplanation": "Основа — слово без нового окончания, которое мы сейчас хотим добавить. Сначала реши, кто говорит: мен — я, сен — ты, сіз — Вы одному человеку уважительно. Затем найди основу: например, дәрігер — врач. После этого выбери личное окончание. Для мен нужно две проверки: твёрдый/мягкий ряд выбирает Ы/І, а последний звук основы выбирает П/Б/М. Для сен и сіз достаточно выбрать твёрдый или мягкий ряд. В отрицании сначала ставится емес — не является, и личное окончание относится уже к емес. В вопросе сначала полностью собирается форма, затем отдельно добавляется ба/бе. Порядок всегда один: смысл → основа → правило → готовая форма.",
+      "shortHint": "Сначала смысл и основа. Потом ряд, последний звук и окончание.",
       "decisionSteps": [
-        "Сначала выбери: мен, сен или сіз.",
-        "Для утверждения поставь нужное личное окончание на главное слово.",
-        "Для отрицания оставь главное слово без личного окончания, добавь емес и поставь окончание на емес.",
-        "Для вопроса добавь в конце ба или бе."
+        "Определи, кто говорит: я, ты или Вы одному человеку уважительно.",
+        "Найди основу — слово без нового окончания.",
+        "Определи твёрдый или мягкий ряд.",
+        "Если это мен, посмотри последний звук основы и выбери П/Б/М.",
+        "Добавь личное окончание.",
+        "Если нужно отрицание, добавь емес и перенеси личное окончание на него.",
+        "Если нужен вопрос, сначала собери форму целиком и только потом добавь ба/бе."
       ],
       "examples": [
         {
-          "kazakh": "Мен дәрігермін",
+          "kazakh": "дәрігермін",
           "translation": "я врач",
-          "why": "мен + дәрігер, лицо на слове"
+          "why": "дәрігер — основа; мягкий ряд; для мен после Р нужна М-серия → -мін."
         },
         {
-          "kazakh": "Мен дәрігер емеспін",
+          "kazakh": "доспын",
+          "translation": "я друг",
+          "why": "дос — основа; С глухая → П-серия → -пын."
+        },
+        {
+          "kazakh": "дәрігер емеспін",
           "translation": "я не врач",
-          "why": "окончание на емес"
-        },
-        {
-          "kazakh": "Сен дәрігерсің бе?",
-          "translation": "ты врач?",
-          "why": "вопрос ба/бе этого урока"
+          "why": "в отрицании личное окончание стоит на емес."
         }
       ],
       "contrastExamples": [
         {
           "bad": "Мен дәрігермін емеспін",
           "good": "Мен дәрігер емеспін",
-          "why": "Не оставляй лицо и на основе, и на емес."
+          "why": "Личное окончание ставится один раз: в отрицании оно относится к емес."
         }
       ],
       "limitations": [
@@ -160,9 +163,9 @@
         }
       ],
       "commonConfusions": [
-        "двойное окончание",
-        "вопрос без частицы",
-        "попытка сразу использовать формы следующих уроков."
+        "пытаться выбирать окончание без основы",
+        "смотреть только на последнюю букву и забывать ряд",
+        "оставлять личное окончание и на основном слове, и на емес"
       ]
     },
     {
@@ -309,7 +312,7 @@
         }
       ],
       "commonConfusions": [
-        "голое слово после мен",
+        "слово без личного окончания после мен",
         "перенос ударения на окончание."
       ]
     },
@@ -691,7 +694,7 @@
       "contrastExamples": [
         {
           "bad": "открыть па/пе сейчас",
-          "good": "ба/бе как кусок 2-1",
+          "good": "ба/бе как часть 2-1",
           "why": "Полная таблица не этого урока."
         }
       ],
@@ -1322,7 +1325,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-2",
@@ -1349,7 +1356,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-3",
@@ -1376,7 +1387,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-4",
@@ -1403,7 +1418,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-5",
@@ -1430,7 +1449,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-6",
@@ -1457,7 +1480,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-7",
@@ -1484,7 +1511,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-8",
@@ -1511,7 +1542,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-9",
@@ -1538,7 +1573,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-10",
@@ -1565,7 +1604,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-11",
@@ -1592,7 +1635,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-12",
@@ -1619,7 +1666,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-13",
@@ -1646,7 +1697,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-14",
@@ -1673,7 +1728,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-15",
@@ -1700,7 +1759,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-16",
@@ -1727,7 +1790,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-17",
@@ -1754,7 +1821,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-form-18",
@@ -1781,7 +1852,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-1-mugalim-siz",
@@ -1808,7 +1883,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-1-mugalim-men",
@@ -1835,7 +1914,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-1-oqushy-sen",
@@ -1862,7 +1945,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-1-oqushy-siz",
@@ -1889,7 +1976,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-1-zanger-sen",
@@ -1916,7 +2007,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-1-zanger-men",
@@ -1943,7 +2038,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-2-qyz-men",
@@ -1970,7 +2069,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-2-qyz-sen",
@@ -1997,7 +2100,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-2-student-siz",
@@ -2024,7 +2131,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-2-student-men",
@@ -2051,7 +2162,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-2-adam-siz",
@@ -2078,7 +2193,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fill-2-2-adam-sen",
@@ -2105,7 +2224,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:person",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-tr-1",
@@ -2132,7 +2255,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-tr-2",
@@ -2159,7 +2286,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-tr-3",
@@ -2186,7 +2317,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-tr-4",
@@ -2213,7 +2348,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-tr-5",
@@ -2240,7 +2379,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-tr-6",
@@ -2267,7 +2410,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-tr-7",
@@ -2294,7 +2441,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-tr-8",
@@ -2321,7 +2472,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-tr-9",
@@ -2348,7 +2503,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-tr-10",
@@ -2375,7 +2534,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-neg-1",
@@ -2407,7 +2570,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-neg-2",
@@ -2440,7 +2607,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-neg-3",
@@ -2472,7 +2643,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-neg-4",
@@ -2504,7 +2679,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-neg-5",
@@ -2537,7 +2716,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-neg-6",
@@ -2569,7 +2752,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-neg-7",
@@ -2601,7 +2788,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-neg-8",
@@ -2633,7 +2824,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-neg-9",
@@ -2665,7 +2860,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-neg-10",
@@ -2697,7 +2896,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-aff-1",
@@ -2729,7 +2932,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-aff-2",
@@ -2761,7 +2968,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-aff-3",
@@ -2794,7 +3005,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-aff-4",
@@ -2826,7 +3041,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-aff-5",
@@ -2858,7 +3077,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-aff-6",
@@ -2890,7 +3113,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-aff-7",
@@ -2922,7 +3149,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-aff-8",
@@ -2954,7 +3185,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-aff-9",
@@ -2986,7 +3221,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-aff-10",
@@ -3018,7 +3257,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-qa-1",
@@ -3051,7 +3294,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:question",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-qa-2",
@@ -3084,7 +3331,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:question",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-qa-3",
@@ -3117,7 +3368,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:question",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-qa-4",
@@ -3150,7 +3405,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:question",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-qa-5",
@@ -3183,7 +3442,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:question",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-qa-6",
@@ -3216,7 +3479,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:question",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-qa-7",
@@ -3249,7 +3516,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:question",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-qa-8",
@@ -3282,7 +3553,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:question",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-qa-9",
@@ -3315,7 +3590,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:question",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-qa-10",
@@ -3348,7 +3627,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:question",
+      "item_type": "practice",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fix-1",
@@ -3383,7 +3666,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "error_diagnosis",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fix-2",
@@ -3417,7 +3704,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "error_diagnosis",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fix-3",
@@ -3451,7 +3742,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "error_diagnosis",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fix-4",
@@ -3485,7 +3780,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "error_diagnosis",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fix-5",
@@ -3517,7 +3816,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:neg",
+      "item_type": "error_diagnosis",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fix-6",
@@ -3551,7 +3854,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "error_diagnosis",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fix-7",
@@ -3583,7 +3890,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "error_diagnosis",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fix-8",
@@ -3615,7 +3926,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "error_diagnosis",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fix-9",
@@ -3649,7 +3964,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "error_diagnosis",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "e21-fix-10",
@@ -3681,7 +4000,11 @@
       ],
       "source_refs": [
         "school-exercises"
-      ]
+      ],
+      "reference_id": "ref:2-1:base",
+      "item_type": "error_diagnosis",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-aqyldy-ru",
@@ -3702,7 +4025,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-aqyldy-kk",
@@ -3723,7 +4049,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zhomart-ru",
@@ -3744,7 +4073,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zhomart-kk",
@@ -3765,7 +4097,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-saran-ru",
@@ -3786,7 +4121,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-saran-kk",
@@ -3807,7 +4145,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-bai-ru",
@@ -3828,7 +4169,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-bai-kk",
@@ -3849,7 +4193,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-kedei-ru",
@@ -3870,7 +4217,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-kedei-kk",
@@ -3891,7 +4241,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zhas-ru",
@@ -3912,7 +4265,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zhas-kk",
@@ -3933,7 +4289,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zeinetker-ru",
@@ -3954,7 +4313,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zeinetker-kk",
@@ -3975,7 +4337,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-esepshi-ru",
@@ -3996,7 +4361,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-esepshi-kk",
@@ -4017,7 +4385,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zhumyssyz-ru",
@@ -4038,7 +4409,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zhumyssyz-kk",
@@ -4059,7 +4433,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zhumysshy-ru",
@@ -4080,7 +4457,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zhumysshy-kk",
@@ -4101,7 +4481,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-bastyq-ru",
@@ -4122,7 +4505,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-bastyq-kk",
@@ -4143,7 +4529,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zholserik-ru",
@@ -4164,7 +4553,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zholserik-kk",
@@ -4185,7 +4577,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-aqyn-ru",
@@ -4206,7 +4601,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-aqyn-kk",
@@ -4227,7 +4625,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-jazushy-ru",
@@ -4248,7 +4649,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-jazushy-kk",
@@ -4269,7 +4673,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zhurgizushi-ru",
@@ -4290,7 +4697,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-zhurgizushi-kk",
@@ -4311,7 +4721,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-kasipker-ru",
@@ -4332,7 +4745,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-kasipker-kk",
@@ -4353,7 +4769,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-oqyrman-ru",
@@ -4374,7 +4793,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-oqyrman-kk",
@@ -4395,7 +4817,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-aspaz-ru",
@@ -4416,7 +4841,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-aspaz-kk",
@@ -4437,7 +4865,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-salem-ru",
@@ -4458,7 +4889,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-salem-kk",
@@ -4479,7 +4913,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-salemetsiz-be-ru",
@@ -4500,7 +4937,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-salemetsiz-be-kk",
@@ -4521,7 +4961,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-salemetsizder-me-ru",
@@ -4542,7 +4985,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-salemetsizder-me-kk",
@@ -4563,7 +5009,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-assalaumagaleikum-ru",
@@ -4584,7 +5033,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-assalaumagaleikum-kk",
@@ -4605,7 +5057,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-uagaleikumassalam-ru",
@@ -4626,7 +5081,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     },
     {
       "id": "v2-2-1-vocab-uagaleikumassalam-kk",
@@ -4647,7 +5105,10 @@
       "source_item": "hw:2-1:source:3",
       "source_refs": [
         "school-homework"
-      ]
+      ],
+      "item_type": "full_form",
+      "recall_eligible": true,
+      "production_eligible": true
     }
   ],
   "practice_generators": [],
@@ -5202,6 +5663,152 @@
       "stage_ids": {},
       "vocab_ids": {},
       "drop_question_ids": []
+    },
+    {
+      "from_revision": "2-1.r1",
+      "to_revision": "2-1.r2",
+      "question_ids": {},
+      "chapter_ids": {},
+      "stage_ids": {},
+      "vocab_ids": {},
+      "drop_question_ids": []
+    }
+  ],
+  "references": [
+    {
+      "id": "ref:2-1:base",
+      "title": "Как собирать форму",
+      "rule_ids": [
+        "v2:2-1:glue",
+        "v2:2-1:clause",
+        "v2:2-1:checkpoint"
+      ],
+      "quick": "1. Определи смысл и лицо.\n2. Найди основу — слово без нового окончания.\n3. Выбери твёрдый/мягкий ряд.\n4. Если правило требует, посмотри последний звук.\n5. Добавь окончание.\n6. Отрицание и вопрос добавляй только после сборки основной формы.",
+      "full": "Главное: ряд и последний звук — две разные проверки. Ряд выбирает Ы/І или А/Е. Последний звук в формах мен выбирает П/Б/М. В отрицании следующим словом становится емес, поэтому личное окончание ставится уже на него.",
+      "rows": [],
+      "examples": [
+        {
+          "kazakh": "студентпін",
+          "translation": "я студент",
+          "why": "мягкий ряд + Т → П-серия."
+        },
+        {
+          "kazakh": "қызбын",
+          "translation": "я девушка",
+          "why": "твёрдый ряд + З → Б-серия."
+        },
+        {
+          "kazakh": "адаммын",
+          "translation": "я человек",
+          "why": "твёрдый ряд + М → М-серия."
+        }
+      ],
+      "core_anchor": "theory:2-1:glue"
+    },
+    {
+      "id": "ref:2-1:person",
+      "title": "Кто говорит и какое окончание",
+      "rule_ids": [
+        "v2:2-1:pron",
+        "v2:2-1:men",
+        "v2:2-1:sen",
+        "v2:2-1:siz",
+        "v2:2-1:siz-word"
+      ],
+      "quick": "МЕН: глухой или конечные Б/В/Г/Д → -пын/-пін; Ж/З → -бын/-бін; остальные → -мын/-мін.\nСЕН: -сың/-сің.\nСІЗ: -сыз/-сіз.",
+      "full": "Для мен сначала выбери твёрдый/мягкий ряд, затем П/Б/М по последнему звуку основы. Для сен и сіз П/Б/М не выбирается: нужен только вариант по ряду.",
+      "rows": [
+        {
+          "kazakh": "мен",
+          "translation": "я",
+          "note": "П/Б/М + Ы/І"
+        },
+        {
+          "kazakh": "сен",
+          "translation": "ты",
+          "note": "-сың/-сің"
+        },
+        {
+          "kazakh": "сіз",
+          "translation": "Вы одному человеку уважительно",
+          "note": "-сыз/-сіз"
+        }
+      ],
+      "examples": [
+        {
+          "kazakh": "доспын",
+          "translation": "я друг",
+          "why": "С глухая → П."
+        },
+        {
+          "kazakh": "қызбын",
+          "translation": "я девушка",
+          "why": "З → Б."
+        },
+        {
+          "kazakh": "дәрігермін",
+          "translation": "я врач",
+          "why": "Р → М; мягкий ряд → І."
+        }
+      ],
+      "core_anchor": "theory:2-1:men"
+    },
+    {
+      "id": "ref:2-1:neg",
+      "title": "Как сделать отрицание",
+      "rule_ids": [
+        "v2:2-1:emes"
+      ],
+      "quick": "Смысловое слово + емес + личное окончание.\nЛичное окончание ставится один раз — на емес.",
+      "full": "Сначала оставь основное слово без личного окончания. Затем добавь емес — «не является / не такой» и поставь на него окончание нужного лица.",
+      "rows": [
+        {
+          "kazakh": "емеспін",
+          "translation": "я не…",
+          "note": "мен"
+        },
+        {
+          "kazakh": "емессің",
+          "translation": "ты не…",
+          "note": "сен"
+        },
+        {
+          "kazakh": "емессіз",
+          "translation": "Вы не…",
+          "note": "сіз"
+        }
+      ],
+      "examples": [
+        {
+          "kazakh": "сен мұғалім емессің",
+          "translation": "ты не учитель",
+          "why": "личное окончание только на емес."
+        }
+      ],
+      "core_anchor": "theory:2-1:emes"
+    },
+    {
+      "id": "ref:2-1:question",
+      "title": "Как задать вопрос",
+      "rule_ids": [
+        "v2:2-1:ba"
+      ],
+      "quick": "В 2–1 используются ба/бе.\nСначала полностью собери утверждение или отрицание. Потом добавь частицу отдельно.\nТвёрдый ряд → ба. Мягкий ряд → бе.",
+      "full": "Полная таблица па/пе, ба/бе, ма/ме будет в 2–3. В 2–1 не нужно угадывать будущие варианты.",
+      "rows": [],
+      "examples": [
+        {
+          "kazakh": "сен оқушысың ба?",
+          "translation": "ты ученик?",
+          "why": "твёрдый ряд → ба."
+        },
+        {
+          "kazakh": "сіз заңгерсіз бе?",
+          "translation": "Вы юрист?",
+          "why": "мягкий ряд → бе."
+        }
+      ],
+      "core_anchor": "theory:2-1:ba"
     }
   ]
 }
