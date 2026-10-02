@@ -140,7 +140,7 @@
    const existing=new Set((learning.lessons||[]).map(x=>x.id));for(const l of learningTracks(p,course.questions))if(!existing.has(l.id)){learning.lessons.push(l);existing.add(l.id);}
    if(root.CourseProgress&&root.CourseProgress.registerStages)root.CourseProgress.registerStages(p.lesson_id,stagePlans(p));
    // Keep metadata only in installed map; questions live in COURSE, theory in GRAMMAR_CHAPTERS.
-   const kept={lesson_id:p.lesson_id,content_revision:p.content_revision,status:p.status,title:p.title,name:p.name||p.title,release:p.release||null,homework:p.homework,migrations:p.migrations||[],sources:p.sources,rules:p.rules,stages:p.stages};
+   const kept={lesson_id:p.lesson_id,content_revision:p.content_revision,status:p.status,title:p.title,name:p.name||p.title,release:p.release||null,homework:p.homework,migrations:p.migrations||[],sources:p.sources,rules:p.rules,references:p.references||[],stages:p.stages};
    installed.set(p.lesson_id,kept);
    releaseHeavy(raw);
    return kept;
@@ -200,6 +200,25 @@
    const raw=(root.LESSON_V2_COMPILED||[]).find(x=>x&&x.lesson_id===id);
    return homeworkMeta(raw);
  }
+ function referenceForRule(lessonId,ruleId,currentText='',preferredId=''){
+   const p=installed.get(lessonId)||ensure(lessonId);
+   if(!p||!ruleId)return null;
+   const refs=p.references||[];
+   let ref=preferredId?refs.find(x=>x.id===preferredId&&x.rule_ids.includes(ruleId)):null;
+   if(!ref)ref=refs.find(x=>x.rule_ids.includes(ruleId));
+   if(!ref)return null;
+   const norm=v=>String(v||'').toLowerCase().replace(/[!?.,;:()[\]{}"']/g,' ').replace(/\s+/g,' ').trim();
+   const hay=norm(currentText);
+   const examples=(ref.examples||[]).filter(e=>{
+     const kz=norm(e.kazakh);
+     if(!kz||!hay)return true;
+     return !(hay.includes(kz)||kz.includes(hay));
+   });
+   return Object.assign({},ref,{examples});
+ }
+ function hasReference(lessonId,ruleId,preferredId=''){
+   return !!referenceForRule(lessonId,ruleId,'',preferredId);
+ }
  function practiceForRule(lessonId,ruleId,limit=12){
    const p=installed.get(lessonId);
    if(!p||!root.COURSE||!ruleId)return [];
@@ -243,7 +262,7 @@
    }
    return picked;
  }
- const api={installAll,installOne,installShells,ensure,byId,isV2,homework,practiceForRule,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
+ const api={installAll,installOne,installShells,ensure,byId,isV2,homework,referenceForRule,hasReference,practiceForRule,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
  root.LessonV2Runtime=api;
  // P0 Chrome Error 9: do not materialize every lesson pack (4-1 has 345 generated Qs) at boot.
  // Shells keep path/learn navigation; ensure(id) hydrates exercises on first open.
