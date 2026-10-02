@@ -131,7 +131,7 @@ assert.ok(mid.completed.includes('2-1:v2-theory-2-1-glue'));
 assert.ok(!mid.completed.includes('2-1:2-1-glue'));
 ok('mid-path old ids migrate and resume on mapped chapter');
 
-const currentDone=simulateLoad({phase:'done',chapterId:null,contentRevision:'2-1.r1',updatedAt:2},{
+const currentDone=simulateLoad({phase:'done',chapterId:null,contentRevision:'2-1.r2',updatedAt:2},{
   '2-1:v2-theory-2-1-glue':true
 });
 assert.equal(currentDone.phase,'done');
@@ -200,7 +200,7 @@ function simulateLoadResilient(savedPath,completed){
 const midSeed={phase:'beat',chapterId:'2-1-emes',beat:0,contentRevision:null,updatedAt:1};
 const midCompleted={'2-1:2-1-glue':true,'2-1:2-1-pron':true,'2-1:2-1-clause':true,'2-1:2-1-men':true,'2-1:2-1-sen':true,'2-1:2-1-siz':true};
 const afterSave=simulatePersist(midSeed,midCompleted);
-assert.notEqual(afterSave.contentRevision,'2-1.r1','persist must NOT stamp target while legacy mid-path ids remain');
+assert.notEqual(afterSave.contentRevision,'2-1.r2','persist must NOT stamp target while legacy mid-path ids remain');
 assert.ok(afterSave.contentRevision===null||afterSave.contentRevision==='2-1.legacy');
 const afterOpen=simulateLoadResilient(afterSave,midCompleted);
 assert.equal(afterOpen.phase,'beat');
@@ -210,19 +210,19 @@ assert.ok(!afterOpen.completed.includes('2-1:2-1-glue'));
 ok('save-then-open mid-path: persist keeps legacy rev; load migrates to v2-theory-2-1-emes');
 
 // Recovery: already-stamped target + legacy ids (broken tip state) still migrates on open
-const premature={phase:'beat',chapterId:'2-1-emes',beat:0,contentRevision:'2-1.r1',updatedAt:2};
+const premature={phase:'beat',chapterId:'2-1-emes',beat:0,contentRevision:'2-1.r2',updatedAt:2};
 const recovered=simulateLoadResilient(premature,midCompleted);
 assert.equal(recovered.chapterId,'v2-theory-2-1-emes');
 assert.ok(recovered.completed.includes('2-1:v2-theory-2-1-glue'));
-ok('premature contentRevision=2-1.r1 + legacy ids still migrate on load');
+ok('premature contentRevision=2-1.r2 + legacy ids still migrate on load');
 
-const persistCurrent=simulatePersist({phase:'beat',chapterId:'v2-theory-2-1-emes',contentRevision:'2-1.r1',updatedAt:3},{
+const persistCurrent=simulatePersist({phase:'beat',chapterId:'v2-theory-2-1-emes',contentRevision:'2-1.r2',updatedAt:3},{
   '2-1:v2-theory-2-1-glue':true
 });
-assert.equal(persistCurrent.contentRevision,'2-1.r1');
+assert.equal(persistCurrent.contentRevision,'2-1.r2');
 ok('persist stamps target when chapter ids already current');
 
-const prematureDone=simulateLoadResilient({phase:'done',chapterId:null,contentRevision:'2-1.r1',updatedAt:2},{
+const prematureDone=simulateLoadResilient({phase:'done',chapterId:null,contentRevision:'2-1.r2',updatedAt:2},{
   '2-1:2-1-glue':true,'2-1:2-1-pron':true,'2-1:2-1-clause':true,'2-1:2-1-men':true,'2-1:2-1-sen':true,
   '2-1:2-1-siz':true,'2-1:2-1-emes':true,'2-1:2-1-ba':true,'2-1:2-1-siz2':true,'2-1:2-1-checkpoint':true
 });
