@@ -29,7 +29,7 @@
  function pathLesson(p){
    if(Array.isArray(p.canonical_core)&&p.canonical_core.length){
      const chapters=p.canonical_core.map((c,i)=>({
-       id:'v2-core-'+stableSlug(c.id||('section-'+(i+1))),
+       id:'v2-'+stableSlug(c.id||('section-'+(i+1))),
        title:c.title||('Шаг '+(i+1)),
        rule_ids:(c.rule_ids||[]).slice(),
        fullExplanation:c.body||'',
