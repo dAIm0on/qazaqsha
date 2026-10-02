@@ -1228,7 +1228,17 @@
      .replace(/Ловушка(?![\u0400-\u04FF])/gi,'Не перепутай')
      .replace(/(^|[\s>«"(\[\n])Запрет(?=[\s:.]|$)/gi,'$1Не так');
  }
- function seeText(s){return esc(studentCopy(s));}
+ function seeText(s){
+   const raw=studentCopy(s);let out='',i=0,italic=false;
+   while(i<raw.length){
+     if(raw.startsWith('{{i}}',i)){out+='<em lang="ru">';italic=true;i+=5;continue;}
+     if(raw.startsWith('{{/i}}',i)){if(italic)out+='</em>';italic=false;i+=6;continue;}
+     let j=raw.indexOf('{{',i);if(j<0)j=raw.length;
+     out+=esc(raw.slice(i,j));i=j;
+     if(i===j&&j<raw.length&&!raw.startsWith('{{i}}',i)&&!raw.startsWith('{{/i}}',i)){out+=esc(raw[i]);i++;}
+   }
+   if(italic)out+='</em>';return out;
+ }
  function namedExercise(s){
    return /^(ловушка|запрет)(?![\u0400-\u04FF])/i.test(String(s||''));
  }
@@ -1270,7 +1280,7 @@
    const letters=hasText;
    const exam=mode==='exam';
    const hw=mode==='homework';
-   const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
+   const canRule=(hw&&window.Homework&&window.Homework.ruleText(q))||(!exam&&window.LessonV2Runtime&&window.LessonV2Runtime.referenceTextForQuestion&&window.LessonV2Runtime.referenceTextForQuestion(q));
    const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
    const letterBar=letters?`<div class="letter-keyboard" lang="kk" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div>`:'';
    $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div></div><form id="answer-form"><div class="typing-scroll"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc((q.phase&&q.phase!=='Вспомнить')?q.phase:(q.source.startsWith('hw')?'':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title" class="practice-prompt">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]&&!/вспомнить/i.test(reviewReasonMap[q.id])?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus):esc(q.stimulus)))}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></div><div class="practice-dock typing-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}</div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div><div class="typing-strip" id="typing-strip">${letterBar}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="retry-button" hidden>Ещё раз</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div></div></div></form>`;
@@ -1349,12 +1359,14 @@
  function hintEvent(q,kind){state.events.push({type:'hint',card_id:q.id,at:Date.now(),hint_kind:kind,response_time_ms:elapsed(),hinted:true});}
  function showRule(q){
    if(checked||mode==='exam')return;
-   const text=window.Homework&&window.Homework.ruleText(q);
-   if(!text)return;
-   rulePeeked=true;
-   state.events.push({type:'rule_peek',card_id:q.id,at:Date.now(),rule_id:window.Homework.ruleId(q),homework:mode==='homework'?1:0});
+   const hwText=window.Homework&&window.Homework.ruleText(q);
+   const v2Html=window.LessonV2Runtime&&window.LessonV2Runtime.referenceHtmlForQuestion?window.LessonV2Runtime.referenceHtmlForQuestion(q):'';
+   if(!hwText&&!v2Html)return;
+   rulePeeked=true;hinted=true;
+   const rid=(q.ruleIds||q.rule_ids||[])[0]||(window.Homework&&window.Homework.ruleId(q))||'';
+   state.events.push({type:'rule_peek',card_id:q.id,at:Date.now(),rule_id:rid,homework:mode==='homework'?1:0,reference_id:v2Html?'v2':null});
    const box=$('#hint-box');
-   box.innerHTML='<strong>Правило, не ответ этого пункта.</strong><pre class="rule-pre">'+esc(text)+'</pre>';
+   box.innerHTML='<strong>Правило, не ответ этого пункта.</strong>'+(v2Html||('<pre class="rule-pre">'+esc(hwText)+'</pre>'));
    box.hidden=false;
    if($('#rule-button'))$('#rule-button').disabled=true;
    save();
@@ -1910,7 +1922,7 @@
      return clip(b.t||b.b||'');
    }
    const canonKey=les.id+':'+ch.id;
-   if(bankCard&&isCanonBeat(beat.k)&&gp.canonShownFor!==canonKey){
+   if(bankCard&&isCanonBeat(beat.k)&&gp.canonShownFor!==canonKey&&!(window.LessonV2Runtime&&window.LessonV2Runtime.usesCanonicalCore&&window.LessonV2Runtime.usesCanonicalCore(les.id))){
      gp.canonShownFor=canonKey;
      gp.canonVisible=true;
      const paras=Bank.paras;
@@ -1968,7 +1980,7 @@
    if(beat.k==='ex'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>Разобранный пример</h2>
        <p lang="kk" class="stimulus">${seeText(beat.from)} → ${seeText(beat.to)}</p>
-       <p>${seeText(beat.ru)}</p>
+       <p class="path-translation"><em lang="ru">${seeText(beat.ru)}</em></p>
        <p>Слот: <strong lang="kk">${seeText(beat.slot)}</strong>. ${seeText(beat.why)}</p>
        ${nav('path-next','Дальше')}</div>`;
      bindNav('path-next',nextBeat);return;
@@ -2032,8 +2044,9 @@
      };
      $('#path-rule').onclick=()=>{
        pathPeek=true;
-       const local=hintLine();
-       showPathFb('hinted','<p>'+seeText(local)+'</p>');
+       const local=hintLine(),rid=(ch.rule_ids||[])[0]||'';
+       const ref=window.LessonV2Runtime&&window.LessonV2Runtime.referenceHtml?window.LessonV2Runtime.referenceHtml(les.id,rid,{excludeAnswers:[exp()]}):'';
+       showPathFb('hinted',ref||('<p>'+seeText(local)+'</p>'));
      };
      const pathSkillFor=(errorType,errorKey,beat)=>{
        const known={

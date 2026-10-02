@@ -109,7 +109,7 @@
    list[i]={
      lesson_id:raw.lesson_id,content_revision:raw.content_revision,title:raw.title,label:raw.label,name:raw.name||raw.title,
      status:raw.status,release:raw.release||null,sources:raw.sources||[],prerequisites:raw.prerequisites||{lessons:[]},
-     rules:raw.rules||[],homework:raw.homework||null,_hydrated:true
+     rules:raw.rules||[],homework:raw.homework||null,content_contract:raw.content_contract||{},references:raw.references||[],practice_policy:raw.practice_policy||{},rule_reference_map:raw.rule_reference_map||{},_hydrated:true
    };
  }
  function installShell(raw){
@@ -140,7 +140,7 @@
    const existing=new Set((learning.lessons||[]).map(x=>x.id));for(const l of learningTracks(p,course.questions))if(!existing.has(l.id)){learning.lessons.push(l);existing.add(l.id);}
    if(root.CourseProgress&&root.CourseProgress.registerStages)root.CourseProgress.registerStages(p.lesson_id,stagePlans(p));
    // Keep metadata only in installed map; questions live in COURSE, theory in GRAMMAR_CHAPTERS.
-   const kept={lesson_id:p.lesson_id,content_revision:p.content_revision,status:p.status,title:p.title,name:p.name||p.title,release:p.release||null,homework:p.homework,migrations:p.migrations||[],sources:p.sources,rules:p.rules,stages:p.stages};
+   const kept={lesson_id:p.lesson_id,content_revision:p.content_revision,status:p.status,title:p.title,name:p.name||p.title,release:p.release||null,homework:p.homework,migrations:p.migrations||[],sources:p.sources,rules:p.rules,stages:p.stages,content_contract:p.content_contract||{},references:p.references||[],practice_policy:p.practice_policy||{},rule_reference_map:p.rule_reference_map||{}};
    installed.set(p.lesson_id,kept);
    releaseHeavy(raw);
    return kept;
@@ -243,7 +243,49 @@
    }
    return picked;
  }
- const api={installAll,installOne,installShells,ensure,byId,isV2,homework,practiceForRule,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
+ function htmlEsc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+ function markedHtml(v){
+   const raw=String(v||'');let out='',i=0,italic=false;
+   while(i<raw.length){
+     if(raw.startsWith('{{i}}',i)){out+='<em lang="ru">';italic=true;i+=5;continue;}
+     if(raw.startsWith('{{/i}}',i)){if(italic)out+='</em>';italic=false;i+=6;continue;}
+     let j=raw.indexOf('{{',i);if(j<0)j=raw.length;
+     out+=htmlEsc(raw.slice(i,j));i=j;
+     if(i===j&&j<raw.length&&!raw.startsWith('{{i}}',i)&&!raw.startsWith('{{/i}}',i)){out+=htmlEsc(raw[i]);i++;}
+   }
+   if(italic)out+='</em>';
+   return out.replace(/\n/g,'<br>');
+ }
+ function lessonMeta(id){return installed.get(id)||ensure(id)||null;}
+ function usesCanonicalCore(id){const p=installed.get(id)||((root.LESSON_V2_COMPILED||[]).find(x=>x&&x.lesson_id===id));return !!(p&&p.content_contract&&p.content_contract.canonical_core);}
+ function referenceForRule(lessonId,ruleId){
+   const p=lessonMeta(lessonId);if(!p||!ruleId)return null;
+   const map=p.rule_reference_map||{},m=map[ruleId];if(!m)return null;
+   const refId=typeof m==='string'?m:(m.reference_id||m.id);if(!refId)return null;
+   const ref=(p.references||[]).find(x=>x&&x.reference_id===refId);if(!ref)return null;
+   return {reference:ref,target_section:typeof m==='object'?(m.target_section||''):''};
+ }
+ function referenceForQuestion(q){if(!q)return null;const rid=(q.ruleIds||q.rule_ids||[])[0];return referenceForRule(q.lessonId,rid);}
+ function referenceHtml(lessonId,ruleId,opts={}){
+   const hit=referenceForRule(lessonId,ruleId);if(!hit)return '';
+   const ref=hit.reference,sections=Array.isArray(ref.sections)?ref.sections:[];
+   let chosen=sections;
+   if(hit.target_section){const one=sections.find(x=>x&&x.id===hit.target_section);if(one)chosen=[one];}
+   const exclude=(opts.excludeAnswers||[]).map(x=>String(x||'').trim()).filter(x=>x.length>1);
+   const body=chosen.map(sec=>{
+     let text=String(sec&&sec.text||'');
+     if(exclude.length)text=text.split(/\n/).filter(line=>!exclude.some(a=>line.includes(a))).join('\n');
+     return '<section class="v2-reference-section">'+(sec&&sec.title?'<h4>'+htmlEsc(sec.title)+'</h4>':'')+'<div>'+markedHtml(text)+'</div></section>';
+   }).join('');
+   return '<div class="v2-reference" data-reference-id="'+htmlEsc(ref.reference_id||'')+'"><h3>'+htmlEsc(ref.title_ru||'Правило')+'</h3>'+body+'</div>';
+ }
+ function referenceHtmlForQuestion(q){
+   if(!q)return '';
+   const rid=(q.ruleIds||q.rule_ids||[])[0],answers=(q.fields||[]).flatMap(f=>f.answers||[]);
+   return referenceHtml(q.lessonId,rid,{excludeAnswers:answers});
+ }
+ function referenceTextForQuestion(q){const hit=referenceForQuestion(q);return hit&&hit.reference&&hit.reference.title_ru||'';}
+ const api={installAll,installOne,installShells,ensure,byId,isV2,homework,practiceForRule,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson,usesCanonicalCore,referenceForRule,referenceForQuestion,referenceHtml,referenceHtmlForQuestion,referenceTextForQuestion};
  root.LessonV2Runtime=api;
  // P0 Chrome Error 9: do not materialize every lesson pack (4-1 has 345 generated Qs) at boot.
  // Shells keep path/learn navigation; ensure(id) hydrates exercises on first open.
