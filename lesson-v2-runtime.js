@@ -140,7 +140,7 @@
    const existing=new Set((learning.lessons||[]).map(x=>x.id));for(const l of learningTracks(p,course.questions))if(!existing.has(l.id)){learning.lessons.push(l);existing.add(l.id);}
    if(root.CourseProgress&&root.CourseProgress.registerStages)root.CourseProgress.registerStages(p.lesson_id,stagePlans(p));
    // Keep metadata only in installed map; questions live in COURSE, theory in GRAMMAR_CHAPTERS.
-   const kept={lesson_id:p.lesson_id,content_revision:p.content_revision,status:p.status,title:p.title,name:p.name||p.title,release:p.release||null,homework:p.homework,migrations:p.migrations||[],sources:p.sources,rules:p.rules,stages:p.stages};
+   const kept={lesson_id:p.lesson_id,content_revision:p.content_revision,status:p.status,title:p.title,name:p.name||p.title,release:p.release||null,homework:p.homework,migrations:p.migrations||[],sources:p.sources,rules:p.rules,references:p.references||[],stages:p.stages};
    installed.set(p.lesson_id,kept);
    releaseHeavy(raw);
    return kept;
@@ -200,6 +200,18 @@
    const raw=(root.LESSON_V2_COMPILED||[]).find(x=>x&&x.lesson_id===id);
    return homeworkMeta(raw);
  }
+ function referenceForRule(lessonId,ruleId){
+   if(!lessonId||!ruleId)return null;
+   const p=installed.get(lessonId);
+   const refs=(p&&p.references)||((root.LESSON_V2_COMPILED||[]).find(x=>x&&x.lesson_id===lessonId)||{}).references||[];
+   return refs.find(r=>(r.rule_ids||[]).includes(ruleId))||null;
+ }
+ function referenceText(ref,full=false){
+   if(!ref)return '';
+   const lines=(full?ref.full_lines:ref.quick_lines)||[];
+   const examples=(ref.examples||[]).map(e=>e.kazakh+' — '+e.translation+(e.why?' · '+e.why:''));
+   return [ref.title,...lines,...examples].filter(Boolean).join('\n');
+ }
  function practiceForRule(lessonId,ruleId,limit=12){
    const p=installed.get(lessonId);
    if(!p||!root.COURSE||!ruleId)return [];
@@ -243,7 +255,7 @@
    }
    return picked;
  }
- const api={installAll,installOne,installShells,ensure,byId,isV2,homework,practiceForRule,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
+ const api={installAll,installOne,installShells,ensure,byId,isV2,homework,practiceForRule,referenceForRule,referenceText,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
  root.LessonV2Runtime=api;
  // P0 Chrome Error 9: do not materialize every lesson pack (4-1 has 345 generated Qs) at boot.
  // Shells keep path/learn navigation; ensure(id) hydrates exercises on first open.
