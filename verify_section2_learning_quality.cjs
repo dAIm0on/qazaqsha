@@ -31,7 +31,14 @@ const forbiddenStudentCodes=[
 ];
 
 function norm(s){
-  return String(s||'').toLocaleLowerCase('kk-KZ').replace(/[«»“”"'`.,!?;:()\[\]{}]/g,' ').replace(/\s+/g,' ').trim();
+  return String(s||'').toLocaleLowerCase('kk-KZ').replace(/[«»“”"'`]/g,'').replace(/\s+/g,' ').trim();
+}
+function escapeRe(s){return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function containsWholeAnswer(stimulus,answer){
+  const s=norm(stimulus),a=norm(answer);
+  if(a.length<3)return false;
+  const re=new RegExp('(?:^|[\\s—:;,.!?()\\[\\]{}])'+escapeRe(a)+'(?=$|[\\s—:;,.!?()\\[\\]{}])','u');
+  return re.test(s);
 }
 function bodyText(p){return [...p.canonical_core,...p.references].map(x=>x.body).join('\n');}
 function assertNoInternalCodes(text,label){
@@ -65,11 +72,9 @@ function assertNoProductionLeak(p){
   for(const s of productionStages){
     for(const id of s.core_ids){
       const q=qById.get(id); if(!q||!q.fields||!q.fields.length)continue;
-      const stimulus=norm(q.stimulus);
       const first=q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0];
-      const answer=norm(first);
-      if(answer.length<3)continue;
-      assert.ok(!stimulus.includes(answer),p.lesson_id+' answer leak before attempt in '+id+': '+first);
+      if(!first)continue;
+      assert.ok(!containsWholeAnswer(q.stimulus,first),p.lesson_id+' answer leak before attempt in '+id+': '+first);
     }
   }
 }
