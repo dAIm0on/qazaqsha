@@ -1943,13 +1943,19 @@
      bindNav('path-next',nextBeat);return;
    }
    if(beat.k==='core'){
+     const fmtCoreLine=line=>{
+       const text=String(line||'');
+       const m=text.match(/^(.+?)\s+—\s+(.+)$/);
+       if(m&&/[әғқңөұүһі]/i.test(m[1]))return seeText(m[1])+' — <em>'+seeText(m[2])+'</em>';
+       return seeText(text);
+     };
      const blocks=String(beat.b||'').split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
      const html=blocks.map(block=>{
        const lines=block.split(/\n+/).map(x=>x.trim()).filter(Boolean);
        const tableish=lines.length>1&&lines.some(x=>x.includes('|'));
-       if(tableish)return '<pre class="path-core-table">'+esc(lines.join('\n'))+'</pre>';
-       if(lines.length>1)return '<p>'+lines.map(x=>seeText(x)).join('<br>')+'</p>';
-       return '<p>'+seeText(block)+'</p>';
+       if(tableish)return '<pre class="path-core-table">'+lines.map(x=>fmtCoreLine(x)).join('\n')+'</pre>';
+       if(lines.length>1)return '<p>'+lines.map(x=>fmtCoreLine(x)).join('<br>')+'</p>';
+       return '<p>'+fmtCoreLine(block)+'</p>';
      }).join('');
      root.innerHTML=`<div class="panel path-paper path-core">${head}<h2>${seeText(beat.t)}</h2><div class="path-core-body">${html}</div>${nav('path-next','Дальше')}</div>`;
      bindNav('path-next',nextBeat);return;
@@ -2047,12 +2053,18 @@
        const ruleId=(ch.rule_ids||[])[0]||'';
        const ref=window.LessonV2Runtime&&window.LessonV2Runtime.referenceForRule?window.LessonV2Runtime.referenceForRule(les.id,ruleId):null;
        if(ref&&ref.body){
+         const fmtRefLine=line=>{
+           const text=String(line||'');
+           const m=text.match(/^(.+?)\s+—\s+(.+)$/);
+           if(m&&/[әғқңөұүһі]/i.test(m[1]))return seeText(m[1])+' — <em>'+seeText(m[2])+'</em>';
+           return seeText(text);
+         };
          const blocks=String(ref.body).split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
          const html=blocks.map(block=>{
            const lines=block.split(/\n+/).map(x=>x.trim()).filter(Boolean);
            const tableish=lines.length>1&&lines.some(x=>x.includes('|'));
-           if(tableish)return '<pre class="path-reference-table">'+esc(lines.join('\n'))+'</pre>';
-           return '<p>'+lines.map(x=>seeText(x)).join('<br>')+'</p>';
+           if(tableish)return '<pre class="path-reference-table">'+lines.map(x=>fmtRefLine(x)).join('\n')+'</pre>';
+           return '<p>'+lines.map(x=>fmtRefLine(x)).join('<br>')+'</p>';
          }).join('');
          showPathFb('hinted','<div class="path-reference"><h3>'+seeText(ref.title||'Правило')+'</h3>'+html+'</div>');
          return;
