@@ -161,7 +161,7 @@
      id:id(r.id,'reference.id'),
      title:str(r.title,'reference.title',300),
      body:str(r.body,'reference.body',50000),
-     rule_ids:strings(r.rule_ids||[],'reference.rule_ids',1,60).map(x=>id(x,'rule_id')),
+     rule_ids:strings(r.rule_ids||[],'reference.rule_ids',0,60).map(x=>id(x,'rule_id')),
      unlock_rule_ids:strings(r.unlock_rule_ids||r.rule_ids||[],'reference.unlock_rule_ids',0,60).map(x=>id(x,'rule_id')),
      source_refs:strings(r.source_refs||[],'reference.source_refs',0,30).map(x=>id(x,'source_ref')),
      core_anchor:r.core_anchor?str(r.core_anchor,'reference.core_anchor',200):''
@@ -285,7 +285,9 @@
    }
    const ids=new Set();
    const take=(x,label)=>{if(ids.has(x))fail('duplicate id '+x+' ('+label+')');ids.add(x);};
-   out.rules.forEach(x=>take(x.id,'rule'));out.theory.forEach(x=>take(x.id,'theory'));out.vocabulary.forEach(x=>take(x.id,'vocabulary'));out.original_exercises.forEach(x=>take(x.id,'exercise'));out.practice_generators.forEach(x=>take(x.id,'generator'));out.corrections.forEach(x=>take(x.id,'correction'));out.canonical_core.forEach(x=>take(x.id,'canonical_core'));out.references.forEach(x=>take(x.id,'reference'));
+   out.rules.forEach(x=>take(x.id,'rule'));out.theory.forEach(x=>take(x.id,'theory'));out.vocabulary.forEach(x=>take(x.id,'vocabulary'));out.original_exercises.forEach(x=>take(x.id,'exercise'));out.practice_generators.forEach(x=>take(x.id,'generator'));out.corrections.forEach(x=>take(x.id,'correction'));
+   const coreIds=new Set();for(const c of out.canonical_core){if(coreIds.has(c.id))fail('duplicate canonical_core id '+c.id);coreIds.add(c.id);}
+   const refIds=new Set();for(const r of out.references){if(refIds.has(r.id))fail('duplicate reference id '+r.id);refIds.add(r.id);}
    out.generated_questions=list(raw.generated_questions||[],'generated_questions',0,5000).map(q=>exercise(q,lessonId));
    out.generated_questions.forEach(x=>{
      take(x.id,'generated question');
