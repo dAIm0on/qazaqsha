@@ -287,6 +287,14 @@
   // r7 X minor: Russian count forms. forms = [1 / 21, 2–4 / 22–24, 5–20 / 0 / 25…]: ruPlural(4,['карточка','карточки','карточек']).
   function ruPlural(n,forms){const k=Math.abs(Math.trunc(Number(n)||0)),m10=k%10,m100=k%100;return forms[m10===1&&m100!==11?0:m10>=2&&m10<=4&&(m100<12||m100>14)?1:2];}
   function ruCount(n,forms){return n+' '+ruPlural(n,forms);}
-  const api={ruPlural,ruCount,normalize,evaluate,migrateRecord,updateRecord,isDue,isDay0Learning,pauseReady,scheduleRepeat,chooseShortSession,lemmaKey,dedupeByLemma,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY,shareVocabAlts};
+  // r7 ux59 #6: «Шаг N из M» of a practice session. M = distinct cards of the session; a card that comes back to the
+  // queue (learning re-insert) does not grow M and does not move N (18 → 19 → 20 before). Same as the bank counter.
+  function sessionStep(queue,position,answered){
+    const q=Array.isArray(queue)?queue:[];const total=new Set(q).size;if(!total)return {step:0,total:0};
+    const pos=Math.min(q.length-1,Math.max(0,Number(position)||0)+(answered?1:0));
+    const reached=new Set(q.slice(0,pos+1)).size;
+    return {step:Math.max(1,Math.min(reached,total)),total};
+  }
+  const api={ruPlural,ruCount,sessionStep,normalize,evaluate,migrateRecord,updateRecord,isDue,isDay0Learning,pauseReady,scheduleRepeat,chooseShortSession,lemmaKey,dedupeByLemma,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY,shareVocabAlts};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TrainerCore=api;
 })(typeof window!=='undefined'?window:globalThis);

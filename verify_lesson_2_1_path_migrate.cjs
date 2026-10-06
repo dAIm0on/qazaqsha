@@ -35,7 +35,8 @@ assert.ok(app.includes('legacyPathRevision'));
 assert.ok(app.includes('migrateLessonCompletedChapters'));
 assert.ok(app.includes('pathHasUnmappedChapters(lessonId,gp,gp.chapterId)'));
 assert.ok(app.includes('Stamp target revision only after chapter ids are current')||app.includes('only after chapter ids are current'));
-assert.ok(/continueLesson[\s\S]*pathNeedsV2TheoryReplay[\s\S]*openPathLesson/.test(app));
+// r7 ux59b #2: the replay gate lives in resumeTarget(), which continueLesson routes by (theory → openPathLesson).
+assert.ok(/function resumeTarget[\s\S]*pathNeedsV2TheoryReplay[\s\S]*function continueLesson[\s\S]*resumeTarget\(id\)[\s\S]*openPathLesson/.test(app));
 ok('app.js has replay CTA + loadLessonPath/continueLesson migration gates');
 ok('persistLessonPath stamps contentRevision only when chapter ids current');
 
@@ -45,7 +46,7 @@ assert.ok(cp.includes('pathNeedsReplay'));
 ok('course-progress persists contentRevision + pathNeedsReplay');
 
 const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-x123-2'"));
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-ux59-2'"));
 ok('sw cache bumped to kb-compact');
 
 const mock={

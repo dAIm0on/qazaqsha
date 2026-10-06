@@ -67,7 +67,7 @@
  // r7 X3: where the learner came from into this session (← Назад / «Сделать паузу» returns there).
  const ORIGIN_VIEWS=['today','learn','path','homework','personal','exam','review','vocabulary','materials','morph'],ORIGIN_LABEL={today:'Сегодня',learn:'Учёба',path:'Уроки',homework:'Домашка',personal:'Тренажёры',exam:'Экзамен',review:'Повторение',vocabulary:'Словарь',materials:'Материалы',morph:'Правила'};
  let sessionOrigin=null,trainerEpoch=null; // trainerEpoch: the queue a catalog trainer started; trainerReturn is valid only for it
- let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null,stageContext=null,practiceHold=null;
+ let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null,stageContext=null,practiceHold=null,restoredEnded=false;
  let hwOrigin='today';
  function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
  function currentLessonId(q){
@@ -416,11 +416,15 @@
    }
  }
 
+ /* r7 ux59b #4: each entry point keeps its own queue. A track / shelf / bank session («Сборник 1-1», «Банк · выбери»,
+    mode 'lesson' with activeLesson) was saved as the lesson's practice, so «Практика этого урока» reopened «Сборник 1-1»
+    and Today showed «практика, шаг 1 из 12» after merely opening it. Only the lesson's own practice is saved there now;
+    a track resumes through the live session (F5) and its own step. Older foreign snapshots are ignored (not deleted). */
+ function isLessonPracticeSnap(s){return !!(s&&Array.isArray(s.queue)&&s.queue.length&&s.mode!=='lesson'&&s.mode!=='voluntary'&&!s.activeLesson);}
+ function lessonPracticeOf(lp){return lp&&isLessonPracticeSnap(lp.practiceSession)?lp.practiceSession:null;}
  function runtimePracticeLessonId(){
-   if(!['course','phrase','lesson','transfer','remediation'].includes(mode)||queue.length<=position)return null;
-   if(P.courseIds().includes(courseBlock))return courseBlock;
-   const l=activeLesson&&window.LEARNING.lessons.find(x=>x.id===activeLesson);
-   return l&&P.courseIds().includes(l.courseLesson)?l.courseLesson:null;
+   if(!['course','phrase','transfer','remediation'].includes(mode)||activeLesson||queue.length<=position)return null;
+   return P.courseIds().includes(courseBlock)?courseBlock:null;
  }
  function runtimePracticeSnapshot(){
    const currentV2=courseBlock&&window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(courseBlock):null;
@@ -434,8 +438,8 @@
  }
  function restoreLessonPractice(id){
    practiceHold=null;
-   const lp=P.ensureLessonProgress(state,id),s=lp&&lp.practiceSession;
-   if(!s||!Array.isArray(s.queue))return false;
+   const lp=P.ensureLessonProgress(state,id),s=lessonPracticeOf(lp);
+   if(!s)return false;
    const currentV2=window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(id):null;
    if(currentV2&&s.stageContext&&s.contentRevision!==currentV2.content_revision){
      P.clearLessonPractice(state,id,Date.now());
@@ -620,21 +624,49 @@
    queueEpoch=Date.now()+Math.random();position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
    markLessonStarted(id,'practice');render();showView('practice');return true;
  }
+ /* r7 ux59 #1: the lesson chosen last («Все уроки», «Выбрать урок», Today) is the lesson of «Выбрать занятие»:
+    «Практика этого урока», its tracks and «Домашка» open it, not the resume lesson (1-1). Navigation only (sessionStorage). */
+ const HUB_KEY='qazaqsha-hub-lesson';
+ function hubLesson(){try{const id=sessionStorage.getItem(HUB_KEY);return id&&courseIds().includes(id)?id:null;}catch{return null;}}
+ function setHubLesson(id){try{if(id&&courseIds().includes(id))sessionStorage.setItem(HUB_KEY,id);}catch{}}
+ /* r7 ux59b #2: the Today card text and the target of «Продолжить» come from one resolver, so the button opens exactly
+    what the card names (cf03db5: the card said «практика, шаг 10 из 14», the button opened the chapter explanation,
+    because v2 lessons forced theory whenever the chapters were not finished). Kinds:
+    practice — her lesson practice was the last surface → that practice, its step and its draft;
+    theory   — chapters to read (or a v2 replay) → that chapter and step;
+    next     — chapters done, no saved practice → the next practice stage. */
+ function pathOf(id){
+   const lp=P.ensureLessonProgress(state,id),gp=state.grammarPath;
+   return gp&&gp.lessonId===id?{chapterId:gp.chapterId,beat:gp.beat,phase:gp.phase,pathNeedsReplay:gp.pathNeedsReplay,contentRevision:gp.contentRevision}:(lp&&lp.path)||null;
+ }
+ function resumeTarget(id){
+   const lp=P.ensureLessonProgress(state,id),rp=P.ensureCourseProgress(state).resumePointer||{},ps=lessonPracticeOf(lp),path=pathOf(id);
+   const v2=window.LessonV2Runtime&&window.LessonV2Runtime.isV2(id);
+   const theory=!path||!path.chapterId||path.phase!=='done'||(v2&&pathNeedsV2TheoryReplay(id,lp&&lp.path,path));
+   const practiceLast=ps&&(!theory||(rp.lessonId===id?rp.surface==='practice':(Number(ps.updatedAt)||0)>=(Number(path&&path.updatedAt)||Number(lp&&lp.path&&lp.path.updatedAt)||0)));
+   if(practiceLast){
+     const st=core.sessionStep(ps.queue,ps.position,ps.answered),ch=path&&path.chapterId?chapterCheckpoint(id,{chapterId:path.chapterId,beat:0}).replace(/ · шаг \d+$/,''):'';
+     return {kind:'practice',surface:'practice',hint:(ch&&!/^Теория/.test(ch)?ch+' · ':'')+'практика, шаг '+st.step+' из '+st.total};
+   }
+   if(theory||!v2){
+     const at=path&&path.chapterId?path:nextChapterOf(id);
+     const hint=at?chapterCheckpoint(id,at):(lp&&lp.status==='not_started'?'Урок ещё не начат':'Место прохождения сохранено');
+     return {kind:theory?'theory':'next',surface:'path',hint};
+   }
+   return {kind:'next',surface:'practice',hint:'Главы прочитаны · практика урока'};
+ }
  function continueLesson(id){
+   setHubLesson(id);
    viewOnlyPathLesson=null;
    // r7 X3/step: on a cold start the v2 cards of this lesson are not installed yet, so the saved practice
    // («шаг 10 из 18») looked missing and «Начать / Продолжить» fell back to theory. Install them first.
    ensureV2(id);
-   const lp=P.ensureLessonProgress(state,id);
-   const gp=loadLessonPath(id);
-   const forceTheory=window.LessonV2Runtime&&window.LessonV2Runtime.isV2(id)&&(pathNeedsV2TheoryReplay(id,lp&&lp.path,gp)||!lp||!lp.path||(gp&&gp.phase!=='done'));
-   if(!forceTheory&&lp&&lp.practiceSession&&restoreLessonPractice(id)){
+   const t=resumeTarget(id);
+   if(t.kind==='practice'&&restoreLessonPractice(id)){
      markLessonStarted(id,'practice');render();showView('practice');return;
    }
+   if(t.kind==='theory'){openPathLesson(id,{meaningful:true});return;}
    const nxt=P.nextRegistered&&P.nextRegistered(id,state.events);
-   if(forceTheory){
-     openPathLesson(id,{meaningful:true});return;
-   }
    if(beginPacked(id))return;
    if(nxt&&beginStaged(id,nxt))return;
    openPathLesson(id,{meaningful:true});
@@ -1188,10 +1220,48 @@
  }
  function courseIds(){return P.courseIds();}
  function studyLive(){return ['homework','course','lesson','phrase','transfer','remediation'].includes(mode)&&queue.length>position;}
+ /* r7 ux59 #2 / ux59b #3: which lesson «Сегодня» names.
+    Before #59: the resume pointer (moved by «Начать / Продолжить» of a lesson, a chapter or lesson practice), else the
+    first unfinished lesson — ДЗ 4-2 or a 2-1 track never moved it off 1-1.
+    Now: the lesson of her latest ANSWER — an answer in its ДЗ, its practice, its tracks / shelves or its chapters
+    (answer events: lesson_id, block «homework:4-2», or the card's lesson). Opening a session, starting a lesson or a
+    pointer move without an answer is not work (cf03db5 counted them: opening «Сборник 1-1» in 3-1 switched Today).
+    Among unfinished lessons (the pointer's lesson may be finished: she is repeating it). No answers at all → the
+    pointer, else the first unfinished lesson. Read-only. */
+ function lessonOfEvent(e){
+   const ids=courseIds();if(e&&ids.includes(String(e.lesson_id||'')))return String(e.lesson_id);
+   const m=/^(?:homework|course|stage|lesson|path):(\d-\d)\b/.exec(String(e&&e.block||''));if(m)return m[1];
+   const q=e&&byId.get(e.card_id);if(q&&q.lessonId)return String(q.lessonId);
+   return compiledCardLesson(e&&e.card_id); // older events of lessons whose cards are not installed yet (lazy)
+ }
+ let compiledCardIdx=null;
+ function compiledCardLesson(id){
+   if(!id)return null;
+   if(!compiledCardIdx){compiledCardIdx=new Map();for(const raw of window.LESSON_V2_COMPILED||[]){const lid=raw&&raw.lesson_id;if(!lid)continue;
+     for(const x of [...(raw.original_exercises||[]),...(Array.isArray(raw.generated_questions)?raw.generated_questions:[]),...((raw.practice_bank&&raw.practice_bank.items)||[])])if(x&&x.id&&!compiledCardIdx.has(x.id))compiledCardIdx.set(x.id,lid);}}
+   return compiledCardIdx.get(id)||null;
+ }
+ function lessonActivity(){
+   const ids=courseIds(),act=Object.create(null),bump=(id,t)=>{t=Number(t)||0;if(t>0&&ids.includes(id)&&t>(act[id]||0))act[id]=t;};
+   for(const [id,a] of Object.entries(state.homeworkAttempts||{}))for(const it of (a&&a.items)||[])bump(id,it&&it.at);
+   for(const e of (state.events||[]).slice(-400))if(e&&e.type==='answer')bump(lessonOfEvent(e),e.at);
+   return act;
+ }
  function namedCourse(){
    const ids=courseIds(),cp=P.ensureCourseProgress(state),rp=cp.resumePointer||{};
+   const done=id=>(P.ensureLessonProgress(state,id)||{}).status==='completed';
+   const act=lessonActivity();let best=null,bestT=0;
+   for(const id of ids){if(done(id)&&id!==rp.lessonId)continue;const t=act[id]||0;if(t>bestT){best=id;bestT=t;}}
+   if(best)return best;
    if(ids.includes(rp.lessonId))return rp.lessonId;
-   return ids.find(id=>(P.ensureLessonProgress(state,id)||{}).status!=='completed')||ids[0]||'1-1';
+   return ids.find(id=>!done(id))||ids[0]||'1-1';
+ }
+ function nextChapterOf(lessonId){
+   let les=null;try{les=window.GrammarPath&&window.GrammarPath.lesson?window.GrammarPath.lesson(lessonId):null;}catch{les=null;}
+   const chs=(les&&les.chapters)||[];if(!chs.length)return null;
+   const gp=state.grammarPath||{},doneCh=gp.completedChapters||{};
+   const ch=chs.find(c=>!doneCh[lessonId+':'+c.id])||chs[chs.length-1];
+   return {chapterId:ch.id,beat:0};
  }
  function chapterCheckpoint(lessonId,p){
    // r7 X QA: «Глава · шаг 5» had no chapter. Name it: «Глава 3 из 13 · Собери первую прошедшую форму · шаг 5».
@@ -1203,18 +1273,16 @@
    return 'Глава '+(i+1)+' из '+chs.length+(title?' · '+title:'')+' · '+step;
  }
  function stepNow(){
-   const ids=courseIds(),cp=P.ensureCourseProgress(state);
+   const ids=courseIds();
    const allDone=ids.length&&ids.every(id=>(P.ensureLessonProgress(state,id)||{}).status==='completed');
-   const lessonId=namedCourse(),lp=P.ensureLessonProgress(state,lessonId),rp=cp.resumePointer||{};
-   if(allDone)return {lessonId,surface:'path',title:'Основное прохождение завершено',hint:'Можно выбрать любой урок и повторить его.'};
-   if(rp.surface==='practice'&&lp&&lp.practiceSession)return {lessonId,surface:'practice',title:'Продолжить урок '+lessonId,hint:'Очередь, позиция и набранный ответ сохранены.'};
-   const p=lp&&lp.path;
-   const checkpoint=p&&p.chapterId?chapterCheckpoint(lessonId,p):(lp&&lp.status==='not_started'?'Урок ещё не начат':'Место прохождения сохранено');
-   return {lessonId,surface:'path',title:(lp&&lp.status==='not_started'?'Начать урок ':'Продолжить урок ')+lessonId,hint:checkpoint};
+   const lessonId=namedCourse(),lp=P.ensureLessonProgress(state,lessonId);
+   if(allDone)return {lessonId,surface:'path',kind:'done',title:'Основное прохождение завершено',hint:'Можно выбрать любой урок и повторить его.'};
+   const t=resumeTarget(lessonId); // r7 ux59b #2: same resolver as continueLesson
+   return {lessonId,surface:t.surface,kind:t.kind,title:(lp&&lp.status==='not_started'?'Начать урок ':'Продолжить урок ')+lessonId,hint:t.hint};
  }
  function continueStep(){
    const s=stepNow();
-   if(s.title==='Основное прохождение завершено'){showView('path');return;}
+   if(s.kind==='done'){showView('path');return;}
    continueLesson(s.lessonId);
  }
  function openChapter(lessonId,chapterId){
@@ -1247,7 +1315,7 @@
   }catch(e){}
 }
  function openPathLesson(lessonId,options){
-   ensureV2(lessonId);
+   ensureV2(lessonId);setHubLesson(lessonId);
    const G=window.GrammarPath;if(!G){showView('path');return;}
    if(!P.courseIds().includes(lessonId))return;
    const meaningful=!!(options&&options.meaningful);
@@ -1332,7 +1400,7 @@
        sp.textContent=`Встречалось ${c.tried} из ${core.ruCount(c.total,['слова','слов','слов'])}`;
      }
      else if(isBankSession()){const total=new Set(practiceIds).size,reached=new Set(queue.slice(0,position+1).filter(id=>practiceIds.includes(id))).size;sp.textContent=`Шаг ${Math.max(1,Math.min(reached,total))} из ${total}`;}
-     else if(['smart','lesson','course','review','contrast'].includes(mode))sp.textContent=`Шаг ${Math.min(position+1,queue.length)} из ${queue.length}`;
+     else if(['smart','lesson','course','review','contrast'].includes(mode)){const st=core.sessionStep(queue,position,false);sp.textContent=`Шаг ${st.step} из ${st.total}`;} // r7 ux59 #6: M stable when a card returns
      else{
        const hw=homeworkScope();
        if(hw&&hw.length){const c=homeworkCounter(hw);sp.textContent=`Встречалось ${c.tried} из ${c.total}`;}
@@ -1671,6 +1739,8 @@
      hours_since_last:hours,
      response_kind:q.kind||'fields',response_modes:responseModes(q),
      rule_peek:rulePeeked?1:0,homework:homeworkMode?1:0,block:window.Homework?window.Homework.inferBlock(q,mode,hwLesson,activeLesson):''};
+   // r7 ux59b #3: every answer names its course lesson (Today = lesson of the latest answer). Additive field.
+   if(!stageContext&&q.lessonId&&courseIds().includes(String(q.lessonId)))event.lesson_id=String(q.lessonId);
    if(stageContext){
      event.lesson_id=stageContext.lessonId;
      event.stage_id=stageContext.stageId;
@@ -1955,7 +2025,7 @@
        <p class="small">Повторно открыть лист можно. «Новая сдача» не стирает прошлый файл. Пауза на карточке возвращает сюда без потери набора.</p>
        <div class="review-actions"><button type="button" class="text-button" data-hw-new>Новая сдача</button></div>
      </div>
-     <div class="panel"><h2>Слабые места</h2>${weak.length?weak.map(w=>`<div class="confusion-row"><div><strong>${esc(window.Homework.weakLabel(w.key))}</strong><p class="small">${core.ruCount(w.count,['раз','раза','раз'])} за 14 дней. Ждали: ${esc(w.expected)} · написала: ${esc(w.actual)}</p></div><button type="button" class="secondary-button" data-weak="${esc(w.cardId)}">Разобрать</button></div>`).join(''):'<p>Пока нет устойчивых слабых мест.</p>'}</div>
+     <div class="panel"><h2>Слабые места</h2>${weak.filter(w=>window.Homework.weakLabel(w.key,questions)).length?weak.filter(w=>window.Homework.weakLabel(w.key,questions)).map(w=>`<div class="confusion-row"><div><strong>${esc(window.Homework.weakLabel(w.key,questions))}</strong><p class="small">${esc(window.Homework.weakDetail(w))}</p></div><button type="button" class="secondary-button" data-weak="${esc(w.cardId)}">Разобрать</button></div>`).join(''):'<p>Пока нет устойчивых слабых мест.</p>'}</div>
      <div class="panel" ${ready?'':'hidden'}><h2>Домашка пройдена</h2>
        <p>Следующий шаг — повторение. Оно использует сохранённые результаты и вернёт нужные карточки по расписанию.</p>
        <p><button type="button" class="primary-button" data-hw-review>Перейти к повторению</button></p>
@@ -2458,6 +2528,16 @@
        finishStagedPractice(lessonId);
        save();return;
      }
+     // r7 ux59b: a reload of a course session that had already ended (its stage was evaluated live, stageContext gone)
+     // marked the lesson «completed» here (seen on prod with a 4-2 state: 24 wrong answers → 4-2 completed, Today → 1-1).
+     // The end was handled before the reload; show the step screen again, change nothing.
+     if(restoredEnded){
+       restoredEnded=false;
+       $('#exercise').innerHTML='<div class="empty-state"><h2>Шаг урока</h2><p>Подход завершён. Можно продолжить урок.</p><div class="finish-actions"><button type="button" class="primary-button" id="stage-continue">Продолжить</button><button type="button" class="secondary-button" id="stage-lessons">К урокам</button></div></div>';
+       $('#stage-continue').onclick=()=>continueLesson(lessonId);
+       $('#stage-lessons').onclick=()=>showView('learn');
+       return;
+     }
      markLessonCompleted(lessonId);
      $('#exercise').innerHTML='<div class="empty-state"><h2>Практика урока завершена</h2><p>Следующий шаг — домашка этого же урока. Можно выйти и вернуться: место сохранено.</p><div class="finish-actions"><button type="button" class="primary-button" id="course-to-homework">Перейти к домашке</button><button type="button" class="secondary-button" id="course-to-learn">К урокам</button></div></div>';
      $('#course-to-homework').onclick=()=>{hwLesson=lessonId;hwPart='exercises';hwSection=0;showView('homework');};
@@ -2868,10 +2948,10 @@
  }
  const learning=window.LearningUI.create({
    get state(){return learningState;},save,startLesson,startCourse,courseJumpMarkup,bindCourseJump,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today'),
-   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,homeworkWordsTrack,homeworkWordList,continueStep,progress:()=>state,openHomework(id){hwLesson=id;hwOrigin='learn';showView('homework');}
+   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,resumeTarget,hubLesson,continueLesson,homeworkWordsTrack,homeworkWordList,continueStep,progress:()=>state,openHomework(id){hwLesson=id;hwOrigin='learn';showView('homework');}
  });
  const dashboard=window.DashboardUI.create({
-   state:()=>state,questions:()=>questions,eligible,hasSession:()=>queue.length>position,continueInfo:stepNow,
+   state:()=>state,questions:()=>questions,eligible,hasSession:()=>queue.length>position,continueInfo:stepNow,resumeTarget,
    action(next){
      if(next.startsWith('remedy:')){startRemedy(next.slice(7));return;}
      if(next==='homework'){hwOrigin='today';hwLesson=hwLesson||namedCourse();showView('homework');return;}
@@ -2927,6 +3007,34 @@
    if(trainerReturn&&queueEpoch!==trainerEpoch)trainerReturn=null;
    return trainerReturn?'personal':mode==='homework'||(mode==='remediation'&&hwReturn)?'homework':mode==='exam'?'exam':pathPracticeReturn?'path':(sessionOrigin||'today');
  }
+ // r7 ux59 #5: the lesson card has its own «← Назад»; the section heading kept a second one (visible on the lesson page,
+ // a zero-size leftover in the DOM / tab order on chapter screens). One back button per screen: hide the heading one then.
+ function syncPathHeadingBack(){
+   const hb=document.querySelector('#path-view .section-heading [data-chrome-back]');if(!hb)return;
+   const own=!!document.querySelector('#path-content .chrome-back, #path-content #path-back, #path-content [data-path-learn]');
+   if(hb.hidden!==own)hb.hidden=own;
+ }
+ try{const pc=document.getElementById('path-content');if(pc)new MutationObserver(syncPathHeadingBack).observe(pc,{childList:true,subtree:true});}catch{}
+ // r7 ux59 #0: the logo «Qazaqsha, сегодня» opens Сегодня in place (no reload): session, drafts and the lesson stay.
+ // Ctrl / ⌘ / Shift / middle click still open a new tab; F5 keeps resumeSurface.
+ const brandLink=document.querySelector('a.brand');
+ if(brandLink)brandLink.addEventListener('click',ev=>{
+   if(ev.defaultPrevented||ev.button!==0||ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.altKey)return;
+   ev.preventDefault();cancelAdvance();abortTutor();
+   const picker=document.getElementById('lesson-picker');if(picker&&picker.open)try{picker.close();}catch{}
+   // r7 ux59b #5: one history entry per logo jump, same URL (F5 / resumeSurface / SW untouched): browser «Назад»
+   // returns to the screen she left (session and draft are in memory and in the saved state), not off the site.
+   const from=view;
+   if(from&&from!=='today')try{history.replaceState(Object.assign({},history.state||{},{qzView:from}),'');history.pushState({qzView:'today'},'');}catch{}
+   showView('today');save();
+   try{window.scrollTo({top:0});}catch{}
+   const h=document.querySelector('#today-view h1, #today-content h2');if(h){h.setAttribute('tabindex','-1');try{h.focus({preventScroll:true});}catch{}}
+ });
+ window.addEventListener('popstate',ev=>{
+   const v=ev.state&&ev.state.qzView;if(!v||v===view)return;
+   if(v==='practice'&&!(queue.length>position))return; // that session is over: stay where she is
+   cancelAdvance();abortTutor();showView(v);save();
+ });
  $('#pause-session').onclick=()=>{
    cancelAdvance();abortTutor();
    const back=pauseTarget(); // drops a trainerReturn left over from an earlier trainer queue
@@ -3021,6 +3129,13 @@
      savedSession.view==='path'&&state.grammarPath&&state.grammarPath.lessonId]);
    for(const id of resumeLessons)if(id)ensureV2(id);
  }
+ // r7 ux59b #3: «Повторить сегодня» counted only cards of lessons installed so far (lazy v2 banks): 28 before a reload,
+ // 0 after it, more after opening a lesson. Install the lessons that own a due / needs-review record at start.
+ try{
+   const now=Date.now(),need=new Set();
+   for(const [id,r] of Object.entries(records||{})){if(byId.has(id)||!r||!(r.needsReview||core.isDue(r,now)))continue;const lid=compiledCardLesson(id);if(lid)need.add(lid);}
+   for(const id of need)ensureV2(id);
+ }catch(e){}
  if(savedSession&&savedSession.mode==='lesson'&&String(savedSession.activeLesson||'').startsWith(HW_WORDS_PREFIX))homeworkWordsTrack(String(savedSession.activeLesson).slice(HW_WORDS_PREFIX.length));
  const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','course','phrase','transfer','contrast','numbers','remediation','words','exam','homework','chunks'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){
@@ -3034,7 +3149,7 @@
    activeStep=activeLesson?Math.min(window.LEARNING.lessons.find(l=>l.id===activeLesson).chunks.length-1,Math.max(0,Number(savedSession.activeStep)||0)):null;
    queue=savedSession.queue;practiceIds=Array.isArray(savedSession.practiceIds)?savedSession.practiceIds.filter(id=>byId.has(id)):[...new Set(queue)];
    stepEvidence=savedSession.stepEvidence&&typeof savedSession.stepEvidence==='object'?savedSession.stepEvidence:{};
-   position=Math.min(queue.length,savedSession.position+(savedSession.answered?1:0));if(savedSession.answered&&!['ordered','shuffle','homework','course','phrase','transfer'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();
+   position=Math.min(queue.length,savedSession.position+(savedSession.answered?1:0));restoredEnded=mode==='course'&&!stageContext&&position>=queue.length;if(savedSession.answered&&!['ordered','shuffle','homework','course','phrase','transfer'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();
    if(!savedSession.answered){hinted=!!savedSession.hinted;elapsedMs=Number.isFinite(savedSession.elapsed_ms)?Math.max(0,savedSession.elapsed_ms):0;}
  }else{queue=[];practiceIds=[];renderStats();}
  const hasMorphResume=!!(state.morphTrainer&&(state.morphTrainer.session||(state.morphTrainer.teaching&&state.morphTrainer.teaching.resume)));
