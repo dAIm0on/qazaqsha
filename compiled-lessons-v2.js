@@ -62537,5 +62537,1958 @@ window.LESSON_V2_COMPILED = [
         }
       ]
     }
+  },
+  {
+    "schema_version": 2,
+    "lesson_id": "5-1",
+    "content_revision": "5-1.r1",
+    "title": "Урок 5–1 · Местный падеж",
+    "label": "5–1",
+    "name": "Местный падеж",
+    "status": "draft",
+    "release": {
+      "approved": false,
+      "preview_head": "",
+      "preview_url": "",
+      "approved_at": "",
+      "note": "r7 #64 draft from PASS-DOC r2.3; approve after QA"
+    },
+    "sources": [
+      {
+        "id": "school-method",
+        "role": "SCHOOL_NORM",
+        "title": "5-1 методичка Местный падеж.pdf",
+        "url": "https://example.invalid/5-1-method.pdf"
+      },
+      {
+        "id": "school-exercises",
+        "role": "SCHOOL_NORM",
+        "title": "5-1 упражнения Местный падеж.pdf",
+        "url": "https://example.invalid/5-1-exercises.pdf"
+      },
+      {
+        "id": "school-homework",
+        "role": "SCHOOL_NORM",
+        "title": "5_1_домашняя_работа_Местный_падеж.pdf",
+        "url": "https://example.invalid/5-1-homework.pdf"
+      },
+      {
+        "id": "canon-r23",
+        "role": "RESEARCH_VERIFIED",
+        "title": "5-1.md r2.3 PASS-DOC",
+        "url": "https://drive.google.com/file/d/1Cy-6y72R3ZPc6_7vGmmfnhPdpPlWD5b3/view"
+      }
+    ],
+    "prerequisites": {
+      "lessons": [
+        "4-2",
+        "3-3",
+        "3-2",
+        "4-1"
+      ],
+      "skills_required": [],
+      "skills_review": []
+    },
+    "scope": {
+      "allowed": [
+        "locative",
+        "local-case",
+        "да-де-locative"
+      ],
+      "blocked_future": []
+    },
+    "rules": [
+      {
+        "id": "v2:5-1:da-too",
+        "title": "Два «да»: тоже и где"
+      },
+      {
+        "id": "v2:5-1:locative",
+        "title": "Что такое местный падеж"
+      },
+      {
+        "id": "v2:5-1:ta-da",
+        "title": "Окончания ТА/ТЕ и ДА/ДЕ"
+      },
+      {
+        "id": "v2:5-1:nda",
+        "title": "НДА/НДЕ после «чьё»"
+      },
+      {
+        "id": "v2:5-1:part-vs-poss",
+        "title": "Часть слова или «чьё»"
+      },
+      {
+        "id": "v2:5-1:names",
+        "title": "Имена собственные"
+      },
+      {
+        "id": "v2:5-1:who",
+        "title": "«Где» + «кто»"
+      },
+      {
+        "id": "v2:5-1:emes",
+        "title": "Отрицание с «емес»"
+      },
+      {
+        "id": "v2:5-1:verb",
+        "title": "С глаголом: «кто» на глаголе"
+      },
+      {
+        "id": "v2:5-1:pronouns",
+        "title": "Местоимения и онда"
+      },
+      {
+        "id": "v2:5-1:dala-time",
+        "title": "«Дала» и время"
+      },
+      {
+        "id": "v2:5-1:age",
+        "title": "Возраст: жас и жыл"
+      },
+      {
+        "id": "v2:5-1:summary",
+        "title": "Резюме урока"
+      }
+    ],
+    "theory": [
+      {
+        "id": "theory:5-1:da-too",
+        "rule_id": "v2:5-1:da-too",
+        "title": "Два «да»: тоже и где",
+        "meaning": "«Тоже» — отдельное слово. «Где» присоединяется к самому слову.",
+        "fullExplanation": "В казахском одно и то же «да/де» бывает двумя разными вещами.\n\nМен де жазамын — «Я тоже пишу»: перед «де» есть пробел, это отдельное слово «тоже».\n\nҮйде — «дома»: буквы присоединены к слову, это «где».\n\nТри способа различить: пробел, можно ли заменить русским «тоже», можно ли спросить «где?».",
+        "shortHint": "«Тоже» — отдельное слово. «Где» присоединяется к самому слову.",
+        "decisionSteps": [
+          "«Тоже» — отдельное слово. «Где» присоединяется к самому слову."
+        ],
+        "examples": [
+          {
+            "kazakh": "Мен де жазамын.",
+            "translation": "Я тоже пишу.",
+            "why": ""
+          },
+          {
+            "kazakh": "Үйде.",
+            "translation": "Дома.",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:da-too:1",
+            "type": "one_prod",
+            "prompt": "«Мен де жазамын» — это «тоже» или «где»?",
+            "answers": [
+              "тоже",
+              "тоже (отдельное слово)"
+            ],
+            "error_key": "loc-da-too",
+            "rule_line": ""
+          },
+          {
+            "id": "check:5-1:da-too:2",
+            "type": "one_prod",
+            "prompt": "Напиши «дома» одним словом.",
+            "answers": [
+              "үйде"
+            ],
+            "error_key": "loc-da-too",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:locative",
+        "rule_id": "v2:5-1:locative",
+        "title": "Что такое местный падеж",
+        "meaning": "Местный падеж отвечает на «где?» / «у кого?».",
+        "fullExplanation": "Местный падеж (жатыс септік) говорит, где что-то находится или у кого.\n\nВопросы: Қайда? Қай жерде?\n\nЧетыре работы: место (үйде), время (жазда), длительность (узнавание), возраст (жиырмадамын).",
+        "shortHint": "Местный падеж отвечает на «где?» / «у кого?».",
+        "decisionSteps": [
+          "Местный падеж отвечает на «где?» / «у кого?»."
+        ],
+        "examples": [
+          {
+            "kazakh": "Кітапханада.",
+            "translation": "В библиотеке.",
+            "why": ""
+          },
+          {
+            "kazakh": "Алматыда.",
+            "translation": "В Алматы.",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:locative:1",
+            "type": "one_prod",
+            "prompt": "Какой вопрос задаём к местному падежу?",
+            "answers": [
+              "Қайда?",
+              "Қайда",
+              "Қай жерде?"
+            ],
+            "error_key": "loc-locative",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:ta-da",
+        "rule_id": "v2:5-1:ta-da",
+        "title": "Окончания ТА/ТЕ и ДА/ДЕ",
+        "meaning": "Последний звук выбирает Т или Д; твёрдость — А или Е.",
+        "fullExplanation": "Смотрим на последний звук слова.\n\nГлухие и конечные б/в/г/д → ТА/ТЕ.\nЛ/р/й/у и гласные → ДА/ДЕ.\n\nТвёрдое слово → А, мягкое → Е: саябақта, мектепте.",
+        "shortHint": "Последний звук выбирает Т или Д; твёрдость — А или Е.",
+        "decisionSteps": [
+          "Последний звук выбирает Т или Д; твёрдость — А или Е."
+        ],
+        "examples": [
+          {
+            "kazakh": "мектепте",
+            "translation": "в школе",
+            "why": ""
+          },
+          {
+            "kazakh": "саябақта",
+            "translation": "в парке",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:ta-da:1",
+            "type": "one_prod",
+            "prompt": "мектеп + где →",
+            "answers": [
+              "мектепте"
+            ],
+            "error_key": "loc-ta-da",
+            "rule_line": ""
+          },
+          {
+            "id": "check:5-1:ta-da:2",
+            "type": "one_prod",
+            "prompt": "саябақ + где →",
+            "answers": [
+              "саябақта"
+            ],
+            "error_key": "loc-ta-da",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:nda",
+        "rule_id": "v2:5-1:nda",
+        "title": "НДА/НДЕ после «чьё»",
+        "meaning": "После «чьё» 3-го лица окончание начинается на Н.",
+        "fullExplanation": "Если на конце слова уже есть «чьё» третьего лица (ы/і, сы/сі), местный падеж — НДА/НДЕ.\n\nдүкенінде — в его/её магазине.\nдостарында — у своих друзей.\nотбасында — в семье (3-е лицо уже внутри «отбасы»).",
+        "shortHint": "После «чьё» 3-го лица окончание начинается на Н.",
+        "decisionSteps": [
+          "После «чьё» 3-го лица окончание начинается на Н."
+        ],
+        "examples": [
+          {
+            "kazakh": "дүкенінде",
+            "translation": "в его/её магазине",
+            "why": ""
+          },
+          {
+            "kazakh": "отбасында",
+            "translation": "в семье",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:nda:1",
+            "type": "one_prod",
+            "prompt": "дүкен + і + где →",
+            "answers": [
+              "дүкенінде"
+            ],
+            "error_key": "loc-nda",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:part-vs-poss",
+        "rule_id": "v2:5-1:part-vs-poss",
+        "title": "Часть слова или «чьё»",
+        "meaning": "көршіде — і часть слова; дүкенінде — і это «чьё».",
+        "fullExplanation": "Не каждое і на конце — «чьё».\n\nкөршіде — у соседа: і часть слова «көрші».\nдүкенінде — в его магазине: і это «чьё».\n\nПризнак: можно ли спросить «чей?».",
+        "shortHint": "көршіде — і часть слова; дүкенінде — і это «чьё».",
+        "decisionSteps": [
+          "көршіде — і часть слова; дүкенінде — і это «чьё»."
+        ],
+        "examples": [
+          {
+            "kazakh": "көршіде",
+            "translation": "у соседа",
+            "why": ""
+          },
+          {
+            "kazakh": "дүкенінде",
+            "translation": "в его/её магазине",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:part-vs-poss:1",
+            "type": "one_prod",
+            "prompt": "«көршіде» — і это «чьё»? (да/нет)",
+            "answers": [
+              "нет",
+              "нет, часть слова"
+            ],
+            "error_key": "loc-part-vs-poss",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:names",
+        "rule_id": "v2:5-1:names",
+        "title": "Имена собственные",
+        "meaning": "Алматы қаласы → Алматы қаласында.",
+        "fullExplanation": "Названия часто идут через «қаласы/бекеті».\n\nАлматы қаласы — город Алматы.\nАлматы қаласында — в городе Алматы.",
+        "shortHint": "Алматы қаласы → Алматы қаласында.",
+        "decisionSteps": [
+          "Алматы қаласы → Алматы қаласында."
+        ],
+        "examples": [
+          {
+            "kazakh": "Алматы қаласында",
+            "translation": "в городе Алматы",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:names:1",
+            "type": "one_prod",
+            "prompt": "Алматы қаласы + где →",
+            "answers": [
+              "Алматы қаласында"
+            ],
+            "error_key": "loc-names",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:who",
+        "rule_id": "v2:5-1:who",
+        "title": "«Где» + «кто»",
+        "meaning": "После падежа можно добавить личное окончание.",
+        "fullExplanation": "Порядок: много → чьё → где → кто.\n\nкітапханадамын — я в библиотеке.\nПосле гласной падежа личные как после гласной; у ол/олар — ноль.",
+        "shortHint": "После падежа можно добавить личное окончание.",
+        "decisionSteps": [
+          "После падежа можно добавить личное окончание."
+        ],
+        "examples": [
+          {
+            "kazakh": "кітапханадамын",
+            "translation": "я в библиотеке",
+            "why": ""
+          },
+          {
+            "kazakh": "даладамыз",
+            "translation": "мы на улице / в степи",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:who:1",
+            "type": "one_prod",
+            "prompt": "кітапханада + мен →",
+            "answers": [
+              "кітапханадамын"
+            ],
+            "error_key": "loc-who",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:emes",
+        "rule_id": "v2:5-1:emes",
+        "title": "Отрицание с «емес»",
+        "meaning": "«емес» забирает личное окончание.",
+        "fullExplanation": "Без глагола отрицание — через емес: личное уезжает на емес.\n\nМен сенің сыныбыңда емеспін — я не в твоём классе.",
+        "shortHint": "«емес» забирает личное окончание.",
+        "decisionSteps": [
+          "«емес» забирает личное окончание."
+        ],
+        "examples": [
+          {
+            "kazakh": "Мен сенің сыныбыңда емеспін.",
+            "translation": "Я не в твоём классе.",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:emes:1",
+            "type": "one_prod",
+            "prompt": "Скажи: я не дома (мен + үйде + емес)",
+            "answers": [
+              "Мен үйде емеспін",
+              "мен үйде емеспін"
+            ],
+            "error_key": "loc-emes",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:verb",
+        "rule_id": "v2:5-1:verb",
+        "title": "С глаголом: «кто» на глаголе",
+        "meaning": "Если есть глагол — личное на глаголе.",
+        "fullExplanation": "В предложении с глаголом «кто» стоит на глаголе, а «где» — на месте.\n\nМен кітапханада оқимын — я читаю в библиотеке.\nОтрицание глаголом; вопрос: тұра ма?",
+        "shortHint": "Если есть глагол — личное на глаголе.",
+        "decisionSteps": [
+          "Если есть глагол — личное на глаголе."
+        ],
+        "examples": [
+          {
+            "kazakh": "Мен кітапханада оқимын.",
+            "translation": "Я читаю в библиотеке.",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:verb:1",
+            "type": "one_prod",
+            "prompt": "Где стоит «кто», если есть глагол?",
+            "answers": [
+              "на глаголе",
+              "на глаголе"
+            ],
+            "error_key": "loc-verb",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:pronouns",
+        "rule_id": "v2:5-1:pronouns",
+        "title": "Местоимения и онда",
+        "meaning": "менде, сенде… особая форма онда.",
+        "fullExplanation": "Личные местоимения: менде, сенде, сізде, бізде, сендерде, сіздерде, оларда.\n\nУ «ол» особая форма: онда (не «олда»).",
+        "shortHint": "менде, сенде… особая форма онда.",
+        "decisionSteps": [
+          "менде, сенде… особая форма онда."
+        ],
+        "examples": [
+          {
+            "kazakh": "онда",
+            "translation": "у него/неё; там",
+            "why": ""
+          },
+          {
+            "kazakh": "менде",
+            "translation": "у меня",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:pronouns:1",
+            "type": "one_prod",
+            "prompt": "ол + где (особая форма) →",
+            "answers": [
+              "онда"
+            ],
+            "error_key": "loc-pronouns",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:dala-time",
+        "rule_id": "v2:5-1:dala-time",
+        "title": "«Дала» и время",
+        "meaning": "дала — степь / вне дома; жазда, түнде.",
+        "fullExplanation": "далада — в степи или на улице (вне помещения).\n\nВремя: жазда — летом, түнде — ночью, сағат жетіде — в семь часов.",
+        "shortHint": "дала — степь / вне дома; жазда, түнде.",
+        "decisionSteps": [
+          "дала — степь / вне дома; жазда, түнде."
+        ],
+        "examples": [
+          {
+            "kazakh": "жазда",
+            "translation": "летом",
+            "why": ""
+          },
+          {
+            "kazakh": "далада",
+            "translation": "в степи / на улице",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:dala-time:1",
+            "type": "one_prod",
+            "prompt": "«летом» одним словом",
+            "answers": [
+              "жазда"
+            ],
+            "error_key": "loc-dala-time",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:age",
+        "rule_id": "v2:5-1:age",
+        "title": "Возраст: жас и жыл",
+        "meaning": "Возраст через жас; жыл — календарный год.",
+        "fullExplanation": "Мне двадцать: жиырма жастамын или жиырмадамын.\n\n«жиырма жылдамын» — ошибка: жыл не для возраста.\n\nҚай жылғысың? — какого ты года? (готовая формула).",
+        "shortHint": "Возраст через жас; жыл — календарный год.",
+        "decisionSteps": [
+          "Возраст через жас; жыл — календарный год."
+        ],
+        "examples": [
+          {
+            "kazakh": "жиырмадамын",
+            "translation": "мне двадцать",
+            "why": ""
+          },
+          {
+            "kazakh": "жиырма жастамын",
+            "translation": "мне двадцать лет",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:age:1",
+            "type": "one_prod",
+            "prompt": "Мне двадцать (короткая форма)",
+            "answers": [
+              "жиырмадамын"
+            ],
+            "error_key": "loc-age",
+            "rule_line": ""
+          }
+        ]
+      },
+      {
+        "id": "theory:5-1:summary",
+        "rule_id": "v2:5-1:summary",
+        "title": "Резюме урока",
+        "meaning": "Три вида окончаний; порядок много → чьё → где → кто.",
+        "fullExplanation": "Местный падеж: та/те, да/де, нда/нде.\n\n«Тоже» — отдельное слово; «где» — на слове.\n\nПосле «чьё» 3-го лица — Н.\n\nС глаголом личное на глаголе; без глагола можно на слове или на емес.",
+        "shortHint": "Три вида окончаний; порядок много → чьё → где → кто.",
+        "decisionSteps": [
+          "Три вида окончаний; порядок много → чьё → где → кто."
+        ],
+        "examples": [
+          {
+            "kazakh": "үйдемін",
+            "translation": "я дома",
+            "why": ""
+          }
+        ],
+        "contrastExamples": [],
+        "limitations": [],
+        "commonConfusions": [],
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ],
+        "checks": [
+          {
+            "id": "check:5-1:summary:1",
+            "type": "one_prod",
+            "prompt": "Назови три вида окончаний «где»",
+            "answers": [
+              "та/те, да/де, нда/нде",
+              "та те да де нда нде"
+            ],
+            "error_key": "loc-summary",
+            "rule_line": ""
+          }
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "id": "vocab:5-1:bolme",
+        "lemma": "бөлме",
+        "forms": [
+          "бөлме"
+        ],
+        "translations": [
+          "комната"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:kol",
+        "lemma": "көл",
+        "forms": [
+          "көл"
+        ],
+        "translations": [
+          "озеро"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:teniz",
+        "lemma": "теңіз",
+        "forms": [
+          "теңіз"
+        ],
+        "translations": [
+          "море"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:alan",
+        "lemma": "алаң",
+        "forms": [
+          "алаң"
+        ],
+        "translations": [
+          "площадь"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:auyl",
+        "lemma": "ауыл",
+        "forms": [
+          "ауыл"
+        ],
+        "translations": [
+          "аул",
+          "деревня"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:sayazhay",
+        "lemma": "саяжай",
+        "forms": [
+          "саяжай"
+        ],
+        "translations": [
+          "дача"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:tau",
+        "lemma": "тау",
+        "forms": [
+          "тау"
+        ],
+        "translations": [
+          "гора"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:qaidan",
+        "lemma": "Қайдансың?",
+        "forms": [
+          "Қайдансың?",
+          "Қайдансыз?"
+        ],
+        "translations": [
+          "Откуда ты?",
+          "Откуда Вы?"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:uy",
+        "lemma": "үй",
+        "forms": [
+          "үй"
+        ],
+        "translations": [
+          "дом"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:mektep",
+        "lemma": "мектеп",
+        "forms": [
+          "мектеп"
+        ],
+        "translations": [
+          "школа"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:kitaphana",
+        "lemma": "кітапхана",
+        "forms": [
+          "кітапхана"
+        ],
+        "translations": [
+          "библиотека"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:duken",
+        "lemma": "дүкен",
+        "forms": [
+          "дүкен"
+        ],
+        "translations": [
+          "магазин"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:dala",
+        "lemma": "дала",
+        "forms": [
+          "дала"
+        ],
+        "translations": [
+          "степь",
+          "улица"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:jas",
+        "lemma": "жас",
+        "forms": [
+          "жас"
+        ],
+        "translations": [
+          "возраст",
+          "год (жизни)"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:jyl",
+        "lemma": "жыл",
+        "forms": [
+          "жыл"
+        ],
+        "translations": [
+          "год"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "vocab:5-1:onda",
+        "lemma": "онда",
+        "forms": [
+          "онда"
+        ],
+        "translations": [
+          "у него",
+          "там"
+        ],
+        "role": "target",
+        "introduced_in": "5-1",
+        "source_refs": [
+          "school-method",
+          "canon-r23"
+        ]
+      }
+    ],
+    "original_exercises": [
+      {
+        "id": "src:5-1:da-too:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Два «да»: тоже и где",
+        "stimulus": "«Мен де жазамын» — это «тоже» или «где»?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тоже",
+              "тоже (отдельное слово)"
+            ]
+          }
+        ],
+        "explanation": "«Тоже» — отдельное слово. «Где» присоединяется к самому слову.",
+        "lessonId": "5-1",
+        "source_item": "Два «да»: тоже и где",
+        "prompt_original": "«Мен де жазамын» — это «тоже» или «где»?",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:da-too:c2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Два «да»: тоже и где",
+        "stimulus": "Напиши «дома» одним словом.",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "үйде"
+            ]
+          }
+        ],
+        "explanation": "«Тоже» — отдельное слово. «Где» присоединяется к самому слову.",
+        "lessonId": "5-1",
+        "source_item": "Два «да»: тоже и где",
+        "prompt_original": "Напиши «дома» одним словом.",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:locative:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Что такое местный падеж",
+        "stimulus": "Какой вопрос задаём к местному падежу?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қайда?",
+              "Қайда",
+              "Қай жерде?"
+            ]
+          }
+        ],
+        "explanation": "Местный падеж отвечает на «где?» / «у кого?».",
+        "lessonId": "5-1",
+        "source_item": "Что такое местный падеж",
+        "prompt_original": "Какой вопрос задаём к местному падежу?",
+        "ruleIds": [
+          "v2:5-1:locative"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:ta-da:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Окончания ТА/ТЕ и ДА/ДЕ",
+        "stimulus": "мектеп + где →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "мектепте"
+            ]
+          }
+        ],
+        "explanation": "Последний звук выбирает Т или Д; твёрдость — А или Е.",
+        "lessonId": "5-1",
+        "source_item": "Окончания ТА/ТЕ и ДА/ДЕ",
+        "prompt_original": "мектеп + где →",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:ta-da:c2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Окончания ТА/ТЕ и ДА/ДЕ",
+        "stimulus": "саябақ + где →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "саябақта"
+            ]
+          }
+        ],
+        "explanation": "Последний звук выбирает Т или Д; твёрдость — А или Е.",
+        "lessonId": "5-1",
+        "source_item": "Окончания ТА/ТЕ и ДА/ДЕ",
+        "prompt_original": "саябақ + где →",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:nda:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "НДА/НДЕ после «чьё»",
+        "stimulus": "дүкен + і + где →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "дүкенінде"
+            ]
+          }
+        ],
+        "explanation": "После «чьё» 3-го лица окончание начинается на Н.",
+        "lessonId": "5-1",
+        "source_item": "НДА/НДЕ после «чьё»",
+        "prompt_original": "дүкен + і + где →",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:part-vs-poss:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»",
+        "stimulus": "«көршіде» — і это «чьё»? (да/нет)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "нет",
+              "нет, часть слова"
+            ]
+          }
+        ],
+        "explanation": "көршіде — і часть слова; дүкенінде — і это «чьё».",
+        "lessonId": "5-1",
+        "source_item": "Часть слова или «чьё»",
+        "prompt_original": "«көршіде» — і это «чьё»? (да/нет)",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:names:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имена собственные",
+        "stimulus": "Алматы қаласы + где →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Алматы қаласында"
+            ]
+          }
+        ],
+        "explanation": "Алматы қаласы → Алматы қаласында.",
+        "lessonId": "5-1",
+        "source_item": "Имена собственные",
+        "prompt_original": "Алматы қаласы + где →",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:who:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Где» + «кто»",
+        "stimulus": "кітапханада + мен →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кітапханадамын"
+            ]
+          }
+        ],
+        "explanation": "После падежа можно добавить личное окончание.",
+        "lessonId": "5-1",
+        "source_item": "«Где» + «кто»",
+        "prompt_original": "кітапханада + мен →",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:emes:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с «емес»",
+        "stimulus": "Скажи: я не дома (мен + үйде + емес)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мен үйде емеспін",
+              "мен үйде емеспін"
+            ]
+          }
+        ],
+        "explanation": "«емес» забирает личное окончание.",
+        "lessonId": "5-1",
+        "source_item": "Отрицание с «емес»",
+        "prompt_original": "Скажи: я не дома (мен + үйде + емес)",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:verb:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом: «кто» на глаголе",
+        "stimulus": "Где стоит «кто», если есть глагол?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "на глаголе",
+              "на глаголе"
+            ]
+          }
+        ],
+        "explanation": "Если есть глагол — личное на глаголе.",
+        "lessonId": "5-1",
+        "source_item": "С глаголом: «кто» на глаголе",
+        "prompt_original": "Где стоит «кто», если есть глагол?",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:pronouns:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимения и онда",
+        "stimulus": "ол + где (особая форма) →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "онда"
+            ]
+          }
+        ],
+        "explanation": "менде, сенде… особая форма онда.",
+        "lessonId": "5-1",
+        "source_item": "Местоимения и онда",
+        "prompt_original": "ол + где (особая форма) →",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:dala-time:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Дала» и время",
+        "stimulus": "«летом» одним словом",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жазда"
+            ]
+          }
+        ],
+        "explanation": "дала — степь / вне дома; жазда, түнде.",
+        "lessonId": "5-1",
+        "source_item": "«Дала» и время",
+        "prompt_original": "«летом» одним словом",
+        "ruleIds": [
+          "v2:5-1:dala-time"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:age:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Возраст: жас и жыл",
+        "stimulus": "Мне двадцать (короткая форма)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жиырмадамын"
+            ]
+          }
+        ],
+        "explanation": "Возраст через жас; жыл — календарный год.",
+        "lessonId": "5-1",
+        "source_item": "Возраст: жас и жыл",
+        "prompt_original": "Мне двадцать (короткая форма)",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:summary:c1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Резюме урока",
+        "stimulus": "Назови три вида окончаний «где»",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "та/те, да/де, нда/нде",
+              "та те да де нда нде"
+            ]
+          }
+        ],
+        "explanation": "Три вида окончаний; порядок много → чьё → где → кто.",
+        "lessonId": "5-1",
+        "source_item": "Резюме урока",
+        "prompt_original": "Назови три вида окончаний «где»",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:xfer:bolme",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "бөлме → где",
+        "stimulus": "бөлме → в комнате",
+        "fields": [
+          {
+            "label": "Форма",
+            "kind": "text",
+            "answers": [
+              "бөлмеде"
+            ]
+          }
+        ],
+        "explanation": "бөлме → бөлмеде.",
+        "lessonId": "5-1",
+        "source_item": "Перенос · где",
+        "prompt_original": "Напиши «в комнате» (бөлме).",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "src:5-1:xfer:kol",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "көл → где",
+        "stimulus": "көл → в озере",
+        "fields": [
+          {
+            "label": "Форма",
+            "kind": "text",
+            "answers": [
+              "көлде"
+            ]
+          }
+        ],
+        "explanation": "көл → көлде.",
+        "lessonId": "5-1",
+        "source_item": "Перенос · где",
+        "prompt_original": "Напиши «в озере» (көл).",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "src:5-1:xfer:teniz",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "теңіз → где",
+        "stimulus": "теңіз → в море",
+        "fields": [
+          {
+            "label": "Форма",
+            "kind": "text",
+            "answers": [
+              "теңізде"
+            ]
+          }
+        ],
+        "explanation": "теңіз → теңізде.",
+        "lessonId": "5-1",
+        "source_item": "Перенос · где",
+        "prompt_original": "Напиши «в море» (теңіз).",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "src:5-1:xfer:alan",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "алаң → где",
+        "stimulus": "алаң → на площади",
+        "fields": [
+          {
+            "label": "Форма",
+            "kind": "text",
+            "answers": [
+              "алаңда"
+            ]
+          }
+        ],
+        "explanation": "алаң → алаңда.",
+        "lessonId": "5-1",
+        "source_item": "Перенос · где",
+        "prompt_original": "Напиши «на площади» (алаң).",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "src:5-1:xfer:auyl",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "ауыл → где",
+        "stimulus": "ауыл → в ауле",
+        "fields": [
+          {
+            "label": "Форма",
+            "kind": "text",
+            "answers": [
+              "ауылда"
+            ]
+          }
+        ],
+        "explanation": "ауыл → ауылда.",
+        "lessonId": "5-1",
+        "source_item": "Перенос · где",
+        "prompt_original": "Напиши «в ауле» (ауыл).",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "src:5-1:xfer:sayazhay",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "саяжай → где",
+        "stimulus": "саяжай → на даче",
+        "fields": [
+          {
+            "label": "Форма",
+            "kind": "text",
+            "answers": [
+              "саяжайда"
+            ]
+          }
+        ],
+        "explanation": "саяжай → саяжайда.",
+        "lessonId": "5-1",
+        "source_item": "Перенос · где",
+        "prompt_original": "Напиши «на даче» (саяжай).",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "src:5-1:xfer:tau",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "тау → где",
+        "stimulus": "тау → в горах",
+        "fields": [
+          {
+            "label": "Форма",
+            "kind": "text",
+            "answers": [
+              "тауда"
+            ]
+          }
+        ],
+        "explanation": "тау → тауда.",
+        "lessonId": "5-1",
+        "source_item": "Перенос · где",
+        "prompt_original": "Напиши «в горах» (тау).",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "src:5-1:xfer:kitap",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "кітапхана → где",
+        "stimulus": "кітапхана → в библиотеке",
+        "fields": [
+          {
+            "label": "Форма",
+            "kind": "text",
+            "answers": [
+              "кітапханада"
+            ]
+          }
+        ],
+        "explanation": "кітапхана → кітапханада.",
+        "lessonId": "5-1",
+        "source_item": "Перенос · где",
+        "prompt_original": "Напиши «в библиотеке» (кітапхана).",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "src:5-1:xfer:mektep",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "мектеп → где",
+        "stimulus": "мектеп → в школе",
+        "fields": [
+          {
+            "label": "Форма",
+            "kind": "text",
+            "answers": [
+              "мектепте"
+            ]
+          }
+        ],
+        "explanation": "мектеп → мектепте.",
+        "lessonId": "5-1",
+        "source_item": "Перенос · где",
+        "prompt_original": "Напиши «в школе» (мектеп).",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "src:5-1:xfer:uy",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "үй → где",
+        "stimulus": "үй → дома",
+        "fields": [
+          {
+            "label": "Форма",
+            "kind": "text",
+            "answers": [
+              "үйде"
+            ]
+          }
+        ],
+        "explanation": "үй → үйде.",
+        "lessonId": "5-1",
+        "source_item": "Перенос · где",
+        "prompt_original": "Напиши «дома» (үй).",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-homework",
+          "canon-r23"
+        ]
+      },
+      {
+        "id": "src:5-1:recog:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "тоже или где",
+        "stimulus": "Мен де жазамын.",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тоже",
+              "Тоже"
+            ]
+          }
+        ],
+        "explanation": "Это «тоже».",
+        "lessonId": "5-1",
+        "source_item": "Распознавание тоже/где",
+        "prompt_original": "«Мен де жазамын.» — тоже или где?",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:recog:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "тоже или где",
+        "stimulus": "Үйдемін.",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "где",
+              "Где"
+            ]
+          }
+        ],
+        "explanation": "Это «где».",
+        "lessonId": "5-1",
+        "source_item": "Распознавание тоже/где",
+        "prompt_original": "«Үйдемін.» — тоже или где?",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:recog:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "тоже или где",
+        "stimulus": "Ол да келеді.",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тоже",
+              "Тоже"
+            ]
+          }
+        ],
+        "explanation": "Это «тоже».",
+        "lessonId": "5-1",
+        "source_item": "Распознавание тоже/где",
+        "prompt_original": "«Ол да келеді.» — тоже или где?",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:recog:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "тоже или где",
+        "stimulus": "Кітапханада.",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "где",
+              "Где"
+            ]
+          }
+        ],
+        "explanation": "Это «где».",
+        "lessonId": "5-1",
+        "source_item": "Распознавание тоже/где",
+        "prompt_original": "«Кітапханада.» — тоже или где?",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:recog:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "тоже или где",
+        "stimulus": "Сен де оқисың.",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тоже",
+              "Тоже"
+            ]
+          }
+        ],
+        "explanation": "Это «тоже».",
+        "lessonId": "5-1",
+        "source_item": "Распознавание тоже/где",
+        "prompt_original": "«Сен де оқисың.» — тоже или где?",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:recog:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "тоже или где",
+        "stimulus": "Мектептеміз.",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "где",
+              "Где"
+            ]
+          }
+        ],
+        "explanation": "Это «где».",
+        "lessonId": "5-1",
+        "source_item": "Распознавание тоже/где",
+        "prompt_original": "«Мектептеміз.» — тоже или где?",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      }
+    ],
+    "practice_generators": [],
+    "corrections": [],
+    "migrations": [],
+    "generated_questions": [],
+    "stages": [
+      {
+        "id": "stage:5-1:recog",
+        "title": "Тоже или где",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:recog:1",
+          "src:5-1:recog:2",
+          "src:5-1:recog:3",
+          "src:5-1:recog:4",
+          "src:5-1:recog:5",
+          "src:5-1:recog:6"
+        ],
+        "required_independent_ids": [
+          "src:5-1:recog:1",
+          "src:5-1:recog:2",
+          "src:5-1:recog:3"
+        ],
+        "rule_ids": [
+          "v2:5-1:da-too"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 20,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:build",
+        "title": "Собери «где»",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:xfer:bolme",
+          "src:5-1:xfer:kol",
+          "src:5-1:xfer:teniz",
+          "src:5-1:xfer:alan",
+          "src:5-1:xfer:auyl",
+          "src:5-1:xfer:sayazhay",
+          "src:5-1:xfer:tau",
+          "src:5-1:xfer:kitap",
+          "src:5-1:xfer:mektep",
+          "src:5-1:xfer:uy"
+        ],
+        "required_independent_ids": [
+          "src:5-1:xfer:bolme",
+          "src:5-1:xfer:kol",
+          "src:5-1:xfer:teniz",
+          "src:5-1:xfer:alan"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:final",
+        "title": "Финальная проверка 5-1",
+        "kind": "checkpoint",
+        "core_ids": [
+          "src:5-1:da-too:c1",
+          "src:5-1:da-too:c2",
+          "src:5-1:locative:c1",
+          "src:5-1:ta-da:c1",
+          "src:5-1:ta-da:c2",
+          "src:5-1:nda:c1",
+          "src:5-1:part-vs-poss:c1",
+          "src:5-1:names:c1",
+          "src:5-1:who:c1",
+          "src:5-1:emes:c1",
+          "src:5-1:verb:c1",
+          "src:5-1:pronouns:c1"
+        ],
+        "required_independent_ids": [
+          "src:5-1:da-too:c1",
+          "src:5-1:da-too:c2",
+          "src:5-1:locative:c1",
+          "src:5-1:ta-da:c1"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da",
+          "v2:5-1:nda",
+          "v2:5-1:who"
+        ],
+        "min_independent_ratio": 0.75,
+        "max_presentations": 24,
+        "final": true
+      }
+    ],
+    "homework": {
+      "lesson_id": "5-1",
+      "title": "Домашняя работа 5–1",
+      "source_items": [
+        {
+          "id": "hw-item:5-1:1",
+          "number": "1",
+          "text": "Повторить материал урока (местный падеж).",
+          "source_ref": "school-homework"
+        },
+        {
+          "id": "hw-item:5-1:2",
+          "number": "2",
+          "text": "Сделать упражнения из сборника.",
+          "source_ref": "school-homework"
+        },
+        {
+          "id": "hw-item:5-1:3",
+          "number": "3",
+          "text": "Выучить слова: бөлме, көл, теңіз, алаң, ауыл, саяжай, тау; Қайдансың?/Қайдансыз?",
+          "source_ref": "school-homework"
+        },
+        {
+          "id": "hw-item:5-1:4",
+          "number": "4",
+          "text": "Тренажёр PadezhMestnyi (24 ч) и зафиксировать результат.",
+          "source_ref": "school-homework"
+        }
+      ],
+      "word_ids": [
+        "vocab:5-1:bolme",
+        "vocab:5-1:kol",
+        "vocab:5-1:teniz",
+        "vocab:5-1:alan",
+        "vocab:5-1:auyl",
+        "vocab:5-1:sayazhay",
+        "vocab:5-1:tau",
+        "vocab:5-1:qaidan"
+      ],
+      "exercise_ids": [
+        "src:5-1:xfer:bolme",
+        "src:5-1:xfer:kol",
+        "src:5-1:xfer:teniz",
+        "src:5-1:xfer:alan",
+        "src:5-1:xfer:auyl",
+        "src:5-1:xfer:sayazhay",
+        "src:5-1:xfer:tau",
+        "src:5-1:xfer:kitap",
+        "src:5-1:xfer:mektep",
+        "src:5-1:xfer:uy"
+      ],
+      "external_tasks": [
+        {
+          "id": "ext:5-1:padezh",
+          "type": "external_test",
+          "label": "PadezhMestnyi (24 ч)",
+          "url": "https://batylbol.kz/test/PadezhMestnyi.html"
+        }
+      ],
+      "checklist": [
+        "method",
+        "exercises",
+        "words",
+        "external_test"
+      ]
+    }
   }
 ];
