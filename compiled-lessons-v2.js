@@ -62551,7 +62551,7 @@ window.LESSON_V2_COMPILED = [
       "preview_head": "",
       "preview_url": "",
       "approved_at": "",
-      "note": "r7 #65 bank 142/186 + mastery D; still draft — not productionReady"
+      "note": "r7 #65 tip3: RU stage/notes; still draft — not productionReady"
     },
     "sources": [
       {
@@ -73292,7 +73292,7 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-exercises"
         ],
-        "note": "D-1=A: ключ «Туда — На флаге». Опечатка печатного листа (окончание не напечатано) — не твоя ошибка. Слово «тау» (гора) — отдельно в словаре."
+        "note": "Ключ «Туда — На флаге». Опечатка печатного листа (окончание не напечатано) — не твоя ошибка. Слово «тау» (гора) — отдельно в словаре."
       },
       {
         "id": "src:5-1:sch:1-3:5",
@@ -74925,7 +74925,7 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-method"
         ],
-        "note": "Зачёт mastery D1: оба поля верны (оба различения)."
+        "note": "Зачёт: оба поля верны (оба различения)."
       },
       {
         "id": "src:5-1:mastery:D2",
@@ -74971,7 +74971,7 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-method"
         ],
-        "note": "Зачёт mastery D2: оба поля верны (обе идеи)."
+        "note": "Зачёт: оба поля верны (обе идеи)."
       },
       {
         "id": "src:5-1:mastery:D3",
@@ -76423,7 +76423,7 @@ window.LESSON_V2_COMPILED = [
       },
       {
         "id": "stage:5-1:final",
-        "title": "Mastery D (D1–D3)",
+        "title": "Зачёт: ключевые различения",
         "kind": "checkpoint",
         "core_ids": [
           "src:5-1:mastery:D1",

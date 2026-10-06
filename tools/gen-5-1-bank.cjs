@@ -409,7 +409,7 @@ schoolTasks.forEach((t,idx)=>{
   // D-1 = A: ту → туда (флаг), with note
   if(mod==='1-3'&&num===4){
     answers.push('туда');
-    school.push(text(id,`Сборник ${mod} №${num}`,`Добавь окончание «где»: ${prompt}`,answers,'v2:5-1:ta-da',{
+    school.push(text(id,`Упражнения 5–1 · ${mod} №${num}`,`Добавь окончание «где»: ${prompt}`,answers,'v2:5-1:ta-da',{
       origin:'school',source_refs:[SE],source_item:`сборник ${mod} №${num}`,
       note:'D-1=A: ключ «Туда — На флаге». Опечатка печатного листа (окончание не напечатано) — не твоя ошибка.'
     }));
@@ -424,7 +424,7 @@ schoolTasks.forEach((t,idx)=>{
       if(ans==='Біз аулада ойнамадық')answers.push('Біз далада ойнамадық');
     }
   }
-  school.push(text(id,`Сборник ${mod} №${num}`,`Задание: ${prompt}`,answers,mod.startsWith('7')?'v2:5-1:part-vs-poss':'v2:5-1:summary',{
+  school.push(text(id,`Упражнения 5–1 · ${mod} №${num}`,`Задание: ${prompt}`,answers,mod.startsWith('7')?'v2:5-1:part-vs-poss':'v2:5-1:summary',{
     origin:'school',source_refs:[SE],source_item:`сборник ${mod} №${num}`,
     ...(answers.length>1&&answers.some(a=>/далада/i.test(a))?{note:'D-7: целевой «аулада»; «далада» тоже засчитывается.'}:{})
   }));
@@ -435,26 +435,26 @@ if(school.length!==75){
 }
 
 // ─── Mastery D: three required free-response + supporting ───
-mastery.push(text('src:5-1:mastery:D1','Mastery D1','Объясни своими словами: почему «дүкенінде», но «көршіде»?',[
+mastery.push(text('src:5-1:mastery:D1','Почему «дүкенінде», но «көршіде»?','Объясни своими словами: почему «дүкенінде», но «көршіде»?',[
   'в дүкенінде і — «его», поэтому нде; в көрші і — часть слова, поэтому де',
   'дүкенінде: і = чьё 3-го лица → нде; көршіде: і часть слова → де',
   'в дүкені есть «чьё», нужен Н; в көрші «чьё» нет'
 ],'v2:5-1:part-vs-poss',{source_item:'mastery D1',note:'Зачёт только если названы ОБА различения (чьё→Н vs часть слова→без Н).'}));
 
-mastery.push(text('src:5-1:mastery:D2','Mastery D2','Почему «Мен мектепте оқымадым», а не «Мен мектепте емес оқыдым»?',[
+mastery.push(text('src:5-1:mastery:D2','Почему «оқымадым», а не «емес оқыдым»?','Почему «Мен мектепте оқымадым», а не «Мен мектепте емес оқыдым»?',[
   'при глаголе отрицание на глаголе; емес — без глагола или «не …, а …»',
   'емес не ставится с отрицанием глагола; емес для форм без глагола',
   'отрицание несёт глагол; емес работает без глагола или в «не …, а …»'
 ],'v2:5-1:verb',{source_item:'mastery D2',note:'Зачёт: обе идеи — (1) при глаголе отрицание на глаголе; (2) емес без глагола / «не …, а …».'}));
 
-mastery.push(text('src:5-1:mastery:D3','Mastery D3','Как собрать «мы в его квартире» по частям?',[
+mastery.push(text('src:5-1:mastery:D3','Собери «мы в его квартире»','Как собрать «мы в его квартире» по частям?',[
   'пәтер + і + нде + міз = пәтеріндеміз',
   'пәтеріндеміз',
   'пәтер-і-нде-міз'
 ],'v2:5-1:who',{source_item:'mastery D3',note:'Зачёт: чьё=і, где=нде, кто=міз, порядок сохранён.'}));
 
 // D-7 explicit card
-mastery.push(text('src:5-1:mastery:D7','Mastery D-7 (аулада)','Переведи: «Ты не играл во дворе.»',[
+mastery.push(text('src:5-1:mastery:D7','Ты не играл во дворе','Переведи: «Ты не играл во дворе.»',[
   'Сен аулада ойнамадың','Сен далада ойнамадың'
 ],'v2:5-1:verb',{source_item:'method 11-2',source_refs:[SR],note:'D-7=A: целевой «аулада»; «далада» тоже засчитывается.'}));
 
@@ -517,7 +517,7 @@ const stages=[
     core_ids:transfer.map(q=>q.id),
     required_independent_ids:transfer.slice(0,7).map(q=>q.id),
     rule_ids:['v2:5-1:ta-da','v2:5-1:nda'],min_independent_ratio:0.75,max_presentations:24,final:false},
-  {id:'stage:5-1:final',title:'Mastery D (обязательные D1–D3)',kind:'checkpoint',
+  {id:'stage:5-1:final',title:'Зачёт: ключевые различения',kind:'checkpoint',
     core_ids:mastery.map(q=>q.id),
     required_independent_ids:['src:5-1:mastery:D1','src:5-1:mastery:D2','src:5-1:mastery:D3'],
     rule_ids:['v2:5-1:part-vs-poss','v2:5-1:verb','v2:5-1:who'],min_independent_ratio:1,max_presentations:12,final:true}
