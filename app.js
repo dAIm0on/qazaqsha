@@ -66,7 +66,7 @@
  let examRaf=null,examTimedOut=false,advanceTimer=null,sessionBlindFails=Object.create(null),sessionUnaided=Object.create(null),rulePeeked=false,hwLesson=null,hwPart=null,hwSection=0,hwReturn=null,pathPracticeReturn=null,remediationNote='',retrying=false,rulesArticle=null;
  // r7 X3: where the learner came from into this session (← Назад / «Сделать паузу» returns there).
  const ORIGIN_VIEWS=['today','learn','path','homework','personal','exam','review','vocabulary','materials','morph'],ORIGIN_LABEL={today:'Сегодня',learn:'Учёба',path:'Уроки',homework:'Домашка',personal:'Тренажёры',exam:'Экзамен',review:'Повторение',vocabulary:'Словарь',materials:'Материалы',morph:'Правила'};
- let sessionOrigin=null;
+ let sessionOrigin=null,trainerEpoch=null; // trainerEpoch: the queue a catalog trainer started; trainerReturn is valid only for it
  let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null,stageContext=null,practiceHold=null;
  let hwOrigin='today';
  function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
@@ -853,7 +853,7 @@
  }
  function save(){
    captureDraft();persistLessonPath();persistLessonPractice();if(window.AiTutor&&window.AiTutor.snapshot)state.aiTutor=window.AiTutor.snapshot();state.records=records;state.learning=learningState;
-   state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,pathPracticeReturn:pathPracticeReturn?JSON.parse(JSON.stringify(pathPracticeReturn)):null,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null,trainerReturn,sessionOrigin};
+   state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,pathPracticeReturn:pathPracticeReturn?JSON.parse(JSON.stringify(pathPracticeReturn)):null,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null,trainerReturn,trainerEpoch,sessionOrigin};
    try{if(storageReadError)throw storageReadError;localStorage.setItem(KEY,JSON.stringify(state));storageAvailable=true;}catch{storageAvailable=false;}
    $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
    if(!cloudApplying)window.QazaqCloud?.pushSoon?.(state);
@@ -1111,6 +1111,7 @@
  }
  function showView(next){
    captureDraft();
+   if(next==='practice'&&trainerReturn&&queueEpoch!==trainerEpoch)trainerReturn=null; // r7 X3: bank/words from Учёба were labelled «Тренажёры»
    if(next==='practice'&&view!=='practice'&&ORIGIN_VIEWS.includes(view))sessionOrigin=view;
    pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
    view=next;document.body.dataset.view=next;
@@ -1150,6 +1151,15 @@
    if(ids.includes(rp.lessonId))return rp.lessonId;
    return ids.find(id=>(P.ensureLessonProgress(state,id)||{}).status!=='completed')||ids[0]||'1-1';
  }
+ function chapterCheckpoint(lessonId,p){
+   // r7 X QA: «Глава · шаг 5» had no chapter. Name it: «Глава 3 из 13 · Собери первую прошедшую форму · шаг 5».
+   const step='шаг '+(Math.max(0,Number(p.beat)||0)+1);
+   let les=null;try{les=window.GrammarPath&&window.GrammarPath.lesson?window.GrammarPath.lesson(lessonId):null;}catch{les=null;}
+   const chs=(les&&les.chapters)||[],i=chs.findIndex(c=>c.id===p.chapterId);
+   if(i<0)return 'Теория · '+step;
+   const B=window.ExplainBankUI,title=String((B&&B.chapterTitle?B.chapterTitle(chs[i]):chs[i].title)||'').trim();
+   return 'Глава '+(i+1)+' из '+chs.length+(title?' · '+title:'')+' · '+step;
+ }
  function stepNow(){
    const ids=courseIds(),cp=P.ensureCourseProgress(state);
    const allDone=ids.length&&ids.every(id=>(P.ensureLessonProgress(state,id)||{}).status==='completed');
@@ -1157,7 +1167,7 @@
    if(allDone)return {lessonId,surface:'path',title:'Основное прохождение завершено',hint:'Можно выбрать любой урок и повторить его.'};
    if(rp.surface==='practice'&&lp&&lp.practiceSession)return {lessonId,surface:'practice',title:'Продолжить урок '+lessonId,hint:'Очередь, позиция и набранный ответ сохранены.'};
    const p=lp&&lp.path;
-   const checkpoint=p&&p.chapterId?('Глава · шаг '+(Math.max(0,Number(p.beat)||0)+1)):(lp&&lp.status==='not_started'?'Урок ещё не начат':'Место прохождения сохранено');
+   const checkpoint=p&&p.chapterId?chapterCheckpoint(lessonId,p):(lp&&lp.status==='not_started'?'Урок ещё не начат':'Место прохождения сохранено');
    return {lessonId,surface:'path',title:(lp&&lp.status==='not_started'?'Начать урок ':'Продолжить урок ')+lessonId,hint:checkpoint};
  }
  function continueStep(){
@@ -2496,13 +2506,13 @@
      const id=String(kind).slice(7),lesson=(window.LEARNING&&window.LEARNING.lessons||[]).find(l=>l.id===id);
      const ids=(lesson&&lesson.questionIds||[]).filter(qid=>{const q=byId.get(qid);return q&&eligible(q)&&(!window.NumberLadder||window.NumberLadder.allowed(q,state));});
      activeLesson=null;activeStep=null;sourceFilter=null;courseBlock=null;topic='numbers';vocabRole=null;mode='numbers';
-     queue=shuffled(ids);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;resetCounts();
+     queue=shuffled(ids);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();trainerEpoch=queueEpoch;position=0;checked=false;resetCounts();
      if(!queue.length){trainerReturn=null;showView('personal');return;}
      render();showView('practice');return;
    }
    const role=kind==='vocab:used'?'used':'must';
    activeLesson=null;activeStep=null;sourceFilter=null;courseBlock=null;topic='vocab';vocabRole=role;mode='words';
-   queue=catalogVocabIds(role);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;resetCounts();
+   queue=catalogVocabIds(role);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();trainerEpoch=queueEpoch;position=0;checked=false;resetCounts();
    if(!queue.length){trainerReturn=null;showView('personal');return;}
    render();showView('practice');
  }
@@ -2871,6 +2881,7 @@
  // r7 X3: ← Назад / «Сделать паузу» leaves the session for the place the learner came from (homework, hub, lesson);
  // it no longer steps to the previous card. The queue, position and typed answer stay saved.
  function pauseTarget(){
+   if(trainerReturn&&queueEpoch!==trainerEpoch)trainerReturn=null;
    return trainerReturn?'personal':mode==='homework'||(mode==='remediation'&&hwReturn)?'homework':mode==='exam'?'exam':pathPracticeReturn?'path':(sessionOrigin||'today');
  }
  $('#pause-session').onclick=()=>{
@@ -2975,7 +2986,7 @@
    sessionAttempts=Math.max(0,Number(savedSession.sessionAttempts)||0);sessionCorrect=Math.min(sessionAttempts,Math.max(0,Number(savedSession.sessionCorrect)||0));sessionAssisted=Math.min(sessionAttempts-sessionCorrect,Math.max(0,Number(savedSession.sessionAssisted)||0));
    draft=savedSession.draft&&Array.isArray(savedSession.draft.answers)?savedSession.draft:null;remediation=savedSession.remediation||null;
    stageContext=P.normalizeStageContext?P.normalizeStageContext(savedSession.stageContext):null;
-   topic=savedSession.topic;mode=savedSession.mode;sourceFilter=savedSession.sourceFilter||null;courseBlock=savedSession.courseBlock||null;hwLesson=savedSession.hwLesson||((mode==='homework'||savedSession.view==='homework')?savedSession.courseBlock||null:null);hwPart=savedSession.hwPart||null;hwSection=Math.max(0,Number(savedSession.hwSection)||0);pathPracticeReturn=savedSession.pathPracticeReturn&&savedSession.pathPracticeReturn.lessonId?savedSession.pathPracticeReturn:null;trainerReturn=savedSession.trainerReturn||null;sessionOrigin=/^(today|learn|path|homework|personal|exam|review|vocabulary|materials|morph)$/.test(savedSession.sessionOrigin||'')?savedSession.sessionOrigin:null;activeLesson=mode==='lesson'?savedSession.activeLesson:null;
+   topic=savedSession.topic;mode=savedSession.mode;sourceFilter=savedSession.sourceFilter||null;courseBlock=savedSession.courseBlock||null;hwLesson=savedSession.hwLesson||((mode==='homework'||savedSession.view==='homework')?savedSession.courseBlock||null:null);hwPart=savedSession.hwPart||null;hwSection=Math.max(0,Number(savedSession.hwSection)||0);pathPracticeReturn=savedSession.pathPracticeReturn&&savedSession.pathPracticeReturn.lessonId?savedSession.pathPracticeReturn:null;trainerReturn=savedSession.trainerReturn||null;trainerEpoch=typeof savedSession.trainerEpoch==='number'?savedSession.trainerEpoch:(trainerReturn&&['numbers','words'].includes(savedSession.mode)?savedSession.queueEpoch:null);sessionOrigin=/^(today|learn|path|homework|personal|exam|review|vocabulary|materials|morph)$/.test(savedSession.sessionOrigin||'')?savedSession.sessionOrigin:null;activeLesson=mode==='lesson'?savedSession.activeLesson:null;
    activeStep=activeLesson?Math.min(window.LEARNING.lessons.find(l=>l.id===activeLesson).chunks.length-1,Math.max(0,Number(savedSession.activeStep)||0)):null;
    queue=savedSession.queue;practiceIds=Array.isArray(savedSession.practiceIds)?savedSession.practiceIds.filter(id=>byId.has(id)):[...new Set(queue)];
    stepEvidence=savedSession.stepEvidence&&typeof savedSession.stepEvidence==='object'?savedSession.stepEvidence:{};
