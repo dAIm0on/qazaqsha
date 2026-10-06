@@ -52,6 +52,8 @@
     return ev!=null&&ex!=null&&ev===ex;
   }
   function evaluate(q,answers){
+    const kinds=typeof module!=='undefined'&&module.exports?require('./response-kinds.js'):root.ResponseKinds;
+    if(kinds&&kinds.isSupportKind(q.kind))return kinds.evaluate(q,answers);
     if(q.kind==='multi'){
       const actual=new Set((answers||[]).map(x=>normalize(x)));
       const expected=new Set(q.correct.map(x=>normalize(x)));

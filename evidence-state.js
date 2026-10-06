@@ -12,10 +12,12 @@
  const FORM_REQUIREMENTS=Object.freeze({
   'vocab:4-2:qalaisyn':Object.freeze({lesson_id:'4-2',forms:Object.freeze(['қалайсың','қалайсыңдар','қалайсыз','қалайсыздар'])})
  });
- // Which evidence counts as "done independently" for a form. Strict until the owner says otherwise:
- // typed production of exactly this form, first try, no hint / reveal / rule peek. Recognition
- // (form -> translation) and one combined "write all forms" answer are recorded but do not count.
+ // Which evidence counts as "done independently" for a form — FINAL owner decision (казакша, 2026-10-06, W-2):
+ // only independent typed production of exactly this form, first try, no hint / reveal / rule peek.
+ // Recognition (form -> translation), one combined "write all 4" answer and any choice / Q6-B support kind
+ // are kept as support practice (help_n / wrong_n under their own keys) and never count.
  const POLICY=Object.freeze({id:'w2c-strict-v1',directions:Object.freeze(['produce']),contexts:Object.freeze(['single'])});
+ const SUPPORT_KINDS=['choice','tap-token','sort','word-bank','detect'];
  const RESPONSE=['typed','choice'],ORIGINS=['homework','exam','lesson','lesson-stage','bank','voluntary','other'];
  const obj=v=>v&&typeof v==='object'&&!Array.isArray(v);
  const safe=k=>typeof k==='string'&&k.length>0&&k.length<=300&&!['__proto__','prototype','constructor'].includes(k);
@@ -41,7 +43,8 @@
    if(!obj(a)||!safe(a.id)||!safe(a.q))return null;
    const fields=Array.isArray(a.fields)?a.fields.filter(obj).slice(0,30).map(f=>({i:Math.max(0,Math.floor(num(f.i))),fp:str(f.fp,16),resp:RESPONSE.includes(f.resp)?f.resp:'typed',alts:!!f.alts,verdict:f.verdict==='correct'?'correct':'incorrect',indep:!!f.indep})):[];
    const forms=Array.isArray(a.forms)?a.forms.filter(f=>obj(f)&&safe(f.src)&&typeof f.form==='string').slice(0,20).map(f=>({src:f.src,form:f.form.slice(0,80),dir:['produce','recognize','choose'].includes(f.dir)?f.dir:'produce',ctx:f.ctx==='set'?'set':'single',ok:!!f.ok,indep:!!f.indep})):[];
-   return {id:a.id.slice(0,160),at:num(a.at),q:a.q,lesson:str(a.lesson,20),rev:str(a.rev,40),origin:ORIGINS.includes(a.origin)?a.origin:'other',q_origin:str(a.q_origin,40),first:a.first!==false,hint:!!a.hint,reveal:!!a.reveal,rule_peek:!!a.rule_peek,correct:!!a.correct,fields,forms};
+   const kind=a.kind==='multi'||SUPPORT_KINDS.includes(a.kind)?a.kind:'fields';
+   return {id:a.id.slice(0,160),at:num(a.at),q:a.q,...(kind!=='fields'?{kind}:{}),lesson:str(a.lesson,20),rev:str(a.rev,40),origin:ORIGINS.includes(a.origin)?a.origin:'other',q_origin:str(a.q_origin,40),first:a.first!==false,hint:!!a.hint,reveal:!!a.reveal,rule_peek:!!a.rule_peek,correct:!!a.correct,fields,forms};
  }
  function migrate(raw){
    if(obj(raw)&&Number(raw.v)>VERSION)return JSON.parse(JSON.stringify(raw)); // newer build wrote it: keep untouched
@@ -133,10 +136,26 @@
    return out;
  }
  function fieldFingerprint(f){return hash(stable([f&&f.label||'',f&&f.kind||'',(f&&f.answers||[]).map(x=>String(x))]));}
+ function supportTokens(q){
+   const p=q.payload||{},out=new Set(),add=t=>toks(t).forEach(x=>out.add(x)),pick=(list,ids)=>(list||[]).filter(x=>(ids||[]).includes(x.id)).forEach(x=>add(x.text));
+   if(q.kind==='choice')pick(p.options,p.accepted);
+   else if(q.kind==='tap-token')pick(p.tokens,(p.accepted||[]).flat());
+   else if(q.kind==='word-bank')pick(p.pieces,(p.accepted||[]).flat());
+   else if(q.kind==='sort')(p.items||[]).forEach(x=>add(x.text));
+   else if(q.kind==='detect')add(p.target||'');
+   add(q.stimulus||'');
+   return out;
+ }
  function formHits(q,answers,result,modes){
    const hits=[];
    for(const [src,req] of Object.entries(FORM_REQUIREMENTS)){
      const forms=req.forms.map(norm);
+     if(SUPPORT_KINDS.includes(q.kind)){
+       // Support kinds are choice evidence: recorded as 'choose', never independent production.
+       const present=forms.filter(f=>supportTokens(q).has(f));
+       for(const f of present)hits.push({src,form:f,dir:'choose',ctx:present.length===1?'single':'set',field:null,ok:!!result.correct});
+       continue;
+     }
      if(q.kind==='multi'){
        for(const opt of q.correct||[]){const f=norm(opt);if(forms.includes(f))hits.push({src,form:f,dir:'choose',ctx:'single',field:null,ok:!!result.correct});}
        continue;
@@ -177,19 +196,21 @@
    const at=Number(event.at)||Date.now();
    const assisted=!!(event.hinted||ctx.revealed||event.rule_peek||event.peek);
    const first=ctx.first!==false;
-   const modes=q.kind==='multi'?['choice']:(q.fields||[]).map((_,i)=>RESPONSE.includes(ctx.responseModes&&ctx.responseModes[i])?ctx.responseModes[i]:'typed');
-   const fields=q.kind==='multi'?[{i:0,fp:hash(stable(q.options||[])),resp:'choice',alts:true,verdict:result.correct?'correct':'incorrect',indep:false}]:(q.fields||[]).map((f,i)=>{
+   const support=SUPPORT_KINDS.includes(q.kind);
+   const modes=support||q.kind==='multi'?['choice']:(q.fields||[]).map((_,i)=>RESPONSE.includes(ctx.responseModes&&ctx.responseModes[i])?ctx.responseModes[i]:'typed');
+   const fields=support?(result.parts||[]).slice(0,30).map((ok,i)=>({i,fp:hash(stable([q.kind,q.payload||null])),resp:'choice',alts:true,verdict:ok?'correct':'incorrect',indep:false})):q.kind==='multi'?[{i:0,fp:hash(stable(q.options||[])),resp:'choice',alts:true,verdict:result.correct?'correct':'incorrect',indep:false}]:(q.fields||[]).map((f,i)=>{
      const ok=!!(result.parts&&result.parts[i]);
      return {i,fp:fieldFingerprint(f),resp:modes[i],alts:modes[i]==='choice',verdict:ok?'correct':'incorrect',indep:ok&&first&&!assisted&&modes[i]==='typed'};
    });
    const forms=[];
    for(const hit of formHits(q,answers,result,modes)){
-     const typed=hit.field==null?(q.kind!=='multi'&&modes.every(m=>m==='typed')):modes[hit.field]==='typed';
-     const indep=!!(hit.ok&&first&&!assisted&&typed&&hit.dir!=='choose');
+     const typed=hit.field==null?(!support&&q.kind!=='multi'&&modes.every(m=>m==='typed')):modes[hit.field]==='typed';
+     // W-2 final: only produce|single can be independent; recognition / combined set / choose stay support practice.
+     const indep=!!(hit.ok&&first&&!assisted&&typed&&hit.dir==='produce'&&hit.ctx==='single');
      forms.push({src:hit.src,form:hit.form,dir:hit.dir,ctx:hit.ctx,ok:hit.ok,indep});
      bump(state,hit.src,hit.form,hit.dir+'|'+hit.ctx,hit,indep,at);
    }
-   const attempt=cleanAttempt({id,at,q:q.id,lesson:ctx.lessonId||q.lessonId||'',rev:ctx.contentRevision||event.content_revision||'',origin:ctx.origin,q_origin:q.origin||'',first,hint:!!(event.hinted||event.peek),reveal:!!ctx.revealed,rule_peek:!!event.rule_peek,correct:!!result.correct,fields,forms});
+   const attempt=cleanAttempt({id,at,q:q.id,kind:q.kind,lesson:ctx.lessonId||q.lessonId||'',rev:ctx.contentRevision||event.content_revision||'',origin:ctx.origin,q_origin:q.origin||'',first,hint:!!(event.hinted||event.peek),reveal:!!ctx.revealed,rule_peek:!!event.rule_peek,correct:!!result.correct,fields,forms});
    if(attempt){ev.attempts.push(attempt);if(ev.attempts.length>MAX_ATTEMPTS)ev.attempts.splice(0,ev.attempts.length-MAX_ATTEMPTS);}
    return attempt;
  }

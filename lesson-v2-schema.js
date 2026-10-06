@@ -4,6 +4,7 @@
  const node=typeof module!=='undefined'&&module.exports;
  const obj=v=>v&&typeof v==='object'&&!Array.isArray(v);
  const fail=m=>{throw Error('Lesson v2: '+m);};
+ const kinds=()=>node?require('./response-kinds.js'):root.ResponseKinds;
  function str(v,label,max=12000,allowEmpty=false){
    if(typeof v!=='string'||(!allowEmpty&&!v.trim())||v.length>max)fail('проверь '+label);
    return allowEmpty?v:v.trim();
@@ -28,6 +29,20 @@
  }
  function exercise(q,lessonId){
    if(!obj(q))fail('exercise object');
+   const K=kinds();
+   if(q.kind!==undefined&&q.kind!=='fields'){
+     // r7 Q6-B: approved support mechanics, blocks 3–4 only; anything else is an explicit error, never a silent fallback.
+     if(!K||!K.isSupportKind(q.kind))fail('exercise.kind '+q.kind+' не поддерживается');
+     if(!K.allowedLesson(lessonId))fail('exercise.kind '+q.kind+' разрешён только в уроках блоков 3–4 (Q6-B)');
+     let payload;try{payload=K.normalize(q.kind,q.payload);}catch(error){fail(error.message);}
+     const row={id:id(q.id,'exercise.id'),origin:str(q.origin||'school','exercise.origin',40),topic:str(q.topic||'verbs','exercise.topic',40),kind:q.kind,
+       title:str(q.title,'exercise.title',400),stimulus:str(q.stimulus,'exercise.stimulus',1400,true),fields:[],payload,
+       explanation:str(q.explanation||'Сверь форму по правилу урока.','exercise.explanation',5000),lessonId};
+     const ruleInput=q.rule_ids||q.ruleIds;if(ruleInput)row.ruleIds=strings(ruleInput,'exercise.rule_ids',0,20).map(x=>id(x,'rule_id'));
+     const sourceInput=q.source_refs||q.sourceRefs;if(sourceInput)row.source_refs=strings(sourceInput,'exercise.source_refs',0,20).map(x=>id(x,'source_ref'));
+     if(q.note)row.note=str(q.note,'exercise.note',1600);
+     return row;
+   }
    const out={
      id:id(q.id,'exercise.id'),origin:str(q.origin||'school','exercise.origin',40),
      topic:str(q.topic||'verbs','exercise.topic',40),kind:'fields',

@@ -6,7 +6,8 @@
  function productionHost(){return !!(root.location&&root.location.hostname==='qazaqsha.pages.dev');}
  function publishable(raw){return !productionHost()||!!(raw&&raw.status==='released'&&raw.release&&raw.release.approved===true&&/^[0-9a-f]{40}$/i.test(raw.release.preview_head||'')&&/^https:\/\//.test(raw.release.preview_url||''));}
  function questionCopy(q,lessonId){
-   return Object.assign({},q,{lessonId,kind:'fields',source:q.source||('v2-'+lessonId),group:q.group||q.id,part:q.part||'1',ruleIds:(q.ruleIds||q.rule_ids||[]).slice(),associationKeys:(q.associationKeys||[]).slice()});
+   const K=root.ResponseKinds,keep=!!(K&&K.isSupportKind(q.kind)&&K.allowedLesson(lessonId)&&q.payload);
+   return Object.assign({},q,{lessonId,kind:keep?q.kind:'fields',fields:keep?[]:q.fields,source:q.source||('v2-'+lessonId),group:q.group||q.id,part:q.part||'1',ruleIds:(q.ruleIds||q.rule_ids||[]).slice(),associationKeys:(q.associationKeys||[]).slice()});
  }
  function explanationBeats(t){
    const raw=String(t.fullExplanation||'').trim();

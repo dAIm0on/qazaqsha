@@ -62,6 +62,27 @@
  const RECOG=new Set(['recognition','visual_recognition','word_to_digit']);
  const PROD=new Set(['production','digit_to_word','full_form','application','suffix_family','exception_20','last_component','sg_initial','marker_presence','sen_siz','biz_initial','no_extra_plural','position','presence','class']);
  function isChoice(q){return q&&q.kind==='multi';}
+ /* r7 decision 3 (forward only): a choice answer — tap buttons inside fields (event.response_modes) or a
+    Q6-B support kind — is practice, never forward mastery. Stored mastery is never recomputed or lowered here;
+    the FSRS schedule still advances so the card is not shown again immediately. */
+ const SUPPORT_KINDS=new Set(['choice','tap-token','sort','word-bank','detect']);
+ function supportBinding(q,b,event){
+   if(q&&SUPPORT_KINDS.has(q.kind))return true;
+   const modes=event&&Array.isArray(event.response_modes)?event.response_modes:null;
+   if(!modes||q.kind==='multi')return false;
+   if(b.field==null)return modes.includes('choice'); // whole-card skill: buttons inside it make it choice evidence
+   return modes[b.field]==='choice';
+ }
+ function supportCap(r,old,correct){
+   if(correct&&old){
+     // A correct choice must not advance mastery evidence: keep streak / spaced-recall counters / review flag as they were.
+     r.correct_streak=Number(old.correct_streak)||0;r.recall_review_successes=Number(old.recall_review_successes)||0;
+     r.review_successes=Number(old.review_successes)||0;r.last_successful_review=old.last_successful_review||null;r.needsReview=!!old.needsReview;
+   }else if(correct){r.correct_streak=0;r.recall_review_successes=0;r.review_successes=0;r.last_successful_review=null;}
+   const ceiling=Math.max(rank.indexOf(old?.mastery_level||'NEW'),rank.indexOf('LEARNING'));
+   r.mastery_level=rank[Math.min(rank.indexOf(S.level(r)),ceiling)];
+   r.streak=Math.min(window.TRAINER_CONFIG.schedule.cleanAnswersToConsolidate,r.correct_streak);r.status=r.mastery_level;
+ }
  function canMasterProduction(q,event){
    if(!q||isChoice(q))return false;
    if(event&&(event.hinted||event.rule_peek||event.peek))return false;
@@ -88,17 +109,19 @@
      }
    }
    for(const [k,{b,correct}] of updates){
+     const support=supportBinding(q,b,event);
      const recSkill=RECOG.has(b.skill_type)||isChoice(q);
-     const old=state.skills[k],recall=!recSkill&&!event.rule_peek&&(event.recall&&!RECOG.has(b.skill_type)||['harmony','initial_consonant'].includes(b.skill_type));
+     const old=state.skills[k],recall=!recSkill&&!support&&!event.rule_peek&&(event.recall&&!RECOG.has(b.skill_type)||['harmony','initial_consonant'].includes(b.skill_type));
      const r=S.answer(old,{at:event.at,correct,hinted:!!(event.hinted||event.rule_peek),responseTime:event.response_time_ms,recall});
      r.item_id=b.item_id;r.skill_type=b.skill_type;r.lesson_id=q.lessonId;
-     r.successful_prompts=Array.from(new Set([...(old?.successful_prompts||[]),...(correct&&!event.hinted&&!event.rule_peek?[q.stimulus||q.id]:[])]));
+     r.successful_prompts=Array.from(new Set([...(old?.successful_prompts||[]),...(correct&&!support&&!event.hinted&&!event.rule_peek?[q.stimulus||q.id]:[])]));
      if(b.item_id==='rule:plural'&&r.mastery_level==='MASTERED'&&r.successful_prompts.length<2)r.mastery_level='REMEMBERED';
      if(recSkill&&r.mastery_level==='MASTERED')r.mastery_level='FAMILIAR';
      if(PROD.has(b.skill_type)&&!canMasterProduction(q,event)&&r.mastery_level==='MASTERED')r.mastery_level='REMEMBERED';
+     if(support)supportCap(r,old,correct); // last word: choice never raises, and never lowers stored mastery on a correct answer
      r.status=r.mastery_level;
      r.error_history=[...(old?.error_history||[]),...errors.filter(e=>b.field===null||e.field===b.field)];
-     state.skills[k]=r;logs.push({skill_id:k,item_id:b.item_id,skill_type:b.skill_type,correct,independent:correct&&!event.hinted&&!event.rule_peek,previous_answer_at:old?.last_answer||null,rating:r.fsrs_log.rating,fsrs_log:r.fsrs_log,fsrs_state:r.fsrs});
+     state.skills[k]=r;logs.push({skill_id:k,item_id:b.item_id,skill_type:b.skill_type,correct,independent:correct&&!support&&!event.hinted&&!event.rule_peek,support,previous_answer_at:old?.last_answer||null,rating:r.fsrs_log.rating,fsrs_log:r.fsrs_log,fsrs_state:r.fsrs});
    }
    // P0 Error 9: sync only this card + siblings sharing touched skills (not all ~3k COURSE.questions).
    const touched=new Set(updates.keys());
@@ -124,5 +147,5 @@
    return out;
  }
  function wordSkills(w,state){const item=items.get(w.id);return Object.entries(item?.skills||{}).map(([type,k])=>({type,label:labels[type]||type,record:state.skills[k]}));}
- window.Knowledge={items,labels,bindings,key,register,hydrate,sync,observe,choose,wordSkills,isChoice,canMasterProduction};
+ window.Knowledge={items,labels,bindings,key,register,hydrate,sync,observe,choose,wordSkills,isChoice,canMasterProduction,supportBinding};
 })();

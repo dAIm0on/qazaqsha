@@ -135,8 +135,8 @@ ok('field evidence keeps response mode, help, reveal, origin and a stable field 
   const grab=name=>{const i=appSrc.indexOf(' function '+name+'(');assert.ok(i>0,name);const j=appSrc.indexOf('\n function ',i+5);return appSrc.slice(i,j);};
   const l11=compiled.find(x=>x.lesson_id==='1-1'),q11=JSON.parse(JSON.stringify(l11.original_exercises.find(x=>x.id==='e1-3-1-1')||null));assert.ok(q11);
   const box={};
-  vm.runInNewContext(grab('classifierOptions')+grab('answerMarkup')+grab('responseModes')+'\nbox.markup=answerMarkup(q);document.markup=box.markup;box.modes=responseModes(q);',{
-    box,q:{...q11,kind:'fields'},esc:v=>String(v??''),
+  vm.runInNewContext(grab('supportKind')+grab('classifierOptions')+grab('answerMarkup')+grab('responseModes')+'\nbox.markup=answerMarkup(q);document.markup=box.markup;box.modes=responseModes(q);',{
+    box,q:{...q11,kind:'fields'},esc:v=>String(v??''),window:{ResponseKinds:require('./response-kinds.js')},
     document:{markup:'',getElementById(id){const m=this.markup.match(new RegExp('<input id="'+id+'"[^>]*type="(\\w+)"'));return m?{type:m[1]}:null;}}
   });
   assert.deepEqual(JSON.parse(JSON.stringify(box.modes)),['typed','choice','choice','choice','choice']);
@@ -155,9 +155,9 @@ assert.equal(/\u0301/.test(fs.readFileSync(path.join(__dirname,'evidence-state.j
 s=P.empty();let t=NOW+20*D;
 const answerAll=(q,answers,extra={})=>E.observe(s,{q,answers,result:require('./core.js').evaluate(q,answers),event:{id:'ev:'+(++t)+':'+q.id,at:t,...(extra.event||{})},responseModes:extra.modes||(q.fields||[]).map(()=>'typed'),revealed:!!extra.reveal,origin:'bank'});
 for(let i=1;i<=4;i++){const q=Q.get('v2-4-2-vocab-qalaisyn-ru-'+i);assert.ok(q,'real recognition card '+i);answerAll(q,[q.fields[0].answers[0]]);}
-st=E.formStatus(s,'vocab:4-2:qalaisyn');assert.equal(st.done,0);assert.ok(st.forms.every(f=>f.seen['recognize|single'].independent===1));
+st=E.formStatus(s,'vocab:4-2:qalaisyn');assert.equal(st.done,0);assert.ok(st.forms.every(f=>f.seen['recognize|single'].independent===0&&f.seen['recognize|single'].with_help===1),'W-2 final: recognition is support practice');
 const set=Q.get('v2-4-2-vocab-qalaisyn-kk-set');assert.ok(set);answerAll(set,[req.forms.join(' ')]);
-st=E.formStatus(s,'vocab:4-2:qalaisyn');assert.equal(st.done,0,'one combined answer is not four separate checks');assert.ok(st.forms.every(f=>f.seen['produce|set'].independent===1));
+st=E.formStatus(s,'vocab:4-2:qalaisyn');assert.equal(st.done,0,'one combined answer is not four separate checks');assert.ok(st.forms.every(f=>f.seen['produce|set'].independent===0&&f.seen['produce|set'].with_help===1),'W-2 final: combined all-4 is support practice');
 const single=f=>({id:'fixture:w2:'+f,kind:'fields',lessonId:'4-2',stimulus:'Как дела?',fields:[{label:'Ответ',kind:'text',answers:[f]}]});
 answerAll(single('қалайсың'),['қалайсың']);
 answerAll({id:'fixture:w2:sentence',kind:'fields',lessonId:'4-2',fields:[{label:'Фраза',kind:'text',answers:['Сендер қалайсыңдар?']}]},['Сендер қалайсыңдар']);
@@ -206,8 +206,8 @@ ok('fresh profiles have no legacy facts; attempt log is capped while per-form su
 const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8'),html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8'),sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(html.indexOf('src="evidence-state.js"')>0&&html.indexOf('src="evidence-state.js"')<html.indexOf('src="progress.js"'));
 assert.ok(sw.includes('"evidence-state.js"'));
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-runtime'"));
-assert.ok(/function responseModes\(q\)\{return q\.kind==='multi'\?\['choice'\]:.*el\.type==='hidden'\?'choice':'typed'/.test(app),'response mode read from the rendered control');
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-runtime2'"));
+assert.ok(/function responseModes\(q\)\{return supportKind\(q\)\|\|q\.kind==='multi'\?\['choice'\]:.*el\.type==='hidden'\?'choice':'typed'/.test(app),'response mode read from the rendered control');
 assert.ok(/state\.events\.push\(event\);rec=records\[q\.id\]\|\|rec;\n\s+if\(window\.EvidenceState\)\{try\{window\.EvidenceState\.observe\(state,/.test(app));
 assert.ok(app.includes("R7_SNAPSHOT=KEY+'-before-r7'")&&app.includes('localStorage.setItem(R7_SNAPSHOT,raw)')&&app.includes('localStorage.getItem(R7_SNAPSHOT)'));
 // ST-01/ST-02: homework accounting unchanged (no Knowledge.observe; hinted+existing record keeps the Again exception).
