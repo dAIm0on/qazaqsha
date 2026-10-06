@@ -99,7 +99,7 @@ assert.ok(empty.indexOf('if(stageContext)') < empty.indexOf('markLessonCompleted
 const cont = app.slice(app.indexOf('function continueLesson'), app.indexOf('function resetCounts'));
 assert.ok(cont.includes('viewOnlyPathLesson=null'));
 assert.ok(cont.indexOf('restoreLessonPractice(id)') < cont.indexOf('nextRegistered'));
-assert.ok(cont.indexOf('nextRegistered') < cont.indexOf('openPathLesson'));
+assert.ok(cont.indexOf('nextRegistered') < cont.lastIndexOf('openPathLesson')); // r7 ux59b: theory target opens the path first; the fallback stays last
 const start = app.slice(app.indexOf('function startCourse'), app.indexOf('function startTransfer'));
 assert.ok(start.indexOf('restoreLessonPractice(block)') < start.indexOf('practiceHold'));
 assert.ok(start.indexOf('practiceHold') < start.indexOf('lessonSession'));

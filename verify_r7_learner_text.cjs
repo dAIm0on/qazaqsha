@@ -31,7 +31,7 @@ vm.runInNewContext(app.slice(ci,cj)+'\nbox.f=chapterCheckpoint;',ctx);
 assert.equal(ctx.box.f('3-1',{chapterId:'b',beat:4}),'Глава 2 из 3 · Собери прошедшее · шаг 5');
 assert.equal(ctx.box.f('9-9',{chapterId:'x',beat:0}),'Теория · шаг 1','unknown chapter: no «Глава ·»');
 assert.ok(!app.includes("'Глава · шаг '"),'old empty substitution gone');
-assert.ok(app.includes('const at=p&&p.chapterId?p:nextChapterOf(lessonId);')&&app.includes('const checkpoint=at?chapterCheckpoint(lessonId,at):'),'Today card uses it (ux59: also before the lesson starts)');
+assert.ok(app.includes('const at=path&&path.chapterId?path:nextChapterOf(id);')&&app.includes('const hint=at?chapterCheckpoint(id,at):'),'Today card uses it (ux59: also before the lesson starts; ux59b: via resumeTarget)');
 ok('Today checkpoint: «Глава N из M · название · шаг K» instead of «Глава · шаг 5»');
 // 4) chapter title rewrite keeps the case
 const ai=adapter.indexOf(' function chapterTitle('),aj=adapter.indexOf(' function paras(');

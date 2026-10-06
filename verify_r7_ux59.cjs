@@ -33,26 +33,27 @@ ok('#1 «Выбрать занятие»: «Практика этого урок
   const state={courseProgress:{lessons,resumePointer:{lessonId:'1-1',surface:'path',updatedAt:100}},homeworkAttempts:{},events:[],grammarPath:{}};
   const P={ensureCourseProgress:s=>s.courseProgress,ensureLessonProgress:(s,id)=>s.courseProgress.lessons[id]};
   const byId=new Map([['q21',{id:'q21',lessonId:'2-1'}]]);
-  const ctx={box:{},P,state,byId,courseIds:()=>ids};vm.runInNewContext(src+'\nbox.f=namedCourse;',ctx);const f=ctx.box.f;
+  const ctx={box:{},P,state,byId,courseIds:()=>ids,window:{}};vm.runInNewContext(src+'\nbox.f=namedCourse;',ctx);const f=ctx.box.f;
   assert.equal(f(),'1-1','pointer only → its lesson');
   state.homeworkAttempts['4-2']={items:[{id:'x',at:200}]};assert.equal(f(),'4-2','ДЗ 4-2 after the pointer → 4-2');
   state.events.push({type:'answer',card_id:'q21',at:300});assert.equal(f(),'2-1','a 2-1 track / practice answer later → 2-1');
   state.events.push({type:'answer',card_id:'zz',block:'homework:4-1',at:400});assert.equal(f(),'4-1','event block names the lesson');
   lessons['4-1'].status='completed';assert.equal(f(),'2-1','finished lessons are skipped');
-  lessons['1-1'].lastAttemptAt=500;assert.equal(f(),'1-1','«Начать / Продолжить» 1-1 later → 1-1');
+  lessons['1-1'].lastAttemptAt=500;assert.equal(f(),'2-1','ux59b #3: a lesson start without an answer is not work');
+  state.events.push({type:'answer',card_id:'zz',lesson_id:'1-1',at:600});assert.equal(f(),'1-1','an answer in 1-1 later → 1-1');
   const empty={courseProgress:{lessons:{'1-1':{status:'completed'},'1-2':{status:'not_started'}},resumePointer:{lessonId:null,updatedAt:0}},events:[]};
-  const c2={box:{},P,state:empty,byId,courseIds:()=>['1-1','1-2']};vm.runInNewContext(src+'\nbox.f=namedCourse;',c2);assert.equal(c2.box.f(),'1-2','no activity, no pointer → first unfinished');
-  const sn=slice(app,' function stepNow(){',' function continueStep(){');
+  const c2={box:{},P,state:empty,byId,courseIds:()=>['1-1','1-2'],window:{}};vm.runInNewContext(src+'\nbox.f=namedCourse;',c2);assert.equal(c2.box.f(),'1-2','no activity, no pointer → first unfinished');
+  const sn=slice(app,' function resumeTarget(id){',' function continueLesson(id){'); // ux59b #2: the card text lives in resumeTarget()
   assert.ok(!sn.includes('Очередь, позиция и набранный ответ сохранены')&&sn.includes("'практика, шаг '+st.step+' из '+st.total"),'practice hint names the step');
-  assert.ok(sn.includes('const at=p&&p.chapterId?p:nextChapterOf(lessonId);'),'not started → first unfinished chapter, «шаг 1»');
+  assert.ok(sn.includes('const at=path&&path.chapterId?path:nextChapterOf(id);'),'not started → first unfinished chapter, «шаг 1»');
 }
-ok('#2 Today names the lesson of the latest work (lesson start, pointer, ДЗ, practice / tracks), and the card shows chapter + step from the start');
+ok('#2 Today names the lesson of the latest answer (ДЗ, practice, tracks; ux59b: answers only), and the card shows chapter + step from the start');
 // #3 weak spots
 {
   assert.ok(dash.includes("learnerWeak(3).filter(w=>(Number(w.count_recent||w.count_total)||0)>=2)"),'a single slip is not a weak spot');
   assert.ok(dash.includes("const weakBody=(...parts)=>{const html=parts.join('');return html||'<p>Устойчивых слабых мест пока нет.</p>';};"),'«пока нет» only when nothing is listed');
   assert.equal((dash.match(/<p>Устойчивых слабых мест пока нет\.<\/p>/g)||[]).length,1);
-  assert.ok(dash.includes('const weakOpen=weak.length||weakWords.length||weakRules.length||repeated.length;'));
+  assert.ok(dash.includes('const weakOpen=weak.length||weakWords.length||weakRules.length||repeated.length||pairN;'));
 }
 ok('#3 «Слабые места»: no «пока нет» above a listed item; «Слово · 1 раз» no longer listed (repeated errors only, «Вспомнить слово»)');
 // #4 memory
