@@ -43,11 +43,11 @@ ok('Q5-02 hw-item:4-2:3 (index 2, number 3) names the 13 T13 targets and none of
   assert.deepEqual(L42.homework.source_items[3],{id:'hw-item:4-2:4',number:'4',text:'Сделать тест ProshVremyaBezIsk на BatylBol, нажать «Зафиксировать результат» и выполнить его в течение 24 часов.',source_ref:'school-homework'});
   assert.deepEqual(L42.homework.external_tasks,[{id:'ext:4-2:bez-isk',type:'external_test',label:'BatylBol · Прошедшее время без исключений · выполнить за 24 часа',url:'https://batylbol.kz/test/ProshVremyaBezIsk.html'}]);
   assert.equal(h16(L42.homework.source_items.slice(0,2)),'64bc43b3bfd105bf');
-  const pins={exercise_ids:[L42.homework.exercise_ids,'efc9f9f22854400e'],checklist:[L42.homework.checklist,'423b404b336f3260'],theory:[L42.theory,'ee3ab5ed3fdbe0f1'],stages:[L42.stages,'da2007ea720d89e7'],rules:[L42.rules,'7f88e5bf6edf775f'],original_exercises:[L42.original_exercises,'e1a2de904139f5f0'],generated_questions:[L42.generated_questions,'172450ba63e61f19'],practice_generators:[L42.practice_generators,'4f53cda18c2baa0c']};
+  const pins={exercise_ids:[L42.homework.exercise_ids,'efc9f9f22854400e'],checklist:[L42.homework.checklist,'423b404b336f3260'],theory:[L42.theory,'c51437b314a3a6da'],stages:[L42.stages,'da2007ea720d89e7'],rules:[L42.rules,'7f88e5bf6edf775f'],original_exercises:[L42.original_exercises,'e1a2de904139f5f0'],generated_questions:[L42.generated_questions,'172450ba63e61f19'],practice_generators:[L42.practice_generators,'4f53cda18c2baa0c']};
   for(const [k,[v,want]] of Object.entries(pins))assert.equal(h16(v),want,'Q5-07: 4-2 '+k+' changed');
-  assert.equal(L42.content_revision,'4-2.r1','theory untouched: no revision bump (a bump would reset a finished 4-2 path)');
+  assert.equal(L42.content_revision,'4-2.r2','2T-b: one content_revision bump with full chapter_ids mapping');
 }
-ok('Q5-03/04/07 hw-item:4-2:4 + ext:4-2:bez-isk, 23 vocab objects, theory/stages/exercises/checklist byte-identical to main 465afdf');
+ok('Q5-03/04/07 hw-item:4-2:4 + ext + vocab stable; theory bumped in 2T-b with mapping');
 
 // Q5-05 4-1 keeps its 10 targets.
 assert.deepEqual(L41.homework.word_ids,['tusinu','baru','zhuru','zhatu','otyru','turu','ashu','zhabu','tigu','also'].map(x=>'vocab:4-1:'+x));
@@ -267,7 +267,7 @@ ok('ST-11 a word/form credit writes evidence only; it does not complete 4-1 or 4
   const all=read('compiled-lessons-v2.js');
   assert.ok(!/(оқу|есту|қою|сүю)[^"]{0,40}не исключени/i.test(all)&&!/L-07/.test(all),'H-06: L-07 is not mounted');
   // r7 2T-a: stress marks removed from 1-2, 2-1, 2-2 (owner decision). Remaining: 3-2 (2) + 3-3 (5) = 7 for 2T-b.
-  assert.equal((all.match(/\u0301/g)||[]).length,7,'H-08: 2T-a removed 1-2/2-1/2-2 marks; 3-2/3-3 kept for 2T-b');
+  assert.equal((all.match(/\u0301/g)||[]).length,0,'H-08: 2T-b removed remaining learner stress marks in 3-2/3-3');
   assert.equal((read('lessons/1-2/lesson.json').match(/\u0301/g)||[]).length,0);
   assert.equal((read('lessons/2-1/lesson.json').match(/\u0301/g)||[]).length,0);
   assert.equal((read('lessons/2-2/lesson.json').match(/\u0301/g)||[]).length,0);

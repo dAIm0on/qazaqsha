@@ -4,14 +4,14 @@ const read=f=>fs.readFileSync(path.join(__dirname,f),'utf8');
 let passed=0;const ok=m=>{passed++;console.log('PASS '+m);};
 {
   for(const id of ['1-2','2-1','2-2'])assert.equal((read('lessons/'+id+'/lesson.json').match(/\u0301/g)||[]).length,0,id+' no stress');
-  assert.equal((read('lessons/3-2/lesson.json').match(/\u0301/g)||[]).length,2,'3-2 kept for 2T-b');
-  assert.equal((read('lessons/3-3/lesson.json').match(/\u0301/g)||[]).length,5,'3-3 kept for 2T-b');
-  const c=read('compiled-lessons-v2.js');assert.equal((c.match(/\u0301/g)||[]).length,7,'compiled matches sources');
+  assert.equal((read('lessons/3-2/lesson.json').match(/\u0301/g)||[]).length,0,'3-2 cleared in 2T-b');
+  assert.equal((read('lessons/3-3/lesson.json').match(/\u0301/g)||[]).length,0,'3-3 cleared in 2T-b');
+  const c=read('compiled-lessons-v2.js');assert.equal((c.match(/\u0301/g)||[]).length,0,'compiled matches sources (no learner stress)');
   assert.ok(!/Методичка откладывает/.test(read('lessons/1-1/lesson.json'))||true);
   // 3-1 limitations untouched
-  assert.ok(read('lessons/3-1/lesson.json').includes('Методичка откладывает'));
+  assert.ok(!read('lessons/3-1/lesson.json').includes('Методичка откладывает'),'3-1 limitations PDF line removed in 2T-b');
 }
-ok('stress marks removed from 1-2, 2-1, 2-2; 3-2/3-3 and 3-1 limitations untouched');
+ok('stress marks removed 1-2…3-3; 3-1 PDF limitations line removed');
 {
   const css=read('theme-redesign.css');
   assert.ok(!/#question-title\.practice-prompt[\s\S]{0,120}line-clamp:\s*2/.test(css),'line-clamp:2 gone');
@@ -54,7 +54,7 @@ ok('path.contentRevision kept across F5 (progress migrate + persistLessonPath); 
 ok('no U+0301 in lesson-pack-1/2*, app.js person panel, grammar-paths (T15); three біз sites clean');
 
 {
-  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-2ta-2'"));
+  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-2tb-1'"));
 }
-ok('SW r7-2ta-2');
+ok('SW r7-2tb-1');
 console.log('verify_r7_2ta: '+passed+' checks passed');
