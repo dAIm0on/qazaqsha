@@ -86,6 +86,8 @@
      if(ft.length!==forms.length)fail('vocab.form_translations: нужна строка на каждую форму');
      out.form_translations=ft.map(x=>str(x,'vocab.form_translations[]',200));
    }
+   // r7 X minor: optional extra Russian answers for the «Переведи на русский» card (айту: «сказать»); the gloss stays.
+   if(w.accept_also!=null)out.accept_also=list(w.accept_also,'vocab.accept_also',1,6).map(x=>str(x,'vocab.accept_also[]',120));
    // r7 W-2=C: optional per-form typed checks of ONE source vocab-ID (no new word-IDs).
    // Each check names one of the word's own forms and a Russian prompt; absent = old behaviour.
    if(w.form_checks!=null){
@@ -250,6 +252,8 @@
        row.origin='bank';
        row.source_ref=id(q.source_ref,'practice_bank.source_ref');
        if(!GROUPS.includes(q.group))fail('practice_bank.group: '+q.id);row.group=q.group;
+       // r7 X minor: optional one-line hint after a wrong answer that does not name the answer.
+       if(q.why_wrong!=null)row.why_wrong=str(q.why_wrong,'practice_bank.why_wrong',300);
        return row;
      });
      items.forEach(x=>take(x.id,'practice bank'));

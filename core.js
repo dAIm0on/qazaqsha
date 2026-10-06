@@ -284,6 +284,9 @@
     }
     return questions;
   }
-  const api={normalize,evaluate,migrateRecord,updateRecord,isDue,isDay0Learning,pauseReady,scheduleRepeat,chooseShortSession,lemmaKey,dedupeByLemma,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY,shareVocabAlts};
+  // r7 X minor: Russian count forms. forms = [1 / 21, 2–4 / 22–24, 5–20 / 0 / 25…]: ruPlural(4,['карточка','карточки','карточек']).
+  function ruPlural(n,forms){const k=Math.abs(Math.trunc(Number(n)||0)),m10=k%10,m100=k%100;return forms[m10===1&&m100!==11?0:m10>=2&&m10<=4&&(m100<12||m100>14)?1:2];}
+  function ruCount(n,forms){return n+' '+ruPlural(n,forms);}
+  const api={ruPlural,ruCount,normalize,evaluate,migrateRecord,updateRecord,isDue,isDay0Learning,pauseReady,scheduleRepeat,chooseShortSession,lemmaKey,dedupeByLemma,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY,shareVocabAlts};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TrainerCore=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -29231,7 +29231,8 @@ window.LESSON_V2_COMPILED = [
             "v2:3-1:assim"
           ],
           "source_ref": "r7-lesson-3-1:10.5",
-          "group": "tap"
+          "group": "tap",
+          "why_wrong": "Ищи слово, где основа кончалась на п/к/қ, а перед гласным окончанием стала б/г/ғ."
         },
         {
           "id": "b34-31-tap-02",
@@ -29269,7 +29270,8 @@ window.LESSON_V2_COMPILED = [
             "v2:3-1:poss"
           ],
           "source_ref": "r7-lesson-3-1:10.5",
-          "group": "tap"
+          "group": "tap",
+          "why_wrong": "«Твой» — окончание -ң / -ың / -ің; -м / -ым — «мой», -ы / -сы — «его»."
         },
         {
           "id": "b34-31-tap-03",
@@ -29277,7 +29279,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "tap-token",
           "title": "Отметь нужное",
-          "stimulus": "Обе формы «его»",
+          "stimulus": "Два слова со значением «его …» (его город, его улица)",
           "fields": [],
           "payload": {
             "tokens": [
@@ -29312,7 +29314,8 @@ window.LESSON_V2_COMPILED = [
             "v2:3-1:poss"
           ],
           "source_ref": "r7-lesson-3-1:10.5",
-          "group": "tap"
+          "group": "tap",
+          "why_wrong": "«Его» — -ы/-і после согласной, -сы/-сі после гласной; -м — «мой», -ңыз — «ваш»."
         },
         {
           "id": "b34-31-sort-01",
@@ -34599,7 +34602,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "tap-token",
           "title": "Отметь нужное",
-          "stimulus": "Обе формы «наш»",
+          "stimulus": "Два слова со значением «наш …»",
           "fields": [],
           "payload": {
             "tokens": [
@@ -34634,7 +34637,8 @@ window.LESSON_V2_COMPILED = [
             "v2:3-2:poss"
           ],
           "source_ref": "r7-lesson-3-2:10.3",
-          "group": "tap"
+          "group": "tap",
+          "why_wrong": "«Наш» — окончание -мыз/-міз или -ымыз/-іміз; -сы — «его», -лары — «их»."
         },
         {
           "id": "b34-32-tap-02",
@@ -34676,7 +34680,8 @@ window.LESSON_V2_COMPILED = [
             "v2:3-2:deixis"
           ],
           "source_ref": "r7-lesson-3-2:10.3",
-          "group": "tap"
+          "group": "tap",
+          "why_wrong": "Здесь «тот» — то, о чём уже шла речь; бұл и осы — «этот», рядом."
         },
         {
           "id": "b34-32-sort-01",
@@ -39647,7 +39652,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "tap-token",
           "title": "Отметь нужное",
-          "stimulus": "Обе формы «кто» (я есть / ты есть)",
+          "stimulus": "Два слова «я — человек» и «ты — человек» (кто, а не чей)",
           "fields": [],
           "payload": {
             "tokens": [
@@ -39682,7 +39687,8 @@ window.LESSON_V2_COMPILED = [
             "v2:3-3:who-whose"
           ],
           "source_ref": "r7-lesson-3-3:10.2",
-          "group": "tap"
+          "group": "tap",
+          "why_wrong": "«Кто» (я есть / ты есть) — -мын / -сың; -ым / -ың — это «мой / твой»."
         },
         {
           "id": "b34-33-tap-02",
@@ -39720,7 +39726,8 @@ window.LESSON_V2_COMPILED = [
             "v2:3-3:who-whose"
           ],
           "source_ref": "r7-lesson-3-3:10.2",
-          "group": "tap"
+          "group": "tap",
+          "why_wrong": "«Наш» — притяжательное -ымыз; -быз / -сыз значит «мы есть / вы есть»."
         },
         {
           "id": "b34-33-sort-01",
@@ -52279,7 +52286,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "tap-token",
           "title": "Отметь нужное",
-          "stimulus": "Обе формы «ты»",
+          "stimulus": "Два глагола с подлежащим «ты» (ты идёшь, ты приходишь)",
           "fields": [],
           "payload": {
             "tokens": [
@@ -52314,7 +52321,8 @@ window.LESSON_V2_COMPILED = [
             "v2:4-1:person"
           ],
           "source_ref": "r7-lesson-4-1:10.1",
-          "group": "tap"
+          "group": "tap",
+          "why_wrong": "«Ты» в настоящем — окончание -сың/-сің; -мын/-мін — «я», -ды/-ді — «он»."
         },
         {
           "id": "b34-41-tap-02",
@@ -52322,7 +52330,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "tap-token",
           "title": "Отметь нужное",
-          "stimulus": "Обе формы отрицания",
+          "stimulus": "Два глагола с «не» (я не …)",
           "fields": [],
           "payload": {
             "tokens": [
@@ -52357,7 +52365,8 @@ window.LESSON_V2_COMPILED = [
             "v2:4-1:negative"
           ],
           "source_ref": "r7-lesson-4-1:10.1",
-          "group": "tap"
+          "group": "tap",
+          "why_wrong": "«Не» — частица -ма/-ме (-ба/-бе, -па/-пе) сразу после основы, потом -й."
         },
         {
           "id": "b34-41-sort-01",
@@ -53926,6 +53935,9 @@ window.LESSON_V2_COMPILED = [
         "introduced_in": "4-2",
         "source_refs": [
           "school-homework"
+        ],
+        "accept_also": [
+          "сказать"
         ]
       },
       {
@@ -62046,7 +62058,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "tap-token",
           "title": "Отметь нужное",
-          "stimulus": "Обе формы прошедшего",
+          "stimulus": "Два глагола в прошедшем времени (действие уже было: писал, пришёл)",
           "fields": [],
           "payload": {
             "tokens": [
@@ -62081,7 +62093,8 @@ window.LESSON_V2_COMPILED = [
             "v2:4-2:contrast"
           ],
           "source_ref": "r7-lesson-4-2:10.2",
-          "group": "tap"
+          "group": "tap",
+          "why_wrong": "Прошедшее — -ды/-ді/-ты/-ті сразу после основы; -а/-е перед окончанием — это настоящее."
         },
         {
           "id": "b34-42-tap-02",
@@ -62089,7 +62102,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "tap-token",
           "title": "Отметь нужное",
-          "stimulus": "Обе формы «мы»",
+          "stimulus": "Два глагола с подлежащим «мы» (мы сказали, мы ждали)",
           "fields": [],
           "payload": {
             "tokens": [
@@ -62124,7 +62137,8 @@ window.LESSON_V2_COMPILED = [
             "v2:4-2:person"
           ],
           "source_ref": "r7-lesson-4-2:10.1",
-          "group": "tap"
+          "group": "tap",
+          "why_wrong": "«Мы» в прошедшем — -қ/-к после -ды/-ты; без -қ/-к — это «он»."
         },
         {
           "id": "b34-42-sort-01",
