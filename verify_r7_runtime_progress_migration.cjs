@@ -75,7 +75,8 @@ const ctx={window:{}};ctx.window.window=ctx.window;
 vm.runInNewContext(fs.readFileSync(path.join(__dirname,'compiled-lessons-v2.js'),'utf8'),ctx);
 const compiled=ctx.window.LESSON_V2_COMPILED;assert.ok(Array.isArray(compiled)&&compiled.length>=10);
 function runtime(list){
-  const mock={LessonV2Schema:Schema,LESSON_V2_COMPILED:list,COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
+  // r7 51: draft-gate hides non-released on public hosts; verify installs all under localhost QA bypass.
+  const mock={location:{hostname:'localhost'},LessonV2Schema:Schema,LESSON_V2_COMPILED:list,COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
     CURRICULUM:{words:[],rules:[],lessons:[],addWord(kazakh,translation,lesson,role){let w=this.words.find(x=>x.kazakh===kazakh);if(!w){w={id:'word:'+kazakh,kazakh,translation:[...translation],lesson_first_seen:lesson,target_or_context:role==='target'?'target':'context',card_ids:[],aliases:[kazakh]};this.words.push(w);}return w;}},
     CourseProgress:{registerStages(){return [];}},Canonical:null};
   vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8'),{window:mock,globalThis:mock,console});
@@ -209,7 +210,7 @@ ok('fresh profiles have no legacy facts; attempt log is capped while per-form su
 const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8'),html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8'),sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(html.indexOf('src="evidence-state.js"')>0&&html.indexOf('src="evidence-state.js"')<html.indexOf('src="progress.js"'));
 assert.ok(sw.includes('"evidence-state.js"'));
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-51-1'"));
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-51-2'"));
 assert.ok(/function responseModes\(q\)\{return supportKind\(q\)\|\|q\.kind==='multi'\?\['choice'\]:.*el\.type==='hidden'\?'choice':'typed'/.test(app),'response mode read from the rendered control');
 assert.ok(/state\.events\.push\(event\);rec=records\[q\.id\]\|\|rec;\n\s+if\(window\.EvidenceState\)\{try\{window\.EvidenceState\.observe\(state,/.test(app));
 assert.ok(app.includes("R7_SNAPSHOT=KEY+'-before-r7'")&&app.includes('localStorage.setItem(R7_SNAPSHOT,raw)')&&app.includes('localStorage.getItem(R7_SNAPSHOT)'));

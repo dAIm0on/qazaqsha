@@ -6,11 +6,23 @@
    const b=node?null:root.ExplainBankUI;
    return b&&Array.isArray(b.COURSE)?b.COURSE.map(x=>Object.assign({kind:'legacy'},x)):[];
  }
- function productionHost(){return !node&&root.location&&root.location.hostname==='qazaqsha.pages.dev';}
  function productionReady(x){return !!(x&&x.status==='released'&&x.release&&x.release.approved===true&&/^[0-9a-f]{40}$/i.test(x.release.preview_head||'')&&/^https:\/\//.test(x.release.preview_url||''));}
+ // r7 51: draft/reviewed stay hidden from ordinary learners on every public host (prod + CF preview).
+ // QA bypass: ?v2qa=1 (or localStorage qazaqsha-v2qa=1). localhost always open for agents.
+ function qaV2Preview(){
+   if(node)return true;
+   try{
+     const h=root.location&&root.location.hostname||'';
+     if(h==='localhost'||h==='127.0.0.1')return true;
+     if(/[?&]v2qa=1(?:&|$)/.test(String(root.location&&root.location.search||'')))return true;
+     if(root.localStorage&&root.localStorage.getItem('qazaqsha-v2qa')==='1')return true;
+   }catch(_){}
+   return false;
+ }
+ function v2Visible(x){return productionReady(x)||qaV2Preview();}
  function v2Rows(){
    const rows=node?[]:(root.LESSON_V2_COMPILED||[]);
-   return rows.filter(x=>!productionHost()||productionReady(x)).map(x=>({id:x.lesson_id,label:x.label||x.lesson_id.replace('-','–'),name:x.name||x.title,rules:(x.rules||[]).map(r=>r.id),kind:'v2',content_revision:x.content_revision,status:x.status||'draft'}));
+   return rows.filter(v2Visible).map(x=>({id:x.lesson_id,label:x.label||x.lesson_id.replace('-','–'),name:x.name||x.title,rules:(x.rules||[]).map(r=>r.id),kind:'v2',content_revision:x.content_revision,status:x.status||'draft'}));
  }
  function course(){
    const map=new Map();
