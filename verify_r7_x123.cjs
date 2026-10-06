@@ -56,7 +56,8 @@ const AUTHOR=/Карта урока|Статус:|Файл дыр|[\wа-яё]\.m
   assert.ok(S.CanonTexts&&S.CanonTexts.DOCS.s31,'canon docs kept for authors');
   for(const f of ['app.js','learning.js','dashboard.js','tutor-ui.js'])assert.ok(!/CanonTexts|canonHtml/.test(read(f)),f+' does not render canon docs');
   // lesson theory beats of every lesson: no author status lines / file names / lesson maps
-  for(const les of (S.GrammarChapters&&S.GrammarChapters.LESSONS)||[]){
+  assert.ok(S.GRAMMAR_CHAPTERS&&S.GRAMMAR_CHAPTERS.LESSONS.length>=11,"chapters loaded");
+  for(const les of S.GRAMMAR_CHAPTERS.LESSONS){
     const t=JSON.stringify(les.chapters||[]);
     assert.ok(!/Карта урока|Статус:|Файл дыр|[\wа-яё]\.md\b|Круг [A-G]\b|разжёвано|На сайт —/.test(t),'theory of '+les.id);
   }
