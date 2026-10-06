@@ -475,7 +475,8 @@
    const gp=state.grammarPath;if(!gp)return null;
    const lessonId=id||gp.lessonId;if(!P.courseIds().includes(lessonId))return null;
    const currentV2=window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(lessonId):null;
-   let contentRevision=gp.contentRevision||null;
+   const lp=P.ensureLessonProgress(state,lessonId);
+   let contentRevision=gp.contentRevision||(lp&&lp.path&&lp.path.contentRevision)||null;
    if(currentV2){
      const targetRev=currentV2.content_revision;
      // Stamp target revision only after chapter ids are current. Premature stamp
@@ -483,6 +484,9 @@
      if(!pathHasUnmappedChapters(lessonId,gp,gp.chapterId))contentRevision=targetRev;
      else if(contentRevision===targetRev)contentRevision=legacyPathRevision(lessonId,currentV2);
    }
+   // r7 2T-a: never write null over a known revision (F5 used to clear path.contentRevision when
+   // migrate dropped gp.contentRevision and persist ran before ensureV2).
+   if(!contentRevision&&lp&&lp.path&&typeof lp.path.contentRevision==='string')contentRevision=lp.path.contentRevision;
    const snap=Object.assign({},gp,{contentRevision});
    return P.saveLessonPath(state,lessonId,snap,Date.now());
  }
@@ -539,7 +543,9 @@
    const phase=(gp&&gp.phase)||(path&&path.phase)||null;
    const chapterId=(gp&&gp.chapterId)||(path&&path.chapterId)||null;
    const unmapped=pathHasUnmappedChapters(lessonId,gp||{},chapterId);
-   return phase==='done'&&(revisionBump||unmapped||!!(gp&&gp.pathNeedsReplay&&revisionBump));
+   // r7 2T-a: content_revision bump alone (ударения / тексты, id глав те же) must not wipe «пройдено».
+   // Replay only when chapters are unmapped or an explicit pathNeedsReplay was set for a structural change.
+   return phase==='done'&&(unmapped||!!(gp&&gp.pathNeedsReplay&&revisionBump)||!!(path&&path.pathNeedsReplay&&revisionBump));
  }
  function loadLessonPath(id){
    const G=window.GrammarPath;if(!G||!P.courseIds().includes(id))return null;
@@ -573,13 +579,17 @@
      const unmapped=pathActive&&pathHasUnmappedChapters(id,gp,chapterId);
      // Premature target stamp + legacy ids: treat like first-time revision so done resets.
      const needsRevisionGate=revisionFirstTime||unmapped||(unmappedBefore&&storedRev===targetRev);
-     if(pathActive&&phase==='done'&&needsRevisionGate){
+     const needsDoneReset=unmapped||(unmappedBefore&&storedRev===targetRev)||pathNeedsReplay||!storedRev;
+     if(pathActive&&phase==='done'&&needsDoneReset){
        clearLessonCompletedChapters(gp,id);
        const first=((G.lesson(id)||{}).chapters||[])[0]||null;
        phase=first?'beat':'lesson';
        chapterId=first?first.id:null;
        beat=0;
        pathNeedsReplay=true;
+       dirty=true;
+     }else if(pathActive&&phase==='done'&&revisionFirstTime){
+       // r7 2T-a: stamp the new revision, keep completed chapters («пройдено» не сбрасывать).
        dirty=true;
      }else if(pathActive&&needsRevisionGate){
        if(chapterId&&!(G.chapter&&G.chapter(id,chapterId))){chapterId=null;dirty=true;}
@@ -2801,7 +2811,7 @@
      <p>Окончание как у мен/сен/сіз, только для біз Н меняется на З. После <strong>м, н, ң</strong> у біз звонкое <span lang="kk">быз/біз</span>: ғалыммын → ғалымбыз, мұғаліммін → мұғалімбіз.</p>
      <div class="table-wrap"><table><thead><tr><th scope="col">Последний звук</th><th scope="col">Біз</th><th scope="col">Сендер</th><th scope="col">Сіздер</th></tr></thead><tbody>
      <tr><th scope="row">Глухие; б в г д</th><td lang="kk">пыз / піз</td><td lang="kk">сыңдар / сіңдер</td><td lang="kk">сыздар / сіздер</td></tr>
-     <tr><th scope="row">м н ң; ж з</th><td lang="kk">быз / бі́з</td><td lang="kk">сыңдар / сіңдер</td><td lang="kk">сыздар / сіздер</td></tr>
+     <tr><th scope="row">м н ң; ж з</th><td lang="kk">быз / біз</td><td lang="kk">сыңдар / сіңдер</td><td lang="kk">сыздар / сіздер</td></tr>
      <tr><th scope="row">Остальные</th><td lang="kk">мыз / міз</td><td lang="kk">сыңдар / сіңдер</td><td lang="kk">сыздар / сіздер</td></tr>
      </tbody></table></div>
      <p>С <strong>сендер</strong> и <strong>сіздер</strong> множественное окончание на само слово не ставим: <span lang="kk">сендер студентсіңдер</span>, не студенттерсіңдер. С біз множественное можно, но в упражнениях пишем без него: <span lang="kk">біз студентпіз</span>.</p>

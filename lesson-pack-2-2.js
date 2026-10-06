@@ -4830,7 +4830,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([
             ]
           }
         ],
-        "explanation": "После М у біз звонкое бі́з: Біз мұғалімбіз. — Мы учителя.",
+        "explanation": "После М у біз звонкое біз: Біз мұғалімбіз. — Мы учителя.",
         "ruleIds": [
           "person-biz"
         ],
@@ -5668,7 +5668,7 @@ window.LESSON_PACKS = (window.LESSON_PACKS || []).concat([
             ]
           }
         ],
-        "explanation": "После М: біз → бі́з. Біз мұғалімбіз.",
+        "explanation": "После М: біз → біз. Біз мұғалімбіз.",
         "note": "Можно с местоимением или только форму.",
         "ruleIds": [
           "person-biz"

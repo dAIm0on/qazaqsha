@@ -25,7 +25,9 @@
    if(obj(raw.incidentalWeek))state.incidentalWeek={key:String(raw.incidentalWeek.key||''),added:Math.max(0,Number(raw.incidentalWeek.added)||0)};
    if(obj(raw.grammarPath)){
      const g=raw.grammarPath;
-     state.grammarPath={topicId:typeof g.topicId==='string'?g.topicId:null,step:Math.max(0,Number(g.step)||0),phase:typeof g.phase==='string'?g.phase:'hub',queue:Array.isArray(g.queue)?g.queue.filter(safe).slice(0,40):[],index:Math.max(0,Number(g.index)||0),peeks:obj(g.peeks)?g.peeks:Object.create(null),fails:obj(g.fails)?g.fails:Object.create(null),passed:obj(g.passed)?g.passed:Object.create(null),blocked:!!g.blocked,completed:Array.isArray(g.completed)?g.completed.filter(safe).slice(0,40):[],lessonId:typeof g.lessonId==='string'?g.lessonId:null,chapterId:typeof g.chapterId==='string'?g.chapterId:null,beat:Math.max(0,Number(g.beat)||0),completedChapters:obj(g.completedChapters)?g.completedChapters:Object.create(null),legacyCompleted:Array.isArray(g.legacyCompleted)?g.legacyCompleted.concat(Array.isArray(g.completed)?g.completed:[]).filter(safe).slice(0,80):Array.isArray(g.completed)?g.completed.filter(safe):[]};
+     state.grammarPath={topicId:typeof g.topicId==='string'?g.topicId:null,step:Math.max(0,Number(g.step)||0),phase:typeof g.phase==='string'?g.phase:'hub',queue:Array.isArray(g.queue)?g.queue.filter(safe).slice(0,40):[],index:Math.max(0,Number(g.index)||0),peeks:obj(g.peeks)?g.peeks:Object.create(null),fails:obj(g.fails)?g.fails:Object.create(null),passed:obj(g.passed)?g.passed:Object.create(null),blocked:!!g.blocked,completed:Array.isArray(g.completed)?g.completed.filter(safe).slice(0,40):[],lessonId:typeof g.lessonId==='string'?g.lessonId:null,chapterId:typeof g.chapterId==='string'?g.chapterId:null,beat:Math.max(0,Number(g.beat)||0),completedChapters:obj(g.completedChapters)?g.completedChapters:Object.create(null),legacyCompleted:Array.isArray(g.legacyCompleted)?g.legacyCompleted.concat(Array.isArray(g.completed)?g.completed:[]).filter(safe).slice(0,80):Array.isArray(g.completed)?g.completed.filter(safe):[]}; // r7 2T-a: keep path contentRevision across F5 (only when set — omit null so golden fixtures stay identical)
+     if(typeof g.contentRevision==='string'&&g.contentRevision)state.grammarPath.contentRevision=g.contentRevision.slice(0,80);
+     if(g.pathNeedsReplay===true)state.grammarPath.pathNeedsReplay=true;
      const d=g.pathDraft;
      if(obj(d)&&typeof d.value==='string')state.grammarPath.pathDraft={lessonId:typeof d.lessonId==='string'?d.lessonId.slice(0,20):null,chapterId:typeof d.chapterId==='string'?d.chapterId.slice(0,80):null,beat:Math.max(0,Math.floor(Number(d.beat)||0)),value:d.value.slice(0,400)};
      if(typeof g.canonShownFor==='string')state.grammarPath.canonShownFor=g.canonShownFor.slice(0,80);
@@ -159,6 +161,8 @@
      out.grammarPath.lessonId=runtimeId;out.grammarPath.chapterId=mergedPath.chapterId;out.grammarPath.beat=mergedPath.beat;out.grammarPath.phase=mergedPath.phase;
      if(mergedPath.pathDraft)out.grammarPath.pathDraft=JSON.parse(JSON.stringify(mergedPath.pathDraft));else delete out.grammarPath.pathDraft;
      if(mergedPath.canonShownFor)out.grammarPath.canonShownFor=mergedPath.canonShownFor;else delete out.grammarPath.canonShownFor;
+     if(mergedPath.contentRevision)out.grammarPath.contentRevision=mergedPath.contentRevision;else delete out.grammarPath.contentRevision;
+     if(mergedPath.pathNeedsReplay)out.grammarPath.pathNeedsReplay=true;else delete out.grammarPath.pathNeedsReplay;
    }
    if(evidence)out.evidence=evidence.merge(out.evidence,incoming.evidence);
    if(before)evidence.recordConflicts(out,before,incoming);

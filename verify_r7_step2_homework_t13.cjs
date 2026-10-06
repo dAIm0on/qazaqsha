@@ -266,7 +266,11 @@ ok('ST-11 a word/form credit writes evidence only; it does not complete 4-1 or 4
   assert.ok(!read('lessons/3-3/corrections.json').includes('corr:3-3:L-01'),'H-01: no corr:3-3:L-01');
   const all=read('compiled-lessons-v2.js');
   assert.ok(!/(оқу|есту|қою|сүю)[^"]{0,40}не исключени/i.test(all)&&!/L-07/.test(all),'H-06: L-07 is not mounted');
-  assert.equal((all.match(/\u0301/g)||[]).length,14,'H-08: stress marks unchanged');
+  // r7 2T-a: stress marks removed from 1-2, 2-1, 2-2 (owner decision). Remaining: 3-2 (2) + 3-3 (5) = 7 for 2T-b.
+  assert.equal((all.match(/\u0301/g)||[]).length,7,'H-08: 2T-a removed 1-2/2-1/2-2 marks; 3-2/3-3 kept for 2T-b');
+  assert.equal((read('lessons/1-2/lesson.json').match(/\u0301/g)||[]).length,0);
+  assert.equal((read('lessons/2-1/lesson.json').match(/\u0301/g)||[]).length,0);
+  assert.equal((read('lessons/2-2/lesson.json').match(/\u0301/g)||[]).length,0);
   assert.equal((read('lessons/4-2/lesson.json').match(/\u0301/g)||[]).length,0);
   const plan=read('docs/r7/R7_STEP2.md');assert.ok(/Q1–Q3[^\n]*открыт/.test(plan),'H-05: Q1–Q3 stay open in the plan');
 }
