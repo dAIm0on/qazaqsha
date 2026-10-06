@@ -62551,7 +62551,7 @@ window.LESSON_V2_COMPILED = [
       "preview_head": "",
       "preview_url": "",
       "approved_at": "",
-      "note": "r7 #65 tip3: RU stage/notes; still draft — not productionReady"
+      "note": "r7 #66 soft: D7 note + RU stage labels; still draft"
     },
     "sources": [
       {
@@ -75028,7 +75028,7 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-method"
         ],
-        "note": "Целевой ответ — «аулада»; «далада» тоже засчитывается (решение владелицы)."
+        "note": "Целевой ответ — «аулада»; «далада» тоже засчитывается."
       },
       {
         "id": "src:5-1:rev:1",
@@ -75731,7 +75731,7 @@ window.LESSON_V2_COMPILED = [
       },
       {
         "id": "stage:5-1:micro-1",
-        "title": "Изолированные рычаги 1",
+        "title": "Часть слова или «чьё»",
         "kind": "learning",
         "core_ids": [
           "src:5-1:mp:part-poss:1",
@@ -75780,7 +75780,7 @@ window.LESSON_V2_COMPILED = [
       },
       {
         "id": "stage:5-1:micro-2",
-        "title": "Изолированные рычаги 2",
+        "title": "Место, время или возраст",
         "kind": "learning",
         "core_ids": [
           "src:5-1:mp:sense:9",
@@ -75829,7 +75829,7 @@ window.LESSON_V2_COMPILED = [
       },
       {
         "id": "stage:5-1:micro-3",
-        "title": "Изолированные рычаги 3",
+        "title": "Т или Д в окончании «где»",
         "kind": "learning",
         "core_ids": [
           "src:5-1:mp:td:17",
@@ -75878,7 +75878,7 @@ window.LESSON_V2_COMPILED = [
       },
       {
         "id": "stage:5-1:micro-4",
-        "title": "Изолированные рычаги 4",
+        "title": "Нужно ли Н после «чьё»",
         "kind": "learning",
         "core_ids": [
           "src:5-1:mp:need-n:5",
@@ -75927,7 +75927,7 @@ window.LESSON_V2_COMPILED = [
       },
       {
         "id": "stage:5-1:micro-5",
-        "title": "Изолированные рычаги 5",
+        "title": "А или Е в окончании «где»",
         "kind": "learning",
         "core_ids": [
           "src:5-1:mp:ae:9",
@@ -75976,7 +75976,7 @@ window.LESSON_V2_COMPILED = [
       },
       {
         "id": "stage:5-1:micro-6",
-        "title": "Изолированные рычаги 6",
+        "title": "Уже есть «чьё» 3-го лица?",
         "kind": "learning",
         "core_ids": [
           "src:5-1:mp:spot:7",
