@@ -17,6 +17,7 @@
    p.words=list(raw.words,'слова').map(w=>({kazakh:text(w.kazakh,'слово',100),translation:list(w.translation,'переводы',1,10).map(t=>text(t,'перевод',200))}));
    p.exercises=list(raw.exercises,'упражнения',2).map(q=>{
      if(!obj(q)||!['vocab','numbers','plural','sounds'].includes(q.topic))fail('неизвестный раздел упражнения');
+     if(q.kind!==undefined&&q.kind!=='fields')fail('новые виды заданий (выбор, сортировка и т. п.) принимаются только из уроков 3–4 пакета v2');
      return {id:id(q.id),topic:q.topic,title:text(q.title,'вопрос',300),stimulus:text(q.stimulus,'пример',1000),explanation:text(q.explanation,'объяснение'),
        fields:list(q.fields,'поля ответа',1,12).map(f=>{if(!obj(f)||!['text','number-text','select','set-text','syllables'].includes(f.kind))fail('тип поля');const field={kind:f.kind,label:text(f.label,'подпись',200),answers:list(f.answers,'ответы',1,12).map(a=>text(a,'ответ',300))};if(f.kind==='select'){field.options=list(f.options,'варианты',2,20).map(a=>text(a,'вариант',300));if(field.answers.some(a=>!field.options.includes(a)))fail('ответ отсутствует в вариантах');}return field;})};
    });

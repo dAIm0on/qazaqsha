@@ -27,12 +27,14 @@
  for(const q of questions)coerceTyped(q);
  const byId=new Map(questions.map(q=>[q.id,q]));
  const topics=[['all','Все задания','∞'],['sounds','Звуки и слоги','01'],['plural','Множественное число','02'],['vocab','Слова','03'],['numbers','Числа и количество','04'],['person','Личные окончания','05'],['rules','Только правила','06'],['phrase','Фразы','07'],['verbs','Глаголы','08']];
- const KEY='qazaq-kris-course-v1', BACKUP=KEY+'-before-import', MIGRATION=KEY+'-before-schema-5';
+ const KEY='qazaq-kris-course-v1', BACKUP=KEY+'-before-import', MIGRATION=KEY+'-before-schema-5', R7_SNAPSHOT=KEY+'-before-r7';
  const cfg=window.TRAINER_CONFIG, P=window.ProgressStore, catalog=window.CURRICULUM;
  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  let state=P.empty(),savedSession=null,storageAvailable=true,storageReadError=null;
- try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);}}
+ try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);
+   // r7: keep the exact pre-migration bytes once (best effort; the migration itself is additive).
+   const r7=window.EvidenceState&&window.EvidenceState.MIGRATION_ID;if(r7&&!(saved.evidence&&saved.evidence.migrations&&saved.evidence.migrations[r7])&&!localStorage.getItem(R7_SNAPSHOT)){try{localStorage.setItem(R7_SNAPSHOT,raw);}catch{}}}}
  catch(error){storageAvailable=false;storageReadError=error;}
  // Letter row must always show on text-input surfaces (any width). Pref defaults on; mount no longer gates on max-width.
  if(!state.prefs.lettersChosen)state.prefs.letters=true;
@@ -617,8 +619,12 @@
    }
    return '';
  }
+ // r7 Q6-B support kinds (blocks 3–4): rendering/grading live in response-kinds.js.
+ function supportKind(q){return !!(q&&window.ResponseKinds&&window.ResponseKinds.isSupportKind(q.kind));}
+ function supportLine(q){return window.ResponseKinds.solutionText(q);}
  function vocabLemmaLine(q){
    if(!q)return '';
+   if(supportKind(q))return supportLine(q);
    if(q.kind==='multi')return (q.correct||[]).join(', ');
    return (q.fields||[]).map(f=>(f.answers||[]).join(' / ')).join('; ');
  }
@@ -1216,6 +1222,7 @@
    return null;
  }
  function answerMarkup(q){
+   if(supportKind(q))return window.ResponseKinds.markup(q,esc);
    const fields=q.fields||[{label:'Ответ',kind:'text'}];
    return `<div class="fields">${fields.map((f,i)=>{
      const taps=classifierOptions(f);
@@ -1313,8 +1320,10 @@
      b.parentElement.querySelectorAll('[data-fill="'+b.dataset.fill+'"]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
      save();
    }));
+   if(supportKind(q))$$('#answer-form .rk button').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();if(checked)return;if(window.ResponseKinds.click($('#answer-form'),q,b))save();}));
    if(draft?.token===queueEpoch+':'+position&&draft.exerciseId===q.id){
-     if(q.kind==='multi')$$('input[name=choice]').forEach(el=>{el.checked=draft.answers.includes(el.value);});
+     if(supportKind(q)){const el=$('#rk-response');if(el){el.value=JSON.stringify((draft.answers||[]).map(String));window.ResponseKinds.paint($('#answer-form'),q);}}
+     else if(q.kind==='multi')$$('input[name=choice]').forEach(el=>{el.checked=draft.answers.includes(el.value);});
      else q.fields.forEach((f,i)=>{$('#answer-'+i).value=String(draft.answers[i]||'');});
    }
    $$('[data-fill]').forEach(b=>{const inp=$('#'+b.dataset.fill);if(inp&&inp.value===b.dataset.val)b.setAttribute('aria-pressed','true');});
@@ -1380,7 +1389,7 @@
      focusAnswer();save();
      return;
    }
-   const answerLine=q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
+   const answerLine=supportKind(q)?supportLine(q):q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
    const why=q.explanation?('<p class="small">'+esc(q.explanation)+'</p>'):'';
    const box=$('#hint-box');
    box.innerHTML='<strong>Сначала слепая попытка, теперь перенабор.</strong> Подсказка = провал для интервала. Набери форму целиком, потом она вернётся ещё раз без подсказки. <p lang="kk"><strong>'+esc(answerLine)+'</strong></p>'+why;
@@ -1407,13 +1416,16 @@
    const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Для окончания важен последний слог.',plural:'Последний слог: А или Е. Потом последняя буква: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Сначала слепая попытка. Не открывай готовое слово — иначе это не вспоминание.',numbers:'Собери разряды: сначала большая часть. Не считай по порядку.',person:'Мен: пын/бын/мын. Сен: сың. Сіз: сыз. Біз после м/н/ң: біз. Сендер/сіздер без -лар на основу. Отрицание: основа + емес + окончание.',rules:'Набери суффикс или короткое слово правила, не целое новое существительное.'};
    const box=$('#hint-box');box.textContent=q.hint&&!/^[А-Яа-яӘәІіҢңҒғҚқӨөҰұҮүҺһ ]{1,24}$/.test(q.hint)?q.hint:(hints[q.topic]||'Вспомни правило, потом форму.');box.hidden=false;save();
  }
- function readAnswers(q){return q.kind==='multi'?$$('input[name=choice]:checked').map(el=>el.value):q.fields.map((_,i)=>$('#answer-'+i).value);}
+ // r7 Q6-B: how each field was really answered on screen (tap buttons = choice), not inferred from q.kind.
+ function responseModes(q){return supportKind(q)||q.kind==='multi'?['choice']:(q.fields||[]).map((_,i)=>{const el=document.getElementById('answer-'+i);return el&&el.type==='hidden'?'choice':'typed';});}
+ function evidenceOrigin(homeworkMode,voluntary){return homeworkMode?'homework':mode==='exam'?'exam':voluntary?'voluntary':stageContext?'lesson-stage':activeLesson?'lesson':'bank';}
+ function readAnswers(q){return supportKind(q)?window.ResponseKinds.read(q):q.kind==='multi'?$$('input[name=choice]:checked').map(el=>el.value):q.fields.map((_,i)=>$('#answer-'+i).value);}
  function checkAnswer(q,reveal=false){
    if(mode==='slice'||mode==='repair'){checkProbe(q,reveal);return;}
    if(checked&&!retrying)return;
    if(retrying){
      const answers=readAnswers(q), warning=$('#validation');
-     if(answers.some(a=>!String(a).trim())&&q.kind!=='multi'){warning.textContent='Набери форму целиком.';warning.hidden=false;return;}
+     if(supportKind(q)?window.ResponseKinds.missing(q,answers):answers.some(a=>!String(a).trim())&&q.kind!=='multi'){warning.textContent=supportKind(q)?'Сначала выбери ответ.':'Набери форму целиком.';warning.hidden=false;return;}
      warning.hidden=true;
      const result=core.evaluate(q,answers);
      if(result.correct){
@@ -1439,11 +1451,12 @@
    }
    const answers=readAnswers(q), warning=$('#validation');
    if(!reveal){
-     const missing=q.kind==='multi'?answers.length===0:answers.some(a=>!a.trim());
-     if(missing){warning.textContent=q.kind==='multi'?'Выбери хотя бы один вариант.':'Заполни все поля — проверим разбор целиком.';warning.hidden=false;if(q.kind!=='multi')$('#answer-'+answers.findIndex(a=>!a.trim())).focus();return;}
+     const support=supportKind(q);
+     const missing=support?window.ResponseKinds.missing(q,answers):q.kind==='multi'?answers.length===0:answers.some(a=>!a.trim());
+     if(missing){warning.textContent=support?'Сначала выбери ответ — проверим целиком.':q.kind==='multi'?'Выбери хотя бы один вариант.':'Заполни все поля — проверим разбор целиком.';warning.hidden=false;if(!support&&q.kind!=='multi')$('#answer-'+answers.findIndex(a=>!a.trim())).focus();return;}
    }
    warning.hidden=true;
-   const result=reveal?{correct:false,parts:q.kind==='multi'?q.options.map(()=>false):q.fields.map(()=>false)}:core.evaluate(q,answers);
+   const result=reveal?{correct:false,parts:supportKind(q)?[]:q.kind==='multi'?q.options.map(()=>false):q.fields.map(()=>false)}:core.evaluate(q,answers);
    checked=true;if(reveal){hintEvent(q,'reveal');hinted=true;}
    pauseTimer();const now=Date.now(),recall=(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='select');
    const F=window.FSRS;
@@ -1479,6 +1492,7 @@
      official_like:(mode==='exam'||q.topic==='rules')?1:0,
      predicted_R:predicted,
      hours_since_last:hours,
+     response_kind:q.kind||'fields',response_modes:responseModes(q),
      rule_peek:rulePeeked?1:0,homework:homeworkMode?1:0,block:window.Homework?window.Homework.inferBlock(q,mode,hwLesson,activeLesson):''};
    if(stageContext){
      event.lesson_id=stageContext.lessonId;
@@ -1488,8 +1502,9 @@
    }
    if(!homeworkMode&&!aiRemed&&!voluntary)event.skills=window.Knowledge.observe(state,q,result,event,errors);
    state.events.push(event);rec=records[q.id]||rec;
+   if(window.EvidenceState){try{window.EvidenceState.observe(state,{q,answers,result,event,responseModes:responseModes(q),origin:evidenceOrigin(homeworkMode,voluntary),revealed:!!reveal,first:true,lessonId:event.lesson_id||currentLessonId(q)||q.lessonId||'',contentRevision:event.content_revision||(window.LessonV2Runtime&&window.LessonV2Runtime.byId&&(window.LessonV2Runtime.byId(q.lessonId)||{}).content_revision)||''});}catch(error){console.warn('evidence',error);}}
    if(homeworkMode&&hwLesson){
-     const expected=q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers[0]).join('; ');
+     const expected=supportKind(q)?supportLine(q):q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers[0]).join('; ');
      window.Homework.recordItem(state,hwLesson,{id:q.id,answers,correct:result.correct,rule_peek:rulePeeked,answer_peek:hinted,skipped:!!reveal,expected,event_id:eventId},now);
    }
    if(!voluntary)P.observeConfusions(state,q,answers,result,now,confusionIndex,hinted||reveal||rulePeeked);
@@ -1516,7 +1531,8 @@
      if(other&&!queue.slice(position+1).includes(other.id))queue.splice(Math.min(position+4,queue.length),0,other.id);
    }
    const deferred=rec.streak<cfg.schedule.cleanAnswersToConsolidate&&!queue.slice(position+1).includes(q.id);
-   if(q.kind==='multi'){
+   if(supportKind(q)){}
+   else if(q.kind==='multi'){
      q.options.forEach((o,i)=>{
        const label=$('#choice-'+i),expected=q.correct.includes(o),selected=answers.includes(o);
        if(expected){label.classList.add(selected&&!reveal?'correct':'missed');label.querySelector('.choice-result').textContent='✓';}
@@ -1532,6 +1548,7 @@
    if(!allowRetry){
      $$('#answer-form input, #answer-form select, #hint-button, #reveal-button, [data-letter]').forEach(el=>{el.disabled=true;});
      $('#answer-form').classList.add('answered');
+     if(supportKind(q))window.ResponseKinds.mark($('#answer-form'),q,result);
      $('#check-button').hidden=true;if($('#retry-button'))$('#retry-button').hidden=true;$('#next-button').hidden=false;
    }else{
      retrying=true;checked=false;
@@ -1555,7 +1572,7 @@
    let status=(!day0&&rec.streak>=2)||(day0&&blinds>=learningCap)?'Следующая проверка по памяти: '+new Date(rec.dueAt).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+'.':!result.correct?'Эта карточка появится снова.':day0?'Для закрепления карточка вернётся в этом подходе ещё раз (нужно '+learningCap+' слепых).':'Для закрепления карточка вернётся позже.';
    if(deferred)status='Карточка сохранена для следующего подхода: сейчас не хватает других заданий для паузы.';
    if(result.correct&&hinted)status='Перенабор засчитан как обучение, не как самостоятельный успех. Карточка вернётся в этом подходе слепой.';
-   const answerLine=q.kind==='multi'?q.correct.join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
+   const answerLine=supportKind(q)?supportLine(q):q.kind==='multi'?q.correct.join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
    const alsoOk=!result.correct?'':(q.fields||[]).map((f,i)=>{
      const used=core.normalize(answers[i]||'');
      const rest=(f.answers||[]).filter(a=>core.normalize(a)!==used);
@@ -2665,7 +2682,7 @@
      topic='all';sourceFilter=null;activeLesson=null;mode=next;startQueue();showView('practice');
    },
    contrast:startContrast,setAssociation,promote,export:()=>{save();downloadProgress(P.serialize(state));},import:importProgress,
-   restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
+   restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(R7_SNAPSHOT)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
  });
  $('#pause-session').onclick=()=>{
    if(position>0&&queue.length){

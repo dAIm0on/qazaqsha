@@ -1,0 +1,138 @@
+{
+ "app": "qazaq-trainer",
+ "schema": 4,
+ "records": {
+  "m1-1-1": {
+   "attempts": 3,
+   "correct": 2,
+   "streak": 1,
+   "dueAt": 1789977600000,
+   "last_seen": 1789891200000
+  },
+  "m1-2-1": {
+   "seen": 1,
+   "review_count": 1,
+   "correct_count": 1,
+   "wrong_count": 0,
+   "correct_streak": 1,
+   "created_at": 1789894800000,
+   "last_seen": 1789894800000,
+   "last_correct": 1789894800000,
+   "last_wrong": null,
+   "last_answer": 1789894800000,
+   "hint_used": false,
+   "hint_count": 0,
+   "response_time": 4200,
+   "response_time_total": 4200,
+   "timed_answers": 1,
+   "next_review": 1789895400000,
+   "needsReview": false,
+   "recall_review_successes": 0,
+   "review_successes": 0,
+   "last_successful_review": null,
+   "last_shown": null,
+   "fsrs": {
+    "due": 1789895400000,
+    "stability": 2.3065,
+    "difficulty": 2.11810397,
+    "elapsed_days": 0,
+    "scheduled_days": 0,
+    "reps": 1,
+    "lapses": 0,
+    "learning_steps": 1,
+    "state": 1,
+    "last_review": 1789894800000
+   },
+   "history_partial": false,
+   "policy_version": "tz2-bir-myn-2026-09-10",
+   "mastery_level": "LEARNING",
+   "status": "LEARNING",
+   "attempts": 1,
+   "correct": 1,
+   "streak": 1,
+   "dueAt": 1789895400000,
+   "lastAttemptAt": 1789894800000,
+   "lapses": 0,
+   "response_time_ms": 4200,
+   "fsrs_difficulty": 2.11810397,
+   "fsrs_stability": 2.3065,
+   "fsrs_retrievability": 1,
+   "fsrs_log": {
+    "rating": 3,
+    "state": 0,
+    "due": 1789894800000,
+    "stability": 0,
+    "difficulty": 0,
+    "elapsed_days": 0,
+    "last_elapsed_days": 0,
+    "scheduled_days": 0,
+    "learning_steps": 0,
+    "review": 1789894800000
+   }
+  }
+ },
+ "skills": {},
+ "vocabulary": {
+  "word:сәлем": {
+   "times_seen": 4,
+   "last_seen": 1789891200000,
+   "last_seen_lesson": "1-1",
+   "target_or_context": "target"
+  }
+ },
+ "associations": {
+  "word:сәлем": "салам — привет"
+ },
+ "events": [
+  {
+   "id": "ev:1789894800000:m1-2-1",
+   "session_id": "1",
+   "presentation": 0,
+   "type": "answer",
+   "card_id": "m1-2-1",
+   "at": 1789894800000,
+   "correct": true,
+   "hinted": false,
+   "response_time_ms": 4200,
+   "response_time": 4200,
+   "latency_ms": 4200,
+   "recall": true,
+   "answers": [
+    "сәлем"
+   ],
+   "item_type": "vocab",
+   "direction": "kk",
+   "first_try_correct": 1,
+   "peek": 0,
+   "retype_after_peek_ok": null,
+   "confusion_tag": "",
+   "confuse_pair_id": "",
+   "official_like": 0,
+   "predicted_R": null,
+   "hours_since_last": null,
+   "rule_peek": 0,
+   "homework": 0,
+   "block": ""
+  }
+ ],
+ "learning": {
+  "lessonId": "1-1",
+  "notes": {
+   "1-1": "гласные"
+  },
+  "steps": {
+   "1-1": 2
+  },
+  "completedSteps": {
+   "1-1:0": true
+  }
+ },
+ "grammarPath": {
+  "topicId": null,
+  "step": 0,
+  "phase": "hub",
+  "completed": [
+   "1-1"
+  ]
+ }
+}
