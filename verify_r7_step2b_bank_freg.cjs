@@ -347,4 +347,14 @@ ok('decision 2: «қалайсың: N из 4 форм самостоятельн
 }
 ok('казакша (a) a check card never shows its answer as the translation line (64 cards hw31–33) · (b) qalaisyn «Напиши все формы» leaves homework (4+4 stay), 4-2 queue 39');
 
+// ── words counter = homework.word_ids in every lesson (2-2 сау бол… cards bound to several words) ──
+{
+  const box={},records={};
+  vm.runInNewContext(grab(appSrc,'wordGroupCounter')+'\nbox.f=wordGroupCounter;',{box,records,byId:Q,window:S});
+  const got={};for(const l of LESSONS){const h=R.homework(l).homework;got[l]=[box.f(plain(h.word_question_ids)).total,h.word_ids.length];}
+  for(const [l,[a,b]] of Object.entries(got))assert.equal(a,b,'counter denominator '+l+' '+JSON.stringify(got));
+  assert.equal(got['2-2'][0],14);assert.equal(got['1-2'][0],24);assert.equal(got['2-1'][0],24);assert.equal(got['3-1'][0],18);
+}
+ok('words-track counter denominator = homework.word_ids in all 11 lessons (2-2: 14 with the сау бол… cards)');
+
 console.log('R7_STEP2B_BANK_FREG_OK',passed);

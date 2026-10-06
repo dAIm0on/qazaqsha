@@ -1231,7 +1231,12 @@
  function wordGroupCounter(ids){
    const tried=id=>records[id]?.attempts>0;
    const groups=new Map();
-   for(const id of ids){const q=byId.get(id),k=(q&&q.vocabIds&&q.vocabIds[0])||id;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(id);}
+   // r7 2b: a card bound to several words (2-2 «сау болыңыздар» also carries «сау бол») counts for its most
+   // specific required homework word of its lesson, so the denominator equals homework.word_ids (2-2: 14, not 11).
+   const want=new Map();
+   const wordsOf=l=>{if(!want.has(l)){let set=null;try{const R=typeof window!=='undefined'&&window.LessonV2Runtime;const c=R&&R.homeworkWordCoverage&&l?R.homeworkWordCoverage(l):null;set=c&&c.words?new Set(c.words.map(w=>w.catalog_id)):null;}catch(_){set=null;}want.set(l,set);}return want.get(l);};
+   const keyOf=q=>{const v=(q&&q.vocabIds)||[],set=q&&wordsOf(q.lessonId),hit=set?v.filter(x=>set.has(x)):[];return hit.length?hit[hit.length-1]:v[0];};
+   for(const id of ids){const q=byId.get(id),k=keyOf(q)||id;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(id);}
    return {tried:[...groups.values()].filter(g=>g.some(tried)).length,total:groups.size};
  }
  function renderStats(){
