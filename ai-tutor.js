@@ -344,9 +344,26 @@
     PLURAL_INITIAL_LDT:'Множественное Л/Д/Т',PLURAL_HARMONY_AE:'Множественное А/Е',
     EMES_SUFFIX_POSITION:'Емес: место окончания',ORDINAL_SUFFIX:'Порядковое',
     POSS_PERSON_SUFFIX:'Притяжательное окончание',POSS_ASSIM_VOICE:'Притяжательное П/К/Қ',POSS_PLURAL_ORDER:'Порядок множественного и притяжательного',POSS_PRONOUN:'Форма владельца',BAR_ZHOK:'Бар / жоқ',
-    VOCAB_RECALL:'Слово'
+    VOCAB_RECALL:'Слово',
+    // r7 X QA: every contract code has a learner label; UNKNOWN has none and is never shown («UNKNOWN · 10»).
+    HARMONY_FRONT_BACK:'Гармония: твёрдый и мягкий ряд',HARMONY_AMBIGUOUS_I_U_YU:'Гармония после И / У / Ю',
+    PLURAL_FORM_COMBINED:'Множественное: Л/Д/Т и А/Е вместе',QUANTIFIER_NO_PLURAL:'Без множественного после «много / несколько»',
+    NUMERAL_LEXEME:'Числа: само слово',NUMERAL_COMPOSITION:'Составные числа',NUMERAL_HUNDREDS_THOUSANDS:'Сотни и тысячи',
+    PERSON_MEN_ENDING:'Окончание «я» (мен)',PERSON_SEN_ENDING:'Окончание «ты» (сен)',PERSON_SIZ_ENDING:'Окончание «вы» (сіз)',
+    PERSON_BIZ_ENDING:'Окончание «мы» (біз)',PERSON_SENDER_ENDING:'Окончание «вы» (сендер)',PERSON_SIZDER_ENDING:'Окончание «вы» (сіздер)',
+    PREDICATIVE_ADJECTIVE:'Признак в роли сказуемого',NO_EXTRA_PLURAL_WITH_PERSON:'Лишнее множественное при лице',OL_OLAR:'Ол и олар',
+    QUESTION_PARTICLE:'Вопрос: частица ма / ме',QUESTION_PARTICLE_HARMONY:'Частица ма / ме: ряд',QUESTION_PARTICLE_PHONOLOGY:'Частица ма / ба / па: звук',
+    KAZAKH_SPELLING:'Казахские буквы',WORD_ORDER_CURRENT:'Порядок слов',
+    POSS_HARMONY:'Притяжательное: ряд',POSS_VOWEL_BUFFER:'Притяжательное после гласной',POSS_ADJ_POSITION:'Признак и притяжательное: порядок',
+    POSS_OWNER_FORM:'Форма владельца (менің, сенің…)',MULTI_ERROR:'Несколько ошибок в одном ответе',PERSON_VS_POSS:'«Кто» и «чей» перепутаны',
+    OWNER_SUBJECT_SWAP:'Владелец и лицо перепутаны',OWNER_WRONG:'Не тот владелец',SUBJECT_WRONG:'Не то лицо',
+    POSS_PERSON_STACK:'Притяжательное + лицо: порядок',PERSON_AFTER_POSS_WRONG:'Лицо после притяжательного',PERSON_AFTER_POSS_MISSING:'Нет окончания лица после притяжательного',
+    THIRD_PERSON_EXTRA_PERSONAL:'Лишнее окончание у «он / она»',EMES_PERSON_POSITION:'Емес: где окончание лица',EMES_POSS_DROPPED:'Емес: потеряно притяжательное',
+    OTBASY_DOUBLE_POSS:'Отбасы: двойное притяжательное',ADJ_ROLE_ORDER:'Порядок признака и слова',INTERROGATIVE_CHOICE:'Не то вопросительное слово'
   }[code]||code;
  }
+ // r7 X QA: what the learner sees under «Слабые места» — only codes with a human label (no UNKNOWN, no raw keys).
+ function learnerWeak(n=3){return topWeak(50).filter(r=>r.error_code&&r.error_code!=='UNKNOWN'&&label(r.error_code)!==r.error_code).slice(0,n);}
 
  function translateWord(word,extra){
   extra=extra||{};
@@ -364,6 +381,6 @@
  function hintLeaks(resp,expected){
   return C.containsExpected(resp,expected);
  }
- const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,coverageGaps,localFallback,isLiveMessage,buildRequest,callTutor,askTutor,translateWord,templateQuestions,takeRemediation,spliceRemediation,topWeak,label,hintLeaks,canonicalExpected,store,load,save,reset,snapshot,restore};
+ const api={KEY,classify,mapDiag,noteAnswer,sameErrorCount,shouldOfferExplain,dueRemediation,coverageGaps,localFallback,isLiveMessage,buildRequest,callTutor,askTutor,translateWord,templateQuestions,takeRemediation,spliceRemediation,topWeak,learnerWeak,label,hintLeaks,canonicalExpected,store,load,save,reset,snapshot,restore};
  if(node)module.exports=api;else root.AiTutor=api;
 })(typeof window!=='undefined'?window:globalThis);

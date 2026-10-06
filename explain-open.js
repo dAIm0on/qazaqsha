@@ -83,9 +83,9 @@
   const src='<section class="path-block" data-canon-source><h3>Исходник</h3><ul>'+pack.docs.map(d=>'<li><a href="'+esc(d.url)+'" target="_blank" rel="noopener noreferrer">'+esc(d.title)+'</a></li>').join('')+'</ul></section>';
   return '<div data-canon-lesson="'+esc(pack.lesson)+'">'+head+body+src+'</div>';
  }
- function fullHtml(ruleId){
-  const canon=canonHtml(ruleId);
-  if(canon)return canon;
+ function fullHtml(ruleId,opts){
+  // r7 X1: author source docs (canon-texts: S31/S32, «Статус», «Файл дыр», .md names, Drive links) are not
+  // learner text. The learner panel is the bank card + chapters; canonHtml stays for authors only (not rendered).
   const card=Bank&&Bank.byId&&Bank.byId(ruleId);
   if(!card)return '';
   const paras=text=>String(text||'').split(/\n{2,}/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('');
@@ -95,14 +95,14 @@
    +'<section class="path-block"><h3>Как работает</h3>'+paras(card.medium)+'</section>'
    +(card.examples&&card.examples.length?'<section class="path-block"><h3>Примеры</h3><ul>'+card.examples.map(x=>'<li lang="kk">'+esc(x)+'</li>').join('')+'</ul></section>':'')
    +(card.traps&&card.traps.length?'<section class="path-block"><h3>Неверно → верно</h3><ul>'+card.traps.map(t=>'<li lang="kk">'+esc(t)+'</li>').join('')+'</ul></section>':'')
-   +chapters;
+   +(opts&&opts.brief?'':chapters);
  }
  function ruleOpen(ruleId){
   if(root.ExplainDepth&&ruleId&&typeof root.ExplainDepth.get==='function')return root.ExplainDepth.get(ruleId)!==false;
   return true;
  }
- function openButton(ruleId){
-  const body=fullHtml(ruleId);
+ function openButton(ruleId,opts){
+  const body=fullHtml(ruleId,opts);
   if(!body)return '';
   const hidden=ruleOpen(ruleId)?'':' hidden';
   return '<p><button type="button" class="secondary-button" data-full-rule="'+esc(ruleId)+'">Показать полностью</button></p><div data-full-panel'+hidden+'>'+body+'</div>';
@@ -136,7 +136,7 @@
   // P0: wrong-feedback must not reveal expected/correct form (A10 UI sibling).
   return (actual?'<p><strong>Неверно:</strong> <span lang="kk">'+esc(actual)+'</span></p>':'')
    +(why?'<p><strong>Почему:</strong> '+esc(why)+'</p>':'')
-   +openButton(ruleId);
+   +openButton(ruleId,{brief:true}); // r7 X1: after a wrong answer the rule card only — chapter beats carry «Верно: <answer>» lines
  }
  function chainHtml(q,typed){
   const actual=Array.isArray(typed)?String(typed[0]||''):String(typed||'');
@@ -146,23 +146,8 @@
   return '<div data-error-chain>'+diff+body+'</div>';
  }
  function map31(){
-  if(!L31||!Bank)return '';
-  const t20=Bank.byId('T20_POSS'),t22=Bank.byId('T22_BAR_ZHOK');
-  const rows=[
-   ['A',L31.SESSION_A.length,'менің. 6 заданий на әке, кітап, қала. Это не 15 слов методички.'],
-   ['B',L31.SESSION_B.length,'сенің'],
-   ['C',L31.SESSION_C.length,'оның'],
-   ['D',L31.SESSION_D.length,'сіздің'],
-   ['E',L31.SESSION_E.length,'бар / жоқ против емес'],
-   ['F',L31.SESSION_F.length,'сначала много, потом чьё'],
-   ['G',L31.SESSION_G.length,'фразы в обе стороны']
-  ];
-  return '<section class="panel path-paper"><h2>Карта урока 3–1</h2>'
-   +'<p class="small">Конструктор «7 шагов, 8 рецептов» открывается в полном правиле урока. Круг A — не 15 слов методички.</p>'
-   +'<h3>Схема</h3><p>'+esc(t20&&t20.short||'')+'</p>'
-   +'<h3>Бар / жоқ, не емес</h3><p>'+esc(t22&&t22.short||'')+'</p>'
-   +'<h3>Круги A–G</h3><ul>'+rows.map(([k,n,note])=>'<li>Круг '+k+': '+n+' заданий. '+esc(note)+'</li>').join('')+'</ul>'
-   +openButton('T20_POSS')+openButton('T22_BAR_ZHOK')+'</section>';
+  // r7 X1: «Карта урока 3–1» (круги A–G, конструктор, рецепты) is an author map, not a learner screen.
+  return '';
  }
  function bind(rootEl){
   if(!rootEl)return;

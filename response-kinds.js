@@ -155,9 +155,9 @@
    const p=q.payload,e=esc||(v=>String(v));
    const head=`<div class="fields rk" data-rk="${e(q.kind)}"><input id="rk-response" type="hidden" value="[]">`;
    if(q.kind==='choice')return head+`<div class="field-row"><span class="field-label">${e(p.cardinality>1?'Выбери '+p.cardinality:'Выбери один')}</span><div class="field-control tap-choices" role="group">${p.options.map(o=>chip(`data-rk-toggle="${e(o.id)}"`,o.text,e)).join('')}</div></div></div>`;
-   if(q.kind==='tap-token')return head+`<div class="field-row"><span class="field-label">Отметь нужное</span><div class="field-control tap-choices" role="group" lang="kk">${p.tokens.map(t=>chip(`data-rk-toggle="${e(t.id)}"`,t.text,e)).join('')}</div></div></div>`;
+   if(q.kind==='tap-token')return head+`<div class="field-row"><span class="field-label">${e((p.cardinality||1)>1?'Отметь '+(p.cardinality===2?'два':p.cardinality===3?'три':p.cardinality)+' слова':'Отметь одно слово')}</span><div class="field-control tap-choices" role="group" lang="kk">${p.tokens.map(t=>chip(`data-rk-toggle="${e(t.id)}"`,t.text,e)).join('')}</div></div></div>`;
    if(q.kind==='sort')return head+p.items.map(it=>`<div class="field-row"><span class="field-label" lang="kk">${e(it.text)}</span><div class="field-control tap-choices" role="group">${p.categories.map(c=>chip(`data-rk-sort="${e(it.id)}" data-rk-cat="${e(c.id)}"`,c.label,e)).join('')}</div></div>`).join('')+'</div>';
-   if(q.kind==='word-bank')return head+`<div class="field-row"><span class="field-label">Собери</span><div class="field-control"><p class="rk-built" lang="kk" data-rk-built></p></div></div><div class="field-row"><span class="field-label">Кусочки</span><div class="field-control tap-choices" role="group" lang="kk">${p.pieces.map(x=>chip(`data-rk-piece="${e(x.id)}" data-rk-count="${x.count}"`,x.text+(x.count>1?' ×'+x.count:''),e)).join('')}<button type="button" class="text-button" data-rk-undo>Стереть</button></div></div></div>`;
+   if(q.kind==='word-bank')return head+`<div class="field-row"><span class="field-label">Собери</span><div class="field-control"><p class="rk-built" lang="kk" data-rk-built></p></div></div><div class="field-row"><span class="field-label">Кусочки</span><div class="field-control tap-choices" role="group" lang="kk">${p.pieces.map(x=>chip(`data-rk-piece="${e(x.id)}" data-rk-count="${x.count}"`,x.text+(x.count>1?' ×'+x.count:''),e)).join('')}<button type="button" class="text-button" data-rk-undo>Убрать последний</button><button type="button" class="text-button" data-rk-clear>Очистить</button></div></div></div>`;
    const steps=p.broken_step?`<div class="field-row"><span class="field-label">Какой шаг сломан?</span><div class="field-control tap-choices" role="group">${p.broken_step.options.map(o=>chip(`data-rk-step="${e(o.id)}"`,o.text,e)).join('')}</div></div>`:'';
    const target=p.target?`<div class="field-row"><span class="field-label">Проверь</span><div class="field-control"><p lang="kk" data-rk-target>${e(p.target)}</p></div></div>`:'';
    return head+target+`<div class="field-row"><span class="field-label">Решение</span><div class="field-control tap-choices" role="group">${chip('data-rk-verdict="correct"','Верно',e)}${chip('data-rk-verdict="wrong"','Есть ошибка',e)}</div></div>${steps}</div>`;
@@ -192,6 +192,7 @@
    }else if(btn.dataset.rkPiece){
      const id=btn.dataset.rkPiece,limit=Number(btn.dataset.rkCount)||1;if(a.filter(x=>x===id).length<limit)a=[...a,id];
    }else if(btn.hasAttribute('data-rk-undo')){a=a.slice(0,-1);}
+   else if(btn.hasAttribute('data-rk-clear')){a=[];} // r7 X minor: «Очистить» empties the built word; «Убрать последний» drops one piece
    else return false;
    input.value=JSON.stringify(a);paint(form,q);
    return true;

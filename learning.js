@@ -67,7 +67,7 @@ function create(api){
      const pr=progressOf(c.id);
      const mark=pr.all?'Разобран':(pr.started?'В процессе':'Не начат');
      return '<button type="button" class="lesson" data-learn-les="'+esc(c.id)+'" '+(c.id===id?'aria-current="true"':'')+'>'+
-      '<span class="number">'+esc(c.label)+'</span><div><h3>'+esc(c.name)+'</h3><p>'+(pr.n?(pr.done+' из '+pr.n+' глав'):'')+'</p></div>'+
+      '<span class="number">'+esc(c.label)+'</span><div><h3>'+esc(c.name)+'</h3><p>'+(pr.n?(pr.done+' из '+pr.n+' '+(window.TrainerCore&&window.TrainerCore.ruPlural?window.TrainerCore.ruPlural(pr.n,['главы','глав','глав']):'глав')):'')+'</p></div>'+
       '<span class="small">'+esc(mark)+'</span></button>';
     }).join('')+
    '</div></div>'+

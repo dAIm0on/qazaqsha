@@ -93,7 +93,7 @@
      const rows=[];
      if(forms.length===1){
        rows.push(
-         {id:base+'-ru',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на русский',stimulus:forms[0],fields:[{label:'Ответ',kind:'text',answers:v.translations}],explanation:forms[0]+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[]},
+         {id:base+'-ru',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на русский',stimulus:forms[0],fields:[{label:'Ответ',kind:'text',answers:v.accept_also?[...v.translations,...v.accept_also]:v.translations}],explanation:forms[0]+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[]},
          {id:base+'-kk',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на казахский',stimulus:v.translations[0],fields:[{label:'Ответ',kind:'text',answers:[forms[0]]}],explanation:forms[0]+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[]}
        );
      }else{

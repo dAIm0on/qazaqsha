@@ -1125,6 +1125,9 @@
       "translations": [
         "говорить"
       ],
+      "accept_also": [
+        "сказать"
+      ],
       "role": "target",
       "source_refs": [
         "school-homework"

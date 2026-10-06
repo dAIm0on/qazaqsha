@@ -313,7 +313,8 @@
  }
  function pauseLine(kind,value){
   if(kind==='savings')return String(value);
-  if(kind==='first-try'||kind==='peek-rate'||kind==='transfer-rate')return kind+' '+value;
+  // r7 X2: first-try / peek-rate / transfer-rate are developer metrics; there is no developer mode, so no learner line.
+  if(kind==='first-try'||kind==='peek-rate'||kind==='transfer-rate')return '';
   return String(value||'');
  }
  const api={classify,diagnose,labels,skillTag,line,pauseLine,SKILL,MICRO,microBinding,ordinalSkill};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.ErrorDiagnostics=api;

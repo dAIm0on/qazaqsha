@@ -322,7 +322,7 @@ ok('decision 3: 60 new-ID cards (1-2 он, 2-1 ×23, 3-1 six question words); ol
 {
   const box={},state={evidence:E.empty(NOW)};
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  vm.runInNewContext(grab(appSrc,'homeworkFormLines')+'\nbox.f=homeworkFormLines;',{box,window:{EvidenceState:E},state,esc,Object});
+  vm.runInNewContext(grab(appSrc,'homeworkFormLines')+'\nbox.f=homeworkFormLines;',{box,window:{EvidenceState:E},state,esc,Object,core});
   assert.equal(box.f('4-1'),'');
   assert.ok(box.f('4-2').includes('data-hw-forms="vocab:4-2:qalaisyn">қалайсың: 0 из 4 форм самостоятельно.'),box.f('4-2'));
   for(const f of E.FORM_REQUIREMENTS['vocab:4-2:qalaisyn'].forms)observe(state,{id:'fx:'+f,kind:'fields',lessonId:'4-2',fields:[{label:'Ответ',kind:'text',answers:[f]}]},[f],{pres:'f:'+f});
