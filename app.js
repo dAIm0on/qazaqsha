@@ -27,12 +27,14 @@
  for(const q of questions)coerceTyped(q);
  const byId=new Map(questions.map(q=>[q.id,q]));
  const topics=[['all','Все задания','∞'],['sounds','Звуки и слоги','01'],['plural','Множественное число','02'],['vocab','Слова','03'],['numbers','Числа и количество','04'],['person','Личные окончания','05'],['rules','Только правила','06'],['phrase','Фразы','07'],['verbs','Глаголы','08']];
- const KEY='qazaq-kris-course-v1', BACKUP=KEY+'-before-import', MIGRATION=KEY+'-before-schema-5';
+ const KEY='qazaq-kris-course-v1', BACKUP=KEY+'-before-import', MIGRATION=KEY+'-before-schema-5', R7_SNAPSHOT=KEY+'-before-r7';
  const cfg=window.TRAINER_CONFIG, P=window.ProgressStore, catalog=window.CURRICULUM;
  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  let state=P.empty(),savedSession=null,storageAvailable=true,storageReadError=null;
- try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);}}
+ try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);
+   // r7: keep the exact pre-migration bytes once (best effort; the migration itself is additive).
+   const r7=window.EvidenceState&&window.EvidenceState.MIGRATION_ID;if(r7&&!(saved.evidence&&saved.evidence.migrations&&saved.evidence.migrations[r7])&&!localStorage.getItem(R7_SNAPSHOT)){try{localStorage.setItem(R7_SNAPSHOT,raw);}catch{}}}}
  catch(error){storageAvailable=false;storageReadError=error;}
  // Letter row must always show on text-input surfaces (any width). Pref defaults on; mount no longer gates on max-width.
  if(!state.prefs.lettersChosen)state.prefs.letters=true;
@@ -1407,6 +1409,9 @@
    const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Для окончания важен последний слог.',plural:'Последний слог: А или Е. Потом последняя буква: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Сначала слепая попытка. Не открывай готовое слово — иначе это не вспоминание.',numbers:'Собери разряды: сначала большая часть. Не считай по порядку.',person:'Мен: пын/бын/мын. Сен: сың. Сіз: сыз. Біз после м/н/ң: біз. Сендер/сіздер без -лар на основу. Отрицание: основа + емес + окончание.',rules:'Набери суффикс или короткое слово правила, не целое новое существительное.'};
    const box=$('#hint-box');box.textContent=q.hint&&!/^[А-Яа-яӘәІіҢңҒғҚқӨөҰұҮүҺһ ]{1,24}$/.test(q.hint)?q.hint:(hints[q.topic]||'Вспомни правило, потом форму.');box.hidden=false;save();
  }
+ // r7 Q6-B: how each field was really answered on screen (tap buttons = choice), not inferred from q.kind.
+ function responseModes(q){return q.kind==='multi'?['choice']:(q.fields||[]).map((_,i)=>{const el=document.getElementById('answer-'+i);return el&&el.type==='hidden'?'choice':'typed';});}
+ function evidenceOrigin(homeworkMode,voluntary){return homeworkMode?'homework':mode==='exam'?'exam':voluntary?'voluntary':stageContext?'lesson-stage':activeLesson?'lesson':'bank';}
  function readAnswers(q){return q.kind==='multi'?$$('input[name=choice]:checked').map(el=>el.value):q.fields.map((_,i)=>$('#answer-'+i).value);}
  function checkAnswer(q,reveal=false){
    if(mode==='slice'||mode==='repair'){checkProbe(q,reveal);return;}
@@ -1488,6 +1493,7 @@
    }
    if(!homeworkMode&&!aiRemed&&!voluntary)event.skills=window.Knowledge.observe(state,q,result,event,errors);
    state.events.push(event);rec=records[q.id]||rec;
+   if(window.EvidenceState){try{window.EvidenceState.observe(state,{q,answers,result,event,responseModes:responseModes(q),origin:evidenceOrigin(homeworkMode,voluntary),revealed:!!reveal,first:true,lessonId:event.lesson_id||currentLessonId(q)||q.lessonId||'',contentRevision:event.content_revision||(window.LessonV2Runtime&&window.LessonV2Runtime.byId&&(window.LessonV2Runtime.byId(q.lessonId)||{}).content_revision)||''});}catch(error){console.warn('evidence',error);}}
    if(homeworkMode&&hwLesson){
      const expected=q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers[0]).join('; ');
      window.Homework.recordItem(state,hwLesson,{id:q.id,answers,correct:result.correct,rule_peek:rulePeeked,answer_peek:hinted,skipped:!!reveal,expected,event_id:eventId},now);
@@ -2665,7 +2671,7 @@
      topic='all';sourceFilter=null;activeLesson=null;mode=next;startQueue();showView('practice');
    },
    contrast:startContrast,setAssociation,promote,export:()=>{save();downloadProgress(P.serialize(state));},import:importProgress,
-   restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
+   restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(R7_SNAPSHOT)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
  });
  $('#pause-session').onclick=()=>{
    if(position>0&&queue.length){
