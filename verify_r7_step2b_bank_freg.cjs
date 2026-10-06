@@ -350,7 +350,7 @@ ok('казакша (a) a check card never shows its answer as the translation li
 // ── words counter = homework.word_ids in every lesson (2-2 сау бол… cards bound to several words) ──
 {
   const box={},records={};
-  vm.runInNewContext(grab(appSrc,'wordGroupCounter')+'\nbox.f=wordGroupCounter;',{box,records,byId:Q,window:S});
+  vm.runInNewContext(grab(appSrc,'answeredSet')+'\n'+grab(appSrc,'wordGroupCounter')+'\nbox.f=wordGroupCounter;',{box,records,byId:Q,window:S,state:{events:[],homeworkAttempts:{}}});
   const got={};for(const l of LESSONS){const h=R.homework(l).homework;got[l]=[box.f(plain(h.word_question_ids)).total,h.word_ids.length];}
   for(const [l,[a,b]] of Object.entries(got))assert.equal(a,b,'counter denominator '+l+' '+JSON.stringify(got));
   assert.equal(got['2-2'][0],14);assert.equal(got['1-2'][0],24);assert.equal(got['2-1'][0],24);assert.equal(got['3-1'][0],18);

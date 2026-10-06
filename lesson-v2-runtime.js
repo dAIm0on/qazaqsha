@@ -97,7 +97,12 @@
          {id:base+'-kk',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на казахский',stimulus:v.translations[0],fields:[{label:'Ответ',kind:'text',answers:[forms[0]]}],explanation:forms[0]+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[]}
        );
      }else{
-       forms.forEach((form,i)=>rows.push({id:base+'-ru-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:'Узнай форму',stimulus:form,fields:[{label:'Перевод',kind:'text',answers:v.translations}],explanation:form+' — '+v.translations.join(' / ')+'. Формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[]}));
+       forms.forEach((form,i)=>{
+         // r7 2b QA m5/m6: the first form is the dictionary form (infinitive), the others keep their own gloss.
+         const gloss=v.form_translations&&v.form_translations[i]?[v.form_translations[i]]:v.translations;
+         const what=i===0?'словарная форма':'форма';
+         rows.push({id:base+'-ru-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:i===0?'Узнай слово (словарная форма)':'Узнай форму',stimulus:form,fields:[{label:'Перевод',kind:'text',answers:gloss}],explanation:form+' ('+what+') — '+gloss.join(' / ')+'. Формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[]});
+       });
        rows.push({id:base+'-kk-set',origin:'generated',topic:'vocab',kind:'fields',title:'Напиши все формы',stimulus:v.translations[0],fields:[{label:'Все формы через пробел или /',kind:'set-text',answers:forms}],explanation:forms.join(' / ')+' — '+v.translations.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[]});
        // r7 W-2=C: one typed card per mandatory form (same source vocab-ID / catalog word, new question-IDs only).
        (v.form_checks||[]).forEach((c,i)=>rows.push({id:base+'-kk-form-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:'Напиши форму',stimulus:c.prompt,fields:[{label:'Ответ',kind:'text',answers:[c.form]}],explanation:c.form+' — '+c.prompt+'. Все формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[],formCheck:{source_id:v.id,form:c.form}}));

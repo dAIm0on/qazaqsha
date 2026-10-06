@@ -1143,6 +1143,10 @@
       "role": "target",
       "source_refs": [
         "school-homework"
+      ],
+      "form_translations": [
+        "класть",
+        "я положил(а)"
       ]
     },
     {
@@ -1159,6 +1163,10 @@
       "role": "target",
       "source_refs": [
         "school-homework"
+      ],
+      "form_translations": [
+        "любить / целовать",
+        "я любил(а) / поцеловал(а)"
       ]
     },
     {
@@ -1177,6 +1185,12 @@
       "role": "target",
       "source_refs": [
         "school-homework"
+      ],
+      "form_translations": [
+        "читать / учиться",
+        "я читал(а) / прочитал(а)",
+        "он(а) читал(а) / прочитал(а)",
+        "я не читал(а)"
       ]
     },
     {
@@ -1193,6 +1207,11 @@
       "role": "target",
       "source_refs": [
         "school-homework"
+      ],
+      "form_translations": [
+        "слышать",
+        "я слышал(а) / услышал(а)",
+        "я не слышал(а)"
       ]
     },
     {

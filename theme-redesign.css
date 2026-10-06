@@ -261,7 +261,9 @@ body.keyboard-open[data-view=rules] #rules-ask-panel{
 .feedback.error h3::before{content:none}
 .feedback.hinted h3::before{content:"◌ ";color:var(--warning)}
 .hint{background:var(--sage);border-color:transparent;color:var(--primary);border-radius:var(--radius-control)}
-.hint::before{content:"Подсказка · ";font-weight:600;color:var(--primary)}
+.hint::before{content:"Подсказка · ";content:"Подсказка · " / "";font-weight:600;color:var(--primary)}
+/* r7 2b QA m8: the decorative prefix is not read out (alt text ""), and the association form is not a hint. */
+#association-box::before{content:none}
 .validation-message,.field-correction{color:var(--error)}
 .choice.correct{background:var(--success-bg);border-color:var(--success)}
 .choice.incorrect{background:var(--error-bg);border-color:var(--error)}
@@ -1151,3 +1153,13 @@ html.typing-compact,html.typing-compact body{
     white-space:normal;
   }
 }
+
+/* r7 2b QA B2: support kinds (bank 3–4) sit in the question body, not in the typing dock.
+   Labels («Собери», «Кусочки», sort stems) and the empty answer slot stay visible; the dock is not sticky
+   for these cards (nothing to type), so it can never cover the feedback. Palette and kb-compact untouched. */
+.question-body .rk{margin:16px 0 4px}
+.question-body .rk .field-row{display:block;margin:0 0 14px}
+.question-body .rk .field-label{position:static;width:auto;height:auto;overflow:visible;clip:auto;display:block;margin:0 0 6px}
+.question-body .rk[data-rk=sort] .field-label{font-size:1.05rem;font-weight:600;color:var(--primary)}
+.question-body .rk .rk-built{min-height:2.75rem;margin:0;padding:10px 12px;border:1px dashed var(--line);border-radius:var(--radius-control,10px);font-size:1.05rem;line-height:1.5}
+.practice-dock.rk-dock{position:static;box-shadow:none}

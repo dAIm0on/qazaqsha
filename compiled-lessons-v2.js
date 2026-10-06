@@ -29074,7 +29074,7 @@ window.LESSON_V2_COMPILED = [
             ],
             "cardinality": 1
           },
-          "explanation": "кітап + ым → кітабым: перед гласной наклейкой п → б.",
+          "explanation": "кітап + ым → кітабым: перед гласным притяжательным окончанием п/к/қ → б/г/ғ.",
           "lessonId": "3-1",
           "ruleIds": [
             "v2:3-1:poss",
@@ -29111,7 +29111,7 @@ window.LESSON_V2_COMPILED = [
             ],
             "cardinality": 1
           },
-          "explanation": "После гласной у «его» подпорка С: қала → қаласы.",
+          "explanation": "После гласной -сы/-сі: қала → қаласы.",
           "lessonId": "3-1",
           "ruleIds": [
             "v2:3-1:poss"
@@ -29197,7 +29197,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "tap-token",
           "title": "Отметь нужное",
-          "stimulus": "Слово, где сработал закон края (п → б)",
+          "stimulus": "Слово, где п/к/қ → б/г/ғ перед гласным притяжательным",
           "fields": [],
           "payload": {
             "tokens": [
@@ -29380,7 +29380,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "sort",
           "title": "Разложи",
-          "stimulus": "Меняется ли край слова перед -ым/-ім?",
+          "stimulus": "Меняется ли последняя буква перед -ым/-ім?",
           "fields": [],
           "payload": {
             "items": [
@@ -29404,11 +29404,11 @@ window.LESSON_V2_COMPILED = [
             "categories": [
               {
                 "id": "c1",
-                "label": "край меняется"
+                "label": "п/к/қ → б/г/ғ"
               },
               {
                 "id": "c2",
-                "label": "край не меняется"
+                "label": "не меняется"
               }
             ],
             "accepted": {
@@ -29418,7 +29418,7 @@ window.LESSON_V2_COMPILED = [
               "i4": "c2"
             }
           },
-          "explanation": "п/к/қ перед гласной наклейкой → б/г/ғ; остальные не меняются.",
+          "explanation": "Перед гласным притяжательным п/к/қ → б/г/ғ; остальные буквы не меняются.",
           "lessonId": "3-1",
           "ruleIds": [
             "v2:3-1:assim"
@@ -29520,7 +29520,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "word-bank",
           "title": "Собери форму",
-          "stimulus": "мои книги (поезд: много → чьё)",
+          "stimulus": "мои книги (сначала «много», потом «чьё»)",
           "fields": [],
           "payload": {
             "pieces": [
@@ -29578,7 +29578,7 @@ window.LESSON_V2_COMPILED = [
               "options": [
                 {
                   "id": "o1",
-                  "text": "закон края (п → б)"
+                  "text": "п/к/қ → б/г/ғ перед гласным притяжательным"
                 },
                 {
                   "id": "o2",
@@ -29594,7 +29594,7 @@ window.LESSON_V2_COMPILED = [
               ]
             }
           },
-          "explanation": "Перед гласной наклейкой п → б: кітабым.",
+          "explanation": "Перед гласным притяжательным п → б: кітабым.",
           "lessonId": "3-1",
           "ruleIds": [
             "v2:3-1:assim"
@@ -29638,7 +29638,7 @@ window.LESSON_V2_COMPILED = [
             },
             "target": "оның қаласы"
           },
-          "explanation": "Верно: подпорка С после гласной.",
+          "explanation": "Верно: после гласной -сы/-сі.",
           "lessonId": "3-1",
           "ruleIds": [
             "v2:3-1:poss"
@@ -34549,7 +34549,7 @@ window.LESSON_V2_COMPILED = [
             ],
             "cardinality": 1
           },
-          "explanation": "Владельцев много → кітаптарың; после «много» закон края не срабатывает.",
+          "explanation": "Владельцев много → кітаптарың; после «много» (-тар) п не меняется на б.",
           "lessonId": "3-2",
           "ruleIds": [
             "v2:3-2:sender"
@@ -34736,7 +34736,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "sort",
           "title": "Разложи",
-          "stimulus": "Что значит указатель?",
+          "stimulus": "Что значит слово?",
           "fields": [],
           "payload": {
             "items": [
@@ -34999,7 +34999,7 @@ window.LESSON_V2_COMPILED = [
               "options": [
                 {
                   "id": "o1",
-                  "text": "закон края после «много» не срабатывает"
+                  "text": "после «много» (-тар) п не меняется на б"
                 },
                 {
                   "id": "o2",
@@ -35015,7 +35015,7 @@ window.LESSON_V2_COMPILED = [
               ]
             }
           },
-          "explanation": "кітаптарың: после «много» края не меняют.",
+          "explanation": "кітаптарың: после «много» (-тар) п не меняется на б.",
           "lessonId": "3-2",
           "ruleIds": [
             "v2:3-2:poss"
@@ -39537,7 +39537,7 @@ window.LESSON_V2_COMPILED = [
             ],
             "cardinality": 1
           },
-          "explanation": "Нормативная целевая форма 1sg: досыңмын.",
+          "explanation": "«я» после «твой»: досың + мын → досыңмын.",
           "lessonId": "3-3",
           "ruleIds": [
             "v2:3-3:stack"
@@ -39551,7 +39551,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "choice",
           "title": "Выбери форму",
-          "stimulus": "Спроси фамильярно: «Как тебя зовут?»",
+          "stimulus": "Спроси на «ты»: «Как тебя зовут?»",
           "fields": [],
           "payload": {
             "options": [
@@ -39999,7 +39999,7 @@ window.LESSON_V2_COMPILED = [
               ]
             }
           },
-          "explanation": "Целевая форма: досыңмын.",
+          "explanation": "Правильно: досыңмын (после ң — мын).",
           "lessonId": "3-3",
           "ruleIds": [
             "v2:3-3:stack"
@@ -40043,7 +40043,7 @@ window.LESSON_V2_COMPILED = [
             },
             "target": "Атың кім?"
           },
-          "explanation": "Верно: фамильярная форма.",
+          "explanation": "Верно: на «ты» — атың.",
           "lessonId": "3-3",
           "ruleIds": [
             "v2:3-3:questions"
@@ -52193,7 +52193,7 @@ window.LESSON_V2_COMPILED = [
             ],
             "cardinality": 1
           },
-          "explanation": "После гласной связка Й: іздеймін.",
+          "explanation": "После гласной основы нужна связка й: іздеймін.",
           "lessonId": "4-1",
           "ruleIds": [
             "v2:4-1:linker"
@@ -52647,7 +52647,7 @@ window.LESSON_V2_COMPILED = [
               ]
             }
           },
-          "explanation": "істеймін: класс 2 → связка Й.",
+          "explanation": "істеймін: после гласной основы нужна связка й.",
           "lessonId": "4-1",
           "ruleIds": [
             "v2:4-1:linker"
@@ -53942,6 +53942,10 @@ window.LESSON_V2_COMPILED = [
         "introduced_in": "4-2",
         "source_refs": [
           "school-homework"
+        ],
+        "form_translations": [
+          "класть",
+          "я положил(а)"
         ]
       },
       {
@@ -53959,6 +53963,10 @@ window.LESSON_V2_COMPILED = [
         "introduced_in": "4-2",
         "source_refs": [
           "school-homework"
+        ],
+        "form_translations": [
+          "любить / целовать",
+          "я любил(а) / поцеловал(а)"
         ]
       },
       {
@@ -53978,6 +53986,12 @@ window.LESSON_V2_COMPILED = [
         "introduced_in": "4-2",
         "source_refs": [
           "school-homework"
+        ],
+        "form_translations": [
+          "читать / учиться",
+          "я читал(а) / прочитал(а)",
+          "он(а) читал(а) / прочитал(а)",
+          "я не читал(а)"
         ]
       },
       {
@@ -53995,6 +54009,11 @@ window.LESSON_V2_COMPILED = [
         "introduced_in": "4-2",
         "source_refs": [
           "school-homework"
+        ],
+        "form_translations": [
+          "слышать",
+          "я слышал(а) / услышал(а)",
+          "я не слышал(а)"
         ]
       },
       {
@@ -61941,7 +61960,7 @@ window.LESSON_V2_COMPILED = [
             ],
             "cardinality": 1
           },
-          "explanation": "біз = -қ, не -мық.",
+          "explanation": "Біз: сначала -ды, потом -қ → жаздық.",
           "lessonId": "4-2",
           "ruleIds": [
             "v2:4-2:person"
@@ -61977,7 +61996,7 @@ window.LESSON_V2_COMPILED = [
             ],
             "cardinality": 1
           },
-          "explanation": "После т — ТЫ: айттым.",
+          "explanation": "После т — ты: айттым.",
           "lessonId": "4-2",
           "ruleIds": [
             "v2:4-2:assim"
@@ -62113,7 +62132,7 @@ window.LESSON_V2_COMPILED = [
           "topic": "bank",
           "kind": "sort",
           "title": "Разложи",
-          "stimulus": "Какой хвост прошедшего?",
+          "stimulus": "Какое окончание прошедшего?",
           "fields": [],
           "payload": {
             "items": [
@@ -62151,7 +62170,7 @@ window.LESSON_V2_COMPILED = [
               "i4": "c2"
             }
           },
-          "explanation": "После глухих — ТЫ/ТІ, иначе ДЫ/ДІ.",
+          "explanation": "После к, қ, п, с, т, ф, х, ш — ты/ті; после остальных букв — ды/ді.",
           "lessonId": "4-2",
           "ruleIds": [
             "v2:4-2:assim"
@@ -62391,7 +62410,7 @@ window.LESSON_V2_COMPILED = [
               ]
             }
           },
-          "explanation": "жазбады: после Й всегда Д.",
+          "explanation": "После отрицания -ба/-ма/-па всегда Д: жазбады.",
           "lessonId": "4-2",
           "ruleIds": [
             "v2:4-2:neg"
@@ -62433,16 +62452,16 @@ window.LESSON_V2_COMPILED = [
             "verdict": {
               "accepted": "wrong"
             },
-            "target": "жазмық",
+            "target": "жаздымыз",
             "broken_step": {
               "options": [
                 {
                   "id": "o1",
-                  "text": "біз = -қ, не -мық"
+                  "text": "окончание «мы»"
                 },
                 {
                   "id": "o2",
-                  "text": "хвост прошедшего"
+                  "text": "окончание прошедшего"
                 },
                 {
                   "id": "o3",
@@ -62454,7 +62473,7 @@ window.LESSON_V2_COMPILED = [
               ]
             }
           },
-          "explanation": "жаздық.",
+          "explanation": "В прошедшем «мы» — это -қ/-к после -ды: жаздық.",
           "lessonId": "4-2",
           "ruleIds": [
             "v2:4-2:person"

@@ -35,9 +35,10 @@ ok('Q5-02 hw-item:4-2:3 (index 2, number 3) names the 13 T13 targets and none of
 
 // Q5-03/04/07: everything else in 4-2 is unchanged (pinned to main 465afdf).
 {
-  const strip=L42.vocabulary.map(v=>{const y={...v};delete y.form_checks;return y;});
+  const strip=L42.vocabulary.map(v=>{const y={...v};delete y.form_checks;delete y.form_translations;return y;}); // r7 2b QA m6: form_translations is additive too
   assert.equal(L42.vocabulary.length,23,'Q5-04: 23 vocabulary objects');
-  assert.equal(h16(strip),'266d6e40de7518e6','Q5-04: vocabulary objects changed (beyond the additive form_checks)');
+  assert.equal(h16(strip),'266d6e40de7518e6','Q5-04: vocabulary objects changed (beyond the additive form_checks / form_translations)');
+  assert.deepEqual(L42.vocabulary.filter(v=>v.form_translations).map(v=>v.id),['vocab:4-2:qoiu','vocab:4-2:suiu','vocab:4-2:oqu','vocab:4-2:estu'],'m6: per-form glosses only on the four past-exception verbs');
   assert.equal(L42.vocabulary.filter(v=>v.form_checks).length,1,'only qalaisyn carries form_checks');
   assert.deepEqual(L42.homework.source_items[3],{id:'hw-item:4-2:4',number:'4',text:'Сделать тест ProshVremyaBezIsk на BatylBol, нажать «Зафиксировать результат» и выполнить его в течение 24 часов.',source_ref:'school-homework'});
   assert.deepEqual(L42.homework.external_tasks,[{id:'ext:4-2:bez-isk',type:'external_test',label:'BatylBol · Прошедшее время без исключений · выполнить за 24 часа',url:'https://batylbol.kz/test/ProshVremyaBezIsk.html'}]);
@@ -148,15 +149,15 @@ const grab=name=>{const i=appSrc.indexOf(' function '+name+'(');assert.ok(i>0,na
 {
   const box={};
   const records={};
-  vm.runInNewContext(grab('homeworkCounter')+grab('wordGroupCounter')+'\nbox.f=homeworkCounter;',{box,records,hwPart:'words',byId:Q});
+  vm.runInNewContext(grab('answeredSet')+'\n'+grab('homeworkCounter')+grab('wordGroupCounter')+'\nbox.f=homeworkCounter;',{box,records,hwPart:'words',byId:Q,state:{events:[],homeworkAttempts:{}}});
   const ids=plain(hw42.word_question_ids);
   let c=box.f(ids);assert.deepEqual(plain(c),{tried:0,total:13});
-  records[ids[0]]={attempts:1};records[ids[1]]={attempts:1};
+  records[ids[0]]={attempts:1,review_count:1};records[ids[1]]={attempts:1,review_count:1};
   const sameWord=Q.get(ids[0]).vocabIds[0]===Q.get(ids[1]).vocabIds[0];
   c=box.f(ids);assert.equal(c.tried,sameWord?1:2);assert.equal(c.total,13);
-  for(let i=1;i<=4;i++)records['v2-4-2-vocab-qalaisyn-kk-form-'+i]={attempts:1};
+  for(let i=1;i<=4;i++)records['v2-4-2-vocab-qalaisyn-kk-form-'+i]={attempts:1,review_count:1};
   c=box.f(ids);assert.equal(c.tried,(sameWord?1:2)+1,'four form cards are one word');
-  const box2={};vm.runInNewContext(grab('homeworkCounter')+grab('wordGroupCounter')+'\nbox.f=homeworkCounter;',{box:box2,records,hwPart:'exercises',byId:Q});
+  const box2={};vm.runInNewContext(grab('answeredSet')+'\n'+grab('homeworkCounter')+grab('wordGroupCounter')+'\nbox.f=homeworkCounter;',{box:box2,records,hwPart:'exercises',byId:Q,state:{events:[],homeworkAttempts:{}}});
   assert.deepEqual(plain(box2.f(['a','b',ids[0]])),{tried:1,total:3});
   const rs=grab('renderStats');assert.ok(/homeworkScope\(\)/.test(rs)&&/homeworkCounter\(hw\)/.test(rs),'renderStats uses the homework scope');
 }

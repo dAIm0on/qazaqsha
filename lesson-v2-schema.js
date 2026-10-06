@@ -80,6 +80,12 @@
    const role=w.role==='context'?'context':'target';
    const lemma=str(w.lemma,'vocab.lemma',120),forms=strings(w.forms||[lemma],'vocab.forms',1,20);
    const out={id:id(w.id,'vocab.id'),lemma,forms,translations:strings(w.translations,'vocab.translations',1,12),role,introduced_in:lessonId,source_refs:strings(w.source_refs||[],'vocab.source_refs',1,20).map(x=>id(x,'source_ref'))};
+   // r7 2b QA m6: optional per-form Russian gloss (parallel to forms): оқыдым is «я читал(а) / прочитал(а)», not «читать».
+   if(w.form_translations!=null){
+     const ft=list(w.form_translations,'vocab.form_translations',forms.length,forms.length);
+     if(ft.length!==forms.length)fail('vocab.form_translations: нужна строка на каждую форму');
+     out.form_translations=ft.map(x=>str(x,'vocab.form_translations[]',200));
+   }
    // r7 W-2=C: optional per-form typed checks of ONE source vocab-ID (no new word-IDs).
    // Each check names one of the word's own forms and a Russian prompt; absent = old behaviour.
    if(w.form_checks!=null){

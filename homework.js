@@ -151,7 +151,26 @@
      return norm.forms.has(vocabLemma(q))||norm.forms.has(core.normalize(q.stimulus||''))||answers.some(a=>norm.forms.has(a));
    });
  }
+ // r7 2b QA m7: the sheet says «сначала узнать (казахский → русский), потом написать». Each X-kk / X-ru pair of
+ // homework word cards is shown recognition first (X-ru), production second (X-kk), at the pair's first place.
+ function recognitionFirst(ids){
+   const list=(ids||[]).slice(),set=new Set(list),out=[],done=new Set();
+   for(const id of list){
+     if(done.has(id))continue;
+     const m=/^(.*)-(kk|ru)$/.exec(id);
+     if(m&&set.has(m[1]+'-ru')&&set.has(m[1]+'-kk')){out.push(m[1]+'-ru',m[1]+'-kk');done.add(m[1]+'-ru');done.add(m[1]+'-kk');continue;}
+     out.push(id);done.add(id);
+   }
+   return out;
+ }
  function buildPack(lessonId,questions,course,opts={}){
+   const p=buildPackRaw(lessonId,questions,course,opts);
+   if(!p||!p.homework||!Array.isArray(p.homework.word_question_ids))return p;
+   const ordered=recognitionFirst(p.homework.word_question_ids);
+   if(ordered.every((id,i)=>id===p.homework.word_question_ids[i]))return p;
+   return Object.assign({},p,{homework:Object.assign({},p.homework,{word_question_ids:ordered})});
+ }
+ function buildPackRaw(lessonId,questions,course,opts={}){
    if(!node&&root.LessonV2Runtime&&root.LessonV2Runtime.homework){
      const v2=root.LessonV2Runtime.homework(lessonId);
      if(v2)return v2;
@@ -539,6 +558,6 @@ ${sourceItems?'<h2>Исходная домашняя работа</h2><ol>'+sour
    }
    return out;
  }
- const api={RULES,EXTERNAL,WORD_LEMMAS,inferRule,ruleId,ruleText,missingRules,buildPack,lesson42WordNorm,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,sliceSection,sectionCount,sectionOf,partProgress,vocabDirections,HW_SECTION,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,otherTopicFillers,remediationQueue,blindCloseDays,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
+ const api={RULES,EXTERNAL,WORD_LEMMAS,inferRule,ruleId,ruleText,missingRules,buildPack,lesson42WordNorm,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,sliceSection,sectionCount,sectionOf,partProgress,vocabDirections,recognitionFirst,HW_SECTION,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,otherTopicFillers,remediationQueue,blindCloseDays,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
  if(node)module.exports=api;else root.Homework=api;
 })(typeof window!=='undefined'?window:globalThis);
