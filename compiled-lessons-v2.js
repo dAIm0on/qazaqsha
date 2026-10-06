@@ -63347,7 +63347,7 @@ window.LESSON_V2_COMPILED = [
         "translations": [
           "дом"
         ],
-        "role": "target",
+        "role": "context",
         "introduced_in": "5-1",
         "source_refs": [
           "school-method",
@@ -63363,7 +63363,7 @@ window.LESSON_V2_COMPILED = [
         "translations": [
           "школа"
         ],
-        "role": "target",
+        "role": "context",
         "introduced_in": "5-1",
         "source_refs": [
           "school-method",
@@ -63379,7 +63379,7 @@ window.LESSON_V2_COMPILED = [
         "translations": [
           "библиотека"
         ],
-        "role": "target",
+        "role": "context",
         "introduced_in": "5-1",
         "source_refs": [
           "school-method",
@@ -63395,7 +63395,7 @@ window.LESSON_V2_COMPILED = [
         "translations": [
           "магазин"
         ],
-        "role": "target",
+        "role": "context",
         "introduced_in": "5-1",
         "source_refs": [
           "school-method",
@@ -63412,7 +63412,7 @@ window.LESSON_V2_COMPILED = [
           "степь",
           "улица"
         ],
-        "role": "target",
+        "role": "context",
         "introduced_in": "5-1",
         "source_refs": [
           "school-method",
@@ -63429,7 +63429,7 @@ window.LESSON_V2_COMPILED = [
           "возраст",
           "год (жизни)"
         ],
-        "role": "target",
+        "role": "context",
         "introduced_in": "5-1",
         "source_refs": [
           "school-method",
@@ -63445,7 +63445,7 @@ window.LESSON_V2_COMPILED = [
         "translations": [
           "год"
         ],
-        "role": "target",
+        "role": "context",
         "introduced_in": "5-1",
         "source_refs": [
           "school-method",
@@ -63462,7 +63462,7 @@ window.LESSON_V2_COMPILED = [
           "у него",
           "там"
         ],
-        "role": "target",
+        "role": "context",
         "introduced_in": "5-1",
         "source_refs": [
           "school-method",

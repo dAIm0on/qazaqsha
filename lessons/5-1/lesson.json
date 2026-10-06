@@ -775,7 +775,7 @@
       "translations": [
         "дом"
       ],
-      "role": "material",
+      "role": "context",
       "source_refs": [
         "school-method",
         "canon-r23"
@@ -790,7 +790,7 @@
       "translations": [
         "школа"
       ],
-      "role": "material",
+      "role": "context",
       "source_refs": [
         "school-method",
         "canon-r23"
@@ -805,7 +805,7 @@
       "translations": [
         "библиотека"
       ],
-      "role": "material",
+      "role": "context",
       "source_refs": [
         "school-method",
         "canon-r23"
@@ -820,7 +820,7 @@
       "translations": [
         "магазин"
       ],
-      "role": "material",
+      "role": "context",
       "source_refs": [
         "school-method",
         "canon-r23"
@@ -836,7 +836,7 @@
         "степь",
         "улица"
       ],
-      "role": "material",
+      "role": "context",
       "source_refs": [
         "school-method",
         "canon-r23"
@@ -852,7 +852,7 @@
         "возраст",
         "год (жизни)"
       ],
-      "role": "material",
+      "role": "context",
       "source_refs": [
         "school-method",
         "canon-r23"
@@ -867,7 +867,7 @@
       "translations": [
         "год"
       ],
-      "role": "material",
+      "role": "context",
       "source_refs": [
         "school-method",
         "canon-r23"
@@ -883,7 +883,7 @@
         "у него",
         "там"
       ],
-      "role": "material",
+      "role": "context",
       "source_refs": [
         "school-method",
         "canon-r23"
