@@ -35,7 +35,7 @@ ok('Q5-02 hw-item:4-2:3 (index 2, number 3) names the 13 T13 targets and none of
 
 // Q5-03/04/07: everything else in 4-2 is unchanged (pinned to main 465afdf).
 {
-  const strip=L42.vocabulary.map(v=>{const y={...v};delete y.form_checks;delete y.form_translations;return y;}); // r7 2b QA m6: form_translations is additive too
+  const strip=L42.vocabulary.map(v=>{const y={...v};delete y.form_checks;delete y.form_translations;delete y.accept_also;return y;}); // r7 2b QA m6: form_translations is additive too; r7 X: accept_also too
   assert.equal(L42.vocabulary.length,23,'Q5-04: 23 vocabulary objects');
   assert.equal(h16(strip),'266d6e40de7518e6','Q5-04: vocabulary objects changed (beyond the additive form_checks / form_translations)');
   assert.deepEqual(L42.vocabulary.filter(v=>v.form_translations).map(v=>v.id),['vocab:4-2:qoiu','vocab:4-2:suiu','vocab:4-2:oqu','vocab:4-2:estu'],'m6: per-form glosses only on the four past-exception verbs');

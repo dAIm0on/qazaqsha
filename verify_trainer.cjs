@@ -789,7 +789,7 @@ assert.ok(/startBlockReview/.test(appSrc));
 assert.ok(/data-weak/.test(appSrc));
 ok('I8 Разобрать wires to skill block review');
 
-assert.ok(/Сделать паузу · Домашка/.test(appSrc));
+assert.ok(/homework:'Домашка'/.test(appSrc)&&/mode==='homework'\|\|\(mode==='remediation'&&hwReturn\)\?'homework'/.test(appSrc)); // r7 X3: label from pauseTarget()
 ok('P1.6 pause copy returns to homework, not Today, from homework/remediation');
 
 const AiC=require('./ai-contract.js');
@@ -1405,14 +1405,15 @@ const openSw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(/lesson31-pack\.js/.test(openSw)&&/lesson31-homework\.js/.test(openSw)&&/lesson-pack-3-1\.js/.test(openSw));
 assert.ok(/lesson32-pack\.js/.test(openSw)&&/lesson32-homework\.js/.test(openSw)&&/lesson-pack-3-2\.js/.test(openSw));
 assert.ok(/transfer-items\.js/.test(openSw));
-assert.ok(/const CACHE='qazaq-offline-live-20261006-r7-step2b-2'/.test(openSw));
+assert.ok(/const CACHE='qazaq-offline-live-20261006-r7-x123-1'/.test(openSw));
 const Open=require('./explain-open.js');
 const possWrong={ruleIds:['T21_POSS_ASSIM'],fields:[{answers:['кітабым']}],explanation:'п озвончается в б',stimulus:'Менің кітапым'};
 const block=Open.forQuestion(possWrong,['кітапым']);
 assert.ok(block.includes('Неверно')&&block.includes('Показать полностью')&&block.includes('кітапым'));
 assert.ok(!block.includes('Верно:')&&!/кітабым/.test(block.split('Показать полностью')[0]),'wrong-feedback must not reveal expected before rule panel');
 const map=Open.map31();
-assert.ok(map.includes('не 15 слов методички')&&map.includes('Круг A: 6')&&map.includes('жоқ')&&map.includes('7 шагов, 8 рецептов')&&!map.includes('в репозитории нет'));
+// r7 X1 (казакша QA): «Карта урока 3–1» (круги A–G, конструктор, рецепты) is an author map — not on the learner screen.
+assert.equal(map,'','no author lesson map');assert.ok(!/ExplainOpen\.map31\(\)/.test(appSrc),'renderPath does not render map31');
 assert.ok(!/#A46042|#E15F2C/.test(fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8')));
 assert.ok(!/assets\/graphics\/g0/.test(fs.readFileSync(path.join(__dirname,'app.js'),'utf8')+fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8')+fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')));
 assert.ok(/\.hero-spot,\.today-option\.hero-spot\{\s*background:var\(--spot,#FF5A1F\)/.test(theme));
@@ -1994,7 +1995,7 @@ assert.ok(/Верно \$\{sessionCorrect\} из/.test(appVocabP1),'words P1 prog
 assert.ok(/countSessionAttempt/.test(appVocabP1),'words P1 skips session counter bump on wrong');
 assert.ok(/function vocabOfferHtml\(/.test(appVocabP1)&&/vocabRole==='used'/.test(appVocabP1),'words P1 no skill-separately mud; used may keep Другой пример');
 assert.ok(!/isVocabWordsMode\(\)[\s\S]{0,80}Проверить этот навык отдельно/.test(appVocabP1.split('function vocabOfferHtml')[1].split('function sameSkillOffers')[0]),'words offer path omits навык отдельно');
-assert.ok(/qazaq-offline-live-20261006-r7-step2b-2/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
+assert.ok(/qazaq-offline-live-20261006-r7-x123-1/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
 ok('Vocab words P1: retry CTA, compact error, correct-only progress, no skill mud');
 
 /* P0 words-error-lemma2 2026-10-01: Не знаю ≠ ask-circle; wrong = strike + orange h3 «Ответ: …»; one bottom Ещё раз. */
@@ -2012,7 +2013,7 @@ assert.ok(!/vocab-lemma-banner/.test(themeVocab)&&!/vocab-retry-wrap/.test(theme
 assert.ok(/#reveal-button\.vocab-idk|#reveal-button\[data-vocab-idk\]/.test(themeVocab.replace(/\s+/g,''))||/#reveal-button\.vocab-idk/.test(themeVocab),'Не знаю ≥44 CSS');
 assert.ok(/#tutor-host/.test(fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8')),'ask circle host kept (explain only)');
 assert.ok(/data-tutor-act=\"unclear\"/.test(fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8'))&&/data-tutor-act=\"explain\"/.test(fs.readFileSync(path.join(__dirname,'tutor-ui.js'),'utf8')),'ask chips Не ясно/Объясни unchanged');
-assert.ok(/qazaq-offline-live-20261006-r7-step2b-2/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump words-error-lemma2');
+assert.ok(/qazaq-offline-live-20261006-r7-x123-1/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump words-error-lemma2');
 ok('Vocab words P0: Не знаю→lemma; wrong strike+orange Ответ sticker; one bottom Ещё раз; no AI/skill-links');
 
 ok('Astra step 9: wrong answer shows the attempt, the block, and an existing same-skill offer (words P0 may reveal lemma)');
@@ -2034,8 +2035,8 @@ assert.ok(/#FF5A1F/.test(petCss),'sticker fill #FF5A1F');
 assert.ok(/#tutor-host\{[^}]*z-index:22/.test(petCss.replace(/\n/g,' '))||/z-index:22/.test(petCss),'sticker z-index below CTA');
 assert.ok(/tutor-sticker-dot/.test(tutorUiSrc)&&/\$\('#tutor-launch'\)\.onclick=\(e\)=>\{e\.preventDefault\(\);toggle\(\);\}/.test(tutorUiSrc)&&/function toggle\(\)\{[\s\S]*?close\(\);[\s\S]*?open\(\);/.test(tutorUiSrc),'tap sticker toggles ask');
 assert.ok(!/pet-idle\.png/.test(tutorUiSrc),'default companion is not pet-idle');
-assert.ok(/qazaq-offline-live-20261006-r7-step2b-2/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE words-error-lemma');
-assert.ok(/qazaq-offline-live-20261006-r7-step2b-2/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
+assert.ok(/qazaq-offline-live-20261006-r7-x123-1/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW CACHE words-error-lemma');
+assert.ok(/qazaq-offline-live-20261006-r7-x123-1/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
 assert.ok(/html\.typing-compact \.question-actions/.test(theme)&&/html\.typing-compact \.secondary-actions/.test(theme)&&/html\.typing-compact \.lesson-actions/.test(theme),'typing-compact hides help wrappers broadly');
 assert.ok(/html\.typing-compact #hint-button/.test(theme)&&/html\.typing-compact #reveal-button/.test(theme)&&/html\.typing-compact #association-button/.test(theme),'typing-compact hides hint/idk/assoc buttons');
 assert.ok(/html\.typing-compact #path-rule/.test(theme)&&/html\.typing-compact #path-idk/.test(theme),'typing-compact hides path help');
@@ -2070,7 +2071,7 @@ assert.ok(/vv\.offsetTop\+vv\.height-barH/.test(appKb5),'morph strip docks with 
 assert.ok(/focusout/.test(appKb5)&&/isPracticeTypingField/.test(appKb5),'focusout clears typingFocus on practice fields');
 const themeKb5=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8');
 assert.ok(/Do NOT add env\(safe-area-inset-bottom\)/.test(themeKb5),'compact strip docs: no safe-area pad');
-assert.ok(/qazaq-offline-live-20261006-r7-step2b-2/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
+assert.ok(/qazaq-offline-live-20261006-r7-x123-1/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
 ok('P0 kb-compact5: iOS VV baseline+focus poll kept');
 
 /* QA tip kb-compact6: scroll-body + dock — prompt scrollable, dock at VV bottom. */
@@ -2086,7 +2087,7 @@ assert.ok(/overflow-y:auto/.test(themeKb6),'typing-scroll overflow-y auto');
 assert.ok(/-webkit-overflow-scrolling:touch/.test(themeKb6),'typing-scroll touch momentum scroll');
 assert.ok(/kb-compact8 guard/.test(themeKb6),'explicit guard against html/body overflow lock');
 assert.ok(/html\.typing-compact,html\.typing-compact body\{[\s\S]*?overflow:visible!important/.test(themeKb6),'html/body overflow visible in compact');
-assert.ok(/qazaq-offline-live-20261006-r7-step2b-2/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
+assert.ok(/qazaq-offline-live-20261006-r7-x123-1/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
 ok('P0 kb-compact6 keep: scroll-body + dock; prompt scrollable; no html/body overflow lock');
 
 /* QA tip kb-compact7: accessory clearance + dock VV formula; target above input. */
@@ -2102,7 +2103,7 @@ assert.ok(/typing-compact[\s\S]{0,120}ensureTargetAboveDock|contains\('typing-co
 assert.ok(/html\.typing-compact,html\.typing-compact body\{[\s\S]*?overflow:visible!important/.test(themeKb7),'html/body never overflow:hidden under compact');
 assert.ok(/overflow:visible!important/.test(themeKb7)&&/kb-compact8 guard/.test(themeKb7),'html/body overflow visible + compact7 guard');
 assert.ok(/Never position:fixed; bottom:0 against the layout window/.test(themeKb7)||/Never position:fixed; bottom:0/.test(appKb7),'docs forbid layout-window bottom:0 dock');
-assert.ok(/qazaq-offline-live-20261006-r7-step2b-2/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
+assert.ok(/qazaq-offline-live-20261006-r7-x123-1/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact7');
 ok('P0 kb-compact7: accessory+44 barH VV dock; target above input; no body overflow/scrollIntoView');
 
 /* QA tip kb-compact8 keep: chrome navigable; only dock VV-fixed; scroll .typing-scroll. */
@@ -2126,7 +2127,7 @@ assert.ok(/NOT fixed — stay in normal flow/.test(themeKb8),'form/path-paper st
 assert.ok(/kb-compact8 guard/.test(themeKb8),'kb-compact8 overflow guard present');
 assert.ok(/body\.keyboard-open\[data-view=practice\] #pause-session/.test(themeKb8)===false||/keep ←Назад/.test(themeKb8),'keyboard-open no longer hides #pause-session');
 assert.ok(!/body\.keyboard-open\[data-view=practice\] \.bottom-nav,/.test(themeKb8),'keyboard-open selector does not hide .bottom-nav (compact class does)');
-assert.ok(/qazaq-offline-live-20261006-r7-step2b-2/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact9');
+assert.ok(/qazaq-offline-live-20261006-r7-x123-1/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact9');
 ok('P0 kb-compact8 keep: chrome/back reachable; only .typing-dock VV-fixed; scroll .typing-scroll');
 
 /* QA tip kb-compact9 Variant A: hide .bottom-nav under compact; keep chrome-back/practice-head;
@@ -2151,7 +2152,7 @@ assert.ok(/html\.typing-compact #issue-toggle/.test(themeKb9)&&/html\.typing-com
 assert.ok(/html\.typing-compact \.question-actions/.test(themeKb9)&&/html\.typing-compact #hint-button/.test(themeKb9),'help rows still hidden');
 assert.ok(/html\.typing-compact \.typing-dock/.test(themeKb9),'typing-dock still styled under compact');
 assert.ok(/kb-compact9/.test(themeKb9),'theme docs kb-compact9');
-assert.ok(/qazaq-offline-live-20261006-r7-step2b-2/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact9');
+assert.ok(/qazaq-offline-live-20261006-r7-x123-1/.test(fs.readFileSync(path.join(__dirname,'sw.js'),'utf8')),'SW bump kb-compact9');
 ok('P0 kb-compact9: hide .bottom-nav under compact; keep chrome-back/practice-head; dock VV-pinned');
 
 assert.ok(/\.tutor-sheet\{[^}]*max-height:min\(78dvh,640px\)/.test(petCss.replace(/\s+/g,''))&&/overflow-y:auto/.test(petCss),'ask panel max-height + overflow-y:auto');
@@ -2227,16 +2228,15 @@ const OpenRead=require('./explain-open.js');
 const BankRead=require('./explain-bank.js');
 const lesson31=OpenRead.fullHtml('T20_POSS');
 const lesson32=OpenRead.fullHtml('T24_POSS_BIZ');
-assert.ok(lesson31.length>8000);
-assert.ok(lesson31.includes('Қазақский этого рода не копирует')||lesson31.includes('рода не копирует'));
-assert.ok(lesson31.includes('Семь шагов'));
-assert.ok(lesson31.includes('data-canon-source'));
+// r7 X1 (казакша QA): author source docs (S31/S32 «Статус: разжёвано…», «Файл дыр», .md names, Drive «Исходник»)
+// are not learner text. The full panel is the bank card (сравни с русским / коротко / как работает) + chapters.
+for(const h of [lesson31,lesson32]){
+  assert.ok(h.length>1000);
+  assert.ok(!/data-canon-source|data-canon-doc|Статус:|Файл дыр|\.md\b|S3\d\.|Разжёвано для ученика|Русский refresh|drive\.google|Исходник/.test(h),'no author doc in the learner panel');
+  assert.ok(h.includes('Сравни с русским')&&h.includes('Коротко'));
+}
 assert.ok(!lesson31.includes('Ниже по-прежнему краткий вид банка'));
 assert.ok(!lesson31.includes('Индекс GRAM'));
-assert.ok(lesson32.length>15000);
-assert.ok(lesson32.includes('Біздің — наш'));
-assert.ok(lesson32.includes('Разжёвано для ученика'));
-assert.ok(lesson32.includes('Что открыл курс'));
 assert.ok(String(BankRead.byId('T20_POSS').medium).length<500);
 assert.ok(String(BankRead.byId('T24_POSS_BIZ').medium).length<500);
 assert.equal(Full.forRule('T1_HARMONY').length,0);

@@ -83,7 +83,7 @@
   const src='<section class="path-block" data-canon-source><h3>Исходник</h3><ul>'+pack.docs.map(d=>'<li><a href="'+esc(d.url)+'" target="_blank" rel="noopener noreferrer">'+esc(d.title)+'</a></li>').join('')+'</ul></section>';
   return '<div data-canon-lesson="'+esc(pack.lesson)+'">'+head+body+src+'</div>';
  }
- function fullHtml(ruleId){
+ function fullHtml(ruleId,opts){
   // r7 X1: author source docs (canon-texts: S31/S32, «Статус», «Файл дыр», .md names, Drive links) are not
   // learner text. The learner panel is the bank card + chapters; canonHtml stays for authors only (not rendered).
   const card=Bank&&Bank.byId&&Bank.byId(ruleId);
@@ -95,14 +95,14 @@
    +'<section class="path-block"><h3>Как работает</h3>'+paras(card.medium)+'</section>'
    +(card.examples&&card.examples.length?'<section class="path-block"><h3>Примеры</h3><ul>'+card.examples.map(x=>'<li lang="kk">'+esc(x)+'</li>').join('')+'</ul></section>':'')
    +(card.traps&&card.traps.length?'<section class="path-block"><h3>Неверно → верно</h3><ul>'+card.traps.map(t=>'<li lang="kk">'+esc(t)+'</li>').join('')+'</ul></section>':'')
-   +chapters;
+   +(opts&&opts.brief?'':chapters);
  }
  function ruleOpen(ruleId){
   if(root.ExplainDepth&&ruleId&&typeof root.ExplainDepth.get==='function')return root.ExplainDepth.get(ruleId)!==false;
   return true;
  }
- function openButton(ruleId){
-  const body=fullHtml(ruleId);
+ function openButton(ruleId,opts){
+  const body=fullHtml(ruleId,opts);
   if(!body)return '';
   const hidden=ruleOpen(ruleId)?'':' hidden';
   return '<p><button type="button" class="secondary-button" data-full-rule="'+esc(ruleId)+'">Показать полностью</button></p><div data-full-panel'+hidden+'>'+body+'</div>';
@@ -136,7 +136,7 @@
   // P0: wrong-feedback must not reveal expected/correct form (A10 UI sibling).
   return (actual?'<p><strong>Неверно:</strong> <span lang="kk">'+esc(actual)+'</span></p>':'')
    +(why?'<p><strong>Почему:</strong> '+esc(why)+'</p>':'')
-   +openButton(ruleId);
+   +openButton(ruleId,{brief:true}); // r7 X1: after a wrong answer the rule card only — chapter beats carry «Верно: <answer>» lines
  }
  function chainHtml(q,typed){
   const actual=Array.isArray(typed)?String(typed[0]||''):String(typed||'');
