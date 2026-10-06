@@ -175,7 +175,7 @@ const simpleWhere=[
 ];
 simpleWhere.forEach((p,i)=>{
   const answers=[p[1]];
-  if(p[0]==='аула')answers.push('далада'); // D-7: also accept далада for «двор» contexts later; here form of аула is аулада
+  // P0: «где» от «аула» = только аулада; dual далада только на mastery D7
   prod.push(text(`src:5-1:bw:simple:${i+1}`,'Собери «где»',`Напиши форму «где» от «${p[0]}».`,answers,'v2:5-1:ta-da',{source_item:'часть 3'}));
 });
 

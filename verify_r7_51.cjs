@@ -1,4 +1,4 @@
-// r7 #65: 5-1 full bank 142/186 + mastery D; draft-gate kept; SW r7-51-3.
+// r7 #65: 5-1 full bank 142/186 + mastery D; draft-gate kept; SW r7-51-4.
 const fs=require('fs'),assert=require('assert'),path=require('path');
 const read=f=>fs.readFileSync(path.join(__dirname,f),'utf8');
 let n=0;const ok=m=>{n++;console.log('PASS '+m);};
@@ -72,9 +72,35 @@ ok('mastery D: D1+D2+D3 required; D-7 аулада+далада; D-1=A; no reviv
   assert.ok(c.includes('"content_revision": "5-1.r2"')||c.includes('"content_revision":"5-1.r2"'));
   assert.ok(!c.includes('example.invalid'));
   assert.ok(!read('explain-bank-adapter.js').includes("{id:'5-1'}"),'5-1 not in legacy COURSE');
-  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-51-3'"));
+  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-51-4'"));
   assert.ok(read('lesson-registry.js').includes('qaV2Preview')&&read('lesson-v2-runtime.js').includes('v2qa=1'));
 }
-ok('compiled r2 + SW r7-51-3 + draft-gate intact');
+ok('compiled r2 + SW r7-51-4 + draft-gate intact');
+
+{
+  const L=JSON.parse(read('lessons/5-1/lesson.json'));
+  const by=Object.fromEntries(L.original_exercises.map(q=>[q.id,q]));
+  // P0: аула → где только аулада
+  const a=by['src:5-1:bw:simple:16'].fields[0].answers;
+  assert.deepEqual(a,['аулада']);
+  let dual=0;
+  for(const q of L.original_exercises){
+    const ans=q.fields.flatMap(f=>f.answers||[]);
+    const hasA=ans.some(x=>/аулада/i.test(x)), hasD=ans.some(x=>/далада/i.test(x));
+    if(hasA&&hasD){dual++; assert.equal(q.id,'src:5-1:mastery:D7','dual only on D7, got '+q.id);}
+  }
+  assert.equal(dual,1);
+  // P1 titles
+  for(const q of L.original_exercises){
+    assert.ok(!/Mastery/i.test(q.title||''), 'Mastery in title '+q.id);
+    assert.ok(!/\bD-\d/.test(q.title||''), 'D-N in title '+q.id);
+    assert.ok(!/^Сборник 1-1/.test(q.title||'') && !/Сборник 1-1/.test(q.title||''), 'Сборник 1-1 '+q.id+' '+q.title);
+  }
+  assert.ok(by['src:5-1:mastery:D1'].fields.length===2 && by['src:5-1:mastery:D1'].fields.every(f=>f.kind==='select'));
+  assert.ok(by['src:5-1:mastery:D2'].fields.length===2 && by['src:5-1:mastery:D2'].fields.every(f=>f.kind==='select'));
+  assert.ok(/Упражнения 5–1/.test(by['src:5-1:sch:1-1:1'].title));
+}
+ok('P0/P1: аула≠далада except D7; RU titles; school 5-1 labels; D1/D2 select');
+
 
 console.log('verify_r7_51: '+n+' checks passed');

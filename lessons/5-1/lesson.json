@@ -5388,8 +5388,7 @@
           "label": "Ответ",
           "kind": "text",
           "answers": [
-            "аулада",
-            "далада"
+            "аулада"
           ]
         }
       ],
@@ -7045,8 +7044,7 @@
           "label": "Ответ",
           "kind": "text",
           "answers": [
-            "Ауладамын",
-            "Даладамын"
+            "Ауладамын"
           ]
         }
       ],
@@ -7057,8 +7055,7 @@
       "source_refs": [
         "school-method"
       ],
-      "source_item": "часть 7",
-      "note": "D-7: целевой «ауладамын»; «даладамын» тоже засчитывается."
+      "source_item": "часть 7"
     },
     {
       "id": "src:5-1:bs:nov:10",
@@ -7527,8 +7524,7 @@
           "label": "Ответ",
           "kind": "text",
           "answers": [
-            "Аулада емеспін",
-            "Далада емеспін"
+            "Аулада емеспін"
           ]
         }
       ],
@@ -7768,8 +7764,7 @@
           "label": "Ответ",
           "kind": "text",
           "answers": [
-            "Біз аулада ойнаймыз",
-            "Біз далада ойнаймыз"
+            "Біз аулада ойнаймыз"
           ]
         }
       ],
@@ -7841,8 +7836,7 @@
           "label": "Ответ",
           "kind": "text",
           "answers": [
-            "Сен аулада ойнамадың",
-            "Сен далада ойнамадың"
+            "Сен аулада ойнамадың"
           ]
         }
       ],
@@ -7853,8 +7847,7 @@
       "source_refs": [
         "school-method"
       ],
-      "source_item": "часть 9",
-      "note": "D-7: целевой «аулада»; «далада» тоже засчитывается."
+      "source_item": "часть 9"
     },
     {
       "id": "src:5-1:bs:verb:7",
@@ -9704,7 +9697,7 @@
       "id": "src:5-1:sch:1-1:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-1 №1",
+      "title": "Упражнения 5–1 · 1-1 №1",
       "stimulus": "Задание: мектеп",
       "fields": [
         {
@@ -9722,13 +9715,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-1 №1"
+      "source_item": "лист упражнений 5–1 · 1-1 №1"
     },
     {
       "id": "src:5-1:sch:1-1:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-1 №2",
+      "title": "Упражнения 5–1 · 1-1 №2",
       "stimulus": "Задание: кітап",
       "fields": [
         {
@@ -9746,13 +9739,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-1 №2"
+      "source_item": "лист упражнений 5–1 · 1-1 №2"
     },
     {
       "id": "src:5-1:sch:1-1:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-1 №3",
+      "title": "Упражнения 5–1 · 1-1 №3",
       "stimulus": "Задание: үй",
       "fields": [
         {
@@ -9770,13 +9763,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-1 №3"
+      "source_item": "лист упражнений 5–1 · 1-1 №3"
     },
     {
       "id": "src:5-1:sch:1-1:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-1 №4",
+      "title": "Упражнения 5–1 · 1-1 №4",
       "stimulus": "Задание: қала",
       "fields": [
         {
@@ -9794,13 +9787,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-1 №4"
+      "source_item": "лист упражнений 5–1 · 1-1 №4"
     },
     {
       "id": "src:5-1:sch:1-1:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-1 №5",
+      "title": "Упражнения 5–1 · 1-1 №5",
       "stimulus": "Задание: дос",
       "fields": [
         {
@@ -9818,13 +9811,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-1 №5"
+      "source_item": "лист упражнений 5–1 · 1-1 №5"
     },
     {
       "id": "src:5-1:sch:1-2:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-2 №1",
+      "title": "Упражнения 5–1 · 1-2 №1",
       "stimulus": "Задание: көл",
       "fields": [
         {
@@ -9842,13 +9835,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-2 №1"
+      "source_item": "лист упражнений 5–1 · 1-2 №1"
     },
     {
       "id": "src:5-1:sch:1-2:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-2 №2",
+      "title": "Упражнения 5–1 · 1-2 №2",
       "stimulus": "Задание: ауыл",
       "fields": [
         {
@@ -9866,13 +9859,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-2 №2"
+      "source_item": "лист упражнений 5–1 · 1-2 №2"
     },
     {
       "id": "src:5-1:sch:1-2:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-2 №3",
+      "title": "Упражнения 5–1 · 1-2 №3",
       "stimulus": "Задание: бөлме",
       "fields": [
         {
@@ -9890,13 +9883,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-2 №3"
+      "source_item": "лист упражнений 5–1 · 1-2 №3"
     },
     {
       "id": "src:5-1:sch:1-2:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-2 №4",
+      "title": "Упражнения 5–1 · 1-2 №4",
       "stimulus": "Задание: теңіз",
       "fields": [
         {
@@ -9914,13 +9907,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-2 №4"
+      "source_item": "лист упражнений 5–1 · 1-2 №4"
     },
     {
       "id": "src:5-1:sch:1-2:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-2 №5",
+      "title": "Упражнения 5–1 · 1-2 №5",
       "stimulus": "Задание: алаң",
       "fields": [
         {
@@ -9938,13 +9931,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-2 №5"
+      "source_item": "лист упражнений 5–1 · 1-2 №5"
     },
     {
       "id": "src:5-1:sch:1-3:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-3 №1",
+      "title": "Упражнения 5–1 · 1-3 №1",
       "stimulus": "Задание: тау",
       "fields": [
         {
@@ -9962,13 +9955,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-3 №1"
+      "source_item": "лист упражнений 5–1 · 1-3 №1"
     },
     {
       "id": "src:5-1:sch:1-3:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-3 №2",
+      "title": "Упражнения 5–1 · 1-3 №2",
       "stimulus": "Задание: дүкен",
       "fields": [
         {
@@ -9986,13 +9979,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-3 №2"
+      "source_item": "лист упражнений 5–1 · 1-3 №2"
     },
     {
       "id": "src:5-1:sch:1-3:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-3 №3",
+      "title": "Упражнения 5–1 · 1-3 №3",
       "stimulus": "Задание: пәтер",
       "fields": [
         {
@@ -10010,13 +10003,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-3 №3"
+      "source_item": "лист упражнений 5–1 · 1-3 №3"
     },
     {
       "id": "src:5-1:sch:1-3:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-3 №4",
+      "title": "Упражнения 5–1 · 1-3 №4",
       "stimulus": "Добавь окончание «где» к слову «ту» (флаг). Ключ сборника: «Туда — На флаге».",
       "fields": [
         {
@@ -10034,14 +10027,14 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-3 №4",
+      "source_item": "лист упражнений 5–1 · 1-3 №4",
       "note": "D-1=A: ключ «Туда — На флаге». Опечатка печатного листа (окончание не напечатано) — не твоя ошибка. Слово «тау» (гора) — отдельно в словаре."
     },
     {
       "id": "src:5-1:sch:1-3:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 1-3 №5",
+      "title": "Упражнения 5–1 · 1-3 №5",
       "stimulus": "Задание: көше",
       "fields": [
         {
@@ -10059,13 +10052,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 1-3 №5"
+      "source_item": "лист упражнений 5–1 · 1-3 №5"
     },
     {
       "id": "src:5-1:sch:2-1:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 2-1 №1",
+      "title": "Упражнения 5–1 · 2-1 №1",
       "stimulus": "Задание: мен/мектеп",
       "fields": [
         {
@@ -10083,13 +10076,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 2-1 №1"
+      "source_item": "лист упражнений 5–1 · 2-1 №1"
     },
     {
       "id": "src:5-1:sch:2-1:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 2-1 №2",
+      "title": "Упражнения 5–1 · 2-1 №2",
       "stimulus": "Задание: сен/үй",
       "fields": [
         {
@@ -10107,13 +10100,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 2-1 №2"
+      "source_item": "лист упражнений 5–1 · 2-1 №2"
     },
     {
       "id": "src:5-1:sch:2-1:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 2-1 №3",
+      "title": "Упражнения 5–1 · 2-1 №3",
       "stimulus": "Задание: біз/қала",
       "fields": [
         {
@@ -10131,13 +10124,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 2-1 №3"
+      "source_item": "лист упражнений 5–1 · 2-1 №3"
     },
     {
       "id": "src:5-1:sch:2-1:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 2-1 №4",
+      "title": "Упражнения 5–1 · 2-1 №4",
       "stimulus": "Задание: сіз/пәтер",
       "fields": [
         {
@@ -10155,13 +10148,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 2-1 №4"
+      "source_item": "лист упражнений 5–1 · 2-1 №4"
     },
     {
       "id": "src:5-1:sch:2-1:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 2-1 №5",
+      "title": "Упражнения 5–1 · 2-1 №5",
       "stimulus": "Задание: олар/дүкен",
       "fields": [
         {
@@ -10179,13 +10172,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 2-1 №5"
+      "source_item": "лист упражнений 5–1 · 2-1 №5"
     },
     {
       "id": "src:5-1:sch:2-2:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 2-2 №1",
+      "title": "Упражнения 5–1 · 2-2 №1",
       "stimulus": "Задание: мен/дүкені",
       "fields": [
         {
@@ -10203,13 +10196,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 2-2 №1"
+      "source_item": "лист упражнений 5–1 · 2-2 №1"
     },
     {
       "id": "src:5-1:sch:2-2:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 2-2 №2",
+      "title": "Упражнения 5–1 · 2-2 №2",
       "stimulus": "Задание: біз/пәтері",
       "fields": [
         {
@@ -10227,13 +10220,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 2-2 №2"
+      "source_item": "лист упражнений 5–1 · 2-2 №2"
     },
     {
       "id": "src:5-1:sch:2-2:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 2-2 №3",
+      "title": "Упражнения 5–1 · 2-2 №3",
       "stimulus": "Задание: сен/үйі",
       "fields": [
         {
@@ -10251,13 +10244,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 2-2 №3"
+      "source_item": "лист упражнений 5–1 · 2-2 №3"
     },
     {
       "id": "src:5-1:sch:2-2:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 2-2 №4",
+      "title": "Упражнения 5–1 · 2-2 №4",
       "stimulus": "Задание: сіз/қаласы",
       "fields": [
         {
@@ -10275,13 +10268,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 2-2 №4"
+      "source_item": "лист упражнений 5–1 · 2-2 №4"
     },
     {
       "id": "src:5-1:sch:2-2:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 2-2 №5",
+      "title": "Упражнения 5–1 · 2-2 №5",
       "stimulus": "Задание: мен/сыныбы",
       "fields": [
         {
@@ -10299,13 +10292,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 2-2 №5"
+      "source_item": "лист упражнений 5–1 · 2-2 №5"
     },
     {
       "id": "src:5-1:sch:3-1:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 3-1 №1",
+      "title": "Упражнения 5–1 · 3-1 №1",
       "stimulus": "Задание: в его магазине",
       "fields": [
         {
@@ -10323,13 +10316,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 3-1 №1"
+      "source_item": "лист упражнений 5–1 · 3-1 №1"
     },
     {
       "id": "src:5-1:sch:3-1:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 3-1 №2",
+      "title": "Упражнения 5–1 · 3-1 №2",
       "stimulus": "Задание: в её городе",
       "fields": [
         {
@@ -10347,13 +10340,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 3-1 №2"
+      "source_item": "лист упражнений 5–1 · 3-1 №2"
     },
     {
       "id": "src:5-1:sch:3-1:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 3-1 №3",
+      "title": "Упражнения 5–1 · 3-1 №3",
       "stimulus": "Задание: в их квартире",
       "fields": [
         {
@@ -10371,13 +10364,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 3-1 №3"
+      "source_item": "лист упражнений 5–1 · 3-1 №3"
     },
     {
       "id": "src:5-1:sch:3-1:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 3-1 №4",
+      "title": "Упражнения 5–1 · 3-1 №4",
       "stimulus": "Задание: в его школе",
       "fields": [
         {
@@ -10395,13 +10388,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 3-1 №4"
+      "source_item": "лист упражнений 5–1 · 3-1 №4"
     },
     {
       "id": "src:5-1:sch:3-1:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 3-1 №5",
+      "title": "Упражнения 5–1 · 3-1 №5",
       "stimulus": "Задание: на его улице",
       "fields": [
         {
@@ -10419,13 +10412,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 3-1 №5"
+      "source_item": "лист упражнений 5–1 · 3-1 №5"
     },
     {
       "id": "src:5-1:sch:3-2:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 3-2 №1",
+      "title": "Упражнения 5–1 · 3-2 №1",
       "stimulus": "Задание: я в его доме",
       "fields": [
         {
@@ -10443,13 +10436,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 3-2 №1"
+      "source_item": "лист упражнений 5–1 · 3-2 №1"
     },
     {
       "id": "src:5-1:sch:3-2:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 3-2 №2",
+      "title": "Упражнения 5–1 · 3-2 №2",
       "stimulus": "Задание: мы в её классе",
       "fields": [
         {
@@ -10467,13 +10460,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 3-2 №2"
+      "source_item": "лист упражнений 5–1 · 3-2 №2"
     },
     {
       "id": "src:5-1:sch:3-2:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 3-2 №3",
+      "title": "Упражнения 5–1 · 3-2 №3",
       "stimulus": "Задание: ты у его друга",
       "fields": [
         {
@@ -10491,13 +10484,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 3-2 №3"
+      "source_item": "лист упражнений 5–1 · 3-2 №3"
     },
     {
       "id": "src:5-1:sch:3-2:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 3-2 №4",
+      "title": "Упражнения 5–1 · 3-2 №4",
       "stimulus": "Задание: Вы в их семье",
       "fields": [
         {
@@ -10515,22 +10508,20 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 3-2 №4"
+      "source_item": "лист упражнений 5–1 · 3-2 №4"
     },
     {
       "id": "src:5-1:sch:3-2:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 3-2 №5",
+      "title": "Упражнения 5–1 · 3-2 №5",
       "stimulus": "Задание: я во дворе",
       "fields": [
         {
           "label": "Ответ",
           "kind": "text",
           "answers": [
-            "аулада",
-            "далада",
-            "далада"
+            "аулада"
           ]
         }
       ],
@@ -10541,14 +10532,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 3-2 №5",
-      "note": "D-7: целевой «аулада»; «далада» тоже засчитывается."
+      "source_item": "лист упражнений 5–1 · 3-2 №5"
     },
     {
       "id": "src:5-1:sch:4-1:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 4-1 №1",
+      "title": "Упражнения 5–1 · 4-1 №1",
       "stimulus": "Задание: көршіде",
       "fields": [
         {
@@ -10566,13 +10556,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 4-1 №1"
+      "source_item": "лист упражнений 5–1 · 4-1 №1"
     },
     {
       "id": "src:5-1:sch:4-1:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 4-1 №2",
+      "title": "Упражнения 5–1 · 4-1 №2",
       "stimulus": "Задание: дүкенінде",
       "fields": [
         {
@@ -10590,13 +10580,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 4-1 №2"
+      "source_item": "лист упражнений 5–1 · 4-1 №2"
     },
     {
       "id": "src:5-1:sch:4-1:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 4-1 №3",
+      "title": "Упражнения 5–1 · 4-1 №3",
       "stimulus": "Задание: туысында",
       "fields": [
         {
@@ -10614,13 +10604,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 4-1 №3"
+      "source_item": "лист упражнений 5–1 · 4-1 №3"
     },
     {
       "id": "src:5-1:sch:4-1:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 4-1 №4",
+      "title": "Упражнения 5–1 · 4-1 №4",
       "stimulus": "Задание: туысыңда",
       "fields": [
         {
@@ -10638,13 +10628,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 4-1 №4"
+      "source_item": "лист упражнений 5–1 · 4-1 №4"
     },
     {
       "id": "src:5-1:sch:4-1:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 4-1 №5",
+      "title": "Упражнения 5–1 · 4-1 №5",
       "stimulus": "Задание: отбасында",
       "fields": [
         {
@@ -10662,13 +10652,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 4-1 №5"
+      "source_item": "лист упражнений 5–1 · 4-1 №5"
     },
     {
       "id": "src:5-1:sch:4-2:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 4-2 №1",
+      "title": "Упражнения 5–1 · 4-2 №1",
       "stimulus": "Задание: пәтеріндеміз",
       "fields": [
         {
@@ -10686,13 +10676,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 4-2 №1"
+      "source_item": "лист упражнений 5–1 · 4-2 №1"
     },
     {
       "id": "src:5-1:sch:4-2:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 4-2 №2",
+      "title": "Упражнения 5–1 · 4-2 №2",
       "stimulus": "Задание: мектептемін",
       "fields": [
         {
@@ -10710,13 +10700,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 4-2 №2"
+      "source_item": "лист упражнений 5–1 · 4-2 №2"
     },
     {
       "id": "src:5-1:sch:4-2:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 4-2 №3",
+      "title": "Упражнения 5–1 · 4-2 №3",
       "stimulus": "Задание: үйдесіңдер",
       "fields": [
         {
@@ -10734,13 +10724,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 4-2 №3"
+      "source_item": "лист упражнений 5–1 · 4-2 №3"
     },
     {
       "id": "src:5-1:sch:4-2:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 4-2 №4",
+      "title": "Упражнения 5–1 · 4-2 №4",
       "stimulus": "Задание: онда",
       "fields": [
         {
@@ -10758,13 +10748,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 4-2 №4"
+      "source_item": "лист упражнений 5–1 · 4-2 №4"
     },
     {
       "id": "src:5-1:sch:4-2:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 4-2 №5",
+      "title": "Упражнения 5–1 · 4-2 №5",
       "stimulus": "Задание: аулада",
       "fields": [
         {
@@ -10783,13 +10773,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 4-2 №5"
+      "source_item": "лист упражнений 5–1 · 4-2 №5"
     },
     {
       "id": "src:5-1:sch:5-1:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 5-1 №1",
+      "title": "Упражнения 5–1 · 5-1 №1",
       "stimulus": "Задание: Я живу в Алматы",
       "fields": [
         {
@@ -10807,13 +10797,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 5-1 №1"
+      "source_item": "лист упражнений 5–1 · 5-1 №1"
     },
     {
       "id": "src:5-1:sch:5-1:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 5-1 №2",
+      "title": "Упражнения 5–1 · 5-1 №2",
       "stimulus": "Задание: Ты учишься дома",
       "fields": [
         {
@@ -10831,22 +10821,20 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 5-1 №2"
+      "source_item": "лист упражнений 5–1 · 5-1 №2"
     },
     {
       "id": "src:5-1:sch:5-1:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 5-1 №3",
+      "title": "Упражнения 5–1 · 5-1 №3",
       "stimulus": "Задание: Мы играем во дворе",
       "fields": [
         {
           "label": "Ответ",
           "kind": "text",
           "answers": [
-            "Біз аулада ойнаймыз",
-            "Біз далада ойнаймыз",
-            "Біз далада ойнаймыз"
+            "Біз аулада ойнаймыз"
           ]
         }
       ],
@@ -10857,14 +10845,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 5-1 №3",
-      "note": "D-7: целевой «аулада»; «далада» тоже засчитывается."
+      "source_item": "лист упражнений 5–1 · 5-1 №3"
     },
     {
       "id": "src:5-1:sch:5-1:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 5-1 №4",
+      "title": "Упражнения 5–1 · 5-1 №4",
       "stimulus": "Задание: Вы работаете в городе",
       "fields": [
         {
@@ -10882,13 +10869,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 5-1 №4"
+      "source_item": "лист упражнений 5–1 · 5-1 №4"
     },
     {
       "id": "src:5-1:sch:5-1:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 5-1 №5",
+      "title": "Упражнения 5–1 · 5-1 №5",
       "stimulus": "Задание: Они живут в Астане",
       "fields": [
         {
@@ -10906,13 +10893,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 5-1 №5"
+      "source_item": "лист упражнений 5–1 · 5-1 №5"
     },
     {
       "id": "src:5-1:sch:5-2:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 5-2 №1",
+      "title": "Упражнения 5–1 · 5-2 №1",
       "stimulus": "Задание: Я читаю в библиотеке",
       "fields": [
         {
@@ -10930,13 +10917,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 5-2 №1"
+      "source_item": "лист упражнений 5–1 · 5-2 №1"
     },
     {
       "id": "src:5-1:sch:5-2:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 5-2 №2",
+      "title": "Упражнения 5–1 · 5-2 №2",
       "stimulus": "Задание: Ты играешь на озере",
       "fields": [
         {
@@ -10954,13 +10941,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 5-2 №2"
+      "source_item": "лист упражнений 5–1 · 5-2 №2"
     },
     {
       "id": "src:5-1:sch:5-2:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 5-2 №3",
+      "title": "Упражнения 5–1 · 5-2 №3",
       "stimulus": "Задание: Мы живём на улице Абая",
       "fields": [
         {
@@ -10978,13 +10965,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 5-2 №3"
+      "source_item": "лист упражнений 5–1 · 5-2 №3"
     },
     {
       "id": "src:5-1:sch:5-2:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 5-2 №4",
+      "title": "Упражнения 5–1 · 5-2 №4",
       "stimulus": "Задание: Вы учитесь в школе",
       "fields": [
         {
@@ -11002,13 +10989,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 5-2 №4"
+      "source_item": "лист упражнений 5–1 · 5-2 №4"
     },
     {
       "id": "src:5-1:sch:5-2:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 5-2 №5",
+      "title": "Упражнения 5–1 · 5-2 №5",
       "stimulus": "Задание: Он работает в магазине",
       "fields": [
         {
@@ -11026,13 +11013,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 5-2 №5"
+      "source_item": "лист упражнений 5–1 · 5-2 №5"
     },
     {
       "id": "src:5-1:sch:6-1:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 6-1 №1",
+      "title": "Упражнения 5–1 · 6-1 №1",
       "stimulus": "Задание: Я не в школе",
       "fields": [
         {
@@ -11050,13 +11037,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 6-1 №1"
+      "source_item": "лист упражнений 5–1 · 6-1 №1"
     },
     {
       "id": "src:5-1:sch:6-1:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 6-1 №2",
+      "title": "Упражнения 5–1 · 6-1 №2",
       "stimulus": "Задание: Ты не учился в школе",
       "fields": [
         {
@@ -11074,13 +11061,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 6-1 №2"
+      "source_item": "лист упражнений 5–1 · 6-1 №2"
     },
     {
       "id": "src:5-1:sch:6-1:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 6-1 №3",
+      "title": "Упражнения 5–1 · 6-1 №3",
       "stimulus": "Задание: Не дома, а в школе",
       "fields": [
         {
@@ -11098,13 +11085,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 6-1 №3"
+      "source_item": "лист упражнений 5–1 · 6-1 №3"
     },
     {
       "id": "src:5-1:sch:6-1:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 6-1 №4",
+      "title": "Упражнения 5–1 · 6-1 №4",
       "stimulus": "Задание: Живёт ли он в городе?",
       "fields": [
         {
@@ -11122,22 +11109,20 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 6-1 №4"
+      "source_item": "лист упражнений 5–1 · 6-1 №4"
     },
     {
       "id": "src:5-1:sch:6-1:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 6-1 №5",
+      "title": "Упражнения 5–1 · 6-1 №5",
       "stimulus": "Задание: Мы не играли во дворе",
       "fields": [
         {
           "label": "Ответ",
           "kind": "text",
           "answers": [
-            "Біз аулада ойнамадық",
-            "Біз далада ойнамадық",
-            "Біз далада ойнамадық"
+            "Біз аулада ойнамадық"
           ]
         }
       ],
@@ -11148,14 +11133,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 6-1 №5",
-      "note": "D-7: целевой «аулада»; «далада» тоже засчитывается."
+      "source_item": "лист упражнений 5–1 · 6-1 №5"
     },
     {
       "id": "src:5-1:sch:6-2:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 6-2 №1",
+      "title": "Упражнения 5–1 · 6-2 №1",
       "stimulus": "Задание: Мне 20 лет",
       "fields": [
         {
@@ -11173,13 +11157,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 6-2 №1"
+      "source_item": "лист упражнений 5–1 · 6-2 №1"
     },
     {
       "id": "src:5-1:sch:6-2:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 6-2 №2",
+      "title": "Упражнения 5–1 · 6-2 №2",
       "stimulus": "Задание: Какого ты года?",
       "fields": [
         {
@@ -11197,13 +11181,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 6-2 №2"
+      "source_item": "лист упражнений 5–1 · 6-2 №2"
     },
     {
       "id": "src:5-1:sch:6-2:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 6-2 №3",
+      "title": "Упражнения 5–1 · 6-2 №3",
       "stimulus": "Задание: Я 95-го года",
       "fields": [
         {
@@ -11221,13 +11205,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 6-2 №3"
+      "source_item": "лист упражнений 5–1 · 6-2 №3"
     },
     {
       "id": "src:5-1:sch:6-2:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 6-2 №4",
+      "title": "Упражнения 5–1 · 6-2 №4",
       "stimulus": "Задание: В Республике Казахстан",
       "fields": [
         {
@@ -11245,13 +11229,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 6-2 №4"
+      "source_item": "лист упражнений 5–1 · 6-2 №4"
     },
     {
       "id": "src:5-1:sch:6-2:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 6-2 №5",
+      "title": "Упражнения 5–1 · 6-2 №5",
       "stimulus": "Задание: Вы какого года?",
       "fields": [
         {
@@ -11269,13 +11253,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 6-2 №5"
+      "source_item": "лист упражнений 5–1 · 6-2 №5"
     },
     {
       "id": "src:5-1:sch:7-1:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 7-1 №1",
+      "title": "Упражнения 5–1 · 7-1 №1",
       "stimulus": "Задание: Алматында",
       "fields": [
         {
@@ -11293,13 +11277,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 7-1 №1"
+      "source_item": "лист упражнений 5–1 · 7-1 №1"
     },
     {
       "id": "src:5-1:sch:7-1:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 7-1 №2",
+      "title": "Упражнения 5–1 · 7-1 №2",
       "stimulus": "Задание: Астанадамын тұрамын",
       "fields": [
         {
@@ -11317,13 +11301,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 7-1 №2"
+      "source_item": "лист упражнений 5–1 · 7-1 №2"
     },
     {
       "id": "src:5-1:sch:7-1:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 7-1 №3",
+      "title": "Упражнения 5–1 · 7-1 №3",
       "stimulus": "Задание: мектепте емес оқыдым",
       "fields": [
         {
@@ -11341,13 +11325,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 7-1 №3"
+      "source_item": "лист упражнений 5–1 · 7-1 №3"
     },
     {
       "id": "src:5-1:sch:7-1:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 7-1 №4",
+      "title": "Упражнения 5–1 · 7-1 №4",
       "stimulus": "Задание: Балалар мектептеміз",
       "fields": [
         {
@@ -11365,13 +11349,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 7-1 №4"
+      "source_item": "лист упражнений 5–1 · 7-1 №4"
     },
     {
       "id": "src:5-1:sch:7-1:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 7-1 №5",
+      "title": "Упражнения 5–1 · 7-1 №5",
       "stimulus": "Задание: Дүкеніде",
       "fields": [
         {
@@ -11389,13 +11373,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 7-1 №5"
+      "source_item": "лист упражнений 5–1 · 7-1 №5"
     },
     {
       "id": "src:5-1:sch:7-2:1",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 7-2 №1",
+      "title": "Упражнения 5–1 · 7-2 №1",
       "stimulus": "Задание: Көршінде",
       "fields": [
         {
@@ -11413,13 +11397,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 7-2 №1"
+      "source_item": "лист упражнений 5–1 · 7-2 №1"
     },
     {
       "id": "src:5-1:sch:7-2:2",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 7-2 №2",
+      "title": "Упражнения 5–1 · 7-2 №2",
       "stimulus": "Задание: мектептемін",
       "fields": [
         {
@@ -11437,13 +11421,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 7-2 №2"
+      "source_item": "лист упражнений 5–1 · 7-2 №2"
     },
     {
       "id": "src:5-1:sch:7-2:3",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 7-2 №3",
+      "title": "Упражнения 5–1 · 7-2 №3",
       "stimulus": "Задание: дүкенінде",
       "fields": [
         {
@@ -11461,13 +11445,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 7-2 №3"
+      "source_item": "лист упражнений 5–1 · 7-2 №3"
     },
     {
       "id": "src:5-1:sch:7-2:4",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 7-2 №4",
+      "title": "Упражнения 5–1 · 7-2 №4",
       "stimulus": "Задание: Алматыда тұрамын",
       "fields": [
         {
@@ -11485,13 +11469,13 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 7-2 №4"
+      "source_item": "лист упражнений 5–1 · 7-2 №4"
     },
     {
       "id": "src:5-1:sch:7-2:5",
       "origin": "school",
       "topic": "locative",
-      "title": "Сборник 7-2 №5",
+      "title": "Упражнения 5–1 · 7-2 №5",
       "stimulus": "Задание: пәтеріндеміз",
       "fields": [
         {
@@ -11509,26 +11493,43 @@
       "source_refs": [
         "school-exercises"
       ],
-      "source_item": "сборник 7-2 №5"
+      "source_item": "лист упражнений 5–1 · 7-2 №5"
     },
     {
       "id": "src:5-1:mastery:D1",
       "origin": "authored",
       "topic": "locative",
-      "title": "Mastery D1",
-      "stimulus": "Объясни своими словами: почему «дүкенінде», но «көршіде»?",
+      "title": "Почему «дүкенінде», но «көршіде»?",
+      "stimulus": "Выбери оба верных различения (нужны оба).",
       "fields": [
         {
-          "label": "Ответ",
-          "kind": "text",
+          "label": "В «дүкенінде»",
+          "kind": "select",
+          "options": [
+            "і — окончание «его/её/их», поэтому «где» = нде",
+            "і — часть слова, поэтому «где» = де",
+            "после «чьё» третьего лица Н не нужно",
+            "Н ставится всегда"
+          ],
           "answers": [
-            "в дүкенінде і — «его», поэтому нде; в көрші і — часть слова, поэтому де",
-            "дүкенінде: і = чьё 3-го лица → нде; көршіде: і часть слова → де",
-            "в дүкені есть «чьё», нужен Н; в көрші «чьё» нет"
+            "і — окончание «его/её/их», поэтому «где» = нде"
+          ]
+        },
+        {
+          "label": "В «көршіде»",
+          "kind": "select",
+          "options": [
+            "і — часть самого слова, «чьё» нет, поэтому «где» = де",
+            "і — окончание «его», поэтому нужен Н",
+            "в көрші і — это «чьё»",
+            "НДА всегда"
+          ],
+          "answers": [
+            "і — часть самого слова, «чьё» нет, поэтому «где» = де"
           ]
         }
       ],
-      "explanation": "Сверь форму по правилу урока 5–1.",
+      "explanation": "В дүкенінде і — «его/её/их», поэтому нде. В көрші і — часть слова, «чьё» нет, поэтому де.",
       "rule_ids": [
         "v2:5-1:part-vs-poss"
       ],
@@ -11536,26 +11537,43 @@
         "school-method"
       ],
       "source_item": "mastery D1",
-      "note": "Зачёт только если названы ОБА различения (чьё→Н vs часть слова→без Н)."
+      "note": "Зачёт mastery D1: оба поля верны (оба различения)."
     },
     {
       "id": "src:5-1:mastery:D2",
       "origin": "authored",
       "topic": "locative",
-      "title": "Mastery D2",
-      "stimulus": "Почему «Мен мектепте оқымадым», а не «Мен мектепте емес оқыдым»?",
+      "title": "Почему «оқымадым», а не «емес оқыдым»?",
+      "stimulus": "Выбери обе обязательные идеи.",
       "fields": [
         {
-          "label": "Ответ",
-          "kind": "text",
+          "label": "При глаголе",
+          "kind": "select",
+          "options": [
+            "отрицание несёт сам глагол, «емес» не ставится",
+            "«емес» нужно всегда рядом с глаголом",
+            "личное окончание убираем",
+            "Н добавляем к глаголу"
+          ],
           "answers": [
-            "при глаголе отрицание на глаголе; емес — без глагола или «не …, а …»",
-            "емес не ставится с отрицанием глагола; емес для форм без глагола",
-            "отрицание несёт глагол; емес работает без глагола или в «не …, а …»"
+            "отрицание несёт сам глагол, «емес» не ставится"
+          ]
+        },
+        {
+          "label": "Когда «емес»",
+          "kind": "select",
+          "options": [
+            "«емес» — без глагола (мектепте емеспін) или в «не …, а …»",
+            "«емес» только с прошедшим временем",
+            "«емес» вместо любого отрицания глагола",
+            "«емес» не бывает в этом уроке"
+          ],
+          "answers": [
+            "«емес» — без глагола (мектепте емеспін) или в «не …, а …»"
           ]
         }
       ],
-      "explanation": "Сверь форму по правилу урока 5–1.",
+      "explanation": "При глаголе отрицание на глаголе (оқымадым). «Емес» — без глагола или в конструкции «не …, а …».",
       "rule_ids": [
         "v2:5-1:verb"
       ],
@@ -11563,13 +11581,13 @@
         "school-method"
       ],
       "source_item": "mastery D2",
-      "note": "Зачёт: обе идеи — (1) при глаголе отрицание на глаголе; (2) емес без глагола / «не …, а …»."
+      "note": "Зачёт mastery D2: оба поля верны (обе идеи)."
     },
     {
       "id": "src:5-1:mastery:D3",
       "origin": "authored",
       "topic": "locative",
-      "title": "Mastery D3",
+      "title": "Собери «мы в его квартире»",
       "stimulus": "Как собрать «мы в его квартире» по частям?",
       "fields": [
         {
@@ -11596,7 +11614,7 @@
       "id": "src:5-1:mastery:D7",
       "origin": "authored",
       "topic": "locative",
-      "title": "Mastery D-7 (аулада)",
+      "title": "Ты не играл во дворе",
       "stimulus": "Переведи: «Ты не играл во дворе.»",
       "fields": [
         {
@@ -11616,7 +11634,7 @@
         "school-method"
       ],
       "source_item": "method 11-2",
-      "note": "D-7=A: целевой «аулада»; «далада» тоже засчитывается."
+      "note": "Целевой ответ — «аулада»; «далада» тоже засчитывается (решение владелицы)."
     },
     {
       "id": "src:5-1:rev:1",

@@ -68283,8 +68283,7 @@ window.LESSON_V2_COMPILED = [
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "аулада",
-              "далада"
+              "аулада"
             ]
           }
         ],
@@ -70078,8 +70077,7 @@ window.LESSON_V2_COMPILED = [
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "Ауладамын",
-              "Даладамын"
+              "Ауладамын"
             ]
           }
         ],
@@ -70091,8 +70089,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-method"
-        ],
-        "note": "D-7: целевой «ауладамын»; «даладамын» тоже засчитывается."
+        ]
       },
       {
         "id": "src:5-1:bs:nov:10",
@@ -70600,8 +70597,7 @@ window.LESSON_V2_COMPILED = [
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "Аулада емеспін",
-              "Далада емеспін"
+              "Аулада емеспін"
             ]
           }
         ],
@@ -70861,8 +70857,7 @@ window.LESSON_V2_COMPILED = [
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "Біз аулада ойнаймыз",
-              "Біз далада ойнаймыз"
+              "Біз аулада ойнаймыз"
             ]
           }
         ],
@@ -70940,8 +70935,7 @@ window.LESSON_V2_COMPILED = [
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "Сен аулада ойнамадың",
-              "Сен далада ойнамадың"
+              "Сен аулада ойнамадың"
             ]
           }
         ],
@@ -70953,8 +70947,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "source_refs": [
           "school-method"
-        ],
-        "note": "D-7: целевой «аулада»; «далада» тоже засчитывается."
+        ]
       },
       {
         "id": "src:5-1:bs:verb:7",
@@ -72941,7 +72934,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-1 №1",
+        "title": "Упражнения 5–1 · 1-1 №1",
         "stimulus": "Задание: мектеп",
         "fields": [
           {
@@ -72954,7 +72947,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-1 №1",
+        "source_item": "лист упражнений 5–1 · 1-1 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -72967,7 +72960,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-1 №2",
+        "title": "Упражнения 5–1 · 1-1 №2",
         "stimulus": "Задание: кітап",
         "fields": [
           {
@@ -72980,7 +72973,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-1 №2",
+        "source_item": "лист упражнений 5–1 · 1-1 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -72993,7 +72986,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-1 №3",
+        "title": "Упражнения 5–1 · 1-1 №3",
         "stimulus": "Задание: үй",
         "fields": [
           {
@@ -73006,7 +72999,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-1 №3",
+        "source_item": "лист упражнений 5–1 · 1-1 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73019,7 +73012,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-1 №4",
+        "title": "Упражнения 5–1 · 1-1 №4",
         "stimulus": "Задание: қала",
         "fields": [
           {
@@ -73032,7 +73025,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-1 №4",
+        "source_item": "лист упражнений 5–1 · 1-1 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73045,7 +73038,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-1 №5",
+        "title": "Упражнения 5–1 · 1-1 №5",
         "stimulus": "Задание: дос",
         "fields": [
           {
@@ -73058,7 +73051,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-1 №5",
+        "source_item": "лист упражнений 5–1 · 1-1 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73071,7 +73064,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-2 №1",
+        "title": "Упражнения 5–1 · 1-2 №1",
         "stimulus": "Задание: көл",
         "fields": [
           {
@@ -73084,7 +73077,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-2 №1",
+        "source_item": "лист упражнений 5–1 · 1-2 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73097,7 +73090,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-2 №2",
+        "title": "Упражнения 5–1 · 1-2 №2",
         "stimulus": "Задание: ауыл",
         "fields": [
           {
@@ -73110,7 +73103,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-2 №2",
+        "source_item": "лист упражнений 5–1 · 1-2 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73123,7 +73116,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-2 №3",
+        "title": "Упражнения 5–1 · 1-2 №3",
         "stimulus": "Задание: бөлме",
         "fields": [
           {
@@ -73136,7 +73129,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-2 №3",
+        "source_item": "лист упражнений 5–1 · 1-2 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73149,7 +73142,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-2 №4",
+        "title": "Упражнения 5–1 · 1-2 №4",
         "stimulus": "Задание: теңіз",
         "fields": [
           {
@@ -73162,7 +73155,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-2 №4",
+        "source_item": "лист упражнений 5–1 · 1-2 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73175,7 +73168,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-2 №5",
+        "title": "Упражнения 5–1 · 1-2 №5",
         "stimulus": "Задание: алаң",
         "fields": [
           {
@@ -73188,7 +73181,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-2 №5",
+        "source_item": "лист упражнений 5–1 · 1-2 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73201,7 +73194,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-3 №1",
+        "title": "Упражнения 5–1 · 1-3 №1",
         "stimulus": "Задание: тау",
         "fields": [
           {
@@ -73214,7 +73207,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-3 №1",
+        "source_item": "лист упражнений 5–1 · 1-3 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73227,7 +73220,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-3 №2",
+        "title": "Упражнения 5–1 · 1-3 №2",
         "stimulus": "Задание: дүкен",
         "fields": [
           {
@@ -73240,7 +73233,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-3 №2",
+        "source_item": "лист упражнений 5–1 · 1-3 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73253,7 +73246,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-3 №3",
+        "title": "Упражнения 5–1 · 1-3 №3",
         "stimulus": "Задание: пәтер",
         "fields": [
           {
@@ -73266,7 +73259,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-3 №3",
+        "source_item": "лист упражнений 5–1 · 1-3 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73279,7 +73272,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-3 №4",
+        "title": "Упражнения 5–1 · 1-3 №4",
         "stimulus": "Добавь окончание «где» к слову «ту» (флаг). Ключ сборника: «Туда — На флаге».",
         "fields": [
           {
@@ -73292,7 +73285,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-3 №4",
+        "source_item": "лист упражнений 5–1 · 1-3 №4",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
@@ -73306,7 +73299,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 1-3 №5",
+        "title": "Упражнения 5–1 · 1-3 №5",
         "stimulus": "Задание: көше",
         "fields": [
           {
@@ -73319,7 +73312,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 1-3 №5",
+        "source_item": "лист упражнений 5–1 · 1-3 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73332,7 +73325,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 2-1 №1",
+        "title": "Упражнения 5–1 · 2-1 №1",
         "stimulus": "Задание: мен/мектеп",
         "fields": [
           {
@@ -73345,7 +73338,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 2-1 №1",
+        "source_item": "лист упражнений 5–1 · 2-1 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73358,7 +73351,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 2-1 №2",
+        "title": "Упражнения 5–1 · 2-1 №2",
         "stimulus": "Задание: сен/үй",
         "fields": [
           {
@@ -73371,7 +73364,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 2-1 №2",
+        "source_item": "лист упражнений 5–1 · 2-1 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73384,7 +73377,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 2-1 №3",
+        "title": "Упражнения 5–1 · 2-1 №3",
         "stimulus": "Задание: біз/қала",
         "fields": [
           {
@@ -73397,7 +73390,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 2-1 №3",
+        "source_item": "лист упражнений 5–1 · 2-1 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73410,7 +73403,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 2-1 №4",
+        "title": "Упражнения 5–1 · 2-1 №4",
         "stimulus": "Задание: сіз/пәтер",
         "fields": [
           {
@@ -73423,7 +73416,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 2-1 №4",
+        "source_item": "лист упражнений 5–1 · 2-1 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73436,7 +73429,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 2-1 №5",
+        "title": "Упражнения 5–1 · 2-1 №5",
         "stimulus": "Задание: олар/дүкен",
         "fields": [
           {
@@ -73449,7 +73442,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 2-1 №5",
+        "source_item": "лист упражнений 5–1 · 2-1 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73462,7 +73455,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 2-2 №1",
+        "title": "Упражнения 5–1 · 2-2 №1",
         "stimulus": "Задание: мен/дүкені",
         "fields": [
           {
@@ -73475,7 +73468,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 2-2 №1",
+        "source_item": "лист упражнений 5–1 · 2-2 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73488,7 +73481,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 2-2 №2",
+        "title": "Упражнения 5–1 · 2-2 №2",
         "stimulus": "Задание: біз/пәтері",
         "fields": [
           {
@@ -73501,7 +73494,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 2-2 №2",
+        "source_item": "лист упражнений 5–1 · 2-2 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73514,7 +73507,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 2-2 №3",
+        "title": "Упражнения 5–1 · 2-2 №3",
         "stimulus": "Задание: сен/үйі",
         "fields": [
           {
@@ -73527,7 +73520,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 2-2 №3",
+        "source_item": "лист упражнений 5–1 · 2-2 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73540,7 +73533,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 2-2 №4",
+        "title": "Упражнения 5–1 · 2-2 №4",
         "stimulus": "Задание: сіз/қаласы",
         "fields": [
           {
@@ -73553,7 +73546,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 2-2 №4",
+        "source_item": "лист упражнений 5–1 · 2-2 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73566,7 +73559,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 2-2 №5",
+        "title": "Упражнения 5–1 · 2-2 №5",
         "stimulus": "Задание: мен/сыныбы",
         "fields": [
           {
@@ -73579,7 +73572,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 2-2 №5",
+        "source_item": "лист упражнений 5–1 · 2-2 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73592,7 +73585,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 3-1 №1",
+        "title": "Упражнения 5–1 · 3-1 №1",
         "stimulus": "Задание: в его магазине",
         "fields": [
           {
@@ -73605,7 +73598,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 3-1 №1",
+        "source_item": "лист упражнений 5–1 · 3-1 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73618,7 +73611,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 3-1 №2",
+        "title": "Упражнения 5–1 · 3-1 №2",
         "stimulus": "Задание: в её городе",
         "fields": [
           {
@@ -73631,7 +73624,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 3-1 №2",
+        "source_item": "лист упражнений 5–1 · 3-1 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73644,7 +73637,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 3-1 №3",
+        "title": "Упражнения 5–1 · 3-1 №3",
         "stimulus": "Задание: в их квартире",
         "fields": [
           {
@@ -73657,7 +73650,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 3-1 №3",
+        "source_item": "лист упражнений 5–1 · 3-1 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73670,7 +73663,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 3-1 №4",
+        "title": "Упражнения 5–1 · 3-1 №4",
         "stimulus": "Задание: в его школе",
         "fields": [
           {
@@ -73683,7 +73676,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 3-1 №4",
+        "source_item": "лист упражнений 5–1 · 3-1 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73696,7 +73689,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 3-1 №5",
+        "title": "Упражнения 5–1 · 3-1 №5",
         "stimulus": "Задание: на его улице",
         "fields": [
           {
@@ -73709,7 +73702,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 3-1 №5",
+        "source_item": "лист упражнений 5–1 · 3-1 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73722,7 +73715,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 3-2 №1",
+        "title": "Упражнения 5–1 · 3-2 №1",
         "stimulus": "Задание: я в его доме",
         "fields": [
           {
@@ -73735,7 +73728,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 3-2 №1",
+        "source_item": "лист упражнений 5–1 · 3-2 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73748,7 +73741,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 3-2 №2",
+        "title": "Упражнения 5–1 · 3-2 №2",
         "stimulus": "Задание: мы в её классе",
         "fields": [
           {
@@ -73761,7 +73754,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 3-2 №2",
+        "source_item": "лист упражнений 5–1 · 3-2 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73774,7 +73767,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 3-2 №3",
+        "title": "Упражнения 5–1 · 3-2 №3",
         "stimulus": "Задание: ты у его друга",
         "fields": [
           {
@@ -73787,7 +73780,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 3-2 №3",
+        "source_item": "лист упражнений 5–1 · 3-2 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73800,7 +73793,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 3-2 №4",
+        "title": "Упражнения 5–1 · 3-2 №4",
         "stimulus": "Задание: Вы в их семье",
         "fields": [
           {
@@ -73813,7 +73806,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 3-2 №4",
+        "source_item": "лист упражнений 5–1 · 3-2 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73826,36 +73819,33 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 3-2 №5",
+        "title": "Упражнения 5–1 · 3-2 №5",
         "stimulus": "Задание: я во дворе",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "аулада",
-              "далада",
-              "далада"
+              "аулада"
             ]
           }
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 3-2 №5",
+        "source_item": "лист упражнений 5–1 · 3-2 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
         "source_refs": [
           "school-exercises"
-        ],
-        "note": "D-7: целевой «аулада»; «далада» тоже засчитывается."
+        ]
       },
       {
         "id": "src:5-1:sch:4-1:1",
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 4-1 №1",
+        "title": "Упражнения 5–1 · 4-1 №1",
         "stimulus": "Задание: көршіде",
         "fields": [
           {
@@ -73868,7 +73858,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 4-1 №1",
+        "source_item": "лист упражнений 5–1 · 4-1 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73881,7 +73871,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 4-1 №2",
+        "title": "Упражнения 5–1 · 4-1 №2",
         "stimulus": "Задание: дүкенінде",
         "fields": [
           {
@@ -73894,7 +73884,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 4-1 №2",
+        "source_item": "лист упражнений 5–1 · 4-1 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73907,7 +73897,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 4-1 №3",
+        "title": "Упражнения 5–1 · 4-1 №3",
         "stimulus": "Задание: туысында",
         "fields": [
           {
@@ -73920,7 +73910,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 4-1 №3",
+        "source_item": "лист упражнений 5–1 · 4-1 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73933,7 +73923,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 4-1 №4",
+        "title": "Упражнения 5–1 · 4-1 №4",
         "stimulus": "Задание: туысыңда",
         "fields": [
           {
@@ -73946,7 +73936,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 4-1 №4",
+        "source_item": "лист упражнений 5–1 · 4-1 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73959,7 +73949,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 4-1 №5",
+        "title": "Упражнения 5–1 · 4-1 №5",
         "stimulus": "Задание: отбасында",
         "fields": [
           {
@@ -73972,7 +73962,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 4-1 №5",
+        "source_item": "лист упражнений 5–1 · 4-1 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -73985,7 +73975,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 4-2 №1",
+        "title": "Упражнения 5–1 · 4-2 №1",
         "stimulus": "Задание: пәтеріндеміз",
         "fields": [
           {
@@ -73998,7 +73988,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 4-2 №1",
+        "source_item": "лист упражнений 5–1 · 4-2 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74011,7 +74001,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 4-2 №2",
+        "title": "Упражнения 5–1 · 4-2 №2",
         "stimulus": "Задание: мектептемін",
         "fields": [
           {
@@ -74024,7 +74014,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 4-2 №2",
+        "source_item": "лист упражнений 5–1 · 4-2 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74037,7 +74027,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 4-2 №3",
+        "title": "Упражнения 5–1 · 4-2 №3",
         "stimulus": "Задание: үйдесіңдер",
         "fields": [
           {
@@ -74050,7 +74040,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 4-2 №3",
+        "source_item": "лист упражнений 5–1 · 4-2 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74063,7 +74053,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 4-2 №4",
+        "title": "Упражнения 5–1 · 4-2 №4",
         "stimulus": "Задание: онда",
         "fields": [
           {
@@ -74076,7 +74066,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 4-2 №4",
+        "source_item": "лист упражнений 5–1 · 4-2 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74089,7 +74079,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 4-2 №5",
+        "title": "Упражнения 5–1 · 4-2 №5",
         "stimulus": "Задание: аулада",
         "fields": [
           {
@@ -74103,7 +74093,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 4-2 №5",
+        "source_item": "лист упражнений 5–1 · 4-2 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74116,7 +74106,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 5-1 №1",
+        "title": "Упражнения 5–1 · 5-1 №1",
         "stimulus": "Задание: Я живу в Алматы",
         "fields": [
           {
@@ -74129,7 +74119,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 5-1 №1",
+        "source_item": "лист упражнений 5–1 · 5-1 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74142,7 +74132,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 5-1 №2",
+        "title": "Упражнения 5–1 · 5-1 №2",
         "stimulus": "Задание: Ты учишься дома",
         "fields": [
           {
@@ -74155,7 +74145,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 5-1 №2",
+        "source_item": "лист упражнений 5–1 · 5-1 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74168,36 +74158,33 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 5-1 №3",
+        "title": "Упражнения 5–1 · 5-1 №3",
         "stimulus": "Задание: Мы играем во дворе",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "Біз аулада ойнаймыз",
-              "Біз далада ойнаймыз",
-              "Біз далада ойнаймыз"
+              "Біз аулада ойнаймыз"
             ]
           }
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 5-1 №3",
+        "source_item": "лист упражнений 5–1 · 5-1 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
         "source_refs": [
           "school-exercises"
-        ],
-        "note": "D-7: целевой «аулада»; «далада» тоже засчитывается."
+        ]
       },
       {
         "id": "src:5-1:sch:5-1:4",
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 5-1 №4",
+        "title": "Упражнения 5–1 · 5-1 №4",
         "stimulus": "Задание: Вы работаете в городе",
         "fields": [
           {
@@ -74210,7 +74197,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 5-1 №4",
+        "source_item": "лист упражнений 5–1 · 5-1 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74223,7 +74210,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 5-1 №5",
+        "title": "Упражнения 5–1 · 5-1 №5",
         "stimulus": "Задание: Они живут в Астане",
         "fields": [
           {
@@ -74236,7 +74223,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 5-1 №5",
+        "source_item": "лист упражнений 5–1 · 5-1 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74249,7 +74236,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 5-2 №1",
+        "title": "Упражнения 5–1 · 5-2 №1",
         "stimulus": "Задание: Я читаю в библиотеке",
         "fields": [
           {
@@ -74262,7 +74249,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 5-2 №1",
+        "source_item": "лист упражнений 5–1 · 5-2 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74275,7 +74262,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 5-2 №2",
+        "title": "Упражнения 5–1 · 5-2 №2",
         "stimulus": "Задание: Ты играешь на озере",
         "fields": [
           {
@@ -74288,7 +74275,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 5-2 №2",
+        "source_item": "лист упражнений 5–1 · 5-2 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74301,7 +74288,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 5-2 №3",
+        "title": "Упражнения 5–1 · 5-2 №3",
         "stimulus": "Задание: Мы живём на улице Абая",
         "fields": [
           {
@@ -74314,7 +74301,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 5-2 №3",
+        "source_item": "лист упражнений 5–1 · 5-2 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74327,7 +74314,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 5-2 №4",
+        "title": "Упражнения 5–1 · 5-2 №4",
         "stimulus": "Задание: Вы учитесь в школе",
         "fields": [
           {
@@ -74340,7 +74327,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 5-2 №4",
+        "source_item": "лист упражнений 5–1 · 5-2 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74353,7 +74340,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 5-2 №5",
+        "title": "Упражнения 5–1 · 5-2 №5",
         "stimulus": "Задание: Он работает в магазине",
         "fields": [
           {
@@ -74366,7 +74353,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 5-2 №5",
+        "source_item": "лист упражнений 5–1 · 5-2 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74379,7 +74366,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 6-1 №1",
+        "title": "Упражнения 5–1 · 6-1 №1",
         "stimulus": "Задание: Я не в школе",
         "fields": [
           {
@@ -74392,7 +74379,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 6-1 №1",
+        "source_item": "лист упражнений 5–1 · 6-1 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74405,7 +74392,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 6-1 №2",
+        "title": "Упражнения 5–1 · 6-1 №2",
         "stimulus": "Задание: Ты не учился в школе",
         "fields": [
           {
@@ -74418,7 +74405,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 6-1 №2",
+        "source_item": "лист упражнений 5–1 · 6-1 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74431,7 +74418,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 6-1 №3",
+        "title": "Упражнения 5–1 · 6-1 №3",
         "stimulus": "Задание: Не дома, а в школе",
         "fields": [
           {
@@ -74444,7 +74431,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 6-1 №3",
+        "source_item": "лист упражнений 5–1 · 6-1 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74457,7 +74444,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 6-1 №4",
+        "title": "Упражнения 5–1 · 6-1 №4",
         "stimulus": "Задание: Живёт ли он в городе?",
         "fields": [
           {
@@ -74470,7 +74457,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 6-1 №4",
+        "source_item": "лист упражнений 5–1 · 6-1 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74483,36 +74470,33 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 6-1 №5",
+        "title": "Упражнения 5–1 · 6-1 №5",
         "stimulus": "Задание: Мы не играли во дворе",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "Біз аулада ойнамадық",
-              "Біз далада ойнамадық",
-              "Біз далада ойнамадық"
+              "Біз аулада ойнамадық"
             ]
           }
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 6-1 №5",
+        "source_item": "лист упражнений 5–1 · 6-1 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
         "source_refs": [
           "school-exercises"
-        ],
-        "note": "D-7: целевой «аулада»; «далада» тоже засчитывается."
+        ]
       },
       {
         "id": "src:5-1:sch:6-2:1",
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 6-2 №1",
+        "title": "Упражнения 5–1 · 6-2 №1",
         "stimulus": "Задание: Мне 20 лет",
         "fields": [
           {
@@ -74525,7 +74509,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 6-2 №1",
+        "source_item": "лист упражнений 5–1 · 6-2 №1",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74538,7 +74522,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 6-2 №2",
+        "title": "Упражнения 5–1 · 6-2 №2",
         "stimulus": "Задание: Какого ты года?",
         "fields": [
           {
@@ -74551,7 +74535,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 6-2 №2",
+        "source_item": "лист упражнений 5–1 · 6-2 №2",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74564,7 +74548,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 6-2 №3",
+        "title": "Упражнения 5–1 · 6-2 №3",
         "stimulus": "Задание: Я 95-го года",
         "fields": [
           {
@@ -74577,7 +74561,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 6-2 №3",
+        "source_item": "лист упражнений 5–1 · 6-2 №3",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74590,7 +74574,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 6-2 №4",
+        "title": "Упражнения 5–1 · 6-2 №4",
         "stimulus": "Задание: В Республике Казахстан",
         "fields": [
           {
@@ -74603,7 +74587,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 6-2 №4",
+        "source_item": "лист упражнений 5–1 · 6-2 №4",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74616,7 +74600,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 6-2 №5",
+        "title": "Упражнения 5–1 · 6-2 №5",
         "stimulus": "Задание: Вы какого года?",
         "fields": [
           {
@@ -74629,7 +74613,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 6-2 №5",
+        "source_item": "лист упражнений 5–1 · 6-2 №5",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -74642,7 +74626,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 7-1 №1",
+        "title": "Упражнения 5–1 · 7-1 №1",
         "stimulus": "Задание: Алматында",
         "fields": [
           {
@@ -74655,7 +74639,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 7-1 №1",
+        "source_item": "лист упражнений 5–1 · 7-1 №1",
         "ruleIds": [
           "v2:5-1:part-vs-poss"
         ],
@@ -74668,7 +74652,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 7-1 №2",
+        "title": "Упражнения 5–1 · 7-1 №2",
         "stimulus": "Задание: Астанадамын тұрамын",
         "fields": [
           {
@@ -74681,7 +74665,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 7-1 №2",
+        "source_item": "лист упражнений 5–1 · 7-1 №2",
         "ruleIds": [
           "v2:5-1:part-vs-poss"
         ],
@@ -74694,7 +74678,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 7-1 №3",
+        "title": "Упражнения 5–1 · 7-1 №3",
         "stimulus": "Задание: мектепте емес оқыдым",
         "fields": [
           {
@@ -74707,7 +74691,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 7-1 №3",
+        "source_item": "лист упражнений 5–1 · 7-1 №3",
         "ruleIds": [
           "v2:5-1:part-vs-poss"
         ],
@@ -74720,7 +74704,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 7-1 №4",
+        "title": "Упражнения 5–1 · 7-1 №4",
         "stimulus": "Задание: Балалар мектептеміз",
         "fields": [
           {
@@ -74733,7 +74717,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 7-1 №4",
+        "source_item": "лист упражнений 5–1 · 7-1 №4",
         "ruleIds": [
           "v2:5-1:part-vs-poss"
         ],
@@ -74746,7 +74730,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 7-1 №5",
+        "title": "Упражнения 5–1 · 7-1 №5",
         "stimulus": "Задание: Дүкеніде",
         "fields": [
           {
@@ -74759,7 +74743,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 7-1 №5",
+        "source_item": "лист упражнений 5–1 · 7-1 №5",
         "ruleIds": [
           "v2:5-1:part-vs-poss"
         ],
@@ -74772,7 +74756,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 7-2 №1",
+        "title": "Упражнения 5–1 · 7-2 №1",
         "stimulus": "Задание: Көршінде",
         "fields": [
           {
@@ -74785,7 +74769,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 7-2 №1",
+        "source_item": "лист упражнений 5–1 · 7-2 №1",
         "ruleIds": [
           "v2:5-1:part-vs-poss"
         ],
@@ -74798,7 +74782,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 7-2 №2",
+        "title": "Упражнения 5–1 · 7-2 №2",
         "stimulus": "Задание: мектептемін",
         "fields": [
           {
@@ -74811,7 +74795,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 7-2 №2",
+        "source_item": "лист упражнений 5–1 · 7-2 №2",
         "ruleIds": [
           "v2:5-1:part-vs-poss"
         ],
@@ -74824,7 +74808,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 7-2 №3",
+        "title": "Упражнения 5–1 · 7-2 №3",
         "stimulus": "Задание: дүкенінде",
         "fields": [
           {
@@ -74837,7 +74821,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 7-2 №3",
+        "source_item": "лист упражнений 5–1 · 7-2 №3",
         "ruleIds": [
           "v2:5-1:part-vs-poss"
         ],
@@ -74850,7 +74834,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 7-2 №4",
+        "title": "Упражнения 5–1 · 7-2 №4",
         "stimulus": "Задание: Алматыда тұрамын",
         "fields": [
           {
@@ -74863,7 +74847,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 7-2 №4",
+        "source_item": "лист упражнений 5–1 · 7-2 №4",
         "ruleIds": [
           "v2:5-1:part-vs-poss"
         ],
@@ -74876,7 +74860,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "school",
         "topic": "locative",
         "kind": "fields",
-        "title": "Сборник 7-2 №5",
+        "title": "Упражнения 5–1 · 7-2 №5",
         "stimulus": "Задание: пәтеріндеміз",
         "fields": [
           {
@@ -74889,7 +74873,7 @@ window.LESSON_V2_COMPILED = [
         ],
         "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "сборник 7-2 №5",
+        "source_item": "лист упражнений 5–1 · 7-2 №5",
         "ruleIds": [
           "v2:5-1:part-vs-poss"
         ],
@@ -74902,20 +74886,37 @@ window.LESSON_V2_COMPILED = [
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Mastery D1",
-        "stimulus": "Объясни своими словами: почему «дүкенінде», но «көршіде»?",
+        "title": "Почему «дүкенінде», но «көршіде»?",
+        "stimulus": "Выбери оба верных различения (нужны оба).",
         "fields": [
           {
-            "label": "Ответ",
-            "kind": "text",
+            "label": "В «дүкенінде»",
+            "kind": "select",
             "answers": [
-              "в дүкенінде і — «его», поэтому нде; в көрші і — часть слова, поэтому де",
-              "дүкенінде: і = чьё 3-го лица → нде; көршіде: і часть слова → де",
-              "в дүкені есть «чьё», нужен Н; в көрші «чьё» нет"
+              "і — окончание «его/её/их», поэтому «где» = нде"
+            ],
+            "options": [
+              "і — окончание «его/её/их», поэтому «где» = нде",
+              "і — часть слова, поэтому «где» = де",
+              "после «чьё» третьего лица Н не нужно",
+              "Н ставится всегда"
+            ]
+          },
+          {
+            "label": "В «көршіде»",
+            "kind": "select",
+            "answers": [
+              "і — часть самого слова, «чьё» нет, поэтому «где» = де"
+            ],
+            "options": [
+              "і — часть самого слова, «чьё» нет, поэтому «где» = де",
+              "і — окончание «его», поэтому нужен Н",
+              "в көрші і — это «чьё»",
+              "НДА всегда"
             ]
           }
         ],
-        "explanation": "Сверь форму по правилу урока 5–1.",
+        "explanation": "В дүкенінде і — «его/её/их», поэтому нде. В көрші і — часть слова, «чьё» нет, поэтому де.",
         "lessonId": "5-1",
         "source_item": "mastery D1",
         "ruleIds": [
@@ -74924,27 +74925,44 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-method"
         ],
-        "note": "Зачёт только если названы ОБА различения (чьё→Н vs часть слова→без Н)."
+        "note": "Зачёт mastery D1: оба поля верны (оба различения)."
       },
       {
         "id": "src:5-1:mastery:D2",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Mastery D2",
-        "stimulus": "Почему «Мен мектепте оқымадым», а не «Мен мектепте емес оқыдым»?",
+        "title": "Почему «оқымадым», а не «емес оқыдым»?",
+        "stimulus": "Выбери обе обязательные идеи.",
         "fields": [
           {
-            "label": "Ответ",
-            "kind": "text",
+            "label": "При глаголе",
+            "kind": "select",
             "answers": [
-              "при глаголе отрицание на глаголе; емес — без глагола или «не …, а …»",
-              "емес не ставится с отрицанием глагола; емес для форм без глагола",
-              "отрицание несёт глагол; емес работает без глагола или в «не …, а …»"
+              "отрицание несёт сам глагол, «емес» не ставится"
+            ],
+            "options": [
+              "отрицание несёт сам глагол, «емес» не ставится",
+              "«емес» нужно всегда рядом с глаголом",
+              "личное окончание убираем",
+              "Н добавляем к глаголу"
+            ]
+          },
+          {
+            "label": "Когда «емес»",
+            "kind": "select",
+            "answers": [
+              "«емес» — без глагола (мектепте емеспін) или в «не …, а …»"
+            ],
+            "options": [
+              "«емес» — без глагола (мектепте емеспін) или в «не …, а …»",
+              "«емес» только с прошедшим временем",
+              "«емес» вместо любого отрицания глагола",
+              "«емес» не бывает в этом уроке"
             ]
           }
         ],
-        "explanation": "Сверь форму по правилу урока 5–1.",
+        "explanation": "При глаголе отрицание на глаголе (оқымадым). «Емес» — без глагола или в конструкции «не …, а …».",
         "lessonId": "5-1",
         "source_item": "mastery D2",
         "ruleIds": [
@@ -74953,14 +74971,14 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-method"
         ],
-        "note": "Зачёт: обе идеи — (1) при глаголе отрицание на глаголе; (2) емес без глагола / «не …, а …»."
+        "note": "Зачёт mastery D2: оба поля верны (обе идеи)."
       },
       {
         "id": "src:5-1:mastery:D3",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Mastery D3",
+        "title": "Собери «мы в его квартире»",
         "stimulus": "Как собрать «мы в его квартире» по частям?",
         "fields": [
           {
@@ -74989,7 +75007,7 @@ window.LESSON_V2_COMPILED = [
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Mastery D-7 (аулада)",
+        "title": "Ты не играл во дворе",
         "stimulus": "Переведи: «Ты не играл во дворе.»",
         "fields": [
           {
@@ -75010,7 +75028,7 @@ window.LESSON_V2_COMPILED = [
         "source_refs": [
           "school-method"
         ],
-        "note": "D-7=A: целевой «аулада»; «далада» тоже засчитывается."
+        "note": "Целевой ответ — «аулада»; «далада» тоже засчитывается (решение владелицы)."
       },
       {
         "id": "src:5-1:rev:1",
