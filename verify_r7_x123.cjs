@@ -107,7 +107,8 @@ ok('X3 ← Назад / «Сделать паузу» returns to homework / hub 
 {
   const cl=grab(appSrc,'continueLesson');
   assert.ok(cl.indexOf('ensureV2(id);')>0&&cl.indexOf('ensureV2(id);')<cl.indexOf('restoreLessonPractice(id)'),'v2 cards installed before the saved practice is restored (cold start)');
-  assert.ok(/pos=Math\.min\(total,Math\.max\(0,Number\(p\.practiceSession\.position\)\|\|0\)\+\(p\.practiceSession\.answered\?1:0\)\)/.test(dashSrc),'picker «шаг N из M» counts like the resume');
+  // ux59 #6: picker and practice share TrainerCore.sessionStep (distinct cards; answered → next).
+  assert.ok(/core\.sessionStep\(p\.practiceSession\.queue,p\.practiceSession\.position,p\.practiceSession\.answered\)/.test(dashSrc),'picker «шаг N из M» counts like the resume');
 }
 ok('step: «Начать» of another lesson does not move the saved step; cold start opens the saved practice; picker step = resume step');
 

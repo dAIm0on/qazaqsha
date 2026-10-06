@@ -20,7 +20,7 @@ const wi=tutor.indexOf(' function learnerWeak(');assert.ok(wi>0);
 const lw=new Function('topWeak','label',tutor.slice(wi,tutor.indexOf('\n',wi))+';return learnerWeak;');
 const rows=[{error_code:'UNKNOWN',count_recent:10},{error_code:'NOT_A_CODE',count_recent:9},{error_code:'PERSON_AFTER_POSS_MISSING',count_recent:4},{error_code:'',count_recent:3}];
 assert.deepEqual(lw(()=>rows,label)().map(r=>r.error_code),['PERSON_AFTER_POSS_MISSING'],'UNKNOWN / unlabeled hidden');
-assert.ok(/learnerWeak\(\)\.map\(w=>esc\(window\.AiTutor\.label\(w\.error_code\)\)\+' · '\+core\.ruCount\(/.test(dash),'dashboard renders the learner list with «N раз(а)»');
+assert.ok(/learnerWeak\(3\)\.filter\(/.test(dash)&&/repeated\.map\(w=>esc\(window\.AiTutor\.label\(w\.error_code\)\)\+' · '\+core\.ruCount\(/.test(dash),'dashboard renders the learner list with «N раз(а)» (ux59: repeated errors only)');
 assert.ok(!/topWeak\(\)\.map\(w=>esc\(window\.AiTutor\.label/.test(dash),'raw topWeak list gone from Today');
 assert.ok(/api=\{[^}]*learnerWeak/.test(tutor),'exported');
 ok('«Слабые места» shows readable labels only (no «UNKNOWN · 10»), counts in words');
@@ -31,7 +31,7 @@ vm.runInNewContext(app.slice(ci,cj)+'\nbox.f=chapterCheckpoint;',ctx);
 assert.equal(ctx.box.f('3-1',{chapterId:'b',beat:4}),'Глава 2 из 3 · Собери прошедшее · шаг 5');
 assert.equal(ctx.box.f('9-9',{chapterId:'x',beat:0}),'Теория · шаг 1','unknown chapter: no «Глава ·»');
 assert.ok(!app.includes("'Глава · шаг '"),'old empty substitution gone');
-assert.ok(app.includes('const checkpoint=p&&p.chapterId?chapterCheckpoint(lessonId,p):'),'Today card uses it');
+assert.ok(app.includes('const at=p&&p.chapterId?p:nextChapterOf(lessonId);')&&app.includes('const checkpoint=at?chapterCheckpoint(lessonId,at):'),'Today card uses it (ux59: also before the lesson starts)');
 ok('Today checkpoint: «Глава N из M · название · шаг K» instead of «Глава · шаг 5»');
 // 4) chapter title rewrite keeps the case
 const ai=adapter.indexOf(' function chapterTitle('),aj=adapter.indexOf(' function paras(');
