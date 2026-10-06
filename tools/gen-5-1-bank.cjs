@@ -497,7 +497,7 @@ const stages=[
     core_ids:micro.filter(q=>q.id.includes('too-where')).map(q=>q.id),
     required_independent_ids:micro.filter(q=>q.id.includes('too-where')).slice(0,8).map(q=>q.id),
     rule_ids:['v2:5-1:da-too'],min_independent_ratio:0.7,max_presentations:24,final:false},
-  {id:'stage:5-1:micro',title:'Изолированные рычаги',kind:'practice',
+  {id:'stage:5-1:micro',title:'Рычаги местного падежа',kind:'practice',
     core_ids:micro.filter(q=>!q.id.includes('too-where')).slice(0,40).map(q=>q.id),
     required_independent_ids:micro.filter(q=>!q.id.includes('too-where')).slice(0,12).map(q=>q.id),
     rule_ids:['v2:5-1:ta-da','v2:5-1:nda','v2:5-1:part-vs-poss'],min_independent_ratio:0.7,max_presentations:48,final:false},
