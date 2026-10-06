@@ -62541,7 +62541,7 @@ window.LESSON_V2_COMPILED = [
   {
     "schema_version": 2,
     "lesson_id": "5-1",
-    "content_revision": "5-1.r1",
+    "content_revision": "5-1.r2",
     "title": "Урок 5–1 · Местный падеж",
     "label": "5–1",
     "name": "Местный падеж",
@@ -62551,7 +62551,7 @@ window.LESSON_V2_COMPILED = [
       "preview_head": "",
       "preview_url": "",
       "approved_at": "",
-      "note": "r7 #64 draft from PASS-DOC r2.3; approve after QA"
+      "note": "r7 #65 tip3: RU stage/notes; still draft — not productionReady"
     },
     "sources": [
       {
@@ -63472,26 +63472,30 @@ window.LESSON_V2_COMPILED = [
     ],
     "original_exercises": [
       {
-        "id": "src:5-1:da-too:c1",
+        "id": "src:5-1:mp:too-where:1",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Два «да»: тоже и где",
-        "stimulus": "«Мен де жазамын» — это «тоже» или «где»?",
+        "title": "Тоже или где?",
+        "stimulus": "«Мен де жазамын» — это «тоже», «где» или оба?",
         "fields": [
           {
-            "label": "Ответ",
-            "kind": "text",
+            "label": "Выбери",
+            "kind": "select",
             "answers": [
               "тоже",
               "тоже (отдельное слово)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
             ]
           }
         ],
-        "explanation": "«Тоже» — отдельное слово. «Где» присоединяется к самому слову.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Два «да»: тоже и где",
-        "prompt_original": "«Мен де жазамын» — это «тоже» или «где»?",
+        "source_item": "часть 0",
         "ruleIds": [
           "v2:5-1:da-too"
         ],
@@ -63500,25 +63504,30 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "src:5-1:da-too:c2",
+        "id": "src:5-1:mp:too-where:2",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Два «да»: тоже и где",
-        "stimulus": "Напиши «дома» одним словом.",
+        "title": "Тоже или где?",
+        "stimulus": "«Мен үйдемін» — это «тоже», «где» или оба?",
         "fields": [
           {
-            "label": "Ответ",
-            "kind": "text",
+            "label": "Выбери",
+            "kind": "select",
             "answers": [
-              "үйде"
+              "где",
+              "где (окончание)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
             ]
           }
         ],
-        "explanation": "«Тоже» — отдельное слово. «Где» присоединяется к самому слову.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Два «да»: тоже и где",
-        "prompt_original": "Напиши «дома» одним словом.",
+        "source_item": "часть 0",
         "ruleIds": [
           "v2:5-1:da-too"
         ],
@@ -63527,27 +63536,1132 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "src:5-1:locative:c1",
+        "id": "src:5-1:mp:too-where:3",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Что такое местный падеж",
-        "stimulus": "Какой вопрос задаём к местному падежу?",
+        "title": "Тоже или где?",
+        "stimulus": "«Мектептемін» — это «тоже», «где» или оба?",
         "fields": [
           {
-            "label": "Ответ",
-            "kind": "text",
+            "label": "Выбери",
+            "kind": "select",
             "answers": [
-              "Қайда?",
-              "Қайда",
-              "Қай жерде?"
+              "где",
+              "где (окончание)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
             ]
           }
         ],
-        "explanation": "Местный падеж отвечает на «где?» / «у кого?».",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Что такое местный падеж",
-        "prompt_original": "Какой вопрос задаём к местному падежу?",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Мен де Алматыдамын» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "тоже и где",
+              "тоже + где",
+              "где и тоже"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Ол да келді» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "тоже",
+              "тоже (отдельное слово)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Біз үйдеміз» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "где",
+              "где (окончание)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Сен де оқисың» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "тоже",
+              "тоже (отдельное слово)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Кітапта» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "где",
+              "где (окончание)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Мен де тұрамын» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "тоже",
+              "тоже (отдельное слово)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Пәтердемін» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "где",
+              "где (окончание)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Олар да бар» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "тоже",
+              "тоже (отдельное слово)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Қаладамыз» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "где",
+              "где (окончание)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:13",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Сіз де келдіңіз» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "тоже",
+              "тоже (отдельное слово)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:14",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Дүкенде» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "где",
+              "где (окончание)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:15",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Мен де студентпін» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "тоже",
+              "тоже (отдельное слово)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:16",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Ауладамыз» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "где",
+              "где (окончание)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:17",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Ол да жазады» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "тоже",
+              "тоже (отдельное слово)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:18",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Көлде» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "где",
+              "где (окончание)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:19",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Біз де барамыз» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "тоже",
+              "тоже (отдельное слово)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:too-where:20",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Тоже или где?",
+        "stimulus": "«Мектепте емеспін» — это «тоже», «где» или оба?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "где",
+              "где (окончание)"
+            ],
+            "options": [
+              "тоже",
+              "где",
+              "тоже и где"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 0",
+        "ruleIds": [
+          "v2:5-1:da-too"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «көршіде» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "часть слова"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «дүкенінде» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "чьё 3-го лица",
+              "чьё"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «кісіде» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "часть слова"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «көшесінде» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "чьё 3-го лица",
+              "чьё"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «туысында» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "чьё 3-го лица",
+              "чьё"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «туысыңда» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "чьё (другое лицо)",
+              "чьё (твоё)",
+              "чьё"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «отбасында» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "чьё уже внутри слова",
+              "чьё внутри",
+              "чьё"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «мектебінде» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "чьё 3-го лица",
+              "чьё"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «пәтерінде» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "чьё 3-го лица",
+              "чьё"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «қаласында» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "чьё 3-го лица",
+              "чьё"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «сыныбында» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "чьё 3-го лица",
+              "чьё"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «досында» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "чьё 3-го лица",
+              "чьё"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:13",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «үйінде» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "чьё 3-го лица",
+              "чьё"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:14",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «балада» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "часть слова"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:15",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «жігітте» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "часть слова"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:part-poss:16",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Часть слова или «чьё»?",
+        "stimulus": "В форме «қызда» і/ы — это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "часть слова"
+            ],
+            "options": [
+              "часть слова",
+              "чьё 3-го лица",
+              "чьё (другое лицо)",
+              "чьё уже внутри слова"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:sense:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Что выражает форма?",
+        "stimulus": "«үйде» — место, время, длительность или возраст?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "место"
+            ],
+            "options": [
+              "место",
+              "время",
+              "длительность",
+              "возраст"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 2/11",
         "ruleIds": [
           "v2:5-1:locative"
         ],
@@ -63556,12 +64670,3224 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "src:5-1:ta-da:c1",
+        "id": "src:5-1:mp:sense:2",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Окончания ТА/ТЕ и ДА/ДЕ",
-        "stimulus": "мектеп + где →",
+        "title": "Что выражает форма?",
+        "stimulus": "«таңертең» — место, время, длительность или возраст?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "время"
+            ],
+            "options": [
+              "место",
+              "время",
+              "длительность",
+              "возраст"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 2/11",
+        "ruleIds": [
+          "v2:5-1:locative"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:sense:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Что выражает форма?",
+        "stimulus": "«бес сағатта» — место, время, длительность или возраст?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "длительность"
+            ],
+            "options": [
+              "место",
+              "время",
+              "длительность",
+              "возраст"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 2/11",
+        "ruleIds": [
+          "v2:5-1:locative"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:sense:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Что выражает форма?",
+        "stimulus": "«жиырма жаста» — место, время, длительность или возраст?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "возраст"
+            ],
+            "options": [
+              "место",
+              "время",
+              "длительность",
+              "возраст"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 2/11",
+        "ruleIds": [
+          "v2:5-1:locative"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:sense:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Что выражает форма?",
+        "stimulus": "«мектепте» — место, время, длительность или возраст?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "место"
+            ],
+            "options": [
+              "место",
+              "время",
+              "длительность",
+              "возраст"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 2/11",
+        "ruleIds": [
+          "v2:5-1:locative"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:sense:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Что выражает форма?",
+        "stimulus": "«кеште» — место, время, длительность или возраст?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "время"
+            ],
+            "options": [
+              "место",
+              "время",
+              "длительность",
+              "возраст"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 2/11",
+        "ruleIds": [
+          "v2:5-1:locative"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:sense:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Что выражает форма?",
+        "stimulus": "«екі күнде» — место, время, длительность или возраст?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "длительность"
+            ],
+            "options": [
+              "место",
+              "время",
+              "длительность",
+              "возраст"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 2/11",
+        "ruleIds": [
+          "v2:5-1:locative"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:sense:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Что выражает форма?",
+        "stimulus": "«отыздамын» — место, время, длительность или возраст?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "возраст"
+            ],
+            "options": [
+              "место",
+              "время",
+              "длительность",
+              "возраст"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 2/11",
+        "ruleIds": [
+          "v2:5-1:locative"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:sense:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Что выражает форма?",
+        "stimulus": "«далада» — место, время, длительность или возраст?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "место"
+            ],
+            "options": [
+              "место",
+              "время",
+              "длительность",
+              "возраст"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 2/11",
+        "ruleIds": [
+          "v2:5-1:locative"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:sense:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Что выражает форма?",
+        "stimulus": "«жазда» — место, время, длительность или возраст?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "время"
+            ],
+            "options": [
+              "место",
+              "время",
+              "длительность",
+              "возраст"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 2/11",
+        "ruleIds": [
+          "v2:5-1:locative"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jas-jyl:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жас или жыл?",
+        "stimulus": "Для «Мне двадцать лет» какое слово?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "жас"
+            ],
+            "options": [
+              "жас",
+              "жыл",
+              "жылғы"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jas-jyl:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жас или жыл?",
+        "stimulus": "Для «Какого ты года рождения?» какое слово?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "жылғы"
+            ],
+            "options": [
+              "жас",
+              "жыл",
+              "жылғы"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jas-jyl:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жас или жыл?",
+        "stimulus": "Для «2020 год» какое слово?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "жыл"
+            ],
+            "options": [
+              "жас",
+              "жыл",
+              "жылғы"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jas-jyl:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жас или жыл?",
+        "stimulus": "Для «жиырма жастамын» какое слово?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "жас"
+            ],
+            "options": [
+              "жас",
+              "жыл",
+              "жылғы"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jas-jyl:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жас или жыл?",
+        "stimulus": "Для «тоқсан бесінші жылғымын» какое слово?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "жылғы"
+            ],
+            "options": [
+              "жас",
+              "жыл",
+              "жылғы"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jas-jyl:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жас или жыл?",
+        "stimulus": "Для «өткен жылы» какое слово?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "жыл"
+            ],
+            "options": [
+              "жас",
+              "жыл",
+              "жылғы"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «мектеп» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ТА/ТЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «кітап» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ТА/ТЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «дос» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ТА/ТЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «сабақ» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ТА/ТЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «жат» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ТА/ТЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «үй» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «қала» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «көл» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «ауыл» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «дала» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «бөлме» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «теңіз» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:13",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «алаң» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:14",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «тау» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:15",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «киім» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:16",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «жұмыс» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:17",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «сынып» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ТА/ТЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:18",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «дүкен» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:19",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «көше» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:td:20",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Т или Д?",
+        "stimulus": "Для «пәтер» окончание «где» начинается с…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ДА/ДЕ"
+            ],
+            "options": [
+              "ТА/ТЕ",
+              "ДА/ДЕ"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Мектептемін» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на слове"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Мектепте оқимын» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на глаголе"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Мектепте емеспін» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на емес"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Үйдеміз» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на слове"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Үйде тұрамыз» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на глаголе"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Үйде емеспіз» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на емес"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Пәтердесің» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на слове"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Пәтерде отырсың» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на глаголе"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Пәтерде емессің» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на емес"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Қаладасыз» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на слове"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Қалада жұмыс істейсіз» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на глаголе"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Қалада емессіз» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на емес"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:13",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Ауладамыз» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на слове"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:14",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Аулада ойнаймыз» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на глаголе"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:15",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Аулада емеспіз» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на емес"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:who-seat:16",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Где стоит «кто»?",
+        "stimulus": "В «Мектепте емес, үйдемін» личное окончание стоит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на емес"
+            ],
+            "options": [
+              "на слове",
+              "на глаголе",
+              "на емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "части 8/9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «дүкені + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «көрші + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "нет"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «қаласы + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «кісі + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "нет"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «пәтері + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «отбасы + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «мектебі + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «үйі + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «дос + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "нет"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «көшесі + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «сыныбы + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «бала + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "нет"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:13",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «туысы + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:14",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «туысың + where» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "нет"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:15",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «Алматы + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "нет"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:16",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «Алматы қаласы + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:17",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «қыз + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "нет"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:18",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «жігіті + где» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:19",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «ағасы + where» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:need-n:20",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Нужно ли Н?",
+        "stimulus": "После «әке + where» нужно ли Н в окончании «где»?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "нет"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «мектеп» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "Е"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «кітап» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "А"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «үй» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "Е"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «қала» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "А"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «көл» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "Е"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «ауыл» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "А"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «бөлме» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "Е"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «тау» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "А"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «дүкен» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "Е"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «пәтер» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "Е"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «дос» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "А"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:ae:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "А или Е?",
+        "stimulus": "В окончании «где» для «көше» гласная…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "Е"
+            ],
+            "options": [
+              "А",
+              "Е"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:onda:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимение «где»",
+        "stimulus": "«у него/неё» по-казахски (местный падеж)?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "онда"
+            ],
+            "options": [
+              "онда",
+              "оларда",
+              "менде",
+              "сенде",
+              "бізде",
+              "сізде",
+              "сендерде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:onda:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимение «где»",
+        "stimulus": "«у них» по-казахски (местный падеж)?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "оларда"
+            ],
+            "options": [
+              "онда",
+              "оларда",
+              "менде",
+              "сенде",
+              "бізде",
+              "сізде",
+              "сендерде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:onda:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимение «где»",
+        "stimulus": "«у меня» по-казахски (местный падеж)?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "менде"
+            ],
+            "options": [
+              "онда",
+              "оларда",
+              "менде",
+              "сенде",
+              "бізде",
+              "сізде",
+              "сендерде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:onda:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимение «где»",
+        "stimulus": "«у тебя» по-казахски (местный падеж)?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "сенде"
+            ],
+            "options": [
+              "онда",
+              "оларда",
+              "менде",
+              "сенде",
+              "бізде",
+              "сізде",
+              "сендерде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:onda:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимение «где»",
+        "stimulus": "«у нас» по-казахски (местный падеж)?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "бізде"
+            ],
+            "options": [
+              "онда",
+              "оларда",
+              "менде",
+              "сенде",
+              "бізде",
+              "сізде",
+              "сендерде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:onda:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимение «где»",
+        "stimulus": "«у Вас» по-казахски (местный падеж)?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "сізде"
+            ],
+            "options": [
+              "онда",
+              "оларда",
+              "менде",
+              "сенде",
+              "бізде",
+              "сізде",
+              "сендерде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:onda:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимение «где»",
+        "stimulus": "«у вас (мн.)» по-казахски (местный падеж)?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "сендерде"
+            ],
+            "options": [
+              "онда",
+              "оларда",
+              "менде",
+              "сенде",
+              "бізде",
+              "сізде",
+              "сендерде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:onda:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимение «где»",
+        "stimulus": "«там (не в этом уроке как «у него»)» по-казахски (местный падеж)?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "онда"
+            ],
+            "options": [
+              "онда",
+              "оларда",
+              "менде",
+              "сенде",
+              "бізде",
+              "сізде",
+              "сендерде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jylgy:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жылғы",
+        "stimulus": "Напиши по-казахски: Какого ты года?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қай жылғысың?",
+              "Қай жылғысың"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jylgy:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жылғы",
+        "stimulus": "Напиши по-казахски: Какого Вы года?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қай жылғысыз?",
+              "Қай жылғысыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jylgy:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жылғы",
+        "stimulus": "Напиши по-казахски: Я девяносто пятого",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Тоқсан бесінші жылғымын",
+              "Тоқсан бесінші жылғымын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jylgy:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жылғы",
+        "stimulus": "Напиши по-казахски: Он двухтысячного",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Екі мыңыншы жылғы",
+              "Екі мыңыншы жылғы"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jylgy:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жылғы",
+        "stimulus": "Напиши по-казахски: Мы какого года",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қай жылғымыз?",
+              "Қай жылғымыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:jylgy:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "жылғы",
+        "stimulus": "Напиши по-казахски: Она восемьдесят третьего",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сексен үшінші жылғы",
+              "Сексен үшінші жылғы"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:spot:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Третье лицо внутри?",
+        "stimulus": "В слове «отбасы» уже есть «чьё» 3-го лица?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:spot:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Третье лицо внутри?",
+        "stimulus": "В слове «дүкені» уже есть «чьё» 3-го лица?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:spot:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Третье лицо внутри?",
+        "stimulus": "В слове «көрші» уже есть «чьё» 3-го лица?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "нет"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:spot:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Третье лицо внутри?",
+        "stimulus": "В слове «қаласы» уже есть «чьё» 3-го лица?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:spot:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Третье лицо внутри?",
+        "stimulus": "В слове «кісі» уже есть «чьё» 3-го лица?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "нет"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:spot:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Третье лицо внутри?",
+        "stimulus": "В слове «мектебі» уже есть «чьё» 3-го лица?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:spot:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Третье лицо внутри?",
+        "stimulus": "В слове «бала» уже есть «чьё» 3-го лица?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "нет"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:mp:spot:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Третье лицо внутри?",
+        "stimulus": "В слове «сыныбы» уже есть «чьё» 3-го лица?",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "да"
+            ],
+            "options": [
+              "да",
+              "нет"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «мектеп».",
         "fields": [
           {
             "label": "Ответ",
@@ -63571,10 +67897,9 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Последний звук выбирает Т или Д; твёрдость — А или Е.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Окончания ТА/ТЕ и ДА/ДЕ",
-        "prompt_original": "мектеп + где →",
+        "source_item": "часть 3",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
@@ -63583,25 +67908,24 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "src:5-1:ta-da:c2",
+        "id": "src:5-1:bw:simple:2",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Окончания ТА/ТЕ и ДА/ДЕ",
-        "stimulus": "саябақ + где →",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «кітап».",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "саябақта"
+              "кітапта"
             ]
           }
         ],
-        "explanation": "Последний звук выбирает Т или Д; твёрдость — А или Е.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Окончания ТА/ТЕ и ДА/ДЕ",
-        "prompt_original": "саябақ + где →",
+        "source_item": "часть 3",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
@@ -63610,12 +67934,376 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "src:5-1:nda:c1",
+        "id": "src:5-1:bw:simple:3",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "НДА/НДЕ после «чьё»",
-        "stimulus": "дүкен + і + где →",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «үй».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "үйде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «қала».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қалада"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «көл».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көлде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «ауыл».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ауылда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «бөлме».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бөлмеде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «теңіз».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "теңізде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «алаң».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "алаңда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «тау».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тауда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «дүкен».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "дүкенде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «пәтер».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "пәтерде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:13",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «дос».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "доста"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:14",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «көше».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көшеде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:15",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «дала».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "далада"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:simple:16",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «где»",
+        "stimulus": "Напиши форму «где» от «аула».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "аулада"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 3",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: дүкені →",
         "fields": [
           {
             "label": "Ответ",
@@ -63625,10 +68313,9 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "После «чьё» 3-го лица окончание начинается на Н.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "НДА/НДЕ после «чьё»",
-        "prompt_original": "дүкен + і + где →",
+        "source_item": "часть 4",
         "ruleIds": [
           "v2:5-1:nda"
         ],
@@ -63637,40 +68324,454 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "src:5-1:part-vs-poss:c1",
+        "id": "src:5-1:bw:poss:2",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Часть слова или «чьё»",
-        "stimulus": "«көршіде» — і это «чьё»? (да/нет)",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: қаласы →",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "нет",
-              "нет, часть слова"
+              "қаласында"
             ]
           }
         ],
-        "explanation": "көршіде — і часть слова; дүкенінде — і это «чьё».",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Часть слова или «чьё»",
-        "prompt_original": "«көршіде» — і это «чьё»? (да/нет)",
+        "source_item": "часть 4",
         "ruleIds": [
-          "v2:5-1:part-vs-poss"
+          "v2:5-1:nda"
         ],
         "source_refs": [
           "school-method"
         ]
       },
       {
-        "id": "src:5-1:names:c1",
+        "id": "src:5-1:bw:poss:3",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Имена собственные",
-        "stimulus": "Алматы қаласы + где →",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: пәтері →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "пәтерінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: мектебі →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "мектебінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: үйі →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "үйінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: сыныбы →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сыныбында"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: көшесі →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көшесінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: досы →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "досында"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: отбасы →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отбасында"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: ағасы →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ағасында"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: әкесі →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "әкесінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: шешесі →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шешесінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:13",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: кітабы →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кітабында"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:14",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: жұмысы →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жұмысында"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:15",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: бөлмесі →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бөлмесінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:poss:16",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "«Чьё» + «где»",
+        "stimulus": "Форма «где» после «чьё»: ауласы →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ауласында"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 4",
+        "ruleIds": [
+          "v2:5-1:nda"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:name:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Алматы».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Алматыда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 6",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:name:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Астана».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Астанада"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 6",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:name:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Алматы қаласы».",
         "fields": [
           {
             "label": "Ответ",
@@ -63680,10 +68781,9 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "Алматы қаласы → Алматы қаласында.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Имена собственные",
-        "prompt_original": "Алматы қаласы + где →",
+        "source_item": "часть 6",
         "ruleIds": [
           "v2:5-1:names"
         ],
@@ -63692,25 +68792,258 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "src:5-1:who:c1",
+        "id": "src:5-1:bw:name:4",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "«Где» + «кто»",
-        "stimulus": "кітапханада + мен →",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Абай көшесі».",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "кітапханадамын"
+              "Абай көшесінде"
             ]
           }
         ],
-        "explanation": "После падежа можно добавить личное окончание.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "«Где» + «кто»",
-        "prompt_original": "кітапханада + мен →",
+        "source_item": "часть 6",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:name:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Қазақстан».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қазақстанда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 6",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:name:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Тараз».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Таразда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 6",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:name:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Шымкент».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Шымкентте"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 6",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:name:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Атырау».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Атырауда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 6",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:name:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Орал».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Оралда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 6",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:name:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Семей».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Семейде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 6",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:name:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Қостанай».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қостанайда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 6",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:name:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Имя собственное + «где»",
+        "stimulus": "Напиши «где» для «Павлодар».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Павлодарда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 6",
+        "ruleIds": [
+          "v2:5-1:names"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: мен / мектеп →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "мектептемін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
         "ruleIds": [
           "v2:5-1:who"
         ],
@@ -63719,68 +69052,714 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "src:5-1:emes:c1",
+        "id": "src:5-1:bw:train:2",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Отрицание с «емес»",
-        "stimulus": "Скажи: я не дома (мен + үйде + емес)",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сен / үй →",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "Мен үйде емеспін",
-              "мен үйде емеспін"
+              "үйдесің"
             ]
           }
         ],
-        "explanation": "«емес» забирает личное окончание.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Отрицание с «емес»",
-        "prompt_original": "Скажи: я не дома (мен + үйде + емес)",
+        "source_item": "часть 7",
         "ruleIds": [
-          "v2:5-1:emes"
+          "v2:5-1:who"
         ],
         "source_refs": [
           "school-method"
         ]
       },
       {
-        "id": "src:5-1:verb:c1",
+        "id": "src:5-1:bw:train:3",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "С глаголом: «кто» на глаголе",
-        "stimulus": "Где стоит «кто», если есть глагол?",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: біз / қала →",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "на глаголе",
-              "на глаголе"
+              "қаладамыз"
             ]
           }
         ],
-        "explanation": "Если есть глагол — личное на глаголе.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "С глаголом: «кто» на глаголе",
-        "prompt_original": "Где стоит «кто», если есть глагол?",
+        "source_item": "часть 7",
         "ruleIds": [
-          "v2:5-1:verb"
+          "v2:5-1:who"
         ],
         "source_refs": [
           "school-method"
         ]
       },
       {
-        "id": "src:5-1:pronouns:c1",
+        "id": "src:5-1:bw:train:4",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Местоимения и онда",
-        "stimulus": "ол + где (особая форма) →",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сіз / пәтер →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "пәтердесіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: мен / дүкені →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "дүкеніндемін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: біз / пәтері →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "пәтеріндеміз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сен / мектебі →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "мектебіндесің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сіз / қаласы →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қаласындасыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: мен / үйі →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "үйіндемін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: біз / сыныбы →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сыныбындамыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сендер / үй →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "үйдесіңдер"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сіздер / мектеп →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "мектептесіздер"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:13",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: мен / аула →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ауладамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:14",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: біз / дала →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "даладамыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:15",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сен / көл →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көлдесің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:16",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сіз / бөлме →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бөлмедесіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:17",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: мен / дос →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "достамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:18",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: біз / көше →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көшедеміз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:19",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сен / кітап →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кітаптасың"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:20",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сіз / жұмыс →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "жұмыстасыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:21",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: мен / отбасы →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отбасындамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:22",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: біз / ағасы →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ағасындамыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:23",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сен / шешесі →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "шешесіндесің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:train:24",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Полный поезд",
+        "stimulus": "Собери форму: сіз / әкесі →",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "әкесіндесіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:pron:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимения «где»",
+        "stimulus": "Напиши: у меня",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "менде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:pron:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимения «где»",
+        "stimulus": "Напиши: у тебя",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сенде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:pron:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимения «где»",
+        "stimulus": "Напиши: у Вас",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сізде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:pron:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимения «где»",
+        "stimulus": "Напиши: у нас",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бізде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:pron:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимения «где»",
+        "stimulus": "Напиши: у него/неё",
         "fields": [
           {
             "label": "Ответ",
@@ -63790,10 +69769,9 @@ window.LESSON_V2_COMPILED = [
             ]
           }
         ],
-        "explanation": "менде, сенде… особая форма онда.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Местоимения и онда",
-        "prompt_original": "ол + где (особая форма) →",
+        "source_item": "часть 10",
         "ruleIds": [
           "v2:5-1:pronouns"
         ],
@@ -63802,52 +69780,1351 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "src:5-1:dala-time:c1",
+        "id": "src:5-1:bw:pron:6",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "«Дала» и время",
-        "stimulus": "«летом» одним словом",
+        "title": "Местоимения «где»",
+        "stimulus": "Напиши: у них",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "жазда"
+              "оларда"
             ]
           }
         ],
-        "explanation": "дала — степь / вне дома; жазда, түнде.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "«Дала» и время",
-        "prompt_original": "«летом» одним словом",
+        "source_item": "часть 10",
         "ruleIds": [
-          "v2:5-1:dala-time"
+          "v2:5-1:pronouns"
         ],
         "source_refs": [
           "school-method"
         ]
       },
       {
-        "id": "src:5-1:age:c1",
+        "id": "src:5-1:bw:pron:7",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Возраст: жас и жыл",
-        "stimulus": "Мне двадцать (короткая форма)",
+        "title": "Местоимения «где»",
+        "stimulus": "Напиши: у вас (сендер)",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "жиырмадамын"
+              "сендерде"
             ]
           }
         ],
-        "explanation": "Возраст через жас; жыл — календарный год.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Возраст: жас и жыл",
-        "prompt_original": "Мне двадцать (короткая форма)",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bw:pron:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Местоимения «где»",
+        "stimulus": "Напиши: у Вас (мн.)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сіздерде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 10",
+        "ruleIds": [
+          "v2:5-1:pronouns"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Я в школе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мектептемін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Ты дома",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Үйдесің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Мы в городе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қаладамыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Вы в квартире",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Пәтердесіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Я у него",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Ондамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Мы в его квартире",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Пәтеріндеміз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Ты в её магазине",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Дүкеніндесің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Вы на его улице",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Көшесіндесіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Я во дворе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Ауладамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Мы в степи / на улице",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Даладамыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Дети в школе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Балалар мектепте"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Они дома",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Олар үйде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:13",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Я в классе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сыныптамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:14",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Ты на работе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Жұмыстасың"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:15",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Мы у друга",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Досымыздамыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:16",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Вы у нас",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Біздесіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:17",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Я в Алматы",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Алматыдамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:18",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Мы на улице Абая",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Абай көшесіндеміз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:19",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Ты в его доме",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Үйіндесің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:nov:20",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Предложение без глагола",
+        "stimulus": "Переведи: Вы в нашей школе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мектебіміздесіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Я не в школе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мектепте емеспін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Ты не дома",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Үйде емессің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Мы не в городе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қалада емеспіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Вы не в квартире",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Пәтерде емессіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Я не у него",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Онда емеспін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Мы не в его магазине",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Дүкенінде емеспіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Они не дома",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Олар үйде емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Он не в школе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Ол мектепте емес"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Я не во дворе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Аулада емеспін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Ты не на работе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Жұмыста емессің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Мы не в Алматы",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Алматыда емеспіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Вы не у нас",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Бізде емессіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:13",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Я не в классе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сыныпта емеспін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:14",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Ты не у друга",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Досыңда емессің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:15",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Мы не на улице",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Көшеде емеспіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:emes:16",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Отрицание с емес",
+        "stimulus": "Переведи: Вы не в их доме",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Үйінде емессіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 8",
+        "ruleIds": [
+          "v2:5-1:emes"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Я живу в Алматы",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мен Алматыда тұрамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Ты учишься в школе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сен мектепте оқисың"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Мы играем во дворе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Біз аулада ойнаймыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Вы работаете в городе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сіз қалада жұмыс істейсіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Я не учился в школе (прош.)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мен мектепте оқымадым"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Ты не играл во дворе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сен аулада ойнамадың"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Не в школе, а дома",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мектепте емес, үйдемін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Живёт ли он в Астане?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Ол Астанада тұра ма?"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Мы не живём там",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Біз онда тұрмаймыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Я читаю в библиотеке",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мен кітапханада оқимын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Они играют на озере",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Олар көлде ойнайды"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:verb:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "С глаголом",
+        "stimulus": "Переведи: Ты живёшь на улице Абая?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сен Абай көшесінде тұрасың ба?"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:age:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Возраст",
+        "stimulus": "Переведи: Мне двадцать лет",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мен жиырма жастамын",
+              "жиырма жастамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
         "ruleIds": [
           "v2:5-1:age"
         ],
@@ -63856,26 +71133,3922 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "src:5-1:summary:c1",
+        "id": "src:5-1:bs:age:2",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "Резюме урока",
-        "stimulus": "Назови три вида окончаний «где»",
+        "title": "Возраст",
+        "stimulus": "Переведи: Ему сорок один год",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "та/те, да/де, нда/нде",
-              "та те да де нда нде"
+              "Ол қырық бір жаста",
+              "қырық бір жаста"
             ]
           }
         ],
-        "explanation": "Три вида окончаний; порядок много → чьё → где → кто.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Резюме урока",
-        "prompt_original": "Назови три вида окончаний «где»",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:age:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Возраст",
+        "stimulus": "Переведи: Мне двадцать (кратко)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мен жиырмадамын",
+              "жиырмадамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:age:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Возраст",
+        "stimulus": "Переведи: Какого ты года?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қай жылғысың?",
+              "Қай жылғысың?"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:age:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Возраст",
+        "stimulus": "Переведи: Я девяносто пятого",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мен тоқсан бесінші жылғымын",
+              "тоқсан бесінші жылғымын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:age:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Возраст",
+        "stimulus": "Переведи: Ей тридцать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Ол отыз жаста",
+              "отыз жаста"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:age:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Возраст",
+        "stimulus": "Переведи: Нам пятнадцать",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Біз он бес жастамыз",
+              "он бес жастамыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bs:age:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Возраст",
+        "stimulus": "Переведи: Какого Вы года?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қай жылғысыз?",
+              "Қай жылғысыз?"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 12",
+        "ruleIds": [
+          "v2:5-1:age"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: пәтеріндеміз",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "мы в его/её/их квартире",
+              "мы в его квартире",
+              "мы в их квартире",
+              "мы в её/их квартире"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: мектебіндемін",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "я в его/её школе",
+              "я в его школе",
+              "я в его/её школе",
+              "я в её школе"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: үйіндесің",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "ты в его/её доме",
+              "ты в его доме",
+              "ты в его/её доме",
+              "ты в её доме"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: қаласындасыз",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "Вы в его/её городе",
+              "Вы в его городе",
+              "Вы в его/её городе",
+              "Вы в её городе"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: сыныбындамыз",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "мы в его/её классе",
+              "мы в его классе",
+              "мы в его/её классе",
+              "мы в её классе"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: дүкеніндемін",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "я в его/её магазине",
+              "я в его магазине",
+              "я в его/её магазине",
+              "я в её магазине"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: көшесіндесің",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "ты на его/её улице",
+              "ты на его улице",
+              "ты на его/её улице",
+              "ты на её улице"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: отбасындамыз",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "мы в его/её семье",
+              "мы в его семье",
+              "мы в его/её семье",
+              "мы в её семье"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: мектептемін",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "я в школе",
+              "я в школе",
+              "я в школе",
+              "я в школе"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: үйдесіңдер",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "вы дома",
+              "вы дома",
+              "вы дома",
+              "вы дома"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: пәтердеміз",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "мы в квартире",
+              "мы в квартире",
+              "мы в квартире",
+              "мы в квартире"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:bb:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Разбор формы",
+        "stimulus": "Разбери и переведи: ауладамын",
+        "fields": [
+          {
+            "label": "Перевод",
+            "kind": "text",
+            "answers": [
+              "я во дворе",
+              "я во дворе",
+              "я во дворе",
+              "я во дворе"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:1a",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«көршіде» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "у соседа"
+            ],
+            "options": [
+              "у соседа",
+              "в его магазине",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:1b",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«дүкенінде» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "в его магазине"
+            ],
+            "options": [
+              "у соседа",
+              "в его магазине",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:2a",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«кісіде» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "у человека"
+            ],
+            "options": [
+              "у человека",
+              "на его улице",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:2b",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«көшесінде» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "на его улице"
+            ],
+            "options": [
+              "у человека",
+              "на его улице",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:3a",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«туысында» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "у его родственника"
+            ],
+            "options": [
+              "у его родственника",
+              "у твоего родственника",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:3b",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«туысыңда» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "у твоего родственника"
+            ],
+            "options": [
+              "у его родственника",
+              "у твоего родственника",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:4a",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«балада» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "у ребёнка (часть слова)"
+            ],
+            "options": [
+              "у ребёнка (часть слова)",
+              "у его ребёнка",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:4b",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«баласында» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "у его ребёнка"
+            ],
+            "options": [
+              "у ребёнка (часть слова)",
+              "у его ребёнка",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:5a",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«достта» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "у друга (тв.)"
+            ],
+            "options": [
+              "у друга (тв.)",
+              "у его друга",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:5b",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«досында» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "у его друга"
+            ],
+            "options": [
+              "у друга (тв.)",
+              "у его друга",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:6a",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«мектепте» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "в школе"
+            ],
+            "options": [
+              "в школе",
+              "в его школе",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:6b",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«мектебінде» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "в его школе"
+            ],
+            "options": [
+              "в школе",
+              "в его школе",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:7a",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«үйде» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "дома"
+            ],
+            "options": [
+              "дома",
+              "в его доме",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:7b",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«үйінде» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "в его доме"
+            ],
+            "options": [
+              "дома",
+              "в его доме",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:8a",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«қалада» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "в городе"
+            ],
+            "options": [
+              "в городе",
+              "в его городе",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:min:8b",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Минимальная пара",
+        "stimulus": "«қаласында» значит…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "в его городе"
+            ],
+            "options": [
+              "в городе",
+              "в его городе",
+              "оба одинаково",
+              "не знаю"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Алматында тұрамын». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ошибка"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Ошибка: лишнее Н без «чьё». Правильно: Алматыда тұрамын.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Мен Астанадамын тұрамын». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ошибка"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Ошибка: «кто» дважды при глаголе. Правильно: Мен Астанада тұрамын.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Мен мектепте емес оқыдым». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ошибка"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Ошибка: емес при отрицании глагола. Правильно: Мен мектепте оқымадым.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Балалар мектептеміз». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ошибка"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Ошибка: личное у 3-го лица. Правильно: Балалар мектепте.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Дүкеніде». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ошибка"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Ошибка: пропущено Н после «чьё». Правильно: Дүкенінде.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Көршінде». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ошибка"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Ошибка: лишнее Н (часть слова). Правильно: Көршіде.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Ол мектептемін». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ошибка"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Ошибка: личное у 3-го лица. Правильно: Ол мектепте.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Сен үйде емес тұрдың». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "ошибка"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Ошибка: емес при глаголе. Правильно: Сен үйде тұрмадың.",
+        "lessonId": "5-1",
+        "source_item": "часть 5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Мен мектептемін». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "верно"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Контрольный верный пункт: Мен мектептемін",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Дүкеніндемін». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "верно"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Контрольный верный пункт: Дүкеніндемін",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Көршіде». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "верно"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Контрольный верный пункт: Көршіде",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Алматыда тұрамын». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "верно"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Контрольный верный пункт: Алматыда тұрамын",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:13",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Мен мектепте оқымадым». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "верно"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Контрольный верный пункт: Мен мектепте оқымадым",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:14",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Балалар үйде». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "верно"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Контрольный верный пункт: Балалар үйде",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:15",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Пәтеріндеміз». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "верно"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Контрольный верный пункт: Пәтеріндеміз",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:16",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Мен де жазамын». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "верно"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Контрольный верный пункт: Мен де жазамын",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:17",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Үйлеріңдесіңдер». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "верно"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Контрольный верный пункт: Үйлеріңдесіңдер",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:det:18",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Детектор",
+        "stimulus": "Форма/фраза: «Отбасындамыз». Это…",
+        "fields": [
+          {
+            "label": "Выбери",
+            "kind": "select",
+            "answers": [
+              "верно"
+            ],
+            "options": [
+              "верно",
+              "ошибка"
+            ]
+          }
+        ],
+        "explanation": "Контрольный верный пункт: Отбасындамыз",
+        "lessonId": "5-1",
+        "source_item": "часть 9",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:sort:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Порядок окончаний",
+        "stimulus": "Собери по порядку (много → чьё → где → кто): үй + лер + ің + де + сіңдер",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "үйлеріңдесіңдер"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:sort:2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Порядок окончаний",
+        "stimulus": "Собери по порядку (много → чьё → где → кто): пәтер + і + нде + міз",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "пәтеріндеміз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:sort:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Порядок окончаний",
+        "stimulus": "Собери по порядку (много → чьё → где → кто): мектеп + і + нде + мін",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "мектебіндемін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:sort:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Порядок окончаний",
+        "stimulus": "Собери по порядку (много → чьё → где → кто): қала + сы + нда + сыз",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қаласындасыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:sort:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Порядок окончаний",
+        "stimulus": "Собери по порядку (много → чьё → где → кто): сынып + ы + нда + мыз",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сыныбындамыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:sort:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Порядок окончаний",
+        "stimulus": "Собери по порядку (много → чьё → где → кто): дүкен + і + нде + сің",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "дүкеніндесің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:sort:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Порядок окончаний",
+        "stimulus": "Собери по порядку (много → чьё → где → кто): үй + лер + іміз + де",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "үйлерімізде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:sort:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Порядок окончаний",
+        "stimulus": "Собери по порядку (много → чьё → где → кто): дос + ы + нда + мын",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "досындамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 7",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-1:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-1 №1",
+        "stimulus": "Задание: мектеп",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "мектепте"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-1 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-1:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-1 №2",
+        "stimulus": "Задание: кітап",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "кітапта"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-1 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-1:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-1 №3",
+        "stimulus": "Задание: үй",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "үйде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-1 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-1:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-1 №4",
+        "stimulus": "Задание: қала",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қалада"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-1 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-1:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-1 №5",
+        "stimulus": "Задание: дос",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "доста"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-1 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-2:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-2 №1",
+        "stimulus": "Задание: көл",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көлде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-2 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-2:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-2 №2",
+        "stimulus": "Задание: ауыл",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ауылда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-2 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-2:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-2 №3",
+        "stimulus": "Задание: бөлме",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бөлмеде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-2 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-2:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-2 №4",
+        "stimulus": "Задание: теңіз",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "теңізде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-2 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-2:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-2 №5",
+        "stimulus": "Задание: алаң",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "алаңда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-2 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-3:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-3 №1",
+        "stimulus": "Задание: тау",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "тауда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-3 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-3:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-3 №2",
+        "stimulus": "Задание: дүкен",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "дүкенде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-3 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-3:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-3 №3",
+        "stimulus": "Задание: пәтер",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "пәтерде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-3 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:1-3:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-3 №4",
+        "stimulus": "Добавь окончание «где» к слову «ту» (флаг). Ключ сборника: «Туда — На флаге».",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "туда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-3 №4",
+        "ruleIds": [
+          "v2:5-1:ta-da"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ],
+        "note": "Ключ «Туда — На флаге». Опечатка печатного листа (окончание не напечатано) — не твоя ошибка. Слово «тау» (гора) — отдельно в словаре."
+      },
+      {
+        "id": "src:5-1:sch:1-3:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 1-3 №5",
+        "stimulus": "Задание: көше",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көшеде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 1-3 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:2-1:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 2-1 №1",
+        "stimulus": "Задание: мен/мектеп",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "мектептемін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 2-1 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:2-1:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 2-1 №2",
+        "stimulus": "Задание: сен/үй",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "үйдесің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 2-1 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:2-1:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 2-1 №3",
+        "stimulus": "Задание: біз/қала",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қаладамыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 2-1 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:2-1:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 2-1 №4",
+        "stimulus": "Задание: сіз/пәтер",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "пәтердесіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 2-1 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:2-1:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 2-1 №5",
+        "stimulus": "Задание: олар/дүкен",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "дүкенде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 2-1 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:2-2:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 2-2 №1",
+        "stimulus": "Задание: мен/дүкені",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "дүкеніндемін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 2-2 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:2-2:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 2-2 №2",
+        "stimulus": "Задание: біз/пәтері",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "пәтеріндеміз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 2-2 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:2-2:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 2-2 №3",
+        "stimulus": "Задание: сен/үйі",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "үйіндесің"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 2-2 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:2-2:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 2-2 №4",
+        "stimulus": "Задание: сіз/қаласы",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қаласындасыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 2-2 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:2-2:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 2-2 №5",
+        "stimulus": "Задание: мен/сыныбы",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сыныбындамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 2-2 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:3-1:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 3-1 №1",
+        "stimulus": "Задание: в его магазине",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "дүкенінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 3-1 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:3-1:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 3-1 №2",
+        "stimulus": "Задание: в её городе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қаласында"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 3-1 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:3-1:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 3-1 №3",
+        "stimulus": "Задание: в их квартире",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "пәтерінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 3-1 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:3-1:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 3-1 №4",
+        "stimulus": "Задание: в его школе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "мектебінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 3-1 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:3-1:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 3-1 №5",
+        "stimulus": "Задание: на его улице",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "көшесінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 3-1 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:3-2:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 3-2 №1",
+        "stimulus": "Задание: я в его доме",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "үйіндемін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 3-2 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:3-2:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 3-2 №2",
+        "stimulus": "Задание: мы в её классе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сыныбындамыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 3-2 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:3-2:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 3-2 №3",
+        "stimulus": "Задание: ты у его друга",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "досындасың"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 3-2 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:3-2:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 3-2 №4",
+        "stimulus": "Задание: Вы в их семье",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "отбасындасыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 3-2 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:3-2:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 3-2 №5",
+        "stimulus": "Задание: я во дворе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "аулада"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 3-2 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:4-1:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 4-1 №1",
+        "stimulus": "Задание: көршіде",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "у соседа"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 4-1 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:4-1:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 4-1 №2",
+        "stimulus": "Задание: дүкенінде",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "в его магазине"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 4-1 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:4-1:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 4-1 №3",
+        "stimulus": "Задание: туысында",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "у его родственника"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 4-1 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:4-1:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 4-1 №4",
+        "stimulus": "Задание: туысыңда",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "у твоего родственника"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 4-1 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:4-1:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 4-1 №5",
+        "stimulus": "Задание: отбасында",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "в его семье"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 4-1 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:4-2:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 4-2 №1",
+        "stimulus": "Задание: пәтеріндеміз",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "мы в его квартире"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 4-2 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:4-2:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 4-2 №2",
+        "stimulus": "Задание: мектептемін",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "я в школе"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 4-2 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:4-2:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 4-2 №3",
+        "stimulus": "Задание: үйдесіңдер",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "вы дома"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 4-2 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:4-2:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 4-2 №4",
+        "stimulus": "Задание: онда",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "у него/неё"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 4-2 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:4-2:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 4-2 №5",
+        "stimulus": "Задание: аулада",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "во дворе",
+              "во дворе"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 4-2 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:5-1:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 5-1 №1",
+        "stimulus": "Задание: Я живу в Алматы",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мен Алматыда тұрамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 5-1 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:5-1:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 5-1 №2",
+        "stimulus": "Задание: Ты учишься дома",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сен үйде оқисың"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 5-1 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:5-1:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 5-1 №3",
+        "stimulus": "Задание: Мы играем во дворе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Біз аулада ойнаймыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 5-1 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:5-1:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 5-1 №4",
+        "stimulus": "Задание: Вы работаете в городе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сіз қалада жұмыс істейсіз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 5-1 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:5-1:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 5-1 №5",
+        "stimulus": "Задание: Они живут в Астане",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Олар Астанада тұрады"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 5-1 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:5-2:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 5-2 №1",
+        "stimulus": "Задание: Я читаю в библиотеке",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мен кітапханада оқимын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 5-2 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:5-2:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 5-2 №2",
+        "stimulus": "Задание: Ты играешь на озере",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сен көлде ойнайсың"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 5-2 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:5-2:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 5-2 №3",
+        "stimulus": "Задание: Мы живём на улице Абая",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Біз Абай көшесінде тұрамыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 5-2 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:5-2:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 5-2 №4",
+        "stimulus": "Задание: Вы учитесь в школе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сіз мектепте оқисыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 5-2 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:5-2:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 5-2 №5",
+        "stimulus": "Задание: Он работает в магазине",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Ол дүкенде жұмыс істейді"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 5-2 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:6-1:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 6-1 №1",
+        "stimulus": "Задание: Я не в школе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мектепте емеспін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 6-1 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:6-1:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 6-1 №2",
+        "stimulus": "Задание: Ты не учился в школе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сен мектепте оқымадың"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 6-1 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:6-1:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 6-1 №3",
+        "stimulus": "Задание: Не дома, а в школе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Үйде емес, мектептемін"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 6-1 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:6-1:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 6-1 №4",
+        "stimulus": "Задание: Живёт ли он в городе?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Ол қалада тұра ма?"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 6-1 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:6-1:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 6-1 №5",
+        "stimulus": "Задание: Мы не играли во дворе",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Біз аулада ойнамадық"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 6-1 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:6-2:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 6-2 №1",
+        "stimulus": "Задание: Мне 20 лет",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мен жиырма жастамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 6-2 №1",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:6-2:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 6-2 №2",
+        "stimulus": "Задание: Какого ты года?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қай жылғысың?"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 6-2 №2",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:6-2:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 6-2 №3",
+        "stimulus": "Задание: Я 95-го года",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Мен тоқсан бесінші жылғымын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 6-2 №3",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:6-2:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 6-2 №4",
+        "stimulus": "Задание: В Республике Казахстан",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қазақстан Республикасында"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 6-2 №4",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:6-2:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 6-2 №5",
+        "stimulus": "Задание: Вы какого года?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Қай жылғысыз?"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 6-2 №5",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:7-1:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 7-1 №1",
+        "stimulus": "Задание: Алматында",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ошибка→Алматыда"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 7-1 №1",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:7-1:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 7-1 №2",
+        "stimulus": "Задание: Астанадамын тұрамын",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ошибка→Астанада тұрамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 7-1 №2",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:7-1:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 7-1 №3",
+        "stimulus": "Задание: мектепте емес оқыдым",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ошибка→оқымадым"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 7-1 №3",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:7-1:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 7-1 №4",
+        "stimulus": "Задание: Балалар мектептеміз",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ошибка→мектепте"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 7-1 №4",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:7-1:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 7-1 №5",
+        "stimulus": "Задание: Дүкеніде",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ошибка→Дүкенінде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 7-1 №5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:7-2:1",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 7-2 №1",
+        "stimulus": "Задание: Көршінде",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "ошибка→Көршіде"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 7-2 №1",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:7-2:2",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 7-2 №2",
+        "stimulus": "Задание: мектептемін",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "верно"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 7-2 №2",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:7-2:3",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 7-2 №3",
+        "stimulus": "Задание: дүкенінде",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "верно"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 7-2 №3",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:7-2:4",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 7-2 №4",
+        "stimulus": "Задание: Алматыда тұрамын",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "верно"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 7-2 №4",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:sch:7-2:5",
+        "origin": "school",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Упражнения 5–1 · 7-2 №5",
+        "stimulus": "Задание: пәтеріндеміз",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "верно"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "лист упражнений 5–1 · 7-2 №5",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-exercises"
+        ]
+      },
+      {
+        "id": "src:5-1:mastery:D1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Почему «дүкенінде», но «көршіде»?",
+        "stimulus": "Выбери оба верных различения (нужны оба).",
+        "fields": [
+          {
+            "label": "В «дүкенінде»",
+            "kind": "select",
+            "answers": [
+              "і — окончание «его/её/их», поэтому «где» = нде"
+            ],
+            "options": [
+              "і — окончание «его/её/их», поэтому «где» = нде",
+              "і — часть слова, поэтому «где» = де",
+              "после «чьё» третьего лица Н не нужно",
+              "Н ставится всегда"
+            ]
+          },
+          {
+            "label": "В «көршіде»",
+            "kind": "select",
+            "answers": [
+              "і — часть самого слова, «чьё» нет, поэтому «где» = де"
+            ],
+            "options": [
+              "і — часть самого слова, «чьё» нет, поэтому «где» = де",
+              "і — окончание «его», поэтому нужен Н",
+              "в көрші і — это «чьё»",
+              "НДА всегда"
+            ]
+          }
+        ],
+        "explanation": "В дүкенінде і — «его/её/их», поэтому нде. В көрші і — часть слова, «чьё» нет, поэтому де.",
+        "lessonId": "5-1",
+        "source_item": "mastery D1",
+        "ruleIds": [
+          "v2:5-1:part-vs-poss"
+        ],
+        "source_refs": [
+          "school-method"
+        ],
+        "note": "Зачёт: оба поля верны (оба различения)."
+      },
+      {
+        "id": "src:5-1:mastery:D2",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Почему «оқымадым», а не «емес оқыдым»?",
+        "stimulus": "Выбери обе обязательные идеи.",
+        "fields": [
+          {
+            "label": "При глаголе",
+            "kind": "select",
+            "answers": [
+              "отрицание несёт сам глагол, «емес» не ставится"
+            ],
+            "options": [
+              "отрицание несёт сам глагол, «емес» не ставится",
+              "«емес» нужно всегда рядом с глаголом",
+              "личное окончание убираем",
+              "Н добавляем к глаголу"
+            ]
+          },
+          {
+            "label": "Когда «емес»",
+            "kind": "select",
+            "answers": [
+              "«емес» — без глагола (мектепте емеспін) или в «не …, а …»"
+            ],
+            "options": [
+              "«емес» — без глагола (мектепте емеспін) или в «не …, а …»",
+              "«емес» только с прошедшим временем",
+              "«емес» вместо любого отрицания глагола",
+              "«емес» не бывает в этом уроке"
+            ]
+          }
+        ],
+        "explanation": "При глаголе отрицание на глаголе (оқымадым). «Емес» — без глагола или в конструкции «не …, а …».",
+        "lessonId": "5-1",
+        "source_item": "mastery D2",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ],
+        "note": "Зачёт: оба поля верны (обе идеи)."
+      },
+      {
+        "id": "src:5-1:mastery:D3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Собери «мы в его квартире»",
+        "stimulus": "Как собрать «мы в его квартире» по частям?",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "пәтер + і + нде + міз = пәтеріндеміз",
+              "пәтеріндеміз",
+              "пәтер-і-нде-міз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "mastery D3",
+        "ruleIds": [
+          "v2:5-1:who"
+        ],
+        "source_refs": [
+          "school-method"
+        ],
+        "note": "Зачёт: чьё=і, где=нде, кто=міз, порядок сохранён."
+      },
+      {
+        "id": "src:5-1:mastery:D7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Ты не играл во дворе",
+        "stimulus": "Переведи: «Ты не играл во дворе.»",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "Сен аулада ойнамадың",
+              "Сен далада ойнамадың"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "method 11-2",
+        "ruleIds": [
+          "v2:5-1:verb"
+        ],
+        "source_refs": [
+          "school-method"
+        ],
+        "note": "Целевой ответ — «аулада»; «далада» тоже засчитывается (решение владелицы)."
+      },
+      {
+        "id": "src:5-1:rev:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: қалам (подсказка: моя город-форма)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қалам"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
         "ruleIds": [
           "v2:5-1:summary"
         ],
@@ -63884,448 +75057,624 @@ window.LESSON_V2_COMPILED = [
         ]
       },
       {
-        "id": "src:5-1:xfer:bolme",
+        "id": "src:5-1:rev:2",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "бөлме → где",
-        "stimulus": "бөлме → в комнате",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: қаламыз (подсказка: наш город)",
         "fields": [
           {
-            "label": "Форма",
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қаламыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:rev:3",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: қалаң (подсказка: твой город)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қалаң"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:rev:4",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: қалаңыз (подсказка: Ваш город)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қалаңыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:rev:5",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: қаласы (подсказка: его город)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "қаласы"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:rev:6",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: сыныбым (подсказка: мой класс)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сыныбым"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:rev:7",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: сыныбымыз (подсказка: наш класс)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сыныбымыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:rev:8",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: сыныбың (подсказка: твой класс)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сыныбың"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:rev:9",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: сыныбыңыз (подсказка: Ваш класс)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сыныбыңыз"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:rev:10",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: сыныбы (подсказка: его класс)",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "сыныбы"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:rev:11",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: барамын (подсказка: я иду (повтор))",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "барамын"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:rev:12",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Повтор таблиц",
+        "stimulus": "Вспомни форму: бардым (подсказка: я ходил (повтор))",
+        "fields": [
+          {
+            "label": "Ответ",
+            "kind": "text",
+            "answers": [
+              "бардым"
+            ]
+          }
+        ],
+        "explanation": "Сверь форму по правилу урока 5–1.",
+        "lessonId": "5-1",
+        "source_item": "часть 1 review",
+        "ruleIds": [
+          "v2:5-1:summary"
+        ],
+        "source_refs": [
+          "school-method"
+        ]
+      },
+      {
+        "id": "src:5-1:xfer:1",
+        "origin": "authored",
+        "topic": "locative",
+        "kind": "fields",
+        "title": "Перенос",
+        "stimulus": "Новое слово урока: форма «где» от «бөлме» (в уроке готовой формы не было).",
+        "fields": [
+          {
+            "label": "Ответ",
             "kind": "text",
             "answers": [
               "бөлмеде"
             ]
           }
         ],
-        "explanation": "бөлме → бөлмеде.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Перенос · где",
-        "prompt_original": "Напиши «в комнате» (бөлме).",
+        "source_item": "§14 transfer",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
         "source_refs": [
-          "school-homework",
-          "canon-r23"
+          "school-method"
         ]
       },
       {
-        "id": "src:5-1:xfer:kol",
+        "id": "src:5-1:xfer:2",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "көл → где",
-        "stimulus": "көл → в озере",
+        "title": "Перенос",
+        "stimulus": "Новое слово урока: форма «где» от «көл» (в уроке готовой формы не было).",
         "fields": [
           {
-            "label": "Форма",
+            "label": "Ответ",
             "kind": "text",
             "answers": [
               "көлде"
             ]
           }
         ],
-        "explanation": "көл → көлде.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Перенос · где",
-        "prompt_original": "Напиши «в озере» (көл).",
+        "source_item": "§14 transfer",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
         "source_refs": [
-          "school-homework",
-          "canon-r23"
+          "school-method"
         ]
       },
       {
-        "id": "src:5-1:xfer:teniz",
+        "id": "src:5-1:xfer:3",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "теңіз → где",
-        "stimulus": "теңіз → в море",
+        "title": "Перенос",
+        "stimulus": "Новое слово урока: форма «где» от «теңіз» (в уроке готовой формы не было).",
         "fields": [
           {
-            "label": "Форма",
+            "label": "Ответ",
             "kind": "text",
             "answers": [
               "теңізде"
             ]
           }
         ],
-        "explanation": "теңіз → теңізде.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Перенос · где",
-        "prompt_original": "Напиши «в море» (теңіз).",
+        "source_item": "§14 transfer",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
         "source_refs": [
-          "school-homework",
-          "canon-r23"
+          "school-method"
         ]
       },
       {
-        "id": "src:5-1:xfer:alan",
+        "id": "src:5-1:xfer:4",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "алаң → где",
-        "stimulus": "алаң → на площади",
+        "title": "Перенос",
+        "stimulus": "Новое слово урока: форма «где» от «алаң» (в уроке готовой формы не было).",
         "fields": [
           {
-            "label": "Форма",
+            "label": "Ответ",
             "kind": "text",
             "answers": [
               "алаңда"
             ]
           }
         ],
-        "explanation": "алаң → алаңда.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Перенос · где",
-        "prompt_original": "Напиши «на площади» (алаң).",
+        "source_item": "§14 transfer",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
         "source_refs": [
-          "school-homework",
-          "canon-r23"
+          "school-method"
         ]
       },
       {
-        "id": "src:5-1:xfer:auyl",
+        "id": "src:5-1:xfer:5",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "ауыл → где",
-        "stimulus": "ауыл → в ауле",
+        "title": "Перенос",
+        "stimulus": "Новое слово урока: форма «где» от «ауыл» (в уроке готовой формы не было).",
         "fields": [
           {
-            "label": "Форма",
+            "label": "Ответ",
             "kind": "text",
             "answers": [
               "ауылда"
             ]
           }
         ],
-        "explanation": "ауыл → ауылда.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Перенос · где",
-        "prompt_original": "Напиши «в ауле» (ауыл).",
+        "source_item": "§14 transfer",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
         "source_refs": [
-          "school-homework",
-          "canon-r23"
+          "school-method"
         ]
       },
       {
-        "id": "src:5-1:xfer:sayazhay",
+        "id": "src:5-1:xfer:6",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "саяжай → где",
-        "stimulus": "саяжай → на даче",
+        "title": "Перенос",
+        "stimulus": "Новое слово урока: форма «где» от «саяжай» (в уроке готовой формы не было).",
         "fields": [
           {
-            "label": "Форма",
+            "label": "Ответ",
             "kind": "text",
             "answers": [
               "саяжайда"
             ]
           }
         ],
-        "explanation": "саяжай → саяжайда.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Перенос · где",
-        "prompt_original": "Напиши «на даче» (саяжай).",
+        "source_item": "§14 transfer",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
         "source_refs": [
-          "school-homework",
-          "canon-r23"
+          "school-method"
         ]
       },
       {
-        "id": "src:5-1:xfer:tau",
+        "id": "src:5-1:xfer:7",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "тау → где",
-        "stimulus": "тау → в горах",
+        "title": "Перенос",
+        "stimulus": "Новое слово урока: форма «где» от «тау» (в уроке готовой формы не было).",
         "fields": [
           {
-            "label": "Форма",
+            "label": "Ответ",
             "kind": "text",
             "answers": [
               "тауда"
             ]
           }
         ],
-        "explanation": "тау → тауда.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Перенос · где",
-        "prompt_original": "Напиши «в горах» (тау).",
+        "source_item": "§14 transfer",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
         "source_refs": [
-          "school-homework",
-          "canon-r23"
+          "school-method"
         ]
       },
       {
-        "id": "src:5-1:xfer:kitap",
+        "id": "src:5-1:xfer:8",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "кітапхана → где",
-        "stimulus": "кітапхана → в библиотеке",
+        "title": "Перенос",
+        "stimulus": "Новое слово урока: форма «где» от «кеңсе» (в уроке готовой формы не было).",
         "fields": [
           {
-            "label": "Форма",
+            "label": "Ответ",
             "kind": "text",
             "answers": [
-              "кітапханада"
+              "кеңседе"
             ]
           }
         ],
-        "explanation": "кітапхана → кітапханада.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Перенос · где",
-        "prompt_original": "Напиши «в библиотеке» (кітапхана).",
+        "source_item": "§14 transfer",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
         "source_refs": [
-          "school-homework",
-          "canon-r23"
+          "school-method"
         ]
       },
       {
-        "id": "src:5-1:xfer:mektep",
+        "id": "src:5-1:xfer:9",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "мектеп → где",
-        "stimulus": "мектеп → в школе",
+        "title": "Перенос",
+        "stimulus": "Новое слово урока: форма «где» от «ғимарат» (в уроке готовой формы не было).",
         "fields": [
           {
-            "label": "Форма",
+            "label": "Ответ",
             "kind": "text",
             "answers": [
-              "мектепте"
+              "ғимаратта"
             ]
           }
         ],
-        "explanation": "мектеп → мектепте.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Перенос · где",
-        "prompt_original": "Напиши «в школе» (мектеп).",
+        "source_item": "§14 transfer",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
         "source_refs": [
-          "school-homework",
-          "canon-r23"
+          "school-method"
         ]
       },
       {
-        "id": "src:5-1:xfer:uy",
+        "id": "src:5-1:xfer:10",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "үй → где",
-        "stimulus": "үй → дома",
+        "title": "Перенос",
+        "stimulus": "Новое слово урока: форма «где» от «терезе» (в уроке готовой формы не было).",
         "fields": [
           {
-            "label": "Форма",
+            "label": "Ответ",
             "kind": "text",
             "answers": [
-              "үйде"
+              "терезеде"
             ]
           }
         ],
-        "explanation": "үй → үйде.",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Перенос · где",
-        "prompt_original": "Напиши «дома» (үй).",
+        "source_item": "§14 transfer",
         "ruleIds": [
           "v2:5-1:ta-da"
         ],
         "source_refs": [
-          "school-homework",
-          "canon-r23"
+          "school-method"
         ]
       },
       {
-        "id": "src:5-1:recog:1",
+        "id": "src:5-1:xfer:combo:1",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "тоже или где",
-        "stimulus": "Мен де жазамын.",
+        "title": "Перенос + чьё",
+        "stimulus": "«в его комнате» (бөлме)",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "тоже",
-              "Тоже"
+              "бөлмесінде"
             ]
           }
         ],
-        "explanation": "Это «тоже».",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Распознавание тоже/где",
-        "prompt_original": "«Мен де жазамын.» — тоже или где?",
+        "source_item": "§14 transfer",
         "ruleIds": [
-          "v2:5-1:da-too"
+          "v2:5-1:nda"
         ],
         "source_refs": [
           "school-method"
         ]
       },
       {
-        "id": "src:5-1:recog:2",
+        "id": "src:5-1:xfer:combo:2",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "тоже или где",
-        "stimulus": "Үйдемін.",
+        "title": "Перенос + кто",
+        "stimulus": "«мы в ауле»",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "где",
-              "Где"
+              "ауылдамыз"
             ]
           }
         ],
-        "explanation": "Это «где».",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Распознавание тоже/где",
-        "prompt_original": "«Үйдемін.» — тоже или где?",
+        "source_item": "§14 transfer",
         "ruleIds": [
-          "v2:5-1:da-too"
+          "v2:5-1:who"
         ],
         "source_refs": [
           "school-method"
         ]
       },
       {
-        "id": "src:5-1:recog:3",
+        "id": "src:5-1:xfer:combo:3",
         "origin": "authored",
         "topic": "locative",
         "kind": "fields",
-        "title": "тоже или где",
-        "stimulus": "Ол да келеді.",
+        "title": "Перенос поезд",
+        "stimulus": "«я в его здании» (ғимарат)",
         "fields": [
           {
             "label": "Ответ",
             "kind": "text",
             "answers": [
-              "тоже",
-              "Тоже"
+              "ғимаратындамын"
             ]
           }
         ],
-        "explanation": "Это «тоже».",
+        "explanation": "Сверь форму по правилу урока 5–1.",
         "lessonId": "5-1",
-        "source_item": "Распознавание тоже/где",
-        "prompt_original": "«Ол да келеді.» — тоже или где?",
+        "source_item": "§14 transfer",
         "ruleIds": [
-          "v2:5-1:da-too"
-        ],
-        "source_refs": [
-          "school-method"
-        ]
-      },
-      {
-        "id": "src:5-1:recog:4",
-        "origin": "authored",
-        "topic": "locative",
-        "kind": "fields",
-        "title": "тоже или где",
-        "stimulus": "Кітапханада.",
-        "fields": [
-          {
-            "label": "Ответ",
-            "kind": "text",
-            "answers": [
-              "где",
-              "Где"
-            ]
-          }
-        ],
-        "explanation": "Это «где».",
-        "lessonId": "5-1",
-        "source_item": "Распознавание тоже/где",
-        "prompt_original": "«Кітапханада.» — тоже или где?",
-        "ruleIds": [
-          "v2:5-1:da-too"
-        ],
-        "source_refs": [
-          "school-method"
-        ]
-      },
-      {
-        "id": "src:5-1:recog:5",
-        "origin": "authored",
-        "topic": "locative",
-        "kind": "fields",
-        "title": "тоже или где",
-        "stimulus": "Сен де оқисың.",
-        "fields": [
-          {
-            "label": "Ответ",
-            "kind": "text",
-            "answers": [
-              "тоже",
-              "Тоже"
-            ]
-          }
-        ],
-        "explanation": "Это «тоже».",
-        "lessonId": "5-1",
-        "source_item": "Распознавание тоже/где",
-        "prompt_original": "«Сен де оқисың.» — тоже или где?",
-        "ruleIds": [
-          "v2:5-1:da-too"
-        ],
-        "source_refs": [
-          "school-method"
-        ]
-      },
-      {
-        "id": "src:5-1:recog:6",
-        "origin": "authored",
-        "topic": "locative",
-        "kind": "fields",
-        "title": "тоже или где",
-        "stimulus": "Мектептеміз.",
-        "fields": [
-          {
-            "label": "Ответ",
-            "kind": "text",
-            "answers": [
-              "где",
-              "Где"
-            ]
-          }
-        ],
-        "explanation": "Это «где».",
-        "lessonId": "5-1",
-        "source_item": "Распознавание тоже/где",
-        "prompt_original": "«Мектептеміз.» — тоже или где?",
-        "ruleIds": [
-          "v2:5-1:da-too"
+          "v2:5-1:who"
         ],
         "source_refs": [
           "school-method"
@@ -64342,49 +75691,731 @@ window.LESSON_V2_COMPILED = [
         "title": "Тоже или где",
         "kind": "learning",
         "core_ids": [
-          "src:5-1:recog:1",
-          "src:5-1:recog:2",
-          "src:5-1:recog:3",
-          "src:5-1:recog:4",
-          "src:5-1:recog:5",
-          "src:5-1:recog:6"
+          "src:5-1:mp:too-where:1",
+          "src:5-1:mp:too-where:2",
+          "src:5-1:mp:too-where:3",
+          "src:5-1:mp:too-where:4",
+          "src:5-1:mp:too-where:5",
+          "src:5-1:mp:too-where:6",
+          "src:5-1:mp:too-where:7",
+          "src:5-1:mp:too-where:8",
+          "src:5-1:mp:too-where:9",
+          "src:5-1:mp:too-where:10",
+          "src:5-1:mp:too-where:11",
+          "src:5-1:mp:too-where:12",
+          "src:5-1:mp:too-where:13",
+          "src:5-1:mp:too-where:14",
+          "src:5-1:mp:too-where:15",
+          "src:5-1:mp:too-where:16",
+          "src:5-1:mp:too-where:17",
+          "src:5-1:mp:too-where:18",
+          "src:5-1:mp:too-where:19",
+          "src:5-1:mp:too-where:20"
         ],
         "required_independent_ids": [
-          "src:5-1:recog:1",
-          "src:5-1:recog:2",
-          "src:5-1:recog:3"
+          "src:5-1:mp:too-where:1",
+          "src:5-1:mp:too-where:2",
+          "src:5-1:mp:too-where:3",
+          "src:5-1:mp:too-where:4",
+          "src:5-1:mp:too-where:5",
+          "src:5-1:mp:too-where:6",
+          "src:5-1:mp:too-where:7",
+          "src:5-1:mp:too-where:8"
         ],
         "rule_ids": [
           "v2:5-1:da-too"
         ],
         "min_independent_ratio": 0.7,
-        "max_presentations": 20,
+        "max_presentations": 24,
         "final": false
       },
       {
-        "id": "stage:5-1:build",
-        "title": "Собери «где»",
+        "id": "stage:5-1:micro-1",
+        "title": "Изолированные рычаги 1",
         "kind": "learning",
         "core_ids": [
-          "src:5-1:xfer:bolme",
-          "src:5-1:xfer:kol",
-          "src:5-1:xfer:teniz",
-          "src:5-1:xfer:alan",
-          "src:5-1:xfer:auyl",
-          "src:5-1:xfer:sayazhay",
-          "src:5-1:xfer:tau",
-          "src:5-1:xfer:kitap",
-          "src:5-1:xfer:mektep",
-          "src:5-1:xfer:uy"
+          "src:5-1:mp:part-poss:1",
+          "src:5-1:mp:part-poss:2",
+          "src:5-1:mp:part-poss:3",
+          "src:5-1:mp:part-poss:4",
+          "src:5-1:mp:part-poss:5",
+          "src:5-1:mp:part-poss:6",
+          "src:5-1:mp:part-poss:7",
+          "src:5-1:mp:part-poss:8",
+          "src:5-1:mp:part-poss:9",
+          "src:5-1:mp:part-poss:10",
+          "src:5-1:mp:part-poss:11",
+          "src:5-1:mp:part-poss:12",
+          "src:5-1:mp:part-poss:13",
+          "src:5-1:mp:part-poss:14",
+          "src:5-1:mp:part-poss:15",
+          "src:5-1:mp:part-poss:16",
+          "src:5-1:mp:sense:1",
+          "src:5-1:mp:sense:2",
+          "src:5-1:mp:sense:3",
+          "src:5-1:mp:sense:4",
+          "src:5-1:mp:sense:5",
+          "src:5-1:mp:sense:6",
+          "src:5-1:mp:sense:7",
+          "src:5-1:mp:sense:8"
         ],
         "required_independent_ids": [
-          "src:5-1:xfer:bolme",
-          "src:5-1:xfer:kol",
-          "src:5-1:xfer:teniz",
-          "src:5-1:xfer:alan"
+          "src:5-1:mp:part-poss:1",
+          "src:5-1:mp:part-poss:2",
+          "src:5-1:mp:part-poss:3",
+          "src:5-1:mp:part-poss:4",
+          "src:5-1:mp:part-poss:5",
+          "src:5-1:mp:part-poss:6",
+          "src:5-1:mp:part-poss:7",
+          "src:5-1:mp:part-poss:8"
         ],
         "rule_ids": [
-          "v2:5-1:ta-da"
+          "v2:5-1:ta-da",
+          "v2:5-1:nda",
+          "v2:5-1:part-vs-poss"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:micro-2",
+        "title": "Изолированные рычаги 2",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:mp:sense:9",
+          "src:5-1:mp:sense:10",
+          "src:5-1:mp:jas-jyl:1",
+          "src:5-1:mp:jas-jyl:2",
+          "src:5-1:mp:jas-jyl:3",
+          "src:5-1:mp:jas-jyl:4",
+          "src:5-1:mp:jas-jyl:5",
+          "src:5-1:mp:jas-jyl:6",
+          "src:5-1:mp:td:1",
+          "src:5-1:mp:td:2",
+          "src:5-1:mp:td:3",
+          "src:5-1:mp:td:4",
+          "src:5-1:mp:td:5",
+          "src:5-1:mp:td:6",
+          "src:5-1:mp:td:7",
+          "src:5-1:mp:td:8",
+          "src:5-1:mp:td:9",
+          "src:5-1:mp:td:10",
+          "src:5-1:mp:td:11",
+          "src:5-1:mp:td:12",
+          "src:5-1:mp:td:13",
+          "src:5-1:mp:td:14",
+          "src:5-1:mp:td:15",
+          "src:5-1:mp:td:16"
+        ],
+        "required_independent_ids": [
+          "src:5-1:mp:sense:9",
+          "src:5-1:mp:sense:10",
+          "src:5-1:mp:jas-jyl:1",
+          "src:5-1:mp:jas-jyl:2",
+          "src:5-1:mp:jas-jyl:3",
+          "src:5-1:mp:jas-jyl:4",
+          "src:5-1:mp:jas-jyl:5",
+          "src:5-1:mp:jas-jyl:6"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da",
+          "v2:5-1:nda",
+          "v2:5-1:part-vs-poss"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:micro-3",
+        "title": "Изолированные рычаги 3",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:mp:td:17",
+          "src:5-1:mp:td:18",
+          "src:5-1:mp:td:19",
+          "src:5-1:mp:td:20",
+          "src:5-1:mp:who-seat:1",
+          "src:5-1:mp:who-seat:2",
+          "src:5-1:mp:who-seat:3",
+          "src:5-1:mp:who-seat:4",
+          "src:5-1:mp:who-seat:5",
+          "src:5-1:mp:who-seat:6",
+          "src:5-1:mp:who-seat:7",
+          "src:5-1:mp:who-seat:8",
+          "src:5-1:mp:who-seat:9",
+          "src:5-1:mp:who-seat:10",
+          "src:5-1:mp:who-seat:11",
+          "src:5-1:mp:who-seat:12",
+          "src:5-1:mp:who-seat:13",
+          "src:5-1:mp:who-seat:14",
+          "src:5-1:mp:who-seat:15",
+          "src:5-1:mp:who-seat:16",
+          "src:5-1:mp:need-n:1",
+          "src:5-1:mp:need-n:2",
+          "src:5-1:mp:need-n:3",
+          "src:5-1:mp:need-n:4"
+        ],
+        "required_independent_ids": [
+          "src:5-1:mp:td:17",
+          "src:5-1:mp:td:18",
+          "src:5-1:mp:td:19",
+          "src:5-1:mp:td:20",
+          "src:5-1:mp:who-seat:1",
+          "src:5-1:mp:who-seat:2",
+          "src:5-1:mp:who-seat:3",
+          "src:5-1:mp:who-seat:4"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da",
+          "v2:5-1:nda",
+          "v2:5-1:part-vs-poss"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:micro-4",
+        "title": "Изолированные рычаги 4",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:mp:need-n:5",
+          "src:5-1:mp:need-n:6",
+          "src:5-1:mp:need-n:7",
+          "src:5-1:mp:need-n:8",
+          "src:5-1:mp:need-n:9",
+          "src:5-1:mp:need-n:10",
+          "src:5-1:mp:need-n:11",
+          "src:5-1:mp:need-n:12",
+          "src:5-1:mp:need-n:13",
+          "src:5-1:mp:need-n:14",
+          "src:5-1:mp:need-n:15",
+          "src:5-1:mp:need-n:16",
+          "src:5-1:mp:need-n:17",
+          "src:5-1:mp:need-n:18",
+          "src:5-1:mp:need-n:19",
+          "src:5-1:mp:need-n:20",
+          "src:5-1:mp:ae:1",
+          "src:5-1:mp:ae:2",
+          "src:5-1:mp:ae:3",
+          "src:5-1:mp:ae:4",
+          "src:5-1:mp:ae:5",
+          "src:5-1:mp:ae:6",
+          "src:5-1:mp:ae:7",
+          "src:5-1:mp:ae:8"
+        ],
+        "required_independent_ids": [
+          "src:5-1:mp:need-n:5",
+          "src:5-1:mp:need-n:6",
+          "src:5-1:mp:need-n:7",
+          "src:5-1:mp:need-n:8",
+          "src:5-1:mp:need-n:9",
+          "src:5-1:mp:need-n:10",
+          "src:5-1:mp:need-n:11",
+          "src:5-1:mp:need-n:12"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da",
+          "v2:5-1:nda",
+          "v2:5-1:part-vs-poss"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:micro-5",
+        "title": "Изолированные рычаги 5",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:mp:ae:9",
+          "src:5-1:mp:ae:10",
+          "src:5-1:mp:ae:11",
+          "src:5-1:mp:ae:12",
+          "src:5-1:mp:onda:1",
+          "src:5-1:mp:onda:2",
+          "src:5-1:mp:onda:3",
+          "src:5-1:mp:onda:4",
+          "src:5-1:mp:onda:5",
+          "src:5-1:mp:onda:6",
+          "src:5-1:mp:onda:7",
+          "src:5-1:mp:onda:8",
+          "src:5-1:mp:jylgy:1",
+          "src:5-1:mp:jylgy:2",
+          "src:5-1:mp:jylgy:3",
+          "src:5-1:mp:jylgy:4",
+          "src:5-1:mp:jylgy:5",
+          "src:5-1:mp:jylgy:6",
+          "src:5-1:mp:spot:1",
+          "src:5-1:mp:spot:2",
+          "src:5-1:mp:spot:3",
+          "src:5-1:mp:spot:4",
+          "src:5-1:mp:spot:5",
+          "src:5-1:mp:spot:6"
+        ],
+        "required_independent_ids": [
+          "src:5-1:mp:ae:9",
+          "src:5-1:mp:ae:10",
+          "src:5-1:mp:ae:11",
+          "src:5-1:mp:ae:12",
+          "src:5-1:mp:onda:1",
+          "src:5-1:mp:onda:2",
+          "src:5-1:mp:onda:3",
+          "src:5-1:mp:onda:4"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da",
+          "v2:5-1:nda",
+          "v2:5-1:part-vs-poss"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:micro-6",
+        "title": "Изолированные рычаги 6",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:mp:spot:7",
+          "src:5-1:mp:spot:8"
+        ],
+        "required_independent_ids": [
+          "src:5-1:mp:spot:7",
+          "src:5-1:mp:spot:8"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da",
+          "v2:5-1:nda",
+          "v2:5-1:part-vs-poss"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:bw-1",
+        "title": "Сборка слова 1",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:bw:simple:1",
+          "src:5-1:bw:simple:2",
+          "src:5-1:bw:simple:3",
+          "src:5-1:bw:simple:4",
+          "src:5-1:bw:simple:5",
+          "src:5-1:bw:simple:6",
+          "src:5-1:bw:simple:7",
+          "src:5-1:bw:simple:8",
+          "src:5-1:bw:simple:9",
+          "src:5-1:bw:simple:10",
+          "src:5-1:bw:simple:11",
+          "src:5-1:bw:simple:12",
+          "src:5-1:bw:simple:13",
+          "src:5-1:bw:simple:14",
+          "src:5-1:bw:simple:15",
+          "src:5-1:bw:simple:16",
+          "src:5-1:bw:poss:1",
+          "src:5-1:bw:poss:2",
+          "src:5-1:bw:poss:3",
+          "src:5-1:bw:poss:4",
+          "src:5-1:bw:poss:5",
+          "src:5-1:bw:poss:6",
+          "src:5-1:bw:poss:7",
+          "src:5-1:bw:poss:8"
+        ],
+        "required_independent_ids": [
+          "src:5-1:bw:simple:1",
+          "src:5-1:bw:simple:2",
+          "src:5-1:bw:simple:3",
+          "src:5-1:bw:simple:4",
+          "src:5-1:bw:simple:5",
+          "src:5-1:bw:simple:6",
+          "src:5-1:bw:simple:7",
+          "src:5-1:bw:simple:8"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da",
+          "v2:5-1:nda",
+          "v2:5-1:who"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:bw-2",
+        "title": "Сборка слова 2",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:bw:poss:9",
+          "src:5-1:bw:poss:10",
+          "src:5-1:bw:poss:11",
+          "src:5-1:bw:poss:12",
+          "src:5-1:bw:poss:13",
+          "src:5-1:bw:poss:14",
+          "src:5-1:bw:poss:15",
+          "src:5-1:bw:poss:16",
+          "src:5-1:bw:name:1",
+          "src:5-1:bw:name:2",
+          "src:5-1:bw:name:3",
+          "src:5-1:bw:name:4",
+          "src:5-1:bw:name:5",
+          "src:5-1:bw:name:6",
+          "src:5-1:bw:name:7",
+          "src:5-1:bw:name:8",
+          "src:5-1:bw:name:9",
+          "src:5-1:bw:name:10",
+          "src:5-1:bw:name:11",
+          "src:5-1:bw:name:12",
+          "src:5-1:bw:train:1",
+          "src:5-1:bw:train:2",
+          "src:5-1:bw:train:3",
+          "src:5-1:bw:train:4"
+        ],
+        "required_independent_ids": [
+          "src:5-1:bw:poss:9",
+          "src:5-1:bw:poss:10",
+          "src:5-1:bw:poss:11",
+          "src:5-1:bw:poss:12",
+          "src:5-1:bw:poss:13",
+          "src:5-1:bw:poss:14",
+          "src:5-1:bw:poss:15",
+          "src:5-1:bw:poss:16"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da",
+          "v2:5-1:nda",
+          "v2:5-1:who"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:bw-3",
+        "title": "Сборка слова 3",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:bw:train:5",
+          "src:5-1:bw:train:6",
+          "src:5-1:bw:train:7",
+          "src:5-1:bw:train:8",
+          "src:5-1:bw:train:9",
+          "src:5-1:bw:train:10",
+          "src:5-1:bw:train:11",
+          "src:5-1:bw:train:12",
+          "src:5-1:bw:train:13",
+          "src:5-1:bw:train:14",
+          "src:5-1:bw:train:15",
+          "src:5-1:bw:train:16",
+          "src:5-1:bw:train:17",
+          "src:5-1:bw:train:18",
+          "src:5-1:bw:train:19",
+          "src:5-1:bw:train:20",
+          "src:5-1:bw:train:21",
+          "src:5-1:bw:train:22",
+          "src:5-1:bw:train:23",
+          "src:5-1:bw:train:24",
+          "src:5-1:bw:pron:1",
+          "src:5-1:bw:pron:2",
+          "src:5-1:bw:pron:3",
+          "src:5-1:bw:pron:4"
+        ],
+        "required_independent_ids": [
+          "src:5-1:bw:train:5",
+          "src:5-1:bw:train:6",
+          "src:5-1:bw:train:7",
+          "src:5-1:bw:train:8",
+          "src:5-1:bw:train:9",
+          "src:5-1:bw:train:10",
+          "src:5-1:bw:train:11",
+          "src:5-1:bw:train:12"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da",
+          "v2:5-1:nda",
+          "v2:5-1:who"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:bw-4",
+        "title": "Сборка слова 4",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:bw:pron:5",
+          "src:5-1:bw:pron:6",
+          "src:5-1:bw:pron:7",
+          "src:5-1:bw:pron:8"
+        ],
+        "required_independent_ids": [
+          "src:5-1:bw:pron:5",
+          "src:5-1:bw:pron:6",
+          "src:5-1:bw:pron:7",
+          "src:5-1:bw:pron:8"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da",
+          "v2:5-1:nda",
+          "v2:5-1:who"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:bs-1",
+        "title": "Предложения 1",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:bs:nov:1",
+          "src:5-1:bs:nov:2",
+          "src:5-1:bs:nov:3",
+          "src:5-1:bs:nov:4",
+          "src:5-1:bs:nov:5",
+          "src:5-1:bs:nov:6",
+          "src:5-1:bs:nov:7",
+          "src:5-1:bs:nov:8",
+          "src:5-1:bs:nov:9",
+          "src:5-1:bs:nov:10",
+          "src:5-1:bs:nov:11",
+          "src:5-1:bs:nov:12",
+          "src:5-1:bs:nov:13",
+          "src:5-1:bs:nov:14",
+          "src:5-1:bs:nov:15",
+          "src:5-1:bs:nov:16",
+          "src:5-1:bs:nov:17",
+          "src:5-1:bs:nov:18",
+          "src:5-1:bs:nov:19",
+          "src:5-1:bs:nov:20",
+          "src:5-1:bs:emes:1",
+          "src:5-1:bs:emes:2",
+          "src:5-1:bs:emes:3",
+          "src:5-1:bs:emes:4"
+        ],
+        "required_independent_ids": [
+          "src:5-1:bs:nov:1",
+          "src:5-1:bs:nov:2",
+          "src:5-1:bs:nov:3",
+          "src:5-1:bs:nov:4",
+          "src:5-1:bs:nov:5",
+          "src:5-1:bs:nov:6",
+          "src:5-1:bs:nov:7",
+          "src:5-1:bs:nov:8"
+        ],
+        "rule_ids": [
+          "v2:5-1:emes",
+          "v2:5-1:verb",
+          "v2:5-1:age"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:bs-2",
+        "title": "Предложения 2",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:bs:emes:5",
+          "src:5-1:bs:emes:6",
+          "src:5-1:bs:emes:7",
+          "src:5-1:bs:emes:8",
+          "src:5-1:bs:emes:9",
+          "src:5-1:bs:emes:10",
+          "src:5-1:bs:emes:11",
+          "src:5-1:bs:emes:12",
+          "src:5-1:bs:emes:13",
+          "src:5-1:bs:emes:14",
+          "src:5-1:bs:emes:15",
+          "src:5-1:bs:emes:16",
+          "src:5-1:bs:verb:1",
+          "src:5-1:bs:verb:2",
+          "src:5-1:bs:verb:3",
+          "src:5-1:bs:verb:4",
+          "src:5-1:bs:verb:5",
+          "src:5-1:bs:verb:6",
+          "src:5-1:bs:verb:7",
+          "src:5-1:bs:verb:8",
+          "src:5-1:bs:verb:9",
+          "src:5-1:bs:verb:10",
+          "src:5-1:bs:verb:11",
+          "src:5-1:bs:verb:12"
+        ],
+        "required_independent_ids": [
+          "src:5-1:bs:emes:5",
+          "src:5-1:bs:emes:6",
+          "src:5-1:bs:emes:7",
+          "src:5-1:bs:emes:8",
+          "src:5-1:bs:emes:9",
+          "src:5-1:bs:emes:10",
+          "src:5-1:bs:emes:11",
+          "src:5-1:bs:emes:12"
+        ],
+        "rule_ids": [
+          "v2:5-1:emes",
+          "v2:5-1:verb",
+          "v2:5-1:age"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:bs-3",
+        "title": "Предложения 3",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:bs:age:1",
+          "src:5-1:bs:age:2",
+          "src:5-1:bs:age:3",
+          "src:5-1:bs:age:4",
+          "src:5-1:bs:age:5",
+          "src:5-1:bs:age:6",
+          "src:5-1:bs:age:7",
+          "src:5-1:bs:age:8"
+        ],
+        "required_independent_ids": [
+          "src:5-1:bs:age:1",
+          "src:5-1:bs:age:2",
+          "src:5-1:bs:age:3",
+          "src:5-1:bs:age:4",
+          "src:5-1:bs:age:5",
+          "src:5-1:bs:age:6",
+          "src:5-1:bs:age:7",
+          "src:5-1:bs:age:8"
+        ],
+        "rule_ids": [
+          "v2:5-1:emes",
+          "v2:5-1:verb",
+          "v2:5-1:age"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:detect",
+        "title": "Детектор и пары",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:det:1",
+          "src:5-1:det:2",
+          "src:5-1:det:3",
+          "src:5-1:det:4",
+          "src:5-1:det:5",
+          "src:5-1:det:6",
+          "src:5-1:det:7",
+          "src:5-1:det:8",
+          "src:5-1:det:9",
+          "src:5-1:det:10",
+          "src:5-1:det:11",
+          "src:5-1:det:12",
+          "src:5-1:det:13",
+          "src:5-1:det:14",
+          "src:5-1:det:15",
+          "src:5-1:det:16",
+          "src:5-1:det:17",
+          "src:5-1:det:18",
+          "src:5-1:min:1a",
+          "src:5-1:min:1b",
+          "src:5-1:min:2a",
+          "src:5-1:min:2b",
+          "src:5-1:min:3a",
+          "src:5-1:min:3b"
+        ],
+        "required_independent_ids": [
+          "src:5-1:det:1",
+          "src:5-1:det:2",
+          "src:5-1:det:3",
+          "src:5-1:det:4",
+          "src:5-1:det:5",
+          "src:5-1:det:6"
+        ],
+        "rule_ids": [
+          "v2:5-1:part-vs-poss",
+          "v2:5-1:verb"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:back-sort",
+        "title": "Разбор и порядок",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:bb:1",
+          "src:5-1:bb:2",
+          "src:5-1:bb:3",
+          "src:5-1:bb:4",
+          "src:5-1:bb:5",
+          "src:5-1:bb:6",
+          "src:5-1:bb:7",
+          "src:5-1:bb:8",
+          "src:5-1:bb:9",
+          "src:5-1:bb:10",
+          "src:5-1:bb:11",
+          "src:5-1:bb:12",
+          "src:5-1:sort:1",
+          "src:5-1:sort:2",
+          "src:5-1:sort:3",
+          "src:5-1:sort:4",
+          "src:5-1:sort:5",
+          "src:5-1:sort:6",
+          "src:5-1:sort:7",
+          "src:5-1:sort:8"
+        ],
+        "required_independent_ids": [
+          "src:5-1:bb:1",
+          "src:5-1:bb:2",
+          "src:5-1:bb:3",
+          "src:5-1:bb:4",
+          "src:5-1:bb:5",
+          "src:5-1:bb:6"
+        ],
+        "rule_ids": [
+          "v2:5-1:who"
+        ],
+        "min_independent_ratio": 0.7,
+        "max_presentations": 24,
+        "final": false
+      },
+      {
+        "id": "stage:5-1:transfer",
+        "title": "Перенос",
+        "kind": "learning",
+        "core_ids": [
+          "src:5-1:xfer:1",
+          "src:5-1:xfer:2",
+          "src:5-1:xfer:3",
+          "src:5-1:xfer:4",
+          "src:5-1:xfer:5",
+          "src:5-1:xfer:6",
+          "src:5-1:xfer:7",
+          "src:5-1:xfer:8",
+          "src:5-1:xfer:9",
+          "src:5-1:xfer:10",
+          "src:5-1:xfer:combo:1",
+          "src:5-1:xfer:combo:2",
+          "src:5-1:xfer:combo:3"
+        ],
+        "required_independent_ids": [
+          "src:5-1:xfer:1",
+          "src:5-1:xfer:2",
+          "src:5-1:xfer:3",
+          "src:5-1:xfer:4",
+          "src:5-1:xfer:5",
+          "src:5-1:xfer:6",
+          "src:5-1:xfer:7"
+        ],
+        "rule_ids": [
+          "v2:5-1:ta-da",
+          "v2:5-1:nda"
         ],
         "min_independent_ratio": 0.7,
         "max_presentations": 24,
@@ -64392,34 +76423,25 @@ window.LESSON_V2_COMPILED = [
       },
       {
         "id": "stage:5-1:final",
-        "title": "Финальная проверка 5-1",
+        "title": "Зачёт: ключевые различения",
         "kind": "checkpoint",
         "core_ids": [
-          "src:5-1:da-too:c1",
-          "src:5-1:da-too:c2",
-          "src:5-1:locative:c1",
-          "src:5-1:ta-da:c1",
-          "src:5-1:ta-da:c2",
-          "src:5-1:nda:c1",
-          "src:5-1:part-vs-poss:c1",
-          "src:5-1:names:c1",
-          "src:5-1:who:c1",
-          "src:5-1:emes:c1",
-          "src:5-1:verb:c1",
-          "src:5-1:pronouns:c1"
+          "src:5-1:mastery:D1",
+          "src:5-1:mastery:D2",
+          "src:5-1:mastery:D3",
+          "src:5-1:mastery:D7"
         ],
         "required_independent_ids": [
-          "src:5-1:da-too:c1",
-          "src:5-1:da-too:c2",
-          "src:5-1:locative:c1",
-          "src:5-1:ta-da:c1"
+          "src:5-1:mastery:D1",
+          "src:5-1:mastery:D2",
+          "src:5-1:mastery:D3"
         ],
         "rule_ids": [
-          "v2:5-1:ta-da",
-          "v2:5-1:nda",
+          "v2:5-1:part-vs-poss",
+          "v2:5-1:verb",
           "v2:5-1:who"
         ],
-        "min_independent_ratio": 0.75,
+        "min_independent_ratio": 1,
         "max_presentations": 24,
         "final": true
       }
@@ -64464,16 +76486,81 @@ window.LESSON_V2_COMPILED = [
         "vocab:5-1:qaidan"
       ],
       "exercise_ids": [
-        "src:5-1:xfer:bolme",
-        "src:5-1:xfer:kol",
-        "src:5-1:xfer:teniz",
-        "src:5-1:xfer:alan",
-        "src:5-1:xfer:auyl",
-        "src:5-1:xfer:sayazhay",
-        "src:5-1:xfer:tau",
-        "src:5-1:xfer:kitap",
-        "src:5-1:xfer:mektep",
-        "src:5-1:xfer:uy"
+        "src:5-1:sch:1-1:1",
+        "src:5-1:sch:1-1:2",
+        "src:5-1:sch:1-1:3",
+        "src:5-1:sch:1-1:4",
+        "src:5-1:sch:1-1:5",
+        "src:5-1:sch:1-2:1",
+        "src:5-1:sch:1-2:2",
+        "src:5-1:sch:1-2:3",
+        "src:5-1:sch:1-2:4",
+        "src:5-1:sch:1-2:5",
+        "src:5-1:sch:1-3:1",
+        "src:5-1:sch:1-3:2",
+        "src:5-1:sch:1-3:3",
+        "src:5-1:sch:1-3:4",
+        "src:5-1:sch:1-3:5",
+        "src:5-1:sch:2-1:1",
+        "src:5-1:sch:2-1:2",
+        "src:5-1:sch:2-1:3",
+        "src:5-1:sch:2-1:4",
+        "src:5-1:sch:2-1:5",
+        "src:5-1:sch:2-2:1",
+        "src:5-1:sch:2-2:2",
+        "src:5-1:sch:2-2:3",
+        "src:5-1:sch:2-2:4",
+        "src:5-1:sch:2-2:5",
+        "src:5-1:sch:3-1:1",
+        "src:5-1:sch:3-1:2",
+        "src:5-1:sch:3-1:3",
+        "src:5-1:sch:3-1:4",
+        "src:5-1:sch:3-1:5",
+        "src:5-1:sch:3-2:1",
+        "src:5-1:sch:3-2:2",
+        "src:5-1:sch:3-2:3",
+        "src:5-1:sch:3-2:4",
+        "src:5-1:sch:3-2:5",
+        "src:5-1:sch:4-1:1",
+        "src:5-1:sch:4-1:2",
+        "src:5-1:sch:4-1:3",
+        "src:5-1:sch:4-1:4",
+        "src:5-1:sch:4-1:5",
+        "src:5-1:sch:4-2:1",
+        "src:5-1:sch:4-2:2",
+        "src:5-1:sch:4-2:3",
+        "src:5-1:sch:4-2:4",
+        "src:5-1:sch:4-2:5",
+        "src:5-1:sch:5-1:1",
+        "src:5-1:sch:5-1:2",
+        "src:5-1:sch:5-1:3",
+        "src:5-1:sch:5-1:4",
+        "src:5-1:sch:5-1:5",
+        "src:5-1:sch:5-2:1",
+        "src:5-1:sch:5-2:2",
+        "src:5-1:sch:5-2:3",
+        "src:5-1:sch:5-2:4",
+        "src:5-1:sch:5-2:5",
+        "src:5-1:sch:6-1:1",
+        "src:5-1:sch:6-1:2",
+        "src:5-1:sch:6-1:3",
+        "src:5-1:sch:6-1:4",
+        "src:5-1:sch:6-1:5",
+        "src:5-1:sch:6-2:1",
+        "src:5-1:sch:6-2:2",
+        "src:5-1:sch:6-2:3",
+        "src:5-1:sch:6-2:4",
+        "src:5-1:sch:6-2:5",
+        "src:5-1:sch:7-1:1",
+        "src:5-1:sch:7-1:2",
+        "src:5-1:sch:7-1:3",
+        "src:5-1:sch:7-1:4",
+        "src:5-1:sch:7-1:5",
+        "src:5-1:sch:7-2:1",
+        "src:5-1:sch:7-2:2",
+        "src:5-1:sch:7-2:3",
+        "src:5-1:sch:7-2:4",
+        "src:5-1:sch:7-2:5"
       ],
       "external_tasks": [
         {

@@ -22,7 +22,7 @@
      q.fields=[{label:'Ответ',kind:'set-text',answers:q.correct||[]}];
      q.note=q.note||'Напиши подходящие через запятую или пробел.';
    }
-   for(const f of q.fields||[])if(f.kind==='select'){f.kind='text';delete f.options;}
+   // r7 51: keep field.kind=select (tap chips). Old coerce→text broke mastery D1/D2 idea checks.
  }
  for(const q of questions)coerceTyped(q);
  const byId=new Map(questions.map(q=>[q.id,q]));
@@ -1485,7 +1485,7 @@
    if(supportKind(q))return window.ResponseKinds.markup(q,esc);
    const fields=q.fields||[{label:'Ответ',kind:'text'}];
    return `<div class="fields">${fields.map((f,i)=>{
-     const taps=classifierOptions(f);
+     const taps=(f.kind==='select'&&Array.isArray(f.options)&&f.options.length>=2)?f.options:classifierOptions(f);
      if(taps)return `<div class="field-row"><span class="field-label" id="label-${i}">${esc(f.label)}</span><div class="field-control tap-choices" role="group" aria-labelledby="label-${i}"><input id="answer-${i}" name="answer-${i}" type="hidden">${taps.map(v=>`<button type="button" class="chip" data-fill="answer-${i}" data-val="${esc(v)}" aria-pressed="false">${esc(v)}</button>`).join('')}</div></div>`;
      return `<div class="field-row"><label class="field-label" for="answer-${i}">${esc(f.label)}</label><div class="field-control"><input id="answer-${i}" name="answer-${i}" type="text" lang="kk" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${f.kind==='number-text'?'inputmode="numeric"':''} aria-describedby="correction-${i}"><span class="field-correction" id="correction-${i}"></span></div></div>`;
    }).join('')}</div>`;
