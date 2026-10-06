@@ -1,0 +1,29 @@
+{
+  "lesson_id": "5-1",
+  "sources": [
+    {
+      "id": "school-method",
+      "role": "SCHOOL_NORM",
+      "title": "5-1 методичка Местный падеж.pdf",
+      "url": "https://drive.google.com/file/d/1mkSTmE2h69RG-HQWIUp13_AEzLVUImpi/view"
+    },
+    {
+      "id": "school-exercises",
+      "role": "SCHOOL_NORM",
+      "title": "5-1 упражнения Местный падеж.pdf",
+      "url": "https://drive.google.com/file/d/1kzrAMy3q7MNPxeXhufrPSMDSXpS6T_pt/view"
+    },
+    {
+      "id": "school-homework",
+      "role": "SCHOOL_NORM",
+      "title": "5_1_домашняя_работа_Местный_падеж.pdf",
+      "url": "https://drive.google.com/file/d/1P2qNErsPIcbGERWlRdih0UsgqnPw83Zb/view"
+    },
+    {
+      "id": "canon-r23",
+      "role": "RESEARCH_VERIFIED",
+      "title": "5-1.md r2.3 PASS-DOC",
+      "url": "https://drive.google.com/file/d/1Cy-6y72R3ZPc6_7vGmmfnhPdpPlWD5b3/view"
+    }
+  ]
+}

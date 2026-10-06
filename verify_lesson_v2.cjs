@@ -204,6 +204,27 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'
 assert.equal(prodMock.LessonV2Runtime.installed.size,0);
 assert.equal(prodMock.COURSE.questions.length,0);
 ok('draft/reviewed v2 lesson is physically blocked on production');
+const previewBlocked=JSON.parse(JSON.stringify(blockedOnProduction));
+const previewMock={
+  location:{hostname:'8ea255f4.qazaqsha.pages.dev',search:''},LessonV2Schema:Schema,LESSON_V2_COMPILED:[previewBlocked],
+  COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
+  CURRICULUM:{words:[],rules:[],lessons:[],addWord(){throw Error('draft must not install on preview without v2qa');}},
+  CourseProgress:{registerStages(){throw Error('draft must not register on preview without v2qa');}},Canonical:null
+};
+vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8'),{window:previewMock,globalThis:previewMock,console});
+assert.equal(previewMock.LessonV2Runtime.installed.size,0);
+ok('draft blocked on CF preview without v2qa');
+const qaPreviewMock={
+  location:{hostname:'8ea255f4.qazaqsha.pages.dev',search:'?v2qa=1'},LessonV2Schema:Schema,LESSON_V2_COMPILED:[previewBlocked],
+  COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
+  CURRICULUM:{words:[],rules:[],lessons:[],addWord(kazakh,translation,lesson,role){let w=this.words.find(x=>x.kazakh===kazakh);if(!w){w={id:'word:'+kazakh,kazakh,translation:[...translation],lesson_first_seen:lesson,target_or_context:role==='target'?'target':'context',card_ids:[],aliases:[kazakh]};this.words.push(w);}return w;}},
+  CourseProgress:{registerStages(){return [];}},Canonical:null
+};
+vm.runInNewContext(fs.readFileSync(path.join(__dirname,'lesson-v2-runtime.js'),'utf8'),{window:qaPreviewMock,globalThis:qaPreviewMock,console});
+qaPreviewMock.LessonV2Runtime.installAll();
+assert.ok(qaPreviewMock.LessonV2Runtime.installed.size>=1);
+ok('draft installs on CF preview with ?v2qa=1');
+
 const releasedMock={
   location:{hostname:'qazaqsha.pages.dev'},LessonV2Schema:Schema,LESSON_V2_COMPILED:[expectedCompiled],
   COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
@@ -227,7 +248,7 @@ const appText=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 assert.equal(indexText.includes('src="nonpast-engine.js"'),false);
 assert.equal(swText.includes('"nonpast-engine.js"'),false);
 assert.equal(swText.includes('"compiled-lessons-v2.js"'),true);
-assert.match(swText,/const CACHE='qazaq-offline-live-20261006-r7-ux63-2'/);
+assert.match(swText,/const CACHE='qazaq-offline-live-20261006-r7-51-2'/);
 const renderPathStart=appText.indexOf('function renderPath');
 const chapterLookup=appText.indexOf("const ch=G.chapter(les.id,gp.chapterId)",renderPathStart);
 const titleInit=appText.indexOf("const chTitle=Bank?Bank.chapterTitle(ch):ch.title",chapterLookup);

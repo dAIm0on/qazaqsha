@@ -3,8 +3,18 @@
  'use strict';
  const schema=root.LessonV2Schema;
  const installed=new Map(); const shells=new Map();
- function productionHost(){return !!(root.location&&root.location.hostname==='qazaqsha.pages.dev');}
- function publishable(raw){return !productionHost()||!!(raw&&raw.status==='released'&&raw.release&&raw.release.approved===true&&/^[0-9a-f]{40}$/i.test(raw.release.preview_head||'')&&/^https:\/\//.test(raw.release.preview_url||''));}
+ function productionReady(raw){return !!(raw&&raw.status==='released'&&raw.release&&raw.release.approved===true&&/^[0-9a-f]{40}$/i.test(raw.release.preview_head||'')&&/^https:\/\//.test(raw.release.preview_url||''));}
+ // r7 51: same learner gate as LessonRegistry — draft/reviewed only with ?v2qa=1 / localStorage / localhost.
+ function qaV2Preview(){
+   try{
+     const h=root.location&&root.location.hostname||'';
+     if(h==='localhost'||h==='127.0.0.1')return true;
+     if(/[?&]v2qa=1(?:&|$)/.test(String(root.location&&root.location.search||'')))return true;
+     if(root.localStorage&&root.localStorage.getItem('qazaqsha-v2qa')==='1')return true;
+   }catch(_){}
+   return false;
+ }
+ function publishable(raw){return productionReady(raw)||qaV2Preview();}
  function questionCopy(q,lessonId){
    const K=root.ResponseKinds,keep=!!(K&&K.isSupportKind(q.kind)&&K.allowedLesson(lessonId)&&q.payload);
    return Object.assign({},q,{lessonId,kind:keep?q.kind:'fields',fields:keep?[]:q.fields,source:q.source||('v2-'+lessonId),group:q.group||q.id,part:q.part||'1',ruleIds:(q.ruleIds||q.rule_ids||[]).slice(),associationKeys:(q.associationKeys||[]).slice()});

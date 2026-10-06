@@ -19,6 +19,7 @@ const packages=lessonIds.map(id=>{
 const registered={};
 
 const mock={
+  location:{hostname:'localhost'},
   LessonV2Schema:Schema,
   LESSON_V2_COMPILED:packages,
   COURSE:{questions:[],sources:{}},
