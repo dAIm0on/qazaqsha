@@ -1144,7 +1144,10 @@
    courseBlock=lesson.courseLesson||courseBlock;
    activeLesson=id;activeStep=step;learningState.lessonId=id;learningState.steps[id]=step;topic=lesson.topic;mode=opts&&opts.voluntary?'voluntary':'lesson';sourceFilter=null;
    queue=lesson.topic==='numbers'?shuffled(stepIds):stepIds;practiceIds=[...queue];stepEvidence={};queueEpoch=Date.now()+Math.random();
-   position=0;variants={};checked=false;resetCounts();render();showView('practice');$('#exercise').scrollIntoView({block:'start'});
+   position=0;variants={};checked=false;resetCounts();render();
+   // r7 ux60 #1: «Сборник» / track opened from Учёба — Back returns to «Выбрать занятие», not to the lesson overview.
+   if(view==='learn')try{history.pushState({qzView:'practice'},'');}catch{}
+   showView('practice');$('#exercise').scrollIntoView({block:'start'});
  }
  function startContrast(pair){
    activeLesson=null;activeStep=null;topic='all';sourceFilter=null;mode='contrast';
@@ -1187,7 +1190,10 @@
    if(next==='practice'&&trainerReturn&&queueEpoch!==trainerEpoch)trainerReturn=null; // r7 X3: bank/words from Учёба were labelled «Тренажёры»
    if(next==='practice'&&view!=='practice'&&ORIGIN_VIEWS.includes(view))sessionOrigin=view;
    pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
-   view=next;document.body.dataset.view=next;
+   const prevView=view;view=next;document.body.dataset.view=next;
+   // r7 ux60 #1: keep the current history entry tagged with the screen we are on, so browser «Назад»
+   // never hits a stale qzView that equals the current view (first Back did nothing after the logo pushState).
+   if(next!==prevView)try{history.replaceState(Object.assign({},history.state||{},{qzView:next}),'');}catch{}
    /* Immersive hides .bottom-nav. Leaving morph must drop the flag or the menu stays gone. */
    if(next!=='morph')delete document.body.dataset.morphImmersive;
    if(next!=='practice'&&next!=='path'&&next!=='morph')typingFocus=false;
@@ -3025,14 +3031,18 @@
    // r7 ux59b #5: one history entry per logo jump, same URL (F5 / resumeSurface / SW untouched): browser «Назад»
    // returns to the screen she left (session and draft are in memory and in the saved state), not off the site.
    const from=view;
-   if(from&&from!=='today')try{history.replaceState(Object.assign({},history.state||{},{qzView:from}),'');history.pushState({qzView:'today'},'');}catch{}
+   // r7 ux60 #1: one new entry only (showView already tagged the screen we leave). No replaceState+pushState pair.
+   if(from&&from!=='today')try{history.pushState({qzView:'today'},'');}catch{}
    showView('today');save();
    try{window.scrollTo({top:0});}catch{}
    const h=document.querySelector('#today-view h1, #today-content h2');if(h){h.setAttribute('tabindex','-1');try{h.focus({preventScroll:true});}catch{}}
  });
  window.addEventListener('popstate',ev=>{
    const v=ev.state&&ev.state.qzView;if(!v||v===view)return;
-   if(v==='practice'&&!(queue.length>position))return; // that session is over: stay where she is
+   if(v==='practice'&&!(queue.length>position)){ // session over: fall back to Учёба if that is where she came from
+     if(sessionOrigin==='learn'||hubLesson()){cancelAdvance();abortTutor();showView('learn');save();}
+     return;
+   }
    cancelAdvance();abortTutor();showView(v);save();
  });
  $('#pause-session').onclick=()=>{
