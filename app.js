@@ -543,7 +543,9 @@
    const phase=(gp&&gp.phase)||(path&&path.phase)||null;
    const chapterId=(gp&&gp.chapterId)||(path&&path.chapterId)||null;
    const unmapped=pathHasUnmappedChapters(lessonId,gp||{},chapterId);
-   return phase==='done'&&(revisionBump||unmapped||!!(gp&&gp.pathNeedsReplay&&revisionBump));
+   // r7 2T-a: content_revision bump alone (ударения / тексты, id глав те же) must not wipe «пройдено».
+   // Replay only when chapters are unmapped or an explicit pathNeedsReplay was set for a structural change.
+   return phase==='done'&&(unmapped||!!(gp&&gp.pathNeedsReplay&&revisionBump)||!!(path&&path.pathNeedsReplay&&revisionBump));
  }
  function loadLessonPath(id){
    const G=window.GrammarPath;if(!G||!P.courseIds().includes(id))return null;
@@ -577,13 +579,17 @@
      const unmapped=pathActive&&pathHasUnmappedChapters(id,gp,chapterId);
      // Premature target stamp + legacy ids: treat like first-time revision so done resets.
      const needsRevisionGate=revisionFirstTime||unmapped||(unmappedBefore&&storedRev===targetRev);
-     if(pathActive&&phase==='done'&&needsRevisionGate){
+     const needsDoneReset=unmapped||(unmappedBefore&&storedRev===targetRev)||pathNeedsReplay||!storedRev;
+     if(pathActive&&phase==='done'&&needsDoneReset){
        clearLessonCompletedChapters(gp,id);
        const first=((G.lesson(id)||{}).chapters||[])[0]||null;
        phase=first?'beat':'lesson';
        chapterId=first?first.id:null;
        beat=0;
        pathNeedsReplay=true;
+       dirty=true;
+     }else if(pathActive&&phase==='done'&&revisionFirstTime){
+       // r7 2T-a: stamp the new revision, keep completed chapters («пройдено» не сбрасывать).
        dirty=true;
      }else if(pathActive&&needsRevisionGate){
        if(chapterId&&!(G.chapter&&G.chapter(id,chapterId))){chapterId=null;dirty=true;}
