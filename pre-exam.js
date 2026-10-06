@@ -1,4 +1,4 @@
-/* r7 ux63: HG-19 «Перед экзаменом» + HG-20 BatylBol admission (lesson 3-3). */
+/* r7 ux63: HG-19 «Перед экзаменом» + HG-20 BatylBol admission (lesson 3-3). Codes stay in comments only. */
 (function(root){
 'use strict';
 const SECTIONS=[
@@ -9,18 +9,18 @@ const SECTIONS=[
   'два одинаковых хвоста','емес в комбинации'
 ];
 const TRAINERS=[
-  {id:'bb:zvuki',label:'Zvuki',url:'https://batylbol.kz/test/Zvuki.html'},
-  {id:'bb:mnozh',label:'MnozhChislo',url:'https://batylbol.kz/test/MnozhChislo.html'},
-  {id:'bb:chis',label:'Chislitielniye',url:'https://batylbol.kz/test/Chislitielniye.html'},
-  {id:'bb:lich-ed',label:'LichnyeEdChislo',url:'https://batylbol.kz/test/LichnyeEdChislo.html'},
-  {id:'bb:lich-12',label:'LichnyeLitso1-2',url:'https://batylbol.kz/test/LichnyeLitso1-2.html'},
-  {id:'bb:lichnye',label:'Lichnye',url:'https://batylbol.kz/test/Lichnye.html'},
-  {id:'bb:vopros',label:'VoprositelnyeChastitsy',url:'https://batylbol.kz/test/VoprositelnyeChastitsy.html'},
-  {id:'bb:prit-ed',label:'PrityazhatelnyeEd',url:'https://batylbol.kz/test/PrityazhatelnyeEd.html'},
-  {id:'bb:prit-mn',label:'PrityazhatelnyeMn',url:'https://batylbol.kz/test/PrityazhatelnyeMn.html'},
-  {id:'bb:bar',label:'BarZhokEmes',url:'https://batylbol.kz/test/BarZhokEmes.html'},
-  {id:'bb:combo',label:'KombinaciyaLichnyhIPrityazhatelnih',url:'https://batylbol.kz/test/KombinaciyaLichnyhIPrityazhatelnih.html'},
-  {id:'bb:combo2',label:'ComboLichPrityazh',url:'https://batylbol.kz/test/ComboLichPrityazh.html'}
+  {id:'bb:zvuki',label:'Звуки и ряд',url:'https://batylbol.kz/test/Zvuki.html'},
+  {id:'bb:mnozh',label:'Множественное число',url:'https://batylbol.kz/test/MnozhChislo.html'},
+  {id:'bb:chis',label:'Числительные',url:'https://batylbol.kz/test/Chislitielniye.html'},
+  {id:'bb:lich-ed',label:'Личные: ед. число',url:'https://batylbol.kz/test/LichnyeEdChislo.html'},
+  {id:'bb:lich-12',label:'Личные: 1–2 лицо мн.',url:'https://batylbol.kz/test/LichnyeLitso1-2.html'},
+  {id:'bb:lichnye',label:'Личные окончания',url:'https://batylbol.kz/test/Lichnye.html'},
+  {id:'bb:vopros',label:'Вопросительные частицы',url:'https://batylbol.kz/test/VoprositelnyeChastitsy.html'},
+  {id:'bb:prit-ed',label:'Притяжательные: ед.',url:'https://batylbol.kz/test/PrityazhatelnyeEd.html'},
+  {id:'bb:prit-mn',label:'Притяжательные: мн.',url:'https://batylbol.kz/test/PrityazhatelnyeMn.html'},
+  {id:'bb:bar',label:'Бар / жоқ / емес',url:'https://batylbol.kz/test/BarZhokEmes.html'},
+  {id:'bb:combo',label:'Личные + притяжательные',url:'https://batylbol.kz/test/KombinaciyaLichnyhIPrityazhatelnih.html'},
+  {id:'bb:combo2',label:'Комбинации ещё раз',url:'https://batylbol.kz/test/ComboLichPrityazh.html'}
 ];
 function ensure(state){
   if(!state.preExam||typeof state.preExam!=='object')state.preExam={trainers:Object.create(null),updatedAt:0};
@@ -44,11 +44,11 @@ function panelHtml(state,esc){
   const secs=SECTIONS.map((s,i)=>`<li><span class="small">${i+1}.</span> ${esc(s)}</li>`).join('');
   return `<div class="panel preexam-panel" data-preexam="1">
     <h2>Перед экзаменом</h2>
-    <p class="small">HG-19: прогон ${SECTIONS.length} разделов 1-1…3-3 вперемешку. Не балл — подготовка к письменному экзамену.</p>
+    <p class="small">Прогон ${SECTIONS.length} разделов 1-1…3-3 вперемешку. Не балл — подготовка к письменному экзамену.</p>
     <div class="lesson-actions"><button type="button" class="primary-button" data-preexam-start>Начать прогон</button></div>
     <details class="preexam-map"><summary>19 разделов карты</summary><ol class="preexam-sections">${secs}</ol></details>
     <h3>Тренажёры BatylBol: ${n} из ${total}</h3>
-    <p class="small">HG-20: школьный допуск — отметить выполненные онлайн-тренажёры.</p>
+    <p class="small">Школьный допуск — отметить выполненные онлайн-тренажёры.</p>
     <div class="preexam-trainers">${rows}</div>
   </div>`;
 }
@@ -70,7 +70,6 @@ const LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
 function pickQueue(size){
   const qs=(root.COURSE&&root.COURSE.questions)||[];
   const pool=qs.filter(q=>q&&LESSONS.includes(String(q.lessonId||''))&&q.topic!=='meta');
-  // interleave by lesson
   const by=Object.create(null);
   for(const q of pool){(by[q.lessonId]=by[q.lessonId]||[]).push(q);}
   const out=[]; const keys=LESSONS.filter(id=>by[id]&&by[id].length);

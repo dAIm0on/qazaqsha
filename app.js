@@ -942,7 +942,7 @@
    if(!cloudApplying)window.QazaqCloud?.pushSoon?.(state);
  }
  function subset(){
-   if(activeLesson){const ids=new Set(window.LEARNING.lessons.find(l=>l.id===activeLesson).questionIds);return questions.filter(q=>ids.has(q.id));}
+   if(activeLesson){const les=(window.LEARNING&&window.LEARNING.lessons||[]).find(l=>l.id===activeLesson);if(!les||!Array.isArray(les.questionIds))return [];const ids=new Set(les.questionIds);return questions.filter(q=>ids.has(q.id));}
    let list=questions.filter(q=>eligible(q));
    if(vocabRole)list=list.filter(q=>q.topic==='vocab'&&q.wordRole===vocabRole);
    if(courseBlock)list=list.filter(q=>q.lessonId===courseBlock);
@@ -1299,12 +1299,15 @@
  }
   function startPreExam(){
    // r7 ux63 HG-19: interleaved answers across 1-1…3-3 (not a score).
+   // activeLesson stays null — '3-3' is not a LEARNING.lessons track id (subset/renderStats would throw).
    if(!(window.PreExam&&window.PreExam.pickQueue))return;
    for(const id of window.PreExam.LESSONS)ensureV2(id);
-   const q=window.PreExam.pickQueue(24);
-   if(!q.length){alert('Пока мало карточек для прогона — сначала пройди практику 1-1…3-3.');return;}
-   mode='course';topic='all';courseBlock=null;sourceFilter=null;vocabRole=null;activeLesson='3-3';activeStep=null;
-   queue=q;position=0;checked=false;reveal=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);
+   const ids=(window.PreExam.pickQueue(24)||[]).filter(id=>byId.has(id));
+   if(!ids.length){alert('Пока мало карточек для прогона — сначала пройди практику 1-1…3-3.');return;}
+   viewOnlyPathLesson=null;persistLessonPractice();persistLessonPath();
+   mode='course';topic='all';courseBlock=null;sourceFilter=null;vocabRole=null;activeLesson=null;activeStep=null;stepEvidence={};
+   queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;hinted=false;
+   sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
    markLessonStarted('3-3','practice');markPlace('practice','3-3');save();render();showView('practice');
  }
  function continueStep(){

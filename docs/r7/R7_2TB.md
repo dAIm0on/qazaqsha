@@ -1,6 +1,6 @@
 # R7 2T-b — уроки 3-1…4-2 (карта 46→39)
 
-SW: `qazaq-offline-live-20261006-r7-ux63-1`.
+SW: `qazaq-offline-live-20261006-r7-ux63-2`.
 Карта: `docs/r7/R7_2TB_CHAPTER_MAP.md` (утверждена казакша).
 
 | Урок | Было | Стало | Главное |

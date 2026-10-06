@@ -1,4 +1,4 @@
-// r7 ux63: chapter_ids v2-theory fix; stress off in grammar-chapters/explain-bank/canon-texts; HG-19/20; Today counts path answers.
+// r7 ux63: chapter_ids v2-theory; stress off; HG-19/20 (codes not in learner DOM); Today path; startPreExam/subset safe.
 const fs=require('fs'),assert=require('assert'),path=require('path');
 const read=f=>fs.readFileSync(path.join(__dirname,f),'utf8');
 let passed=0;const ok=m=>{passed++;console.log('PASS '+m);};
@@ -20,11 +20,21 @@ ok('3-2 chapter_ids use v2-theory-* and revision r3');
 {
   const app=read('app.js');
   assert.ok(app.includes("e.type==='answer'||e.type==='path'"),'Today counts path answers');
-  assert.ok(app.includes('function startPreExam'),'HG-19 startPreExam');
-  assert.ok(read('learning.js').includes('data-preexam')||read('learning.js').includes('PreExam.panelHtml'));
-  assert.ok(read('pre-exam.js').includes('HG-19')&&read('pre-exam.js').includes('HG-20'));
+  assert.ok(app.includes('function startPreExam'),'startPreExam');
+  // A: no undeclared reveal=; activeLesson cleared for pre-exam
+  assert.ok(!/reveal\s*=\s*false/.test(app.match(/function startPreExam\(\)\{[\s\S]*?\n \}/)[0]),'startPreExam no reveal=');
+  assert.ok(/activeLesson\s*=\s*null/.test(app.match(/function startPreExam\(\)\{[\s\S]*?\n \}/)[0]),'startPreExam activeLesson=null');
+  // B: subset guards missing LEARNING track
+  assert.ok(app.includes('if(!les||!Array.isArray(les.questionIds))return []'),'subset guards questionIds');
+  const pe=read('pre-exam.js');
+  // C: learner DOM copy has no HG-19/20; Russian trainer labels
+  assert.ok(!/HG-19|HG-20/.test(pe.replace(/^\/\*[\s\S]*?\*\//,'')),'no HG codes outside file header comment');
+  assert.ok(!/>HG-1[90]/.test(pe)&&!/HG-1[90]:/.test(pe),'no HG in panel strings');
+  assert.ok(pe.includes('Звуки и ряд')&&pe.includes('Множественное число'),'Russian BatylBol labels');
+  assert.ok(!/\blabel:'Zvuki'/.test(pe)&&!/\blabel:'MnozhChislo'/.test(pe),'latin trainer labels gone');
+  assert.ok(read('learning.js').includes('PreExam.panelHtml'));
   assert.ok(read('index.html').includes('pre-exam.js'));
-  assert.ok(read('sw.js').includes('pre-exam.js')&&read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-ux63-1'"));
+  assert.ok(read('sw.js').includes('pre-exam.js')&&read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-ux63-2'"));
 }
-ok('HG-19/20 wired; Today path answers; SW r7-ux63-1');
+ok('A–C: startPreExam safe; subset guarded; no HG in UI; RU labels; SW r7-ux63-2');
 console.log('verify_r7_ux63: '+passed+' checks passed');
