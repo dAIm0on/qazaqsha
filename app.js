@@ -330,8 +330,49 @@
    armTypingFocusPoll();
    if(document.documentElement.classList.contains('typing-compact'))scrollFieldAndStrip(t);
  });
+ /* r7 X QA item 1: a typed but unchecked answer survives «← Назад», another screen, a new session and F5.
+    Kept per card in its own key (never in records/evidence): it is not an answer, not a try, not a hint. Cleared on Проверить / Показать ответ. */
+ const DRAFT_KEY=KEY+'-drafts',DRAFT_TTL=14*864e5,DRAFT_CAP=60;
+ function draftBook(){try{const b=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}');return b&&typeof b==='object'&&!Array.isArray(b)?b:{};}catch{return {};}}
+ function draftPut(k,a){
+   if(!k)return;const b=draftBook(),now=Date.now();
+   if(!Array.isArray(a)||!a.some(x=>String(x||'').trim()))delete b[k];else b[k]={a:a.slice(0,8).map(x=>String(x||'').slice(0,200)),t:now};
+   const keep=Object.entries(b).filter(([,r])=>r&&Array.isArray(r.a)&&now-(Number(r.t)||0)<DRAFT_TTL).sort((x,y)=>y[1].t-x[1].t).slice(0,DRAFT_CAP);
+   try{if(keep.length)localStorage.setItem(DRAFT_KEY,JSON.stringify(Object.fromEntries(keep)));else localStorage.removeItem(DRAFT_KEY);}catch{}
+ }
+ function draftGet(k){const r=k&&draftBook()[k];return r&&Array.isArray(r.a)&&Date.now()-(Number(r.t)||0)<DRAFT_TTL?r.a:null;}
+ function typedCard(q){return !!(q&&!supportKind(q)&&q.kind!=='multi'&&Array.isArray(q.fields)&&q.fields.length);}
+ // Scoped to the session kind: a draft typed in ДЗ words does not pop up in Тренажёры for the same card.
+ function draftScope(){return String(mode||'')+':'+String((trainerReturn&&queueEpoch===trainerEpoch?'t-'+trainerReturn:'')||(mode==='homework'?hwLesson+'/'+hwPart:'')||courseBlock||activeLesson||'');}
+ function cardDraftKey(q){return typedCard(q)?'q|'+draftScope()+'|'+q.id+'|'+String(q.stimulus||'').slice(0,80):'';}
+ function stashCard(q,keepEmpty){if(!typedCard(q)||checked||retrying)return;const a=readAnswers(q);if(!keepEmpty&&!a.some(x=>String(x||'').trim()))return;draftPut(cardDraftKey(q),a);}
+ function dropCardDraft(q){if(typedCard(q))draftPut(cardDraftKey(q),null);}
+ function refillCardDraft(){
+   const q=byId.get(queue[position]);if(!typedCard(q)||checked||!$('#answer-form'))return false;
+   const a=draftGet(cardDraftKey(q));if(!a)return false;
+   const els=q.fields.map((f,i)=>$('#answer-'+i));if(els.some(el=>!el||el.disabled||el.value))return false;
+   els.forEach((el,i)=>{el.value=String(a[i]||'');});return true;
+ }
+ /* Satellite trainers outside the session queue (free practice, rules trainer): same rule, keyed by the card text around the field. */
+ const SAT_FIELDS='#free-step-input,#free-write,#morph-answer';
+ function satKey(el){
+   const form=el.closest('form'),box=el.closest('.morph-panel,.panel,section')||document.body;
+   const txt=(box.textContent||'').replace(form?form.textContent:'','').replace(/\s+/g,' ').trim();
+   let h=5381;for(let i=0;i<txt.length;i++)h=((h<<5)+h+txt.charCodeAt(i))|0;
+   return 's|'+el.id+'|'+(h>>>0).toString(36);
+ }
+ document.addEventListener('input',e=>{const el=e.target;if(el&&el.matches&&el.matches(SAT_FIELDS))draftPut(el.dataset.draftKey||satKey(el),[el.value]);},true);
+ document.addEventListener('submit',e=>{const el=e.target&&e.target.querySelector&&e.target.querySelector(SAT_FIELDS);if(el)draftPut(el.dataset.draftKey||satKey(el),null);},true);
+ function refillSatellite(){
+   document.querySelectorAll(SAT_FIELDS).forEach(el=>{
+     if(el.dataset.draftKey||el.disabled)return;
+     const k=satKey(el);el.dataset.draftKey=k;
+     const a=draftGet(k);if(a&&!el.value)el.value=String(a[0]||'');
+   });
+ }
+ try{new MutationObserver(()=>refillSatellite()).observe(document.body,{childList:true,subtree:true});}catch{}
  function wordsBlurKeepsDraft(next){
-   return !!(next&&next.closest&&next.closest('#check-button,#retry-button,#next-button,#hint-button,#reveal-button,#association-button,#rule-button,[data-letter],#tutor-host,.tutor-launch,#issue-dialog'));
+   return !!(next&&next.closest&&next.closest('#pause-session,#check-button,#retry-button,#next-button,#hint-button,#reveal-button,#association-button,#rule-button,[data-letter],#tutor-host,.tutor-launch,#issue-dialog'));
  }
  document.addEventListener('focusout',e=>{
    if(!isPracticeTypingField(e.target))return;
@@ -343,7 +384,7 @@
      if(vvFocusPoll){clearInterval(vvFocusPoll);vvFocusPoll=null;}
      /* Words: an uncommitted fragment must not stay after the field loses focus.
         Keep it when the tap is Проверить, a letter, hint, or the ask circle. */
-     if(isVocabWordsMode()&&!checked&&!retrying&&left.isConnected&&!wordsBlurKeepsDraft(ae)){
+     if(isVocabWordsMode()&&view==='practice'&&!checked&&!retrying&&left.isConnected&&!wordsBlurKeepsDraft(ae)){
        $$('#answer-form input[type=text]').forEach(el=>{if(!el.disabled)el.value='';});
        draft=null;
        save();
@@ -367,7 +408,7 @@
      const beat=Number(pathInput.dataset.beat);
      gp.pathDraft={lessonId:pathInput.dataset.lesson||gp.lessonId,chapterId:pathInput.dataset.chapter||gp.chapterId,beat:Number.isInteger(beat)?beat:gp.beat,value:pathInput.value};
    }
-   const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form'))draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};
+   const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form')){draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};stashCard(q,false);}
    const ask=$('#rules-ask-q');
    if(ask){
      if(ask.value)state.rulesDraft={article:rulesArticle||'',value:ask.value.slice(0,400)};
@@ -820,7 +861,7 @@
    const row=item?P.judge(item,answers,!!reveal):{id:q.id,item_rule:(q.ruleIds||[])[0],rule_id:(q.ruleIds||[])[0],correct:false,peek:!!reveal,signature:false};
    state.sliceRun=state.sliceRun||[];state.sliceRun.push(row);
    if(mode==='repair'&&window.RepairState)window.RepairState.note(state,row.correct);
-   checked=true;pauseTimer();hinted=!!reveal;
+   checked=true;dropCardDraft(q);pauseTimer();hinted=!!reveal;
    const feedback=$('#feedback');
    const answerLine=(q.fields||[]).map(f=>f.answers[0]).join(' · ');
    feedback.className='feedback '+(row.correct?'':'error');
@@ -1121,6 +1162,7 @@
    const gpNow=state.grammarPath||{};
    document.body.classList.toggle('path-immersive',next==='path'&&!!(gpNow.lessonId&&gpNow.phase==='beat'));
    document.querySelectorAll('main > section').forEach(el=>{el.hidden=el.id!==next+'-view';});
+   if(next==='practice')refillCardDraft();
    const tab=shellTab(next);
    $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
    renderStats();if(next==='learn')learning.render();if(next==='personal'&&window.PersonalTrainers)window.PersonalTrainers.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='materials')renderMaterials();if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();if(next==='morph'&&window.MorphTrainer)window.MorphTrainer.render();
@@ -1458,8 +1500,9 @@
      else if(q.kind==='multi')$$('input[name=choice]').forEach(el=>{el.checked=draft.answers.includes(el.value);});
      else q.fields.forEach((f,i)=>{$('#answer-'+i).value=String(draft.answers[i]||'');});
    }
+   refillCardDraft();
    $$('[data-fill]').forEach(b=>{const inp=$('#'+b.dataset.fill);if(inp&&inp.value===b.dataset.val)b.setAttribute('aria-pressed','true');});
-   $('#answer-form').addEventListener('input',()=>{collapseVocabErrorOnInput();save();});$('#answer-form').addEventListener('change',save);
+   $('#answer-form').addEventListener('input',()=>{collapseVocabErrorOnInput();stashCard(q,true);save();});$('#answer-form').addEventListener('change',save);
    activateCard();save();syncKbInset();
   if(window.TutorUI&&mode!=='exam'){
     const lid=currentLessonId(q);
@@ -1591,7 +1634,7 @@
    }
    warning.hidden=true;
    const result=reveal?{correct:false,parts:supportKind(q)?[]:q.kind==='multi'?q.options.map(()=>false):q.fields.map(()=>false)}:core.evaluate(q,answers);
-   checked=true;if(reveal){hintEvent(q,'reveal');hinted=true;}
+   checked=true;dropCardDraft(q);if(reveal){hintEvent(q,'reveal');hinted=true;}
    pauseTimer();const now=Date.now(),recall=(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='select');
    const F=window.FSRS;
    let rating;
@@ -2517,11 +2560,11 @@
    render();showView('practice');
  }
  function launchCatalogTrainer(kind){
-   if(trainerReturn===kind&&queue.length>position){showView('practice');return;}
+   if(trainerReturn===kind&&queueEpoch===trainerEpoch&&queue.length>position){showView('practice');return;}
    startCatalogTrainer(kind);
  }
  function catalogTrainerStatus(kind){
-   if(trainerReturn!==kind||!queue.length||position>=queue.length)return null;
+   if(trainerReturn!==kind||queueEpoch!==trainerEpoch||!queue.length||position>=queue.length)return null;
    return {remaining:queue.length-position,total:queue.length,position};
  }
  function practiceWords(ids){
@@ -2821,7 +2864,7 @@
  if(filterClose&&filterDlg)filterClose.onclick=()=>{if(filterDlg.close)filterDlg.close();else filterDlg.removeAttribute('open');};
  function resetProgress(){
    if(!window.confirm('Сбросить весь прогресс в этом браузере? Ответы, ошибки, заметки и ассоциации будут очищены.'))return;
-   try{localStorage.setItem(BACKUP,P.serialize(state));}catch{}const retainedPackages=state.lesson_packages;state=P.empty();state.lesson_packages=retainedPackages;records=state.records;learningState=state.learning;storageReadError=null;topic='all';mode='smart';sourceFilter=null;activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;showView('today');
+   try{localStorage.setItem(BACKUP,P.serialize(state));}catch{}try{localStorage.removeItem(DRAFT_KEY);}catch{}const retainedPackages=state.lesson_packages;state=P.empty();state.lesson_packages=retainedPackages;records=state.records;learningState=state.learning;storageReadError=null;topic='all';mode='smart';sourceFilter=null;activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;showView('today');
  }
  const learning=window.LearningUI.create({
    get state(){return learningState;},save,startLesson,startCourse,courseJumpMarkup,bindCourseJump,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today'),
@@ -2886,7 +2929,8 @@
  }
  $('#pause-session').onclick=()=>{
    cancelAdvance();abortTutor();
-   showView(trainerReturn?'personal':pauseTarget());
+   const back=pauseTarget(); // drops a trainerReturn left over from an earlier trainer queue
+   showView(trainerReturn?'personal':back);
  };
  const lettersPref=$('#pref-letters');
  if(lettersPref){lettersPref.checked=!!state.prefs.letters;lettersPref.onchange=()=>{state.prefs.letters=lettersPref.checked;state.prefs.lettersChosen=true;save();if(view==='practice')render();};}

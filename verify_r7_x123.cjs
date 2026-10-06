@@ -77,13 +77,15 @@ ok('X2 first-try / peek-rate / transfer-rate are not shown (no developer mode ex
 // X3
 {
   const box={};
-  const ctx={box,trainerReturn:null,mode:'homework',hwReturn:null,pathPracticeReturn:null,sessionOrigin:null};
+  const ctx={box,trainerReturn:null,trainerEpoch:null,queueEpoch:1,mode:'homework',hwReturn:null,pathPracticeReturn:null,sessionOrigin:null};
   const pt=appSrc.slice(appSrc.indexOf(' function pauseTarget('),appSrc.indexOf('\n }\n',appSrc.indexOf(' function pauseTarget('))+4);
   vm.runInNewContext(pt+'\nbox.f=pauseTarget;',ctx);
-  const t=(o)=>{Object.assign(ctx,{trainerReturn:null,mode:'lesson',hwReturn:null,pathPracticeReturn:null,sessionOrigin:null},o);return box.f();};
+  const t=(o)=>{Object.assign(ctx,{trainerReturn:null,trainerEpoch:null,queueEpoch:1,mode:'lesson',hwReturn:null,pathPracticeReturn:null,sessionOrigin:null},o);return box.f();};
   assert.equal(t({mode:'homework'}),'homework','homework words session → Домашка');
   assert.equal(t({mode:'remediation',hwReturn:{lesson:'4-2'}}),'homework');
-  assert.equal(t({trainerReturn:'numbers'}),'personal');
+  assert.equal(t({trainerReturn:'numbers',trainerEpoch:1}),'personal','trainer queue → Тренажёры');
+  assert.equal(t({trainerReturn:'words',trainerEpoch:7,sessionOrigin:'learn'}),'learn','QA #58: a bank / words queue after a trainer keeps its own origin (stale trainerReturn dropped)');
+  assert.equal(ctx.trainerReturn,null);
   assert.equal(t({mode:'exam'}),'exam');
   assert.equal(t({pathPracticeReturn:{lessonId:'4-2'}}),'path','practice from a lesson chapter → the lesson');
   assert.equal(t({sessionOrigin:'learn'}),'learn','hub track → Учёба');
@@ -91,9 +93,12 @@ ok('X2 first-try / peek-rate / transfer-rate are not shown (no developer mode ex
   assert.equal(t({}),'today');
   const h=appSrc.slice(appSrc.indexOf(" $('#pause-session').onclick=()=>{"),appSrc.indexOf(" const lettersPref=$('#pref-letters');"));
   assert.ok(!/position--/.test(h),'← Назад no longer steps to the previous card');
-  assert.ok(/showView\(trainerReturn\?'personal':pauseTarget\(\)\)/.test(h));
+  assert.ok(/const back=pauseTarget\(\);[^\n]*\n\s*showView\(trainerReturn\?'personal':back\)/.test(h));
+  assert.ok(appSrc.includes("if(next==='practice'&&trainerReturn&&queueEpoch!==trainerEpoch)trainerReturn=null;"),'entering practice with another queue drops trainerReturn');
+  assert.equal((appSrc.match(/trainerEpoch=queueEpoch;/g)||[]).length,2,'both catalog trainer starts bind their queue');
+  assert.ok(/trainerReturn,trainerEpoch,sessionOrigin\};/.test(appSrc)&&appSrc.includes('trainerEpoch=typeof savedSession.trainerEpoch'),'binding saved and restored');
   assert.ok(/if\(next==='practice'&&view!=='practice'&&ORIGIN_VIEWS\.includes\(view\)\)sessionOrigin=view;/.test(appSrc),'showView remembers the origin');
-  assert.ok(/trainerReturn,sessionOrigin\};/.test(appSrc)&&/sessionOrigin=\/\^\(today\|learn\|path\|homework/.test(appSrc),'origin saved with the session and restored');
+  assert.ok(/trainerEpoch,sessionOrigin\};/.test(appSrc)&&/sessionOrigin=\/\^\(today\|learn\|path\|homework/.test(appSrc),'origin saved with the session and restored');
   assert.ok(/'Сделать паузу · '\+ORIGIN_LABEL\[pauseTarget\(\)\]/.test(appSrc),'aria-label names the real target');
 }
 ok('X3 ← Назад / «Сделать паузу» returns to homework / hub / lesson / today (where the session came from), never to the previous card');
@@ -153,4 +158,33 @@ ok('step: «Начать» of another lesson does not move the saved step; cold 
   assert.equal(kk.stimulus,'говорить','the gloss itself stays');
 }
 ok('minors: Russian counts, explicit «отметь» prompts + one-line why, «Убрать последний» / «Очистить», bank header names the kind, айту ← «сказать»');
+// QA #58 item 1: drafts in every typed session (ДЗ, words / Тренажёры, lesson, bank, exam, remediation) + satellite trainers
+{
+  const i=appSrc.indexOf(' const DRAFT_KEY='),j=appSrc.indexOf(' function wordsBlurKeepsDraft(');
+  assert.ok(i>0&&j>i,'durable draft book present');
+  const store={};const localStorage={getItem:k=>k in store?store[k]:null,setItem:(k,v)=>{store[k]=String(v);},removeItem:k=>{delete store[k];}};
+  const body=appSrc.slice(i,j).replace(/ try\{new MutationObserver[^\n]*\n/,'').replace(/ document\.addEventListener\('(input|submit)'[^\n]*\n/g,'');
+  const ctx={KEY:'qazaq-kris-course-v1',localStorage,box:{},mode:'homework',hwLesson:'4-2',hwPart:'words',trainerReturn:null,trainerEpoch:null,queueEpoch:1,courseBlock:'4-2',activeLesson:null,checked:false,retrying:false,
+    supportKind:q=>!!q.payload,readAnswers:q=>q._a,Date,JSON,Object,Array,String,Number};
+  vm.runInNewContext(body+'\nbox.put=draftPut;box.get=draftGet;box.key=cardDraftKey;box.stash=stashCard;box.drop=dropCardDraft;',ctx);
+  const q={id:'v2-4-2-vocab-oilau-kk',stimulus:'думать',fields:[{answers:['ойлау']}],_a:['проба']};
+  ctx.box.stash(q,false);assert.deepEqual(ctx.box.get(ctx.box.key(q)),['проба'],'typed text kept per card');
+  assert.ok(!('records' in JSON.parse(store['qazaq-kris-course-v1-drafts'])),'own key, no records / evidence');
+  ctx.trainerReturn='words';ctx.trainerEpoch=1;ctx.mode='words';assert.equal(ctx.box.get(ctx.box.key(q)),null,'a ДЗ draft does not leak into Тренажёры');
+  ctx.mode='homework';ctx.trainerReturn=null;ctx.checked=true;ctx.box.stash(q,true);assert.deepEqual(ctx.box.get(ctx.box.key(q)),['проба'],'nothing stashed after Проверить');
+  ctx.checked=false;q._a=[''];ctx.box.stash(q,false);assert.deepEqual(ctx.box.get(ctx.box.key(q)),['проба'],'a blur-cleared field does not erase the draft');
+  ctx.box.drop(q);assert.equal(ctx.box.get(ctx.box.key(q)),null,'Проверить / Показать ответ clears it');
+  for(let n=0;n<80;n++)ctx.box.put('k'+n,['x']);assert.ok(Object.keys(JSON.parse(store['qazaq-kris-course-v1-drafts'])).length<=60,'capped');
+  assert.equal(ctx.box.key({id:'b',payload:{},fields:[]}),'','word-bank / tap / choice cards have no typed draft');
+  // wiring
+  assert.ok(appSrc.includes("checked=true;dropCardDraft(q);if(reveal)")&&appSrc.includes("checked=true;dropCardDraft(q);pauseTimer();"),'cleared when answered (check / reveal / probe)');
+  assert.ok(appSrc.includes("collapseVocabErrorOnInput();stashCard(q,true);save();"),'stashed on input');
+  assert.ok(/draft=\{token:queueEpoch\+':'\+position,exerciseId:q\.id,answers:readAnswers\(q\)\};stashCard\(q,false\);/.test(appSrc),'stashed when leaving');
+  assert.ok(/\n   refillCardDraft\(\);\n/.test(appSrc)&&appSrc.includes("if(next==='practice')refillCardDraft();"),'restored on render and on return');
+  assert.ok(appSrc.includes("if(isVocabWordsMode()&&view==='practice'&&!checked"),'words blur rule does not wipe the field when leaving practice');
+  assert.ok(/'#pause-session,#check-button,/.test(appSrc),'← Назад keeps the words draft');
+  assert.ok(appSrc.includes("const SAT_FIELDS='#free-step-input,#free-write,#morph-answer';"),'free practice + rules trainer fields too');
+  assert.ok(appSrc.includes('localStorage.removeItem(DRAFT_KEY)'),'reset progress clears drafts');
+}
+ok('item 1: a typed unchecked answer survives ← Назад / Продолжить / F5 in every typed session; not an answer, not evidence');
 console.log('verify_r7_x123: '+passed+' checks passed');
