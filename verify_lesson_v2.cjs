@@ -17,7 +17,7 @@ const p=Schema.validate(raw);
 let passed=0;const ok=n=>{passed++;console.log('PASS',n);};
 
 assert.equal(p.lesson_id,'4-1');
-assert.equal(p.content_revision,'4-1.r1');
+assert.equal(p.content_revision,'4-1.r2');
 assert.ok(p.theory.length>=10);
 assert.ok(p.sources.filter(x=>x.role==='SCHOOL_NORM').length>=3);
 assert.ok(p.sources.filter(x=>x.role==='RESEARCH_VERIFIED').length>=5);
@@ -173,7 +173,7 @@ ok('data-only runtime auto-registers theory, 444 questions (+14 bank), vocabular
 
 const migratedPackage=JSON.parse(JSON.stringify(expectedCompiled));
 migratedPackage.migrations=[{
-  from_revision:'4-1.r0',to_revision:'4-1.r1',
+  from_revision:'4-1.r0',to_revision:'4-1.r2',
   question_ids:{'old-question':'gold:4-1:negative-01'},
   chapter_ids:{'old-chapter':'v2-theory-4-1-negative'},
   stage_ids:{},vocab_ids:{},drop_question_ids:['old-dropped']
@@ -227,7 +227,7 @@ const appText=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 assert.equal(indexText.includes('src="nonpast-engine.js"'),false);
 assert.equal(swText.includes('"nonpast-engine.js"'),false);
 assert.equal(swText.includes('"compiled-lessons-v2.js"'),true);
-assert.match(swText,/const CACHE='qazaq-offline-live-20261006-r7-2ta-2'/);
+assert.match(swText,/const CACHE='qazaq-offline-live-20261006-r7-2tb-1'/);
 const renderPathStart=appText.indexOf('function renderPath');
 const chapterLookup=appText.indexOf("const ch=G.chapter(les.id,gp.chapterId)",renderPathStart);
 const titleInit=appText.indexOf("const chTitle=Bank?Bank.chapterTitle(ch):ch.title",chapterLookup);
