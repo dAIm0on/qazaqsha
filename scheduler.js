@@ -14,12 +14,14 @@
    return 'FAMILIAR';
  }
  function validCard(v){return !!v&&typeof v==='object'&&['due','stability','difficulty','elapsed_days','scheduled_days','reps','lapses','state'].every(k=>Number.isFinite(v[k])&&v[k]>=0)&&v.state<=3&&v.difficulty<=10&&v.stability<=36500&&(v.last_review==null||Number.isFinite(v.last_review));}
+ // r7 ux59b #3: a card only SHOWN (opened, never answered: review_count 0) is not due — opening «Сборник 1-1» made it
+ // «Повторить сегодня» +1 at the next load (28 → 29). Legacy records without review_count keep «seen → due now».
  function migrate(p={},now=Date.now()){
    p=p||{};const seen=count(p.seen??p.attempts),correct=Math.min(seen,count(p.correct_count??p.correct));
    const r={...p,seen,review_count:count(p.review_count??(correct+count(p.wrong_count??Math.max(0,seen-correct)))),correct_count:correct,wrong_count:count(p.wrong_count??Math.max(0,seen-correct)),correct_streak:count(p.correct_streak??p.streak),
      created_at:stamp(p.created_at)||now,last_seen:stamp(p.last_seen??p.lastAttemptAt),last_correct:stamp(p.last_correct),last_wrong:stamp(p.last_wrong),last_answer:stamp(p.last_answer),
      hint_used:!!p.hint_used,hint_count:count(p.hint_count),response_time:Number.isFinite(p.response_time_ms??p.response_time)?Math.max(0,p.response_time_ms??p.response_time):null,
-     response_time_total:count(p.response_time_total),timed_answers:count(p.timed_answers),next_review:stamp(p.next_review??p.dueAt)||(seen?now:null),needsReview:!!p.needsReview,
+     response_time_total:count(p.response_time_total),timed_answers:count(p.timed_answers),next_review:stamp(p.next_review??p.dueAt)||(seen&&(p.review_count==null||count(p.review_count)>0)?now:null),needsReview:!!p.needsReview,
      recall_review_successes:count(p.recall_review_successes),review_successes:count(p.review_successes),last_successful_review:stamp(p.last_successful_review),last_shown:stamp(p.last_shown),
      fsrs:validCard(p.fsrs)?{...p.fsrs}:null,history_partial:!!p.history_partial||!!seen&&!p.fsrs,policy_version:cfg.version};
    r.mastery_level=level(r);return aliases(r);
