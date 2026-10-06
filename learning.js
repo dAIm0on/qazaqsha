@@ -47,10 +47,12 @@ function create(api){
   const ruleCard=ruleId&&window.ExplainBank&&window.ExplainBank.byId?window.ExplainBank.byId(ruleId):null;
   const ruleBlock=ruleCard&&window.ExplainOpen?'<div class="panel"><h2>Правило этого урока</h2><p>'+esc(ruleCard.title||'')+'</p>'+window.ExplainOpen.openButton(ruleId)+'</div>':'';
   const lessonWords=(window.CURRICULUM&&window.CURRICULUM.words||[]).filter(w=>w.lesson_first_seen===id);
-  const mustWords=lessonWords.filter(w=>w.target_or_context==='target');
-  const metWords=lessonWords.filter(w=>w.target_or_context!=='target');
+  const hwList=api.homeworkWordList?api.homeworkWordList(id):null;
+  const mustWords=hwList||lessonWords.filter(w=>w.target_or_context==='target');
+  const mustIds=new Set(mustWords.map(w=>w.id));
+  const metWords=hwList?lessonWords.filter(w=>!mustIds.has(w.id)):lessonWords.filter(w=>w.target_or_context!=='target');
   const wordLine=list=>list.length?'<p lang="kk">'+list.map(w=>esc(w.kazakh)).join(' · ')+'</p>':'<p class="small">В этом уроке таких слов нет.</p>';
-  const wordBlock=lessonWords.length?'<div class="panel"><h2>Слова этого урока</h2><p class="small">Те же слова словаря. Нового списка нет.</p><h3>Задано выучить</h3>'+wordLine(mustWords)+'<h3>Встречается в объяснении</h3>'+wordLine(metWords)+'</div>':'';
+  const wordBlock=(lessonWords.length||mustWords.length)?'<div class="panel"><h2>Слова этого урока</h2><p class="small">Те же слова словаря. Нового списка нет.</p><h3>Задано выучить</h3>'+wordLine(mustWords)+'<h3>Встречается в объяснении</h3>'+wordLine(metWords)+'</div>':'';
   const subjects=[['','Этот урок'],['numbers','Числа'],['plural','Окончания'],['vocab','Слова'],['person','Лица'],['verbs','Глаголы'],['phrase','Фразы']];
   $('#learn-content').innerHTML=
    '<article class="panel learn-now">'+
@@ -107,7 +109,9 @@ function create(api){
   const all=window.LEARNING&&window.LEARNING.lessons||[];
   // r7 Q5-A (QA): the lesson's own homework words replace the global must-track (1-1…) in this hub.
   const hw=api.homeworkWordsTrack?api.homeworkWordsTrack(lessonId):null;
-  return all.filter(l=>l&&!l.homeworkWords&&(l.courseLesson===lessonId||l.courseLesson==='bank')).map(l=>hw&&l.id==='vocab-must'?hw:l);
+  // r7 QA F4: false = the lesson's words are not all covered by cards yet; then no words button at all
+  // (not the global 1-1… must-track under the same title either).
+  return all.filter(l=>l&&!l.homeworkWords&&(l.courseLesson===lessonId||l.courseLesson==='bank')&&!(hw===false&&l.id==='vocab-must')).map(l=>hw&&l.id==='vocab-must'?hw:l);
  }
  function tracksMarkup(lessonId){
   const TOPIC={sounds:'Звуки',vocab:'Слова',numbers:'Числа',plural:'Окончания',person:'Лица',verbs:'Глаголы',rules:'Правила',phrase:'Фразы',possessive:'Притяжательность'};

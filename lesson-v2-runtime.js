@@ -34,7 +34,14 @@
        ...explanationBeats(t),
        {k:'algo',t:'Как действовать',items:t.decisionSteps}
      ];
-     for(const e of t.examples||[])beats.push({k:'ex',from:e.kazakh,to:e.kazakh,ru:e.translation,why:e.why||''});
+     // r7 QA F2: a v2 example is one Kazakh line. Show an arrow only for a real «было → стало» pair
+     // written in the data; never invent the slot or repeat the same word on both sides (қол → қол).
+     for(const e of t.examples||[]){
+       const kk=String(e.kazakh||'').trim(),pair=kk.split(/\s*(?:→|->)\s*/);
+       const beat={k:'ex',from:kk,ru:e.translation,why:e.why||''};
+       if(pair.length===2&&pair[0]&&pair[1]&&pair[0]!==pair[1]){beat.from=pair[0];beat.to=pair[1];}
+       beats.push(beat);
+     }
      for(const c of t.contrastExamples||[])beats.push({k:'trap',bad:c.bad,good:c.good,why:c.why});
      for(const note of t.limitations||[])beats.push({k:'fold',t:'Граница урока',b:note});
      for(const check of t.checks||[])beats.push({k:'ask',id:check.id,type:check.type,prompt:check.prompt,answer:check.answers[0],answers:check.answers,error_key:check.error_key,rule_line:check.rule_line||t.shortHint});
@@ -97,6 +104,21 @@
    if(!bindings)return all.map(q=>q.id);
    const wanted=new Set((wordIds||[]).map(id=>bindings[id]).filter(Boolean));
    return all.filter(q=>(q.vocabIds||[]).some(w=>wanted.has(w))).map(q=>q.id);
+ }
+ // r7 QA F4/M1: which required homework words (homework.word_ids, source order) have their own card in this
+ // lesson's homework word set. Hub and button use it: the button shows only when every word is covered.
+ function homeworkWordCoverage(lessonId){
+   const p=byId(lessonId)||ensure(lessonId);
+   if(!p||!p.homework)return null;
+   const ids=(p.homework.word_ids||[]).slice();
+   const qs=root.COURSE&&root.COURSE.questions||[];
+   const qids=homeworkWordQuestionIds(lessonId,ids,p.vocab_bindings,qs);
+   const byQ=new Map(qs.map(q=>[q.id,q]));
+   const bound=new Set(qids.flatMap(id=>(byQ.get(id)&&byQ.get(id).vocabIds)||[]));
+   const lemma=new Map((p.vocabulary||[]).map(v=>[v.id,v.lemma]));
+   const words=ids.map(id=>{const w=p.vocab_bindings&&p.vocab_bindings[id];return {id,catalog_id:w||null,lemma:lemma.get(id)||'',covered:!!(w&&bound.has(w))};});
+   const covered=words.filter(w=>w.covered).length;
+   return {lesson_id:lessonId,total:words.length,covered,complete:words.length>0&&covered===words.length,words,question_ids:qids};
  }
  function learningTracks(p,allQuestions){
    const byId=new Map(allQuestions.map(q=>[q.id,q]));
@@ -261,7 +283,7 @@
    }
    return picked;
  }
- const api={installAll,installOne,installShells,ensure,byId,isV2,homework,homeworkWordQuestionIds,practiceForRule,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
+ const api={installAll,installOne,installShells,ensure,byId,isV2,homework,homeworkWordQuestionIds,homeworkWordCoverage,practiceForRule,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
  root.LessonV2Runtime=api;
  // P0 Chrome Error 9: do not materialize every lesson pack (4-1 has 345 generated Qs) at boot.
  // Shells keep path/learn navigation; ensure(id) hydrates exercises on first open.

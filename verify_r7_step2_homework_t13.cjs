@@ -148,7 +148,7 @@ const grab=name=>{const i=appSrc.indexOf(' function '+name+'(');assert.ok(i>0,na
 {
   const box={};
   const records={};
-  vm.runInNewContext(grab('homeworkCounter')+'\nbox.f=homeworkCounter;',{box,records,hwPart:'words',byId:Q});
+  vm.runInNewContext(grab('homeworkCounter')+grab('wordGroupCounter')+'\nbox.f=homeworkCounter;',{box,records,hwPart:'words',byId:Q});
   const ids=plain(hw42.word_question_ids);
   let c=box.f(ids);assert.deepEqual(plain(c),{tried:0,total:13});
   records[ids[0]]={attempts:1};records[ids[1]]={attempts:1};
@@ -156,7 +156,7 @@ const grab=name=>{const i=appSrc.indexOf(' function '+name+'(');assert.ok(i>0,na
   c=box.f(ids);assert.equal(c.tried,sameWord?1:2);assert.equal(c.total,13);
   for(let i=1;i<=4;i++)records['v2-4-2-vocab-qalaisyn-kk-form-'+i]={attempts:1};
   c=box.f(ids);assert.equal(c.tried,(sameWord?1:2)+1,'four form cards are one word');
-  const box2={};vm.runInNewContext(grab('homeworkCounter')+'\nbox.f=homeworkCounter;',{box:box2,records,hwPart:'exercises',byId:Q});
+  const box2={};vm.runInNewContext(grab('homeworkCounter')+grab('wordGroupCounter')+'\nbox.f=homeworkCounter;',{box:box2,records,hwPart:'exercises',byId:Q});
   assert.deepEqual(plain(box2.f(['a','b',ids[0]])),{tried:1,total:3});
   const rs=grab('renderStats');assert.ok(/homeworkScope\(\)/.test(rs)&&/homeworkCounter\(hw\)/.test(rs),'renderStats uses the homework scope');
 }
