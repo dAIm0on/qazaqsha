@@ -14,6 +14,10 @@ function create(api){
  function currentId(){
   const Bank=window.ExplainBankUI;
   const list=window.LessonRegistry?window.LessonRegistry.course():(Bank?Bank.COURSE:[]);
+  if(api.hubLesson){ // r7 ux59 #1: the lesson chosen last, not the resume lesson
+   const id=api.hubLesson();
+   if(id&&list.some(c=>c.id===id))return id;
+  }
   if(api.currentCourse){
    const id=api.currentCourse();
    if(id&&list.some(c=>c.id===id))return id;
@@ -80,7 +84,8 @@ function create(api){
      '<button type="button" class="text-button" id="learn-homework">Домашка</button>'+
     '</div></div>';
   const go=$('#learn-continue');
-  if(go)go.onclick=()=>api.continueStep?api.continueStep():(api.openPath?api.openPath(id):api.startCourse(id));
+  // r7 ux59 #1: the hub's button continues the hub lesson (Today's lesson only when it is the same one).
+  if(go)go.onclick=()=>api.continueLesson&&api.currentCourse&&api.currentCourse()!==id?api.continueLesson(id):api.continueStep?api.continueStep():(api.openPath?api.openPath(id):api.startCourse(id));
   document.querySelectorAll('[data-learn-les]').forEach(b=>b.onclick=()=>{
    if(api.openPath)api.openPath(b.dataset.learnLes);
   });

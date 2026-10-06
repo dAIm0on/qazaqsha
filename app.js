@@ -620,7 +620,13 @@
    queueEpoch=Date.now()+Math.random();position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
    markLessonStarted(id,'practice');render();showView('practice');return true;
  }
+ /* r7 ux59 #1: the lesson chosen last («Все уроки», «Выбрать урок», Today) is the lesson of «Выбрать занятие»:
+    «Практика этого урока», its tracks and «Домашка» open it, not the resume lesson (1-1). Navigation only (sessionStorage). */
+ const HUB_KEY='qazaqsha-hub-lesson';
+ function hubLesson(){try{const id=sessionStorage.getItem(HUB_KEY);return id&&courseIds().includes(id)?id:null;}catch{return null;}}
+ function setHubLesson(id){try{if(id&&courseIds().includes(id))sessionStorage.setItem(HUB_KEY,id);}catch{}}
  function continueLesson(id){
+   setHubLesson(id);
    viewOnlyPathLesson=null;
    // r7 X3/step: on a cold start the v2 cards of this lesson are not installed yet, so the saved practice
    // («шаг 10 из 18») looked missing and «Начать / Продолжить» fell back to theory. Install them first.
@@ -1188,10 +1194,39 @@
  }
  function courseIds(){return P.courseIds();}
  function studyLive(){return ['homework','course','lesson','phrase','transfer','remediation'].includes(mode)&&queue.length>position;}
+ /* r7 ux59 #2: which lesson «Сегодня» names. Before: the resume pointer (set only by «Начать / Продолжить» of a lesson,
+    a chapter or lesson practice), else the first unfinished lesson — so ДЗ 4-2 or a 2-1 track never moved it off 1-1.
+    Now: the lesson with the latest real work — lesson start (lastAttemptAt), the resume pointer, an answer in its ДЗ,
+    its practice / tracks (answer events of its cards) — among unfinished lessons (the pointer's lesson may be finished:
+    she is repeating it). Nothing at all → the pointer, else the first unfinished lesson (as before). Read-only. */
+ function lessonOfEvent(e){
+   const m=/^(?:homework|course|stage|lesson|path):(\d-\d)\b/.exec(String(e&&e.block||''));if(m)return m[1];
+   const q=e&&byId.get(e.card_id);return q&&q.lessonId?String(q.lessonId):null;
+ }
+ function lessonActivity(){
+   const ids=courseIds(),act=Object.create(null),bump=(id,t)=>{t=Number(t)||0;if(t>0&&ids.includes(id)&&t>(act[id]||0))act[id]=t;};
+   const cp=P.ensureCourseProgress(state),rp=cp.resumePointer||{};
+   bump(rp.lessonId,rp.updatedAt);
+   for(const id of ids)bump(id,(P.ensureLessonProgress(state,id)||{}).lastAttemptAt);
+   for(const [id,a] of Object.entries(state.homeworkAttempts||{}))for(const it of (a&&a.items)||[])bump(id,it&&it.at);
+   for(const e of (state.events||[]).slice(-400))if(e&&e.type==='answer')bump(lessonOfEvent(e),e.at);
+   return act;
+ }
  function namedCourse(){
    const ids=courseIds(),cp=P.ensureCourseProgress(state),rp=cp.resumePointer||{};
+   const done=id=>(P.ensureLessonProgress(state,id)||{}).status==='completed';
+   const act=lessonActivity();let best=null,bestT=0;
+   for(const id of ids){if(done(id)&&id!==rp.lessonId)continue;const t=act[id]||0;if(t>bestT){best=id;bestT=t;}}
+   if(best)return best;
    if(ids.includes(rp.lessonId))return rp.lessonId;
-   return ids.find(id=>(P.ensureLessonProgress(state,id)||{}).status!=='completed')||ids[0]||'1-1';
+   return ids.find(id=>!done(id))||ids[0]||'1-1';
+ }
+ function nextChapterOf(lessonId){
+   let les=null;try{les=window.GrammarPath&&window.GrammarPath.lesson?window.GrammarPath.lesson(lessonId):null;}catch{les=null;}
+   const chs=(les&&les.chapters)||[];if(!chs.length)return null;
+   const gp=state.grammarPath||{},doneCh=gp.completedChapters||{};
+   const ch=chs.find(c=>!doneCh[lessonId+':'+c.id])||chs[chs.length-1];
+   return {chapterId:ch.id,beat:0};
  }
  function chapterCheckpoint(lessonId,p){
    // r7 X QA: «Глава · шаг 5» had no chapter. Name it: «Глава 3 из 13 · Собери первую прошедшую форму · шаг 5».
@@ -1207,9 +1242,15 @@
    const allDone=ids.length&&ids.every(id=>(P.ensureLessonProgress(state,id)||{}).status==='completed');
    const lessonId=namedCourse(),lp=P.ensureLessonProgress(state,lessonId),rp=cp.resumePointer||{};
    if(allDone)return {lessonId,surface:'path',title:'Основное прохождение завершено',hint:'Можно выбрать любой урок и повторить его.'};
-   if(rp.surface==='practice'&&lp&&lp.practiceSession)return {lessonId,surface:'practice',title:'Продолжить урок '+lessonId,hint:'Очередь, позиция и набранный ответ сохранены.'};
+   if(rp.lessonId===lessonId&&rp.surface==='practice'&&lp&&lp.practiceSession){
+     // r7 ux59 #2: name the place, not «Очередь, позиция…»: the last chapter read + the practice step.
+     const ps=lp.practiceSession,st=core.sessionStep(ps.queue,ps.position,ps.answered),ch=lp.path&&lp.path.chapterId?chapterCheckpoint(lessonId,{chapterId:lp.path.chapterId,beat:0}).replace(/ · шаг \d+$/,''):'';
+     return {lessonId,surface:'practice',title:'Продолжить урок '+lessonId,hint:(ch&&!/^Теория/.test(ch)?ch+' · ':'')+'практика, шаг '+st.step+' из '+st.total};
+   }
    const p=lp&&lp.path;
-   const checkpoint=p&&p.chapterId?chapterCheckpoint(lessonId,p):(lp&&lp.status==='not_started'?'Урок ещё не начат':'Место прохождения сохранено');
+   // r7 ux59 #2: a lesson not started yet still names where it starts («Глава 1 из 6 · … · шаг 1»), not «Урок ещё не начат».
+   const at=p&&p.chapterId?p:nextChapterOf(lessonId);
+   const checkpoint=at?chapterCheckpoint(lessonId,at):(lp&&lp.status==='not_started'?'Урок ещё не начат':'Место прохождения сохранено');
    return {lessonId,surface:'path',title:(lp&&lp.status==='not_started'?'Начать урок ':'Продолжить урок ')+lessonId,hint:checkpoint};
  }
  function continueStep(){
@@ -1247,7 +1288,7 @@
   }catch(e){}
 }
  function openPathLesson(lessonId,options){
-   ensureV2(lessonId);
+   ensureV2(lessonId);setHubLesson(lessonId);
    const G=window.GrammarPath;if(!G){showView('path');return;}
    if(!P.courseIds().includes(lessonId))return;
    const meaningful=!!(options&&options.meaningful);
@@ -1332,7 +1373,7 @@
        sp.textContent=`Встречалось ${c.tried} из ${core.ruCount(c.total,['слова','слов','слов'])}`;
      }
      else if(isBankSession()){const total=new Set(practiceIds).size,reached=new Set(queue.slice(0,position+1).filter(id=>practiceIds.includes(id))).size;sp.textContent=`Шаг ${Math.max(1,Math.min(reached,total))} из ${total}`;}
-     else if(['smart','lesson','course','review','contrast'].includes(mode))sp.textContent=`Шаг ${Math.min(position+1,queue.length)} из ${queue.length}`;
+     else if(['smart','lesson','course','review','contrast'].includes(mode)){const st=core.sessionStep(queue,position,false);sp.textContent=`Шаг ${st.step} из ${st.total}`;} // r7 ux59 #6: M stable when a card returns
      else{
        const hw=homeworkScope();
        if(hw&&hw.length){const c=homeworkCounter(hw);sp.textContent=`Встречалось ${c.tried} из ${c.total}`;}
@@ -2868,7 +2909,7 @@
  }
  const learning=window.LearningUI.create({
    get state(){return learningState;},save,startLesson,startCourse,courseJumpMarkup,bindCourseJump,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today'),
-   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,homeworkWordsTrack,homeworkWordList,continueStep,progress:()=>state,openHomework(id){hwLesson=id;hwOrigin='learn';showView('homework');}
+   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,hubLesson,continueLesson,homeworkWordsTrack,homeworkWordList,continueStep,progress:()=>state,openHomework(id){hwLesson=id;hwOrigin='learn';showView('homework');}
  });
  const dashboard=window.DashboardUI.create({
    state:()=>state,questions:()=>questions,eligible,hasSession:()=>queue.length>position,continueInfo:stepNow,
@@ -2927,6 +2968,25 @@
    if(trainerReturn&&queueEpoch!==trainerEpoch)trainerReturn=null;
    return trainerReturn?'personal':mode==='homework'||(mode==='remediation'&&hwReturn)?'homework':mode==='exam'?'exam':pathPracticeReturn?'path':(sessionOrigin||'today');
  }
+ // r7 ux59 #5: the lesson card has its own «← Назад»; the section heading kept a second one (visible on the lesson page,
+ // a zero-size leftover in the DOM / tab order on chapter screens). One back button per screen: hide the heading one then.
+ function syncPathHeadingBack(){
+   const hb=document.querySelector('#path-view .section-heading [data-chrome-back]');if(!hb)return;
+   const own=!!document.querySelector('#path-content .chrome-back, #path-content #path-back, #path-content [data-path-learn]');
+   if(hb.hidden!==own)hb.hidden=own;
+ }
+ try{const pc=document.getElementById('path-content');if(pc)new MutationObserver(syncPathHeadingBack).observe(pc,{childList:true,subtree:true});}catch{}
+ // r7 ux59 #0: the logo «Qazaqsha, сегодня» opens Сегодня in place (no reload): session, drafts and the lesson stay.
+ // Ctrl / ⌘ / Shift / middle click still open a new tab; F5 keeps resumeSurface.
+ const brandLink=document.querySelector('a.brand');
+ if(brandLink)brandLink.addEventListener('click',ev=>{
+   if(ev.defaultPrevented||ev.button!==0||ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.altKey)return;
+   ev.preventDefault();cancelAdvance();abortTutor();
+   const picker=document.getElementById('lesson-picker');if(picker&&picker.open)try{picker.close();}catch{}
+   showView('today');save();
+   try{window.scrollTo({top:0});}catch{}
+   const h=document.querySelector('#today-view h1, #today-content h2');if(h){h.setAttribute('tabindex','-1');try{h.focus({preventScroll:true});}catch{}}
+ });
  $('#pause-session').onclick=()=>{
    cancelAdvance();abortTutor();
    const back=pauseTarget(); // drops a trainerReturn left over from an earlier trainer queue
