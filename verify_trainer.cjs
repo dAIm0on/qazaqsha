@@ -1391,7 +1391,7 @@ assert.ok(start31.indexOf('restoreLessonPractice(block)')<start31.indexOf('cours
 ok('Phase 3 dormant Practice/Phrase integration installs nothing while closed and all 46 items when 3-1 gate opens');
 
 const openAdapter=require('./explain-bank-adapter.js');
-assert.deepEqual(openAdapter.OPEN,['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3','4-2']);
+assert.deepEqual(openAdapter.OPEN,['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3','4-2','5-1']);
 assert.deepEqual(openAdapter.courseById('3-1').rules,['T20_POSS','T21_POSS_ASSIM','T22_BAR_ZHOK','T23_POSS_PL']);
 assert.equal(openAdapter.CHAPTER_RULE['3-1-poss'],'T20_POSS');
 assert.equal(openAdapter.CHAPTER_RULE['3-1-assim'],'T21_POSS_ASSIM');
