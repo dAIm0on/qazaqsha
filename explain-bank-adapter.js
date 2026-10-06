@@ -80,7 +80,7 @@
  function chapterTitle(ch){
   if(!ch)return '';
   if(TITLE_FIX[ch.id])return TITLE_FIX[ch.id];
-  return String(ch.title||'').replace(/^Рычаг [АAБB]:\s*/,'').replace(/бирка/gi,'окончание').replace(/рычаг(ов|ами|а)?/gi,'шаг');
+  return String(ch.title||'').replace(/^Рычаг [АAБB]:\s*/,'').replace(/бирка/gi,'окончание').replace(/(р)ычаг(ами|ам|ах|ов|ом|а|е|и|у)?/gi,(m,r,suf)=>(r==='Р'?'Ш':'ш')+'аг'+(suf||'')); // keep the case ending: «двух рычагов» → «двух шагов» (was «двух шаг»)
  }
  function paras(text){
   return String(text||'').split(/\n\n+/).map(p=>p.trim()).filter(Boolean);
