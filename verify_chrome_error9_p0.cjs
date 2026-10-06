@@ -45,8 +45,9 @@ assert.ok(l33&&(l33.homework.exercise_ids||[]).length===64,'3-3 HW 64 items inta
 ok('lesson content for 3-3/4-1/4-2 not cut');
 
 function freshMock(list){
+  // r7 51: draft-gate — verify under localhost QA bypass so all shells install for nav.
   return {
-    LessonV2Schema:Schema,LESSON_V2_COMPILED:JSON.parse(JSON.stringify(list)),
+    location:{hostname:'localhost'},LessonV2Schema:Schema,LESSON_V2_COMPILED:JSON.parse(JSON.stringify(list)),
     COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
     CURRICULUM:{words:[],rules:[],lessons:[],addWord(kazakh,translation,lesson,role){const w={id:'word:'+kazakh,kazakh,translation:[...translation],lesson_first_seen:lesson,target_or_context:role==='target'?'target':'context',card_ids:[],aliases:[kazakh]};this.words.push(w);return w;}},
     CourseProgress:{registerStages(){return [];}},Canonical:null

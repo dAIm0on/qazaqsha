@@ -50,6 +50,7 @@ assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-51-2'"));
 ok('sw cache bumped to kb-compact');
 
 const mock={
+  location:{hostname:'localhost'},
   LessonV2Schema:Schema,
   LESSON_V2_COMPILED:[validated],
   COURSE:{questions:[],sources:{}},

@@ -16,7 +16,7 @@ const Schema=require('./lesson-v2-schema.js');
 const ctx={window:{}};ctx.window.window=ctx.window;vm.runInNewContext(read('compiled-lessons-v2.js'),ctx);
 const compiled=plain(ctx.window.LESSON_V2_COMPILED);
 function runtime(list){
-  const mock={LessonV2Schema:Schema,LESSON_V2_COMPILED:list,COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
+  const mock={location:{hostname:'localhost'},LessonV2Schema:Schema,LESSON_V2_COMPILED:list,COURSE:{questions:[],sources:{}},LEARNING:{lessons:[]},GRAMMAR_CHAPTERS:{LESSONS:[]},
     CURRICULUM:{words:[],rules:[],lessons:[],addWord(kazakh,translation,lesson,role){let w=this.words.find(x=>x.kazakh===kazakh);if(!w){w={id:'word:'+kazakh,kazakh,translation:[...translation],lesson_first_seen:lesson,target_or_context:role==='target'?'target':'context',card_ids:[],aliases:[kazakh]};this.words.push(w);}return w;}},
     CourseProgress:{registerStages(){return [];}},Canonical:null};
   vm.runInNewContext(read('lesson-v2-runtime.js'),{window:mock,globalThis:mock,console});
