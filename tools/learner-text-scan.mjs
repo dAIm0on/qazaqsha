@@ -17,7 +17,10 @@ export const PATTERNS=[
  ['skill code',/\bSKILL_/],['error_key',/error_key/],['CODE_NAME',/\b[A-Z][A-Z0-9]+(?:_[A-Z0-9]+)+\b/],['snake_case',/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/],
  ['template',/\$\{/],['«Глава ·»',/Глава\s*·/],['« ·  · »',/·\s*·/],
  ['empty number',/(?:^|[\s(])(?:Глава|Урок|Шаг|шаг|из)\s*·|Глава\s+из(?![а-яё])|(?:Глава|Урок|шаг)\s+из\s+(?:\D|$)/m],['dangling ·',/·[ \t]*$|^[ \t]*·/m],
- ['cut word after «шаг» rewrite',/(?:^|\s)(?:двух|трёх|нескольких|всех)\s+шаг(?![а-яё])/i]
+ ['cut word after «шаг» rewrite',/(?:^|\s)(?:двух|трёх|нескольких|всех)\s+шаг(?![а-яё])/i],
+ // r7 ux59b #1: raw keys («rule:v2:4-2:bridge::application», «confuse:lex-4»), arrows with an empty side, «Часто путаю: 9 →».
+ ['raw key',/\b[A-Za-z_]\w*:[\w:-]+/],['arrow, empty left',/(?:[.:;,(·][ \t]*→|^[ \t]*→[ \t]*\S)/m],['arrow, empty right',/\S[ \t]*→[ \t]*(?:$|[.,;:)·])/m], // a line that is only «→» is a breadcrumb separator
+ ['«Часто путаю: N →»',/Часто путаю:\s*\d+/]
 ];
 let server=null;
 if(!host){
@@ -36,7 +39,22 @@ function stateOf(raw){ // accepts a localStorage state, an export file or a base
  for(const k of ['first','second'])if(raw[k]){const st=raw[k].storage||raw[k].localStorage||raw[k];const v=st&&st['qazaq-kris-course-v1'];if(v)return typeof v==='string'?JSON.parse(v):v;}
  return null;
 }
-const cases=[{name:'empty',state:null,ai:null},{name:'ai-unknown',state:null,ai:AI_UNKNOWN},{name:'mid-chapter-3-1',state:null,ai:AI_UNKNOWN,mid:'3-1'}];
+const cases=[{name:'empty',state:null,ai:null},{name:'ai-unknown',state:null,ai:AI_UNKNOWN},{name:'mid-chapter-3-1',state:null,ai:AI_UNKNOWN,mid:'3-1'},
+ // r7 ux59b #1: accumulated errors the way QA made them on the preview — «Практика этого урока» 4-2, «тест» typed again and
+ // again (rule buckets), plus сен ↔ сіз swapped where the answer has one of them (a real confusion pair).
+ {name:'typed-wrong-4-2',state:null,ai:null,drive:'4-2'}];
+async function drive(page,id){
+ await page.evaluate(async id=>{const W=ms=>new Promise(r=>setTimeout(r,ms));window.QazaqShell.show('learn');await W(300);document.querySelector(`[data-learn-les="${id}"]`).click();await W(400);window.QazaqShell.show('learn');await W(300);document.getElementById('learn-practice').click();await W(700);
+  for(let i=0;i<34;i++){if(document.body.dataset.view!=='practice')break;
+   const s=JSON.parse(localStorage.getItem('qazaq-kris-course-v1')).session||{};const q=window.COURSE.questions.find(x=>x.id===(s.queue||[])[s.position]);
+   const inputs=[...document.querySelectorAll('[id^="answer-"]')].filter(el=>el.offsetParent&&!el.disabled&&el.tagName!=='SELECT');
+   if(!inputs.length){const rk=document.getElementById('rk-response');if(rk)rk.value=JSON.stringify(['zzz']);}
+   inputs.forEach((el,j)=>{const exp=String(q&&q.fields&&q.fields[j]&&q.fields[j].answers&&q.fields[j].answers[0]||'');const sw=exp.replace(/(^|[^\p{L}])(сіз|сен)(?=$|[^\p{L}])/giu,(m,a,w)=>a+(w.toLowerCase()==='сіз'?'сен':'сіз'));el.value=sw!==exp?sw:'тест';el.dispatchEvent(new Event('input',{bubbles:true}));});
+   const cb=document.getElementById('check-button');if(cb&&!cb.hidden)cb.click();await W(600);
+   const nb=document.getElementById('next-button');if(nb&&!nb.hidden)nb.click();else{const rv=document.getElementById('reveal-button');if(rv&&!rv.hidden){rv.click();await W(300);document.getElementById('next-button')?.click();}}
+   await W(350);}
+  window.QazaqShell.show('today');await W(300);},id);
+}
 for(const f of files){try{const s=stateOf(JSON.parse(fs.readFileSync(f,'utf8')));if(s)cases.push({name:path.basename(f),state:s,ai:AI_UNKNOWN,mid:'3-1'});else console.log('skip (no state):',f);}catch(e){console.log('skip',f,e.message);}}
 const browser=await chromium.launch({headless:true,executablePath:CHROME,args:['--disable-dev-shm-usage']});
 const findings=[];let screens=0;
@@ -59,8 +77,10 @@ for(const c of cases){
   await probe.ctx.close();
  }
  const {ctx,page,errs}=await boot(c,seed);
+ if(c.drive)await drive(page,c.drive);
  const show=async v=>{await page.evaluate(v=>window.QazaqShell.show(v),v);await page.waitForTimeout(350);return visibleText(page);};
- for(const v of ['today','learn','personal','path','homework','exam']){const t=await show(v);check(c,v,t);
+ for(const v of ['today','learn','personal','path','homework','exam','review']){const t=await show(v);check(c,v,t);
+  if(v==='today'&&c.drive)expect(c,v,t,/Слабые места[\s\S]*\d+ раза? за 14 дней/,'a named weak spot «… N раз за 14 дней» after the typed errors');
   if(v==='today'&&c.ai)expect(c,v,t,/Нет окончания лица после притяжательного · 4 раза/,'readable weak spot «… · 4 раза» (UNKNOWN hidden)');
   if(v==='today'&&c.mid&&!c.state)expect(c,v,t,/Глава \d+ из \d+ · [^\n·]+ · шаг 5/,'checkpoint «Глава N из M · название · шаг 5»');}
  // each homework lesson page

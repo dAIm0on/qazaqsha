@@ -17,7 +17,7 @@
        const retention=window.LearningSupport.retention(state);
        const weakWords=catalog.words.filter(w=>catalog.wordStats(w,state).weak),weakRules=catalog.rules.filter(r=>cards.some(q=>q.ruleIds?.includes(r.id)&&state.records[q.id]?.needsReview));
        const ms=progress.memoryStats(state);
-       const weak=window.LearningSupport.weakSpots?window.LearningSupport.weakSpots(state,api.questions()):[];
+       const weak=window.Homework&&window.Homework.learnerWeakSpots?window.Homework.learnerWeakSpots(state,api.questions()):[]; // r7 ux59b #1: named only
        const step=api.continueInfo?api.continueInfo():{lessonId:'1-1',title:'Продолжить урок',hint:'Текущий урок курса.'};
        const dueHint=dueShow?'карточек в очереди повторения':'На сегодня всё повторено';
        const pauseN=cards.filter(q=>core.pauseReady(state.records[q.id])).length;
@@ -30,13 +30,18 @@
        const weakBody=(...parts)=>{const html=parts.join('');return html||'<p>Устойчивых слабых мест пока нет.</p>';};
        const recallLine=retention.total?retention.correct+' из '+retention.total+' проверок после паузы — самостоятельно.':'';
        const tip=(id,text)=>`<details class="help-line"><summary aria-label="Что это значит">?</summary><p id="${id}">${text}</p></details>`;
-       const pairN=progress.pairs(state).length;
-       const weakOpen=weak.length||weakWords.length||weakRules.length||repeated.length;
+       // r7 ux59b #1: «Часто путаю: 9 →» counted every (expected, typed) pair, «тест» included, and led to a screen without them.
+       // Now: only pairs where the typed answer is itself a real answer of the course (known_alternative), both sides shown.
+       const pairRows=progress.pairs(state).filter(([,p])=>p&&p.known_alternative&&String(p.expected_answer||'').trim()&&String(p.wrong_answer_given||'').trim()&&p.expected_answer!==p.wrong_answer_given).slice(0,3);
+       const pairN=pairRows.length;
+       const weakRulesShown=weakRules.filter(r=>String(r.title||'').trim()&&!weak.some(w=>w.label===r.title)); // not twice under one name
+       const weakOpen=weak.length||weakWords.length||weakRules.length||repeated.length||pairN;
        const courseRows=(window.LessonRegistry&&window.LessonRegistry.course())||(window.ExplainBankUI&&window.ExplainBankUI.COURSE)||[];
        const curCourse=courseRows.some(row=>row.id===step.lessonId)?step.lessonId:'';
        const lessonProgress=id=>progress.ensureLessonProgress?progress.ensureLessonProgress(state,id):((state.courseProgress&&state.courseProgress.lessons||{})[id]||{status:'not_started'});
        const statusText=p=>p.status==='completed'?'Завершён':p.status==='in_progress'?'В процессе':'Не начат';
        const progressHint=(id,p)=>{
+         if(api.resumeTarget&&p.status!=='completed')return api.resumeTarget(id).hint; // r7 ux59b #2: same resolver as «Продолжить»
          if(p.practiceSession&&Array.isArray(p.practiceSession.queue)){
            const st=core.sessionStep(p.practiceSession.queue,p.practiceSession.position,p.practiceSession.answered); // r7 ux59 #6: same step the practice shows, M stable
            return 'Практика · шаг '+st.step+' из '+st.total;
@@ -87,7 +92,7 @@
       <div class="today-collage" aria-hidden="true"><div class="today-photo p1"></div><div class="today-photo p2"></div><div class="today-photo p3"></div><div class="today-photo p4"></div></div>
        <dialog id="lesson-picker" class="settings-dialog lesson-picker" aria-labelledby="lesson-picker-title"><div class="lesson-picker-head"><div><p class="eyebrow">Прохождение</p><h2 id="lesson-picker-title">Выбрать урок</h2><p class="small">Просмотр не меняет место, с которого продолжится основное обучение.</p></div><button type="button" class="text-button" data-picker-close>Закрыть</button></div><div class="lesson-picker-list">${pickerRows}</div></dialog>
        <details class="panel compact-panel"><summary>Память</summary><p>Помню после паузы: <strong>${remembered} из ${core.ruCount(recallCards.length,['карточки','карточек','карточек'])}</strong>, которые уже ${recallCards.length===1?'встречалась':'встречались'} с вводом ответа.</p><p class="small" id="memory-help">Это не процент знания языка: считается, сколько карточек вспоминается после паузы в несколько дней без подсказки.</p>${recallLine?'<p>'+recallLine+'</p>':''}${ms.firstTry==null?'':'<p>Вспомнила самостоятельно: '+ms.firstTry+'%</p>'}${ms.peekRate==null?'':'<p>С подсказкой: '+ms.peekRate+'%</p>'}${ms.stop?'<p class="small">Если три дня подряд больше половины домашки открывается с подсказкой — уменьши пачку, не добавляй новый тип.</p>':''}</details>
-       <details class="panel compact-panel"${weakOpen?' open':''}><summary>Слабые места</summary>${(window.RepairState&&window.ErrorDiagnostics?window.RepairState.metricParts(state,state.events).filter(part=>part.kind==='savings').map(()=>'<p class="small">Стало легче вспоминать</p>').slice(0,1).join(''):'')}${weakBody(weak.length?weak.map(w=>`<div class="confusion-row"><div><strong>${esc(window.Homework&&window.Homework.weakLabel?window.Homework.weakLabel(w.key):w.key)}</strong><p class="small">${w.count} за 14 дней. ${esc(w.expected)} → ${esc(w.actual)}</p></div><button type="button" class="secondary-button" data-action="weak:${esc(w.cardId)}">Разобрать</button></div>`).join(''):'',weakWords.length?'<p>'+weakWords.slice(0,5).map(w=>esc(w.kazakh)).join(' · ')+'</p>':'',weakRules.length?'<p class="small">Правила: '+weakRules.map(r=>esc(r.title)).join(', ')+'</p>':'',repeated.length?'<p class="small">Повторяются ошибки:<br>'+repeated.map(w=>esc(window.AiTutor.label(w.error_code))+' · '+core.ruCount(Number(w.count_recent||w.count_total)||0,['раз','раза','раз'])).join('<br>')+'</p><button type="button" class="text-button" data-action="ai-summary">Краткий разбор сессии</button>':'')}${pairN?`<button type="button" class="text-button" data-action="confusions">Часто путаю: ${pairN} →</button>`:''}</details>
+       <details class="panel compact-panel"${weakOpen?' open':''}><summary>Слабые места</summary>${(window.RepairState&&window.ErrorDiagnostics?window.RepairState.metricParts(state,state.events).filter(part=>part.kind==='savings').map(()=>'<p class="small">Стало легче вспоминать</p>').slice(0,1).join(''):'')}${weakBody(weak.length?weak.map(w=>`<div class="confusion-row"><div><strong>${esc(w.label)}</strong><p class="small">${esc(window.Homework.weakDetail(w))}</p></div><button type="button" class="secondary-button" data-action="weak:${esc(w.cardId)}">Разобрать</button></div>`).join(''):'',weakWords.length?'<p>'+weakWords.slice(0,5).map(w=>esc(w.kazakh)).join(' · ')+'</p>':'',weakRulesShown.length?'<p class="small">Правила: '+weakRulesShown.map(r=>esc(r.title)).join(', ')+'</p>':'',pairN?'<p class="small">Путаю похожие ответы:</p>'+pairRows.map(([,p])=>`<div class="confusion-row"><div><strong lang="kk">${esc(p.expected_answer)} и ${esc(p.wrong_answer_given)}</strong><p class="small">${esc(core.ruCount(Number(p.confusion_count)||0,['раз','раза','раз']))}</p></div><button type="button" class="secondary-button" data-action="pair:${esc(p.expected_answer)}:${esc(p.wrong_answer_given)}">Потренировать</button></div>`).join(''):'',repeated.length?'<p class="small">Повторяются ошибки:<br>'+repeated.map(w=>esc(window.AiTutor.label(w.error_code))+' · '+core.ruCount(Number(w.count_recent||w.count_total)||0,['раз','раза','раз'])).join('<br>')+'</p><button type="button" class="text-button" data-action="ai-summary">Краткий разбор сессии</button>':'')}</details>
        <details class="panel compact-panel"><summary>Навыки</summary><div class="useful-stats"><div><strong>${rows.filter(r=>['LEARNING','FAMILIAR'].includes(r.mastery_level)).length}</strong><span>Изучается / знакомо</span></div><div><strong>${rows.filter(r=>r.mastery_level==='REMEMBERED').length}</strong><span>Помню после паузы</span></div><div><strong>${rows.filter(r=>r.mastery_level==='MASTERED').length}</strong><span>Устойчиво вспоминаю</span></div></div><p class="small">Произношение голосом приложение не проверяет. Тренируем буквы, гармонию и набор.</p></details>
        <details class="panel compact-panel"><summary>Мой словарь и материалы</summary><div class="utility-links"><button type="button" class="secondary-button" data-action="vocabulary">Мой словарь</button><button type="button" class="text-button" data-action="materials">Материалы курса</button></div></details>${backupMarkup()}`;
      }else if(view==='review'){
@@ -96,12 +101,12 @@
        const times=state.events.filter(e=>e.type==='answer'&&e.correct&&!e.hinted&&e.response_time_ms!=null);
        const rt=types=>{const values=times.filter(e=>e.skills?.some(s=>types.includes(s.skill_type))).slice(-30).map(e=>e.response_time_ms).sort((a,b)=>a-b);return values.length?{n:values.length,median:values[Math.floor(values.length/2)]/1000}:null;};
        const digitTime=rt(['digit_to_word']),readTime=rt(['word_to_digit']);
-       const weakNow=window.LearningSupport.weakSpots?window.LearningSupport.weakSpots(state,api.questions()):[];
+       const weakNow=window.Homework&&window.Homework.learnerWeakSpots?window.Homework.learnerWeakSpots(state,api.questions()):[];
        const hardRows=weakNow.slice(0,4).map(w=>{
          const pair=String(w.key||'').startsWith('confuse:')?w.key.slice(8).split('_'):null;
          const action=pair?'pair:'+esc(pair[0]||'')+':'+esc(pair[1]||''):'weak:'+esc(w.cardId);
          const label=pair?'Короткая тренировка':'Разобрать и попробовать';
-         return `<div class="confusion-row"><div><strong>${esc(window.Homework&&window.Homework.weakLabel?window.Homework.weakLabel(w.key):w.key)}</strong><p class="small">${w.count} за 14 дней</p></div><button type="button" class="secondary-button" data-action="${action}">${label}</button></div>`;
+         return `<div class="confusion-row"><div><strong>${esc(w.label)}</strong><p class="small">${esc(window.Homework.weakDetail(w))}</p></div><button type="button" class="secondary-button" data-action="${action}">${label}</button></div>`;
        }).join('');
        const hardPanel=`<div class="panel"><h2>Сейчас трудно</h2>${hardRows||'<p>Устойчивых трудностей пока нет.</p>'}</div>`;
        const gapArticle=gaps.length?'<article class="review-due"><p class="eyebrow">Очередь на сегодня</p><h2>Пора вспомнить</h2>'+gapHtml+'</article>':'';

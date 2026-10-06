@@ -335,11 +335,63 @@
    'confuse:жеті_жетпіс':'7 и 70',
    'confuse:тоғыз_тоқсан':'9 и 90'
  };
- function weakLabel(key){
+ // r7 ux59b #1: every weak-spot key the learner can meet has a Russian name; an unnamed key is hidden, never shown raw
+ // («rule:v2:4-2:bridge::application», «confuse:lex-4»). Sources: diagnostics SKILL tags, weaknessKey fallbacks,
+ // verb rules (rule:<id>::application → the rule title of its lesson), word keys, confuse pairs, card:<id>.
+ Object.assign(WEAK_LABELS,{
+   'rule:plural':'Множественное число','rule:translation::recognition':'Перевод: узнать значение','rule:harmony':'Гармония гласных',
+   'rule:person::sg':'Личные окончания: я, ты, вы','rule:person::pl':'Личные окончания: мы, вы (сендер, сіздер)',
+   'rule:question::particle':'Вопрос: частица ма / ме','rule:question::consonant_class':'Частица ма / ба / па: звук','rule:question::which':'Не то вопросительное слово',
+   'rule:numeral::atom':'Числа: само слово','rule:third_person::no_personal_suffix':'Он / она: без личного окончания',
+   'rule:poss::suffix':'Притяжательное окончание','rule:poss::assim_voice':'Притяжательное: П/К/Қ становятся Б/Г/Ғ',
+   'rule:bar_zhok':'Бар / жоқ','rule:bar_zhok::not_emes':'Жоқ, а не емес',
+   'rule:poss::plural_order':'Порядок множественного и притяжательного','rule:poss::phrase':'Притяжательное сочетание',
+   'rule:poss::owner_form':'Форма владельца (менің, сенің…)','rule:poss::glide':'Притяжательное: звук на стыке',
+   'rule:poss::sender_plural':'Притяжательное «ваш» (сендер)','rule:poss::readings':'Притяжательное: два прочтения','rule:poss::olar':'Притяжательное «их» (олар)',
+   'rule:deixis::bare':'Указательные слова','rule:deixis::ol':'Ол как «тот»','rule:poss::not_person':'Притяжательное, а не личное окончание',
+   'rule:poss::harmony':'Притяжательное: ряд','rule:poss::edge':'Притяжательное: последняя буква','rule:poss::buffer':'Притяжательное после гласной',
+   'rule:poss::person_vs':'«Кто» и «чей» перепутаны','rule:poss::owner_subject':'Владелец и лицо перепутаны','rule:poss::owner':'Не тот владелец',
+   'rule:poss::subject':'Не то лицо','rule:poss::stack':'Притяжательное + лицо: порядок','rule:poss::person_tail':'Лицо после притяжательного',
+   'rule:otbasy::double':'Отбасы: двойное притяжательное','rule:adj::role':'Порядок признака и слова'
+ });
+ const PAIR_WORDS=[['алты','алпыс'],['жеті','жетпіс'],['сегіз','сексен'],['тоғыз','тоқсан'],['сен','сіз'],['сың','сіз']];
+ function ruleTitle(id){
+   const c=root.CURRICULUM&&root.CURRICULUM.rules||[];const r=c.find(x=>x&&x.id===id);if(r&&r.title)return String(r.title);
+   const b=explainBank();const card=b&&b.byId?b.byId(id):null;if(card&&card.title)return String(card.title);
+   for(const raw of root.LESSON_V2_COMPILED||[]){const x=(raw.rules||[]).find(y=>y&&y.id===id);if(x&&x.title)return String(x.title);}
+   return '';
+ }
+ const cyr=t=>/[а-яёәіңғүұқөһ]/i.test(String(t||''));
+ function weakLabel(key,questions){
+   key=String(key||'');
    if(WEAK_LABELS[key])return WEAK_LABELS[key];
-   if(String(key).startsWith('word:')&&String(key).endsWith('::production'))return 'Слово: написать по-казахски';
-   if(String(key).startsWith('word:')&&String(key).endsWith('::recognition'))return 'Слово: узнать перевод';
-   return key;
+   let m=/^confuse:lex-(\d+)$/.exec(key);if(m&&PAIR_WORDS[+m[1]])return PAIR_WORDS[+m[1]][0]+' и '+PAIR_WORDS[+m[1]][1];
+   m=/^confuse:([^_:]+)_([^_:]+)$/.exec(key);if(m&&cyr(m[1])&&cyr(m[2]))return m[1]+' и '+m[2];
+   if(key.startsWith('confuse:'))return '';
+   if(/::production$/.test(key))return 'Слово: написать по-казахски';
+   if(/::recognition$/.test(key))return 'Слово: узнать перевод';
+   m=/^rule:(.+?)(?:::[a-z_]+)?$/.exec(key);
+   if(m){const t=ruleTitle(m[1]);if(t)return t;const l=/^v2:(\d)-(\d)\b/.exec(m[1]);return l?'Правило урока '+l[1]+'–'+l[2]:'';}
+   m=/^card:(.+)$/.exec(key);
+   if(m){const q=(questions||(root.COURSE&&root.COURSE.questions)||[]).find(x=>x&&x.id===m[1]);const t=q&&String(q.title||'').trim();return t&&cyr(t)?'Задание: '+t.replace(/[.:]$/,''):'';}
+   return '';
+ }
+ // Detail line: «3 раза за 14 дней. сөйлейсіз → тест» — the arrow only when both sides exist.
+ function weakDetail(w){
+   const n=Number(w&&w.count)||0,word=n%10===1&&n%100!==11?'раз':[2,3,4].includes(n%10)&&![12,13,14].includes(n%100)?'раза':'раз';
+   const exp=String(w&&w.expected||'').trim(),act=String(w&&w.actual||'').trim();
+   return n+' '+word+' за 14 дней'+(exp&&act&&exp!==act?'. '+exp+' → '+act:'');
+ }
+ // Learner list: named weak spots only.
+ function learnerWeakSpots(state,questions,now=Date.now(),opts={}){
+   return weakSpots(state,questions,now,opts).map(w=>Object.assign({},w,{label:weakLabel(w.key,questions)})).filter(w=>w.label);
+ }
+ // A confusion is real only when the wrong answer is the other word of the pair (сіз typed for сен), not any slip on a сен/сіз card.
+ function realConfusion(pairId,expected,actual){
+   const m=/^lex-(\d+)$/.exec(String(pairId||''));const pair=m&&PAIR_WORDS[+m[1]];if(!pair)return null;
+   const has=(t,w)=>new RegExp('(?:^|[^\\p{L}])'+w+'(?:$|[^\\p{L}])','iu').test(String(t||''));
+   const [a,b]=pair;const ok=(has(expected,a)&&has(actual,b)&&!has(actual,a))||(has(expected,b)&&has(actual,a)&&!has(actual,b));
+   return ok?'confuse:'+a+'_'+b:null;
  }
  function markChecklist(state,lessonId,key,value){
    const attempt=ensureAttempt(state,lessonId);
@@ -384,7 +436,7 @@
    }).join('');
    const sourceItems=(pack.homework.source_items||[]).map(x=>'<li><strong>'+esc(x.number)+'.</strong> '+esc(x.text)+'</li>').join('');
    const missed=(attempt.items||[]).filter(it=>it.status==='ошибка'||it.status==='пропуск');
-   const weak=(attempt.weak_tags||[]).map(t=>esc(t)).join(', ')||'нет';
+   const weak=[...new Set((attempt.weak_tags||[]).map(t=>weakLabel(t,questions)).filter(Boolean))].map(t=>esc(t)).join(', ')||'нет'; // r7 ux59b #1: names, not keys
    return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Домашка ${esc(pack.lesson_id)} · ${stamp}</title>
 <style>@page{size:A4;margin:12mm}body{font:15px/1.45 Georgia,serif;color:#111;background:#fff;margin:16px}h1,h2{font-weight:700}table{border-collapse:collapse;width:100%;table-layout:fixed}th,td{border:1px solid #333;padding:6px 8px;vertical-align:top;overflow-wrap:anywhere}th{text-align:left}tr{break-inside:avoid}@media print{body{margin:0;color:#000;background:#fff}a{color:#000;text-decoration:none}nav,.no-print{display:none!important}}</style></head>
 <body><h1>Qazaqsha · ${esc(pack.homework.title)} · ${stamp}</h1>
@@ -393,7 +445,7 @@ ${sourceItems?'<h2>Исходная домашняя работа</h2><ol>'+sour
 <p>Чеклист: методичка ${check.method?'да':'нет'} · упражнения ${check.exercises?'да':'нет'} · слова ${check.words?'да':'нет'} · тест сайта ${check.external_test?'отмечен':'не отмечен'}</p>
 <p>Тест сайта: ${pack.homework.external_test_url?esc(pack.homework.external_test_url):'ссылка не найдена в PDF'}. Результат сайта здесь не проверяется.</p>
 <table><thead><tr><th style="width:16%">Источник</th><th style="width:42%">Задание</th><th style="width:27%">Мой ответ</th><th style="width:15%">Статус</th></tr></thead><tbody>${rows}</tbody></table>
-<h2>Не сошлось</h2><p>${missed.length?missed.map(it=>esc(it.id)+' — '+esc((it.answers||[]).join(' / '))).join('; '):'нет'}</p>
+<h2>Не сошлось</h2><p>${missed.length?missed.map(it=>{const q=byId.get(it.id);const name=q?String(q.stimulus||q.prompt_original||q.title||'').trim():'';return esc(name||'задание')+' — '+esc((it.answers||[]).join(' / ')||'без ответа');}).join('; '):'нет'}</p>
 <p>Слабые места этого листа: ${weak}</p>
 </body></html>`;
  }
@@ -461,8 +513,9 @@ ${sourceItems?'<h2>Исходная домашняя работа</h2><ol>'+sour
      if(e.at<cutoff||e.type!=='answer')continue;
      const q=byId.get(e.card_id);
      if(firstTryFail(e)&&(e.confusion_tag==='lexical_confuse'||e.confuse_pair_id)){
-       const pair=e.confuse_pair_id==='lex-0'?'confuse:алты_алпыс':('confuse:'+(e.confuse_pair_id||'pair'));
-       add(pair,e.at,e.expected_answer,(e.answers||[])[0],e.card_id,true);
+       const exp=(q&&q.fields&&q.fields[0]&&q.fields[0].answers[0])||e.expected_answer||'';
+       const pair=realConfusion(e.confuse_pair_id,exp,(e.answers||[])[0]);
+       if(pair)add(pair,e.at,exp,(e.answers||[])[0],e.card_id,true);
      }
      if(!firstTryFail(e)){markSeen(e.id,e.card_id,e.at);continue;}
      const key=weaknessKey(e,q);
@@ -558,6 +611,6 @@ ${sourceItems?'<h2>Исходная домашняя работа</h2><ol>'+sour
    }
    return out;
  }
- const api={RULES,EXTERNAL,WORD_LEMMAS,inferRule,ruleId,ruleText,missingRules,buildPack,lesson42WordNorm,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,sliceSection,sectionCount,sectionOf,partProgress,vocabDirections,recognitionFirst,HW_SECTION,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,otherTopicFillers,remediationQueue,blindCloseDays,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
+ const api={RULES,EXTERNAL,WORD_LEMMAS,inferRule,ruleId,ruleText,missingRules,buildPack,lesson42WordNorm,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,sliceSection,sectionCount,sectionOf,partProgress,vocabDirections,recognitionFirst,HW_SECTION,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,otherTopicFillers,remediationQueue,blindCloseDays,firstTryFail,weaknessKey,weakLabel,weakDetail,learnerWeakSpots,realConfusion,ruleTitle,WEAK_LABELS};
  if(node)module.exports=api;else root.Homework=api;
 })(typeof window!=='undefined'?window:globalThis);
