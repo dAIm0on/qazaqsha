@@ -21,7 +21,7 @@ ok('question prompt is not line-clamped');
 {
   const app=read('app.js'),prog=read('progress.js');
   assert.ok(app.includes("never write null over a known revision")||app.includes("if(!contentRevision&&lp&&lp.path&&typeof lp.path.contentRevision==='string')"));
-  assert.ok(prog.includes("contentRevision:typeof g.contentRevision==='string'?g.contentRevision.slice(0,80):null"));
+  assert.ok(prog.includes("if(typeof g.contentRevision==='string'&&g.contentRevision)state.grammarPath.contentRevision"));
   assert.ok(prog.includes('if(mergedPath.contentRevision)out.grammarPath.contentRevision=mergedPath.contentRevision'));
   // content_revision bumped once on changed lessons
   const j=id=>JSON.parse(read('lessons/'+id+'/lesson.json'));
