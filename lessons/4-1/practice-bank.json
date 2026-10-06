@@ -1,0 +1,534 @@
+{
+ "note": "r7 2b: independent practice bank (Q6). Support kinds only; origin bank; not homework. Language QA pending.",
+ "items": [
+  {
+   "id": "b34-41-choice-01",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "я пишу",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "жазамын"
+     },
+     {
+      "id": "o2",
+      "text": "жаздым"
+     },
+     {
+      "id": "o3",
+      "text": "жазасың"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:4-1:person"
+   ],
+   "source_ref": "r7-lesson-4-1:10.3",
+   "explanation": "жаз + а + мын: непрошедшее."
+  },
+  {
+   "id": "b34-41-choice-02",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "я ищу",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "іздеймін"
+     },
+     {
+      "id": "o2",
+      "text": "іздемін"
+     },
+     {
+      "id": "o3",
+      "text": "іздейсің"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:4-1:linker"
+   ],
+   "source_ref": "r7-lesson-4-1:10.3",
+   "explanation": "После гласной связка Й: іздеймін."
+  },
+  {
+   "id": "b34-41-choice-03",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "я не пишу",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "жазбаймын"
+     },
+     {
+      "id": "o2",
+      "text": "жазамын"
+     },
+     {
+      "id": "o3",
+      "text": "жазады"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:4-1:negative"
+   ],
+   "source_ref": "r7-lesson-4-1:10.3",
+   "explanation": "В отрицании всегда Й: жазбаймын."
+  },
+  {
+   "id": "b34-41-choice-04",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "он понимает",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "түсінеді"
+     },
+     {
+      "id": "o2",
+      "text": "түсінемін"
+     },
+     {
+      "id": "o3",
+      "text": "түсінесің"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:4-1:person"
+   ],
+   "source_ref": "r7-lesson-4-1:10.1",
+   "explanation": "-ді — он/они."
+  },
+  {
+   "id": "b34-41-tap-01",
+   "origin": "bank",
+   "group": "tap",
+   "topic": "bank",
+   "kind": "tap-token",
+   "title": "Отметь нужное",
+   "stimulus": "Обе формы «ты»",
+   "payload": {
+    "tokens": [
+     {
+      "id": "t1",
+      "text": "келесің"
+     },
+     {
+      "id": "t2",
+      "text": "келемін"
+     },
+     {
+      "id": "t3",
+      "text": "барасың"
+     },
+     {
+      "id": "t4",
+      "text": "барады"
+     }
+    ],
+    "accepted": [
+     [
+      "t1",
+      "t3"
+     ]
+    ],
+    "cardinality": 2
+   },
+   "ruleIds": [
+    "v2:4-1:person"
+   ],
+   "source_ref": "r7-lesson-4-1:10.1",
+   "explanation": "-сың/-сің — ты."
+  },
+  {
+   "id": "b34-41-tap-02",
+   "origin": "bank",
+   "group": "tap",
+   "topic": "bank",
+   "kind": "tap-token",
+   "title": "Отметь нужное",
+   "stimulus": "Обе формы отрицания",
+   "payload": {
+    "tokens": [
+     {
+      "id": "t1",
+      "text": "жүремін"
+     },
+     {
+      "id": "t2",
+      "text": "жүрмеймін"
+     },
+     {
+      "id": "t3",
+      "text": "отырамын"
+     },
+     {
+      "id": "t4",
+      "text": "тұрмаймын"
+     }
+    ],
+    "accepted": [
+     [
+      "t2",
+      "t4"
+     ]
+    ],
+    "cardinality": 2
+   },
+   "ruleIds": [
+    "v2:4-1:negative"
+   ],
+   "source_ref": "r7-lesson-4-1:10.1",
+   "explanation": "-ма/-ме + й: отрицание."
+  },
+  {
+   "id": "b34-41-sort-01",
+   "origin": "bank",
+   "group": "sort",
+   "topic": "bank",
+   "kind": "sort",
+   "title": "Разложи",
+   "stimulus": "Какая связка?",
+   "payload": {
+    "items": [
+     {
+      "id": "i1",
+      "text": "жазамын"
+     },
+     {
+      "id": "i2",
+      "text": "іздеймін"
+     },
+     {
+      "id": "i3",
+      "text": "келемін"
+     },
+     {
+      "id": "i4",
+      "text": "ойлаймын"
+     }
+    ],
+    "categories": [
+     {
+      "id": "c1",
+      "label": "-а-/-е-"
+     },
+     {
+      "id": "c2",
+      "label": "-й-"
+     }
+    ],
+    "accepted": {
+     "i1": "c1",
+     "i2": "c2",
+     "i3": "c1",
+     "i4": "c2"
+    }
+   },
+   "ruleIds": [
+    "v2:4-1:linker"
+   ],
+   "source_ref": "r7-lesson-4-1:10.1",
+   "explanation": "После согласной -а-/-е-, после гласной -й-."
+  },
+  {
+   "id": "b34-41-sort-02",
+   "origin": "bank",
+   "group": "sort",
+   "topic": "bank",
+   "kind": "sort",
+   "title": "Разложи",
+   "stimulus": "Кто делает?",
+   "payload": {
+    "items": [
+     {
+      "id": "i1",
+      "text": "аламын"
+     },
+     {
+      "id": "i2",
+      "text": "аласың"
+     },
+     {
+      "id": "i3",
+      "text": "алады"
+     },
+     {
+      "id": "i4",
+      "text": "беремін"
+     }
+    ],
+    "categories": [
+     {
+      "id": "c1",
+      "label": "я"
+     },
+     {
+      "id": "c2",
+      "label": "ты"
+     },
+     {
+      "id": "c3",
+      "label": "он/они"
+     }
+    ],
+    "accepted": {
+     "i1": "c1",
+     "i2": "c2",
+     "i3": "c3",
+     "i4": "c1"
+    }
+   },
+   "ruleIds": [
+    "v2:4-1:person"
+   ],
+   "source_ref": "r7-lesson-4-1:10.1",
+   "explanation": "-мын / -сың / -ды."
+  },
+  {
+   "id": "b34-41-build-01",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери форму",
+   "stimulus": "я не пишу",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "жаз"
+     },
+     {
+      "id": "p2",
+      "text": "ба"
+     },
+     {
+      "id": "p3",
+      "text": "й"
+     },
+     {
+      "id": "p4",
+      "text": "мын"
+     },
+     {
+      "id": "p5",
+      "text": "а"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2",
+      "p3",
+      "p4"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:4-1:negative"
+   ],
+   "source_ref": "r7-lesson-4-1:10.4",
+   "explanation": "жаз + ба + й + мын."
+  },
+  {
+   "id": "b34-41-build-02",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери форму",
+   "stimulus": "я ищу",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "ізде"
+     },
+     {
+      "id": "p2",
+      "text": "й"
+     },
+     {
+      "id": "p3",
+      "text": "мін"
+     },
+     {
+      "id": "p4",
+      "text": "е"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2",
+      "p3"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:4-1:linker"
+   ],
+   "source_ref": "r7-lesson-4-1:10.4",
+   "explanation": "ізде + й + мін."
+  },
+  {
+   "id": "b34-41-build-03",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери форму",
+   "stimulus": "я нахожу",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "таб"
+     },
+     {
+      "id": "p2",
+      "text": "тап"
+     },
+     {
+      "id": "p3",
+      "text": "а"
+     },
+     {
+      "id": "p4",
+      "text": "мын"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p3",
+      "p4"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:4-1:alternation"
+   ],
+   "source_ref": "r7-lesson-4-1:10.1",
+   "explanation": "тап → таб перед гласной: табамын."
+  },
+  {
+   "id": "b34-41-detect-01",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«я делаю»",
+   "payload": {
+    "verdict": {
+     "accepted": "wrong"
+    },
+    "target": "істемін",
+    "broken_step": {
+     "options": [
+      {
+       "id": "o1",
+       "text": "связка: после гласной нужна й"
+      },
+      {
+       "id": "o2",
+       "text": "окончание лица"
+      },
+      {
+       "id": "o3",
+       "text": "основа"
+      }
+     ],
+     "accepted": [
+      "o1"
+     ]
+    }
+   },
+   "ruleIds": [
+    "v2:4-1:linker"
+   ],
+   "source_ref": "r7-lesson-4-1:10.3",
+   "explanation": "істеймін: класс 2 → связка Й."
+  },
+  {
+   "id": "b34-41-detect-02",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«я не пишу»",
+   "payload": {
+    "verdict": {
+     "accepted": "correct"
+    },
+    "target": "жазбаймын"
+   },
+   "ruleIds": [
+    "v2:4-1:negative"
+   ],
+   "source_ref": "r7-lesson-4-1:10.1",
+   "explanation": "Верно."
+  },
+  {
+   "id": "b34-41-detect-03",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«я опаздываю»",
+   "payload": {
+    "verdict": {
+     "accepted": "correct"
+    },
+    "target": "кешігемін"
+   },
+   "ruleIds": [
+    "v2:4-1:alternation"
+   ],
+   "source_ref": "r7-lesson-4-1:10.1",
+   "explanation": "Верно: к → г перед гласной."
+  }
+ ]
+}

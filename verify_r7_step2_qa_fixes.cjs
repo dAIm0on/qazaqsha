@@ -101,13 +101,12 @@ function fullStack(){
 }
 {
   const S=fullStack(),FR=S.LessonV2Runtime;assert.ok(FR&&FR.homeworkWordCoverage,'full stack runtime');
-  const expectMissing={'1-2':['он'],'3-1':['кім','не','қандай','қай','нешінші','бұл']};
+  // r7 2b (казакша, решение 3): the former gaps (1-2 он, 2-1 23/24, 3-1 six question words) got own cards
+  // with new IDs, so every lesson is complete now and the F4 hide no longer triggers anywhere.
   const rows={};
   for(const id of LESSONS){
     const c=plain(FR.homeworkWordCoverage(id));assert.ok(c&&c.total>0,id);rows[id]=c;
-    if(id==='2-1'){assert.equal(c.covered,1);assert.equal(c.total,24);assert.equal(c.complete,false);continue;}
-    if(expectMissing[id]){assert.deepEqual(c.words.filter(w=>!w.covered).map(w=>w.lemma),expectMissing[id],'F4 '+id);assert.equal(c.complete,false);continue;}
-    assert.equal(c.complete,true,'F4: '+id+' should be fully covered');
+    assert.equal(c.complete,true,'F4: '+id+' should be fully covered: '+c.words.filter(w=>!w.covered).map(w=>w.lemma).join(','));
   }
   const c42=rows['4-2'];
   assert.deepEqual(c42.words.map(w=>w.id),JSON.parse(read('lessons/4-2/lesson.json')).homework.word_ids,'M1: T13 order');
@@ -120,7 +119,7 @@ function fullStack(){
   assert.ok(/const hwList=api\.homeworkWordList\?api\.homeworkWordList\(id\):null;/.test(learnSrc)&&/const mustWords=hwList\|\|/.test(learnSrc),'M1: hub «Задано выучить» uses homework words');
   assert.ok(/homeworkWordsTrack,homeworkWordList,/.test(appSrc));
 }
-ok('F4/M1 coverage per lesson: 1-2 (он), 2-1 (23 of 24), 3-1 (6 question words) incomplete → no words button; others shown; 4-2 list = T13 with сүю');
+ok('F4/M1 coverage per lesson: complete in all 11 lessons after 2b (F4 hide stays as a guard); 4-2 list = T13 with сүю');
 
 // M2: harmony vs person.
 {

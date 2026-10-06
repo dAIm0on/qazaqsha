@@ -29033,6 +29033,620 @@ window.LESSON_V2_COMPILED = [
         "words",
         "external_test"
       ]
+    },
+    "practice_bank": {
+      "prefix": "b34-31-",
+      "counts": {
+        "choice": 4,
+        "tap-token": 3,
+        "sort": 2,
+        "word-bank": 3,
+        "detect": 3
+      },
+      "total": 15,
+      "homework_intersection": 0,
+      "items": [
+        {
+          "id": "b34-31-choice-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "моя книга",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "кітабым"
+              },
+              {
+                "id": "o2",
+                "text": "кітапым"
+              },
+              {
+                "id": "o3",
+                "text": "кітабың"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "кітап + ым → кітабым: перед гласной наклейкой п → б.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:poss",
+            "v2:3-1:assim"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "choice"
+        },
+        {
+          "id": "b34-31-choice-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "его город",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "қаласы"
+              },
+              {
+                "id": "o2",
+                "text": "қалам"
+              },
+              {
+                "id": "o3",
+                "text": "қалаң"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "После гласной у «его» подпорка С: қала → қаласы.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:poss"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "choice"
+        },
+        {
+          "id": "b34-31-choice-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "Ваш язык",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "тіліңіз"
+              },
+              {
+                "id": "o2",
+                "text": "тілің"
+              },
+              {
+                "id": "o3",
+                "text": "тілім"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "сіздің → -іңіз: тіліңіз.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:poss"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "choice"
+        },
+        {
+          "id": "b34-31-choice-04",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "моя вода",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "суым"
+              },
+              {
+                "id": "o2",
+                "text": "суың"
+              },
+              {
+                "id": "o3",
+                "text": "суыңыз"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "у на конце — согласная, поэтому -ым: суым.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:poss"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "choice"
+        },
+        {
+          "id": "b34-31-tap-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "tap-token",
+          "title": "Отметь нужное",
+          "stimulus": "Слово, где сработал закон края (п → б)",
+          "fields": [],
+          "payload": {
+            "tokens": [
+              {
+                "id": "t1",
+                "text": "менің"
+              },
+              {
+                "id": "t2",
+                "text": "кітабым"
+              },
+              {
+                "id": "t3",
+                "text": "сенің"
+              },
+              {
+                "id": "t4",
+                "text": "көзің"
+              }
+            ],
+            "accepted": [
+              [
+                "t2"
+              ]
+            ],
+            "cardinality": 1
+          },
+          "explanation": "кітап → кітабым.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:assim"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "tap"
+        },
+        {
+          "id": "b34-31-tap-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "tap-token",
+          "title": "Отметь нужное",
+          "stimulus": "Слово в форме «твой»",
+          "fields": [],
+          "payload": {
+            "tokens": [
+              {
+                "id": "t1",
+                "text": "басым"
+              },
+              {
+                "id": "t2",
+                "text": "көзің"
+              },
+              {
+                "id": "t3",
+                "text": "қолы"
+              }
+            ],
+            "accepted": [
+              [
+                "t2"
+              ]
+            ],
+            "cardinality": 1
+          },
+          "explanation": "-ің — «твой»: көзің.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:poss"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "tap"
+        },
+        {
+          "id": "b34-31-tap-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "tap-token",
+          "title": "Отметь нужное",
+          "stimulus": "Обе формы «его»",
+          "fields": [],
+          "payload": {
+            "tokens": [
+              {
+                "id": "t1",
+                "text": "қаласы"
+              },
+              {
+                "id": "t2",
+                "text": "көшесі"
+              },
+              {
+                "id": "t3",
+                "text": "қаламым"
+              },
+              {
+                "id": "t4",
+                "text": "тіліңіз"
+              }
+            ],
+            "accepted": [
+              [
+                "t1",
+                "t2"
+              ]
+            ],
+            "cardinality": 2
+          },
+          "explanation": "После гласной «его» — -сы/-сі.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:poss"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "tap"
+        },
+        {
+          "id": "b34-31-sort-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "sort",
+          "title": "Разложи",
+          "stimulus": "Чьё это? Разложи по владельцу.",
+          "fields": [],
+          "payload": {
+            "items": [
+              {
+                "id": "i1",
+                "text": "басым"
+              },
+              {
+                "id": "i2",
+                "text": "көзің"
+              },
+              {
+                "id": "i3",
+                "text": "тіліңіз"
+              },
+              {
+                "id": "i4",
+                "text": "қолы"
+              }
+            ],
+            "categories": [
+              {
+                "id": "c1",
+                "label": "менің"
+              },
+              {
+                "id": "c2",
+                "label": "сенің"
+              },
+              {
+                "id": "c3",
+                "label": "сіздің"
+              },
+              {
+                "id": "c4",
+                "label": "оның"
+              }
+            ],
+            "accepted": {
+              "i1": "c1",
+              "i2": "c2",
+              "i3": "c3",
+              "i4": "c4"
+            }
+          },
+          "explanation": "Окончание показывает владельца: -ым / -ің / -іңіз / -ы.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:poss"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5-10.1",
+          "group": "sort"
+        },
+        {
+          "id": "b34-31-sort-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "sort",
+          "title": "Разложи",
+          "stimulus": "Меняется ли край слова перед -ым/-ім?",
+          "fields": [],
+          "payload": {
+            "items": [
+              {
+                "id": "i1",
+                "text": "кітап"
+              },
+              {
+                "id": "i2",
+                "text": "көйлек"
+              },
+              {
+                "id": "i3",
+                "text": "қалам"
+              },
+              {
+                "id": "i4",
+                "text": "қала"
+              }
+            ],
+            "categories": [
+              {
+                "id": "c1",
+                "label": "край меняется"
+              },
+              {
+                "id": "c2",
+                "label": "край не меняется"
+              }
+            ],
+            "accepted": {
+              "i1": "c1",
+              "i2": "c1",
+              "i3": "c2",
+              "i4": "c2"
+            }
+          },
+          "explanation": "п/к/қ перед гласной наклейкой → б/г/ғ; остальные не меняются.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:assim"
+          ],
+          "source_ref": "r7-lesson-3-1:10.2",
+          "group": "sort"
+        },
+        {
+          "id": "b34-31-build-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери",
+          "stimulus": "моя книга",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "менің",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "кітабым",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "сенің",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "кітабың",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2"
+              ]
+            ]
+          },
+          "explanation": "менің кітабым.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:poss",
+            "v2:3-1:assim"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "build"
+        },
+        {
+          "id": "b34-31-build-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери",
+          "stimulus": "его улица",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "оның",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "көшесі",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "менің",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2"
+              ]
+            ]
+          },
+          "explanation": "оның көшесі.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:poss"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "build"
+        },
+        {
+          "id": "b34-31-build-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери форму",
+          "stimulus": "мои книги (поезд: много → чьё)",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "кітап",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "тар",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "ым",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "ың",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2",
+                "p3"
+              ]
+            ]
+          },
+          "explanation": "кітап + тар + ым: сначала «много», потом «чьё».",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:pl"
+          ],
+          "source_ref": "r7-lesson-3-1:10.3",
+          "group": "build"
+        },
+        {
+          "id": "b34-31-detect-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«моя книга»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "wrong"
+            },
+            "target": "менің кітапым",
+            "broken_step": {
+              "options": [
+                {
+                  "id": "o1",
+                  "text": "закон края (п → б)"
+                },
+                {
+                  "id": "o2",
+                  "text": "окончание владельца"
+                },
+                {
+                  "id": "o3",
+                  "text": "слово-владелец"
+                }
+              ],
+              "accepted": [
+                "o1"
+              ]
+            }
+          },
+          "explanation": "Перед гласной наклейкой п → б: кітабым.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:assim"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "detect"
+        },
+        {
+          "id": "b34-31-detect-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«мои книги»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "correct"
+            },
+            "target": "менің кітаптарым"
+          },
+          "explanation": "Верно: после «много» озвончения нет.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:pl"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "detect"
+        },
+        {
+          "id": "b34-31-detect-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«его город»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "correct"
+            },
+            "target": "оның қаласы"
+          },
+          "explanation": "Верно: подпорка С после гласной.",
+          "lessonId": "3-1",
+          "ruleIds": [
+            "v2:3-1:poss"
+          ],
+          "source_ref": "r7-lesson-3-1:10.5",
+          "group": "detect"
+        }
+      ]
     }
   },
   {
@@ -33826,6 +34440,590 @@ window.LESSON_V2_COMPILED = [
         "words",
         "external_test"
       ]
+    },
+    "practice_bank": {
+      "prefix": "b34-32-",
+      "counts": {
+        "choice": 4,
+        "tap-token": 2,
+        "sort": 2,
+        "word-bank": 3,
+        "detect": 3
+      },
+      "total": 14,
+      "homework_intersection": 0,
+      "items": [
+        {
+          "id": "b34-32-choice-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "наш класс",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "сыныбымыз"
+              },
+              {
+                "id": "o2",
+                "text": "сыныпымыз"
+              },
+              {
+                "id": "o3",
+                "text": "сыныбың"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "Озвончение работает: сынып → сыныбымыз.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:poss"
+          ],
+          "source_ref": "r7-lesson-3-2:10.3",
+          "group": "choice"
+        },
+        {
+          "id": "b34-32-choice-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "их семья",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "олардың отбасы"
+              },
+              {
+                "id": "o2",
+                "text": "олардың отбасысы"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "«сы» уже внутри основы отбасы.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:repair"
+          ],
+          "source_ref": "r7-lesson-3-2:10.2",
+          "group": "choice"
+        },
+        {
+          "id": "b34-32-choice-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "ваши книги (сендердің)",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "кітаптарың"
+              },
+              {
+                "id": "o2",
+                "text": "кітабың"
+              },
+              {
+                "id": "o3",
+                "text": "кітабарың"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "Владельцев много → кітаптарың; после «много» закон края не срабатывает.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:sender"
+          ],
+          "source_ref": "r7-lesson-3-2:10.2",
+          "group": "choice"
+        },
+        {
+          "id": "b34-32-choice-04",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "наши руки",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "қолымыз"
+              },
+              {
+                "id": "o2",
+                "text": "қолдарымыз"
+              },
+              {
+                "id": "o3",
+                "text": "қолың"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "Части тела: множественное не ставится.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:poss"
+          ],
+          "source_ref": "r7-lesson-3-2:10.2",
+          "group": "choice"
+        },
+        {
+          "id": "b34-32-tap-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "tap-token",
+          "title": "Отметь нужное",
+          "stimulus": "Обе формы «наш»",
+          "fields": [],
+          "payload": {
+            "tokens": [
+              {
+                "id": "t1",
+                "text": "баламыз"
+              },
+              {
+                "id": "t2",
+                "text": "баласы"
+              },
+              {
+                "id": "t3",
+                "text": "ісіміз"
+              },
+              {
+                "id": "t4",
+                "text": "балалары"
+              }
+            ],
+            "accepted": [
+              [
+                "t1",
+                "t3"
+              ]
+            ],
+            "cardinality": 2
+          },
+          "explanation": "-мыз / -іміз — «наш».",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:poss"
+          ],
+          "source_ref": "r7-lesson-3-2:10.3",
+          "group": "tap"
+        },
+        {
+          "id": "b34-32-tap-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "tap-token",
+          "title": "Отметь нужное",
+          "stimulus": "Слово «тот»",
+          "fields": [],
+          "payload": {
+            "tokens": [
+              {
+                "id": "t1",
+                "text": "бұл"
+              },
+              {
+                "id": "t2",
+                "text": "осы"
+              },
+              {
+                "id": "t3",
+                "text": "сол"
+              },
+              {
+                "id": "t4",
+                "text": "анау"
+              }
+            ],
+            "accepted": [
+              [
+                "t3"
+              ]
+            ],
+            "cardinality": 1
+          },
+          "explanation": "сол — тот.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:deixis"
+          ],
+          "source_ref": "r7-lesson-3-2:10.3",
+          "group": "tap"
+        },
+        {
+          "id": "b34-32-sort-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "sort",
+          "title": "Разложи",
+          "stimulus": "Один предмет или много?",
+          "fields": [],
+          "payload": {
+            "items": [
+              {
+                "id": "i1",
+                "text": "баламыз"
+              },
+              {
+                "id": "i2",
+                "text": "балаларымыз"
+              },
+              {
+                "id": "i3",
+                "text": "көршіміз"
+              },
+              {
+                "id": "i4",
+                "text": "көршілеріміз"
+              }
+            ],
+            "categories": [
+              {
+                "id": "c1",
+                "label": "один"
+              },
+              {
+                "id": "c2",
+                "label": "много"
+              }
+            ],
+            "accepted": {
+              "i1": "c1",
+              "i2": "c2",
+              "i3": "c1",
+              "i4": "c2"
+            }
+          },
+          "explanation": "«много» стоит перед «чьё»: бала-лар-ымыз.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:poss"
+          ],
+          "source_ref": "r7-lesson-3-2:10.4",
+          "group": "sort"
+        },
+        {
+          "id": "b34-32-sort-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "sort",
+          "title": "Разложи",
+          "stimulus": "Что значит указатель?",
+          "fields": [],
+          "payload": {
+            "items": [
+              {
+                "id": "i1",
+                "text": "бұл"
+              },
+              {
+                "id": "i2",
+                "text": "осы"
+              },
+              {
+                "id": "i3",
+                "text": "сол"
+              },
+              {
+                "id": "i4",
+                "text": "анау"
+              }
+            ],
+            "categories": [
+              {
+                "id": "c1",
+                "label": "этот"
+              },
+              {
+                "id": "c2",
+                "label": "вот этот"
+              },
+              {
+                "id": "c3",
+                "label": "тот"
+              },
+              {
+                "id": "c4",
+                "label": "вон тот"
+              }
+            ],
+            "accepted": {
+              "i1": "c1",
+              "i2": "c2",
+              "i3": "c3",
+              "i4": "c4"
+            }
+          },
+          "explanation": "бұл / осы / сол / анау.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:deixis"
+          ],
+          "source_ref": "r7-lesson-3-2:10.3",
+          "group": "sort"
+        },
+        {
+          "id": "b34-32-build-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери",
+          "stimulus": "наш класс",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "біздің",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "сыныбымыз",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "сыныпымыз",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2"
+              ]
+            ]
+          },
+          "explanation": "біздің сыныбымыз.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:poss"
+          ],
+          "source_ref": "r7-lesson-3-2:10.3",
+          "group": "build"
+        },
+        {
+          "id": "b34-32-build-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери",
+          "stimulus": "их дети",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "олардың",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "балалары",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "баласы",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2"
+              ]
+            ]
+          },
+          "explanation": "олардың балалары.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:poss"
+          ],
+          "source_ref": "r7-lesson-3-2:10.3",
+          "group": "build"
+        },
+        {
+          "id": "b34-32-build-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери форму",
+          "stimulus": "наши дети",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "бала",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "лар",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "ымыз",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "ың",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2",
+                "p3"
+              ]
+            ]
+          },
+          "explanation": "бала + лар + ымыз.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:poss"
+          ],
+          "source_ref": "r7-lesson-3-2:10.3",
+          "group": "build"
+        },
+        {
+          "id": "b34-32-detect-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«его семья»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "wrong"
+            },
+            "target": "оның отбасысы",
+            "broken_step": {
+              "options": [
+                {
+                  "id": "o1",
+                  "text": "«сы» уже внутри основы"
+                },
+                {
+                  "id": "o2",
+                  "text": "окончание «много»"
+                },
+                {
+                  "id": "o3",
+                  "text": "слово-владелец"
+                }
+              ],
+              "accepted": [
+                "o1"
+              ]
+            }
+          },
+          "explanation": "оның отбасы: «сы» уже внутри основы.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:repair"
+          ],
+          "source_ref": "r7-lesson-3-2:10.2",
+          "group": "detect"
+        },
+        {
+          "id": "b34-32-detect-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«наш класс»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "correct"
+            },
+            "target": "біздің сыныбымыз"
+          },
+          "explanation": "Верно: п → б.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:poss"
+          ],
+          "source_ref": "r7-lesson-3-2:10.3",
+          "group": "detect"
+        },
+        {
+          "id": "b34-32-detect-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«твои книги»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "wrong"
+            },
+            "target": "кітабарың",
+            "broken_step": {
+              "options": [
+                {
+                  "id": "o1",
+                  "text": "закон края после «много» не срабатывает"
+                },
+                {
+                  "id": "o2",
+                  "text": "окончание владельца"
+                },
+                {
+                  "id": "o3",
+                  "text": "слово-владелец"
+                }
+              ],
+              "accepted": [
+                "o1"
+              ]
+            }
+          },
+          "explanation": "кітаптарың: после «много» края не меняют.",
+          "lessonId": "3-2",
+          "ruleIds": [
+            "v2:3-2:poss"
+          ],
+          "source_ref": "r7-lesson-3-2:10.2",
+          "group": "detect"
+        }
+      ]
     }
   },
   {
@@ -38297,6 +39495,562 @@ window.LESSON_V2_COMPILED = [
         "exercises",
         "words",
         "external_test"
+      ]
+    },
+    "practice_bank": {
+      "prefix": "b34-33-",
+      "counts": {
+        "choice": 4,
+        "tap-token": 2,
+        "sort": 2,
+        "word-bank": 3,
+        "detect": 3
+      },
+      "total": 14,
+      "homework_intersection": 0,
+      "items": [
+        {
+          "id": "b34-33-choice-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "я твой друг",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "досыңмын"
+              },
+              {
+                "id": "o2",
+                "text": "досыңбын"
+              },
+              {
+                "id": "o3",
+                "text": "досымсың"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "Нормативная целевая форма 1sg: досыңмын.",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:stack"
+          ],
+          "source_ref": "r7-lesson-3-3:10.3",
+          "group": "choice"
+        },
+        {
+          "id": "b34-33-choice-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "Спроси фамильярно: «Как тебя зовут?»",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "Атың кім?"
+              },
+              {
+                "id": "o2",
+                "text": "Атыңыз кім?"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "С «сен» — атың; атыңыз — уважительно.",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:questions"
+          ],
+          "source_ref": "r7-lesson-3-3:10.4",
+          "group": "choice"
+        },
+        {
+          "id": "b34-33-choice-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "Спроси о предмете: «Это что?»",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "Бұл не?"
+              },
+              {
+                "id": "o2",
+                "text": "Бұл кім?"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "кім — о людях, не — о предметах.",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:questions"
+          ],
+          "source_ref": "r7-lesson-3-3:10.3",
+          "group": "choice"
+        },
+        {
+          "id": "b34-33-choice-04",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "какой (по качеству)",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "қандай"
+              },
+              {
+                "id": "o2",
+                "text": "қай"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "қандай — какой по качеству; қай — который из.",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:questions"
+          ],
+          "source_ref": "r7-lesson-3-3:10.3",
+          "group": "choice"
+        },
+        {
+          "id": "b34-33-tap-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "tap-token",
+          "title": "Отметь нужное",
+          "stimulus": "Обе формы «кто» (я есть / ты есть)",
+          "fields": [],
+          "payload": {
+            "tokens": [
+              {
+                "id": "t1",
+                "text": "адаммын"
+              },
+              {
+                "id": "t2",
+                "text": "адамым"
+              },
+              {
+                "id": "t3",
+                "text": "адамсың"
+              },
+              {
+                "id": "t4",
+                "text": "адамың"
+              }
+            ],
+            "accepted": [
+              [
+                "t1",
+                "t3"
+              ]
+            ],
+            "cardinality": 2
+          },
+          "explanation": "-мын / -сың — «кто»; -ым / -ың — «чьё».",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:who-whose"
+          ],
+          "source_ref": "r7-lesson-3-3:10.2",
+          "group": "tap"
+        },
+        {
+          "id": "b34-33-tap-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "tap-token",
+          "title": "Отметь нужное",
+          "stimulus": "Форма «наш человек»",
+          "fields": [],
+          "payload": {
+            "tokens": [
+              {
+                "id": "t1",
+                "text": "адамбыз"
+              },
+              {
+                "id": "t2",
+                "text": "адамымыз"
+              },
+              {
+                "id": "t3",
+                "text": "адамсыз"
+              }
+            ],
+            "accepted": [
+              [
+                "t2"
+              ]
+            ],
+            "cardinality": 1
+          },
+          "explanation": "адамымыз — наш; адамбыз — мы люди.",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:who-whose"
+          ],
+          "source_ref": "r7-lesson-3-3:10.2",
+          "group": "tap"
+        },
+        {
+          "id": "b34-33-sort-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "sort",
+          "title": "Разложи",
+          "stimulus": "«Кто» или «чьё»?",
+          "fields": [],
+          "payload": {
+            "items": [
+              {
+                "id": "i1",
+                "text": "адаммын"
+              },
+              {
+                "id": "i2",
+                "text": "адамым"
+              },
+              {
+                "id": "i3",
+                "text": "адамсың"
+              },
+              {
+                "id": "i4",
+                "text": "адамың"
+              }
+            ],
+            "categories": [
+              {
+                "id": "c1",
+                "label": "кто"
+              },
+              {
+                "id": "c2",
+                "label": "чьё"
+              }
+            ],
+            "accepted": {
+              "i1": "c1",
+              "i2": "c2",
+              "i3": "c1",
+              "i4": "c2"
+            }
+          },
+          "explanation": "С → «кто»; без С → «чьё».",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:who-whose"
+          ],
+          "source_ref": "r7-lesson-3-3:10.2",
+          "group": "sort"
+        },
+        {
+          "id": "b34-33-sort-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "sort",
+          "title": "Разложи",
+          "stimulus": "Какой вопрос подходит?",
+          "fields": [],
+          "payload": {
+            "items": [
+              {
+                "id": "i1",
+                "text": "Айгүл"
+              },
+              {
+                "id": "i2",
+                "text": "кітап"
+              },
+              {
+                "id": "i3",
+                "text": "көрші"
+              },
+              {
+                "id": "i4",
+                "text": "қалам"
+              }
+            ],
+            "categories": [
+              {
+                "id": "c1",
+                "label": "кім?"
+              },
+              {
+                "id": "c2",
+                "label": "не?"
+              }
+            ],
+            "accepted": {
+              "i1": "c1",
+              "i2": "c2",
+              "i3": "c1",
+              "i4": "c2"
+            }
+          },
+          "explanation": "кім — о людях, не — о предметах.",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:questions"
+          ],
+          "source_ref": "r7-lesson-3-3:10.3",
+          "group": "sort"
+        },
+        {
+          "id": "b34-33-build-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери",
+          "stimulus": "Меня зовут Айгүл.",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "Менің",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "атым",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "Айгүл.",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "атың",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2",
+                "p3"
+              ]
+            ]
+          },
+          "explanation": "Менің атым Айгүл.",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:questions"
+          ],
+          "source_ref": "r7-lesson-3-3:10.4",
+          "group": "build"
+        },
+        {
+          "id": "b34-33-build-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери",
+          "stimulus": "Как Вас зовут?",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "Атыңыз",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "кім?",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "Атың",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "не?",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2"
+              ]
+            ]
+          },
+          "explanation": "Атыңыз кім?",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:questions"
+          ],
+          "source_ref": "r7-lesson-3-3:10.4",
+          "group": "build"
+        },
+        {
+          "id": "b34-33-build-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери форму",
+          "stimulus": "ты мой сосед",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "көрші",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "м",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "сің",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "мін",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2",
+                "p3"
+              ]
+            ]
+          },
+          "explanation": "көрші + м + сің: «чьё», потом «кто».",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:stack"
+          ],
+          "source_ref": "r7-lesson-3-3:10.3",
+          "group": "build"
+        },
+        {
+          "id": "b34-33-detect-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«я твой друг»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "wrong"
+            },
+            "target": "досыңбын",
+            "broken_step": {
+              "options": [
+                {
+                  "id": "o1",
+                  "text": "окончание «я» после ң"
+                },
+                {
+                  "id": "o2",
+                  "text": "окончание «твой»"
+                },
+                {
+                  "id": "o3",
+                  "text": "основа"
+                }
+              ],
+              "accepted": [
+                "o1"
+              ]
+            }
+          },
+          "explanation": "Целевая форма: досыңмын.",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:stack"
+          ],
+          "source_ref": "r7-lesson-3-3:10.3",
+          "group": "detect"
+        },
+        {
+          "id": "b34-33-detect-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«Это что? — Это книга.»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "correct"
+            },
+            "target": "Бұл не? — Бұл кітап."
+          },
+          "explanation": "Верно: не — о предмете.",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:questions"
+          ],
+          "source_ref": "r7-lesson-3-3:10.3",
+          "group": "detect"
+        },
+        {
+          "id": "b34-33-detect-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«Как тебя зовут?»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "correct"
+            },
+            "target": "Атың кім?"
+          },
+          "explanation": "Верно: фамильярная форма.",
+          "lessonId": "3-3",
+          "ruleIds": [
+            "v2:3-3:questions"
+          ],
+          "source_ref": "r7-lesson-3-3:10.4",
+          "group": "detect"
+        }
       ]
     }
   },
@@ -50362,6 +52116,590 @@ window.LESSON_V2_COMPILED = [
         "words",
         "external_test"
       ]
+    },
+    "practice_bank": {
+      "prefix": "b34-41-",
+      "counts": {
+        "choice": 4,
+        "tap-token": 2,
+        "sort": 2,
+        "word-bank": 3,
+        "detect": 3
+      },
+      "total": 14,
+      "homework_intersection": 0,
+      "items": [
+        {
+          "id": "b34-41-choice-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "я пишу",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "жазамын"
+              },
+              {
+                "id": "o2",
+                "text": "жаздым"
+              },
+              {
+                "id": "o3",
+                "text": "жазасың"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "жаз + а + мын: непрошедшее.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:person"
+          ],
+          "source_ref": "r7-lesson-4-1:10.3",
+          "group": "choice"
+        },
+        {
+          "id": "b34-41-choice-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "я ищу",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "іздеймін"
+              },
+              {
+                "id": "o2",
+                "text": "іздемін"
+              },
+              {
+                "id": "o3",
+                "text": "іздейсің"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "После гласной связка Й: іздеймін.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:linker"
+          ],
+          "source_ref": "r7-lesson-4-1:10.3",
+          "group": "choice"
+        },
+        {
+          "id": "b34-41-choice-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "я не пишу",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "жазбаймын"
+              },
+              {
+                "id": "o2",
+                "text": "жазамын"
+              },
+              {
+                "id": "o3",
+                "text": "жазады"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "В отрицании всегда Й: жазбаймын.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:negative"
+          ],
+          "source_ref": "r7-lesson-4-1:10.3",
+          "group": "choice"
+        },
+        {
+          "id": "b34-41-choice-04",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "он понимает",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "түсінеді"
+              },
+              {
+                "id": "o2",
+                "text": "түсінемін"
+              },
+              {
+                "id": "o3",
+                "text": "түсінесің"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "-ді — он/они.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:person"
+          ],
+          "source_ref": "r7-lesson-4-1:10.1",
+          "group": "choice"
+        },
+        {
+          "id": "b34-41-tap-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "tap-token",
+          "title": "Отметь нужное",
+          "stimulus": "Обе формы «ты»",
+          "fields": [],
+          "payload": {
+            "tokens": [
+              {
+                "id": "t1",
+                "text": "келесің"
+              },
+              {
+                "id": "t2",
+                "text": "келемін"
+              },
+              {
+                "id": "t3",
+                "text": "барасың"
+              },
+              {
+                "id": "t4",
+                "text": "барады"
+              }
+            ],
+            "accepted": [
+              [
+                "t1",
+                "t3"
+              ]
+            ],
+            "cardinality": 2
+          },
+          "explanation": "-сың/-сің — ты.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:person"
+          ],
+          "source_ref": "r7-lesson-4-1:10.1",
+          "group": "tap"
+        },
+        {
+          "id": "b34-41-tap-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "tap-token",
+          "title": "Отметь нужное",
+          "stimulus": "Обе формы отрицания",
+          "fields": [],
+          "payload": {
+            "tokens": [
+              {
+                "id": "t1",
+                "text": "жүремін"
+              },
+              {
+                "id": "t2",
+                "text": "жүрмеймін"
+              },
+              {
+                "id": "t3",
+                "text": "отырамын"
+              },
+              {
+                "id": "t4",
+                "text": "тұрмаймын"
+              }
+            ],
+            "accepted": [
+              [
+                "t2",
+                "t4"
+              ]
+            ],
+            "cardinality": 2
+          },
+          "explanation": "-ма/-ме + й: отрицание.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:negative"
+          ],
+          "source_ref": "r7-lesson-4-1:10.1",
+          "group": "tap"
+        },
+        {
+          "id": "b34-41-sort-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "sort",
+          "title": "Разложи",
+          "stimulus": "Какая связка?",
+          "fields": [],
+          "payload": {
+            "items": [
+              {
+                "id": "i1",
+                "text": "жазамын"
+              },
+              {
+                "id": "i2",
+                "text": "іздеймін"
+              },
+              {
+                "id": "i3",
+                "text": "келемін"
+              },
+              {
+                "id": "i4",
+                "text": "ойлаймын"
+              }
+            ],
+            "categories": [
+              {
+                "id": "c1",
+                "label": "-а-/-е-"
+              },
+              {
+                "id": "c2",
+                "label": "-й-"
+              }
+            ],
+            "accepted": {
+              "i1": "c1",
+              "i2": "c2",
+              "i3": "c1",
+              "i4": "c2"
+            }
+          },
+          "explanation": "После согласной -а-/-е-, после гласной -й-.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:linker"
+          ],
+          "source_ref": "r7-lesson-4-1:10.1",
+          "group": "sort"
+        },
+        {
+          "id": "b34-41-sort-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "sort",
+          "title": "Разложи",
+          "stimulus": "Кто делает?",
+          "fields": [],
+          "payload": {
+            "items": [
+              {
+                "id": "i1",
+                "text": "аламын"
+              },
+              {
+                "id": "i2",
+                "text": "аласың"
+              },
+              {
+                "id": "i3",
+                "text": "алады"
+              },
+              {
+                "id": "i4",
+                "text": "беремін"
+              }
+            ],
+            "categories": [
+              {
+                "id": "c1",
+                "label": "я"
+              },
+              {
+                "id": "c2",
+                "label": "ты"
+              },
+              {
+                "id": "c3",
+                "label": "он/они"
+              }
+            ],
+            "accepted": {
+              "i1": "c1",
+              "i2": "c2",
+              "i3": "c3",
+              "i4": "c1"
+            }
+          },
+          "explanation": "-мын / -сың / -ды.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:person"
+          ],
+          "source_ref": "r7-lesson-4-1:10.1",
+          "group": "sort"
+        },
+        {
+          "id": "b34-41-build-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери форму",
+          "stimulus": "я не пишу",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "жаз",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "ба",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "й",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "мын",
+                "count": 1
+              },
+              {
+                "id": "p5",
+                "text": "а",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2",
+                "p3",
+                "p4"
+              ]
+            ]
+          },
+          "explanation": "жаз + ба + й + мын.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:negative"
+          ],
+          "source_ref": "r7-lesson-4-1:10.4",
+          "group": "build"
+        },
+        {
+          "id": "b34-41-build-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери форму",
+          "stimulus": "я ищу",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "ізде",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "й",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "мін",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "е",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2",
+                "p3"
+              ]
+            ]
+          },
+          "explanation": "ізде + й + мін.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:linker"
+          ],
+          "source_ref": "r7-lesson-4-1:10.4",
+          "group": "build"
+        },
+        {
+          "id": "b34-41-build-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери форму",
+          "stimulus": "я нахожу",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "таб",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "тап",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "а",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "мын",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p3",
+                "p4"
+              ]
+            ]
+          },
+          "explanation": "тап → таб перед гласной: табамын.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:alternation"
+          ],
+          "source_ref": "r7-lesson-4-1:10.1",
+          "group": "build"
+        },
+        {
+          "id": "b34-41-detect-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«я делаю»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "wrong"
+            },
+            "target": "істемін",
+            "broken_step": {
+              "options": [
+                {
+                  "id": "o1",
+                  "text": "связка: после гласной нужна й"
+                },
+                {
+                  "id": "o2",
+                  "text": "окончание лица"
+                },
+                {
+                  "id": "o3",
+                  "text": "основа"
+                }
+              ],
+              "accepted": [
+                "o1"
+              ]
+            }
+          },
+          "explanation": "істеймін: класс 2 → связка Й.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:linker"
+          ],
+          "source_ref": "r7-lesson-4-1:10.3",
+          "group": "detect"
+        },
+        {
+          "id": "b34-41-detect-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«я не пишу»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "correct"
+            },
+            "target": "жазбаймын"
+          },
+          "explanation": "Верно.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:negative"
+          ],
+          "source_ref": "r7-lesson-4-1:10.1",
+          "group": "detect"
+        },
+        {
+          "id": "b34-41-detect-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«я опаздываю»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "correct"
+            },
+            "target": "кешігемін"
+          },
+          "explanation": "Верно: к → г перед гласной.",
+          "lessonId": "4-1",
+          "ruleIds": [
+            "v2:4-1:alternation"
+          ],
+          "source_ref": "r7-lesson-4-1:10.1",
+          "group": "detect"
+        }
+      ]
     }
   },
   {
@@ -59525,6 +61863,605 @@ window.LESSON_V2_COMPILED = [
         "exercises",
         "words",
         "external_test"
+      ]
+    },
+    "practice_bank": {
+      "prefix": "b34-42-",
+      "counts": {
+        "choice": 4,
+        "tap-token": 2,
+        "sort": 2,
+        "word-bank": 3,
+        "detect": 3
+      },
+      "total": 14,
+      "homework_intersection": 0,
+      "items": [
+        {
+          "id": "b34-42-choice-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "я написал",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "жаздым"
+              },
+              {
+                "id": "o2",
+                "text": "жазамын"
+              },
+              {
+                "id": "o3",
+                "text": "жазды"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "-ды + м: я (прошедшее).",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:dy"
+          ],
+          "source_ref": "r7-lesson-4-2:10.2",
+          "group": "choice"
+        },
+        {
+          "id": "b34-42-choice-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "мы написали",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "жаздық"
+              },
+              {
+                "id": "o2",
+                "text": "жазмық"
+              },
+              {
+                "id": "o3",
+                "text": "жаздым"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "біз = -қ, не -мық.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:person"
+          ],
+          "source_ref": "r7-lesson-4-2:10.2",
+          "group": "choice"
+        },
+        {
+          "id": "b34-42-choice-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "я сказал",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "айттым"
+              },
+              {
+                "id": "o2",
+                "text": "айтты"
+              },
+              {
+                "id": "o3",
+                "text": "айттық"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "После т — ТЫ: айттым.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:assim"
+          ],
+          "source_ref": "r7-lesson-4-2:10.1",
+          "group": "choice"
+        },
+        {
+          "id": "b34-42-choice-04",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "choice",
+          "title": "Выбери форму",
+          "stimulus": "Вы (Сіз) написали",
+          "fields": [],
+          "payload": {
+            "options": [
+              {
+                "id": "o1",
+                "text": "жаздыңыз"
+              },
+              {
+                "id": "o2",
+                "text": "жаздыңдар"
+              },
+              {
+                "id": "o3",
+                "text": "жаздың"
+              }
+            ],
+            "accepted": [
+              "o1"
+            ],
+            "cardinality": 1
+          },
+          "explanation": "Сіз — -ңыз, Сендер — -ңдар.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:person"
+          ],
+          "source_ref": "r7-lesson-4-2:10.2",
+          "group": "choice"
+        },
+        {
+          "id": "b34-42-tap-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "tap-token",
+          "title": "Отметь нужное",
+          "stimulus": "Обе формы прошедшего",
+          "fields": [],
+          "payload": {
+            "tokens": [
+              {
+                "id": "t1",
+                "text": "жазады"
+              },
+              {
+                "id": "t2",
+                "text": "жазды"
+              },
+              {
+                "id": "t3",
+                "text": "келеді"
+              },
+              {
+                "id": "t4",
+                "text": "келді"
+              }
+            ],
+            "accepted": [
+              [
+                "t2",
+                "t4"
+              ]
+            ],
+            "cardinality": 2
+          },
+          "explanation": "Нет связки — прошедшее.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:contrast"
+          ],
+          "source_ref": "r7-lesson-4-2:10.2",
+          "group": "tap"
+        },
+        {
+          "id": "b34-42-tap-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "tap-token",
+          "title": "Отметь нужное",
+          "stimulus": "Обе формы «мы»",
+          "fields": [],
+          "payload": {
+            "tokens": [
+              {
+                "id": "t1",
+                "text": "айттық"
+              },
+              {
+                "id": "t2",
+                "text": "айтты"
+              },
+              {
+                "id": "t3",
+                "text": "күттік"
+              },
+              {
+                "id": "t4",
+                "text": "күтті"
+              }
+            ],
+            "accepted": [
+              [
+                "t1",
+                "t3"
+              ]
+            ],
+            "cardinality": 2
+          },
+          "explanation": "-қ/-к — мы.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:person"
+          ],
+          "source_ref": "r7-lesson-4-2:10.1",
+          "group": "tap"
+        },
+        {
+          "id": "b34-42-sort-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "sort",
+          "title": "Разложи",
+          "stimulus": "Какой хвост прошедшего?",
+          "fields": [],
+          "payload": {
+            "items": [
+              {
+                "id": "i1",
+                "text": "айт"
+              },
+              {
+                "id": "i2",
+                "text": "кел"
+              },
+              {
+                "id": "i3",
+                "text": "күт"
+              },
+              {
+                "id": "i4",
+                "text": "сен"
+              }
+            ],
+            "categories": [
+              {
+                "id": "c1",
+                "label": "-ты/-ті"
+              },
+              {
+                "id": "c2",
+                "label": "-ды/-ді"
+              }
+            ],
+            "accepted": {
+              "i1": "c1",
+              "i2": "c2",
+              "i3": "c1",
+              "i4": "c2"
+            }
+          },
+          "explanation": "После глухих — ТЫ/ТІ, иначе ДЫ/ДІ.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:assim"
+          ],
+          "source_ref": "r7-lesson-4-2:10.3",
+          "group": "sort"
+        },
+        {
+          "id": "b34-42-sort-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "sort",
+          "title": "Разложи",
+          "stimulus": "Когда?",
+          "fields": [],
+          "payload": {
+            "items": [
+              {
+                "id": "i1",
+                "text": "жазады"
+              },
+              {
+                "id": "i2",
+                "text": "жазды"
+              },
+              {
+                "id": "i3",
+                "text": "келеді"
+              },
+              {
+                "id": "i4",
+                "text": "келді"
+              }
+            ],
+            "categories": [
+              {
+                "id": "c1",
+                "label": "сейчас / обычно"
+              },
+              {
+                "id": "c2",
+                "label": "в прошлом"
+              }
+            ],
+            "accepted": {
+              "i1": "c1",
+              "i2": "c2",
+              "i3": "c1",
+              "i4": "c2"
+            }
+          },
+          "explanation": "Связка есть — непрошедшее; нет — прошедшее.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:contrast"
+          ],
+          "source_ref": "r7-lesson-4-2:10.2",
+          "group": "sort"
+        },
+        {
+          "id": "b34-42-build-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери форму",
+          "stimulus": "я не написал",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "жаз",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "ба",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "ды",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "м",
+                "count": 1
+              },
+              {
+                "id": "p5",
+                "text": "ты",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2",
+                "p3",
+                "p4"
+              ]
+            ]
+          },
+          "explanation": "После отрицания всегда Д: жазбадым.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:neg"
+          ],
+          "source_ref": "r7-lesson-4-2:10.1",
+          "group": "build"
+        },
+        {
+          "id": "b34-42-build-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери форму",
+          "stimulus": "мы ждали",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "күт",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "ті",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "к",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "ді",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2",
+                "p3"
+              ]
+            ]
+          },
+          "explanation": "күт + ті + к.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:assim"
+          ],
+          "source_ref": "r7-lesson-4-2:10.1",
+          "group": "build"
+        },
+        {
+          "id": "b34-42-build-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "word-bank",
+          "title": "Собери форму",
+          "stimulus": "я понял",
+          "fields": [],
+          "payload": {
+            "pieces": [
+              {
+                "id": "p1",
+                "text": "түсін",
+                "count": 1
+              },
+              {
+                "id": "p2",
+                "text": "ді",
+                "count": 1
+              },
+              {
+                "id": "p3",
+                "text": "м",
+                "count": 1
+              },
+              {
+                "id": "p4",
+                "text": "ті",
+                "count": 1
+              }
+            ],
+            "accepted": [
+              [
+                "p1",
+                "p2",
+                "p3"
+              ]
+            ]
+          },
+          "explanation": "түсін + ді + м.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:dy"
+          ],
+          "source_ref": "r7-lesson-4-2:10.1",
+          "group": "build"
+        },
+        {
+          "id": "b34-42-detect-01",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«он не написал»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "wrong"
+            },
+            "target": "жазбаты",
+            "broken_step": {
+              "options": [
+                {
+                  "id": "o1",
+                  "text": "после отрицания всегда Д"
+                },
+                {
+                  "id": "o2",
+                  "text": "окончание лица"
+                },
+                {
+                  "id": "o3",
+                  "text": "основа"
+                }
+              ],
+              "accepted": [
+                "o1"
+              ]
+            }
+          },
+          "explanation": "жазбады: после Й всегда Д.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:neg"
+          ],
+          "source_ref": "r7-lesson-4-2:10.2",
+          "group": "detect"
+        },
+        {
+          "id": "b34-42-detect-02",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«мы сказали»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "correct"
+            },
+            "target": "айттық"
+          },
+          "explanation": "Верно.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:person"
+          ],
+          "source_ref": "r7-lesson-4-2:10.1",
+          "group": "detect"
+        },
+        {
+          "id": "b34-42-detect-03",
+          "origin": "bank",
+          "topic": "bank",
+          "kind": "detect",
+          "title": "Найди ошибку",
+          "stimulus": "«мы написали»",
+          "fields": [],
+          "payload": {
+            "verdict": {
+              "accepted": "wrong"
+            },
+            "target": "жазмық",
+            "broken_step": {
+              "options": [
+                {
+                  "id": "o1",
+                  "text": "біз = -қ, не -мық"
+                },
+                {
+                  "id": "o2",
+                  "text": "хвост прошедшего"
+                },
+                {
+                  "id": "o3",
+                  "text": "основа"
+                }
+              ],
+              "accepted": [
+                "o1"
+              ]
+            }
+          },
+          "explanation": "жаздық.",
+          "lessonId": "4-2",
+          "ruleIds": [
+            "v2:4-2:person"
+          ],
+          "source_ref": "r7-lesson-4-2:10.2",
+          "group": "detect"
+        }
       ]
     }
   }

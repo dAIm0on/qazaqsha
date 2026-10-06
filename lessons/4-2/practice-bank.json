@@ -1,0 +1,549 @@
+{
+ "note": "r7 2b: independent practice bank (Q6). Support kinds only; origin bank; not homework. Language QA pending.",
+ "items": [
+  {
+   "id": "b34-42-choice-01",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "я написал",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "жаздым"
+     },
+     {
+      "id": "o2",
+      "text": "жазамын"
+     },
+     {
+      "id": "o3",
+      "text": "жазды"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:4-2:dy"
+   ],
+   "source_ref": "r7-lesson-4-2:10.2",
+   "explanation": "-ды + м: я (прошедшее)."
+  },
+  {
+   "id": "b34-42-choice-02",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "мы написали",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "жаздық"
+     },
+     {
+      "id": "o2",
+      "text": "жазмық"
+     },
+     {
+      "id": "o3",
+      "text": "жаздым"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:4-2:person"
+   ],
+   "source_ref": "r7-lesson-4-2:10.2",
+   "explanation": "біз = -қ, не -мық."
+  },
+  {
+   "id": "b34-42-choice-03",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "я сказал",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "айттым"
+     },
+     {
+      "id": "o2",
+      "text": "айтты"
+     },
+     {
+      "id": "o3",
+      "text": "айттық"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:4-2:assim"
+   ],
+   "source_ref": "r7-lesson-4-2:10.1",
+   "explanation": "После т — ТЫ: айттым."
+  },
+  {
+   "id": "b34-42-choice-04",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "Вы (Сіз) написали",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "жаздыңыз"
+     },
+     {
+      "id": "o2",
+      "text": "жаздыңдар"
+     },
+     {
+      "id": "o3",
+      "text": "жаздың"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:4-2:person"
+   ],
+   "source_ref": "r7-lesson-4-2:10.2",
+   "explanation": "Сіз — -ңыз, Сендер — -ңдар."
+  },
+  {
+   "id": "b34-42-tap-01",
+   "origin": "bank",
+   "group": "tap",
+   "topic": "bank",
+   "kind": "tap-token",
+   "title": "Отметь нужное",
+   "stimulus": "Обе формы прошедшего",
+   "payload": {
+    "tokens": [
+     {
+      "id": "t1",
+      "text": "жазады"
+     },
+     {
+      "id": "t2",
+      "text": "жазды"
+     },
+     {
+      "id": "t3",
+      "text": "келеді"
+     },
+     {
+      "id": "t4",
+      "text": "келді"
+     }
+    ],
+    "accepted": [
+     [
+      "t2",
+      "t4"
+     ]
+    ],
+    "cardinality": 2
+   },
+   "ruleIds": [
+    "v2:4-2:contrast"
+   ],
+   "source_ref": "r7-lesson-4-2:10.2",
+   "explanation": "Нет связки — прошедшее."
+  },
+  {
+   "id": "b34-42-tap-02",
+   "origin": "bank",
+   "group": "tap",
+   "topic": "bank",
+   "kind": "tap-token",
+   "title": "Отметь нужное",
+   "stimulus": "Обе формы «мы»",
+   "payload": {
+    "tokens": [
+     {
+      "id": "t1",
+      "text": "айттық"
+     },
+     {
+      "id": "t2",
+      "text": "айтты"
+     },
+     {
+      "id": "t3",
+      "text": "күттік"
+     },
+     {
+      "id": "t4",
+      "text": "күтті"
+     }
+    ],
+    "accepted": [
+     [
+      "t1",
+      "t3"
+     ]
+    ],
+    "cardinality": 2
+   },
+   "ruleIds": [
+    "v2:4-2:person"
+   ],
+   "source_ref": "r7-lesson-4-2:10.1",
+   "explanation": "-қ/-к — мы."
+  },
+  {
+   "id": "b34-42-sort-01",
+   "origin": "bank",
+   "group": "sort",
+   "topic": "bank",
+   "kind": "sort",
+   "title": "Разложи",
+   "stimulus": "Какой хвост прошедшего?",
+   "payload": {
+    "items": [
+     {
+      "id": "i1",
+      "text": "айт"
+     },
+     {
+      "id": "i2",
+      "text": "кел"
+     },
+     {
+      "id": "i3",
+      "text": "күт"
+     },
+     {
+      "id": "i4",
+      "text": "сен"
+     }
+    ],
+    "categories": [
+     {
+      "id": "c1",
+      "label": "-ты/-ті"
+     },
+     {
+      "id": "c2",
+      "label": "-ды/-ді"
+     }
+    ],
+    "accepted": {
+     "i1": "c1",
+     "i2": "c2",
+     "i3": "c1",
+     "i4": "c2"
+    }
+   },
+   "ruleIds": [
+    "v2:4-2:assim"
+   ],
+   "source_ref": "r7-lesson-4-2:10.3",
+   "explanation": "После глухих — ТЫ/ТІ, иначе ДЫ/ДІ."
+  },
+  {
+   "id": "b34-42-sort-02",
+   "origin": "bank",
+   "group": "sort",
+   "topic": "bank",
+   "kind": "sort",
+   "title": "Разложи",
+   "stimulus": "Когда?",
+   "payload": {
+    "items": [
+     {
+      "id": "i1",
+      "text": "жазады"
+     },
+     {
+      "id": "i2",
+      "text": "жазды"
+     },
+     {
+      "id": "i3",
+      "text": "келеді"
+     },
+     {
+      "id": "i4",
+      "text": "келді"
+     }
+    ],
+    "categories": [
+     {
+      "id": "c1",
+      "label": "сейчас / обычно"
+     },
+     {
+      "id": "c2",
+      "label": "в прошлом"
+     }
+    ],
+    "accepted": {
+     "i1": "c1",
+     "i2": "c2",
+     "i3": "c1",
+     "i4": "c2"
+    }
+   },
+   "ruleIds": [
+    "v2:4-2:contrast"
+   ],
+   "source_ref": "r7-lesson-4-2:10.2",
+   "explanation": "Связка есть — непрошедшее; нет — прошедшее."
+  },
+  {
+   "id": "b34-42-build-01",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери форму",
+   "stimulus": "я не написал",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "жаз"
+     },
+     {
+      "id": "p2",
+      "text": "ба"
+     },
+     {
+      "id": "p3",
+      "text": "ды"
+     },
+     {
+      "id": "p4",
+      "text": "м"
+     },
+     {
+      "id": "p5",
+      "text": "ты"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2",
+      "p3",
+      "p4"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:4-2:neg"
+   ],
+   "source_ref": "r7-lesson-4-2:10.1",
+   "explanation": "После отрицания всегда Д: жазбадым."
+  },
+  {
+   "id": "b34-42-build-02",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери форму",
+   "stimulus": "мы ждали",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "күт"
+     },
+     {
+      "id": "p2",
+      "text": "ті"
+     },
+     {
+      "id": "p3",
+      "text": "к"
+     },
+     {
+      "id": "p4",
+      "text": "ді"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2",
+      "p3"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:4-2:assim"
+   ],
+   "source_ref": "r7-lesson-4-2:10.1",
+   "explanation": "күт + ті + к."
+  },
+  {
+   "id": "b34-42-build-03",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери форму",
+   "stimulus": "я понял",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "түсін"
+     },
+     {
+      "id": "p2",
+      "text": "ді"
+     },
+     {
+      "id": "p3",
+      "text": "м"
+     },
+     {
+      "id": "p4",
+      "text": "ті"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2",
+      "p3"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:4-2:dy"
+   ],
+   "source_ref": "r7-lesson-4-2:10.1",
+   "explanation": "түсін + ді + м."
+  },
+  {
+   "id": "b34-42-detect-01",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«он не написал»",
+   "payload": {
+    "verdict": {
+     "accepted": "wrong"
+    },
+    "target": "жазбаты",
+    "broken_step": {
+     "options": [
+      {
+       "id": "o1",
+       "text": "после отрицания всегда Д"
+      },
+      {
+       "id": "o2",
+       "text": "окончание лица"
+      },
+      {
+       "id": "o3",
+       "text": "основа"
+      }
+     ],
+     "accepted": [
+      "o1"
+     ]
+    }
+   },
+   "ruleIds": [
+    "v2:4-2:neg"
+   ],
+   "source_ref": "r7-lesson-4-2:10.2",
+   "explanation": "жазбады: после Й всегда Д."
+  },
+  {
+   "id": "b34-42-detect-02",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«мы сказали»",
+   "payload": {
+    "verdict": {
+     "accepted": "correct"
+    },
+    "target": "айттық"
+   },
+   "ruleIds": [
+    "v2:4-2:person"
+   ],
+   "source_ref": "r7-lesson-4-2:10.1",
+   "explanation": "Верно."
+  },
+  {
+   "id": "b34-42-detect-03",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«мы написали»",
+   "payload": {
+    "verdict": {
+     "accepted": "wrong"
+    },
+    "target": "жазмық",
+    "broken_step": {
+     "options": [
+      {
+       "id": "o1",
+       "text": "біз = -қ, не -мық"
+      },
+      {
+       "id": "o2",
+       "text": "хвост прошедшего"
+      },
+      {
+       "id": "o3",
+       "text": "основа"
+      }
+     ],
+     "accepted": [
+      "o1"
+     ]
+    }
+   },
+   "ruleIds": [
+    "v2:4-2:person"
+   ],
+   "source_ref": "r7-lesson-4-2:10.2",
+   "explanation": "жаздық."
+  }
+ ]
+}

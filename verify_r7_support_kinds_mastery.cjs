@@ -83,14 +83,15 @@ ok('Q6-B barrier: new kinds only in 3–4 lessons, explicit errors elsewhere, pa
   mock.LessonV2Runtime.installAll();
   const q=mock.COURSE.questions.find(x=>x.id==='t-choice');assert.ok(q,'installed');assert.equal(q.kind,'choice');assert.deepEqual(plain(q.fields),[]);
   assert.equal(core.evaluate(q,['o2']).correct,true);
-  assert.ok(mock.COURSE.questions.filter(x=>!x.id.startsWith('t-')).every(x=>x.kind==='fields'),'all existing cards stay fields');
+  assert.ok(mock.COURSE.questions.filter(x=>!x.id.startsWith('t-')&&!x.bank).every(x=>x.kind==='fields'),'all existing cards stay fields (r7 2b: the bank b34-* is the only support-kind content)');
+  assert.ok(mock.COURSE.questions.filter(x=>x.bank).every(x=>/^b34-/.test(x.id)&&x.origin==='bank'&&x.kind!=='fields'),'bank cards are support kinds with origin bank');
 }
 ok('runtime install keeps support kinds for 3–4 and leaves every existing card as fields');
 
 // D. Page wiring: renderer uses existing chip classes, hidden JSON answer, ID-encoded taps; response mode = choice; event carries response_modes.
 const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8'),html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8'),sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(html.indexOf('src="response-kinds.js"')>html.indexOf('src="core.js"')&&html.indexOf('src="response-kinds.js"')<html.indexOf('src="lesson-v2-schema.js"'));
-assert.ok(sw.includes('"response-kinds.js"')&&sw.includes("CACHE='qazaq-offline-live-20261006-r7-step2-2'"));
+assert.ok(sw.includes('"response-kinds.js"')&&sw.includes("CACHE='qazaq-offline-live-20261006-r7-step2b'"));
 assert.ok(app.includes("response_kind:q.kind||'fields',response_modes:responseModes(q),"));
 assert.ok(app.includes('function readAnswers(q){return supportKind(q)?window.ResponseKinds.read(q):'));
 {

@@ -27,14 +27,16 @@
  for(const q of questions)coerceTyped(q);
  const byId=new Map(questions.map(q=>[q.id,q]));
  const topics=[['all','Все задания','∞'],['sounds','Звуки и слоги','01'],['plural','Множественное число','02'],['vocab','Слова','03'],['numbers','Числа и количество','04'],['person','Личные окончания','05'],['rules','Только правила','06'],['phrase','Фразы','07'],['verbs','Глаголы','08']];
- const KEY='qazaq-kris-course-v1', BACKUP=KEY+'-before-import', MIGRATION=KEY+'-before-schema-5', R7_SNAPSHOT=KEY+'-before-r7';
+ const KEY='qazaq-kris-course-v1', BACKUP=KEY+'-before-import', MIGRATION=KEY+'-before-schema-5', R7_SNAPSHOT=KEY+'-before-r7', R7_FREG_SNAPSHOT=KEY+'-before-r7-freg';
  const cfg=window.TRAINER_CONFIG, P=window.ProgressStore, catalog=window.CURRICULUM;
  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  let state=P.empty(),savedSession=null,storageAvailable=true,storageReadError=null;
  try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);
    // r7: keep the exact pre-migration bytes once (best effort; the migration itself is additive).
-   const r7=window.EvidenceState&&window.EvidenceState.MIGRATION_ID;if(r7&&!(saved.evidence&&saved.evidence.migrations&&saved.evidence.migrations[r7])&&!localStorage.getItem(R7_SNAPSHOT)){try{localStorage.setItem(R7_SNAPSHOT,raw);}catch{}}}}
+   const r7=window.EvidenceState&&window.EvidenceState.MIGRATION_ID;if(r7&&!(saved.evidence&&saved.evidence.migrations&&saved.evidence.migrations[r7])&&!localStorage.getItem(R7_SNAPSHOT)){try{localStorage.setItem(R7_SNAPSHOT,raw);}catch{}}
+   // r7 2b FREG: the same one-time full snapshot before the field-key migration (restore = whole state, not only FSRS).
+   const freg=window.EvidenceState&&window.EvidenceState.FREG_ID;if(freg&&!(saved.evidence&&saved.evidence.migrations&&saved.evidence.migrations[freg])&&!localStorage.getItem(R7_FREG_SNAPSHOT)){try{localStorage.setItem(R7_FREG_SNAPSHOT,raw);}catch{}}}}
  catch(error){storageAvailable=false;storageReadError=error;}
  // Letter row must always show on text-input surfaces (any width). Pref defaults on; mount no longer gates on max-width.
  if(!state.prefs.lettersChosen)state.prefs.letters=true;
@@ -698,6 +700,8 @@
  function eligible(value){
   const q=typeof value==='string'?byId.get(value):value;
   if(!q)return false;
+  // r7 2b: practice-bank cards (blocks 3–4) live only in their own hub tracks («Банк · …»).
+  if(q.bank===true)return false;
   if(window.MemoryPolicy&&window.MemoryPolicy.isLetterBreakdown&&window.MemoryPolicy.isLetterBreakdown(q))return false;
   if(q.source==='p2b'&&!records[q.id]?.seen&&mode!=='course')return false;
   if(q.source==='phrase'&&!records[q.id]?.seen&&mode!=='phrase'&&mode!=='course')return false;
@@ -1084,7 +1088,7 @@
    }
    if(tracks.length===1){startLesson(tracks[0].id,learningState.steps[tracks[0].id]||0,{voluntary:true});return;}
    const ids=questions.filter(q=>{
-     if(!q||!(q.ruleIds||[]).includes(ruleId))return false;
+     if(!q||q.bank||!(q.ruleIds||[]).includes(ruleId))return false;
      if(!catalog.eligible(q,state))return false;
      if(q.topic==='numbers'&&window.NumberLadder&&!window.NumberLadder.allowed(q,state))return false;
      return true;
@@ -1368,7 +1372,7 @@
    const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
    const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
    const letterBar=letters?`<div class="letter-keyboard" lang="kk" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div>`:'';
-   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div></div><form id="answer-form"><div class="typing-scroll"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc((q.phase&&q.phase!=='Вспомнить')?q.phase:(q.source.startsWith('hw')?'':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title" class="practice-prompt">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]&&!/вспомнить/i.test(reviewReasonMap[q.id])?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus):esc(q.stimulus)))}${q.translation?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></div><div class="practice-dock typing-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}</div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div><div class="typing-strip" id="typing-strip">${letterBar}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="retry-button" hidden>Ещё раз</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div></div></div></form>`;
+   $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div></div><form id="answer-form"><div class="typing-scroll"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc((q.phase&&q.phase!=='Вспомнить')?q.phase:(q.source.startsWith('hw')?'':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title" class="practice-prompt">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]&&!/вспомнить/i.test(reviewReasonMap[q.id])?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus):esc(q.stimulus)))}${q.translation&&!translationGivesAnswer(q)?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></div><div class="practice-dock typing-dock" id="practice-dock"><div class="practice-composer"><div class="composer-row">${answerMarkup(q)}</div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div><div class="typing-strip" id="typing-strip">${letterBar}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="retry-button" hidden>Ещё раз</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div></div></div></form>`;
    const goCard=()=>{if(checked)nextQuestion();else if(isVocabWordsMode()&&retrying&&$('#retry-button')&&!$('#retry-button').hidden)beginVocabRetry();else checkAnswer(q);};
    if(window._qazaqEnter)document.removeEventListener('keydown',window._qazaqEnter);
    window._qazaqEnter=e=>{
@@ -1516,6 +1520,8 @@
      if(supportKind(q)?window.ResponseKinds.missing(q,answers):answers.some(a=>!String(a).trim())&&q.kind!=='multi'){warning.textContent=supportKind(q)?'Сначала выбери ответ.':'Набери форму целиком.';warning.hidden=false;return;}
      warning.hidden=true;
      const result=core.evaluate(q,answers);
+     // r7 2b Q6-07/08: a retry answer is kept as evidence of the same presentation (never a first try).
+     if(window.EvidenceState){try{const at=Date.now();window.EvidenceState.observe(state,{q,answers,result,event:{id:'retry:'+q.id+':'+at,at,hinted},responseModes:responseModes(q),origin:q.bank&&mode!=='homework'?'bank':evidenceOrigin(mode==='homework',mode==='voluntary'),presentation:typeof presented==='string'?presented:'',first:false,lessonId:currentLessonId(q)||q.lessonId||''});}catch(error){console.warn('evidence',error);}}
      if(result.correct){
        // Words P1: progress counts closed/correct cards; retry path must credit the success.
        if(isVocabWordsMode()){sessionAttempts++;if(hinted)sessionAssisted++;else sessionCorrect++;}
@@ -1590,7 +1596,7 @@
    }
    if(!homeworkMode&&!aiRemed&&!voluntary)event.skills=window.Knowledge.observe(state,q,result,event,errors);
    state.events.push(event);rec=records[q.id]||rec;
-   if(window.EvidenceState){try{window.EvidenceState.observe(state,{q,answers,result,event,responseModes:responseModes(q),origin:evidenceOrigin(homeworkMode,voluntary),revealed:!!reveal,first:true,lessonId:event.lesson_id||currentLessonId(q)||q.lessonId||'',contentRevision:event.content_revision||(window.LessonV2Runtime&&window.LessonV2Runtime.byId&&(window.LessonV2Runtime.byId(q.lessonId)||{}).content_revision)||''});}catch(error){console.warn('evidence',error);}}
+   if(window.EvidenceState){try{window.EvidenceState.observe(state,{q,answers,result,event,responseModes:responseModes(q),origin:q.bank&&!homeworkMode?'bank':evidenceOrigin(homeworkMode,voluntary),presentation:typeof presented==='string'?presented:'',revealed:!!reveal,first:true,lessonId:event.lesson_id||currentLessonId(q)||q.lessonId||'',contentRevision:event.content_revision||(window.LessonV2Runtime&&window.LessonV2Runtime.byId&&(window.LessonV2Runtime.byId(q.lessonId)||{}).content_revision)||''});}catch(error){console.warn('evidence',error);}}
    if(homeworkMode&&hwLesson){
      const expected=supportKind(q)?supportLine(q):q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers[0]).join('; ');
      window.Homework.recordItem(state,hwLesson,{id:q.id,answers,correct:result.correct,rule_peek:rulePeeked,answer_peek:hinted,skipped:!!reveal,expected,event_id:eventId},now);
@@ -1771,6 +1777,22 @@
    remediationNote=(window.Homework.ruleText(q)||'').split('\n').map(s=>s.trim()).find(Boolean)||'';
    startCustom(ids,'remediation');
  }
+ // r7 2b (казакша, решение 2): one short line per W-2 form requirement of the lesson (қалайсың 4/4),
+ // counted by EvidenceState.formStatus (independent typed form, first try, no hint).
+ // r7 2b (казакша a): a check card must not print its own answer as the translation line above the input
+ // (3-2 «сынып · класс» → answer «класс»). The meaning still comes with the feedback/explanation after answering.
+ function translationGivesAnswer(q){
+   if(!q||!q.translation)return false;
+   const n=v=>core.normalize?core.normalize(String(v)):String(v).trim().toLowerCase(),t=n(q.translation);
+   return (q.fields||[]).some(f=>(f.answers||[]).some(a=>n(a)===t));
+ }
+ function homeworkFormLines(lessonId){
+   const E=window.EvidenceState;if(!E||!E.FORM_REQUIREMENTS||!E.formStatus)return '';
+   return Object.entries(E.FORM_REQUIREMENTS).filter(([,r])=>r.lesson_id===lessonId).map(([src,r])=>{
+     const st=E.formStatus(state,src);if(!st)return '';
+     return ` <span class="small" data-hw-forms="${esc(src)}">${esc(r.forms[0])}: ${st.done} из ${st.required} форм самостоятельно.</span>`;
+   }).join('');
+ }
  function homeworkListUpdated(lessonId,attempt,wordQuestionIds){
    const keep=new Set(wordQuestionIds||[]),prefix='v2-'+lessonId+'-vocab-';
    return (attempt&&attempt.items||[]).some(i=>i&&typeof i.id==='string'&&i.id.startsWith(prefix)&&!keep.has(i.id));
@@ -1816,7 +1838,7 @@
          <li>Повторить методичку — ${pdfLink(h.method_url,h.method_title,'method')}${check('method')}</li>
          <li>PDF домашки — ${pdfLink(h.homework_pdf_url,h.homework_pdf_title||('Домашка '+pack.lesson_id),'homework-pdf')}</li>
          <li>${exercisesClosed?'Упражнения сборника откроются вместе с правилом.':`Упражнения сборника (${h.exercise_ids.length} пунктов, по ${window.Homework.HW_SECTION} в части) <button type="button" class="secondary-button" data-hw-part="exercises">${exP.done?'Продолжить упражнения':'Открыть упражнения'}</button>${secBtns('exercises',exN)}`}</li>
-         <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${wordLine}.${listNote} <button type="button" class="secondary-button" data-hw-part="words">${wP.done?'Продолжить слова':'Открыть слова'}</button>${secBtns('words',wN)}</li>
+         <li>Слова урока: сначала узнать (казахский → русский), потом написать. ${wordLine}.${listNote}${homeworkFormLines(pack.lesson_id)} <button type="button" class="secondary-button" data-hw-part="words">${wP.done?'Продолжить слова':'Открыть слова'}</button>${secBtns('words',wN)}</li>
          <li>Внешний тест: ${(h.external_tests&&h.external_tests.length?h.external_tests:[h.external_test_url]).filter(Boolean).map(u=>`<a class="ext-test-link" href="${esc(u)}" target="_blank" rel="noopener noreferrer">BatylBol · внешний тест</a>`).join(' · ')||'URL в PDF не найден'}. Мы результат сайта не проверяем и не обещаем зачёт на BatylBol. ${check('external_test')}</li>
          ${(h.extras||[]).map(x=>'<li>'+check(x)+'</li>').join('')}
        </ol>
@@ -2787,7 +2809,7 @@
      topic='all';sourceFilter=null;activeLesson=null;mode=next;startQueue();showView('practice');
    },
    contrast:startContrast,setAssociation,promote,export:()=>{save();downloadProgress(P.serialize(state));},import:importProgress,
-   restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(R7_SNAPSHOT)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
+   restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(R7_FREG_SNAPSHOT)||localStorage.getItem(R7_SNAPSHOT)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
  });
  $('#pause-session').onclick=()=>{
    if(position>0&&queue.length){

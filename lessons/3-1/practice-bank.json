@@ -1,0 +1,564 @@
+{
+ "note": "r7 2b: independent practice bank (Q6). Support kinds only; origin bank; not homework. Language QA pending.",
+ "items": [
+  {
+   "id": "b34-31-choice-01",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "моя книга",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "кітабым"
+     },
+     {
+      "id": "o2",
+      "text": "кітапым"
+     },
+     {
+      "id": "o3",
+      "text": "кітабың"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-1:poss",
+    "v2:3-1:assim"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "кітап + ым → кітабым: перед гласной наклейкой п → б."
+  },
+  {
+   "id": "b34-31-choice-02",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "его город",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "қаласы"
+     },
+     {
+      "id": "o2",
+      "text": "қалам"
+     },
+     {
+      "id": "o3",
+      "text": "қалаң"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-1:poss"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "После гласной у «его» подпорка С: қала → қаласы."
+  },
+  {
+   "id": "b34-31-choice-03",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "Ваш язык",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "тіліңіз"
+     },
+     {
+      "id": "o2",
+      "text": "тілің"
+     },
+     {
+      "id": "o3",
+      "text": "тілім"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-1:poss"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "сіздің → -іңіз: тіліңіз."
+  },
+  {
+   "id": "b34-31-choice-04",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "моя вода",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "суым"
+     },
+     {
+      "id": "o2",
+      "text": "суың"
+     },
+     {
+      "id": "o3",
+      "text": "суыңыз"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-1:poss"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "у на конце — согласная, поэтому -ым: суым."
+  },
+  {
+   "id": "b34-31-tap-01",
+   "origin": "bank",
+   "group": "tap",
+   "topic": "bank",
+   "kind": "tap-token",
+   "title": "Отметь нужное",
+   "stimulus": "Слово, где сработал закон края (п → б)",
+   "payload": {
+    "tokens": [
+     {
+      "id": "t1",
+      "text": "менің"
+     },
+     {
+      "id": "t2",
+      "text": "кітабым"
+     },
+     {
+      "id": "t3",
+      "text": "сенің"
+     },
+     {
+      "id": "t4",
+      "text": "көзің"
+     }
+    ],
+    "accepted": [
+     [
+      "t2"
+     ]
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-1:assim"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "кітап → кітабым."
+  },
+  {
+   "id": "b34-31-tap-02",
+   "origin": "bank",
+   "group": "tap",
+   "topic": "bank",
+   "kind": "tap-token",
+   "title": "Отметь нужное",
+   "stimulus": "Слово в форме «твой»",
+   "payload": {
+    "tokens": [
+     {
+      "id": "t1",
+      "text": "басым"
+     },
+     {
+      "id": "t2",
+      "text": "көзің"
+     },
+     {
+      "id": "t3",
+      "text": "қолы"
+     }
+    ],
+    "accepted": [
+     [
+      "t2"
+     ]
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-1:poss"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "-ің — «твой»: көзің."
+  },
+  {
+   "id": "b34-31-tap-03",
+   "origin": "bank",
+   "group": "tap",
+   "topic": "bank",
+   "kind": "tap-token",
+   "title": "Отметь нужное",
+   "stimulus": "Обе формы «его»",
+   "payload": {
+    "tokens": [
+     {
+      "id": "t1",
+      "text": "қаласы"
+     },
+     {
+      "id": "t2",
+      "text": "көшесі"
+     },
+     {
+      "id": "t3",
+      "text": "қаламым"
+     },
+     {
+      "id": "t4",
+      "text": "тіліңіз"
+     }
+    ],
+    "accepted": [
+     [
+      "t1",
+      "t2"
+     ]
+    ],
+    "cardinality": 2
+   },
+   "ruleIds": [
+    "v2:3-1:poss"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "После гласной «его» — -сы/-сі."
+  },
+  {
+   "id": "b34-31-sort-01",
+   "origin": "bank",
+   "group": "sort",
+   "topic": "bank",
+   "kind": "sort",
+   "title": "Разложи",
+   "stimulus": "Чьё это? Разложи по владельцу.",
+   "payload": {
+    "items": [
+     {
+      "id": "i1",
+      "text": "басым"
+     },
+     {
+      "id": "i2",
+      "text": "көзің"
+     },
+     {
+      "id": "i3",
+      "text": "тіліңіз"
+     },
+     {
+      "id": "i4",
+      "text": "қолы"
+     }
+    ],
+    "categories": [
+     {
+      "id": "c1",
+      "label": "менің"
+     },
+     {
+      "id": "c2",
+      "label": "сенің"
+     },
+     {
+      "id": "c3",
+      "label": "сіздің"
+     },
+     {
+      "id": "c4",
+      "label": "оның"
+     }
+    ],
+    "accepted": {
+     "i1": "c1",
+     "i2": "c2",
+     "i3": "c3",
+     "i4": "c4"
+    }
+   },
+   "ruleIds": [
+    "v2:3-1:poss"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5-10.1",
+   "explanation": "Окончание показывает владельца: -ым / -ің / -іңіз / -ы."
+  },
+  {
+   "id": "b34-31-sort-02",
+   "origin": "bank",
+   "group": "sort",
+   "topic": "bank",
+   "kind": "sort",
+   "title": "Разложи",
+   "stimulus": "Меняется ли край слова перед -ым/-ім?",
+   "payload": {
+    "items": [
+     {
+      "id": "i1",
+      "text": "кітап"
+     },
+     {
+      "id": "i2",
+      "text": "көйлек"
+     },
+     {
+      "id": "i3",
+      "text": "қалам"
+     },
+     {
+      "id": "i4",
+      "text": "қала"
+     }
+    ],
+    "categories": [
+     {
+      "id": "c1",
+      "label": "край меняется"
+     },
+     {
+      "id": "c2",
+      "label": "край не меняется"
+     }
+    ],
+    "accepted": {
+     "i1": "c1",
+     "i2": "c1",
+     "i3": "c2",
+     "i4": "c2"
+    }
+   },
+   "ruleIds": [
+    "v2:3-1:assim"
+   ],
+   "source_ref": "r7-lesson-3-1:10.2",
+   "explanation": "п/к/қ перед гласной наклейкой → б/г/ғ; остальные не меняются."
+  },
+  {
+   "id": "b34-31-build-01",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери",
+   "stimulus": "моя книга",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "менің"
+     },
+     {
+      "id": "p2",
+      "text": "кітабым"
+     },
+     {
+      "id": "p3",
+      "text": "сенің"
+     },
+     {
+      "id": "p4",
+      "text": "кітабың"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:3-1:poss",
+    "v2:3-1:assim"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "менің кітабым."
+  },
+  {
+   "id": "b34-31-build-02",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери",
+   "stimulus": "его улица",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "оның"
+     },
+     {
+      "id": "p2",
+      "text": "көшесі"
+     },
+     {
+      "id": "p3",
+      "text": "менің"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:3-1:poss"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "оның көшесі."
+  },
+  {
+   "id": "b34-31-build-03",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери форму",
+   "stimulus": "мои книги (поезд: много → чьё)",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "кітап"
+     },
+     {
+      "id": "p2",
+      "text": "тар"
+     },
+     {
+      "id": "p3",
+      "text": "ым"
+     },
+     {
+      "id": "p4",
+      "text": "ың"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2",
+      "p3"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:3-1:pl"
+   ],
+   "source_ref": "r7-lesson-3-1:10.3",
+   "explanation": "кітап + тар + ым: сначала «много», потом «чьё»."
+  },
+  {
+   "id": "b34-31-detect-01",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«моя книга»",
+   "payload": {
+    "verdict": {
+     "accepted": "wrong"
+    },
+    "target": "менің кітапым",
+    "broken_step": {
+     "options": [
+      {
+       "id": "o1",
+       "text": "закон края (п → б)"
+      },
+      {
+       "id": "o2",
+       "text": "окончание владельца"
+      },
+      {
+       "id": "o3",
+       "text": "слово-владелец"
+      }
+     ],
+     "accepted": [
+      "o1"
+     ]
+    }
+   },
+   "ruleIds": [
+    "v2:3-1:assim"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "Перед гласной наклейкой п → б: кітабым."
+  },
+  {
+   "id": "b34-31-detect-02",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«мои книги»",
+   "payload": {
+    "verdict": {
+     "accepted": "correct"
+    },
+    "target": "менің кітаптарым"
+   },
+   "ruleIds": [
+    "v2:3-1:pl"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "Верно: после «много» озвончения нет."
+  },
+  {
+   "id": "b34-31-detect-03",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«его город»",
+   "payload": {
+    "verdict": {
+     "accepted": "correct"
+    },
+    "target": "оның қаласы"
+   },
+   "ruleIds": [
+    "v2:3-1:poss"
+   ],
+   "source_ref": "r7-lesson-3-1:10.5",
+   "explanation": "Верно: подпорка С после гласной."
+  }
+ ]
+}

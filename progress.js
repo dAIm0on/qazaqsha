@@ -111,7 +111,10 @@
    return {state,summary:{cards:ids.length,unknown,events:state.events.length,associations:Object.keys(state.associations).length},warning:unknown?'Записи отсутствующих в этой версии карточек сохранятся, но не попадут в тренировку.':''};
  }
  function merge(current,incoming){
-   const out=migrate(current);out.morphTrainer=morph.merge(current.morphTrainer,incoming.morphTrainer);out.session=null;out.lesson_packages=packages.merge(out.lesson_packages,incoming.lesson_packages);
+   const out=migrate(current);
+   // r7 2b ST-07: both sides of a record conflict are kept in evidence.conflicts (core choice below is unchanged).
+   const before=evidence&&evidence.recordConflicts?{records:Object.assign({},out.records),skills:Object.assign({},out.skills),events:out.events}:null;
+   out.morphTrainer=morph.merge(current.morphTrainer,incoming.morphTrainer);out.session=null;out.lesson_packages=packages.merge(out.lesson_packages,incoming.lesson_packages);
    for(const [id,r] of Object.entries(incoming.skills)){const old=out.skills[id];if(!old||(r.last_answer||0)>(old.last_answer||0)||((r.last_answer||0)===(old.last_answer||0)&&r.review_count>old.review_count))out.skills[id]=r;}
    out.errors=Array.from(new Map([...out.errors,...incoming.errors].map(e=>[JSON.stringify(e),e])).values());
    for(const [id,r] of Object.entries(incoming.records)){
@@ -158,6 +161,7 @@
      if(mergedPath.canonShownFor)out.grammarPath.canonShownFor=mergedPath.canonShownFor;else delete out.grammarPath.canonShownFor;
    }
    if(evidence)out.evidence=evidence.merge(out.evidence,incoming.evidence);
+   if(before)evidence.recordConflicts(out,before,incoming);
    out.schema=7;
    return out;
  }

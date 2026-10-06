@@ -114,7 +114,7 @@ function create(api){
   return all.filter(l=>l&&!l.homeworkWords&&(l.courseLesson===lessonId||l.courseLesson==='bank')&&!(hw===false&&l.id==='vocab-must')).map(l=>hw&&l.id==='vocab-must'?hw:l);
  }
  function tracksMarkup(lessonId){
-  const TOPIC={sounds:'Звуки',vocab:'Слова',numbers:'Числа',plural:'Окончания',person:'Лица',verbs:'Глаголы',rules:'Правила',phrase:'Фразы',possessive:'Притяжательность'};
+  const TOPIC={sounds:'Звуки',vocab:'Слова',numbers:'Числа',plural:'Окончания',person:'Лица',verbs:'Глаголы',rules:'Правила',phrase:'Фразы',possessive:'Притяжательность',bank:'Банк заданий'};
   const all=window.LEARNING&&window.LEARNING.lessons||[];
   const rows=picked?all.filter(l=>l&&l.topic===picked&&!l.homeworkWords):tracksFor(lessonId);
   const heading=picked?(TOPIC[picked]||'Ступени'):'Ступени этого урока';

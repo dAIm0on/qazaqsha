@@ -1,0 +1,537 @@
+{
+ "note": "r7 2b: independent practice bank (Q6). Support kinds only; origin bank; not homework. Language QA pending.",
+ "items": [
+  {
+   "id": "b34-32-choice-01",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "наш класс",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "сыныбымыз"
+     },
+     {
+      "id": "o2",
+      "text": "сыныпымыз"
+     },
+     {
+      "id": "o3",
+      "text": "сыныбың"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-2:poss"
+   ],
+   "source_ref": "r7-lesson-3-2:10.3",
+   "explanation": "Озвончение работает: сынып → сыныбымыз."
+  },
+  {
+   "id": "b34-32-choice-02",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "их семья",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "олардың отбасы"
+     },
+     {
+      "id": "o2",
+      "text": "олардың отбасысы"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-2:repair"
+   ],
+   "source_ref": "r7-lesson-3-2:10.2",
+   "explanation": "«сы» уже внутри основы отбасы."
+  },
+  {
+   "id": "b34-32-choice-03",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "ваши книги (сендердің)",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "кітаптарың"
+     },
+     {
+      "id": "o2",
+      "text": "кітабың"
+     },
+     {
+      "id": "o3",
+      "text": "кітабарың"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-2:sender"
+   ],
+   "source_ref": "r7-lesson-3-2:10.2",
+   "explanation": "Владельцев много → кітаптарың; после «много» закон края не срабатывает."
+  },
+  {
+   "id": "b34-32-choice-04",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "наши руки",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "қолымыз"
+     },
+     {
+      "id": "o2",
+      "text": "қолдарымыз"
+     },
+     {
+      "id": "o3",
+      "text": "қолың"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-2:poss"
+   ],
+   "source_ref": "r7-lesson-3-2:10.2",
+   "explanation": "Части тела: множественное не ставится."
+  },
+  {
+   "id": "b34-32-tap-01",
+   "origin": "bank",
+   "group": "tap",
+   "topic": "bank",
+   "kind": "tap-token",
+   "title": "Отметь нужное",
+   "stimulus": "Обе формы «наш»",
+   "payload": {
+    "tokens": [
+     {
+      "id": "t1",
+      "text": "баламыз"
+     },
+     {
+      "id": "t2",
+      "text": "баласы"
+     },
+     {
+      "id": "t3",
+      "text": "ісіміз"
+     },
+     {
+      "id": "t4",
+      "text": "балалары"
+     }
+    ],
+    "accepted": [
+     [
+      "t1",
+      "t3"
+     ]
+    ],
+    "cardinality": 2
+   },
+   "ruleIds": [
+    "v2:3-2:poss"
+   ],
+   "source_ref": "r7-lesson-3-2:10.3",
+   "explanation": "-мыз / -іміз — «наш»."
+  },
+  {
+   "id": "b34-32-tap-02",
+   "origin": "bank",
+   "group": "tap",
+   "topic": "bank",
+   "kind": "tap-token",
+   "title": "Отметь нужное",
+   "stimulus": "Слово «тот»",
+   "payload": {
+    "tokens": [
+     {
+      "id": "t1",
+      "text": "бұл"
+     },
+     {
+      "id": "t2",
+      "text": "осы"
+     },
+     {
+      "id": "t3",
+      "text": "сол"
+     },
+     {
+      "id": "t4",
+      "text": "анау"
+     }
+    ],
+    "accepted": [
+     [
+      "t3"
+     ]
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-2:deixis"
+   ],
+   "source_ref": "r7-lesson-3-2:10.3",
+   "explanation": "сол — тот."
+  },
+  {
+   "id": "b34-32-sort-01",
+   "origin": "bank",
+   "group": "sort",
+   "topic": "bank",
+   "kind": "sort",
+   "title": "Разложи",
+   "stimulus": "Один предмет или много?",
+   "payload": {
+    "items": [
+     {
+      "id": "i1",
+      "text": "баламыз"
+     },
+     {
+      "id": "i2",
+      "text": "балаларымыз"
+     },
+     {
+      "id": "i3",
+      "text": "көршіміз"
+     },
+     {
+      "id": "i4",
+      "text": "көршілеріміз"
+     }
+    ],
+    "categories": [
+     {
+      "id": "c1",
+      "label": "один"
+     },
+     {
+      "id": "c2",
+      "label": "много"
+     }
+    ],
+    "accepted": {
+     "i1": "c1",
+     "i2": "c2",
+     "i3": "c1",
+     "i4": "c2"
+    }
+   },
+   "ruleIds": [
+    "v2:3-2:poss"
+   ],
+   "source_ref": "r7-lesson-3-2:10.4",
+   "explanation": "«много» стоит перед «чьё»: бала-лар-ымыз."
+  },
+  {
+   "id": "b34-32-sort-02",
+   "origin": "bank",
+   "group": "sort",
+   "topic": "bank",
+   "kind": "sort",
+   "title": "Разложи",
+   "stimulus": "Что значит указатель?",
+   "payload": {
+    "items": [
+     {
+      "id": "i1",
+      "text": "бұл"
+     },
+     {
+      "id": "i2",
+      "text": "осы"
+     },
+     {
+      "id": "i3",
+      "text": "сол"
+     },
+     {
+      "id": "i4",
+      "text": "анау"
+     }
+    ],
+    "categories": [
+     {
+      "id": "c1",
+      "label": "этот"
+     },
+     {
+      "id": "c2",
+      "label": "вот этот"
+     },
+     {
+      "id": "c3",
+      "label": "тот"
+     },
+     {
+      "id": "c4",
+      "label": "вон тот"
+     }
+    ],
+    "accepted": {
+     "i1": "c1",
+     "i2": "c2",
+     "i3": "c3",
+     "i4": "c4"
+    }
+   },
+   "ruleIds": [
+    "v2:3-2:deixis"
+   ],
+   "source_ref": "r7-lesson-3-2:10.3",
+   "explanation": "бұл / осы / сол / анау."
+  },
+  {
+   "id": "b34-32-build-01",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери",
+   "stimulus": "наш класс",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "біздің"
+     },
+     {
+      "id": "p2",
+      "text": "сыныбымыз"
+     },
+     {
+      "id": "p3",
+      "text": "сыныпымыз"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:3-2:poss"
+   ],
+   "source_ref": "r7-lesson-3-2:10.3",
+   "explanation": "біздің сыныбымыз."
+  },
+  {
+   "id": "b34-32-build-02",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери",
+   "stimulus": "их дети",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "олардың"
+     },
+     {
+      "id": "p2",
+      "text": "балалары"
+     },
+     {
+      "id": "p3",
+      "text": "баласы"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:3-2:poss"
+   ],
+   "source_ref": "r7-lesson-3-2:10.3",
+   "explanation": "олардың балалары."
+  },
+  {
+   "id": "b34-32-build-03",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери форму",
+   "stimulus": "наши дети",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "бала"
+     },
+     {
+      "id": "p2",
+      "text": "лар"
+     },
+     {
+      "id": "p3",
+      "text": "ымыз"
+     },
+     {
+      "id": "p4",
+      "text": "ың"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2",
+      "p3"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:3-2:poss"
+   ],
+   "source_ref": "r7-lesson-3-2:10.3",
+   "explanation": "бала + лар + ымыз."
+  },
+  {
+   "id": "b34-32-detect-01",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«его семья»",
+   "payload": {
+    "verdict": {
+     "accepted": "wrong"
+    },
+    "target": "оның отбасысы",
+    "broken_step": {
+     "options": [
+      {
+       "id": "o1",
+       "text": "«сы» уже внутри основы"
+      },
+      {
+       "id": "o2",
+       "text": "окончание «много»"
+      },
+      {
+       "id": "o3",
+       "text": "слово-владелец"
+      }
+     ],
+     "accepted": [
+      "o1"
+     ]
+    }
+   },
+   "ruleIds": [
+    "v2:3-2:repair"
+   ],
+   "source_ref": "r7-lesson-3-2:10.2",
+   "explanation": "оның отбасы: «сы» уже внутри основы."
+  },
+  {
+   "id": "b34-32-detect-02",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«наш класс»",
+   "payload": {
+    "verdict": {
+     "accepted": "correct"
+    },
+    "target": "біздің сыныбымыз"
+   },
+   "ruleIds": [
+    "v2:3-2:poss"
+   ],
+   "source_ref": "r7-lesson-3-2:10.3",
+   "explanation": "Верно: п → б."
+  },
+  {
+   "id": "b34-32-detect-03",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«твои книги»",
+   "payload": {
+    "verdict": {
+     "accepted": "wrong"
+    },
+    "target": "кітабарың",
+    "broken_step": {
+     "options": [
+      {
+       "id": "o1",
+       "text": "закон края после «много» не срабатывает"
+      },
+      {
+       "id": "o2",
+       "text": "окончание владельца"
+      },
+      {
+       "id": "o3",
+       "text": "слово-владелец"
+      }
+     ],
+     "accepted": [
+      "o1"
+     ]
+    }
+   },
+   "ruleIds": [
+    "v2:3-2:poss"
+   ],
+   "source_ref": "r7-lesson-3-2:10.2",
+   "explanation": "кітаптарың: после «много» края не меняют."
+  }
+ ]
+}
