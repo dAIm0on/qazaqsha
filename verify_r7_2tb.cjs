@@ -1,4 +1,4 @@
-// r7 2T-b: chapter map 46→39; stress off in 3-x; limitations line removed; SW r7-ux63-2.
+// r7 2T-b: chapter map 46→39; stress off in 3-x; limitations line removed; SW r7-51-1.
 const fs=require('fs'),assert=require('assert'),path=require('path');
 const read=f=>fs.readFileSync(path.join(__dirname,f),'utf8');
 const j=id=>JSON.parse(read('lessons/'+id+'/lesson.json'));
@@ -53,6 +53,6 @@ ok('3-1 limitations line gone; 32j1→practice; 42ct→choice');
   assert.equal(hits.length,0,'stress leftovers '+hits.join(','));
   assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-51-1'"));
 }
-ok('no U+0301 in 3-1…4-2; SW r7-ux63-2');
+ok('no U+0301 in 3-1…4-2; SW r7-51-1');
 
 console.log('verify_r7_2tb: '+passed+' checks passed');
