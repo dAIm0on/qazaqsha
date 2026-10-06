@@ -66,12 +66,23 @@
     Q6-B support kind — is practice, never forward mastery. Stored mastery is never recomputed or lowered here;
     the FSRS schedule still advances so the card is not shown again immediately. */
  const SUPPORT_KINDS=new Set(['choice','tap-token','sort','word-bank','detect']);
- function supportBinding(q,b,event){
+ function supportBinding(q,b,event,result,fields){
    if(q&&SUPPORT_KINDS.has(q.kind))return true;
    const modes=event&&Array.isArray(event.response_modes)?event.response_modes:null;
-   if(!modes||q.kind==='multi')return false;
-   if(b.field==null)return modes.includes('choice'); // whole-card skill: buttons inside it make it choice evidence
-   return modes[b.field]==='choice';
+   if(!modes||q.kind==='multi'||!modes.includes('choice'))return false;
+   // Fields this skill covers: a whole-card binding (field null) covers every field.
+   const list=fields&&fields.length?fields:[b.field];
+   const covered=list.some(f=>f==null)?modes.map((_,i)=>i):[...new Set(list)].filter(i=>i!=null&&i<modes.length);
+   const typed=covered.filter(i=>modes[i]!=='choice'),choice=covered.filter(i=>modes[i]==='choice');
+   if(!choice.length)return false;
+   if(!typed.length)return true; // buttons only: never above LEARNING
+   /* казакша 2026-10-06, mixed card (e1-3-*): may rise only when EVERY input field was done independently
+      (correct, no hint / reveal / rule peek) AND every button field is correct. Buttons alone never give mastery. */
+   const parts=result&&Array.isArray(result.parts)?result.parts:[];
+   const assisted=!!(event.hinted||event.rule_peek||event.peek||event.revealed);
+   const typedIndependent=!assisted&&typed.every(i=>parts[i]===true);
+   const buttonsCorrect=choice.every(i=>parts[i]===true);
+   return !(typedIndependent&&buttonsCorrect);
  }
  function supportCap(r,old,correct){
    if(correct&&old){
@@ -97,7 +108,7 @@
      if(b.facet){const f=q.fields[b.field],e=core.normalize(f.answers[0]),a=core.normalize(event.answers[b.field]);
        if(/[лдт][ае]р$/.test(a)&&e.slice(0,-3)===a.slice(0,-3))correct=b.facet==='vowel'?e.at(-2)===a.at(-2):e.at(-3)===a.at(-3);
      }
-     const k=key(b),prev=updates.get(k);updates.set(k,{b,correct:prev?prev.correct&&correct:correct});
+     const k=key(b),prev=updates.get(k);updates.set(k,{b,correct:prev?prev.correct&&correct:correct,fields:[...(prev?prev.fields:[]),b.field]});
    }
    for(const error of errors){const skill={vowel_harmony:'harmony',plural_initial_consonant:'initial_consonant',plural_after_numeral:'plural_suppression'}[error.error_type];if(skill){const b={item_id:'rule:plural',skill_type:skill,field:error.field};updates.set(key(b),{b,correct:false});}}
    if(window.ErrorDiagnostics&&window.ErrorDiagnostics.microBinding){
@@ -108,8 +119,8 @@
        updates.set(key(b),{b,correct:false});
      }
    }
-   for(const [k,{b,correct}] of updates){
-     const support=supportBinding(q,b,event);
+   for(const [k,{b,correct,fields}] of updates){
+     const support=supportBinding(q,b,event,result,fields);
      const recSkill=RECOG.has(b.skill_type)||isChoice(q);
      const old=state.skills[k],recall=!recSkill&&!support&&!event.rule_peek&&(event.recall&&!RECOG.has(b.skill_type)||['harmony','initial_consonant'].includes(b.skill_type));
      const r=S.answer(old,{at:event.at,correct,hinted:!!(event.hinted||event.rule_peek),responseTime:event.response_time_ms,recall});

@@ -90,7 +90,7 @@ ok('runtime install keeps support kinds for 3–4 and leaves every existing card
 // D. Page wiring: renderer uses existing chip classes, hidden JSON answer, ID-encoded taps; response mode = choice; event carries response_modes.
 const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8'),html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8'),sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(html.indexOf('src="response-kinds.js"')>html.indexOf('src="core.js"')&&html.indexOf('src="response-kinds.js"')<html.indexOf('src="lesson-v2-schema.js"'));
-assert.ok(sw.includes('"response-kinds.js"')&&sw.includes("CACHE='qazaq-offline-live-20261006-r7-runtime2'"));
+assert.ok(sw.includes('"response-kinds.js"')&&sw.includes("CACHE='qazaq-offline-live-20261006-r7-runtime3'"));
 assert.ok(app.includes("response_kind:q.kind||'fields',response_modes:responseModes(q),"));
 assert.ok(app.includes('function readAnswers(q){return supportKind(q)?window.ResponseKinds.read(q):'));
 {
@@ -118,26 +118,48 @@ function knowledge(){
 const l11=compiled.find(x=>x.lesson_id==='1-1'),q11raw=l11.original_exercises.find(x=>x.id==='e1-3-1-1');
 const mk=()=>({...plain(q11raw),kind:'fields',lessonId:'1-1',ruleIds:q11raw.rule_ids||[]});
 const MODES_11=['typed','choice','choice','choice','choice']; // what the page renders for e1-3-1-1 (verified in r7 runtime verify H2)
-function drill(K,q,modes,n=6,state={skills:{},records:{}}){
-  const ans=q.fields.map(f=>f.answers[0]),logs=[];let at=NOW;
+const BUTTONS_ONLY=()=>{const q=mk();q.fields=q.fields.slice(1);delete q.skillBindings;return q;}; // same card id, only the classifier (button) fields
+const MODES_BTN=['choice','choice','choice','choice'];
+function drill(K,q,modes,n=6,state={skills:{},records:{}},opts={}){
+  const logs=[];let at=opts.at||NOW;
   for(let i=0;i<n;i++){
-    const result=core.evaluate(q,ans),event={at,answers:ans,hinted:false,rule_peek:0,recall:true,response_time_ms:4000,...(modes?{response_modes:modes}:{})};
+    const ans=(opts.answers||q.fields.map(f=>f.answers[0])).slice();
+    const result=core.evaluate(q,ans),event={at,answers:ans,hinted:false,rule_peek:0,recall:true,response_time_ms:4000,...(opts.event||{}),...(modes?{response_modes:modes}:{})};
     logs.push(...K.observe(state,q,result,event,[]));
     const k=Object.keys(state.skills)[0];at=Math.max(at+DAY+1,(state.skills[k].next_review||0)+1);
   }
-  return {state,logs};
+  return {state,logs,at};
 }
+const lvl=s=>Object.values(s.skills)[0].mastery_level;
 {
   const K=knowledge();
-  const typed=drill(K,mk(),['typed','typed','typed','typed','typed']).state,choice=drill(K,mk(),MODES_11).state,legacy=drill(knowledge(),mk(),null).state;
-  const lvl=s=>Object.values(s.skills)[0].mastery_level;
+  const typed=drill(K,mk(),['typed','typed','typed','typed','typed']).state,legacy=drill(knowledge(),mk(),null).state;
   assert.ok(['REMEMBERED','MASTERED'].includes(lvl(typed)),'typed answers still climb: '+lvl(typed));
   assert.equal(lvl(legacy),lvl(typed),'events without response_modes (grammar path, old builds) behave as before');
-  assert.equal(lvl(choice),'LEARNING','tap buttons inside 1-1 fields never move the card past LEARNING');
-  assert.equal(choice.records['e1-3-1-1'].mastery_level,'LEARNING');
-  const sk=Object.values(choice.skills)[0];assert.equal(sk.correct_streak,0);assert.equal(sk.recall_review_successes,0);assert.deepEqual(plain(sk.successful_prompts),[]);
+  // (a) mixed card, every input independent + every button correct: may rise.
+  const mixed=drill(knowledge(),mk(),MODES_11).state;
+  assert.ok(['REMEMBERED','MASTERED'].includes(lvl(mixed)),'mixed card with independent input + correct buttons can rise: '+lvl(mixed));
+  // (d) buttons-only card: never above LEARNING.
+  const only=drill(knowledge(),BUTTONS_ONLY(),MODES_BTN).state;
+  assert.equal(lvl(only),'LEARNING','buttons-only card stays ≤ LEARNING');assert.equal(only.records['e1-3-1-1'].mastery_level,'LEARNING');
+  const sk=Object.values(only.skills)[0];assert.equal(sk.correct_streak,0);assert.equal(sk.recall_review_successes,0);assert.deepEqual(plain(sk.successful_prompts),[]);
   assert.ok(sk.next_review>NOW,'schedule still advances (card is not stuck as due)');
-  const logs=drill(knowledge(),mk(),MODES_11,2).logs;assert.ok(logs.every(l=>l.independent===false&&l.support===true));
+  const logs=drill(knowledge(),BUTTONS_ONLY(),MODES_BTN,2).logs;assert.ok(logs.every(l=>l.independent===false&&l.support===true));
+  // (b)/(c) from the same point one clean answer away from rising: hint / reveal / rule peek on the input, or one wrong button, never rise.
+  const primed=()=>{const K2=knowledge(),r=drill(K2,mk(),MODES_11,1);assert.equal(lvl(r.state),'LEARNING');return {K2,...r};};
+  {const {K2,state,at}=primed();drill(K2,mk(),MODES_11,1,state,{at});assert.ok(['FAMILIAR','REMEMBERED','MASTERED'].includes(lvl(state)),'control: clean mixed answer rises: '+lvl(state));}
+  for(const event of [{hinted:true},{peek:1},{rule_peek:1},{revealed:true}]){
+    const {K2,state,at}=primed();const before=plain(Object.values(state.skills)[0]);
+    const r=drill(K2,mk(),MODES_11,1,state,{at,event});
+    assert.equal(lvl(state),'LEARNING','assisted input never rises: '+JSON.stringify(event));
+    assert.ok(Object.values(state.skills)[0].correct_streak<=before.correct_streak);assert.ok(r.logs.every(l=>!l.independent));
+  }
+  {const {K2,state,at}=primed();const ans=mk().fields.map(f=>f.answers[0]);ans[4]=ans[4]==='Твёрдое'?'Мягкое':'Твёрдое';
+   drill(K2,mk(),MODES_11,1,state,{at,answers:ans});assert.equal(lvl(state),'LEARNING','a wrong button blocks the rise');}
+  {const {K2,state,at}=primed();const ans=mk().fields.map(f=>f.answers[0]);ans[0]='ғы-лым';
+   drill(K2,mk(),MODES_11,1,state,{at,answers:ans});assert.equal(lvl(state),'LEARNING','wrong input blocks the rise');}
+  // several mixed drills with a hint every time stay LEARNING
+  assert.equal(lvl(drill(knowledge(),mk(),MODES_11,6,{skills:{},records:{}},{event:{hinted:true}}).state),'LEARNING');
 }
 { // field-level bindings: only the choice field is held back.
   const K=knowledge();
@@ -152,8 +174,8 @@ function drill(K,q,modes,n=6,state={skills:{},records:{}}){
   const K=knowledge(),q=mk(),k='exercise:e1-3-1-1::application';
   const typedState=drill(K,q,['typed','typed','typed','typed','typed'],8).state,before=plain(typedState.skills[k]);
   assert.equal(before.mastery_level,"MASTERED");
-  const at=before.next_review+1,ans=q.fields.map(f=>f.answers[0]);
-  K.observe(typedState,q,core.evaluate(q,ans),{at,answers:ans,hinted:false,recall:true,response_modes:MODES_11},[]);
+  const btn=BUTTONS_ONLY(),at=before.next_review+1,ans=btn.fields.map(f=>f.answers[0]);
+  K.observe(typedState,btn,core.evaluate(btn,ans),{at,answers:ans,hinted:false,recall:true,response_modes:MODES_BTN},[]);
   const after=typedState.skills[k];
   assert.equal(after.mastery_level,'MASTERED');for(const f of ['correct_streak','recall_review_successes','review_successes'])assert.equal(after[f],before[f],f);
   const legacy={...P.empty(),skills:{[k]:before,'word:x::production':{...before,item_id:'word:x',skill_type:'production'}},records:{'e1-3-1-1':{...typedState.records['e1-3-1-1']}}};
@@ -169,7 +191,7 @@ function drill(K,q,modes,n=6,state={skills:{},records:{}}){
   const st2={skills:{},records:{}};K.observe(st2,{...plain(Q.detect),id:'t-d2'},{correct:true,parts:[true,true]},{at:NOW,answers:['verdict:wrong','step:s2'],hinted:false,recall:false},[]);
   assert.equal(Object.values(st2.skills)[0].mastery_level,'LEARNING');
 }
-ok('forward mastery: choice taps (1-1 fields) and support kinds stay ≤ LEARNING; typed input still climbs; stored mastery untouched by migration and choice answers');
+ok('forward mastery: mixed 1-1 card rises only with independent input + correct buttons; hint/reveal/wrong button/buttons-only/support kinds stay ≤ LEARNING; stored mastery untouched');
 
 // F. Evidence: support kinds are recorded as choice practice; W-2 counts only independent single typed production.
 {
