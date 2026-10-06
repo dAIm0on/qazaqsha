@@ -16,8 +16,8 @@ export const PATTERNS=[
  ['raw UNKNOWN',/\bUNKNOWN\b/],['undefined',/\bundefined\b/],['null',/\bnull\b/],['NaN',/\bNaN\b/],['[object Object]',/\[object Object\]/],
  ['skill code',/\bSKILL_/],['error_key',/error_key/],['CODE_NAME',/\b[A-Z][A-Z0-9]+(?:_[A-Z0-9]+)+\b/],['snake_case',/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/],
  ['template',/\$\{/],['«Глава ·»',/Глава\s*·/],['« ·  · »',/·\s*·/],
- ['empty number',/(?:^|[\s(])(?:Глава|Урок|Шаг|шаг|из)\s*·|Глава\s+из\b|(?:Глава|Урок|шаг)\s+из\s+(?:\D|$)/m],['dangling ·',/·[ \t]*$|^[ \t]*·/m],
- ['cut word after «шаг» rewrite',/\b(?:двух|трёх|нескольких|всех)\s+шаг\b/]
+ ['empty number',/(?:^|[\s(])(?:Глава|Урок|Шаг|шаг|из)\s*·|Глава\s+из(?![а-яё])|(?:Глава|Урок|шаг)\s+из\s+(?:\D|$)/m],['dangling ·',/·[ \t]*$|^[ \t]*·/m],
+ ['cut word after «шаг» rewrite',/(?:^|\s)(?:двух|трёх|нескольких|всех)\s+шаг(?![а-яё])/i]
 ];
 let server=null;
 if(!host){
