@@ -344,7 +344,7 @@
     PLURAL_INITIAL_LDT:'Множественное Л/Д/Т',PLURAL_HARMONY_AE:'Множественное А/Е',
     EMES_SUFFIX_POSITION:'Емес: место окончания',ORDINAL_SUFFIX:'Порядковое',
     POSS_PERSON_SUFFIX:'Притяжательное окончание',POSS_ASSIM_VOICE:'Притяжательное П/К/Қ',POSS_PLURAL_ORDER:'Порядок множественного и притяжательного',POSS_PRONOUN:'Форма владельца',BAR_ZHOK:'Бар / жоқ',
-    VOCAB_RECALL:'Слово',
+    VOCAB_RECALL:'Вспомнить слово',
     // r7 X QA: every contract code has a learner label; UNKNOWN has none and is never shown («UNKNOWN · 10»).
     HARMONY_FRONT_BACK:'Гармония: твёрдый и мягкий ряд',HARMONY_AMBIGUOUS_I_U_YU:'Гармония после И / У / Ю',
     PLURAL_FORM_COMBINED:'Множественное: Л/Д/Т и А/Е вместе',QUANTIFIER_NO_PLURAL:'Без множественного после «много / несколько»',
