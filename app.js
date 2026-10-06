@@ -2811,7 +2811,7 @@
      <p>Окончание как у мен/сен/сіз, только для біз Н меняется на З. После <strong>м, н, ң</strong> у біз звонкое <span lang="kk">быз/біз</span>: ғалыммын → ғалымбыз, мұғаліммін → мұғалімбіз.</p>
      <div class="table-wrap"><table><thead><tr><th scope="col">Последний звук</th><th scope="col">Біз</th><th scope="col">Сендер</th><th scope="col">Сіздер</th></tr></thead><tbody>
      <tr><th scope="row">Глухие; б в г д</th><td lang="kk">пыз / піз</td><td lang="kk">сыңдар / сіңдер</td><td lang="kk">сыздар / сіздер</td></tr>
-     <tr><th scope="row">м н ң; ж з</th><td lang="kk">быз / бі́з</td><td lang="kk">сыңдар / сіңдер</td><td lang="kk">сыздар / сіздер</td></tr>
+     <tr><th scope="row">м н ң; ж з</th><td lang="kk">быз / біз</td><td lang="kk">сыңдар / сіңдер</td><td lang="kk">сыздар / сіздер</td></tr>
      <tr><th scope="row">Остальные</th><td lang="kk">мыз / міз</td><td lang="kk">сыңдар / сіңдер</td><td lang="kk">сыздар / сіздер</td></tr>
      </tbody></table></div>
      <p>С <strong>сендер</strong> и <strong>сіздер</strong> множественное окончание на само слово не ставим: <span lang="kk">сендер студентсіңдер</span>, не студенттерсіңдер. С біз множественное можно, но в упражнениях пишем без него: <span lang="kk">біз студентпіз</span>.</p>

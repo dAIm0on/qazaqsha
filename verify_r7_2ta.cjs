@@ -29,4 +29,32 @@ ok('question prompt is not line-clamped');
   assert.equal(j('1-1').content_revision,'1-1.r2'); // unchanged lesson not bumped
 }
 ok('path.contentRevision kept across F5 (progress migrate + persistLessonPath); content_revision bumped once per changed lesson');
+
+{
+  const fs2=fs, path2=path;
+  const hits=[];
+  const scan=(rel)=>{
+    const txt=read(rel);
+    for(const [i,line] of txt.split(/\n/).entries()){
+      if(line.includes('\u0301'))hits.push(rel+':'+(i+1)+':'+line.trim().slice(0,120));
+    }
+  };
+  for(const f of fs.readdirSync(__dirname).filter(n=>/^lesson-pack-[12]/.test(n)&&n.endsWith('.js')))scan(f);
+  scan('app.js');
+  // grammar-paths T15 is in 2-x farewell scope — no stress there either for 2T-a
+  scan('grammar-paths.js');
+  assert.equal(hits.length,0,'U+0301 leftovers:\n'+hits.join('\n'));
+  // Explicitly catch the three former бі́з sites by positive «біз» wording without combining accent
+  const pack=read('lesson-pack-2-2.js'), app=read('app.js');
+  assert.ok(pack.includes('звонкое біз:')||pack.includes('звонкое біз '),'e22-5-1 біз without stress');
+  assert.ok(pack.includes('біз → біз'),'m22-form-1 біз without stress');
+  assert.ok(app.includes('быз / біз')&&!app.includes('бі\u0301з'),'person panel біз without stress');
+  assert.ok(!read('grammar-paths.js').includes('Ударение:'),'T15 stress line removed');
+}
+ok('no U+0301 in lesson-pack-1/2*, app.js person panel, grammar-paths (T15); three біз sites clean');
+
+{
+  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-2ta-2'"));
+}
+ok('SW r7-2ta-2');
 console.log('verify_r7_2ta: '+passed+' checks passed');
