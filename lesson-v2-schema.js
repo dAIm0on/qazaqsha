@@ -80,6 +80,12 @@
    const role=w.role==='context'?'context':'target';
    const lemma=str(w.lemma,'vocab.lemma',120),forms=strings(w.forms||[lemma],'vocab.forms',1,20);
    const out={id:id(w.id,'vocab.id'),lemma,forms,translations:strings(w.translations,'vocab.translations',1,12),role,introduced_in:lessonId,source_refs:strings(w.source_refs||[],'vocab.source_refs',1,20).map(x=>id(x,'source_ref'))};
+   // r7 2b QA m6: optional per-form Russian gloss (parallel to forms): оқыдым is «я читал(а) / прочитал(а)», not «читать».
+   if(w.form_translations!=null){
+     const ft=list(w.form_translations,'vocab.form_translations',forms.length,forms.length);
+     if(ft.length!==forms.length)fail('vocab.form_translations: нужна строка на каждую форму');
+     out.form_translations=ft.map(x=>str(x,'vocab.form_translations[]',200));
+   }
    // r7 W-2=C: optional per-form typed checks of ONE source vocab-ID (no new word-IDs).
    // Each check names one of the word's own forms and a Russian prompt; absent = old behaviour.
    if(w.form_checks!=null){
@@ -225,6 +231,32 @@
    for(const row of out.homework.source_items)if(!sourceIds.has(row.source_ref))fail('homework source_ref не найден: '+row.source_ref);
    const vocabIds=new Set(out.vocabulary.map(v=>v.id));
    for(const wid of out.homework.word_ids)if(!vocabIds.has(wid))fail('homework word_id не найден: '+wid);
+   // r7 2b: independent practice bank (blocks 3–4 only). Support kinds only, origin bank, a source_ref per
+   // item, own id prefix, never an exercise of the homework and never a listen/audio card.
+   if(raw.practice_bank!=null){
+     const pb=raw.practice_bank;if(!obj(pb))fail('practice_bank object');
+     const K=kinds();if(!K||!K.allowedLesson(lessonId))fail('practice_bank разрешён только в уроках блоков 3–4');
+     const prefix='b34-'+lessonId.replace('-','')+'-';
+     const hwSet=new Set(out.homework.exercise_ids||[]);
+     const GROUPS=['choice','tap','sort','build','detect'];
+     const items=list(pb.items,'practice_bank.items',1,200).map(q=>{
+       if(!obj(q))fail('practice_bank item');
+       if(q.kind===undefined||q.kind==='fields')fail('practice_bank: только опорные механики (choice/tap-token/sort/word-bank/detect): '+q.id);
+       if(q.audio||q.modality==='listen'||q.kind==='listen')fail('practice_bank: аудио/аудирование не поддерживается: '+q.id);
+       if(q.origin!=='bank')fail('practice_bank.origin должен быть bank: '+q.id);
+       const row=exercise(q,lessonId);
+       if(row.id.indexOf(prefix)!==0)fail('practice_bank id должен начинаться с '+prefix+': '+row.id);
+       if(qids.has(row.id)||hwSet.has(row.id))fail('practice_bank пересекается с упражнением/домашкой: '+row.id);
+       row.origin='bank';
+       row.source_ref=id(q.source_ref,'practice_bank.source_ref');
+       if(!GROUPS.includes(q.group))fail('practice_bank.group: '+q.id);row.group=q.group;
+       return row;
+     });
+     items.forEach(x=>take(x.id,'practice bank'));
+     for(const q of items)for(const rid of q.ruleIds||[])if(!ruleIds.has(rid))fail('practice_bank rule_id не найден: '+rid);
+     const counts={};for(const q of items)counts[q.kind]=(counts[q.kind]||0)+1;
+     out.practice_bank={prefix,counts,total:items.length,homework_intersection:items.filter(q=>hwSet.has(q.id)).length,items};
+   }
    const migrationFrom=new Set();
    for(const m of out.migrations){
      if(migrationFrom.has(m.from_revision))fail('duplicate migration from_revision '+m.from_revision);

@@ -171,11 +171,15 @@
   else ctx.focus_word=w||'';
   return ctx.focus_word||'';
  }
- function markKkWords(text){
+ // r7 2b QA m8: opts.onlyKazakh — a Russian instruction («Обе формы прошедшего») is plain text; only words
+ // with Kazakh letters (Сіз, сендердің, Айгүл) become tap-to-gloss buttons.
+ const KK_ONLY=/[ӘәҒғҚқҢңӨөҰұҮүҺһІі]/;
+ function markKkWords(text,opts){
   const s=String(text||'');
   let out='',last=0,m;
   const re=new RegExp(KK_RE.source,'g');
   while((m=re.exec(s))){
+   if(opts&&opts.onlyKazakh&&!KK_ONLY.test(m[0]))continue;
    out+=esc(s.slice(last,m.index));
    out+='<button type="button" class="tutor-word-tap" data-tutor-word="'+esc(m[0])+'" lang="kk">'+esc(m[0])+'</button>';
    last=m.index+m[0].length;

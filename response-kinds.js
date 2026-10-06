@@ -131,6 +131,23 @@
    if(q.kind==='detect')return p.verdict.accepted==='correct'?'Верно':'Есть ошибка: '+p.broken_step.accepted.map(by(p.broken_step.options)).join(', ');
    return '';
  }
+// r7 2b QA B1: the learner's own answer in human words (never option/token/piece ids).
+ function answerText(q,answers){
+   const p=q&&q.payload,a=(answers||[]).map(String);if(!p)return '';
+   const by=(list,key='text')=>id=>{const x=(list||[]).find(e=>e.id===id);return x?x[key]:'';};
+   if(q.kind==='choice')return a.map(by(p.options)).filter(Boolean).join(', ');
+   if(q.kind==='tap-token')return a.map(by(p.tokens)).filter(Boolean).join(' ');
+   if(q.kind==='sort'){const m=sortMap(a);return p.items.filter(it=>m[it.id]).map(it=>{const c=by(p.categories,'label')(m[it.id]);return c?it.text+' → '+c:'';}).filter(Boolean).join('; ');}
+   if(q.kind==='word-bank')return a.map(by(p.pieces)).filter(Boolean).join(' ');
+   if(q.kind==='detect'){
+     const v=(a.find(x=>x.startsWith('verdict:'))||'').slice(8),st=(a.find(x=>x.startsWith('step:'))||'').slice(5);
+     const verdict=v==='correct'?'Верно':v==='wrong'?'Есть ошибка':'';
+     const step=st&&p.broken_step?by(p.broken_step.options)(st):'';
+     return verdict+(verdict&&step?': '+step:'');
+   }
+   return '';
+ }
+ function answerLead(q){return q.kind==='word-bank'?'Ты собрала':q.kind==='sort'?'Ты разложила':q.kind==='detect'?'Твой ответ':'Ты выбрала';}
  function payloadFingerprintSource(q){return JSON.stringify([q.kind,q.payload]);}
  // ---- browser renderer: one hidden input #rk-response holds the JSON answer array ----
  function chip(attrs,label,esc){return `<button type="button" class="chip" aria-pressed="false" ${attrs}>${esc(label)}</button>`;}
@@ -184,6 +201,6 @@
    form.querySelectorAll('button').forEach(b=>{b.disabled=true;});
    const r=form.querySelector('.rk');if(r)r.setAttribute('data-rk-result',result&&result.correct?'correct':'incorrect');
  }
- const api={KINDS,isSupportKind,allowedLesson,normalize,evaluate,missing,solutionText,payloadFingerprintSource,markup,read,paint,click,mark};
+ const api={KINDS,isSupportKind,allowedLesson,normalize,evaluate,missing,solutionText,answerText,answerLead,payloadFingerprintSource,markup,read,paint,click,mark};
  if(node)module.exports=api;else root.ResponseKinds=api;
 })(typeof window!=='undefined'?window:globalThis);

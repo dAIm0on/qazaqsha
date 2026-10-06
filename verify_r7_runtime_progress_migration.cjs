@@ -88,7 +88,9 @@ const Q=new Map(rt.COURSE.questions.map(q=>[q.id,q]));
 let lessonsChecked=0;
 for(const raw of compiled){
   const id=raw.lesson_id,h=rt.LessonV2Runtime.homework(id);if(!h||!rt.LessonV2Runtime.byId(id))continue;
-  const before=rt.COURSE.questions.filter(q=>q.lessonId===id&&q.topic==='vocab'&&q.wordRole==='must').map(q=>q.id);
+  // r7 2b (казакша b): the combined «all forms» card of a word with per-form checks is not in the homework queue.
+  const formWords=new Set(rt.COURSE.questions.filter(q=>q.lessonId===id&&q.formCheck).flatMap(q=>q.vocabIds||[]));
+  const before=rt.COURSE.questions.filter(q=>q.lessonId===id&&q.topic==='vocab'&&q.wordRole==='must'&&!(/-kk-set$/.test(q.id)&&(q.vocabIds||[]).some(w=>formWords.has(w)))).map(q=>q.id);
   assert.deepEqual(h.homework.word_question_ids,before,id+': word queue changed with unchanged data');
   lessonsChecked++;
 }
@@ -107,7 +109,8 @@ assert.ok(t13q.length>0);
 assert.ok(t13q.every(id=>!(Q.get(id).vocabIds||[]).some(w=>r10words.has(w))),'R10 must not enter the 4-2 word queue under T13');
 const qalWord=p42.vocab_bindings['vocab:4-2:qalaisyn'];
 const qalQs=rt.COURSE.questions.filter(q=>q.lessonId==='4-2'&&(q.vocabIds||[]).includes(qalWord)).map(q=>q.id);
-assert.ok(qalQs.length>=1&&qalQs.every(id=>t13q.includes(id)));
+// r7 2b (b): every қалайсың card is in the T13 queue except the combined «all forms» duplicate.
+assert.ok(qalQs.length>=1&&qalQs.filter(id=>!/-kk-set$/.test(id)).every(id=>t13q.includes(id))&&!t13q.includes('v2-4-2-vocab-qalaisyn-kk-set'));
 assert.equal(rt.CURRICULUM.words.filter(w=>w.id===qalWord).length,1,'qalaisyn stays one catalog word');
 ok('Q5-A reader: same queues on current data for '+lessonsChecked+' lessons; T13 fixture excludes R10, keeps qalaisyn as one id');
 
@@ -206,7 +209,7 @@ ok('fresh profiles have no legacy facts; attempt log is capped while per-form su
 const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8'),html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8'),sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(html.indexOf('src="evidence-state.js"')>0&&html.indexOf('src="evidence-state.js"')<html.indexOf('src="progress.js"'));
 assert.ok(sw.includes('"evidence-state.js"'));
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-step2-2'"));
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-step2b-2'"));
 assert.ok(/function responseModes\(q\)\{return supportKind\(q\)\|\|q\.kind==='multi'\?\['choice'\]:.*el\.type==='hidden'\?'choice':'typed'/.test(app),'response mode read from the rendered control');
 assert.ok(/state\.events\.push\(event\);rec=records\[q\.id\]\|\|rec;\n\s+if\(window\.EvidenceState\)\{try\{window\.EvidenceState\.observe\(state,/.test(app));
 assert.ok(app.includes("R7_SNAPSHOT=KEY+'-before-r7'")&&app.includes('localStorage.setItem(R7_SNAPSHOT,raw)')&&app.includes('localStorage.getItem(R7_SNAPSHOT)'));

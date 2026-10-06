@@ -34,10 +34,10 @@ const LESSONS=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3','4-1','4-2'
   assert.ok(!/queue\.length/.test(br),'F1: words track counter must not depend on the queue');
   assert.ok(rs.indexOf("startsWith(HW_WORDS_PREFIX)")<rs.indexOf('Шаг ${'),'F1: words-track branch wins over «Шаг N из queue»');
   const box={},records={};
-  vm.runInNewContext(grab(appSrc,'wordGroupCounter')+'\nbox.f=wordGroupCounter;',{box,records,byId:Q});
+  vm.runInNewContext(grab(appSrc,'answeredSet')+'\n'+grab(appSrc,'wordGroupCounter')+'\nbox.f=wordGroupCounter;',{box,records,byId:Q,state:{events:[],homeworkAttempts:{}}});
   const ids=plain(R.homework('4-2').homework.word_question_ids);
   const seen=[];
-  for(let i=0;i<ids.length;i++){records[ids[i]]={attempts:1};const c=box.f(ids);assert.equal(c.total,13,'F1: denominator 13 after answer '+(i+1));seen.push(c.tried);}
+  for(let i=0;i<ids.length;i++){records[ids[i]]={attempts:1,review_count:1};/* r7 2b QA: answered = reviewed record / answer event / sheet item */const c=box.f(ids);assert.equal(c.total,13,'F1: denominator 13 after answer '+(i+1));seen.push(c.tried);}
   assert.ok(seen.every((v,i)=>i===0||v>=seen[i-1]),'F1: «встречалось» never goes back');
   assert.equal(seen.at(-1),13);
   // reload: same records, same list → same numbers.
@@ -81,7 +81,7 @@ ok('F2 «Разобранный пример»: no «қол → қол» / «С�
   for(const f of fs.readdirSync(__dirname).filter(f=>/\.js$/.test(f)))assert.ok(!/Не входит в банк 220 ID/.test(read(f)),'F3: service text in '+f);
   const at=appSrc.indexOf('window.AiTutor.takeRemediation(byId)');assert.ok(at>0);
   const guard=appSrc.slice(at-200,at);
-  assert.ok(/if\(mode!=='homework'&&!homeworkMode\)\{\s*const extra=$/.test(guard),'F3: remediation splice is skipped in homework');
+  assert.ok(/if\(mode!=='homework'&&!homeworkMode(&&!bankRun&&!q\.bank)?\)\{\s*const extra=$/.test(guard),'F3: remediation splice is skipped in homework (r7 2b QA B5: and in bank sessions)');
   // the probe itself is still a normal short check outside homework
   assert.ok(/explanation:'Короткая проверка того же навыка\.'/.test(ai));
 }
@@ -101,13 +101,12 @@ function fullStack(){
 }
 {
   const S=fullStack(),FR=S.LessonV2Runtime;assert.ok(FR&&FR.homeworkWordCoverage,'full stack runtime');
-  const expectMissing={'1-2':['он'],'3-1':['кім','не','қандай','қай','нешінші','бұл']};
+  // r7 2b (казакша, решение 3): the former gaps (1-2 он, 2-1 23/24, 3-1 six question words) got own cards
+  // with new IDs, so every lesson is complete now and the F4 hide no longer triggers anywhere.
   const rows={};
   for(const id of LESSONS){
     const c=plain(FR.homeworkWordCoverage(id));assert.ok(c&&c.total>0,id);rows[id]=c;
-    if(id==='2-1'){assert.equal(c.covered,1);assert.equal(c.total,24);assert.equal(c.complete,false);continue;}
-    if(expectMissing[id]){assert.deepEqual(c.words.filter(w=>!w.covered).map(w=>w.lemma),expectMissing[id],'F4 '+id);assert.equal(c.complete,false);continue;}
-    assert.equal(c.complete,true,'F4: '+id+' should be fully covered');
+    assert.equal(c.complete,true,'F4: '+id+' should be fully covered: '+c.words.filter(w=>!w.covered).map(w=>w.lemma).join(','));
   }
   const c42=rows['4-2'];
   assert.deepEqual(c42.words.map(w=>w.id),JSON.parse(read('lessons/4-2/lesson.json')).homework.word_ids,'M1: T13 order');
@@ -120,7 +119,7 @@ function fullStack(){
   assert.ok(/const hwList=api\.homeworkWordList\?api\.homeworkWordList\(id\):null;/.test(learnSrc)&&/const mustWords=hwList\|\|/.test(learnSrc),'M1: hub «Задано выучить» uses homework words');
   assert.ok(/homeworkWordsTrack,homeworkWordList,/.test(appSrc));
 }
-ok('F4/M1 coverage per lesson: 1-2 (он), 2-1 (23 of 24), 3-1 (6 question words) incomplete → no words button; others shown; 4-2 list = T13 with сүю');
+ok('F4/M1 coverage per lesson: complete in all 11 lessons after 2b (F4 hide stays as a guard); 4-2 list = T13 with сүю');
 
 // M2: harmony vs person.
 {

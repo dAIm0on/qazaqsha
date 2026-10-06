@@ -1,0 +1,507 @@
+{
+ "note": "r7 2b: independent practice bank (Q6). Support kinds only; origin bank; not homework. Language QA pending.",
+ "items": [
+  {
+   "id": "b34-33-choice-01",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "я твой друг",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "досыңмын"
+     },
+     {
+      "id": "o2",
+      "text": "досыңбын"
+     },
+     {
+      "id": "o3",
+      "text": "досымсың"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-3:stack"
+   ],
+   "source_ref": "r7-lesson-3-3:10.3",
+   "explanation": "«я» после «твой»: досың + мын → досыңмын."
+  },
+  {
+   "id": "b34-33-choice-02",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "Спроси на «ты»: «Как тебя зовут?»",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "Атың кім?"
+     },
+     {
+      "id": "o2",
+      "text": "Атыңыз кім?"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-3:questions"
+   ],
+   "source_ref": "r7-lesson-3-3:10.4",
+   "explanation": "С «сен» — атың; атыңыз — уважительно."
+  },
+  {
+   "id": "b34-33-choice-03",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "Спроси о предмете: «Это что?»",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "Бұл не?"
+     },
+     {
+      "id": "o2",
+      "text": "Бұл кім?"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-3:questions"
+   ],
+   "source_ref": "r7-lesson-3-3:10.3",
+   "explanation": "кім — о людях, не — о предметах."
+  },
+  {
+   "id": "b34-33-choice-04",
+   "origin": "bank",
+   "group": "choice",
+   "topic": "bank",
+   "kind": "choice",
+   "title": "Выбери форму",
+   "stimulus": "какой (по качеству)",
+   "payload": {
+    "options": [
+     {
+      "id": "o1",
+      "text": "қандай"
+     },
+     {
+      "id": "o2",
+      "text": "қай"
+     }
+    ],
+    "accepted": [
+     "o1"
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-3:questions"
+   ],
+   "source_ref": "r7-lesson-3-3:10.3",
+   "explanation": "қандай — какой по качеству; қай — который из."
+  },
+  {
+   "id": "b34-33-tap-01",
+   "origin": "bank",
+   "group": "tap",
+   "topic": "bank",
+   "kind": "tap-token",
+   "title": "Отметь нужное",
+   "stimulus": "Обе формы «кто» (я есть / ты есть)",
+   "payload": {
+    "tokens": [
+     {
+      "id": "t1",
+      "text": "адаммын"
+     },
+     {
+      "id": "t2",
+      "text": "адамым"
+     },
+     {
+      "id": "t3",
+      "text": "адамсың"
+     },
+     {
+      "id": "t4",
+      "text": "адамың"
+     }
+    ],
+    "accepted": [
+     [
+      "t1",
+      "t3"
+     ]
+    ],
+    "cardinality": 2
+   },
+   "ruleIds": [
+    "v2:3-3:who-whose"
+   ],
+   "source_ref": "r7-lesson-3-3:10.2",
+   "explanation": "-мын / -сың — «кто»; -ым / -ың — «чьё»."
+  },
+  {
+   "id": "b34-33-tap-02",
+   "origin": "bank",
+   "group": "tap",
+   "topic": "bank",
+   "kind": "tap-token",
+   "title": "Отметь нужное",
+   "stimulus": "Форма «наш человек»",
+   "payload": {
+    "tokens": [
+     {
+      "id": "t1",
+      "text": "адамбыз"
+     },
+     {
+      "id": "t2",
+      "text": "адамымыз"
+     },
+     {
+      "id": "t3",
+      "text": "адамсыз"
+     }
+    ],
+    "accepted": [
+     [
+      "t2"
+     ]
+    ],
+    "cardinality": 1
+   },
+   "ruleIds": [
+    "v2:3-3:who-whose"
+   ],
+   "source_ref": "r7-lesson-3-3:10.2",
+   "explanation": "адамымыз — наш; адамбыз — мы люди."
+  },
+  {
+   "id": "b34-33-sort-01",
+   "origin": "bank",
+   "group": "sort",
+   "topic": "bank",
+   "kind": "sort",
+   "title": "Разложи",
+   "stimulus": "«Кто» или «чьё»?",
+   "payload": {
+    "items": [
+     {
+      "id": "i1",
+      "text": "адаммын"
+     },
+     {
+      "id": "i2",
+      "text": "адамым"
+     },
+     {
+      "id": "i3",
+      "text": "адамсың"
+     },
+     {
+      "id": "i4",
+      "text": "адамың"
+     }
+    ],
+    "categories": [
+     {
+      "id": "c1",
+      "label": "кто"
+     },
+     {
+      "id": "c2",
+      "label": "чьё"
+     }
+    ],
+    "accepted": {
+     "i1": "c1",
+     "i2": "c2",
+     "i3": "c1",
+     "i4": "c2"
+    }
+   },
+   "ruleIds": [
+    "v2:3-3:who-whose"
+   ],
+   "source_ref": "r7-lesson-3-3:10.2",
+   "explanation": "С → «кто»; без С → «чьё»."
+  },
+  {
+   "id": "b34-33-sort-02",
+   "origin": "bank",
+   "group": "sort",
+   "topic": "bank",
+   "kind": "sort",
+   "title": "Разложи",
+   "stimulus": "Какой вопрос подходит?",
+   "payload": {
+    "items": [
+     {
+      "id": "i1",
+      "text": "Айгүл"
+     },
+     {
+      "id": "i2",
+      "text": "кітап"
+     },
+     {
+      "id": "i3",
+      "text": "көрші"
+     },
+     {
+      "id": "i4",
+      "text": "қалам"
+     }
+    ],
+    "categories": [
+     {
+      "id": "c1",
+      "label": "кім?"
+     },
+     {
+      "id": "c2",
+      "label": "не?"
+     }
+    ],
+    "accepted": {
+     "i1": "c1",
+     "i2": "c2",
+     "i3": "c1",
+     "i4": "c2"
+    }
+   },
+   "ruleIds": [
+    "v2:3-3:questions"
+   ],
+   "source_ref": "r7-lesson-3-3:10.3",
+   "explanation": "кім — о людях, не — о предметах."
+  },
+  {
+   "id": "b34-33-build-01",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери",
+   "stimulus": "Меня зовут Айгүл.",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "Менің"
+     },
+     {
+      "id": "p2",
+      "text": "атым"
+     },
+     {
+      "id": "p3",
+      "text": "Айгүл."
+     },
+     {
+      "id": "p4",
+      "text": "атың"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2",
+      "p3"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:3-3:questions"
+   ],
+   "source_ref": "r7-lesson-3-3:10.4",
+   "explanation": "Менің атым Айгүл."
+  },
+  {
+   "id": "b34-33-build-02",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери",
+   "stimulus": "Как Вас зовут?",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "Атыңыз"
+     },
+     {
+      "id": "p2",
+      "text": "кім?"
+     },
+     {
+      "id": "p3",
+      "text": "Атың"
+     },
+     {
+      "id": "p4",
+      "text": "не?"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:3-3:questions"
+   ],
+   "source_ref": "r7-lesson-3-3:10.4",
+   "explanation": "Атыңыз кім?"
+  },
+  {
+   "id": "b34-33-build-03",
+   "origin": "bank",
+   "group": "build",
+   "topic": "bank",
+   "kind": "word-bank",
+   "title": "Собери форму",
+   "stimulus": "ты мой сосед",
+   "payload": {
+    "pieces": [
+     {
+      "id": "p1",
+      "text": "көрші"
+     },
+     {
+      "id": "p2",
+      "text": "м"
+     },
+     {
+      "id": "p3",
+      "text": "сің"
+     },
+     {
+      "id": "p4",
+      "text": "мін"
+     }
+    ],
+    "accepted": [
+     [
+      "p1",
+      "p2",
+      "p3"
+     ]
+    ]
+   },
+   "ruleIds": [
+    "v2:3-3:stack"
+   ],
+   "source_ref": "r7-lesson-3-3:10.3",
+   "explanation": "көрші + м + сің: «чьё», потом «кто»."
+  },
+  {
+   "id": "b34-33-detect-01",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«я твой друг»",
+   "payload": {
+    "verdict": {
+     "accepted": "wrong"
+    },
+    "target": "досыңбын",
+    "broken_step": {
+     "options": [
+      {
+       "id": "o1",
+       "text": "окончание «я» после ң"
+      },
+      {
+       "id": "o2",
+       "text": "окончание «твой»"
+      },
+      {
+       "id": "o3",
+       "text": "основа"
+      }
+     ],
+     "accepted": [
+      "o1"
+     ]
+    }
+   },
+   "ruleIds": [
+    "v2:3-3:stack"
+   ],
+   "source_ref": "r7-lesson-3-3:10.3",
+   "explanation": "Правильно: досыңмын (после ң — мын)."
+  },
+  {
+   "id": "b34-33-detect-02",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«Это что? — Это книга.»",
+   "payload": {
+    "verdict": {
+     "accepted": "correct"
+    },
+    "target": "Бұл не? — Бұл кітап."
+   },
+   "ruleIds": [
+    "v2:3-3:questions"
+   ],
+   "source_ref": "r7-lesson-3-3:10.3",
+   "explanation": "Верно: не — о предмете."
+  },
+  {
+   "id": "b34-33-detect-03",
+   "origin": "bank",
+   "group": "detect",
+   "topic": "bank",
+   "kind": "detect",
+   "title": "Найди ошибку",
+   "stimulus": "«Как тебя зовут?»",
+   "payload": {
+    "verdict": {
+     "accepted": "correct"
+    },
+    "target": "Атың кім?"
+   },
+   "ruleIds": [
+    "v2:3-3:questions"
+   ],
+   "source_ref": "r7-lesson-3-3:10.4",
+   "explanation": "Верно: на «ты» — атың."
+  }
+ ]
+}

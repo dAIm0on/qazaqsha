@@ -46,6 +46,51 @@
     if(i!==t.length&&t.some(w=>NUM_U[w]==null&&NUM_T[w]==null&&w!=='жүз'&&w!=='мың'))return null;
     return Number.isFinite(total)?total:null;
   }
+  // r7 2b QA m4: a Russian answer to a number card may be the digit or the Russian word (нөл → «0» или «ноль»).
+  const RU_NUM={ноль:0,нуль:0,один:1,одна:1,одно:1,два:2,две:2,три:3,четыре:4,пять:5,шесть:6,семь:7,восемь:8,девять:9,десять:10,
+    одиннадцать:11,двенадцать:12,тринадцать:13,четырнадцать:14,пятнадцать:15,шестнадцать:16,семнадцать:17,восемнадцать:18,девятнадцать:19,
+    двадцать:20,тридцать:30,сорок:40,пятьдесят:50,шестьдесят:60,семьдесят:70,восемьдесят:80,девяносто:90,
+    сто:100,двести:200,триста:300,четыреста:400,пятьсот:500,шестьсот:600,семьсот:700,восемьсот:800,девятьсот:900};
+  function ruNumberValue(s){
+    const t=normalize(s).replace(/ё/g,'е').split(/\s+/).filter(Boolean);if(!t.length)return null;
+    let total=0,cur=0;
+    for(const w of t){
+      if(/^(тысяча|тысячи|тысяч)$/.test(w)){total+=(cur||1)*1000;cur=0;continue;}
+      if(RU_NUM[w]==null)return null;cur+=RU_NUM[w];
+    }
+    return total+cur;
+  }
+  function digitWordMatch(expected,actual){
+    const e=normalize(expected).replace(/\s+/g,''),a=normalize(actual).replace(/\s+/g,'');
+    if(/^\d+$/.test(e)){const v=ruNumberValue(actual);return v!=null&&v===Number(e);}
+    if(/^\d+$/.test(a)){const v=ruNumberValue(expected);return v!=null&&v===Number(a);}
+    return false;
+  }
+  // r7 2b QA m5/m6: Russian glosses — «любить / целовать» is one reference of two accepted meanings,
+  // «я читал(а)» stands for «я читал» and «я читала». Kazakh answers are never split or expanded.
+  const KK_LETTER=/[әғқңөұүһі]/i;
+  function glossVariants(a){
+    const s=String(a||'');
+    if(KK_LETTER.test(s)||!/[а-яё]/i.test(s))return [s];
+    const out=new Set(),pron=(/^(я|ты|он\(а\)|он|она|оно|мы|вы|они)\s+/i.exec(s.trim())||[])[1]||'';
+    const pieces=s.split(/\s*[\/;]\s*/);
+    // a reference «я читал(а) / прочитал(а)» means «я читал(а)» or «я прочитал(а)»: later parts inherit the pronoun.
+    const own=x=>/^(я|ты|он|она|оно|мы|вы|они)[\s(]/i.test(x.trim());
+    for(const part of [s,...pieces.map(x=>pron&&!own(x)?pron+' '+x:x)]){
+      if(!part.trim())continue;
+      const forms=/\([а-яё]{1,3}\)/i.test(part)?[part,part.replace(/\(([а-яё]{1,3})\)/gi,''),part.replace(/\(([а-яё]{1,3})\)/gi,'$1')]:[part];
+      for(const f of forms)out.add(f);
+    }
+    return [...out];
+  }
+  function glossMatch(answers,actual,kind){
+    if(kind&&kind!=='text')return false;
+    const ok=new Set((answers||[]).flatMap(glossVariants).map(x=>normalize(x)));
+    const a=normalize(actual);if(!a)return false;
+    if(ok.has(a))return true;
+    const parts=a.split(/\s*[\/,;]\s*/).filter(Boolean);
+    return parts.length>1&&parts.every(p=>ok.has(p));
+  }
   function numberMatch(expected,actual,kind){
     if(normalize(expected,kind)===normalize(actual,kind))return true;
     const ev=numberValue(actual),ex=numberValue(expected);
@@ -65,6 +110,8 @@
       if(f.kind==='set-text')return sameSet(tokens(answers[i]),expectedTokens(f));
       if(f.answers.some(a=>normalize(a,f.kind)===normalize(answers[i],f.kind)))return true;
       if((phone||f.kind==='number-text'||q.topic==='numbers')&&f.answers.some(a=>numberMatch(a,answers[i],f.kind)))return true;
+      if((!f.kind||f.kind==='text'||f.kind==='number-text')&&f.answers.some(a=>digitWordMatch(a,answers[i])))return true;
+      if(glossMatch(f.answers,answers[i],f.kind||'text'))return true;
       return false;
     });
     return {correct:parts.every(Boolean),parts};

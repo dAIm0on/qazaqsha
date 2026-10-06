@@ -59,6 +59,8 @@
    const norm=s=>root.TrainerCore&&root.TrainerCore.normalize?root.TrainerCore.normalize(s):String(s||'').trim().toLowerCase();
    // r7 C-ROLE: source vocab-ID -> catalog word-ID, recorded instead of re-derived from a normalizer.
    const bindings=Object.create(null);
+   const hwWords=new Set((p.homework&&p.homework.word_ids)||[]);
+   const ownIds=new Set([...(p.original_exercises||[]),...(p.generated_questions||[]),...((p.practice_bank&&p.practice_bank.items)||[])].map(q=>q&&q.id));
    for(const v of p.vocabulary||[]){
      const w=catalog.addWord(v.lemma,v.translations,p.lesson_id,v.role);
      bindings[v.id]=w.id;
@@ -78,19 +80,32 @@
        if(rankedTarget&&(q.source==='bank'||lessonRank(q.lessonId)==null))return false;
        return true;
      });
-     if(taken)continue;
-     const base='v2-'+p.lesson_id+'-vocab-'+String(v.id).split(':').at(-1);
+     // r7 2b (казакша, решение 3): a required homework word (homework.word_ids) that has no card of THIS
+     // lesson still gets its own cards — new question-IDs only (old records/progress are not touched).
+     // The usual id is used when it is free; if a school card already holds it, the id gets «-hw-».
+     const hwOwn=taken&&hwWords.has(v.id)&&!(course.questions||[]).some(q=>q&&q.lessonId===p.lesson_id&&q.topic==='vocab'&&q.wordRole==='must'&&(q.vocabIds||[]).includes(w.id));
+     if(taken&&!hwOwn)continue;
+     const slug=String(v.id).split(':').at(-1);
+     let base='v2-'+p.lesson_id+'-vocab-'+slug;
+     const exists=id=>ownIds.has(id)||(course.questions||[]).some(q=>q&&q.id===id);
+     if(hwOwn&&[base+'-ru',base+'-kk',base+'-ru-1',base+'-kk-set'].some(exists))base='v2-'+p.lesson_id+'-hw-'+slug;
+     const roleOf=hwOwn?'must':(v.role==='target'?'must':'used');
      const rows=[];
      if(forms.length===1){
        rows.push(
-         {id:base+'-ru',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на русский',stimulus:forms[0],fields:[{label:'Ответ',kind:'text',answers:v.translations}],explanation:forms[0]+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]},
-         {id:base+'-kk',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на казахский',stimulus:v.translations[0],fields:[{label:'Ответ',kind:'text',answers:[forms[0]]}],explanation:forms[0]+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]}
+         {id:base+'-ru',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на русский',stimulus:forms[0],fields:[{label:'Ответ',kind:'text',answers:v.translations}],explanation:forms[0]+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[]},
+         {id:base+'-kk',origin:'generated',topic:'vocab',kind:'fields',title:'Переведи на казахский',stimulus:v.translations[0],fields:[{label:'Ответ',kind:'text',answers:[forms[0]]}],explanation:forms[0]+' — '+v.translations.join(' / '),lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[]}
        );
      }else{
-       forms.forEach((form,i)=>rows.push({id:base+'-ru-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:'Узнай форму',stimulus:form,fields:[{label:'Перевод',kind:'text',answers:v.translations}],explanation:form+' — '+v.translations.join(' / ')+'. Формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]}));
-       rows.push({id:base+'-kk-set',origin:'generated',topic:'vocab',kind:'fields',title:'Напиши все формы',stimulus:v.translations[0],fields:[{label:'Все формы через пробел или /',kind:'set-text',answers:forms}],explanation:forms.join(' / ')+' — '+v.translations.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]});
+       forms.forEach((form,i)=>{
+         // r7 2b QA m5/m6: the first form is the dictionary form (infinitive), the others keep their own gloss.
+         const gloss=v.form_translations&&v.form_translations[i]?[v.form_translations[i]]:v.translations;
+         const what=i===0?'словарная форма':'форма';
+         rows.push({id:base+'-ru-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:i===0?'Узнай слово (словарная форма)':'Узнай форму',stimulus:form,fields:[{label:'Перевод',kind:'text',answers:gloss}],explanation:form+' ('+what+') — '+gloss.join(' / ')+'. Формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[]});
+       });
+       rows.push({id:base+'-kk-set',origin:'generated',topic:'vocab',kind:'fields',title:'Напиши все формы',stimulus:v.translations[0],fields:[{label:'Все формы через пробел или /',kind:'set-text',answers:forms}],explanation:forms.join(' / ')+' — '+v.translations.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[]});
        // r7 W-2=C: one typed card per mandatory form (same source vocab-ID / catalog word, new question-IDs only).
-       (v.form_checks||[]).forEach((c,i)=>rows.push({id:base+'-kk-form-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:'Напиши форму',stimulus:c.prompt,fields:[{label:'Ответ',kind:'text',answers:[c.form]}],explanation:c.form+' — '+c.prompt+'. Все формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[],formCheck:{source_id:v.id,form:c.form}}));
+       (v.form_checks||[]).forEach((c,i)=>rows.push({id:base+'-kk-form-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:'Напиши форму',stimulus:c.prompt,fields:[{label:'Ответ',kind:'text',answers:[c.form]}],explanation:c.form+' — '+c.prompt+'. Все формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:roleOf,vocabIds:[w.id],ruleIds:[],formCheck:{source_id:v.id,form:c.form}}));
      }
      for(const q of rows){addQuestion(course,catalog,q);if(!w.card_ids.includes(q.id))w.card_ids.push(q.id);}
    }
@@ -100,7 +115,12 @@
  // through the recorded catalog binding, not the global must/target role. With the current
  // data (word_ids == every target of the lesson) this is the same set as before.
  function homeworkWordQuestionIds(lessonId,wordIds,bindings,questions){
-   const all=(questions||[]).filter(q=>q&&q.lessonId===lessonId&&q.topic==='vocab'&&q.wordRole==='must');
+   const own=(questions||[]).filter(q=>q&&q.lessonId===lessonId&&q.topic==='vocab'&&q.wordRole==='must');
+   // r7 2b (казакша b): «Напиши все формы» duplicates the per-form checks (W-2=C: four separate typed
+   // forms + four recognitions). Where a word has form checks, the combined card stays in practice but
+   // leaves the homework queue (it never counted toward the 4/4 anyway).
+   const formWords=new Set(own.filter(q=>q.formCheck).flatMap(q=>q.vocabIds||[]));
+   const all=own.filter(q=>!(/-kk-set$/.test(q.id)&&(q.vocabIds||[]).some(w=>formWords.has(w))));
    if(!bindings)return all.map(q=>q.id);
    const wanted=new Set((wordIds||[]).map(id=>bindings[id]).filter(Boolean));
    return all.filter(q=>(q.vocabIds||[]).some(w=>wanted.has(w))).map(q=>q.id);
@@ -131,6 +151,16 @@
      const items=ids.slice(0,4).map(id=>{const q=byId.get(id);return {front:q.stimulus,back:(q.fields&&q.fields[0]&&q.fields[0].answers||[])[0]||'',cue:q.explanation||''};});
      return {id:'v2-track-'+stableSlug(s.id),title:s.title,topic:topicForIds(ids),courseLesson:p.lesson_id,intro:'Практика после объяснения. Можно повторять столько, сколько нужно.',items:[],questionIds:ids,chunks:[{title:s.title,explanation:'Сначала попробуй без подсказки. Ошибка вернётся позже на другом примере.',items,questionIds:ids,associationKey:'stage:'+s.id}]};
    });
+ }
+ // r7 2b: one hub track per bank group («Банк · …»); voluntary practice, own origin 'bank'.
+ const BANK_GROUPS=[['choice','Банк · выбери'],['tap','Банк · отметь в строке'],['sort','Банк · разложи'],['build','Банк · собери'],['detect','Банк · найди ошибку']];
+ function bankTracks(p){
+   const items=(p.practice_bank&&p.practice_bank.items)||[];if(!items.length)return [];
+   return BANK_GROUPS.map(([g,title])=>{
+     const ids=items.filter(q=>q.group===g).map(q=>q.id);if(!ids.length)return null;
+     const chunks=[];for(let i=0;i<ids.length;i+=6)chunks.push({title,explanation:'Банк заданий урока: выбор, отметка, сортировка и сборка. Это тренировка с опорой, не домашка.',items:[],questionIds:ids.slice(i,i+6),associationKey:'bank:'+p.lesson_id+':'+g});
+     return {id:'b34-track-'+p.lesson_id+'-'+g,title,topic:'bank',bank:true,courseLesson:p.lesson_id,intro:'Задания с вариантами. Они тренируют узнавание и не заменяют самостоятельный ввод.',items:[],questionIds:ids,chunks};
+   }).filter(Boolean);
  }
  function stagePlans(p){
    return (p.stages||[]).map((s,i)=>({
@@ -175,12 +205,15 @@
    for(const r of p.rules)if(!catalog.rules.some(x=>x.id===r.id))catalog.rules.push({id:r.id,title:r.title,lesson_first_seen:p.lesson_id});
    const vocabBindings=addVocabQuestions(p,course,catalog);
    for(const q of [...p.original_exercises,...p.generated_questions])addQuestion(course,catalog,q);
+   // r7 2b: independent practice bank of blocks 3–4 (origin bank, support kinds only, never homework).
+   const bank=(p.practice_bank&&p.practice_bank.items)||[];
+   for(const q of bank)addQuestion(course,catalog,Object.assign({},q,{origin:'bank',bank:true,source:'b34-'+p.lesson_id,lessonId:p.lesson_id}));
    if(!catalog.lessons.some(x=>x.id===p.lesson_id))catalog.lessons.push({id:p.lesson_id,title:p.title,active:true,status:p.status,depends_on:p.prerequisites.lessons.slice(),rules:p.rules.map(r=>r.id),sources:p.sources.filter(s=>s.url).map(s=>s.url)});
    const gLesson=pathLesson(p);const at=chapters.LESSONS.findIndex(x=>x.id===p.lesson_id);if(at<0)chapters.LESSONS.push(gLesson);else chapters.LESSONS[at]=gLesson;
-   const existing=new Set((learning.lessons||[]).map(x=>x.id));for(const l of learningTracks(p,course.questions))if(!existing.has(l.id)){learning.lessons.push(l);existing.add(l.id);}
+   const existing=new Set((learning.lessons||[]).map(x=>x.id));for(const l of [...learningTracks(p,course.questions),...bankTracks(p)])if(!existing.has(l.id)){learning.lessons.push(l);existing.add(l.id);}
    if(root.CourseProgress&&root.CourseProgress.registerStages)root.CourseProgress.registerStages(p.lesson_id,stagePlans(p));
    // Keep metadata only in installed map; questions live in COURSE, theory in GRAMMAR_CHAPTERS.
-   const kept={lesson_id:p.lesson_id,content_revision:p.content_revision,status:p.status,title:p.title,name:p.name||p.title,release:p.release||null,homework:p.homework,migrations:p.migrations||[],sources:p.sources,rules:p.rules,stages:p.stages,vocab_bindings:vocabBindings,vocabulary:(p.vocabulary||[]).map(v=>({id:v.id,lemma:v.lemma,forms:v.forms.slice()}))};
+   const kept={lesson_id:p.lesson_id,content_revision:p.content_revision,status:p.status,title:p.title,name:p.name||p.title,release:p.release||null,homework:p.homework,migrations:p.migrations||[],sources:p.sources,rules:p.rules,stages:p.stages,vocab_bindings:vocabBindings,practice_bank:p.practice_bank?{prefix:p.practice_bank.prefix,counts:p.practice_bank.counts,homework_intersection:p.practice_bank.homework_intersection,ids:p.practice_bank.items.map(q=>q.id)}:null,vocabulary:(p.vocabulary||[]).map(v=>({id:v.id,lemma:v.lemma,forms:v.forms.slice()}))};
    installed.set(p.lesson_id,kept);
    releaseHeavy(raw);
    return kept;
@@ -243,7 +276,7 @@
  function practiceForRule(lessonId,ruleId,limit=12){
    const p=installed.get(lessonId);
    if(!p||!root.COURSE||!ruleId)return [];
-   const lessonRows=(root.COURSE.questions||[]).filter(q=>q&&q.lessonId===lessonId);
+   const lessonRows=(root.COURSE.questions||[]).filter(q=>q&&q.lessonId===lessonId&&!q.bank);
    const byId=new Map(lessonRows.map(q=>[q.id,q]));
    const candidateIds=[],seen=new Set();
    const add=id=>{if(id&&byId.has(id)&&!seen.has(id)){seen.add(id);candidateIds.push(id);}};

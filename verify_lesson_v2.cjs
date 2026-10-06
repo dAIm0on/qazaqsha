@@ -99,6 +99,8 @@ ok('persistent ids unique');
 const compiledText=fs.readFileSync(path.join(__dirname,'compiled-lessons-v2.js'),'utf8');
 const compiledJson=compiledText.replace(/^.*?window\.LESSON_V2_COMPILED\s*=\s*/s,'').replace(/;\s*$/s,'');
 const built=JSON.parse(JSON.stringify(p));built.generated_questions=[...p.generated_questions,...expanded];
+// r7 2b: the compiler also loads lessons/4-1/practice-bank.json (independent bank, origin bank).
+if(fs.existsSync(path.join(__dirname,'lessons/4-1/practice-bank.json')))built.practice_bank={items:JSON.parse(fs.readFileSync(path.join(__dirname,'lessons/4-1/practice-bank.json'),'utf8')).items};
 const expectedCompiled=Schema.validate(built);
 const compiledAll=JSON.parse(compiledJson);
 const compiled41=compiledAll.find(x=>x.lesson_id==='4-1');
@@ -163,8 +165,11 @@ assert.ok(mock.GRAMMAR_CHAPTERS.LESSONS.find(x=>x.id==='4-1').chapters.every(x=>
 const extra=mock.LessonV2Runtime.practiceForRule('4-1','v2:4-1:negative',12);
 assert.equal(extra.length,12);
 assert.equal(new Set(extra).size,12);
-assert.equal(mock.COURSE.questions.length,444);
-ok('data-only runtime auto-registers theory, 444 questions, vocabulary and varied optional practice');
+// r7 2b: + 14 practice-bank cards (b34-41-*), never offered as rule practice.
+assert.equal(mock.COURSE.questions.length,444+14);
+assert.equal(mock.COURSE.questions.filter(q=>q.bank).length,14);
+assert.ok(extra.every(id=>!/^b34-/.test(id)),'bank never in practiceForRule');
+ok('data-only runtime auto-registers theory, 444 questions (+14 bank), vocabulary and varied optional practice');
 
 const migratedPackage=JSON.parse(JSON.stringify(expectedCompiled));
 migratedPackage.migrations=[{
@@ -222,7 +227,7 @@ const appText=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 assert.equal(indexText.includes('src="nonpast-engine.js"'),false);
 assert.equal(swText.includes('"nonpast-engine.js"'),false);
 assert.equal(swText.includes('"compiled-lessons-v2.js"'),true);
-assert.match(swText,/const CACHE='qazaq-offline-live-20261006-r7-step2-2'/);
+assert.match(swText,/const CACHE='qazaq-offline-live-20261006-r7-step2b-2'/);
 const renderPathStart=appText.indexOf('function renderPath');
 const chapterLookup=appText.indexOf("const ch=G.chapter(les.id,gp.chapterId)",renderPathStart);
 const titleInit=appText.indexOf("const chTitle=Bank?Bank.chapterTitle(ch):ch.title",chapterLookup);

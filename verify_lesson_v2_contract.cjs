@@ -19,6 +19,7 @@ function load(dir){
   const sources=path.join(base,'sources.json'),corrections=path.join(base,'corrections.json');
   if(fs.existsSync(sources))raw.sources=readJson(sources).sources||[];
   if(fs.existsSync(corrections))raw.corrections=readJson(corrections).corrections||[];
+  const bank=path.join(base,'practice-bank.json');if(fs.existsSync(bank))raw.practice_bank=readJson(bank);
   return Schema.validate(raw);
 }
 
@@ -55,6 +56,7 @@ for(const dir of dirs){
   const generated=Generators.expand(lesson);
   const compiled=JSON.parse(JSON.stringify(lesson));
   compiled.generated_questions=[...(lesson.generated_questions||[]),...generated];
+  if(compiled.practice_bank)compiled.practice_bank={items:compiled.practice_bank.items};
   const normalized=Schema.validate(compiled);
   for(const q of [...normalized.original_exercises,...normalized.generated_questions]){
     assert.equal(questionIds.has(q.id),false,'duplicate question across lessons '+q.id);
