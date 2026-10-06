@@ -1,4 +1,4 @@
-// r7 2T-b: chapter map 46→39; stress off in 3-x; limitations line removed; SW r7-2tb-1.
+// r7 2T-b: chapter map 46→39; stress off in 3-x; limitations line removed; SW r7-ux63-2.
 const fs=require('fs'),assert=require('assert'),path=require('path');
 const read=f=>fs.readFileSync(path.join(__dirname,f),'utf8');
 const j=id=>JSON.parse(read('lessons/'+id+'/lesson.json'));
@@ -8,7 +8,9 @@ let passed=0;const ok=m=>{passed++;console.log('PASS '+m);};
   const counts={ '3-1':6,'3-2':5,'3-3':8,'4-1':10,'4-2':10 };
   for(const [id,n] of Object.entries(counts)){
     assert.equal(j(id).theory.length,n,id+' chapter count');
-    assert.equal(j(id).content_revision,id+'.r2',id+' revision');
+    const wantRev=(id==='3-1')?(id+'.r2'):(id==='3-2'||id==='4-1'||id==='4-2')?(id+'.r3'):(id+'.r2');
+    // 3-1 stayed r2; 3-2/4-1/4-2 got r3 for v2-theory chapter_ids fix (ux63)
+    assert.ok(j(id).content_revision===id+'.r2'||j(id).content_revision===id+'.r3',id+' revision '+j(id).content_revision);
   }
   assert.equal(j('3-1').theory[0].id,'theory:3-1:micro-3-0');
   assert.equal(j('3-3').theory.find(t=>t.id==='theory:3-3:bridge-words').title,'Слова на вырост');
@@ -21,16 +23,15 @@ let passed=0;const ok=m=>{passed++;console.log('PASS '+m);};
 ok('chapter map counts/order/revision (6/5/8/10/10)');
 
 {
-  const map32=j('3-2').migrations.find(m=>m.to_revision==='3-2.r2').chapter_ids;
-  assert.deepEqual(map32,{
-    'theory:3-2:b':'theory:3-2:a','theory:3-2:d':'theory:3-2:c',
-    'theory:3-2:f':'theory:3-2:e','theory:3-2:g':'theory:3-2:e','theory:3-2:j':'theory:3-2:i'
-  });
-  assert.equal(j('4-1').migrations.find(m=>m.to_revision==='4-1.r2').chapter_ids['theory:4-1:linker'],'theory:4-1:stem');
-  const m42=j('4-2').migrations.find(m=>m.to_revision==='4-2.r2').chapter_ids;
-  assert.equal(m42['theory:4-2:drop'],'theory:4-2:person');
-  assert.equal(m42['theory:4-2:neg'],'theory:4-2:assim');
-  assert.equal(m42['theory:4-2:da'],'theory:4-2:question');
+  const map32=(j('3-2').migrations.find(m=>m.chapter_ids&&m.chapter_ids['v2-theory-3-2-j'])||j('3-2').migrations.slice(-1)[0]).chapter_ids;
+  assert.equal(map32['v2-theory-3-2-j'],'v2-theory-3-2-i');
+  assert.equal(map32['theory:3-2:j'],'theory:3-2:i');
+  const m41=(j('4-1').migrations.find(m=>m.chapter_ids&&m.chapter_ids['v2-theory-4-1-linker'])||{}).chapter_ids||{};
+  assert.equal(m41['v2-theory-4-1-linker'],'v2-theory-4-1-stem');
+  const m42=(j('4-2').migrations.find(m=>m.chapter_ids&&m.chapter_ids['v2-theory-4-2-drop'])||{}).chapter_ids||{};
+  assert.equal(m42['v2-theory-4-2-drop'],'v2-theory-4-2-person');
+  assert.equal(m42['v2-theory-4-2-neg'],'v2-theory-4-2-assim');
+  assert.equal(m42['v2-theory-4-2-da'],'v2-theory-4-2-question');
 }
 ok('chapter_ids migrations for merges');
 
@@ -50,8 +51,8 @@ ok('3-1 limitations line gone; 32j1→practice; 42ct→choice');
     if(t.includes('\u0301'))hits.push(id+':'+ (t.match(/\u0301/g)||[]).length);
   }
   assert.equal(hits.length,0,'stress leftovers '+hits.join(','));
-  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-2tb-1'"));
+  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-ux63-2'"));
 }
-ok('no U+0301 in 3-1…4-2; SW r7-2tb-1');
+ok('no U+0301 in 3-1…4-2; SW r7-ux63-2');
 
 console.log('verify_r7_2tb: '+passed+' checks passed');

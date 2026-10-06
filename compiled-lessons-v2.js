@@ -29757,7 +29757,7 @@ window.LESSON_V2_COMPILED = [
   {
     "schema_version": 2,
     "lesson_id": "3-2",
-    "content_revision": "3-2.r2",
+    "content_revision": "3-2.r3",
     "title": "Урок 3–2 · Біздің, сендердің, сіздердің, олардың",
     "label": "3–2",
     "name": "Біздің, сендердің, сіздердің, олардың",
@@ -33885,10 +33885,35 @@ window.LESSON_V2_COMPILED = [
         "question_ids": {},
         "chapter_ids": {
           "theory:3-2:b": "theory:3-2:a",
+          "v2-theory-3-2-b": "v2-theory-3-2-a",
           "theory:3-2:d": "theory:3-2:c",
+          "v2-theory-3-2-d": "v2-theory-3-2-c",
           "theory:3-2:f": "theory:3-2:e",
+          "v2-theory-3-2-f": "v2-theory-3-2-e",
           "theory:3-2:g": "theory:3-2:e",
-          "theory:3-2:j": "theory:3-2:i"
+          "v2-theory-3-2-g": "v2-theory-3-2-e",
+          "theory:3-2:j": "theory:3-2:i",
+          "v2-theory-3-2-j": "v2-theory-3-2-i"
+        },
+        "stage_ids": {},
+        "vocab_ids": {},
+        "drop_question_ids": []
+      },
+      {
+        "from_revision": "3-2.r2",
+        "to_revision": "3-2.r3",
+        "question_ids": {},
+        "chapter_ids": {
+          "theory:3-2:b": "theory:3-2:a",
+          "v2-theory-3-2-b": "v2-theory-3-2-a",
+          "theory:3-2:d": "theory:3-2:c",
+          "v2-theory-3-2-d": "v2-theory-3-2-c",
+          "theory:3-2:f": "theory:3-2:e",
+          "v2-theory-3-2-f": "v2-theory-3-2-e",
+          "theory:3-2:g": "theory:3-2:e",
+          "v2-theory-3-2-g": "v2-theory-3-2-e",
+          "theory:3-2:j": "theory:3-2:i",
+          "v2-theory-3-2-j": "v2-theory-3-2-i"
         },
         "stage_ids": {},
         "vocab_ids": {},
@@ -40116,7 +40141,7 @@ window.LESSON_V2_COMPILED = [
   {
     "schema_version": 2,
     "lesson_id": "4-1",
-    "content_revision": "4-1.r2",
+    "content_revision": "4-1.r3",
     "title": "Урок 4–1 · Переходное время",
     "label": "4–1",
     "name": "Переходное время",
@@ -43587,7 +43612,20 @@ window.LESSON_V2_COMPILED = [
         "to_revision": "4-1.r2",
         "question_ids": {},
         "chapter_ids": {
-          "theory:4-1:linker": "theory:4-1:stem"
+          "theory:4-1:linker": "theory:4-1:stem",
+          "v2-theory-4-1-linker": "v2-theory-4-1-stem"
+        },
+        "stage_ids": {},
+        "vocab_ids": {},
+        "drop_question_ids": []
+      },
+      {
+        "from_revision": "4-1.r2",
+        "to_revision": "4-1.r3",
+        "question_ids": {},
+        "chapter_ids": {
+          "theory:4-1:linker": "theory:4-1:stem",
+          "v2-theory-4-1-linker": "v2-theory-4-1-stem"
         },
         "stage_ids": {},
         "vocab_ids": {},
@@ -52753,7 +52791,7 @@ window.LESSON_V2_COMPILED = [
   {
     "schema_version": 2,
     "lesson_id": "4-2",
-    "content_revision": "4-2.r2",
+    "content_revision": "4-2.r3",
     "title": "Урок 4–2 · Прошедшее время",
     "label": "4–2",
     "name": "Прошедшее время",
@@ -59613,8 +59651,27 @@ window.LESSON_V2_COMPILED = [
         "question_ids": {},
         "chapter_ids": {
           "theory:4-2:drop": "theory:4-2:person",
+          "v2-theory-4-2-drop": "v2-theory-4-2-person",
           "theory:4-2:neg": "theory:4-2:assim",
-          "theory:4-2:da": "theory:4-2:question"
+          "v2-theory-4-2-neg": "v2-theory-4-2-assim",
+          "theory:4-2:da": "theory:4-2:question",
+          "v2-theory-4-2-da": "v2-theory-4-2-question"
+        },
+        "stage_ids": {},
+        "vocab_ids": {},
+        "drop_question_ids": []
+      },
+      {
+        "from_revision": "4-2.r2",
+        "to_revision": "4-2.r3",
+        "question_ids": {},
+        "chapter_ids": {
+          "theory:4-2:drop": "theory:4-2:person",
+          "v2-theory-4-2-drop": "v2-theory-4-2-person",
+          "theory:4-2:neg": "theory:4-2:assim",
+          "v2-theory-4-2-neg": "v2-theory-4-2-assim",
+          "theory:4-2:da": "theory:4-2:question",
+          "v2-theory-4-2-da": "v2-theory-4-2-question"
         },
         "stage_ids": {},
         "vocab_ids": {},

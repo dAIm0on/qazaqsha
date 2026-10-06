@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "lesson_id": "4-2",
-  "content_revision": "4-2.r2",
+  "content_revision": "4-2.r3",
   "title": "Урок 4–2 · Прошедшее время",
   "label": "4–2",
   "name": "Прошедшее время",
@@ -8532,10 +8532,26 @@
       "to_revision": "4-2.r2",
       "chapter_ids": {
         "theory:4-2:drop": "theory:4-2:person",
+        "v2-theory-4-2-drop": "v2-theory-4-2-person",
         "theory:4-2:neg": "theory:4-2:assim",
-        "theory:4-2:da": "theory:4-2:question"
+        "v2-theory-4-2-neg": "v2-theory-4-2-assim",
+        "theory:4-2:da": "theory:4-2:question",
+        "v2-theory-4-2-da": "v2-theory-4-2-question"
       },
-      "note": "r7 2T-b: contrast first; drop→person neg→assim da→question; 42ct/ex → choice"
+      "note": "r7 2T-b: contrast first; drop→person neg→assim da→question; 42ct/ex → choice; runtime ids v2-theory-* (+ theory: aliases)"
+    },
+    {
+      "from_revision": "4-2.r2",
+      "to_revision": "4-2.r3",
+      "chapter_ids": {
+        "theory:4-2:drop": "theory:4-2:person",
+        "v2-theory-4-2-drop": "v2-theory-4-2-person",
+        "theory:4-2:neg": "theory:4-2:assim",
+        "v2-theory-4-2-neg": "v2-theory-4-2-assim",
+        "theory:4-2:da": "theory:4-2:question",
+        "v2-theory-4-2-da": "v2-theory-4-2-question"
+      },
+      "note": "r7 ux63: re-apply chapter_ids with v2-theory-* keys for profiles that landed on r2 before the id fix"
     }
   ]
 }

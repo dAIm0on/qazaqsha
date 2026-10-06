@@ -942,7 +942,7 @@
    if(!cloudApplying)window.QazaqCloud?.pushSoon?.(state);
  }
  function subset(){
-   if(activeLesson){const ids=new Set(window.LEARNING.lessons.find(l=>l.id===activeLesson).questionIds);return questions.filter(q=>ids.has(q.id));}
+   if(activeLesson){const les=(window.LEARNING&&window.LEARNING.lessons||[]).find(l=>l.id===activeLesson);if(!les||!Array.isArray(les.questionIds))return [];const ids=new Set(les.questionIds);return questions.filter(q=>ids.has(q.id));}
    let list=questions.filter(q=>eligible(q));
    if(vocabRole)list=list.filter(q=>q.topic==='vocab'&&q.wordRole===vocabRole);
    if(courseBlock)list=list.filter(q=>q.lessonId===courseBlock);
@@ -1258,9 +1258,10 @@
    return compiledCardIdx.get(id)||null;
  }
  function lessonActivity(){
+   // r7 ux63: real work = answers (practice/ДЗ) + path check answers (type path, block path:N-N).
    const ids=courseIds(),act=Object.create(null),bump=(id,t)=>{t=Number(t)||0;if(t>0&&ids.includes(id)&&t>(act[id]||0))act[id]=t;};
-   for(const [id,a] of Object.entries(state.homeworkAttempts||{}))for(const it of (a&&a.items)||[])bump(id,it&&it.at);
-   for(const e of (state.events||[]).slice(-400))if(e&&e.type==='answer')bump(lessonOfEvent(e),e.at);
+   for(const [id,a] of Object.entries(state.homeworkAttempts||{}))for(const it of (a&&a.items)||[])bump(id,it&&(it.at||it.answered_at||a.started_at));
+   for(const e of (state.events||[]).slice(-400))if(e&&(e.type==='answer'||e.type==='path'))bump(lessonOfEvent(e),e.at);
    return act;
  }
  function namedCourse(){
@@ -1295,6 +1296,19 @@
    if(allDone)return {lessonId,surface:'path',kind:'done',title:'Основное прохождение завершено',hint:'Можно выбрать любой урок и повторить его.'};
    const t=resumeTarget(lessonId); // r7 ux59b #2: same resolver as continueLesson
    return {lessonId,surface:t.surface,kind:t.kind,title:(lp&&lp.status==='not_started'?'Начать урок ':'Продолжить урок ')+lessonId,hint:t.hint};
+ }
+  function startPreExam(){
+   // r7 ux63 HG-19: interleaved answers across 1-1…3-3 (not a score).
+   // activeLesson stays null — '3-3' is not a LEARNING.lessons track id (subset/renderStats would throw).
+   if(!(window.PreExam&&window.PreExam.pickQueue))return;
+   for(const id of window.PreExam.LESSONS)ensureV2(id);
+   const ids=(window.PreExam.pickQueue(24)||[]).filter(id=>byId.has(id));
+   if(!ids.length){alert('Пока мало карточек для прогона — сначала пройди практику 1-1…3-3.');return;}
+   viewOnlyPathLesson=null;persistLessonPractice();persistLessonPath();
+   mode='course';topic='all';courseBlock=null;sourceFilter=null;vocabRole=null;activeLesson=null;activeStep=null;stepEvidence={};
+   queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;hinted=false;
+   sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
+   markLessonStarted('3-3','practice');markPlace('practice','3-3');save();render();showView('practice');
  }
  function continueStep(){
    const s=stepNow();
@@ -2964,7 +2978,7 @@
  }
  const learning=window.LearningUI.create({
    get state(){return learningState;},save,startLesson,startCourse,courseJumpMarkup,bindCourseJump,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today'),
-   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,resumeTarget,hubLesson,continueLesson,homeworkWordsTrack,homeworkWordList,continueStep,progress:()=>state,openHomework(id){hwLesson=id;hwOrigin='learn';showView('homework');}
+   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,resumeTarget,hubLesson,continueLesson,startPreExam,homeworkWordsTrack,homeworkWordList,continueStep,progress:()=>state,openHomework(id){hwLesson=id;hwOrigin='learn';showView('homework');}
  });
  const dashboard=window.DashboardUI.create({
    state:()=>state,questions:()=>questions,eligible,hasSession:()=>queue.length>position,continueInfo:stepNow,resumeTarget,

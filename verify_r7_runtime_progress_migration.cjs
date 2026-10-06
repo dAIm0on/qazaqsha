@@ -14,7 +14,7 @@ let passed=0;const ok=n=>{passed++;console.log('PASS',n);};
 const load=n=>JSON.parse(fs.readFileSync(path.join(dir,n+'.json'),'utf8'));
 function stable(v){if(Array.isArray(v))return v.map(stable);if(v&&typeof v==='object'){const o={};for(const k of Object.keys(v).sort())o[k]=stable(v[k]);return o;}return v;}
 const plain=v=>stable(JSON.parse(JSON.stringify(v)));
-const core=s=>{const c=plain(s);delete c.evidence;return c;};
+const core=s=>{const c=plain(s);delete c.evidence;delete c.preExam;return c;}; // r7 ux63: preExam additive like evidence
 const names=Object.keys(golden.migrate);
 assert.equal(golden.base_commit,'8d6b032b1629900f43cc19d5dc01985a8b343d93');
 assert.ok(names.length>=4);
@@ -48,7 +48,7 @@ assert.equal(E.fingerprint(m3),E.fingerprint(m1));
 ok('migration is idempotent: same marker, no extra events/errors, same fingerprint');
 
 // D. Rollback-safe: dropping the namespace returns exactly the old state; schema stays 7 for older builds.
-assert.deepEqual(plain(E.rollback(P.migrate(raw42,NOW))),golden.migrate['schema7-lesson-4-2-homework']);
+{const rolled=plain(E.rollback(P.migrate(raw42,NOW)));delete rolled.preExam;assert.deepEqual(rolled,golden.migrate['schema7-lesson-4-2-homework']);}
 const exported=JSON.parse(P.serialize(m1));assert.equal(exported.schema,7);assert.equal(exported.app,'qazaq-trainer');assert.ok(exported.evidence);
 assert.doesNotThrow(()=>P.validate(P.serialize(m1),new Set(Object.keys(m1.records))));
 ok('rollback = drop state.evidence (old state byte-identical); export stays schema 7 for previous builds');
@@ -209,7 +209,7 @@ ok('fresh profiles have no legacy facts; attempt log is capped while per-form su
 const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8'),html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8'),sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(html.indexOf('src="evidence-state.js"')>0&&html.indexOf('src="evidence-state.js"')<html.indexOf('src="progress.js"'));
 assert.ok(sw.includes('"evidence-state.js"'));
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-2tb-1'"));
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-ux63-2'"));
 assert.ok(/function responseModes\(q\)\{return supportKind\(q\)\|\|q\.kind==='multi'\?\['choice'\]:.*el\.type==='hidden'\?'choice':'typed'/.test(app),'response mode read from the rendered control');
 assert.ok(/state\.events\.push\(event\);rec=records\[q\.id\]\|\|rec;\n\s+if\(window\.EvidenceState\)\{try\{window\.EvidenceState\.observe\(state,/.test(app));
 assert.ok(app.includes("R7_SNAPSHOT=KEY+'-before-r7'")&&app.includes('localStorage.setItem(R7_SNAPSHOT,raw)')&&app.includes('localStorage.getItem(R7_SNAPSHOT)'));

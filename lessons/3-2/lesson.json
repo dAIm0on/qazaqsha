@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "lesson_id": "3-2",
-  "content_revision": "3-2.r2",
+  "content_revision": "3-2.r3",
   "title": "Урок 3–2 · Біздің, сендердің, сіздердің, олардың",
   "label": "3–2",
   "name": "Біздің, сендердің, сіздердің, олардың",
@@ -4199,12 +4199,34 @@
       "to_revision": "3-2.r2",
       "chapter_ids": {
         "theory:3-2:b": "theory:3-2:a",
+        "v2-theory-3-2-b": "v2-theory-3-2-a",
         "theory:3-2:d": "theory:3-2:c",
+        "v2-theory-3-2-d": "v2-theory-3-2-c",
         "theory:3-2:f": "theory:3-2:e",
+        "v2-theory-3-2-f": "v2-theory-3-2-e",
         "theory:3-2:g": "theory:3-2:e",
-        "theory:3-2:j": "theory:3-2:i"
+        "v2-theory-3-2-g": "v2-theory-3-2-e",
+        "theory:3-2:j": "theory:3-2:i",
+        "v2-theory-3-2-j": "v2-theory-3-2-i"
       },
-      "note": "r7 2T-b: merge b→a d→c f/g→e; j→i (traps→practice); strip stress"
+      "note": "r7 2T-b: merge b→a d→c f/g→e; j→i (traps→practice); strip stress; runtime ids v2-theory-* (+ theory: aliases)"
+    },
+    {
+      "from_revision": "3-2.r2",
+      "to_revision": "3-2.r3",
+      "chapter_ids": {
+        "theory:3-2:b": "theory:3-2:a",
+        "v2-theory-3-2-b": "v2-theory-3-2-a",
+        "theory:3-2:d": "theory:3-2:c",
+        "v2-theory-3-2-d": "v2-theory-3-2-c",
+        "theory:3-2:f": "theory:3-2:e",
+        "v2-theory-3-2-f": "v2-theory-3-2-e",
+        "theory:3-2:g": "theory:3-2:e",
+        "v2-theory-3-2-g": "v2-theory-3-2-e",
+        "theory:3-2:j": "theory:3-2:i",
+        "v2-theory-3-2-j": "v2-theory-3-2-i"
+      },
+      "note": "r7 ux63: re-apply chapter_ids with v2-theory-* keys for profiles that landed on r2 before the id fix"
     }
   ]
 }
