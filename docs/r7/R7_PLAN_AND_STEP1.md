@@ -21,6 +21,8 @@
 
 ## Шаг 2 — fixtures + банк заданий (после ответа на вопросы)
 
+> Статус 2026-10-06: шаг 2 разбит на 2a (пп. 1–3 + QA #1/#6/#7, см. `R7_STEP2.md`) и 2b (пп. 4–7). Таблица глав 2T-b — `R7_2TB_CHAPTER_MAP.md`.
+
 1. Данные Q5-A: `lessons/4-2/lesson.json` → `homework.word_ids` = T13 в исходном порядке; текст только `source_items[2]` (`hw-item:4-2:3`, number "3"); 23 vocabulary-объекта, `source_items[3]`, `ext:4-2:bez-isk`, exercise_ids, checklist не меняются; `compiled-lessons-v2.js` через `tools/compile-lessons.cjs`; content_revision + `migrations` урока.
 2. W-2=C: четыре отдельные проверки форм `Қалайсың / Қалайсыңдар / Қалайсыз / Қалайсыздар` (typed, по одной форме), без новых word-ID; подключение `formStatus` к статусу слов ДЗ 4-2.
 3. Fallback `Lesson42Homework` (29 глаголов) — guard: не используется как T13 при наличии V2 (Q5-13).

@@ -303,7 +303,7 @@
     source:'ai-remed',topic:code.indexOf('NUMERAL')===0?'numbers':code==='VOCAB_RECALL'?'vocab':'plural',kind:'fields',
     title:'Скажи по-казахски',stimulus:row.ru,
     fields:[{label:'Ответ',kind:'text',answers:[kk]}],
-    explanation:'Временная проверка навыка. Не входит в банк 220 ID.',
+    explanation:'Короткая проверка того же навыка.',
     ruleIds:code==='PLURAL_AFTER_NUMBER'?['quantity']:code==='VOCAB_RECALL'?[]:['plural'],
     contextOnly:false
    };

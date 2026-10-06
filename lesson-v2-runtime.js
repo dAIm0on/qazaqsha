@@ -34,7 +34,14 @@
        ...explanationBeats(t),
        {k:'algo',t:'Как действовать',items:t.decisionSteps}
      ];
-     for(const e of t.examples||[])beats.push({k:'ex',from:e.kazakh,to:e.kazakh,ru:e.translation,why:e.why||''});
+     // r7 QA F2: a v2 example is one Kazakh line. Show an arrow only for a real «было → стало» pair
+     // written in the data; never invent the slot or repeat the same word on both sides (қол → қол).
+     for(const e of t.examples||[]){
+       const kk=String(e.kazakh||'').trim(),pair=kk.split(/\s*(?:→|->)\s*/);
+       const beat={k:'ex',from:kk,ru:e.translation,why:e.why||''};
+       if(pair.length===2&&pair[0]&&pair[1]&&pair[0]!==pair[1]){beat.from=pair[0];beat.to=pair[1];}
+       beats.push(beat);
+     }
      for(const c of t.contrastExamples||[])beats.push({k:'trap',bad:c.bad,good:c.good,why:c.why});
      for(const note of t.limitations||[])beats.push({k:'fold',t:'Граница урока',b:note});
      for(const check of t.checks||[])beats.push({k:'ask',id:check.id,type:check.type,prompt:check.prompt,answer:check.answers[0],answers:check.answers,error_key:check.error_key,rule_line:check.rule_line||t.shortHint});
@@ -63,8 +70,10 @@
      const rankedTarget=v.role==='target'&&lessonRank(p.lesson_id)!=null;
      const taken=(course.questions||[]).some(q=>{
        if(!q||q.topic!=='vocab')return false;
-       if((q.vocabIds||[]).includes(w.id))return true;
-       const sameLemma=norm(q.stimulus)===lemmaKey||((q.fields||[]).flatMap(f=>f.answers||[])).some(a=>norm(a)===lemmaKey);
+       // r7 Q5-06: a free bank card (no lesson) never blocks a lesson target's own cards — also when it
+       // is already bound to the catalog word (before, only the same-lemma path had this exception).
+       const bound=(q.vocabIds||[]).includes(w.id);
+       const sameLemma=bound||norm(q.stimulus)===lemmaKey||((q.fields||[]).flatMap(f=>f.answers||[])).some(a=>norm(a)===lemmaKey);
        if(!sameLemma)return false;
        if(rankedTarget&&(q.source==='bank'||lessonRank(q.lessonId)==null))return false;
        return true;
@@ -80,6 +89,8 @@
      }else{
        forms.forEach((form,i)=>rows.push({id:base+'-ru-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:'Узнай форму',stimulus:form,fields:[{label:'Перевод',kind:'text',answers:v.translations}],explanation:form+' — '+v.translations.join(' / ')+'. Формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]}));
        rows.push({id:base+'-kk-set',origin:'generated',topic:'vocab',kind:'fields',title:'Напиши все формы',stimulus:v.translations[0],fields:[{label:'Все формы через пробел или /',kind:'set-text',answers:forms}],explanation:forms.join(' / ')+' — '+v.translations.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]});
+       // r7 W-2=C: one typed card per mandatory form (same source vocab-ID / catalog word, new question-IDs only).
+       (v.form_checks||[]).forEach((c,i)=>rows.push({id:base+'-kk-form-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:'Напиши форму',stimulus:c.prompt,fields:[{label:'Ответ',kind:'text',answers:[c.form]}],explanation:c.form+' — '+c.prompt+'. Все формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[],formCheck:{source_id:v.id,form:c.form}}));
      }
      for(const q of rows){addQuestion(course,catalog,q);if(!w.card_ids.includes(q.id))w.card_ids.push(q.id);}
    }
@@ -93,6 +104,21 @@
    if(!bindings)return all.map(q=>q.id);
    const wanted=new Set((wordIds||[]).map(id=>bindings[id]).filter(Boolean));
    return all.filter(q=>(q.vocabIds||[]).some(w=>wanted.has(w))).map(q=>q.id);
+ }
+ // r7 QA F4/M1: which required homework words (homework.word_ids, source order) have their own card in this
+ // lesson's homework word set. Hub and button use it: the button shows only when every word is covered.
+ function homeworkWordCoverage(lessonId){
+   const p=byId(lessonId)||ensure(lessonId);
+   if(!p||!p.homework)return null;
+   const ids=(p.homework.word_ids||[]).slice();
+   const qs=root.COURSE&&root.COURSE.questions||[];
+   const qids=homeworkWordQuestionIds(lessonId,ids,p.vocab_bindings,qs);
+   const byQ=new Map(qs.map(q=>[q.id,q]));
+   const bound=new Set(qids.flatMap(id=>(byQ.get(id)&&byQ.get(id).vocabIds)||[]));
+   const lemma=new Map((p.vocabulary||[]).map(v=>[v.id,v.lemma]));
+   const words=ids.map(id=>{const w=p.vocab_bindings&&p.vocab_bindings[id];return {id,catalog_id:w||null,lemma:lemma.get(id)||'',covered:!!(w&&bound.has(w))};});
+   const covered=words.filter(w=>w.covered).length;
+   return {lesson_id:lessonId,total:words.length,covered,complete:words.length>0&&covered===words.length,words,question_ids:qids};
  }
  function learningTracks(p,allQuestions){
    const byId=new Map(allQuestions.map(q=>[q.id,q]));
@@ -257,7 +283,7 @@
    }
    return picked;
  }
- const api={installAll,installOne,installShells,ensure,byId,isV2,homework,homeworkWordQuestionIds,practiceForRule,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
+ const api={installAll,installOne,installShells,ensure,byId,isV2,homework,homeworkWordQuestionIds,homeworkWordCoverage,practiceForRule,migrationChain,migrateId,migrateIds,installed,shells,stagePlans,pathLesson};
  root.LessonV2Runtime=api;
  // P0 Chrome Error 9: do not materialize every lesson pack (4-1 has 345 generated Qs) at boot.
  // Shells keep path/learn navigation; ensure(id) hydrates exercises on first open.
