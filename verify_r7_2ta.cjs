@@ -54,7 +54,7 @@ ok('path.contentRevision kept across F5 (progress migrate + persistLessonPath); 
 ok('no U+0301 in lesson-pack-1/2*, app.js person panel, grammar-paths (T15); three біз sites clean');
 
 {
-  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-51-2'"));
+  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-51-3'"));
 }
-ok('SW r7-51-2');
+ok('SW r7-51-3');
 console.log('verify_r7_2ta: '+passed+' checks passed');
