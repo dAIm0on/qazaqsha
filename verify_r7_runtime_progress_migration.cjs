@@ -97,7 +97,7 @@ const L42=JSON.parse(fs.readFileSync(path.join(__dirname,'lessons','4-2','lesson
 const T13=['vocab:4-2:oilau','vocab:4-2:oinau','vocab:4-2:senu','vocab:4-2:kutu','vocab:4-2:aitu','vocab:4-2:qoiu','vocab:4-2:suiu','vocab:4-2:oqu','vocab:4-2:estu','vocab:4-2:qalai','vocab:4-2:qalaisyn','vocab:4-2:bari','vocab:4-2:raqmet'];
 const R10=['vocab:4-2:tusinu','vocab:4-2:baru','vocab:4-2:zhuru','vocab:4-2:zhatu','vocab:4-2:otyru','vocab:4-2:turu','vocab:4-2:ashu','vocab:4-2:zhabu','vocab:4-2:tigu','vocab:4-2:da'];
 assert.equal(T13.length,13);assert.equal(new Set(T13).size,13);
-assert.deepEqual(L42.homework.word_ids,[...R10,...T13],'4-2 data unchanged in step 1 (T13 data edit belongs to step 2)');
+assert.deepEqual(L42.homework.word_ids,T13,'r7 step 2: 4-2 homework.word_ids = T13 exactly (Q5-01)');
 assert.equal(L42.vocabulary.length,23,'all 23 vocabulary objects kept');
 const p42=rt.LessonV2Runtime.byId('4-2');
 assert.equal(new Set(Object.keys(p42.vocab_bindings)).size,23);
@@ -206,7 +206,7 @@ ok('fresh profiles have no legacy facts; attempt log is capped while per-form su
 const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8'),html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8'),sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(html.indexOf('src="evidence-state.js"')>0&&html.indexOf('src="evidence-state.js"')<html.indexOf('src="progress.js"'));
 assert.ok(sw.includes('"evidence-state.js"'));
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-runtime3'"));
+assert.ok(sw.includes("CACHE='qazaq-offline-live-20261006-r7-step2'"));
 assert.ok(/function responseModes\(q\)\{return supportKind\(q\)\|\|q\.kind==='multi'\?\['choice'\]:.*el\.type==='hidden'\?'choice':'typed'/.test(app),'response mode read from the rendered control');
 assert.ok(/state\.events\.push\(event\);rec=records\[q\.id\]\|\|rec;\n\s+if\(window\.EvidenceState\)\{try\{window\.EvidenceState\.observe\(state,/.test(app));
 assert.ok(app.includes("R7_SNAPSHOT=KEY+'-before-r7'")&&app.includes('localStorage.setItem(R7_SNAPSHOT,raw)')&&app.includes('localStorage.getItem(R7_SNAPSHOT)'));

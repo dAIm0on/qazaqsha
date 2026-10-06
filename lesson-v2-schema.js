@@ -79,7 +79,19 @@
    if(!obj(w))fail('vocabulary object');
    const role=w.role==='context'?'context':'target';
    const lemma=str(w.lemma,'vocab.lemma',120),forms=strings(w.forms||[lemma],'vocab.forms',1,20);
-   return {id:id(w.id,'vocab.id'),lemma,forms,translations:strings(w.translations,'vocab.translations',1,12),role,introduced_in:lessonId,source_refs:strings(w.source_refs||[],'vocab.source_refs',1,20).map(x=>id(x,'source_ref'))};
+   const out={id:id(w.id,'vocab.id'),lemma,forms,translations:strings(w.translations,'vocab.translations',1,12),role,introduced_in:lessonId,source_refs:strings(w.source_refs||[],'vocab.source_refs',1,20).map(x=>id(x,'source_ref'))};
+   // r7 W-2=C: optional per-form typed checks of ONE source vocab-ID (no new word-IDs).
+   // Each check names one of the word's own forms and a Russian prompt; absent = old behaviour.
+   if(w.form_checks!=null){
+     out.form_checks=list(w.form_checks,'vocab.form_checks',1,20).map(c=>{
+       if(!obj(c))fail('vocab.form_checks object');
+       const form=str(c.form,'vocab.form_checks.form',120);
+       if(!forms.includes(form))fail('vocab.form_checks.form не входит в forms: '+form);
+       return {form,prompt:str(c.prompt,'vocab.form_checks.prompt',200)};
+     });
+     if(new Set(out.form_checks.map(c=>c.form)).size!==out.form_checks.length)fail('vocab.form_checks: повтор формы');
+   }
+   return out;
  }
  function generator(g){
    if(!obj(g))fail('generator object');

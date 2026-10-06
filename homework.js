@@ -124,8 +124,32 @@
  function wordsForLesson(questions,lessonId){
    const hwSource={ '1-1':'hw1','1-2':'hw2','1-3':'hw3','2-3':'hw23' }[lessonId];
    if(hwSource)return orderedWords(bySource(questions,hwSource));
+   if(lessonId==='4-2')return orderedWords(lesson42WordQuestions(questions,lesson42WordNorm())); // r7 Q5-13
    const lemmas=new Set((WORD_LEMMAS[lessonId]||[]).map(w=>core.normalize(w)));
    return orderedWords((questions||[]).filter(q=>lemmas.has(vocabLemma(q))));
+ }
+ // r7 Q5-13: the 4-2 word norm is T13 from lessons/4-2 homework.word_ids (Q5-A). The legacy
+ // 29-verb list (Lesson42Homework.VERBS / target_vocabulary) never acts as the 4-2 word list:
+ // if the V2 source is unavailable the fallback carries no mandatory words at all.
+ function lesson42WordNorm(){
+   let raw=null;
+   try{
+     raw=node?JSON.parse(require('fs').readFileSync(require('path').join(__dirname,'lessons','4-2','lesson.json'),'utf8'))
+       :((root.LESSON_V2_COMPILED||[]).find(x=>x&&x.lesson_id==='4-2')||null);
+   }catch(_){raw=null;}
+   const h=raw&&raw.homework,vocab=raw&&raw.vocabulary||[];
+   if(!h||!Array.isArray(h.word_ids))return {word_ids:[],forms:new Set()};
+   const want=new Set(h.word_ids),forms=new Set();
+   for(const v of vocab)if(v&&want.has(v.id))for(const f of [v.lemma,...(v.forms||[])])if(f)forms.add(core.normalize(f));
+   return {word_ids:h.word_ids.slice(),forms};
+ }
+ function lesson42WordQuestions(questions,norm){
+   return (questions||[]).filter(q=>{
+     if(!q||q.lessonId!=='4-2'||q.topic!=='vocab')return false;
+     if((q.vocabIds||[]).some(id=>norm.forms.has(core.normalize(String(id).replace(/^word:/,'')))))return true;
+     const answers=(q.fields||[]).flatMap(f=>f.answers||[]).map(a=>core.normalize(a));
+     return norm.forms.has(vocabLemma(q))||norm.forms.has(core.normalize(q.stimulus||''))||answers.some(a=>norm.forms.has(a));
+   });
  }
  function buildPack(lessonId,questions,course,opts={}){
    if(!node&&root.LessonV2Runtime&&root.LessonV2Runtime.homework){
@@ -137,11 +161,12 @@
      const qById=new Map((questions||[]).map(q=>[q.id,q]));
      const pack42=node?require('./lesson42-pack.js'):root.Lesson42Pack;
      const present=id=>qById.has(id)||!!(pack42&&pack42.byId&&pack42.byId(id));
-     const words=(questions||[]).filter(q=>q&&q.lessonId==='4-2'&&q.topic==='vocab');
+     const norm=lesson42WordNorm();
+     const words=lesson42WordQuestions(questions,norm);
      const method=methodSource(lessonId,course);
      const exercise_ids=(spec.item_ids||[]).filter(present);
      const missing_ids=(spec.item_ids||[]).filter(id=>!present(id));
-     return {lesson_id:'4-2',homework:{title:spec.title,word_ids:(spec.target_vocabulary||[]).map(w=>w.id),exercise_ids,missing_ids,word_question_ids:words.map(q=>q.id),rule_map:{...spec.rule_map},external_test_url:spec.external_test_url,external_tests:[spec.external_test_url],checklist:['method','exercises','words','external_test'],extras:[],method_title:method.title,method_url:method.url}};
+     return {lesson_id:'4-2',homework:{title:spec.title,word_ids:norm.word_ids,exercise_ids,missing_ids,word_question_ids:words.map(q=>q.id),rule_map:{...spec.rule_map},external_test_url:spec.external_test_url,external_tests:[spec.external_test_url],checklist:['method','exercises','words','external_test'],extras:[],method_title:method.title,method_url:method.url}};
    }
    if(lessonId==='3-3'&&lesson33Homework){
      const spec=lesson33Homework.build({events:opts.events||[]});
@@ -186,7 +211,7 @@
      lesson_id:lessonId,
      homework:{
        title:'Домашка '+lessonId.replace('-','–'),
-       word_ids:(WORD_LEMMAS[lessonId]||[]).map(wordId),
+       word_ids:lessonId==='4-2'?lesson42WordNorm().word_ids:(WORD_LEMMAS[lessonId]||[]).map(wordId),
        exercise_ids:exercises.map(q=>q.id),
        word_question_ids:words.map(q=>q.id),
        rule_map,
@@ -514,6 +539,6 @@ ${sourceItems?'<h2>Исходная домашняя работа</h2><ol>'+sour
    }
    return out;
  }
- const api={RULES,EXTERNAL,WORD_LEMMAS,inferRule,ruleId,ruleText,missingRules,buildPack,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,sliceSection,sectionCount,sectionOf,partProgress,vocabDirections,HW_SECTION,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,otherTopicFillers,remediationQueue,blindCloseDays,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
+ const api={RULES,EXTERNAL,WORD_LEMMAS,inferRule,ruleId,ruleText,missingRules,buildPack,lesson42WordNorm,packs,validateHomework,emptyAttempt,ensureAttempt,newAttempt,statusOf,recordItem,resumeIndex,sliceSection,sectionCount,sectionOf,partProgress,vocabDirections,HW_SECTION,markChecklist,sheetReady,exportJson,exportHtml,fileStamp,weakSpots,stillWeak,inferBlock,blockReviewQueue,isolatedFor,otherTopicFillers,remediationQueue,blindCloseDays,firstTryFail,weaknessKey,weakLabel,WEAK_LABELS};
  if(node)module.exports=api;else root.Homework=api;
 })(typeof window!=='undefined'?window:globalThis);

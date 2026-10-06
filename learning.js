@@ -105,12 +105,14 @@ function create(api){
  }
  function tracksFor(lessonId){
   const all=window.LEARNING&&window.LEARNING.lessons||[];
-  return all.filter(l=>l&&(l.courseLesson===lessonId||l.courseLesson==='bank'));
+  // r7 Q5-A (QA): the lesson's own homework words replace the global must-track (1-1…) in this hub.
+  const hw=api.homeworkWordsTrack?api.homeworkWordsTrack(lessonId):null;
+  return all.filter(l=>l&&!l.homeworkWords&&(l.courseLesson===lessonId||l.courseLesson==='bank')).map(l=>hw&&l.id==='vocab-must'?hw:l);
  }
  function tracksMarkup(lessonId){
   const TOPIC={sounds:'Звуки',vocab:'Слова',numbers:'Числа',plural:'Окончания',person:'Лица',verbs:'Глаголы',rules:'Правила',phrase:'Фразы',possessive:'Притяжательность'};
   const all=window.LEARNING&&window.LEARNING.lessons||[];
-  const rows=picked?all.filter(l=>l&&l.topic===picked):tracksFor(lessonId);
+  const rows=picked?all.filter(l=>l&&l.topic===picked&&!l.homeworkWords):tracksFor(lessonId);
   const heading=picked?(TOPIC[picked]||'Ступени'):'Ступени этого урока';
   if(!rows.length)return '';
   const groups=new Map();

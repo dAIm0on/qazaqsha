@@ -63,8 +63,10 @@
      const rankedTarget=v.role==='target'&&lessonRank(p.lesson_id)!=null;
      const taken=(course.questions||[]).some(q=>{
        if(!q||q.topic!=='vocab')return false;
-       if((q.vocabIds||[]).includes(w.id))return true;
-       const sameLemma=norm(q.stimulus)===lemmaKey||((q.fields||[]).flatMap(f=>f.answers||[])).some(a=>norm(a)===lemmaKey);
+       // r7 Q5-06: a free bank card (no lesson) never blocks a lesson target's own cards — also when it
+       // is already bound to the catalog word (before, only the same-lemma path had this exception).
+       const bound=(q.vocabIds||[]).includes(w.id);
+       const sameLemma=bound||norm(q.stimulus)===lemmaKey||((q.fields||[]).flatMap(f=>f.answers||[])).some(a=>norm(a)===lemmaKey);
        if(!sameLemma)return false;
        if(rankedTarget&&(q.source==='bank'||lessonRank(q.lessonId)==null))return false;
        return true;
@@ -80,6 +82,8 @@
      }else{
        forms.forEach((form,i)=>rows.push({id:base+'-ru-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:'Узнай форму',stimulus:form,fields:[{label:'Перевод',kind:'text',answers:v.translations}],explanation:form+' — '+v.translations.join(' / ')+'. Формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]}));
        rows.push({id:base+'-kk-set',origin:'generated',topic:'vocab',kind:'fields',title:'Напиши все формы',stimulus:v.translations[0],fields:[{label:'Все формы через пробел или /',kind:'set-text',answers:forms}],explanation:forms.join(' / ')+' — '+v.translations.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[]});
+       // r7 W-2=C: one typed card per mandatory form (same source vocab-ID / catalog word, new question-IDs only).
+       (v.form_checks||[]).forEach((c,i)=>rows.push({id:base+'-kk-form-'+(i+1),origin:'generated',topic:'vocab',kind:'fields',title:'Напиши форму',stimulus:c.prompt,fields:[{label:'Ответ',kind:'text',answers:[c.form]}],explanation:c.form+' — '+c.prompt+'. Все формы: '+forms.join(' / ')+'.',lessonId:p.lesson_id,source:'v2-'+p.lesson_id+'-vocab',wordRole:v.role==='target'?'must':'used',vocabIds:[w.id],ruleIds:[],formCheck:{source_id:v.id,form:c.form}}));
      }
      for(const q of rows){addQuestion(course,catalog,q);if(!w.card_ids.includes(q.id))w.card_ids.push(q.id);}
    }

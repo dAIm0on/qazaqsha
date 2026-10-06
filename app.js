@@ -710,6 +710,9 @@
    if(presented!==token){
      presented=token;if(mode!=='voluntary')records[q.id]=window.ReviewScheduler.shown(records[q.id]);
      for(const id of q.vocabIds||[]){const w=catalog.words.find(w=>w.id===id),p=state.vocabulary[id]||{times_seen:0,target_or_context:w?.target_or_context||'context'};state.vocabulary[id]={...p,times_seen:p.times_seen+1,last_seen:Date.now(),last_seen_lesson:q.lessonId};}
+     // r7 step 2 (QA #6): the header counter was painted before this card was marked as shown,
+     // so it lagged one card until the next repaint (F5 looked like a double count). Recount now.
+     renderStats();
    }startTimer();startExamBar();focusAnswer();
  }
  function startExamBar(){
@@ -984,7 +987,30 @@
    if(window.MemoryPolicy&&window.MemoryPolicy.mixRulesProbes&&['smart','review','ordered'].includes(mode))ids=window.MemoryPolicy.mixRulesProbes(ids,questions,state,{lessonId:courseBlock||null,topic});
    queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);resetCounts();render();
  }
+ // r7 Q5-A (QA): in a lesson hub «Слова, которые задали выучить» is THAT lesson's homework words
+ // (homework.word_question_ids → T13 for 4-2), not the global must-track that starts with 1-1.
+ const HW_WORDS_PREFIX='hw-words-';
+ function homeworkWordsTrack(lessonId){
+   const R=window.LessonV2Runtime,L=window.LEARNING;
+   if(!lessonId||!L||!R||!R.homework||!(R.isV2&&R.isV2(lessonId)))return null;
+   ensureV2(lessonId);
+   let pack=null;try{pack=R.homework(lessonId);}catch(_){pack=null;}
+   const ids=((pack&&pack.homework&&pack.homework.word_question_ids)||[]).filter(qid=>byId.has(qid));
+   if(!ids.length)return null;
+   const id=HW_WORDS_PREFIX+lessonId,label=lessonId.replace('-','–');
+   const intro='Слова, которые задали выучить в уроке '+label+'. Сначала вспомни сама, потом проверь.';
+   const chunks=[];
+   for(let i=0;i<ids.length;i+=4){
+     const slice=ids.slice(i,i+4);
+     chunks.push({title:'Слова урока '+label+' · '+(Math.floor(i/4)+1),explanation:intro,items:slice.map(qid=>{const q=byId.get(qid);return {front:q.stimulus,back:((q.fields&&q.fields[0]&&q.fields[0].answers)||[]).join(' / '),cue:q.hint||'Сначала вспомни, потом открой.'};}),questionIds:slice,associationKey:'track:'+id});
+   }
+   const track={id,topic:'vocab',courseLesson:lessonId,homeworkWords:true,title:'Слова, которые задали выучить',intro,note:'',items:[],questionIds:ids,chunks,method:'Вспомнить без подглядывания'};
+   const at=L.lessons.findIndex(l=>l&&l.id===id);
+   if(at>=0)L.lessons[at]=track;else L.lessons.push(track);
+   return track;
+ }
  function startLesson(id,step=learningState.steps[id]||0,opts){
+   if(String(id||'').startsWith(HW_WORDS_PREFIX))homeworkWordsTrack(String(id).slice(HW_WORDS_PREFIX.length));
    const lesson=window.LEARNING.lessons.find(l=>l.id===id),chunk=lesson?.chunks[step];if(!chunk)return;
    let stepIds=[...chunk.questionIds];
    if(lesson.topic==='numbers'&&window.NumberLadder){
@@ -998,7 +1024,7 @@
    }
    // PR-C Variant A: vocab-must Learn — due/NEW поверх frozen chunk-0 (адам/қыз),
    // same chooseShortSession mix as catalogVocabIds/PR-B. Chunk step stays for UI only.
-   if(id==='vocab-must'){
+   if(id==='vocab-must'||String(id).startsWith(HW_WORDS_PREFIX)){
      const pool=(lesson.questionIds||[]).map(qid=>byId.get(qid)).filter(q=>q&&eligible(q));
      const limit=Math.max(2,(cfg.session.size||10)+(cfg.session.newLimit||0));
      const picked=core.chooseShortSession(pool,records,Date.now(),limit);
@@ -1163,6 +1189,26 @@
    const les=courseBlock?(COURSE_BLOCKS.find(b=>b.id===courseBlock)||{}).title:null;
    return les?('Урок '+les+' · '+type):type;
  }
+ // r7 step 2 (QA #7, Q5-A): in homework the header counter covers that homework part only —
+ // words: distinct homework words (several cards of one word count once); exercises: the sheet cards.
+ let hwScopeCache={key:'',ids:null};
+ function homeworkScope(){
+   if(mode!=='homework'||!hwLesson||!window.Homework||!window.Homework.buildPack)return null;
+   const key=hwLesson+'|'+hwPart+'|'+questions.length;
+   if(hwScopeCache.key!==key){
+     let ids=null;
+     try{const pack=window.Homework.buildPack(hwLesson,questions,course,homeworkOpts());const h=pack&&pack.homework;if(h)ids=((hwPart==='words'?h.word_question_ids:h.exercise_ids)||[]).filter(id=>byId.has(id));}catch(_){ids=null;}
+     hwScopeCache={key,ids};
+   }
+   return hwScopeCache.ids;
+ }
+ function homeworkCounter(ids){
+   const tried=id=>records[id]?.attempts>0;
+   if(hwPart!=='words')return {tried:ids.filter(tried).length,total:ids.length};
+   const groups=new Map();
+   for(const id of ids){const q=byId.get(id),k=(q&&q.vocabIds&&q.vocabIds[0])||id;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(id);}
+   return {tried:[...groups.values()].filter(g=>g.some(tried)).length,total:groups.size};
+ }
  function renderStats(){
    const pause=$('#pause-session');
    if(pause){
@@ -1175,7 +1221,11 @@
    if(sp){
      if(isVocabWordsMode())sp.textContent=`Верно ${sessionCorrect} из ${queue.length}`;
      else if(['smart','lesson','course','review','contrast'].includes(mode))sp.textContent=`Шаг ${Math.min(position+1,queue.length)} из ${queue.length}`;
-     else sp.textContent=`Встречалось ${tried} из ${scope.length}`;
+     else{
+       const hw=homeworkScope();
+       if(hw&&hw.length){const c=homeworkCounter(hw);sp.textContent=`Встречалось ${c.tried} из ${c.total}`;}
+       else sp.textContent=`Встречалось ${tried} из ${scope.length}`;
+     }
    }
    const ss=$('#session-score');
    if(ss)ss.textContent=sessionAttempts?`Без подсказки: ${sessionCorrect} / ${sessionAttempts}`:'';
@@ -1238,6 +1288,17 @@
  function seeText(s){return esc(studentCopy(s));}
  function namedExercise(s){
    return /^(ловушка|запрет)(?![\u0400-\u04FF])/i.test(String(s||''));
+ }
+ // r7 step 2 (QA): the path error badge follows the check's error_key; the generic diagnostics
+ // fallback (verb_form / unclassified) is never shown for a check that names its own error.
+ const PATH_KEY_LABEL={harmony:'harmony_class',junction_ldt:'plural_initial_consonant'};
+ function pathErrorBadges(beat,errors){
+   const L=window.ErrorDiagnostics&&window.ErrorDiagnostics.labels||{};
+   const key=beat&&beat.error_key;
+   const own=key?(L[key]||L[PATH_KEY_LABEL[key]]||''):'';
+   if(own)return [own];
+   const generic=new Set(['verb_form','unclassified']);
+   return [...new Set((errors||[]).filter(e=>!(key&&generic.has(e.error_type))).map(e=>L[e.error_type]||e.error_type).filter(Boolean))];
  }
  function faceTitle(s){
    const t=String(s||'');
@@ -2136,7 +2197,7 @@
        if(ok){nextBeat();return;}
        const right=noted.right;
        const diag=formAsk&&val.trim()?G.diagnoseProd(right,val):'Пока неверно.';
-       const why=noted.diagErrors.map(err=>window.ErrorDiagnostics&&window.ErrorDiagnostics.labels[err.error_type]||err.error_type).filter(Boolean);
+       const why=pathErrorBadges(beat,noted.diagErrors);
        const bankCard=window.ExplainBankUI&&window.ExplainBankUI.cardForChapter(ch);
        const tr=window.TransferItems&&window.TransferItems.oneForPath(ch,les,{catalog:window.CURRICULUM});
        const ruleId=window.ExplainBankUI&&window.ExplainBankUI.ruleForChapter?window.ExplainBankUI.ruleForChapter(ch):'';
@@ -2147,7 +2208,10 @@
        const chain=window.ExplainOpen&&window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(pathQ,val):'';
        const gap=window.AiTutor&&window.AiTutor.coverageGaps?window.AiTutor.coverageGaps().find(g=>noted.aiCodes.includes(g.error_code)):null;
        const gapHtml=gap&&!offers.isolated&&!offers.other?'<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>':'';
-       showPathFb('error','<p data-error-diff>Ты написала: <s lang="kk">'+esc(val.trim()||'пусто')+'</s>. Разберём механизм — без готового ответа.</p><p>Ты написала: <strong lang="kk">'+esc(val.trim()||'пусто')+'</strong></p>'+(why.length?'<p>'+esc([...new Set(why)].join(' · '))+'</p>':'')+studentCopy(chain)+offerHtml(offers)+gapHtml+(beat.trap?'<p>'+seeText(beat.trap)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
+       // r7 step 2 (QA): exactly one «Ты написала» line, first; the chain's own copy of it is dropped.
+       const chainBody=String(chain||'').replace(/<p data-error-diff>[\s\S]*?<\/p>/g,'');
+       const diffLine='<p data-error-diff>Ты написала: <s lang="kk">'+esc(val.trim()||'пусто')+'</s>. Разберём механизм — без готового ответа.</p>';
+       showPathFb('error',diffLine+(why.length?'<p>'+esc([...new Set(why)].join(' · '))+'</p>':'')+studentCopy(chainBody)+offerHtml(offers)+gapHtml+(beat.trap?'<p>'+seeText(beat.trap)+'</p>':'')+(tr?'<p class="small">Другой корень: <strong lang="kk">'+esc(tr.stimulus)+'</strong></p><button type="button" class="secondary-button" id="path-transfer">Набрать перенос</button>':'')+'<div class="ai-tutor-actions"><button type="button" class="text-button" id="path-again-rule">Ещё раз правило</button><button type="button" class="text-button" id="path-ask-tutor">Спросить тьютора</button></div><button type="button" class="primary-button" id="path-go">Дальше</button>');
        if(window.ExplainOpen)window.ExplainOpen.bind($('#path-fb'));
        bindOffers($('#path-fb'));
        const again=$('#path-again-rule');if(again)again.onclick=()=>{showPathFb('hinted','<p>'+seeText(bankCard&&(bankCard.short||bankCard.medium)||hintLine())+'</p>');};
@@ -2631,7 +2695,7 @@
  }
  const learning=window.LearningUI.create({
    get state(){return learningState;},save,startLesson,startCourse,courseJumpMarkup,bindCourseJump,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today'),
-   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,continueStep,progress:()=>state,openHomework(id){hwLesson=id;hwOrigin='learn';showView('homework');}
+   grammarPath:()=>state.grammarPath,openPath:openPathLesson,currentCourse:namedCourse,homeworkWordsTrack,continueStep,progress:()=>state,openHomework(id){hwLesson=id;hwOrigin='learn';showView('homework');}
  });
  const dashboard=window.DashboardUI.create({
    state:()=>state,questions:()=>questions,eligible,hasSession:()=>queue.length>position,continueInfo:stepNow,
@@ -2783,6 +2847,7 @@
      savedSession.view==='path'&&state.grammarPath&&state.grammarPath.lessonId]);
    for(const id of resumeLessons)if(id)ensureV2(id);
  }
+ if(savedSession&&savedSession.mode==='lesson'&&String(savedSession.activeLesson||'').startsWith(HW_WORDS_PREFIX))homeworkWordsTrack(String(savedSession.activeLesson).slice(HW_WORDS_PREFIX.length));
  const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','course','phrase','transfer','contrast','numbers','remediation','words','exam','homework','chunks'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){
    variants=savedSession.variants||{};
