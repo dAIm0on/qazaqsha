@@ -63,7 +63,8 @@ function create(api){
     '<p class="eyebrow">ТЕКУЩИЙ УРОК</p>'+
     '<h2>Урок '+(cur?esc(cur.label):esc(id))+'</h2>'+
     '<p class="learn-now-name">'+(cur?esc(cur.name):'')+'</p>'+
-    (prog?'<p class="small">'+esc(prog)+(chTitle?(' · '+esc(chTitle)):'')+'</p>':'')+
+    // r7 ux59b #2: the line under the lesson and the button target come from the same resolver as Today.
+    (api.resumeTarget?'<p class="small" data-resume-hint>'+esc(api.resumeTarget(id).hint)+'</p>':(prog?'<p class="small">'+esc(prog)+(chTitle?(' · '+esc(chTitle)):'')+'</p>':''))+
     '<div class="lesson-actions"><button type="button" class="primary-button" id="learn-continue">'+esc(cta)+'</button></div>'+
    '</article>'+
    '<div class="panel learn-course"><h2>Все уроки</h2><div class="learn-lessons">'+
