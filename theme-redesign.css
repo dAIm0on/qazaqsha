@@ -888,11 +888,11 @@ html.keyboard-open .tutor-launch,body.keyboard-open .tutor-launch{display:none}
 
 /* typing-compact: letters + Проверить sit on the visual viewport, not window bottom. */
 .phase-label:empty{display:none}
+/* r7 2T-a: show the whole question (was clamped to 2 lines with an ellipsis). */
 #question-title.practice-prompt,
 h2.practice-prompt,
 .exercise-card .question-note{
-  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;
-  overflow:hidden
+  overflow:visible
 }
 .typing-strip{
   display:flex;flex-direction:column;gap:6px;

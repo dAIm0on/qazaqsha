@@ -475,7 +475,8 @@
    const gp=state.grammarPath;if(!gp)return null;
    const lessonId=id||gp.lessonId;if(!P.courseIds().includes(lessonId))return null;
    const currentV2=window.LessonV2Runtime&&window.LessonV2Runtime.byId?window.LessonV2Runtime.byId(lessonId):null;
-   let contentRevision=gp.contentRevision||null;
+   const lp=P.ensureLessonProgress(state,lessonId);
+   let contentRevision=gp.contentRevision||(lp&&lp.path&&lp.path.contentRevision)||null;
    if(currentV2){
      const targetRev=currentV2.content_revision;
      // Stamp target revision only after chapter ids are current. Premature stamp
@@ -483,6 +484,9 @@
      if(!pathHasUnmappedChapters(lessonId,gp,gp.chapterId))contentRevision=targetRev;
      else if(contentRevision===targetRev)contentRevision=legacyPathRevision(lessonId,currentV2);
    }
+   // r7 2T-a: never write null over a known revision (F5 used to clear path.contentRevision when
+   // migrate dropped gp.contentRevision and persist ran before ensureV2).
+   if(!contentRevision&&lp&&lp.path&&typeof lp.path.contentRevision==='string')contentRevision=lp.path.contentRevision;
    const snap=Object.assign({},gp,{contentRevision});
    return P.saveLessonPath(state,lessonId,snap,Date.now());
  }

@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "lesson_id": "2-2",
-  "content_revision": "2-2.r1",
+  "content_revision": "2-2.r2",
   "title": "Урок 2–2 · Біз, сендер, сіздер; прилагательное",
   "label": "2–2",
   "name": "Біз, сендер, сіздер; прилагательное",
@@ -3208,7 +3208,7 @@
           ]
         }
       ],
-      "explanation": "После М у біз звонкое бі́з: Біз мұғалімбіз. — Мы учителя.",
+      "explanation": "После М у біз звонкое біз: Біз мұғалімбіз. — Мы учителя.",
       "source_item": "wb:2-2:5-1",
       "source_refs": [
         "school-exercises"
@@ -4025,5 +4025,10 @@
       "external_test"
     ]
   },
-  "migrations": []
+  "migrations": [
+    {
+      "from_revision": "2-2.r1",
+      "note": "r7 2T-a: stress marks removed (1-2/2-1/2-2) / content bump; chapter ids unchanged"
+    }
+  ]
 }
