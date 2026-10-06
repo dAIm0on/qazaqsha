@@ -10,7 +10,7 @@
  const obj=v=>v&&typeof v==='object'&&!Array.isArray(v);
  const safe=k=>typeof k==='string'&&k.length<=300&&!['__proto__','prototype','constructor'].includes(k);
  function dictionary(value,transform){const out=Object.create(null);if(obj(value))for(const [k,v] of Object.entries(value))if(safe(k)){const next=transform(v,k);if(next!==undefined)out[k]=next;}return out;}
- function empty(){return {schema:7,morphTrainer:morph.empty(),records:Object.create(null),skills:Object.create(null),errors:[],issueLog:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:true,lettersChosen:false},incidentalWeek:{key:'',added:0},homeworkAttempts:Object.create(null),grammarPath:{topicId:null,step:0,phase:'hub',queue:[],index:0,peeks:Object.create(null),fails:Object.create(null),passed:Object.create(null),blocked:false,completed:[],lessonId:null,chapterId:null,beat:0,completedChapters:Object.create(null),legacyCompleted:[]},courseProgress:courseProgress.empty(),session:null,lesson_packages:[],repair:null,savings:Object.create(null),...(evidence?{evidence:evidence.empty()}:{})};}
+ function empty(){return {schema:7,morphTrainer:morph.empty(),records:Object.create(null),skills:Object.create(null),errors:[],issueLog:[],associations:Object.create(null),confusions:Object.create(null),vocabulary:Object.create(null),events:[],learning:{lessonId:'numbers-0',notes:{},steps:{},completedSteps:{}},prefs:{letters:true,lettersChosen:false},preExam:{trainers:Object.create(null),updatedAt:0},incidentalWeek:{key:'',added:0},homeworkAttempts:Object.create(null),grammarPath:{topicId:null,step:0,phase:'hub',queue:[],index:0,peeks:Object.create(null),fails:Object.create(null),passed:Object.create(null),blocked:false,completed:[],lessonId:null,chapterId:null,beat:0,completedChapters:Object.create(null),legacyCompleted:[]},courseProgress:courseProgress.empty(),session:null,lesson_packages:[],repair:null,savings:Object.create(null),...(evidence?{evidence:evidence.empty()}:{})};}
  function migrate(raw={},now=Date.now()){
    const state=empty();state.morphTrainer=morph.migrate(raw.morphTrainer);state.lesson_packages=packages.merge([],raw.lesson_packages||[]);state.skills=dictionary(raw.skills,r=>obj(r)?core.migrateRecord(r,now):undefined);state.errors=Array.isArray(raw.errors)?raw.errors.filter(e=>obj(e)&&typeof e.error_type==='string'&&Number.isFinite(e.timestamp)):[];state.records=dictionary(raw.records,r=>obj(r)?core.migrateRecord(r,now):undefined);
   // Drop retired letter-breakdown («Разбери каждую букву») FSRS cards — skip on load.
@@ -67,7 +67,8 @@
    state.courseProgress=courseProgress.migrate(raw.courseProgress,state,raw,now);
    // r7: additive evidence namespace + one-time legacy marker; never rewrites the namespaces above.
    if(evidence)evidence.upgrade(state,raw,now);
-   return state;
+    if(obj(raw.preExam)){state.preExam={trainers:Object.create(null),updatedAt:Number(raw.preExam.updatedAt)||0};const tr=raw.preExam.trainers;if(obj(tr)){for(const [k,v] of Object.entries(tr)){if(typeof k==='string'&&k.length<80)state.preExam.trainers[k]=!!v;}}}else if(!state.preExam){state.preExam={trainers:Object.create(null),updatedAt:0};} // r7 ux63 HG-20
+ return state;
  }
  function tidyTutor(raw){
    const errors=Object.create(null);

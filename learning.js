@@ -99,6 +99,13 @@ function create(api){
    if(b.disabled)return;
    b.onclick=()=>{if(api.startLesson)api.startLesson(b.dataset.track);};
   });
+  // r7 ux63 HG-19/20: «Перед экзаменом» on lesson 3-3
+  if(id==='3-3'&&window.PreExam){
+    const box=document.createElement('div');
+    box.innerHTML=window.PreExam.panelHtml(api.progress?api.progress():{},esc);
+    const host=$('#learn-content');
+    if(host){host.appendChild(box.firstElementChild);window.PreExam.bind(host,{progress:api.progress,save:api.save,renderLearn:render,startPreExam:api.startPreExam});}
+  }
   const pr=$('#learn-practice');if(pr)pr.onclick=()=>api.startCourse(id);
   const hw=$('#learn-homework');if(hw)hw.onclick=()=>{if(api.openHomework)api.openHomework(id);else api.today();};
   document.querySelectorAll('[data-subject]').forEach(b=>b.onclick=()=>{picked=b.dataset.subject||'';render();});

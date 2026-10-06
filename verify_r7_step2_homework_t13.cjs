@@ -45,7 +45,7 @@ ok('Q5-02 hw-item:4-2:3 (index 2, number 3) names the 13 T13 targets and none of
   assert.equal(h16(L42.homework.source_items.slice(0,2)),'64bc43b3bfd105bf');
   const pins={exercise_ids:[L42.homework.exercise_ids,'efc9f9f22854400e'],checklist:[L42.homework.checklist,'423b404b336f3260'],theory:[L42.theory,'c51437b314a3a6da'],stages:[L42.stages,'da2007ea720d89e7'],rules:[L42.rules,'7f88e5bf6edf775f'],original_exercises:[L42.original_exercises,'e1a2de904139f5f0'],generated_questions:[L42.generated_questions,'172450ba63e61f19'],practice_generators:[L42.practice_generators,'4f53cda18c2baa0c']};
   for(const [k,[v,want]] of Object.entries(pins))assert.equal(h16(v),want,'Q5-07: 4-2 '+k+' changed');
-  assert.equal(L42.content_revision,'4-2.r2','2T-b: one content_revision bump with full chapter_ids mapping');
+  assert.equal(L42.content_revision,'4-2.r3','2T-b: one content_revision bump with full chapter_ids mapping');
 }
 ok('Q5-03/04/07 hw-item:4-2:4 + ext + vocab stable; theory bumped in 2T-b with mapping');
 
