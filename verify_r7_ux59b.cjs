@@ -108,9 +108,11 @@ ok('#4 each entry point keeps its own queue: shelves / bank tracks never land in
 // #5 logo history
 {
   const h=slice(app,"const brandLink=document.querySelector('a.brand');"," $('#pause-session').onclick");
-  assert.ok(h.includes("history.replaceState(Object.assign({},history.state||{},{qzView:from}),'');history.pushState({qzView:'today'},'');"),'one entry, same URL');
+  // ux60 #1: logo is a single pushState; showView keeps the current entry tagged (no replaceState+pushState pair).
+  assert.ok(h.includes("history.pushState({qzView:'today'},'');"),'one entry, same URL');
+  assert.ok(app.includes("history.replaceState(Object.assign({},history.state||{},{qzView:next}),'');"),'showView tags the current entry');
   assert.ok(!/pushState\([^)]*,[^)]*,[^)]+\)/.test(h),'no URL argument → F5 / resumeSurface / SW untouched');
-  assert.ok(h.includes("window.addEventListener('popstate',ev=>{")&&h.includes("if(v==='practice'&&!(queue.length>position))return;")&&h.includes('showView(v);save();'),'«Назад» returns to the screen, never into an ended session');
+  assert.ok(h.includes("window.addEventListener('popstate',ev=>{")&&h.includes("if(v==='practice'&&!(queue.length>position))")&&h.includes('showView(v);save();'),'«Назад» returns to the screen, never into an ended session');
 }
 ok('#5 logo adds one history entry (same URL); browser «Назад» returns to the previous screen with its session and draft');
 // reload guard

@@ -4,12 +4,17 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const $=s=>document.querySelector(s);
 function create(api){
  function progressOf(lessonId){
+  // r7 ux60 #2: status from the saved lesson progress, not the live grammarPath pointer
+  // (choosing 3-1 used to make 4-2 look «Не начат» because gp.lessonId became 3-1).
   const G=window.GrammarPath;
   const les=G&&G.lesson(lessonId);
   const gp=api.grammarPath?api.grammarPath():{};
   const n=les&&les.chapters?les.chapters.length:0;
   const done=n?(les.chapters.filter(c=>gp.completedChapters&&gp.completedChapters[lessonId+':'+c.id]).length):0;
-  return {n,done,started:done>0||(gp.lessonId===lessonId&&gp.chapterId),all:n>0&&done>=n};
+  const st=api.progress?api.progress():{},lp=(st.courseProgress&&st.courseProgress.lessons||{})[lessonId]||{};
+  const started=lp.status==='in_progress'||lp.status==='completed'||done>0||!!(lp.path&&lp.path.chapterId)||!!(lp.practiceSession&&lp.practiceSession.queue&&lp.practiceSession.queue.length)||(gp.lessonId===lessonId&&!!gp.chapterId);
+  const all=lp.status==='completed'||(n>0&&done>=n);
+  return {n,done,started,all,status:lp.status||(all?'completed':started?'in_progress':'not_started')};
  }
  function currentId(){
   const Bank=window.ExplainBankUI;
@@ -70,7 +75,7 @@ function create(api){
    '<div class="panel learn-course"><h2>Все уроки</h2><div class="learn-lessons">'+
     list.map(c=>{
      const pr=progressOf(c.id);
-     const mark=pr.all?'Разобран':(pr.started?'В процессе':'Не начат');
+     const mark=pr.status==='completed'||pr.all?'Пройден':(pr.started?'В процессе':'Не начат'); // r7 ux60 #2
      return '<button type="button" class="lesson" data-learn-les="'+esc(c.id)+'" '+(c.id===id?'aria-current="true"':'')+'>'+
       '<span class="number">'+esc(c.label)+'</span><div><h3>'+esc(c.name)+'</h3><p>'+(pr.n?(pr.done+' из '+pr.n+' '+(window.TrainerCore&&window.TrainerCore.ruPlural?window.TrainerCore.ruPlural(pr.n,['главы','глав','глав']):'глав')):'')+'</p></div>'+
       '<span class="small">'+esc(mark)+'</span></button>';
