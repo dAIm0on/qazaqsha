@@ -1,4 +1,4 @@
-// r7 step 3: static gates for OPEN 1–4 learner run (no 5-1 open).
+// r7 step 3: static gates for OPEN 1–4 learner run (+ 5-1 now released).
 const assert=require('assert'),fs=require('fs'),path=require('path');
 const read=p=>fs.readFileSync(p,'utf8');
 const root=__dirname;
@@ -17,8 +17,9 @@ for(const id of OPEN){
 }
 ok('OPEN lessons present in compiled: '+OPEN.join(','));
 assert.ok(by['5-1'],'5-1 in compiled');
-assert.equal(by['5-1'].status,'draft');
-ok('5-1 present as draft only');
+assert.equal(by['5-1'].status,'released');
+assert.equal(by['5-1'].release&&by['5-1'].release.approved,true);
+ok('5-1 present as released+approved');
 // HW ∩ practice for v2 with homework.exercise_ids
 for(const id of OPEN){
   const L=by[id];
