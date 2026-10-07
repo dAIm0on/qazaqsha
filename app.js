@@ -1548,7 +1548,9 @@
    const letters=hasText;
    const exam=mode==='exam';
    const hw=mode==='homework';
-   const canRule=hw&&window.Homework&&window.Homework.ruleText(q);
+   const v2RuleId=(q.ruleIds&&q.ruleIds[0])||'';
+   const v2RuleRef=window.LessonV2Runtime&&window.LessonV2Runtime.referenceForRule?window.LessonV2Runtime.referenceForRule(currentLessonId(q),v2RuleId):null;
+   const canRule=(hw&&window.Homework&&window.Homework.ruleText(q))||!!(v2RuleRef&&v2RuleRef.body);
    const longHw=hw&&hwLesson&&state.homeworkAttempts[hwLesson]&&Date.now()-(state.homeworkAttempts[hwLesson].started_at||Date.now())>25*60*1000;
    const letterBar=letters?`<div class="letter-keyboard" lang="kk" aria-label="Казахские буквы">${[...'әғқңөұүһі'].map(c=>`<button type="button" lang="kk" data-letter="${c}" aria-label="Вставить ${c}">${c}</button>`).join('')}</div>`:'';
    $('#exercise').innerHTML=`<div class="question-top"><div class="source-label">${sourceLabel}${location?'<br>'+esc(location):''}</div></div><form id="answer-form"><div class="typing-scroll"><div class="question-body"><p class="phase-label">${exam?'НА ВРЕМЯ':hw?'ДОМАШКА':mode==='voluntary'?'ПО ЖЕЛАНИЮ':esc((q.phase&&q.phase!=='Вспомнить')?q.phase:(q.source.startsWith('hw')?'':'Применить правило'))}</p>${mode==='voluntary'?'<p class="question-note" data-voluntary>Это подход по желанию. Очередь «пора вспомнить» от него не меняется.</p>':''}${longHw?'<p class="question-note">Уже больше 25 минут на этом листе. Можно сохранить и продолжить позже — это не стоп.</p>':''}<h2 id="question-title" class="practice-prompt">${esc(faceTitle(q.title))}</h2>${mode==='review'&&reviewReasonMap[q.id]&&!/вспомнить/i.test(reviewReasonMap[q.id])?`<p class="question-note">${esc(reviewReasonMap[q.id])}</p>`:''}${q.stimulus?`<div class="stimulus" lang="${q.title.includes('на казахский')||q.bank?'ru':'kk'}">${(q.title.includes('на казахский')?esc(q.stimulus):(window.TutorUI&&window.TutorUI.markKkWords?window.TutorUI.markKkWords(q.stimulus,q.bank?{onlyKazakh:true}:undefined):esc(q.stimulus)))}${q.translation&&!translationGivesAnswer(q)?`<span class="translation" lang="ru">${esc(q.translation)}</span>`:''}</div>`:''}${q.note?`<p class="question-note">${esc(q.note)}</p>`:''}${mode==='remediation'&&remediationNote&&position===0?`<p class="question-note remediation-rule">${esc(remediationNote)}</p>`:''}${encodingMarkup(q)}${supportKind(q)?answerMarkup(q):''}${q.contextGloss?`<div class="context-gloss">${q.contextGloss.map(g=>`<span><strong>${esc(g.word)}</strong> — ${esc(g.translation)} <small>для контекста</small></span>`).join('')}</div>`:''}<div id="hint-box" class="hint" hidden></div><div id="association-box" class="hint" hidden></div><p id="validation" class="validation-message" role="alert" hidden></p></div><div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div></div><div class="practice-dock typing-dock${supportKind(q)?' rk-dock':''}" id="practice-dock"><div class="practice-composer"><div class="composer-row">${supportKind(q)?'':answerMarkup(q)}</div><div class="question-actions"><div class="secondary-actions"><button type="button" class="secondary-button" id="rule-button" ${canRule?'':'hidden'}>Правило</button><button type="button" class="secondary-button" id="hint-button" ${exam?'hidden':''}>Нужна подсказка</button><button type="button" class="text-button" id="reveal-button">${exam?'Пропустить': 'Не знаю'}</button><button type="button" class="text-button" id="association-button" ${exam?'hidden':''}>Ассоциация</button></div></div><div class="typing-strip" id="typing-strip">${letterBar}<div class="primary-slot"><button type="submit" class="primary-button" id="check-button">Проверить</button><button type="button" class="primary-button" id="retry-button" hidden>Ещё раз</button><button type="submit" class="primary-button" id="next-button" hidden>Дальше →</button></div></div></div></div></form>`;
@@ -1631,12 +1633,30 @@
  function hintEvent(q,kind){state.events.push({type:'hint',card_id:q.id,at:Date.now(),hint_kind:kind,response_time_ms:elapsed(),hinted:true});}
  function showRule(q){
    if(checked||mode==='exam')return;
-   const text=window.Homework&&window.Homework.ruleText(q);
-   if(!text)return;
+   const lessonId=currentLessonId(q),ruleId=(q.ruleIds&&q.ruleIds[0])||'';
+   const ref=window.LessonV2Runtime&&window.LessonV2Runtime.referenceForRule?window.LessonV2Runtime.referenceForRule(lessonId,ruleId):null;
+   const hwText=window.Homework&&window.Homework.ruleText(q);
+   const raw=ref&&ref.body?String(ref.body):String(hwText||'');
+   if(!raw)return;
+   const answerTokens=(q.fields||[]).flatMap(f=>f.answers||[]).map(x=>String(x||'').trim().toLocaleLowerCase('kk')).filter(x=>x.length>=4&&!x.startsWith('-'));
+   const safe=ref?raw.split(/\n/).filter(line=>{
+     const low=String(line||'').toLocaleLowerCase('kk');
+     return !answerTokens.some(a=>low.includes(a)&&(/[—→]/.test(line)));
+   }).join('\n'):raw;
+   const fmt=line=>{
+     const e=esc(String(line||''));
+     return e.replace(/(^|;\s*)([^;—]{1,90})\s+—\s+([^;]+)/g,(m,p,left,right)=>p+left+' — <em>'+right+'</em>');
+   };
+   const blocks=safe.split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
+   const html=blocks.map(block=>{
+     const lines=block.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+     if(lines.length>1&&lines.some(x=>x.includes('|')))return '<pre class="rule-pre">'+lines.map(fmt).join('\n')+'</pre>';
+     return '<p>'+lines.map(fmt).join('<br>')+'</p>';
+   }).join('');
    rulePeeked=true;
-   state.events.push({type:'rule_peek',card_id:q.id,at:Date.now(),rule_id:window.Homework.ruleId(q),homework:mode==='homework'?1:0});
+   state.events.push({type:'rule_peek',card_id:q.id,at:Date.now(),rule_id:ruleId||(window.Homework&&window.Homework.ruleId(q))||'',reference_id:ref&&ref.id||'',homework:mode==='homework'?1:0});
    const box=$('#hint-box');
-   box.innerHTML='<strong>Правило, не ответ этого пункта.</strong><pre class="rule-pre">'+esc(text)+'</pre>';
+   box.innerHTML='<strong>Правило, не ответ этого пункта.</strong>'+(ref&&ref.title?'<h3>'+esc(ref.title)+'</h3>':'')+html;
    box.hidden=false;
    if($('#rule-button'))$('#rule-button').disabled=true;
    save();
@@ -1752,11 +1772,11 @@
    if(homeworkMode){
      if(hinted&&previous){rec=core.updateRecord(previous,result.correct,true,now,{responseTime:elapsedMs,recall,rating:F.Rating.Again});records[q.id]=rec;}
    }else if(voluntary){rec=previous||rec;}
-   else if(!aiRemed){rec=core.updateRecord(previous,result.correct,hinted,now,{responseTime:elapsedMs,recall,rating});records[q.id]=rec;}
+   else if(!aiRemed){rec=core.updateRecord(previous,result.correct,(hinted||rulePeeked),now,{responseTime:elapsedMs,recall,rating});records[q.id]=rec;}
    else records[q.id]=rec;
    const errors=reveal||supportKind(q)?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);state.errors.push(...errors);
    const policy=window.MemoryPolicy;
-   const flags=policy&&policy.answerFlags?policy.answerFlags({hinted,correct:result.correct}):{first_try_correct:hinted?0:(result.correct?1:0),peek:hinted?1:0,retype_after_peek_ok:hinted?(result.correct?1:0):null};
+   const flags=policy&&policy.answerFlags?policy.answerFlags({hinted:(hinted||rulePeeked),correct:result.correct}):{first_try_correct:(hinted||rulePeeked)?0:(result.correct?1:0),peek:(hinted||rulePeeked)?1:0,retype_after_peek_ok:(hinted||rulePeeked)?(result.correct?1:0):null};
    if(rulePeeked)flags.first_try_correct=0;
    const eventId='ev:'+now+':'+q.id;
    const event={id:eventId,session_id:String(queueEpoch),presentation:position,type:'answer',card_id:q.id,at:now,correct:result.correct,hinted,response_time_ms:elapsedMs,response_time:elapsedMs,latency_ms:elapsedMs,recall,answers,
@@ -1787,13 +1807,13 @@
    }
    if(!voluntary&&!supportKind(q))P.observeConfusions(state,q,answers,result,now,confusionIndex,hinted||reveal||rulePeeked);
    for(const pair of Object.values(state.confusions)){pair.expected_item=[...confusionIndex.get(pair.expected_answer)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.given_item=[...confusionIndex.get(pair.wrong_answer_given)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.last_confused=pair.last_wrong;}
-   if(activeLesson&&practiceIds.includes(q.id))stepEvidence[q.id]=result.correct&&!hinted;
+   if(activeLesson&&practiceIds.includes(q.id))stepEvidence[q.id]=result.correct&&!hinted&&!rulePeeked;
    const countSessionAttempt=!(isVocabWordsMode()&&!result.correct&&!reveal);
-   if(countSessionAttempt){sessionAttempts++;if(result.correct){if(hinted)sessionAssisted++;else sessionCorrect++;}}
+   if(countSessionAttempt){sessionAttempts++;if(result.correct){if(hinted||rulePeeked)sessionAssisted++;else sessionCorrect++;}}
    if(!hinted&&!result.correct)sessionBlindFails[q.id]=(sessionBlindFails[q.id]||0)+1;
    const day0=core.isDay0Learning(rec,now);
-   if(hinted||!result.correct)sessionUnaided[q.id]=0;
-   else if(!hinted&&result.correct)sessionUnaided[q.id]=(sessionUnaided[q.id]||0)+1;
+   if(hinted||rulePeeked||!result.correct)sessionUnaided[q.id]=0;
+   else if(!hinted&&!rulePeeked&&result.correct)sessionUnaided[q.id]=(sessionUnaided[q.id]||0)+1;
    const bankRun=isBankSession();
    if(bankRun){
      // B5/B6: no fillers, no review/remediation/contrast cards; a missed bank task comes back once at the end.
@@ -2293,6 +2313,24 @@
      root.innerHTML=`<div class="panel path-paper">${head}<p class="eyebrow">КАК ПРИМЕРНО ПОЧУВСТВОВАТЬ</p><h2 lang="kk">${seeText(beat.letter)}</h2><p><strong>Русский якорь:</strong> ${seeText(beat.anchor)}</p><p>${seeText(beat.art)}</p><p lang="kk">${seeText(beat.ex)}</p><p class="small">${seeText(beat.warn)}</p>${nav('path-next','Дальше')}</div>`;
      bindNav('path-next',nextBeat);return;
    }
+   if(beat.k==='core'){
+     const fmtCoreLine=line=>{
+       const text=String(line||'');
+       const m=text.match(/^(.+?)\s+—\s+(.+)$/);
+       if(m&&String(m[1]).trim().length<=90&&!/[.!?]$/.test(String(m[1]).trim()))return seeText(m[1])+' — <em>'+seeText(m[2])+'</em>';
+       return seeText(text);
+     };
+     const blocks=String(beat.b||'').split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
+     const html=blocks.map(block=>{
+       const lines=block.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+       const tableish=lines.length>1&&lines.some(x=>x.includes('|'));
+       if(tableish)return '<pre class="path-core-table">'+lines.map(x=>fmtCoreLine(x)).join('\n')+'</pre>';
+       if(lines.length>1)return '<p>'+lines.map(x=>fmtCoreLine(x)).join('<br>')+'</p>';
+       return '<p>'+fmtCoreLine(block)+'</p>';
+     }).join('');
+     root.innerHTML=`<div class="panel path-paper path-core">${head}<h2>${seeText(beat.t)}</h2><div class="path-core-body">${html}</div>${nav('path-next','Дальше')}</div>`;
+     bindNav('path-next',nextBeat);return;
+   }
    if(beat.k==='why'){
      root.innerHTML=`<div class="panel path-paper">${head}<h2>${seeText(beat.t)}</h2><p>${seeText(beat.b)}</p>${nav('path-next','Дальше')}</div>`;
      bindNav('path-next',nextBeat);return;
@@ -2383,6 +2421,25 @@
      };
      $('#path-rule').onclick=()=>{
        pathPeek=true;
+       const ruleId=(ch.rule_ids||[])[0]||'';
+       const ref=window.LessonV2Runtime&&window.LessonV2Runtime.referenceForRule?window.LessonV2Runtime.referenceForRule(les.id,ruleId):null;
+       if(ref&&ref.body){
+         const fmtRefLine=line=>{
+           const text=String(line||'');
+           const m=text.match(/^(.+?)\s+—\s+(.+)$/);
+           if(m&&String(m[1]).trim().length<=90&&!/[.!?]$/.test(String(m[1]).trim()))return seeText(m[1])+' — <em>'+seeText(m[2])+'</em>';
+           return seeText(text);
+         };
+         const blocks=String(ref.body).split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
+         const html=blocks.map(block=>{
+           const lines=block.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+           const tableish=lines.length>1&&lines.some(x=>x.includes('|'));
+           if(tableish)return '<pre class="path-reference-table">'+lines.map(x=>fmtRefLine(x)).join('\n')+'</pre>';
+           return '<p>'+lines.map(x=>fmtRefLine(x)).join('<br>')+'</p>';
+         }).join('');
+         showPathFb('hinted','<div class="path-reference"><h3>'+seeText(ref.title||'Правило')+'</h3>'+html+'</div>');
+         return;
+       }
        const local=hintLine();
        showPathFb('hinted','<p>'+seeText(local)+'</p>');
      };

@@ -54,7 +54,12 @@ ok('F1 4-2 words track: «Встречалось X из 13 слов», denominat
     if(b.to){arrows++;assert.notEqual(b.to,b.from);}
     assert.ok(!('slot' in b)||String(b.slot).trim(),'F2: empty slot');
   }
-  assert.ok(ex>=290,'F2: all v2 examples still rendered ('+ex+')');
+  // Section 2 (#54) pathLesson uses k=core beats instead of theory ex; non-canon lessons keep ex.
+  assert.ok(ex>=220,'F2: non-canon v2 examples still rendered ('+ex+')');
+  for(const id of ['2-1','2-2','2-3']){
+    const les=rt.GRAMMAR_CHAPTERS.LESSONS.find(l=>l.id===id);
+    assert.ok(les&&les.chapters.length&&les.chapters.every(ch=>(ch.beats||[]).some(b=>b.k==='core')),'F2: '+id+' canonical core beats');
+  }
   const box={};vm.runInNewContext(grab(appSrc,'exampleLine')+grab(appSrc,'exampleNote')+'\nbox.line=exampleLine;box.note=exampleNote;',{box});
   const esc=v=>String(v).replace(/</g,'&lt;');
   assert.equal(box.line({from:'қол'},esc),'қол');

@@ -182,6 +182,26 @@
    }
    return out;
  }
+ function coreSection(c){
+   if(!obj(c))fail('canonical_core section object');
+   return {id:id(c.id,'canonical_core.id'),title:str(c.title,'canonical_core.title',300),body:str(c.body,'canonical_core.body',30000),rule_ids:strings(c.rule_ids||[],'canonical_core.rule_ids',0,20).map(x=>id(x,'rule_id'))};
+ }
+ function reference(r){
+   if(!obj(r))fail('reference object');
+   return {id:id(r.id,'reference.id'),title:str(r.title,'reference.title',240),body:str(r.body,'reference.body',30000),rule_ids:strings(r.rule_ids||[],'reference.rule_ids',0,40).map(x=>id(x,'rule_id')),unlock_rule_ids:strings(r.unlock_rule_ids||r.rule_ids||[],'reference.unlock_rule_ids',0,40).map(x=>id(x,'rule_id'))};
+ }
+ function practicePolicy(p){
+   const x=obj(p)?p:{};
+   return {
+     stages:strings(x.stages||['S1','S2','S3','S4','S5','S6','S7','S8'],'practice_policy.stages',1,16),
+     no_answer_before_attempt:x.no_answer_before_attempt!==false,
+     translation_every_occurrence:x.translation_every_occurrence!==false,
+     repair_min_intervening:Number.isFinite(Number(x.repair_min_intervening))?Math.max(1,Math.min(12,Math.floor(Number(x.repair_min_intervening)))):3,
+     repair_preferred_intervening:Number.isFinite(Number(x.repair_preferred_intervening))?Math.max(1,Math.min(12,Math.floor(Number(x.repair_preferred_intervening)))):4,
+     final_reference_default:x.final_reference_default==='open'?'open':'closed',
+     notes:strings(x.notes||[],'practice_policy.notes',0,40)
+   };
+ }
  function validate(raw){
    if(!obj(raw)||raw.schema_version!==2)fail('нужен schema_version=2');
    const lessonId=str(raw.lesson_id,'lesson_id',30);if(!/^\d+-\d+$/.test(lessonId))fail('lesson_id вида 4-1');
@@ -199,6 +219,9 @@
      vocabulary:list(raw.vocabulary||[],'vocabulary',0,500).map(w=>vocabulary(w,lessonId)),
      original_exercises:list(raw.original_exercises||[],'original_exercises',0,1000).map(q=>exercise(q,lessonId)),
      practice_generators:list(raw.practice_generators||[],'practice_generators',0,50).map(generator),
+     canonical_core:list(raw.canonical_core||[],'canonical_core',0,100).map(coreSection),
+     references:list(raw.references||[],'references',0,50).map(reference),
+     practice_policy:practicePolicy(raw.practice_policy),
      corrections:list(raw.corrections||[],'corrections',0,100).map(correction),
      migrations:list(raw.migrations||[],'migrations',0,50).map(m=>migration(m,raw.content_revision))
    };
@@ -206,6 +229,11 @@
    for(const t of out.theory){
      if(!ruleIds.has(t.rule_id))fail('theory rule_id не найден: '+t.rule_id);
      for(const ref of t.source_refs)if(!sourceIds.has(ref))fail('theory source_ref не найден: '+ref);
+   }
+   for(const c of out.canonical_core)for(const rid of c.rule_ids)if(!ruleIds.has(rid))fail('canonical_core rule_id не найден: '+rid);
+   for(const r of out.references){
+     for(const rid of r.rule_ids)if(!ruleIds.has(rid))fail('reference rule_id не найден: '+rid);
+     for(const rid of r.unlock_rule_ids)if(!ruleIds.has(rid))fail('reference unlock_rule_id не найден: '+rid);
    }
    for(const w of out.vocabulary)for(const ref of w.source_refs)if(!sourceIds.has(ref))fail('vocab source_ref не найден: '+ref);
    for(const q of out.original_exercises){
@@ -216,6 +244,8 @@
    const ids=new Set();
    const take=(x,label)=>{if(ids.has(x))fail('duplicate id '+x+' ('+label+')');ids.add(x);};
    out.rules.forEach(x=>take(x.id,'rule'));out.theory.forEach(x=>take(x.id,'theory'));out.vocabulary.forEach(x=>take(x.id,'vocabulary'));out.original_exercises.forEach(x=>take(x.id,'exercise'));out.practice_generators.forEach(x=>take(x.id,'generator'));out.corrections.forEach(x=>take(x.id,'correction'));
+   const coreIds=new Set();for(const c of out.canonical_core){if(coreIds.has(c.id))fail('duplicate canonical_core id '+c.id);coreIds.add(c.id);}
+   const refIds=new Set();for(const r of out.references){if(refIds.has(r.id))fail('duplicate reference id '+r.id);refIds.add(r.id);}
    out.generated_questions=list(raw.generated_questions||[],'generated_questions',0,5000).map(q=>exercise(q,lessonId));
    out.generated_questions.forEach(x=>{
      take(x.id,'generated question');
