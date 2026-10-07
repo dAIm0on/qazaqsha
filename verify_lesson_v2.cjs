@@ -248,7 +248,7 @@ const appText=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 assert.equal(indexText.includes('src="nonpast-engine.js"'),false);
 assert.equal(swText.includes('"nonpast-engine.js"'),false);
 assert.equal(swText.includes('"compiled-lessons-v2.js"'),true);
-assert.match(swText,/const CACHE='qazaq-offline-live-20261007-section2-1'/);
+assert.match(swText,/const CACHE='qazaq-offline-live-20261007-51-live'/);
 const renderPathStart=appText.indexOf('function renderPath');
 const chapterLookup=appText.indexOf("const ch=G.chapter(les.id,gp.chapterId)",renderPathStart);
 const titleInit=appText.indexOf("const chTitle=Bank?Bank.chapterTitle(ch):ch.title",chapterLookup);

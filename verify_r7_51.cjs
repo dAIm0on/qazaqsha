@@ -10,8 +10,8 @@ const Schema=require('./lesson-v2-schema.js');
   L.sources=S.sources;
   assert.equal(L.lesson_id,'5-1');
   assert.equal(L.content_revision,'5-1.r2');
-  assert.equal(L.status,'draft');
-  assert.equal(L.release&&L.release.approved,false);
+  assert.equal(L.status,'released');
+  assert.equal(L.release&&L.release.approved,true);
   const p=Schema.validate(L);
   assert.equal(p.original_exercises.length,432);
   const ids=p.original_exercises.map(q=>q.id);
@@ -28,7 +28,7 @@ const Schema=require('./lesson-v2-schema.js');
   assert.equal((JSON.stringify(L).match(/\u0301/g)||[]).length,0,'no U+0301');
   assert.ok(!JSON.stringify(L).includes('example.invalid'));
 }
-ok('5-1 bank: 142 micro + 186 productive; draft; no stress/placeholder');
+ok('5-1 bank: 142 micro + 186 productive; released+approved; no stress/placeholder');
 
 {
   const L=JSON.parse(read('lessons/5-1/lesson.json'));
@@ -72,10 +72,10 @@ ok('mastery D: D1+D2+D3 required; D-7 аулада+далада; D-1=A; no reviv
   assert.ok(c.includes('"content_revision": "5-1.r2"')||c.includes('"content_revision":"5-1.r2"'));
   assert.ok(!c.includes('example.invalid'));
   assert.ok(!read('explain-bank-adapter.js').includes("{id:'5-1'}"),'5-1 not in legacy COURSE');
-  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261007-section2-1'"));
+  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261007-51-live'"));
   assert.ok(read('lesson-registry.js').includes('qaV2Preview')&&read('lesson-v2-runtime.js').includes('v2qa=1'));
 }
-ok('compiled r2 + SW r7-51-7 + draft-gate intact');
+ok('compiled r2 + SW 51-live + release-gate intact');
 
 {
   const L=JSON.parse(read('lessons/5-1/lesson.json'));

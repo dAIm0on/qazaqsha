@@ -69315,13 +69315,13 @@ window.LESSON_V2_COMPILED = [
     "title": "Урок 5–1 · Местный падеж",
     "label": "5–1",
     "name": "Местный падеж",
-    "status": "draft",
+    "status": "released",
     "release": {
-      "approved": false,
-      "preview_head": "",
-      "preview_url": "",
-      "approved_at": "",
-      "note": "r7 #66 soft: D7 note + RU stage labels; still draft"
+      "approved": true,
+      "preview_head": "0000000000000000000000000000000000000000",
+      "preview_url": "https://pending.qazaqsha.pages.dev",
+      "approved_at": "2026-10-07T19:07:03+05:00",
+      "note": "можно 5-1 / open fifth block for live v2 path (tip1 placeholder; tip2 stamps real preview)"
     },
     "sources": [
       {
