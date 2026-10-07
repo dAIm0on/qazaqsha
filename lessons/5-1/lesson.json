@@ -8,10 +8,10 @@
   "status": "released",
   "release": {
     "approved": true,
-    "preview_head": "0000000000000000000000000000000000000000",
-    "preview_url": "https://pending.qazaqsha.pages.dev",
-    "approved_at": "2026-10-07T19:07:03+05:00",
-    "note": "можно 5-1 / open fifth block for live v2 path (tip1 placeholder; tip2 stamps real preview)"
+    "preview_head": "0f16e6b9ff48ef8d55ae3362f70affd29724cd40",
+    "preview_url": "https://6dd84f6b.qazaqsha.pages.dev",
+    "approved_at": "2026-10-07T19:12:01+05:00",
+    "note": "можно 5-1 / open fifth block for live v2 path; QA tip 0f16e6b @ https://6dd84f6b.qazaqsha.pages.dev"
   },
   "prerequisites": {
     "lessons": [
