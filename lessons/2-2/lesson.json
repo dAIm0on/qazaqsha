@@ -8,10 +8,10 @@
   "status": "released",
   "release": {
     "approved": true,
-    "preview_head": "3e7b7290459449aa26460254f9fe5c74a6b52319",
-    "preview_url": "https://ed422447.qazaqsha.pages.dev",
-    "approved_at": "2026-10-07T15:29:25+05:00",
-    "note": "Section 2 canon #54 release for live v2 path (no v2qa); tip1 provisional preview, tip2 stamps CF tip"
+    "preview_head": "2f1c0649d40f610827146691f7fd78ca3922c052",
+    "preview_url": "https://13b2a3ce.qazaqsha.pages.dev",
+    "approved_at": "2026-10-07T15:36:14+05:00",
+    "note": "Section 2 canon #54 → live path; QA tip 2f1c064 @ https://13b2a3ce.qazaqsha.pages.dev"
   },
   "prerequisites": {
     "lessons": [
@@ -3224,7 +3224,7 @@
           ]
         }
       ],
-      "explanation": "После М у біз звонкое бі́з: Біз мұғалімбіз. — Мы учителя.",
+      "explanation": "После М у біз звонкое біз: Біз мұғалімбіз. — Мы учителя.",
       "source_item": "wb:2-2:5-1",
       "source_refs": [
         "school-exercises"
