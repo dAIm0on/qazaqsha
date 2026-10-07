@@ -51,7 +51,7 @@ ok('3-1 limitations line gone; 32j1→practice; 42ct→choice');
     if(t.includes('\u0301'))hits.push(id+':'+ (t.match(/\u0301/g)||[]).length);
   }
   assert.equal(hits.length,0,'stress leftovers '+hits.join(','));
-  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261006-r7-51-7'"));
+  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261007-section2-1'"));
 }
 ok('no U+0301 in 3-1…4-2; SW r7-51-7');
 

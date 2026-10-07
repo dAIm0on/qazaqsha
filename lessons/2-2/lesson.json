@@ -5,13 +5,13 @@
   "title": "Урок 2–2 · Біз, сендер, сіздер; прилагательное",
   "label": "2–2",
   "name": "Біз, сендер, сіздер; прилагательное",
-  "status": "reviewed",
+  "status": "released",
   "release": {
-    "approved": false,
-    "preview_head": "",
-    "preview_url": "",
-    "approved_at": "",
-    "note": "2026-10-02 LESSONS FIX canonical core + S1-S8 practice + contextual references. Pending preview QA; no merge/deploy."
+    "approved": true,
+    "preview_head": "3e7b7290459449aa26460254f9fe5c74a6b52319",
+    "preview_url": "https://ed422447.qazaqsha.pages.dev",
+    "approved_at": "2026-10-07T15:29:25+05:00",
+    "note": "Section 2 canon #54 release for live v2 path (no v2qa); tip1 provisional preview, tip2 stamps CF tip"
   },
   "prerequisites": {
     "lessons": [

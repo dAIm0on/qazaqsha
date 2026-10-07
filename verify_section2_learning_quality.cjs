@@ -85,8 +85,14 @@ for(const [lessonId,e] of Object.entries(expected)){
   const p=Schema.validate(compiled);
 
   assert.equal(p.content_revision,e.revision,lessonId+' revision');
-  assert.equal(p.status,'reviewed',lessonId+' must stay reviewed until black-box approval');
-  assert.equal(p.release.approved,false,lessonId+' must not release before black-box approval');
+  assert.ok(p.status==='reviewed'||p.status==='released',lessonId+' status must be reviewed or released');
+  if(p.status==='released'){
+    assert.equal(p.release.approved,true,lessonId+' released requires approved');
+    assert.match(p.release.preview_head||'',/^[0-9a-f]{40}$/i,lessonId+' released requires preview_head SHA40');
+    assert.match(p.release.preview_url||'',/^https:\/\//,lessonId+' released requires https preview_url');
+  }else{
+    assert.equal(p.release.approved,false,lessonId+' reviewed must not be approved yet');
+  }
   assert.deepEqual(p.prerequisites.lessons,e.prereq,lessonId+' prerequisite chain');
   assert.equal(p.canonical_core.length,e.core,lessonId+' canonical core count');
   assert.equal(p.references.length,e.refs,lessonId+' reference count');
