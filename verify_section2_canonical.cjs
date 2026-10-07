@@ -13,9 +13,9 @@ const all=JSON.parse(compiledJson);
 assert.ok(all.length>=11,'compiled snapshot unexpectedly shrank');
 
 const expected={
-  '2-1':{revision:'2-1.r2',core:10,refs:4,depends:['1-3']},
-  '2-2':{revision:'2-2.r2',core:11,refs:6,depends:['2-1']},
-  '2-3':{revision:'2-3.r2',core:15,refs:7,depends:['2-2']}
+  '2-1':{revision:'2-1.r3',core:10,refs:4,depends:['1-3']},
+  '2-2':{revision:'2-2.r3',core:11,refs:6,depends:['2-1']},
+  '2-3':{revision:'2-3.r3',core:15,refs:7,depends:['2-2']}
 };
 const packs={};
 for(const [id,e] of Object.entries(expected)){
@@ -39,6 +39,19 @@ for(const [id,e] of Object.entries(expected)){
   for(const r of p.references){
     assert.ok(r.body.length>100,id+' empty reference '+r.id);
     for(const rid of r.rule_ids)assert.ok(p.rules.some(x=>x.id===rid),id+' unknown ref rule '+rid);
+  }
+}
+
+
+// P0 author/product leak scan: learner-facing canonical_core bodies must not carry editorial meta.
+const AUTHOR_LEAK=/Статус документа|канонический CORE|должен открываться|открывается справочник|prerequisite|нельзя сокращать|Источник курса прямо требует|^УРОК 2–/m;
+for(const [id,p] of Object.entries(packs)){
+  for(const c of p.canonical_core){
+    const hit=String(c.body||'').match(AUTHOR_LEAK);
+    assert.equal(hit,null,id+' author/product leak in '+c.id+': '+(hit&&hit[0]));
+    const title=String(c.title||'').trim();
+    const firstLine=String(c.body||'').split(/\n/)[0].trim();
+    assert.notEqual(firstLine,title,id+' duplicates title inside body of '+c.id);
   }
 }
 
@@ -90,7 +103,7 @@ assert.match(app,/answerTokens[\s\S]{0,900}safe=/,'practice reference must filte
 
 const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.match(sw,/compiled-lessons-v2\.js/,'service worker must cache compiled lessons');
-assert.match(sw,/section2-canonical|section2-1|20261007-section2|20261002|20261007-51-live|51-live/i,'service worker cache version must be bumped for section 2');
+assert.match(sw,/section2-canonical|section2-1|section2-2|20261007-section2|20261002|20261007-51-live|51-live|s2-core-clean/i,'service worker cache version must be bumped for section 2');
 
 console.log('SECTION2_CANONICAL_VERIFY_OK',{
   lessons:Object.keys(expected),

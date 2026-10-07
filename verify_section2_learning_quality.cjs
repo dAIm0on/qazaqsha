@@ -12,15 +12,15 @@ const all=JSON.parse(compiledJson);
 
 const expected={
   '2-1':{
-    revision:'2-1.r2',core:10,refs:4,canonicalPractice:79,prereq:['1-3'],
+    revision:'2-1.r3',core:10,refs:4,canonicalPractice:79,prereq:['1-3'],
     anchors:[/основа/i,/П\s*[\/,]\s*Б\s*[\/,]\s*М/i,/емес/i,/ба\s*\/\s*бе/i,/BatylBol/i]
   },
   '2-2':{
-    revision:'2-2.r2',core:11,refs:6,canonicalPractice:83,prereq:['2-1'],
+    revision:'2-2.r3',core:11,refs:6,canonicalPractice:83,prereq:['2-1'],
     anchors:[/біз/i,/сендер/i,/сіздер/i,/сыңдар/i,/сіңдер/i,/сыздар/i,/сіздер/i,/BatylBol/i]
   },
   '2-3':{
-    revision:'2-3.r2',core:15,refs:7,canonicalPractice:88,prereq:['2-2'],
+    revision:'2-3.r3',core:15,refs:7,canonicalPractice:88,prereq:['2-2'],
     anchors:[/олар/i,/ыншы/i,/інші/i,/ншы/i,/нші/i,/жиырмасыншы/i,/қырқыншы/i,/па\s*\/\s*пе/i,/ба\s*\/\s*бе/i,/ма\s*\/\s*ме/i,/BatylBol/i]
   }
 };

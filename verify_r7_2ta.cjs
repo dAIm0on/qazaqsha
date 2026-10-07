@@ -25,7 +25,7 @@ ok('question prompt is not line-clamped');
   assert.ok(prog.includes('if(mergedPath.contentRevision)out.grammarPath.contentRevision=mergedPath.contentRevision'));
   // content_revision bumped once on changed lessons
   const j=id=>JSON.parse(read('lessons/'+id+'/lesson.json'));
-  assert.equal(j('1-2').content_revision,'1-2.r2');assert.equal(j('2-1').content_revision,'2-1.r2');assert.equal(j('2-2').content_revision,'2-2.r2');
+  assert.equal(j('1-2').content_revision,'1-2.r2');assert.equal(j('2-1').content_revision,'2-1.r3');assert.equal(j('2-2').content_revision,'2-2.r3');
   assert.equal(j('1-1').content_revision,'1-1.r2'); // unchanged lesson not bumped
 }
 ok('path.contentRevision kept across F5 (progress migrate + persistLessonPath); content_revision bumped once per changed lesson');
@@ -54,7 +54,7 @@ ok('path.contentRevision kept across F5 (progress migrate + persistLessonPath); 
 ok('no U+0301 in lesson-pack-1/2*, app.js person panel, grammar-paths (T15); three біз sites clean');
 
 {
-  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261007-51-live'"));
+  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261007-section2-2'"));
 }
 ok('SW r7-51-7');
 console.log('verify_r7_2ta: '+passed+' checks passed');
