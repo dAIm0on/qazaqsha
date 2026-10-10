@@ -2,7 +2,17 @@
   'use strict';
   const scheduler=typeof module!=='undefined'&&module.exports?require('./scheduler.js'):root.ReviewScheduler;
   const config=typeof module!=='undefined'&&module.exports?require('./config.js'):root.TRAINER_CONFIG;
+  // Pure function; hot in lesson install and Knowledge.register (per word × per card). Memoize string inputs.
+  const normalizeMemo=new Map();
   function normalize(value,kind='text'){
+    if(typeof value!=='string')return normalizeRaw(value,kind);
+    const key=kind+'\u0000'+value,hit=normalizeMemo.get(key);
+    if(hit!==undefined)return hit;
+    const out=normalizeRaw(value,kind);
+    if(normalizeMemo.size>=50000)normalizeMemo.clear();
+    normalizeMemo.set(key,out);return out;
+  }
+  function normalizeRaw(value,kind){
     let s=String(value??'').normalize('NFC').toLocaleLowerCase('ru').trim();
     if(kind==='syllables')return s.replace(/[\s\u2010-\u2015/·.]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
     if(kind==='number-text')return s.replace(/\s+/g,'');

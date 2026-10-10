@@ -700,6 +700,22 @@
      if(id)ensureV2(id);
    }catch(e){}
  }
+ // §4.3: the tap on «Новые слова» must not install the whole course. After start-up the course is installed
+ // lesson by lesson in idle time, in the same order as the ensureV2 prefix, then prepareVocabPool() runs once.
+ // A tap before the warm-up ends finishes the remaining lessons synchronously, exactly as before.
+ function warmVocabPool(){
+   if(vocabPoolReady||typeof window.addEventListener!=='function')return;
+   const ids=(window.LESSON_V2_COMPILED||[]).map(raw=>raw&&raw.lesson_id).filter(Boolean);
+   const later=cb=>window.requestIdleCallback?window.requestIdleCallback(cb,{timeout:1500}):setTimeout(cb,30);
+   let i=0;
+   const step=()=>{
+     if(vocabPoolReady)return;
+     if(i<ids.length){ensureV2(ids[i++]);later(step);return;}
+     prepareVocabPool();
+   };
+   const start=()=>later(step);
+   if(document.readyState==='complete')start();else window.addEventListener('load',start,{once:true});
+ }
  function mustCourseRank(q){
    const lessons=window.LESSON_V2_COMPILED||[];
    const li=lessons.findIndex(raw=>raw&&raw.lesson_id===q.lessonId);
@@ -3429,6 +3445,7 @@
  }catch(e){}
  if(savedSession&&savedSession.mode==='lesson'&&String(savedSession.activeLesson||'').startsWith(HW_WORDS_PREFIX))homeworkWordsTrack(String(savedSession.activeLesson).slice(HW_WORDS_PREFIX.length));
  if(savedSession&&savedSession.mode==='words'&&savedSession.trainerReturn==='vocab:must'&&typeof prepareVocabPool==='function')prepareVocabPool();
+ if(typeof warmVocabPool==='function')warmVocabPool();
  const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','course','phrase','transfer','contrast','numbers','remediation','words','exam','homework','chunks'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){
    variants=savedSession.variants||{};

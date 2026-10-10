@@ -70,8 +70,16 @@
    });
    return {id:p.lesson_id,title:p.name||p.title,chapters};
  }
+ // Append-only id index of course.questions (rebuilt if the array shrinks). Replaces an O(n) scan per added card.
+ const questionIdIndex=new WeakMap();
+ function hasQuestionId(course,id){
+   const qs=course.questions||[];let e=questionIdIndex.get(qs);
+   if(!e||e.len>qs.length){e={len:0,ids:new Set()};questionIdIndex.set(qs,e);}
+   for(;e.len<qs.length;e.len++){const x=qs[e.len];if(x)e.ids.add(x.id);}
+   return e.ids.has(id);
+ }
  function addQuestion(course,catalog,q){
-   if(course.questions.some(x=>x.id===q.id))return;
+   if(hasQuestionId(course,q.id))return;
    const row=root.Canonical?root.Canonical.applyQuestion(questionCopy(q,q.lessonId)):questionCopy(q,q.lessonId);
    course.questions.push(row);
    for(const wid of row.vocabIds||[]){const w=catalog.words.find(x=>x.id===wid);if(w&&!w.card_ids.includes(row.id))w.card_ids.push(row.id);}
@@ -108,7 +116,7 @@
      if(taken&&!hwOwn)continue;
      const slug=String(v.id).split(':').at(-1);
      let base='v2-'+p.lesson_id+'-vocab-'+slug;
-     const exists=id=>ownIds.has(id)||(course.questions||[]).some(q=>q&&q.id===id);
+     const exists=id=>ownIds.has(id)||hasQuestionId(course,id);
      if(hwOwn&&[base+'-ru',base+'-kk',base+'-ru-1',base+'-kk-set'].some(exists))base='v2-'+p.lesson_id+'-hw-'+slug;
      const roleOf=hwOwn?'must':(v.role==='target'?'must':'used');
      const rows=[];

@@ -46,13 +46,47 @@
    for(const q of pool||[])if(cardHasHistory(state,q)||lemmaHasHistory(state,pool,core,lemmaKey(core,q)))return true;
    return false;
  }
+ // One pass over events/skills/pool per planPortion call. Same answers as cardHasHistory /
+ // lemmaHasHistory / poolHasAnswerHistory, without rescanning the pool and events per lemma.
+ function historyIndex(state,pool,core){
+   const answered=new Set();
+   for(const e of state.events||[])if(e&&e.type==='answer')answered.add(e.card_id);
+   const skillLemmas=new Set();
+   if(state.skills)for(const [k,sk] of Object.entries(state.skills)){
+     if(!(sk&&Number(sk.review_count)>0))continue;
+     skillLemmas.add(k);
+     for(let i=k.indexOf('::');i>=0;i=k.indexOf('::',i+1))skillLemmas.add(k.slice(0,i));
+   }
+   const lemOf=new Map(),byLemma=new Map(),cardMemo=new Map(),lemmaMemo=new Map();
+   const lk=q=>{let v=lemOf.get(q);if(v===undefined){v=lemmaKey(core,q);lemOf.set(q,v);}return v;};
+   for(const q of pool||[]){const l=lk(q);let list=byLemma.get(l);if(!list)byLemma.set(l,list=[]);list.push(q);}
+   const card=q=>{
+     if(!q)return false;
+     let v=cardMemo.get(q);if(v!==undefined)return v;
+     v=false;
+     const rec=state.records&&state.records[q.id];
+     if(rec&&Number(rec.review_count)>0)v=true;
+     if(!v)for(const b of q.skillBindings||[]){const sk=state.skills&&state.skills[skillKey(b)];if(sk&&Number(sk.review_count)>0){v=true;break;}}
+     if(!v)v=answered.has(q.id);
+     cardMemo.set(q,v);return v;
+   };
+   const lemma=l=>{
+     if(!l)return false;
+     let v=lemmaMemo.get(l);if(v!==undefined)return v;
+     v=skillLemmas.has(l)||(byLemma.get(l)||[]).some(card);
+     lemmaMemo.set(l,v);return v;
+   };
+   const any=()=>(pool||[]).some(q=>card(q)||lemma(lk(q)));
+   return {lk,card,lemma,any};
+ }
  function planPortion(pool,state,cfg,core,now,opts){
    opts=opts||{};
    pool=(pool||[]).filter(q=>q&&q.wordRole!=='used');
+   const H=historyIndex(state||{},pool,core),lk=H.lk;
    const answerBudget=cfg&&cfg.vocab&&Number(cfg.vocab.answerBudget)||10;
    const sessionNewCap=cfg&&cfg.vocab&&Number(cfg.vocab.sessionNewCap)||2;
    const records=(state&&state.records)||{};
-   const clean=!poolHasAnswerHistory(state||{},pool,core);
+   const clean=!H.any();
    const rankOf=typeof opts.rank==='function'?opts.rank:null;
    const ordered=rankOf?pool.slice().sort((a,b)=>{
      const d=(Number(rankOf(a))||0)-(Number(rankOf(b))||0);
@@ -61,53 +95,53 @@
    }):pool.slice();
    const seen=new Set(),newCards=[];
    for(const q of ordered){
-     const lem=lemmaKey(core,q);
+     const lem=lk(q);
      if(seen.has(lem))continue;
      seen.add(lem);
-     if(lemmaHasHistory(state||{},pool,core,lem))continue;
+     if(H.lemma(lem))continue;
      newCards.push(q);
    }
    const nNew=clean?Math.min(3,newCards.length):Math.min(sessionNewCap,newCards.length);
    const picked=newCards.slice(0,nNew);
-   const newLemmas=picked.map(q=>lemmaKey(core,q));
+   const newLemmas=picked.map(q=>lk(q));
    const newSet=new Set(newLemmas);
    const otherCap=Math.max(0,answerBudget-3*nNew);
    const limit=nNew+otherCap;
    const pickedIds=new Set(picked.map(q=>q.id));
-   const bucket=pool.filter(q=>pickedIds.has(q.id)||cardHasHistory(state||{},q));
+   const bucket=pool.filter(q=>pickedIds.has(q.id)||H.card(q));
    let out=[];
    if(core&&typeof core.chooseShortSession==='function'){
      out=core.chooseShortSession(bucket,records,now,limit,{newLimit:nNew,isNew:q=>pickedIds.has(q.id)});
    }else{
-     const others=pool.filter(q=>!newSet.has(lemmaKey(core,q))&&cardHasHistory(state||{},q));
+     const others=pool.filter(q=>!newSet.has(lk(q))&&H.card(q));
      const errors=others.filter(q=>records[q.id]&&records[q.id].needsReview);
      const due=others.filter(q=>records[q.id]&&!records[q.id].needsReview&&core.isDue(records[q.id],now)).sort((a,b)=>(Number(records[a.id].dueAt)||0)-(Number(records[b.id].dueAt)||0));
      const learning=others.filter(q=>{const r=records[q.id];return r&&!r.needsReview&&!core.isDue(r,now)&&(Number(r.streak)||0)<2;});
      const review=[];const reviewSeen=new Set();
-     for(const q of [...errors,...due]){const k=lemmaKey(core,q);if(reviewSeen.has(k))continue;reviewSeen.add(k);review.push(q);}
+     for(const q of [...errors,...due]){const k=lk(q);if(reviewSeen.has(k))continue;reviewSeen.add(k);review.push(q);}
      const used=new Set();
-     const take=(list,cap)=>{let n=0;for(const q of list){if(out.length>=limit||n>=cap)break;const k=lemmaKey(core,q);if(used.has(k))continue;used.add(k);out.push(q);n++;}};
+     const take=(list,cap)=>{let n=0;for(const q of list){if(out.length>=limit||n>=cap)break;const k=lk(q);if(used.has(k))continue;used.add(k);out.push(q);n++;}};
      take(review,Math.max(0,limit-nNew));
      take(picked,nNew);
      take(learning,limit);
    }
    const review=[],learning=[];
    for(const q of out){
-     if(newSet.has(lemmaKey(core,q)))continue;
+     if(newSet.has(lk(q)))continue;
      const r=records[q.id];
      if(r&&(r.needsReview||(core.isDue&&core.isDue(r,now))))review.push(q);
      else learning.push(q);
    }
    out=review.concat(picked,learning);
-   const usedLem=new Set(out.map(q=>lemmaKey(core,q)));
-   let room=Math.max(0,otherCap-out.filter(q=>!newSet.has(lemmaKey(core,q))).length);
+   const usedLem=new Set(out.map(q=>lk(q)));
+   let room=Math.max(0,otherCap-out.filter(q=>!newSet.has(lk(q))).length);
    if(room>0&&out.length<limit){
      const retr=typeof opts.retrievability==='function'?opts.retrievability:()=>null;
      const seenF=new Set(),filler=[];
      for(const q of pool){
-       const lem=lemmaKey(core,q);
+       const lem=lk(q);
        if(seenF.has(lem)||usedLem.has(lem)||newSet.has(lem))continue;
-       if(!lemmaHasHistory(state||{},pool,core,lem))continue;
+       if(!H.lemma(lem))continue;
        seenF.add(lem);filler.push(q);
      }
      filler.sort((a,b)=>{

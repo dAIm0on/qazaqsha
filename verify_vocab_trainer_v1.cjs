@@ -539,7 +539,7 @@ const held=contrastQueue(true);
 assert.ok(!held.queue.includes(held.other));
 assert.deepEqual(held.queue,['v2-1-2-vocab-togyz-kk','a','b','c','d','e']);
 
-function bootMust(first){
+function bootMust(first,how){
   // curriculum.js installs LESSON_PACKS when it loads. A shorter file list never sees lesson-pack-*.js,
   // so those homework cards stay out and v2 `taken` builds a different, smaller must pool.
   const window={
@@ -584,16 +584,18 @@ function bootMust(first){
     'const idsOf=list=>{const out=[];for(const q of list)if(q&&q.id!=null)out.push(String(q.id));out.sort();return out;};',
     'let partial=[];',
     'if('+JSON.stringify(first)+'){ensureV2('+JSON.stringify(first)+');partial=idsOf(mustPool());}',
+    how==='warm'?"document.readyState='complete';window.requestIdleCallback=function(cb){cb();return 1;};warmVocabPool();":'',
+    how==='early'?"document.readyState='complete';var __idle=0;window.requestIdleCallback=function(cb){if(__idle++>=2)return 0;cb();return 1;};warmVocabPool();":'',
     'prepareVocabPool();',
     'const pool=mustPool();',
     'const ids=idsOf(pool);',
     'const lemmas=new Set(pool.map(q=>window.TrainerCore.lemmaKey(q))).size;',
     'const vocabIds=new Set(pool.flatMap(q=>q.vocabIds||[])).size;',
     'const foreign=pool.filter(q=>!q||q.topic!=="vocab"||q.wordRole!=="must").length;',
-    '({partial,ids,lemmas,vocabIds,foreign});'
+    '({partial,ids,lemmas,vocabIds,foreign,ready:vocabPoolReady});'
   ].join('\n');
   const result=vm.runInContext(body,ctx,{filename:'product-must-pool.js'});
-  return {partial:[...result.partial],ids:[...result.ids],lemmas:result.lemmas,vocabIds:result.vocabIds,foreign:result.foreign};
+  return {partial:[...result.partial],ids:[...result.ids],lemmas:result.lemmas,vocabIds:result.vocabIds,foreign:result.foreign,ready:result.ready};
 }
 const freshPool=bootMust(null);
 const after32=bootMust('3-2');
@@ -608,5 +610,13 @@ assert.equal(freshPool.foreign,0);
 assert.ok(freshPool.lemmas>0&&freshPool.lemmas<=freshPool.ids.length);
 assert.ok(freshPool.ids.every(id=>id));
 console.log('must pool from product path cards',freshPool.ids.length,'lemmaKey',freshPool.lemmas,'vocabIds',freshPool.vocabIds);
+const warmed=bootMust(null,'warm');
+const earlyTap=bootMust(null,'early');
+assert.equal(freshPool.ready,true);
+assert.equal(warmed.ready,true);
+assert.equal(earlyTap.ready,true);
+assert.deepEqual(warmed.ids,freshPool.ids);
+assert.deepEqual(earlyTap.ids,freshPool.ids);
+console.log('warm pool matches sync',warmed.ids.length,'early matches',earlyTap.ids.length);
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');
