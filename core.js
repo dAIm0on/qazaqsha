@@ -297,6 +297,20 @@
   // r7 X minor: Russian count forms. forms = [1 / 21, 2–4 / 22–24, 5–20 / 0 / 25…]: ruPlural(4,['карточка','карточки','карточек']).
   function ruPlural(n,forms){const k=Math.abs(Math.trunc(Number(n)||0)),m10=k%10,m100=k%100;return forms[m10===1&&m100!==11?0:m10>=2&&m10<=4&&(m100<12||m100>14)?1:2];}
   function ruCount(n,forms){return n+' '+ruPlural(n,forms);}
+  // §2.1 answer language by card-id role, not by title. Unknown stays strict.
+  function answerLang(q,i){
+    const id=String(q&&q.id||'');
+    if(/(?:^|-)ru(?:-\d+)?$/.test(id))return 'ru';
+    if(/(?:^|-)kk(?:-rev|-set|-form-\d+)?$/.test(id))return 'kk';
+    if(/^learn-word-\d+$/.test(id))return 'kk';
+    if(/^bank-\d+-kk$/.test(id))return 'kk';
+    if(/^bank-\d+-ru$/.test(id))return 'ru';
+    const fields=q&&q.fields||[];
+    const field=fields[i==null?0:i];
+    const role=field&&(field.answerLang||field.lang);
+    if(role==='kk'||role==='ru')return role;
+    return 'unknown';
+  }
   // r7 ux59 #6: «Шаг N из M» of a practice session. M = distinct cards of the session; a card that comes back to the
   // queue (learning re-insert) does not grow M and does not move N (18 → 19 → 20 before). Same as the bank counter.
   function sessionStep(queue,position,answered){
@@ -305,6 +319,6 @@
     const reached=new Set(q.slice(0,pos+1)).size;
     return {step:Math.max(1,Math.min(reached,total)),total};
   }
-  const api={ruPlural,ruCount,sessionStep,normalize,evaluate,migrateRecord,updateRecord,isDue,isDay0Learning,pauseReady,scheduleRepeat,chooseShortSession,lemmaKey,dedupeByLemma,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY,shareVocabAlts};
+  const api={ruPlural,ruCount,sessionStep,normalize,evaluate,migrateRecord,updateRecord,isDue,isDay0Learning,pauseReady,scheduleRepeat,chooseShortSession,lemmaKey,dedupeByLemma,answerLang,spaceRecent,blockReviewQueue,numberParts,numberToKazakh,numberValue,numberMatch,tokens,DAY,shareVocabAlts};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TrainerCore=api;
 })(typeof window!=='undefined'?window:globalThis);
