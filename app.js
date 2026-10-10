@@ -692,7 +692,13 @@
  function prepareVocabPool(){
    if(vocabPoolReady)return;
    vocabPoolReady=true;
-   try{for(const raw of window.LESSON_V2_COMPILED||[]){const id=raw&&raw.lesson_id;if(id)ensureV2(id);}}catch(e){}
+   // Last lesson's prefix is the whole course. One ensureV2 syncs byId, hydrate and answerIndex once.
+   try{
+     const list=window.LESSON_V2_COMPILED||[];
+     const last=list.length?list[list.length-1]:null;
+     const id=last&&last.lesson_id;
+     if(id)ensureV2(id);
+   }catch(e){}
  }
  function mustCourseRank(q){
    const lessons=window.LESSON_V2_COMPILED||[];
@@ -1984,7 +1990,7 @@
      /* vocab:must return is planned once inside commitFirst; do not write a second FSRS row here */
    }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2&&lemmaSessionCount(q.id)<(cfg.schedule.learningSessionBlinds||3))core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0,lemmaAppearCap:cfg.schedule.learningSessionBlinds||3});
    const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);
-   if(!stageContext&&!bankRun&&mate&&!result.correct&&!hinted){
+   if(!stageContext&&!bankRun&&!isVocabMustTrainer()&&mate&&!result.correct&&!hinted){
      const other=questions.find(x=>x.id!==q.id&&window.MemoryPolicy.contrastSide(x)?.pair===mate.pair&&window.MemoryPolicy.contrastSide(x)?.side!==mate.side);
      if(other&&!queue.slice(position+1).includes(other.id))queue.splice(Math.min(position+4,queue.length),0,other.id);
    }

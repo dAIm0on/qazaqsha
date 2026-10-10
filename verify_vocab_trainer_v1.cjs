@@ -232,6 +232,10 @@ assert.ok(beginSrc.indexOf('prepareVocabPool()')<beginSrc.indexOf('mustPool()'))
 assert.ok(!beginSrc.includes('loaded.length<3'));
 const ensureSrc=app.slice(app.indexOf('function ensureV2'),app.indexOf('function openPathLesson'));
 assert.ok(ensureSrc.includes('slice(0,idx+1)'));
+const poolSrc=app.slice(app.indexOf('function prepareVocabPool'),app.indexOf('function mustCourseRank'));
+assert.ok(poolSrc.includes('ensureV2(id)'));
+assert.ok(!/for\s*\(const raw of window\.LESSON_V2_COMPILED/.test(poolSrc));
+assert.ok(check.includes('!isVocabMustTrainer()&&mate&&!result.correct&&!hinted'));
 const indexHtml=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
 const dashboard=fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8');
 const personal=fs.readFileSync(path.join(__dirname,'personal-trainers.js'),'utf8');
@@ -513,40 +517,83 @@ for(let portion=0;portion<20;portion++){
 assert.equal(runEmpty,0);
 console.log('20 portions missed old',missedOld.join(',')||'(none)');
 
+const contrastBlock=app.slice(app.indexOf('const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);'),app.indexOf('const deferred='));
+function contrastQueue(isMust){
+  const policy=require('./memory-policy.js');
+  const q={id:'v2-1-2-vocab-togyz-kk',topic:'vocab',wordRole:'must',title:'Переведи на русский',stimulus:'тоғыз',fields:[{answers:['девять']}]};
+  const other={id:'hw2-19-kk',topic:'vocab',wordRole:'',title:'Переведи на русский',stimulus:'тоқсан',fields:[{answers:['девяносто']}]};
+  const fillers=['a','b','c','d','e'].map(id=>({id,topic:'vocab',wordRole:'must',stimulus:id,fields:[{answers:[id]}]}));
+  const questions=[q,other,...fillers];
+  const mustIds=new Set([q.id,...fillers.map(x=>x.id)]);
+  let queue=[q.id,...fillers.map(x=>x.id)];
+  const position=0,result={correct:false},hinted=false,stageContext=null,bankRun=false;
+  const window={MemoryPolicy:policy};
+  function isVocabMustTrainer(){return isMust;}
+  eval(contrastBlock);
+  return {queue,mustIds,other:other.id};
+}
+const leaked=contrastQueue(false);
+assert.ok(leaked.queue.includes(leaked.other));
+assert.ok(!leaked.mustIds.has(leaked.other));
+const held=contrastQueue(true);
+assert.ok(!held.queue.includes(held.other));
+assert.deepEqual(held.queue,['v2-1-2-vocab-togyz-kk','a','b','c','d','e']);
+
 function bootMust(first){
+  // curriculum.js installs LESSON_PACKS when it loads. A shorter file list never sees lesson-pack-*.js,
+  // so those homework cards stay out and v2 `taken` builds a different, smaller must pool.
   const window={
-    document:{querySelector(){return null;},querySelectorAll(){return [];},addEventListener(){},createElement(){return {style:{},classList:{add(){},remove(){},toggle(){}},append(){},setAttribute(){},appendChild(){},addEventListener(){}};},documentElement:{classList:{contains(){return false;},add(){},remove(){}}},body:{appendChild(){},addEventListener(){}}},
-    localStorage:{getItem(){return null;},setItem(){},removeItem(){}},
+    document:{documentElement:{getAttribute(){return null;},classList:{contains(){return false;},add(){},remove(){}}},querySelector(){return null;},querySelectorAll(){return [];},getElementById(){return null;},addEventListener(){},body:{appendChild(){}},head:{},createElement(){return {style:{},classList:{add(){},remove(){},toggle(){}},setAttribute(){},appendChild(){},addEventListener(){}};}},
+    localStorage:{_d:Object.create(null),getItem(k){return this._d[k]??null;},setItem(k,v){this._d[k]=String(v);},removeItem(k){delete this._d[k];}},
     sessionStorage:{getItem(){return null;},setItem(){},removeItem(){}},
     navigator:{userAgent:'node',language:'ru'},
-    location:{href:'http://127.0.0.1/',origin:'http://127.0.0.1'},
-    console,setTimeout,clearTimeout,Date,Math,JSON,Object,Array,Map,Set,WeakMap,WeakSet,Promise,Number,String,Boolean,RegExp,Error,parseInt,parseFloat,isNaN,isFinite,URL,URLSearchParams,Intl,
+    location:{hostname:'localhost',href:'http://127.0.0.1/',origin:'http://127.0.0.1',protocol:'http:'},
+    matchMedia(){return {matches:false,addListener(){},addEventListener(){}};},
+    console,setTimeout,clearTimeout,Date,Math,JSON,Object,Array,Map,Set,WeakMap,WeakSet,Promise,Number,String,Boolean,RegExp,Error,parseInt,parseFloat,isNaN,isFinite,Infinity,NaN,undefined,URL,URLSearchParams,Intl,TextEncoder,TextDecoder,
     performance:{now(){return Date.now();}},requestAnimationFrame(){return 0;},cancelAnimationFrame(){},addEventListener(){},removeEventListener(){}
   };
   window.window=window;window.globalThis=window;window.self=window;
   const ctx=vm.createContext(window);
-  const files=['data.js','config.js','fsrs-vendor.js','scheduler.js','core.js','canonical.js','curriculum-gate.js','response-kinds.js','package-schema.js','lesson-v2-schema.js','compiled-lessons-v2.js','diagnostics.js','lesson31-pack.js','lesson31-homework.js','lesson32-pack.js','lesson32-homework.js','lesson33-pack.js','lesson33-homework.js','learning-data.js','lesson-registry.js','word-bank.js','curriculum.js','grammar-paths.js','grammar-chapters.js','lesson-v2-runtime.js','vocab-tracks.js'];
+  const skip=new Set(['app.js','pwa.js','design-ui.js','cloud.js','firebase-config.js','dashboard.js','morph-ui.js','morph-nav2.js','personal-trainers.js','free-practice-view.js','tutor-ui.js']);
+  const files=fs.readFileSync(path.join(__dirname,'index.html'),'utf8').match(/src="([^"]+\.js)"/g).map(s=>s.slice(5,-1)).filter(f=>!skip.has(f));
   for(const f of files)vm.runInContext(fs.readFileSync(path.join(__dirname,f),'utf8'),ctx,{filename:f});
-  const ensure=id=>{
-    const list=window.LESSON_V2_COMPILED||[];
-    const idx=list.findIndex(raw=>raw&&raw.lesson_id===id);
-    const ids=idx<0?[id]:list.slice(0,idx+1).map(raw=>raw&&raw.lesson_id).filter(Boolean);
-    for(const lessonId of ids){try{window.LessonV2Runtime.ensure(lessonId);}catch(e){}}
-  };
-  const idsOf=list=>{
-    const out=[];
-    for(const q of list)if(q&&q.id!=null)out.push(String(q.id));
-    out.sort();
-    return out;
-  };
-  if(first)ensure(first);
-  const partial=idsOf((window.COURSE.questions||[]).filter(q=>q&&q.topic==='vocab'&&q.wordRole==='must'));
-  for(const raw of window.LESSON_V2_COMPILED||[])if(raw&&raw.lesson_id)ensure(raw.lesson_id);
-  const questions=window.COURSE.questions||[];
-  const must=questions.filter(q=>q&&q.topic==='vocab'&&q.wordRole==='must');
-  const usedIds=new Set(idsOf(questions.filter(q=>q&&q.topic==='vocab'&&q.wordRole&&q.wordRole!=='must')));
-  const ids=idsOf(must);
-  return {partial,ids,lemmas:new Set(must.map(q=>core.lemmaKey(q))).size,foreign:ids.filter(id=>usedIds.has(id)).length};
+  const startupStart=app.indexOf("try{if(!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-1')))window.Lesson31Pack?.install?.(course,window.CURRICULUM);}");
+  const startupEnd=app.indexOf('const questions=course.questions;');
+  assert.ok(startupStart>0&&startupEnd>startupStart);
+  const coerceSrc=app.slice(app.indexOf('function coerceTyped('),app.indexOf('for(const q of questions)coerceTyped'));
+  const eligSrc=app.slice(app.indexOf('function eligible('),app.indexOf('function activateCard('));
+  const mustSrc=app.slice(app.indexOf('function mustPool('),app.indexOf('function prepareVocabPool('));
+  const prepSrc=app.slice(app.indexOf('function prepareVocabPool('),app.indexOf('function mustCourseRank('));
+  const ensureFn=app.slice(app.indexOf('function ensureV2('),app.indexOf('function openPathLesson('));
+  const body=[
+    'const course=window.COURSE;',
+    app.slice(startupStart,startupEnd),
+    'const questions=course.questions;',
+    coerceSrc,
+    "let mode='words';",
+    'let state=window.ProgressStore.empty();',
+    'let records=state.records;',
+    'const catalog=window.CURRICULUM;',
+    'try{catalog.activatePromotions(state);}catch(e){}',
+    'const byId=new Map(questions.map(q=>[q.id,q]));',
+    'for(const q of questions){coerceTyped(q);byId.set(q.id,q);}',
+    'let confusionIndex=null;',
+    'const P=window.ProgressStore;',
+    'let vocabPoolReady=false;',
+    eligSrc,mustSrc,prepSrc,ensureFn,
+    'const idsOf=list=>{const out=[];for(const q of list)if(q&&q.id!=null)out.push(String(q.id));out.sort();return out;};',
+    'let partial=[];',
+    'if('+JSON.stringify(first)+'){ensureV2('+JSON.stringify(first)+');partial=idsOf(mustPool());}',
+    'prepareVocabPool();',
+    'const pool=mustPool();',
+    'const ids=idsOf(pool);',
+    'const lemmas=new Set(pool.map(q=>window.TrainerCore.lemmaKey(q))).size;',
+    'const vocabIds=new Set(pool.flatMap(q=>q.vocabIds||[])).size;',
+    'const foreign=pool.filter(q=>!q||q.topic!=="vocab"||q.wordRole!=="must").length;',
+    '({partial,ids,lemmas,vocabIds,foreign});'
+  ].join('\n');
+  const result=vm.runInContext(body,ctx,{filename:'product-must-pool.js'});
+  return {partial:[...result.partial],ids:[...result.ids],lemmas:result.lemmas,vocabIds:result.vocabIds,foreign:result.foreign};
 }
 const freshPool=bootMust(null);
 const after32=bootMust('3-2');
@@ -560,6 +607,6 @@ assert.ok(after42.partial.every(id=>freshPool.ids.includes(id)));
 assert.equal(freshPool.foreign,0);
 assert.ok(freshPool.lemmas>0&&freshPool.lemmas<=freshPool.ids.length);
 assert.ok(freshPool.ids.every(id=>id));
-console.log('must pool from lesson data cards',freshPool.ids.length,'lemmas',freshPool.lemmas);
+console.log('must pool from product path cards',freshPool.ids.length,'lemmaKey',freshPool.lemmas,'vocabIds',freshPool.vocabIds);
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');
