@@ -5,6 +5,7 @@
    fsrs:{desired_retention:0.90,enable_fuzz:false,enable_short_term:true},
    schedule:{cleanAnswersToConsolidate:2,learningSessionBlinds:3,learningIntervening:2,pauseIntervalDays:21,spacedRecallsForRemembered:1,spacedRecallsForMastered:2,minSpacedMs:86400000,responseTimeAffectsSchedule:false},
    session:{size:8,maxAttempts:10,recentWindowMs:600000,microSize:4,minIntervening:3,preferredIntervening:4,newLimit:8,examSize:8,examMs:4000,examHardMs:3000,examEasyMs:1500,incidentalWeekCap:8},
+   vocab:{answerBudget:10,sessionNewCap:2},
    context:{wordLimit:1},
    analytics:{retentionGapMs:86400000},
    remediation:{threshold:2,historyWindow:12,cleanToResolve:3,exerciseCount:4},

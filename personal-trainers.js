@@ -7,7 +7,7 @@
     Object.freeze({id:'harmony_letters',order:1,title:'Буквы · кот',description:'Твёрдые / мягкие сигналы, пары и слова',enabled:true,kind:'cat'}),
     Object.freeze({id:'numbers',order:2,title:'Числа',description:'Лестница от 0–10 до сотен и тысяч. Числительные урока 1–2 — в тренажёре Числа, не в „Новых словах“.',enabled:true,kind:'numbers'}),
     Object.freeze({id:'vocab_must',order:3,title:'Новые слова',description:'Слова, которые задали выучить · оба направления вперемешку',enabled:true,kind:'bridge',target:'vocab:must'}),
-    Object.freeze({id:'vocab_used',order:4,title:'Встречавшиеся слова',description:'Узнать и написать вперемешку в одном подходе',enabled:true,kind:'bridge',target:'vocab:used'})
+    Object.freeze({id:'vocab_used',order:4,title:'Встречавшиеся слова',description:'Узнать и написать вперемешку',enabled:true,kind:'bridge',target:'vocab:used'})
   ]);
   const STAGE_LABELS={0:'Карта пар',1:'Найди пару',2:'К какой группе?',3:'Собери из памяти',4:'Сигнал в слове',5:'Быстрый раунд'};
   let screen='catalog',activeId=null,itemShownAt=0,selection=new Set(),pairSelection={};

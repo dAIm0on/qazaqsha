@@ -129,7 +129,7 @@ test('K2.1-16 service worker caches both standalone trainer files',()=>{
   const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
   assert.ok(sw.includes('"harmony-letter-trainer.js"'));
   assert.ok(sw.includes('"personal-trainers.js"'));
-  assert.ok(/qazaq-offline-live-20261010-nav01/.test(sw));
+  assert.ok(/qazaq-offline-live-20261010-vocab-qa/.test(sw));
 });
 
 
@@ -151,7 +151,8 @@ test('K2.1-18 encountered-word trainer mixes both directions in one queue',()=>{
   assert.ok(app.includes("list.filter(q=>/-ru$/.test(q.id))"));
   assert.ok(app.includes("list.filter(q=>/-kk$/.test(q.id))"));
   assert.ok(app.includes('Math.random()<0.5'));
-  assert.ok(personal.includes('Узнать и написать вперемешку в одном подходе'));
+  assert.ok(personal.includes('Узнать и написать вперемешку'));
+  assert.equal(personal.includes('в одном подходе'),false);
   assert.equal(personal.includes('vocab_seen_write'),false);
 });
 
