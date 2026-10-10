@@ -151,7 +151,8 @@ test('K2.1-18 encountered-word trainer mixes both directions in one queue',()=>{
   assert.ok(app.includes("list.filter(q=>/-ru$/.test(q.id))"));
   assert.ok(app.includes("list.filter(q=>/-kk$/.test(q.id))"));
   assert.ok(app.includes('Math.random()<0.5'));
-  assert.ok(personal.includes('Узнать и написать вперемешку в одном подходе'));
+  assert.ok(personal.includes('Узнать и написать вперемешку'));
+  assert.equal(personal.includes('в одном подходе'),false);
   assert.equal(personal.includes('vocab_seen_write'),false);
 });
 

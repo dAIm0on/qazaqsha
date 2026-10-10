@@ -174,6 +174,10 @@
    const rec=core.updateRecord(records[q.id],correctFlag,hintedFlag,now,{responseTime:ctx.elapsed,recall:ctx.recall!==false,rating:ctx.rating});
    records[q.id]=rec;
    const event={id:'ans:'+sessionId+':'+presentation+':'+q.id,at:now,type:'answer',session_id:sessionId,presentation,card_id:q.id,answers:Array.isArray(ctx.answers)?ctx.answers.slice():[],correct:correctFlag,hinted:hintedFlag,peek:hintedFlag?1:0,first_try_correct:kind==='good'?1:0,idk:kind==='idk'?1:0,rating:ctx.rating,response_time_ms:ctx.elapsed,response_time:ctx.elapsed,latency_ms:ctx.elapsed,recall:ctx.recall!==false};
+   if(ctx.analytics&&typeof ctx.analytics==='object'){
+     const reserved={id:1,at:1,type:1,session_id:1,presentation:1,card_id:1,answers:1,correct:1,hinted:1,peek:1,first_try_correct:1,idk:1,rating:1,response_time_ms:1,response_time:1,latency_ms:1,recall:1,skills:1};
+     for(const key of Object.keys(ctx.analytics))if(!reserved[key])event[key]=ctx.analytics[key];
+   }
    if(ctx.observe)event.skills=ctx.observe(state,q,ctx.result||{correct:correctFlag,parts:[]},event,ctx.errors||[],{must:true});
    state.events.push(event);
    let queue=(ctx.queue||[]).slice(),scheduled=false,retry=null;
@@ -231,8 +235,10 @@
      if(!e||!inSitting(sitting,e))continue;
      const key=String(e.session_id)+'|'+String(e.presentation)+'|'+String(e.card_id);
      if(e.type==='retry_close'&&e.correct)assisted.add(key);
+     else if(e.type==='answer'&&e.correct&&!e.idk&&(e.hinted||e.peek||e.rule_peek))assisted.add(key);
      else if(e.type==='answer'&&e.correct&&!e.hinted&&!e.idk&&!e.rule_peek&&!e.peek)unaided.add(key);
    }
+   for(const key of assisted)unaided.delete(key);
    let u=unaided.size,a=assisted.size;
    if(sitting.legacy){u+=Number(sitting.legacy.sessionCorrect)||0;a+=Number(sitting.legacy.sessionAssisted)||0;}
    return {unaided:u,assisted:a,closed:u+a};
@@ -245,6 +251,7 @@
    const events=((state&&state.events)||[]).filter(e=>e&&e.card_id===cardId&&inSitting(sitting,e));
    if(events.some(e=>e.type==='retry_close'))return 'с подсказкой';
    const ans=events.find(e=>e.type==='answer');
+   if(ans&&ans.correct&&!ans.idk&&(ans.hinted||ans.peek||ans.rule_peek))return 'с подсказкой';
    if(ans&&ans.correct&&!ans.hinted&&!ans.idk&&!ans.rule_peek&&!ans.peek)return 'самостоятельно';
    if((sitting.shown||[]).includes(lemma)&&!ans)return 'Без ответа';
    if(!ans)return 'Без ответа';

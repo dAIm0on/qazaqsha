@@ -213,5 +213,158 @@ assert.ok(!/dayNewCap|vocabDay|vocabMode/.test(app+fs.readFileSync(path.join(__d
 const remote=app.split('function applyRemote')[1].split('function paintAccount')[0];
 assert.ok(!/queue=\[\]/.test(remote));
 assert.ok(app.includes('state.session.vocab'));
+assert.ok(peek.includes('analytics:answerAnalytics'));
+assert.ok(check.includes('analytics:answerAnalytics'));
+assert.ok(app.includes("function isVocabMustTrainer(){return mode==='words'&&vocabRole==='must'&&trainerReturn==='vocab:must'&&queueEpoch===trainerEpoch;}"));
+assert.ok(app.includes('function importProgress(incoming,importMode)'));
+assert.ok(!app.includes('function importProgress(incoming,mode)'));
+assert.ok(app.includes("vocab:'Не открывай готовое слово — иначе это не вспоминание.'"));
+assert.ok(!app.includes("vocab:'Сначала слепая попытка"));
+assert.ok(!app.includes('Пока всё'));
+assert.ok(app.includes('<h2>Можно продолжить</h2>'));
+const indexHtml=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
+const dashboard=fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8');
+const personal=fs.readFileSync(path.join(__dirname,'personal-trainers.js'),'utf8');
+assert.ok(!indexHtml.includes('Сначала слепая попытка'));
+assert.ok(indexHtml.includes('Короткий набор'));
+assert.ok(!indexHtml.includes('Короткий подход'));
+assert.ok(dashboard.includes('Рекомендовано сейчас'));
+assert.ok(!dashboard.includes('Рекомендовано на один подход'));
+assert.ok(personal.includes('Узнать и написать вперемешку'));
+assert.ok(!personal.includes('в одном подходе'));
+
+const hintState=state();
+const hintSit=VM.emptySitting(1);
+hintSit.sessions=['m'];
+VM.commitFirst({state:hintState,records:hintState.records,q:card('G2','word:g2'),now:100,sessionId:'m',presentation:0,kind:'good',answers:['G2к'],elapsed:4,core,observe:()=>[],queue:['G2','H'],position:0,pool:[card('G2','word:g2'),card('H','word:h')],plan:{budget:9,nNew:2,baseLen:2,newLemmas:['word:g2','word:h']},sitting:hintSit,rating:F.Rating.Good,errors:[],result:{correct:true,parts:[true]},budget:9,minGap:2,appearCap:3,hinted:false,recall:true});
+VM.commitFirst({state:hintState,records:hintState.records,q:card('H','word:h'),now:110,sessionId:'m',presentation:1,kind:'assisted',answers:['Hк'],elapsed:6,core,observe:()=>[],queue:['G2','H'],position:1,pool:[card('G2','word:g2'),card('H','word:h')],plan:{budget:9,nNew:2,baseLen:2,newLemmas:['word:g2','word:h']},sitting:hintSit,rating:F.Rating.Again,errors:[],result:{correct:true,parts:[true]},budget:9,minGap:2,appearCap:3,hinted:true,recall:true});
+const hintTally=VM.recount(hintState,hintSit);
+assert.equal(hintTally.unaided,1);
+assert.equal(hintTally.assisted,1);
+assert.equal(hintTally.closed,hintSit.answers);
+assert.equal(hintSit.answers,2);
+assert.equal(VM.wordLine(hintState,hintSit,{cardId:'H',lemma:'word:h'}),'с подсказкой');
+assert.equal(VM.wordLine(hintState,hintSit,{cardId:'G2',lemma:'word:g2'}),'самостоятельно');
+
+const tagged=VM.commitFirst({state:hintState,records:hintState.records,q:card('T','word:t'),now:120,sessionId:'m',presentation:2,kind:'good',answers:['Tк'],elapsed:3,core,observe:()=>[],queue:['T'],position:0,pool:[card('T','word:t')],plan:{budget:9,nNew:1,baseLen:1,newLemmas:['word:t']},sitting:hintSit,rating:F.Rating.Good,errors:[],result:{correct:true,parts:[true]},budget:9,minGap:2,appearCap:3,hinted:false,recall:true,analytics:{item_type:'vocab',direction:'kk-ru',predicted_R:0.42,hours_since_last:3,id:'nope',correct:false}});
+assert.equal(tagged.event.item_type,'vocab');
+assert.equal(tagged.event.direction,'kk-ru');
+assert.equal(tagged.event.predicted_R,0.42);
+assert.equal(tagged.event.hours_since_last,3);
+assert.notEqual(tagged.event.id,'nope');
+assert.equal(tagged.event.correct,true);
+
+const rel=state();
+const relSit=VM.emptySitting(1);
+relSit.sessions=['s1'];
+const opened=VM.commitFirst({state:rel,records:rel.records,q,now:5000,sessionId:'s1',presentation:0,kind:'idk',answers:[''],elapsed:10,core,observe:()=>{},queue:['A','B','C'],position:0,pool,plan,sitting:relSit,rating:F.Rating.Again,errors:[],result:{correct:false,parts:[false]},budget:9,minGap:2,appearCap:3,hinted:true,recall:true});
+assert.equal(rel.records.A.review_count,1);
+const snap=VM.snapshot({plan,sitting:relSit,retry:opened.retry,closed:[],unaided:{},blindFails:{}});
+const savedSession={mode:'words',trainerReturn:'vocab:must',topic:'vocab',queue:opened.queue.slice(),position:0,queueEpoch:'s1',trainerEpoch:'s1',vocab:snap};
+const back=VM.restoreSaved(savedSession,rel,cfg,9000);
+assert.equal(back.legacy,false);
+assert.equal(back.vocab.retry.kind,'idk');
+assert.equal(back.vocab.retry.cardId,'A');
+const dup=VM.commitFirst({state:rel,records:rel.records,q,now:9100,sessionId:'s1',presentation:0,kind:'idk',answers:[''],elapsed:10,core,observe:()=>{},queue:opened.queue,position:0,pool,plan,sitting:relSit,rating:F.Rating.Again,errors:[],result:{correct:false,parts:[false]},budget:9,minGap:2,appearCap:3,hinted:true,recall:true});
+assert.equal(dup.duplicate,true);
+assert.equal(rel.records.A.review_count,1);
+assert.equal(rel.events.filter(e=>e.type==='answer'&&e.card_id==='A').length,1);
+const fromEvent=VM.restoreSaved({mode:'words',trainerReturn:'vocab:must',queue:['A','B','C','A'],position:0,queueEpoch:'s1',vocab:{plan,sitting:relSit,retry:null,closed:[],nearMiss:null}},rel,cfg,9200);
+assert.equal(fromEvent.vocab.retry.kind,'idk');
+assert.equal(fromEvent.vocab.retry.cardId,'A');
+
+function sliceFn(src,from,to){
+  const a=src.indexOf(from),b=src.indexOf(to);
+  assert.ok(a>0&&b>a,from);
+  return src.slice(a,b);
+}
+function runImport(appSrc,start,incoming,importMode){
+  const pred=sliceFn(appSrc,'function isVocabMustTrainer','function mustPool');
+  const imp=sliceFn(appSrc,'function importProgress','function vocabTable');
+  const body=[
+    'const window={};',
+    'window.LessonPackages={prepare(){},install(){}};',
+    'window.LessonPackageSchema={merge(a){return Array.isArray(a)?a:[];}};',
+    'window.Knowledge={hydrate(){}};',
+    'window.VocabMust=VM;',
+    'const catalog={activatePromotions(){}};',
+    'const KEY="progress", BACKUP="backup";',
+    'const store={};',
+    'const localStorage={setItem(k,v){store[k]=String(v);},getItem(k){return store[k]||null;}};',
+    'const P={serialize(s){return JSON.stringify(s);},migrate(raw){return {records:Object.create(null),events:[],learning:{},session:raw&&raw.session||null,lesson_packages:[]};},merge(current){return {records:current.records||{},events:current.events||[],learning:current.learning||{},session:null,lesson_packages:[]};},answerIndex(){return new Map();}};',
+    'let mode=start.mode, vocabRole=start.vocabRole, trainerReturn=start.trainerReturn, queueEpoch=start.queueEpoch, trainerEpoch=start.trainerEpoch, position=start.position;',
+    'let queue=(start.queue||[]).slice(), topic=start.topic||"all", sourceFilter=null, courseBlock=null, practiceIds=(start.practiceIds||[]).slice();',
+    'let checked=false, presented=null, sessionAttempts=0, sessionCorrect=0, sessionAssisted=0;',
+    'let vocabRetry=start.vocabRetry||null, vocabPlan=start.vocabPlan||null, vocabSitting=start.vocabSitting||null, vocabClosed=[];',
+    'let view=start.view||"today", state=start.state, records=state.records, learningState=state.learning||{}, questions=start.questions||[];',
+    'const byId=start.byId; let confusionIndex=null, elapsedMs=0, storageReadError=null, storageAvailable=true;',
+    'const views=[], saves=[]; let poolCalls=0, vocabPoolReady=false;',
+    'function prepareVocabPool(){if(vocabPoolReady)return; vocabPoolReady=true; poolCalls++; for(const q of start.pool||[])byId.set(q.id,q);}',
+    'function applySavedMust(saved){const built=VM.restoreSaved(saved,state,cfg,3000); const v=built.vocab; vocabPlan=v.plan; vocabSitting=v.sitting; vocabRetry=v.retry; vocabClosed=v.closed||[];}',
+    'function captureMustLive(){return {queue:queue.slice(),position,queueEpoch,trainerEpoch,trainerReturn,vocabRole,mode,topic,courseBlock,sourceFilter,view,practiceIds:practiceIds.slice(),vocabPlan,vocabSitting,vocabRetry,vocabClosed:vocabClosed.slice(),sessionAttempts,sessionCorrect,sessionAssisted};}',
+    'function restoreMustLive(keep){queue=keep.queue;position=keep.position;queueEpoch=keep.queueEpoch;trainerEpoch=keep.trainerEpoch;trainerReturn=keep.trainerReturn;vocabRole=keep.vocabRole;mode=keep.mode;topic=keep.topic;courseBlock=keep.courseBlock;sourceFilter=keep.sourceFilter;view=keep.view;practiceIds=keep.practiceIds;vocabPlan=keep.vocabPlan;vocabSitting=keep.vocabSitting;vocabRetry=keep.vocabRetry;vocabClosed=keep.vocabClosed;sessionAttempts=keep.sessionAttempts;sessionCorrect=keep.sessionCorrect;sessionAssisted=keep.sessionAssisted;}',
+    'function save(){saves.push({mode,queue:queue.slice(),position,snap:isVocabMustTrainer(),kind:vocabRetry&&vocabRetry.kind,cardId:vocabRetry&&vocabRetry.cardId,queueEpoch,trainerEpoch,view});}',
+    'function render(){} function showView(name){views.push(name); view=name;} function pauseTimer(){}',
+    pred,imp,
+    'importProgress(incoming, importMode);',
+    'return {mode,queue:queue.slice(),position,practiceIds:practiceIds.slice(),kind:vocabRetry&&vocabRetry.kind,cardId:vocabRetry&&vocabRetry.cardId,queueEpoch,trainerEpoch,vocabRole,trainerReturn,view,views:views.slice(),saves,poolCalls,snap:isVocabMustTrainer()};'
+  ].join('\n');
+  return new Function('start','incoming','importMode','VM','cfg',body)(start,incoming,importMode,VM,cfg);
+}
+function knownStart(ids,extra){
+  const byId=new Map(ids.map(id=>[id,{id}]));
+  return Object.assign({mode:'ordered',vocabRole:null,trainerReturn:null,queueEpoch:1,trainerEpoch:null,position:0,queue:[],topic:'all',state:{records:Object.create(null),events:[],learning:{}},questions:[],byId,pool:[],view:'today'},extra||{},{byId});
+}
+function mustSession(queue,position,patch){
+  const sitting=VM.emptySitting(1); sitting.sessions=['50'];
+  return {session:Object.assign({mode:'words',trainerReturn:'vocab:must',topic:'vocab',queue,position,queueEpoch:50,trainerEpoch:50,vocab:{plan:{budget:10,nNew:0,baseLen:queue.length,newLemmas:[]},sitting,retry:{cardId:queue[0],sessionId:'50',presentation:0,kind:'idk',typed:[],answerEventId:null},closed:[],unaided:{},blindFails:{},nearMiss:null}},patch||{})};
+}
+const openIdk=runImport(app,knownStart([],{pool:[{id:'LATE'}]}),mustSession(['LATE','GONE'],0), 'replace');
+assert.equal(openIdk.poolCalls,1);
+assert.deepEqual(openIdk.queue,['LATE']);
+assert.equal(openIdk.position,0);
+assert.equal(openIdk.mode,'words');
+assert.equal(openIdk.trainerReturn,'vocab:must');
+assert.equal(openIdk.queueEpoch,50);
+assert.equal(openIdk.trainerEpoch,50);
+assert.equal(openIdk.snap,true);
+assert.equal(openIdk.kind,'idk');
+assert.equal(openIdk.cardId,'LATE');
+assert.deepEqual(openIdk.views,['practice']);
+assert.equal(openIdk.saves.at(-1).snap,true);
+assert.equal(openIdk.saves.at(-1).mode,'words');
+const droppedBefore=runImport(app,knownStart(['A','B']),mustSession(['MISSING','A','B'],1,{vocab:{plan:{budget:10,nNew:0,baseLen:3,newLemmas:[]},sitting:VM.emptySitting(1),retry:null,closed:[],nearMiss:null}}),'replace');
+assert.deepEqual(droppedBefore.queue,['A','B']);
+assert.equal(droppedBefore.position,0);
+const atMissing=runImport(app,knownStart(['A','B']),mustSession(['A','MISSING','B'],1,{vocab:{plan:{budget:10,nNew:0,baseLen:3,newLemmas:[]},sitting:VM.emptySitting(1),retry:null,closed:[],nearMiss:null}}),'replace');
+assert.deepEqual(atMissing.queue,['A','B']);
+assert.equal(atMissing.position,1);
+assert.equal(atMissing.queue[atMissing.position],'B');
+const kept=runImport(app,knownStart(['A','B']),mustSession(['A','B'],1,{vocab:{plan:{budget:10,nNew:0,baseLen:2,newLemmas:[]},sitting:VM.emptySitting(1),retry:null,closed:[],nearMiss:null}}),'replace');
+assert.deepEqual(kept.queue,['A','B']);
+assert.equal(kept.position,1);
+const emptyQueue=runImport(app,knownStart(['A'],{pool:[{id:'LATE'}]}),mustSession(['GONE'],0),'replace');
+assert.equal(emptyQueue.mode,'ordered');
+assert.equal(emptyQueue.trainerReturn,null);
+assert.deepEqual(emptyQueue.queue,[]);
+assert.equal(emptyQueue.kind,null);
+assert.deepEqual(emptyQueue.views,['today']);
+assert.equal(emptyQueue.saves.at(-1).snap,false);
+const uneven=runImport(app,knownStart(['A']),mustSession(['A'],0,{queueEpoch:10,trainerEpoch:11}),'replace');
+assert.equal(uneven.mode,'words');
+assert.equal(uneven.queueEpoch,10);
+assert.equal(uneven.trainerEpoch,11);
+assert.equal(uneven.snap,false);
+const copiedEpoch=runImport(app,knownStart(['A']),mustSession(['A'],0,{queueEpoch:12,trainerEpoch:undefined}),'replace');
+assert.equal(copiedEpoch.queueEpoch,12);
+assert.equal(copiedEpoch.trainerEpoch,12);
+assert.equal(copiedEpoch.snap,true);
+const live=knownStart(['LOCAL'],{mode:'words',vocabRole:'must',trainerReturn:'vocab:must',queueEpoch:4,trainerEpoch:4,position:0,queue:['LOCAL'],vocabRetry:{cardId:'LOCAL',kind:'idk'}});
+const keptLocal=runImport(app,live,{session:{mode:'words',trainerReturn:'vocab:must',queue:['OTHER'],position:0,queueEpoch:1}},'merge');
+assert.deepEqual(keptLocal.queue,['LOCAL']);
+assert.equal(keptLocal.mode,'words');
+assert.equal(keptLocal.kind,'idk');
+assert.equal(keptLocal.cardId,'LOCAL');
+assert.deepEqual(keptLocal.views,['practice']);
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');

@@ -687,7 +687,7 @@
  function exampleLine(b,fmt=v=>String(v??'')){const from=String(b&&b.from||'').trim(),to=String(b&&b.to||'').trim();return from&&to&&from!==to?fmt(from)+' → '+fmt(to):fmt(from||to);}
  function exampleNote(b,fmt){const slot=String(b&&b.slot||'').trim(),why=String(b&&b.why||'').trim();if(!slot&&!why)return '';return '<p>'+(slot?'Слот: <strong lang="kk">'+fmt(slot)+'</strong>. ':'')+(why?fmt(why):'')+'</p>';}
  function isVocabWordsMode(){return mode==='words';}
- function isVocabMustTrainer(){return mode==='words'&&vocabRole==='must'&&trainerReturn==='vocab:must';}
+ function isVocabMustTrainer(){return mode==='words'&&vocabRole==='must'&&trainerReturn==='vocab:must'&&queueEpoch===trainerEpoch;}
  function mustPool(){return questions.filter(q=>q&&eligible(q)&&q.topic==='vocab'&&q.wordRole==='must');}
  function prepareVocabPool(){
    if(vocabPoolReady)return;
@@ -1722,11 +1722,37 @@
    if($('#rule-button'))$('#rule-button').disabled=true;
    save();
  }
+ function answerAnalytics(q,result,answers,now,elapsedValue,hintedFlag){
+   const policy=window.MemoryPolicy;
+   const previous=records[q.id];
+   const predicted=window.ReviewScheduler&&window.ReviewScheduler.retrievability?window.ReviewScheduler.retrievability(previous,now):null;
+   const hours=previous&&previous.last_correct?(now-previous.last_correct)/3600000:null;
+   const homeworkMode=mode==='homework';
+   const flags=policy&&policy.answerFlags?policy.answerFlags({hinted:!!hintedFlag,correct:!!(result&&result.correct)}):{retype_after_peek_ok:hintedFlag?(result&&result.correct?1:0):null};
+   const extra={
+     item_type:policy?policy.classify(q):null,
+     direction:policy?policy.direction(q):null,
+     retype_after_peek_ok:flags.retype_after_peek_ok,
+     confusion_tag:policy?policy.confusionTag(q,answers,result):'',
+     confuse_pair_id:policy&&policy.contrastSide(q)?String(policy.contrastSide(q).pair):'',
+     official_like:(mode==='exam'||q.topic==='rules')?1:0,
+     predicted_R:predicted,
+     hours_since_last:hours,
+     response_kind:q.kind||'fields',
+     response_modes:responseModes(q),
+     rule_peek:rulePeeked?1:0,
+     homework:homeworkMode?1:0,
+     block:window.Homework?window.Homework.inferBlock(q,mode,hwLesson,activeLesson):''
+   };
+   if(!stageContext&&q.lessonId&&courseIds().includes(String(q.lessonId)))extra.lesson_id=String(q.lessonId);
+   if(stageContext){extra.lesson_id=stageContext.lessonId;extra.stage_id=stageContext.stageId;extra.content_revision=stageContext.contentRevision;extra.practice_kind=stageContext.kind;}
+   return extra;
+ }
  function peekAnswer(q){
    if(checked||mode==='exam')return;
    if(isVocabMustTrainer()&&window.VocabMust){
      const answers=readAnswers(q),now=Date.now();
-     const pack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:'idk',answers,elapsed:elapsed(),core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating:window.FSRS.Rating.Again,errors:[],result:{correct:false,parts:(q.fields||[]).map(()=>false)},budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:true,recall:true});
+     const pack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:'idk',answers,elapsed:elapsed(),core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating:window.FSRS.Rating.Again,errors:[],result:{correct:false,parts:(q.fields||[]).map(()=>false)},budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:true,recall:true,analytics:answerAnalytics(q,{correct:false,parts:(q.fields||[]).map(()=>false)},answers,now,elapsed(),true)});
      queue=pack.queue;vocabRetry=pack.retry;vocabReturnScheduled=!!pack.scheduled;hinted=true;retrying=true;checked=false;retryAfterWrong=false;
      paintVocabLemmaFeedback($('#feedback'),q,[],{note:'<p class="small">'+esc(window.VocabMust.idkNote(!!pack.scheduled))+'</p>'});
      (q.fields||[]).forEach((_,i)=>{const el=$('#answer-'+i);if(el){el.value='';el.classList.add('invalid');el.disabled=false;}});
@@ -1778,7 +1804,7 @@
  }
  function showHint(q){
    hinted=true;hintEvent(q,'explanation');if($('#hint-button'))$('#hint-button').disabled=true;
-   const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Для окончания важен последний слог.',plural:'Последний слог: А или Е. Потом последняя буква: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Сначала слепая попытка. Не открывай готовое слово — иначе это не вспоминание.',numbers:'Собери разряды: сначала большая часть. Не считай по порядку.',person:'Мен: пын/бын/мын. Сен: сың. Сіз: сыз. Біз после м/н/ң: біз. Сендер/сіздер без -лар на основу. Отрицание: основа + емес + окончание.',rules:'Набери суффикс или короткое слово правила, не целое новое существительное.'};
+   const hints={sounds:'Схема курса: мягкая группа Ә, Ө, І, Ү, Е, К, Г, Э; твёрдая А, О, Ы, Ұ, Қ, Ғ, Я, Ё. Для окончания важен последний слог.',plural:'Последний слог: А или Е. Потом последняя буква: глухие и Б, В, Г, Д → тар/тер; Л, М, Н, Ң, Ж, З → дар/дер; гласные, Р, Й, У → лар/лер.',vocab:'Не открывай готовое слово — иначе это не вспоминание.',numbers:'Собери разряды: сначала большая часть. Не считай по порядку.',person:'Мен: пын/бын/мын. Сен: сың. Сіз: сыз. Біз после м/н/ң: біз. Сендер/сіздер без -лар на основу. Отрицание: основа + емес + окончание.',rules:'Набери суффикс или короткое слово правила, не целое новое существительное.'};
    const box=$('#hint-box');box.textContent=q.hint&&!/^[А-Яа-яӘәІіҢңҒғҚқӨөҰұҮүҺһ ]{1,24}$/.test(q.hint)?q.hint:(hints[q.topic]||'Вспомни правило, потом форму.');box.hidden=false;save();
  }
  // r7 Q6-B: how each field was really answered on screen (tap buttons = choice), not inferred from q.kind.
@@ -1861,7 +1887,7 @@
    const errors=reveal||supportKind(q)?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);
    let mustPack=null;
    if(isVocabMustTrainer()&&!reveal&&window.VocabMust){
-     mustPack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:!result.correct?'wrong':(hinted||rulePeeked)?'assisted':'good',answers,elapsed:elapsedMs,core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating,errors,result,budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:!!(hinted||rulePeeked),recall});
+     mustPack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:!result.correct?'wrong':(hinted||rulePeeked)?'assisted':'good',answers,elapsed:elapsedMs,core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating,errors,result,budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:!!(hinted||rulePeeked),recall,analytics:answerAnalytics(q,result,answers,now,elapsedMs,!!(hinted||rulePeeked))});
      queue=mustPack.queue;vocabReturnScheduled=!!mustPack.scheduled;
      if(mustPack.retry){vocabRetry=mustPack.retry;retryAfterWrong=mustPack.retry.kind==='wrong';}
      else retryAfterWrong=false;
@@ -2751,7 +2777,7 @@
      const returnKind=trainerReturn;
      if(isVocabMustTrainer()&&window.VocabMust){
        const t=window.VocabMust.recount(state,vocabSitting||{});
-       $('#exercise').innerHTML='<div class="empty-state"><h2>Пока всё</h2><p>Самостоятельно: '+t.unaided+'. С подсказкой: '+t.assisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё слова</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
+       $('#exercise').innerHTML='<div class="empty-state"><h2>Можно продолжить</h2><p>Самостоятельно: '+t.unaided+'. С подсказкой: '+t.assisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё слова</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
      }else $('#exercise').innerHTML='<div class="empty-state"><h2>Подход завершён</h2><p>Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё подход</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
      $('#restart').onclick=()=>startCatalogTrainer(returnKind);
      $('#back-to-learning').onclick=()=>{trainerReturn=null;showView('personal');if(window.PersonalTrainers&&window.PersonalTrainers.openCatalog)window.PersonalTrainers.openCatalog();};
@@ -2881,8 +2907,8 @@
    if(policy){const week=policy.incidentalWeek(state);week.added+=1;state.incidentalWeek=week;}
    window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);save();
  }
- function importProgress(incoming,mode){
-   const plan=window.VocabMust?window.VocabMust.importPlan({mustUnfinished:isVocabMustTrainer()&&position<queue.length,position,queueEpoch,retry:vocabRetry},incoming,mode):{action:'reset'};
+ function importProgress(incoming,importMode){
+   const plan=window.VocabMust?window.VocabMust.importPlan({mustUnfinished:isVocabMustTrainer()&&position<queue.length,position,queueEpoch,retry:vocabRetry},incoming,importMode):{action:'reset'};
    const backup=P.serialize(state);
    try{localStorage.setItem(BACKUP,backup);}catch{throw Error('Не удалось сохранить копию перед импортом. Сначала скачай текущий прогресс; импорт не выполнен.');}
    if(plan.action==='keep-local'){
@@ -2900,11 +2926,22 @@
      state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;
      if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
      window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);
+     prepareVocabPool();
      const sess=plan.session;
-     topic=sess.topic;mode=sess.mode;sourceFilter=sess.sourceFilter||null;courseBlock=sess.courseBlock||null;vocabRole='must';trainerReturn=sess.trainerReturn;queueEpoch=typeof sess.queueEpoch==='number'?sess.queueEpoch:Date.now();trainerEpoch=typeof sess.trainerEpoch==='number'?sess.trainerEpoch:queueEpoch;queue=sess.queue.slice();practiceIds=Array.isArray(sess.practiceIds)?sess.practiceIds.slice():[...queue];position=Math.min(queue.length,sess.position||0);checked=false;presented=null;sessionAttempts=Math.max(0,Number(sess.sessionAttempts)||0);sessionCorrect=Math.max(0,Number(sess.sessionCorrect)||0);sessionAssisted=Math.max(0,Number(sess.sessionAssisted)||0);
-     applySavedMust(sess);pauseTimer();elapsedMs=0;save();render();showView('practice');return;
+     topic=sess.topic;mode=sess.mode;sourceFilter=sess.sourceFilter||null;courseBlock=sess.courseBlock||null;vocabRole='must';trainerReturn=sess.trainerReturn;queueEpoch=typeof sess.queueEpoch==='number'?sess.queueEpoch:Date.now();trainerEpoch=typeof sess.trainerEpoch==='number'?sess.trainerEpoch:queueEpoch;
+     const rawQueue=Array.isArray(sess.queue)?sess.queue:[];
+     const at=Math.max(0,Number(sess.position)||0);
+     let skipped=0;queue=[];
+     rawQueue.forEach((id,i)=>{if(!byId.has(id)){if(i<at)skipped++;return;}queue.push(id);});
+     position=Math.min(queue.length,Math.max(0,at-skipped));
+     practiceIds=(Array.isArray(sess.practiceIds)?sess.practiceIds:[...queue]).filter(id=>byId.has(id));
+     checked=false;presented=null;sessionAttempts=Math.max(0,Number(sess.sessionAttempts)||0);sessionCorrect=Math.max(0,Number(sess.sessionCorrect)||0);sessionAssisted=Math.max(0,Number(sess.sessionAssisted)||0);
+     applySavedMust(sess);
+     if(vocabRetry&&(!byId.has(vocabRetry.cardId)||!queue.includes(vocabRetry.cardId)))vocabRetry=null;
+     if(!queue.length){mode='ordered';vocabRole=null;trainerReturn=null;trainerEpoch=null;vocabPlan=null;vocabSitting=null;vocabRetry=null;vocabClosed=[];position=0;practiceIds=[];pauseTimer();elapsedMs=0;save();render();showView('today');return;}
+     pauseTimer();elapsedMs=0;save();render();showView('practice');return;
    }
-   const next=mode==='replace'?P.migrate(incoming):P.merge(state,incoming);next.session=null;next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
+   const next=importMode==='replace'?P.migrate(incoming):P.merge(state,incoming);next.session=null;next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
    try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
    state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;
    if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
