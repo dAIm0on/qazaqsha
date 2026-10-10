@@ -91,7 +91,7 @@ ok('runtime install keeps support kinds for 3–4 and leaves every existing card
 // D. Page wiring: renderer uses existing chip classes, hidden JSON answer, ID-encoded taps; response mode = choice; event carries response_modes.
 const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8'),html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8'),sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.ok(html.indexOf('src="response-kinds.js"')>html.indexOf('src="core.js"')&&html.indexOf('src="response-kinds.js"')<html.indexOf('src="lesson-v2-schema.js"'));
-assert.ok(sw.includes('"response-kinds.js"')&&sw.includes("CACHE='qazaq-offline-live-20261007-section2-2'"));
+assert.ok(sw.includes('"response-kinds.js"')&&sw.includes("CACHE='qazaq-offline-live-20261010-nav01'"));
 assert.ok(app.includes("response_kind:q.kind||'fields',response_modes:responseModes(q),"));
 assert.ok(app.includes('function readAnswers(q){return supportKind(q)?window.ResponseKinds.read(q):'));
 {
