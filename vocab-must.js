@@ -46,14 +46,21 @@
    for(const q of pool||[])if(cardHasHistory(state,q)||lemmaHasHistory(state,pool,core,lemmaKey(core,q)))return true;
    return false;
  }
- function planPortion(pool,state,cfg,core,now){
+ function planPortion(pool,state,cfg,core,now,opts){
+   opts=opts||{};
    pool=(pool||[]).filter(q=>q&&q.wordRole!=='used');
    const answerBudget=cfg&&cfg.vocab&&Number(cfg.vocab.answerBudget)||10;
    const sessionNewCap=cfg&&cfg.vocab&&Number(cfg.vocab.sessionNewCap)||2;
    const records=(state&&state.records)||{};
    const clean=!poolHasAnswerHistory(state||{},pool,core);
+   const rankOf=typeof opts.rank==='function'?opts.rank:null;
+   const ordered=rankOf?pool.slice().sort((a,b)=>{
+     const d=(Number(rankOf(a))||0)-(Number(rankOf(b))||0);
+     if(d)return d;
+     return String(a.id)<String(b.id)?-1:String(a.id)>String(b.id)?1:0;
+   }):pool.slice();
    const seen=new Set(),newCards=[];
-   for(const q of pool){
+   for(const q of ordered){
      const lem=lemmaKey(core,q);
      if(seen.has(lem))continue;
      seen.add(lem);
@@ -63,19 +70,55 @@
    const nNew=clean?Math.min(3,newCards.length):Math.min(sessionNewCap,newCards.length);
    const picked=newCards.slice(0,nNew);
    const newLemmas=picked.map(q=>lemmaKey(core,q));
+   const newSet=new Set(newLemmas);
    const otherCap=Math.max(0,answerBudget-3*nNew);
    const limit=nNew+otherCap;
-   const others=pool.filter(q=>!newLemmas.includes(lemmaKey(core,q))&&lemmaHasHistory(state||{},pool,core,lemmaKey(core,q)));
-   const errors=others.filter(q=>records[q.id]&&records[q.id].needsReview);
-   const due=others.filter(q=>records[q.id]&&!records[q.id].needsReview&&core.isDue(records[q.id],now)).sort((a,b)=>(Number(records[a.id].next_review||records[a.id].dueAt)||0)-(Number(records[b.id].next_review||records[b.id].dueAt)||0));
-   const learning=others.filter(q=>{const r=records[q.id];return r&&!r.needsReview&&!core.isDue(r,now)&&(Number(r.streak)||0)<2;});
-   const review=[];const reviewSeen=new Set();
-   for(const q of [...errors,...due]){const k=lemmaKey(core,q);if(reviewSeen.has(k))continue;reviewSeen.add(k);review.push(q);}
-   const out=[];const used=new Set();
-   const take=(list,cap)=>{let n=0;for(const q of list){if(out.length>=limit||n>=cap)break;const k=lemmaKey(core,q);if(used.has(k))continue;used.add(k);out.push(q);n++;}};
-   take(review,Math.max(0,limit-nNew));
-   take(picked,nNew);
-   take(learning,limit);
+   const pickedIds=new Set(picked.map(q=>q.id));
+   const bucket=pool.filter(q=>pickedIds.has(q.id)||cardHasHistory(state||{},q));
+   let out=[];
+   if(core&&typeof core.chooseShortSession==='function'){
+     out=core.chooseShortSession(bucket,records,now,limit,{newLimit:nNew,isNew:q=>pickedIds.has(q.id)});
+   }else{
+     const others=pool.filter(q=>!newSet.has(lemmaKey(core,q))&&cardHasHistory(state||{},q));
+     const errors=others.filter(q=>records[q.id]&&records[q.id].needsReview);
+     const due=others.filter(q=>records[q.id]&&!records[q.id].needsReview&&core.isDue(records[q.id],now)).sort((a,b)=>(Number(records[a.id].dueAt)||0)-(Number(records[b.id].dueAt)||0));
+     const learning=others.filter(q=>{const r=records[q.id];return r&&!r.needsReview&&!core.isDue(r,now)&&(Number(r.streak)||0)<2;});
+     const review=[];const reviewSeen=new Set();
+     for(const q of [...errors,...due]){const k=lemmaKey(core,q);if(reviewSeen.has(k))continue;reviewSeen.add(k);review.push(q);}
+     const used=new Set();
+     const take=(list,cap)=>{let n=0;for(const q of list){if(out.length>=limit||n>=cap)break;const k=lemmaKey(core,q);if(used.has(k))continue;used.add(k);out.push(q);n++;}};
+     take(review,Math.max(0,limit-nNew));
+     take(picked,nNew);
+     take(learning,limit);
+   }
+   const review=[],learning=[];
+   for(const q of out){
+     if(newSet.has(lemmaKey(core,q)))continue;
+     const r=records[q.id];
+     if(r&&(r.needsReview||(core.isDue&&core.isDue(r,now))))review.push(q);
+     else learning.push(q);
+   }
+   out=review.concat(picked,learning);
+   const usedLem=new Set(out.map(q=>lemmaKey(core,q)));
+   let room=Math.max(0,otherCap-out.filter(q=>!newSet.has(lemmaKey(core,q))).length);
+   if(room>0&&out.length<limit){
+     const retr=typeof opts.retrievability==='function'?opts.retrievability:()=>null;
+     const seenF=new Set(),filler=[];
+     for(const q of pool){
+       const lem=lemmaKey(core,q);
+       if(seenF.has(lem)||usedLem.has(lem)||newSet.has(lem))continue;
+       if(!lemmaHasHistory(state||{},pool,core,lem))continue;
+       seenF.add(lem);filler.push(q);
+     }
+     filler.sort((a,b)=>{
+       const ra=retr(a),rb=retr(b);
+       const an=ra==null||Number.isNaN(ra),bn=rb==null||Number.isNaN(rb);
+       if(an!==bn)return an?1:-1;
+       if(!an&&ra!==rb)return ra-rb;
+       return String(a.id)<String(b.id)?-1:String(a.id)>String(b.id)?1:0;
+     });
+     for(const q of filler){if(room<=0||out.length>=limit)break;out.push(q);room--;}
+   }
    const baseLen=out.length;
    const budget=Math.min(answerBudget,baseLen+2*nNew);
    return {ids:out.map(q=>q.id),plan:{budget,nNew,baseLen,newLemmas}};
@@ -151,6 +194,15 @@
    const next=queue.slice(0,position+1).concat(seq.slice(0,at),[cardId],seq.slice(at));
    if(budget&&next.length>budget)return {queue:original,scheduled:false};
    if(next.filter(id=>id===cardId).length>appearCap)return {queue:original,scheduled:false};
+   const shown=new Set();
+   for(let i=0;i<=position&&i<next.length;i++)shown.add(lemOf(next[i]));
+   const cap=budget||next.length;
+   for(const lem of plan.newLemmas||[]){
+     if(!lem||shown.has(lem))continue;
+     let at=-1;
+     for(let i=0;i<next.length&&i<cap;i++)if(lemOf(next[i])===lem){at=i;break;}
+     if(at<0)return {queue:original,scheduled:false};
+   }
    return {queue:next,scheduled:true};
  }
  function retryFromAnswer(event){

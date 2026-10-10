@@ -103,7 +103,7 @@ assert.match(app,/answerTokens[\s\S]{0,900}safe=/,'practice reference must filte
 
 const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.match(sw,/compiled-lessons-v2\.js/,'service worker must cache compiled lessons');
-assert.match(sw,/section2-canonical|section2-1|section2-2|20261007-section2|20261002|20261007-51-live|51-live|s2-core-clean|20261010-nav01|20261010-vocab-qa/i,'service worker cache version must be bumped for section 2');
+assert.match(sw,/section2-canonical|section2-1|section2-2|20261007-section2|20261002|20261007-51-live|51-live|s2-core-clean|20261010-nav01|20261010-vocab-qa|20261010-vocab-pr2/i,'service worker cache version must be bumped for section 2');
 
 console.log('SECTION2_CANONICAL_VERIFY_OK',{
   lessons:Object.keys(expected),

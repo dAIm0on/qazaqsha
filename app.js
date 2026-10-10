@@ -694,16 +694,35 @@
    vocabPoolReady=true;
    try{for(const raw of window.LESSON_V2_COMPILED||[]){const id=raw&&raw.lesson_id;if(id)ensureV2(id);}}catch(e){}
  }
+ function mustCourseRank(q){
+   const lessons=window.LESSON_V2_COMPILED||[];
+   const li=lessons.findIndex(raw=>raw&&raw.lesson_id===q.lessonId);
+   const lessonRank=li<0?lessons.length:li;
+   let wordRank=100000;
+   const pack=window.LessonV2Runtime&&window.LessonV2Runtime.byId&&window.LessonV2Runtime.byId(q.lessonId);
+   const ids=pack&&pack.homework&&pack.homework.word_ids||[];
+   const bindings=pack&&pack.vocab_bindings||{};
+   const wanted=q.vocabIds||[];
+   for(let i=0;i<ids.length;i++){
+     const cat=bindings[ids[i]];
+     if(cat&&wanted.includes(cat)){wordRank=i;break;}
+   }
+   return lessonRank*100000+wordRank;
+ }
+ function mustRetrievability(q){
+   const rec=records[q.id];
+   if(!rec||!window.ReviewScheduler||typeof window.ReviewScheduler.retrievability!=='function')return null;
+   try{const v=window.ReviewScheduler.retrievability(rec,Date.now());return v==null||Number.isNaN(v)?null:v;}catch(e){return null;}
+ }
  function beginMustPortion(fresh){
    const VM=window.VocabMust;if(!VM)return false;
    if(fresh||!vocabSitting){vocabSitting=VM.emptySitting(Date.now());vocabClosed=[];sessionCorrect=0;sessionAssisted=0;}
-   const loaded=questions.filter(q=>q&&q.topic==='vocab'&&q.wordRole==='must');
-   if(loaded.length<3)prepareVocabPool();
+   prepareVocabPool();
    const pool=mustPool();
-   const planned=VM.planPortion(pool,state,cfg,core,Date.now());
+   const planned=VM.planPortion(pool,state,cfg,core,Date.now(),{rank:mustCourseRank,retrievability:mustRetrievability});
    if(!planned.ids.length)return false;
-   const ids=VM.enforceGap(planned.ids,vocabSitting,pool,core,cfg.schedule.learningIntervening||2);
-   if(!ids.length)return false;
+   let ids=VM.enforceGap(planned.ids,vocabSitting,pool,core,cfg.schedule.learningIntervening||2);
+   if(!ids.length)ids=planned.ids.slice();
    sessionAttempts=0;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);draft=null;presented=null;
    queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();trainerEpoch=(queueEpoch);
    vocabPlan=planned.plan;vocabSitting.sessions.push(String(queueEpoch));
@@ -1388,7 +1407,12 @@
  function ensureV2(lessonId){
   try{
     if(!(window.LessonV2Runtime&&window.LessonV2Runtime.ensure&&lessonId))return;
-    window.LessonV2Runtime.ensure(lessonId);
+    // Vocab card ids depend on earlier lessons already being installed (taken / -hw-).
+    // Always install the course prefix first so a later lesson opened alone cannot change the must pool.
+    const list=window.LESSON_V2_COMPILED||[];
+    const idx=list.findIndex(raw=>raw&&raw.lesson_id===lessonId);
+    const ids=idx<0?[lessonId]:list.slice(0,idx+1).map(raw=>raw&&raw.lesson_id).filter(Boolean);
+    for(const id of ids){try{window.LessonV2Runtime.ensure(id);}catch(e){}}
     // Lazy install pushes into COURSE.questions; keep app byId / Knowledge in sync.
     let added=false;
     for(const q of course.questions){
@@ -2776,9 +2800,11 @@
    if(trainerReturn){
      const returnKind=trainerReturn;
      if(isVocabMustTrainer()&&window.VocabMust){
-       const t=window.VocabMust.recount(state,vocabSitting||{});
-       $('#exercise').innerHTML='<div class="empty-state"><h2>Можно продолжить</h2><p>Самостоятельно: '+t.unaided+'. С подсказкой: '+t.assisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё слова</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
-     }else $('#exercise').innerHTML='<div class="empty-state"><h2>Подход завершён</h2><p>Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё подход</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
+       $('#exercise').innerHTML='<div class="empty-state"><h2>Все слова пройдены</h2><div class="finish-actions"><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
+       $('#back-to-learning').onclick=()=>{trainerReturn=null;showView('personal');if(window.PersonalTrainers&&window.PersonalTrainers.openCatalog)window.PersonalTrainers.openCatalog();};
+       save();return;
+     }
+     $('#exercise').innerHTML='<div class="empty-state"><h2>Подход завершён</h2><p>Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё подход</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
      $('#restart').onclick=()=>startCatalogTrainer(returnKind);
      $('#back-to-learning').onclick=()=>{trainerReturn=null;showView('personal');if(window.PersonalTrainers&&window.PersonalTrainers.openCatalog)window.PersonalTrainers.openCatalog();};
      save();return;
@@ -2821,15 +2847,10 @@
    const limit=Math.max(2,(cfg.session.size||10)+(cfg.session.newLimit||0));
    let list;
    if(role==='must'){
-     // due/needsReview first, reserved NEW (newLimit), then learning — not pure random
-     list=core.chooseShortSession(pool,records,Date.now(),limit);
-     if(list.length<limit){
-       const have=new Set(list.map(q=>q.id));
-       const fillers=pool.filter(q=>!have.has(q.id));
-       const more=window.Knowledge&&window.Knowledge.choose?window.Knowledge.choose(shuffled(fillers),state,limit-list.length):shuffled(fillers).slice(0,limit-list.length);
-       list=list.concat(more);
-     }
-     if(window.Knowledge&&window.Knowledge.choose)list=window.Knowledge.choose(list,state,limit);
+     prepareVocabPool();
+     const full=questions.filter(q=>eligible(q)&&q.topic==='vocab'&&q.wordRole==='must');
+     if(window.VocabMust)return window.VocabMust.planPortion(full,state,cfg,core,Date.now(),{rank:mustCourseRank,retrievability:mustRetrievability}).ids;
+     return [];
    }else{
      list=window.Knowledge&&window.Knowledge.choose?window.Knowledge.choose(shuffled(pool),state,Infinity):shuffled(pool);
      const recognize=shuffled(list.filter(q=>/-ru$/.test(q.id)));
