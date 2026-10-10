@@ -101,7 +101,7 @@
    if(types.every(t=>RECOG.has(t)))return false;
    return types.some(t=>PROD.has(t)||t==='harmony'||t==='initial_consonant'||t==='plural_suppression');
  }
- function observe(state,q,result,event,errors){
+ function observe(state,q,result,event,errors,trainer){
    register(q);const updates=new Map(),logs=[];
    for(const b of bindings(q)){
      let correct=b.field===null?result.correct:!!result.parts[b.field];
@@ -123,7 +123,8 @@
      const support=supportBinding(q,b,event,result,fields);
      const recSkill=RECOG.has(b.skill_type)||isChoice(q);
      const old=state.skills[k],recall=!recSkill&&!support&&!event.rule_peek&&(event.recall&&!RECOG.has(b.skill_type)||['harmony','initial_consonant'].includes(b.skill_type));
-     const r=S.answer(old,{at:event.at,correct,hinted:!!(event.hinted||event.rule_peek),responseTime:event.response_time_ms,recall});
+     const must=!!(trainer&&trainer.must),passRating=must&&Number.isFinite(event.rating)?event.rating:undefined;
+     const r=S.answer(old,{at:event.at,correct,hinted:!!(event.hinted||event.rule_peek),responseTime:event.response_time_ms,recall,rating:passRating});
      r.item_id=b.item_id;r.skill_type=b.skill_type;r.lesson_id=q.lessonId;
      r.successful_prompts=Array.from(new Set([...(old?.successful_prompts||[]),...(correct&&!support&&!event.hinted&&!event.rule_peek?[q.stimulus||q.id]:[])]));
      if(b.item_id==='rule:plural'&&r.mastery_level==='MASTERED'&&r.successful_prompts.length<2)r.mastery_level='REMEMBERED';

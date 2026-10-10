@@ -67,6 +67,7 @@
  // r7 X3: where the learner came from into this session (← Назад / «Сделать паузу» returns there).
  const ORIGIN_VIEWS=['today','learn','path','homework','personal','exam','review','vocabulary','materials','morph'],ORIGIN_LABEL={today:'Сегодня',learn:'Учёба',path:'Уроки',homework:'Домашка',personal:'Тренажёры',exam:'Экзамен',review:'Повторение',vocabulary:'Словарь',materials:'Материалы',morph:'Правила'};
  let sessionOrigin=null,trainerEpoch=null; // trainerEpoch: the queue a catalog trainer started; trainerReturn is valid only for it
+ let vocabPlan=null,vocabSitting=null,vocabRetry=null,vocabClosed=[],retryAfterWrong=false,vocabPoolReady=false,vocabReturnScheduled=false;
  let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null,stageContext=null,practiceHold=null,restoredEnded=false;
  let hwOrigin='today';
  function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
@@ -686,6 +687,59 @@
  function exampleLine(b,fmt=v=>String(v??'')){const from=String(b&&b.from||'').trim(),to=String(b&&b.to||'').trim();return from&&to&&from!==to?fmt(from)+' → '+fmt(to):fmt(from||to);}
  function exampleNote(b,fmt){const slot=String(b&&b.slot||'').trim(),why=String(b&&b.why||'').trim();if(!slot&&!why)return '';return '<p>'+(slot?'Слот: <strong lang="kk">'+fmt(slot)+'</strong>. ':'')+(why?fmt(why):'')+'</p>';}
  function isVocabWordsMode(){return mode==='words';}
+ function isVocabMustTrainer(){return mode==='words'&&vocabRole==='must'&&trainerReturn==='vocab:must';}
+ function mustPool(){return questions.filter(q=>q&&eligible(q)&&q.topic==='vocab'&&q.wordRole==='must');}
+ function prepareVocabPool(){
+   if(vocabPoolReady)return;
+   vocabPoolReady=true;
+   try{for(const raw of window.LESSON_V2_COMPILED||[]){const id=raw&&raw.lesson_id;if(id)ensureV2(id);}}catch(e){}
+ }
+ function beginMustPortion(fresh){
+   const VM=window.VocabMust;if(!VM)return false;
+   if(fresh||!vocabSitting){vocabSitting=VM.emptySitting(Date.now());vocabClosed=[];sessionCorrect=0;sessionAssisted=0;}
+   const loaded=questions.filter(q=>q&&q.topic==='vocab'&&q.wordRole==='must');
+   if(loaded.length<3)prepareVocabPool();
+   const pool=mustPool();
+   const planned=VM.planPortion(pool,state,cfg,core,Date.now());
+   if(!planned.ids.length)return false;
+   const ids=VM.enforceGap(planned.ids,vocabSitting,pool,core,cfg.schedule.learningIntervening||2);
+   if(!ids.length)return false;
+   sessionAttempts=0;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);draft=null;presented=null;
+   queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();trainerEpoch=(queueEpoch);
+   vocabPlan=planned.plan;vocabSitting.sessions.push(String(queueEpoch));
+   position=0;checked=false;hinted=false;retrying=false;vocabRetry=null;retryAfterWrong=false;vocabReturnScheduled=false;
+   return true;
+ }
+ function paintMustRetry(q){
+   if(!q||!vocabRetry)return;
+   retrying=true;hinted=vocabRetry.kind==='idk';retryAfterWrong=vocabRetry.kind==='wrong';checked=false;
+   const typed=vocabRetry.kind==='wrong'?(vocabRetry.typed||[]):[];
+   const scheduled=queue.slice(position+1).includes(q.id);
+   const text=window.VocabMust?(vocabRetry.kind==='idk'?window.VocabMust.idkNote(scheduled):window.VocabMust.statusNote(scheduled)):'';
+   const note=text?'<p class="small">'+esc(text)+'</p>':'';
+   const feedback=$('#feedback');
+   if(feedback)paintVocabLemmaFeedback(feedback,q,typed,{note});
+   (q.fields||[]).forEach((_,i)=>{const el=$('#answer-'+i);if(el){el.value='';el.disabled=false;el.classList.add('invalid');}});
+   if($('#reveal-button'))$('#reveal-button').disabled=true;
+   if($('#hint-button'))$('#hint-button').disabled=true;
+   focusAnswer();
+ }
+ function captureMustLive(){
+   return {queue:[...queue],position,queueEpoch,trainerEpoch,trainerReturn,vocabRole,mode,topic,courseBlock,sourceFilter,view,practiceIds:[...practiceIds],vocabPlan,vocabSitting,vocabRetry,vocabClosed:[...vocabClosed],sessionAttempts,sessionCorrect,sessionAssisted,sessionUnaided:Object.assign(Object.create(null),sessionUnaided),sessionBlindFails:Object.assign(Object.create(null),sessionBlindFails),retryAfterWrong,checked,hinted,presented};
+ }
+ function restoreMustLive(keep){
+   queue=keep.queue;position=keep.position;queueEpoch=keep.queueEpoch;trainerEpoch=keep.trainerEpoch;trainerReturn=keep.trainerReturn;vocabRole=keep.vocabRole;mode=keep.mode;topic=keep.topic;courseBlock=keep.courseBlock;sourceFilter=keep.sourceFilter;view=keep.view||view;practiceIds=keep.practiceIds;vocabPlan=keep.vocabPlan;vocabSitting=keep.vocabSitting;vocabRetry=keep.vocabRetry;vocabClosed=keep.vocabClosed;sessionAttempts=keep.sessionAttempts;sessionCorrect=keep.sessionCorrect;sessionAssisted=keep.sessionAssisted;sessionUnaided=keep.sessionUnaided;sessionBlindFails=keep.sessionBlindFails;retryAfterWrong=keep.retryAfterWrong;checked=keep.checked;hinted=keep.hinted;presented=keep.presented;
+ }
+ function applySavedMust(saved){
+   if(!window.VocabMust||!saved)return;
+   const built=window.VocabMust.restoreSaved(saved,state,cfg,Date.now());
+   const v=built.vocab;
+   vocabPlan=v.plan;vocabSitting=v.sitting;vocabRetry=v.retry;vocabClosed=v.closed||[];
+   sessionUnaided=Object.assign(Object.create(null),v.unaided||{});
+   sessionBlindFails=Object.assign(Object.create(null),v.blindFails||{});
+   retryAfterWrong=!!(vocabRetry&&vocabRetry.kind==='wrong');
+   vocabRole='must';
+ }
  function beginVocabRetry(){
    if(!isVocabWordsMode())return;
    const fb=$('#feedback');
@@ -809,6 +863,7 @@
    const token=queueEpoch+':'+position;
    if(presented!==token){
      presented=token;if(mode!=='voluntary')records[q.id]=window.ReviewScheduler.shown(records[q.id]);
+     if(isVocabMustTrainer()&&window.VocabMust&&vocabSitting){window.VocabMust.noteShown(vocabSitting,core.lemmaKey(q));window.VocabMust.noteRecent(vocabSitting,{cardId:q.id,lemma:core.lemmaKey(q),sessionId:String(queueEpoch),presentation:position});}
      for(const id of q.vocabIds||[]){const w=catalog.words.find(w=>w.id===id),p=state.vocabulary[id]||{times_seen:0,target_or_context:w?.target_or_context||'context'};state.vocabulary[id]={...p,times_seen:p.times_seen+1,last_seen:Date.now(),last_seen_lesson:q.lessonId};}
      // r7 step 2 (QA #6): the header counter was painted before this card was marked as shown,
      // so it lagged one card until the next repaint (F5 looked like a double count). Recount now.
@@ -936,7 +991,8 @@
  }
  function save(){
    captureDraft();persistLessonPath();persistLessonPractice();if(window.AiTutor&&window.AiTutor.snapshot)state.aiTutor=window.AiTutor.snapshot();state.records=records;state.learning=learningState;
-   state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,pathPracticeReturn:pathPracticeReturn?JSON.parse(JSON.stringify(pathPracticeReturn)):null,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null,trainerReturn,trainerEpoch,sessionOrigin};
+   state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,pathPracticeReturn:pathPracticeReturn?JSON.parse(JSON.stringify(pathPracticeReturn)):null,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null,vocabRole,trainerReturn,trainerEpoch,sessionOrigin};
+   if(isVocabMustTrainer()&&window.VocabMust)state.session.vocab=window.VocabMust.snapshot({plan:vocabPlan,sitting:vocabSitting,retry:vocabRetry,closed:vocabClosed,unaided:sessionUnaided,blindFails:sessionBlindFails});
    try{if(storageReadError)throw storageReadError;localStorage.setItem(KEY,JSON.stringify(state));storageAvailable=true;}catch{storageAvailable=false;}
    $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
    if(!cloudApplying)window.QazaqCloud?.pushSoon?.(state);
@@ -1422,7 +1478,8 @@
    const scope=subset(), tried=scope.filter(q=>records[q.id]?.attempts>0).length;
    const sp=$('#session-position');
    if(sp){
-     if(isVocabWordsMode())sp.textContent=`Верно ${sessionCorrect} из ${queue.length}`;
+     if(isVocabMustTrainer()&&window.VocabMust)sp.textContent=window.VocabMust.mustCounterText(vocabSitting?vocabSitting.answers:0);
+     else if(isVocabWordsMode())sp.textContent=`Верно ${sessionCorrect} из ${queue.length}`;
      else if(mode==='lesson'&&String(activeLesson||'').startsWith(HW_WORDS_PREFIX)){
        // r7 QA F1: the words track re-inserts cards while learning, so «Шаг N из queue» drifted (13 → 14 → 12).
        // Count words of the homework list instead: the denominator is the list (13 for 4-2) and never moves.
@@ -1438,7 +1495,10 @@
      }
    }
    const ss=$('#session-score');
-   if(ss)ss.textContent=sessionAttempts?`Без подсказки: ${sessionCorrect} / ${sessionAttempts}`:'';
+   if(ss){
+     if(isVocabMustTrainer()&&window.VocabMust){const t=window.VocabMust.recount(state,vocabSitting||{});ss.textContent=t.closed?('Самостоятельно: '+t.unaided+' · С подсказкой: '+t.assisted):'';}
+     else ss.textContent=sessionAttempts?`Без подсказки: ${sessionCorrect} / ${sessionAttempts}`:'';
+   }
    const pt=$('#practice-title');
    if(pt)pt.textContent=mode==='exam'?'Экзамен':mode==='homework'?'Домашка':activeLesson?(window.LEARNING.lessons.find(l=>l.id===activeLesson)||{}).title||'Практика':topic==='all'?'Практика':(topics.find(x=>x[0]===topic)||[])[1]||'Практика';
    const sum=$('#practice-filter-summary');
@@ -1603,6 +1663,7 @@
    refillCardDraft();
    $$('[data-fill]').forEach(b=>{const inp=$('#'+b.dataset.fill);if(inp&&inp.value===b.dataset.val)b.setAttribute('aria-pressed','true');});
    $('#answer-form').addEventListener('input',()=>{collapseVocabErrorOnInput();stashCard(q,true);save();});$('#answer-form').addEventListener('change',save);
+   if(isVocabMustTrainer()&&vocabRetry&&queue[position]===vocabRetry.cardId)paintMustRetry(q);
    activateCard();save();syncKbInset();
   if(window.TutorUI&&mode!=='exam'){
     const lid=currentLessonId(q);
@@ -1663,6 +1724,17 @@
  }
  function peekAnswer(q){
    if(checked||mode==='exam')return;
+   if(isVocabMustTrainer()&&window.VocabMust){
+     const answers=readAnswers(q),now=Date.now();
+     const pack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:'idk',answers,elapsed:elapsed(),core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating:window.FSRS.Rating.Again,errors:[],result:{correct:false,parts:(q.fields||[]).map(()=>false)},budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:true,recall:true});
+     queue=pack.queue;vocabRetry=pack.retry;vocabReturnScheduled=!!pack.scheduled;hinted=true;retrying=true;checked=false;retryAfterWrong=false;
+     paintVocabLemmaFeedback($('#feedback'),q,[],{note:'<p class="small">'+esc(window.VocabMust.idkNote(!!pack.scheduled))+'</p>'});
+     (q.fields||[]).forEach((_,i)=>{const el=$('#answer-'+i);if(el){el.value='';el.classList.add('invalid');el.disabled=false;}});
+     if($('#reveal-button'))$('#reveal-button').disabled=true;
+     if($('#hint-button'))$('#hint-button').disabled=true;
+     focusAnswer();save();
+     return;
+   }
    hinted=true;hintEvent(q,'reveal');
    if(isVocabWordsMode()){
      // Separate «Не знаю» (≥44): show эталон immediately. Does NOT count as correct. Ask-circle stays explain-only.
@@ -1723,6 +1795,24 @@
      const result=core.evaluate(q,answers);
      // r7 2b Q6-07/08: a retry answer is kept as evidence of the same presentation (never a first try).
      if(window.EvidenceState){try{const at=Date.now();window.EvidenceState.observe(state,{q,answers,result,event:{id:'retry:'+q.id+':'+at,at,hinted},responseModes:responseModes(q),origin:q.bank&&mode!=='homework'?'bank':evidenceOrigin(mode==='homework',mode==='voluntary'),presentation:typeof presented==='string'?presented:'',first:false,lessonId:currentLessonId(q)||q.lessonId||''});}catch(error){console.warn('evidence',error);}}
+     if(isVocabMustTrainer()&&window.VocabMust){
+       const out=window.VocabMust.commitRetype({state,sitting:vocabSitting,retry:vocabRetry,sessionId:String(queueEpoch),presentation:position,cardId:q.id,answers,result,now:Date.now(),legacy:!!(vocabRetry&&vocabRetry.legacy)});
+       if(!out.closed){
+         vocabRetry=out.retry;
+         const scheduled=queue.slice(position+1).includes(q.id);
+         const text=vocabRetry&&vocabRetry.kind==='idk'?window.VocabMust.idkNote(scheduled):window.VocabMust.statusNote(scheduled);
+         paintVocabLemmaFeedback($('#feedback'),q,answers,{note:'<p class="small">'+esc(text)+'</p>'});
+         focusAnswer();save();return;
+       }
+       if(!out.duplicate){
+         sessionAttempts++;
+         if(hinted||retryAfterWrong)sessionAssisted++;
+         const key=String(queueEpoch)+'|'+position+'|'+q.id;
+         if(!vocabClosed.includes(key))vocabClosed.push(key);
+       }
+       vocabRetry=null;retryAfterWrong=false;retrying=false;
+       save();nextQuestion();return;
+     }
      if(result.correct){
        // Words P1: progress counts closed/correct cards; retry path must credit the success.
        if(isVocabWordsMode()){sessionAttempts++;if(hinted)sessionAssisted++;else sessionCorrect++;}
@@ -1768,18 +1858,29 @@
    const homeworkMode=mode==='homework';
    const voluntary=mode==='voluntary';
    const aiRemed=String(q.id||'').startsWith('ai-remed:');
+   const errors=reveal||supportKind(q)?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);
+   let mustPack=null;
+   if(isVocabMustTrainer()&&!reveal&&window.VocabMust){
+     mustPack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:!result.correct?'wrong':(hinted||rulePeeked)?'assisted':'good',answers,elapsed:elapsedMs,core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating,errors,result,budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:!!(hinted||rulePeeked),recall});
+     queue=mustPack.queue;vocabReturnScheduled=!!mustPack.scheduled;
+     if(mustPack.retry){vocabRetry=mustPack.retry;retryAfterWrong=mustPack.retry.kind==='wrong';}
+     else retryAfterWrong=false;
+     if(mustPack.duplicate){checked=false;retrying=true;paintMustRetry(q);save();return;}
+   }
+   state.errors.push(...errors);
    let rec=previous||core.migrateRecord({},now);
-   if(homeworkMode){
+   if(mustPack){rec=mustPack.record||records[q.id];}
+   else if(homeworkMode){
      if(hinted&&previous){rec=core.updateRecord(previous,result.correct,true,now,{responseTime:elapsedMs,recall,rating:F.Rating.Again});records[q.id]=rec;}
    }else if(voluntary){rec=previous||rec;}
    else if(!aiRemed){rec=core.updateRecord(previous,result.correct,(hinted||rulePeeked),now,{responseTime:elapsedMs,recall,rating});records[q.id]=rec;}
    else records[q.id]=rec;
-   const errors=reveal||supportKind(q)?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);state.errors.push(...errors);
    const policy=window.MemoryPolicy;
    const flags=policy&&policy.answerFlags?policy.answerFlags({hinted:(hinted||rulePeeked),correct:result.correct}):{first_try_correct:(hinted||rulePeeked)?0:(result.correct?1:0),peek:(hinted||rulePeeked)?1:0,retype_after_peek_ok:(hinted||rulePeeked)?(result.correct?1:0):null};
    if(rulePeeked)flags.first_try_correct=0;
-   const eventId='ev:'+now+':'+q.id;
-   const event={id:eventId,session_id:String(queueEpoch),presentation:position,type:'answer',card_id:q.id,at:now,correct:result.correct,hinted,response_time_ms:elapsedMs,response_time:elapsedMs,latency_ms:elapsedMs,recall,answers,
+   const eventId=mustPack&&mustPack.event?mustPack.event.id:('ev:'+now+':'+q.id);
+   let event=mustPack&&mustPack.event?mustPack.event:null;
+   if(!event)event={id:eventId,session_id:String(queueEpoch),presentation:position,type:'answer',card_id:q.id,at:now,correct:result.correct,hinted,response_time_ms:elapsedMs,response_time:elapsedMs,latency_ms:elapsedMs,recall,answers,
      item_type:policy?policy.classify(q):null,direction:policy?policy.direction(q):null,
      first_try_correct:flags.first_try_correct,peek:flags.peek,retype_after_peek_ok:flags.retype_after_peek_ok,
      confusion_tag:policy?policy.confusionTag(q,answers,result):'',
@@ -1797,9 +1898,12 @@
      event.content_revision=stageContext.contentRevision;
      event.practice_kind=stageContext.kind;
    }
-   if(!homeworkMode&&!aiRemed&&!voluntary)event.skills=window.Knowledge.observe(state,q,result,event,errors);
-   state.events.push(event);rec=records[q.id]||rec;
+   if(mustPack)rec=records[q.id]||rec;else{
+     if(!homeworkMode&&!aiRemed&&!voluntary)event.skills=window.Knowledge.observe(state,q,result,event,errors);
+     state.events.push(event);rec=records[q.id]||rec;
    if(window.EvidenceState){try{window.EvidenceState.observe(state,{q,answers,result,event,responseModes:responseModes(q),origin:q.bank&&!homeworkMode?'bank':evidenceOrigin(homeworkMode,voluntary),presentation:typeof presented==='string'?presented:'',revealed:!!reveal,first:true,lessonId:event.lesson_id||currentLessonId(q)||q.lessonId||'',contentRevision:event.content_revision||(window.LessonV2Runtime&&window.LessonV2Runtime.byId&&(window.LessonV2Runtime.byId(q.lessonId)||{}).content_revision)||''});}catch(error){console.warn('evidence',error);}}
+   }
+   if(mustPack&&window.EvidenceState){try{window.EvidenceState.observe(state,{q,answers,result,event,responseModes:responseModes(q),origin:q.bank&&mode!=='homework'?'bank':evidenceOrigin(mode==='homework',mode==='voluntary'),presentation:typeof presented==='string'?presented:'',revealed:!!reveal,first:!mustPack.duplicate,lessonId:event.lesson_id||currentLessonId(q)||q.lessonId||'',contentRevision:event.content_revision||(window.LessonV2Runtime&&window.LessonV2Runtime.byId&&(window.LessonV2Runtime.byId(q.lessonId)||{}).content_revision)||''});}catch(error){console.warn('evidence',error);}}
    if(homeworkMode&&hwLesson){
      const expected=supportKind(q)?supportLine(q):q.kind==='multi'?(q.correct||[]).join(', '):(q.fields||[]).map(f=>f.answers[0]).join('; ');
      window.Homework.recordItem(state,hwLesson,{id:q.id,answers,correct:result.correct,rule_peek:rulePeeked,answer_peek:hinted,skipped:!!reveal,expected,event_id:eventId},now);
@@ -1826,6 +1930,8 @@
      }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2&&lemmaSessionCount(q.id)<(cfg.schedule.learningSessionBlinds||3)){
        core.scheduleRepeat(queue,position,q.id,rec.streak,stageContext.coreIds.filter(id=>id!==q.id&&byId.has(id)),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0,lemmaAppearCap:cfg.schedule.learningSessionBlinds||3});
      }
+   }else if(isVocabMustTrainer()){
+     /* vocab:must return is planned once inside commitFirst; do not write a second FSRS row here */
    }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2&&lemmaSessionCount(q.id)<(cfg.schedule.learningSessionBlinds||3))core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0,lemmaAppearCap:cfg.schedule.learningSessionBlinds||3});
    const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);
    if(!stageContext&&!bankRun&&mate&&!result.correct&&!hinted){
@@ -1874,6 +1980,7 @@
    let status=(!day0&&rec.streak>=2)||(day0&&blinds>=learningCap)?'Следующая проверка по памяти: '+new Date(rec.dueAt).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+'.':!result.correct?'Эта карточка появится снова.':day0?'Для закрепления карточка вернётся в этом подходе ещё раз (нужно '+learningCap+' слепых).':'Для закрепления карточка вернётся позже.';
    if(deferred)status='Карточка сохранена для следующего подхода: сейчас не хватает других заданий для паузы.';
    if(result.correct&&hinted)status='Перенабор засчитан как обучение, не как самостоятельный успех. Карточка вернётся в этом подходе слепой.';
+   if(isVocabMustTrainer()&&window.VocabMust)status=result.correct&&!(hinted||rulePeeked)?'':window.VocabMust.statusNote(!!vocabReturnScheduled);
    const answerLine=supportKind(q)?supportLine(q):q.kind==='multi'?q.correct.join(', '):(q.fields||[]).map(f=>f.answers.join(' / ')).join('; ');
    const alsoOk=!result.correct?'':(q.fields||[]).map((f,i)=>{
      const used=core.normalize(answers[i]||'');
@@ -1893,7 +2000,8 @@
    const vocabWrong=isVocabWordsMode()&&!result.correct;
    if(vocabWrong){
      // P0: strike attempt + orange #FF5A1F h3 sticker with lemma; bottom Ещё раз only; no Why/правило/skill-links.
-     paintVocabLemmaFeedback(feedback,q,answers,{});
+     const opts=isVocabMustTrainer()&&window.VocabMust?{note:'<p class="small">'+esc(window.VocabMust.statusNote(!!vocabReturnScheduled))+'</p>'}:{};
+     paintVocabLemmaFeedback(feedback,q,answers,opts);
    }else{
    feedback.innerHTML=`<h3>${headline}</h3>${tarErr?'<p class="error-sticker">не -тар</p><p>Число уже сказало, сколько. Окончание множественного здесь лишнее.</p>':''}${morph}${supportDiff}${result.correct?'<p><strong>Ответ:</strong> '+esc(answerLine)+'.</p>':''}${result.correct&&alsoOk?'<p class="small">Ещё верно: '+esc(alsoOk)+'.</p>':''}${local.length?'<p><strong>Где ошибка:</strong> '+[...new Set(local)].map(esc).join('; ')+'.</p>':''}${(()=>{const raw=q.explanation||'';if(result.correct)return raw?'<p>'+esc(raw)+'</p>':'';if(supportKind(q)&&q.why_wrong)return '';const safe=(window.ExplainOpen&&window.ExplainOpen.safeWrongWhy)?window.ExplainOpen.safeWrongWhy(raw,q):(raw&&window.ExplainOpen&&window.ExplainOpen.spoilsOnWrong&&window.ExplainOpen.spoilsOnWrong(raw,q)?'':raw);return safe?'<p>'+esc(safe)+'</p>':'';})()}<p class="small">${status}</p>${timeLine?'<p class="small">'+timeLine+'</p>':''}`+(!result.correct&&mode!=='exam'?`<div class="ai-tutor-panel" id="ai-tutor-panel"><div class="ai-tutor-actions"><button type="button" class="text-button" id="ai-why">Почему так?</button><button type="button" class="text-button" id="ai-rule">Покажи правило</button></div>${aiRepeat?'<p class="small" id="ai-repeat-note">Это уже повторялось — разберём</p>':''}<div id="ai-tutor-out" class="ai-tutor-out" hidden></div></div>`:'');feedback.hidden=false;if(!result.correct&&window.ExplainOpen&&!supportKind(q)){const offers=sameSkillOffers(q);feedback.insertAdjacentHTML('beforeend',(window.ExplainOpen.chainHtml?window.ExplainOpen.chainHtml(q,answers):window.ExplainOpen.forQuestion(q,answers))+offerHtml(offers));window.ExplainOpen.bind(feedback);bindOffers(feedback);}if(!result.correct&&mode!=='exam'&&window.AiTutor&&window.AiTutor.coverageGaps&&!feedback.querySelector('[data-coverage-gap]')){const gap=window.AiTutor.coverageGaps().find(g=>aiCodes.includes(g.error_code));if(gap)feedback.insertAdjacentHTML('beforeend','<p class="small" data-coverage-gap>'+esc(gap.phrase)+(gap.label?' '+esc(gap.label)+'.':'')+'</p>');}
    }
@@ -1957,7 +2065,7 @@
      advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
    }
  }
- function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;position++;if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}focusAnswer();}
+ function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;retryAfterWrong=false;vocabRetry=null;position++;if(isVocabMustTrainer()){const budget=vocabPlan&&vocabPlan.budget||(cfg.vocab&&cfg.vocab.answerBudget)||10;if(window.VocabMust&&window.VocabMust.portionDone(sessionAttempts,budget,position,queue.length)){if(!beginMustPortion(false))position=queue.length;}}else if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}focusAnswer();}
  function homeworkOpts(){
    const sessionGUnlocked=!!(window.Lesson31Pack?.sessionG?.().length)&&window.Lesson31Pack.sessionG().every(q=>records[q.id]?.seen);
    return {sessionGUnlocked,events:state.events};
@@ -2641,7 +2749,10 @@
    if(complete)learningState.completedSteps[activeLesson+':'+activeStep]=true;
    if(trainerReturn){
      const returnKind=trainerReturn;
-     $('#exercise').innerHTML='<div class="empty-state"><h2>Подход завершён</h2><p>Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё подход</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
+     if(isVocabMustTrainer()&&window.VocabMust){
+       const t=window.VocabMust.recount(state,vocabSitting||{});
+       $('#exercise').innerHTML='<div class="empty-state"><h2>Пока всё</h2><p>Самостоятельно: '+t.unaided+'. С подсказкой: '+t.assisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё слова</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
+     }else $('#exercise').innerHTML='<div class="empty-state"><h2>Подход завершён</h2><p>Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё подход</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
      $('#restart').onclick=()=>startCatalogTrainer(returnKind);
      $('#back-to-learning').onclick=()=>{trainerReturn=null;showView('personal');if(window.PersonalTrainers&&window.PersonalTrainers.openCatalog)window.PersonalTrainers.openCatalog();};
      save();return;
@@ -2722,6 +2833,11 @@
    }
    const role=kind==='vocab:used'?'used':'must';
    activeLesson=null;activeStep=null;sourceFilter=null;courseBlock=null;topic='vocab';vocabRole=role;mode='words';
+   if(role==='must'){
+     const ok=beginMustPortion(true);
+     if(!ok){trainerReturn=null;showView('personal');return;}
+     render();showView('practice');return;
+   }
    queue=catalogVocabIds(role);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();trainerEpoch=queueEpoch;position=0;checked=false;resetCounts();
    if(!queue.length){trainerReturn=null;showView('personal');return;}
    render();showView('practice');
@@ -2766,14 +2882,34 @@
    window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);save();
  }
  function importProgress(incoming,mode){
+   const plan=window.VocabMust?window.VocabMust.importPlan({mustUnfinished:isVocabMustTrainer()&&position<queue.length,position,queueEpoch,retry:vocabRetry},incoming,mode):{action:'reset'};
    const backup=P.serialize(state);
    try{localStorage.setItem(BACKUP,backup);}catch{throw Error('Не удалось сохранить копию перед импортом. Сначала скачай текущий прогресс; импорт не выполнен.');}
+   if(plan.action==='keep-local'){
+     const keep=captureMustLive();
+     const next=P.merge(state,incoming);next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
+     try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
+     state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;
+     if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
+     window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);
+     restoreMustLive(keep);save();render();showView('practice');return;
+   }
+   if(plan.action==='restore'){
+     const next=P.migrate(incoming);next.session=plan.session;next.lesson_packages=window.LessonPackageSchema.merge([],next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
+     try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
+     state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;
+     if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
+     window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);
+     const sess=plan.session;
+     topic=sess.topic;mode=sess.mode;sourceFilter=sess.sourceFilter||null;courseBlock=sess.courseBlock||null;vocabRole='must';trainerReturn=sess.trainerReturn;queueEpoch=typeof sess.queueEpoch==='number'?sess.queueEpoch:Date.now();trainerEpoch=typeof sess.trainerEpoch==='number'?sess.trainerEpoch:queueEpoch;queue=sess.queue.slice();practiceIds=Array.isArray(sess.practiceIds)?sess.practiceIds.slice():[...queue];position=Math.min(queue.length,sess.position||0);checked=false;presented=null;sessionAttempts=Math.max(0,Number(sess.sessionAttempts)||0);sessionCorrect=Math.max(0,Number(sess.sessionCorrect)||0);sessionAssisted=Math.max(0,Number(sess.sessionAssisted)||0);
+     applySavedMust(sess);pauseTimer();elapsedMs=0;save();render();showView('practice');return;
+   }
    const next=mode==='replace'?P.migrate(incoming):P.merge(state,incoming);next.session=null;next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
    try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
    state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;
    if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
    window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);
-   activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;checked=false;presented=null;pauseTimer();elapsedMs=0;showView('today');
+   activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;checked=false;presented=null;pauseTimer();elapsedMs=0;vocabPlan=null;vocabSitting=null;vocabRetry=null;vocabClosed=[];retryAfterWrong=false;showView('today');
  }
  function vocabTable(rows){return `<div class="table-wrap"><table><thead><tr><th scope="col">Қазақша</th><th scope="col">По-русски / число</th></tr></thead><tbody>${rows.map(([k,r])=>`<tr><td lang="kk">${esc(k)}</td><td>${esc(Array.isArray(r)?r.join(', '):r)}</td></tr>`).join('')}</tbody></table></div>`;}
  function explainCanonMarkup(){
@@ -3228,6 +3364,7 @@
    for(const id of need)ensureV2(id);
  }catch(e){}
  if(savedSession&&savedSession.mode==='lesson'&&String(savedSession.activeLesson||'').startsWith(HW_WORDS_PREFIX))homeworkWordsTrack(String(savedSession.activeLesson).slice(HW_WORDS_PREFIX.length));
+ if(savedSession&&savedSession.mode==='words'&&savedSession.trainerReturn==='vocab:must'&&typeof prepareVocabPool==='function')prepareVocabPool();
  const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','course','phrase','transfer','contrast','numbers','remediation','words','exam','homework','chunks'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){
    variants=savedSession.variants||{};
@@ -3240,7 +3377,7 @@
    activeStep=activeLesson?Math.min(window.LEARNING.lessons.find(l=>l.id===activeLesson).chunks.length-1,Math.max(0,Number(savedSession.activeStep)||0)):null;
    queue=savedSession.queue;practiceIds=Array.isArray(savedSession.practiceIds)?savedSession.practiceIds.filter(id=>byId.has(id)):[...new Set(queue)];
    stepEvidence=savedSession.stepEvidence&&typeof savedSession.stepEvidence==='object'?savedSession.stepEvidence:{};
-   position=Math.min(queue.length,savedSession.position+(savedSession.answered?1:0));restoredEnded=mode==='course'&&!stageContext&&position>=queue.length;if(savedSession.answered&&!['ordered','shuffle','homework','course','phrase','transfer'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();
+   position=Math.min(queue.length,savedSession.position+(savedSession.answered?1:0));restoredEnded=mode==='course'&&!stageContext&&position>=queue.length;if(savedSession.answered&&!['ordered','shuffle','homework','course','phrase','transfer'].includes(mode)){const mustCap=mode==='words'&&savedSession.trainerReturn==='vocab:must'&&savedSession.vocab&&savedSession.vocab.plan?Number(savedSession.vocab.plan.budget):cfg.session.maxAttempts;if(sessionAttempts>=mustCap)position=queue.length;}if(mode==='words'&&trainerReturn==='vocab:must')vocabRole='must';if(mode==='words'&&trainerReturn==='vocab:must'&&typeof applySavedMust==='function'){applySavedMust(savedSession);if(typeof beginMustPortion==='function'&&window.VocabMust&&vocabPlan&&window.VocabMust.portionDone(sessionAttempts,vocabPlan.budget,position,queue.length))beginMustPortion(false);}render();
    if(!savedSession.answered){hinted=!!savedSession.hinted;elapsedMs=Number.isFinite(savedSession.elapsed_ms)?Math.max(0,savedSession.elapsed_ms):0;}
  }else{queue=[];practiceIds=[];renderStats();}
  const hasMorphResume=!!(state.morphTrainer&&(state.morphTrainer.session||(state.morphTrainer.teaching&&state.morphTrainer.teaching.resume)));
