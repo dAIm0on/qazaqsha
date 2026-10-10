@@ -1,0 +1,15 @@
+{
+  "baseline": "0dab333adac7c95c2dd486b85eaaf1c20cff6f5f",
+  "algorithm": "sha256",
+  "newline": "lf",
+  "files": {
+    "morph-ui.js": "c282d2470b3a663879a881cfdfc802a72cac49ace460310f4827b219769d9927",
+    "morph-nav2.js": "66503a4a9c5c857486e00e6b0b901da30a415e2bd51bd224154573f61daa3742",
+    "morph.css": "07a02d40ce16aeb572dadb53df6f3fd9412998de25b8fedd6db36cc4137b300e",
+    "free-practice-config.js": "912e21d0443c659ebab3dc4cc4b7e77bd0f48ad2c7d70b29f50b328e9513b2a7",
+    "free-practice-queue.js": "e608ff36e1611e1f208c73d3e497c5c032094075e6bda758d18ce3d95f8ec159",
+    "free-practice-state.js": "79b37020eb3bb2643bf3aaf3e275ca99ae84932e0142133b4e490b86d88116f5",
+    "free-practice-content.js": "701b37058eefaed232575d578219f85236cd862adc54c0c327c8296138170b49",
+    "free-practice-view.js": "1627fc5e60d03ce46628591c894e0e3240bf5ce974ff21f61ed564a9736e1496"
+  }
+}

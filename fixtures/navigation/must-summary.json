@@ -1,0 +1,36 @@
+{
+  "fixtureStatus": "EXPECTED_UNTIL_VOC",
+  "structural": true,
+  "note": "v6 session.vocab is not on baseline 0dab333adac7c95c2dd486b85eaaf1c20cff6f5f. Structural placeholder only. Not product behavior.",
+  "session": {
+    "mode": "words",
+    "trainerReturn": "vocab:must",
+    "vocabRole": "must",
+    "position": 0,
+    "answered": false,
+    "vocab": {
+      "plan": {
+        "budget": 10,
+        "nNew": 3,
+        "baseLen": 3,
+        "newLemmas": []
+      },
+      "sitting": {
+        "startedAt": null,
+        "sessions": [],
+        "newLemmas": [],
+        "answers": 3,
+        "shown": [],
+        "recent": [],
+        "legacy": null
+      },
+      "retry": null,
+      "closed": [
+        "structural-card"
+      ],
+      "unaided": {},
+      "blindFails": {},
+      "nearMiss": null
+    }
+  }
+}
