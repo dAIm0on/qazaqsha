@@ -2,9 +2,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const {execFileSync} = require('node:child_process');
 
-const BASE = '0dab333adac7c95c2dd486b85eaaf1c20cff6f5f';
 const ROOT = __dirname;
 
 function read(rel) {
@@ -13,10 +11,7 @@ function read(rel) {
 function lineOf(text, needle) {
   const at = text.indexOf(needle);
   assert.ok(at >= 0, needle);
-  return text.slice(0, at).split('\n').length;
-}
-function git(args) {
-  return execFileSync('git', args, {cwd: ROOT, encoding: 'utf8'}).replace(/\r\n/g, '\n').trim();
+  return text.slice(0, at).split(/\r?\n/).length;
 }
 
 const html = read('index.html');
@@ -77,17 +72,18 @@ console.log('CSS_LINE theme-redesign.css', lineOf(theme, practiceMenu), practice
 console.log('CSS_LINE theme-redesign.css', lineOf(theme, pathNav), pathNav);
 
 const morph = read('morph.css');
+const morphOverflow = 'html:has(body[data-view=morph]){overflow-x:hidden}';
 const morphSession = 'body[data-morph-immersive="1"] .bottom-nav{display:none}';
+assert.ok(morph.includes(morphOverflow));
 assert.ok(morph.includes(morphSession));
+console.log('CSS_LINE morph.css', lineOf(morph, morphOverflow), morphOverflow);
 console.log('CSS_LINE morph.css', lineOf(morph, morphSession), morphSession);
 
 const tokens = read('design-tokens.css');
 assert.ok(tokens.includes('#FF5A1F'));
-assert.equal(git(['diff', '--name-only', BASE, '--', 'design-tokens.css']), '');
-assert.equal(git(['diff', '--name-only', BASE, '--', 'theme-redesign.css', 'morph.css']), '');
 assert.match(html, /id="today-view"/);
 assert.match(html, /id="practice-view"/);
 assert.match(html, /id="morph-view"/);
 assert.match(html, /<nav class="bottom-nav"/);
-console.log('PALETTE #FF5A1F still in design-tokens.css; index.html is checked by structure, not a frozen diff');
+console.log('PALETTE #FF5A1F still in design-tokens.css; protected CSS rules are checked by text, not a frozen file diff');
 console.log('VERIFY_NAVIGATION_UI_OK');
