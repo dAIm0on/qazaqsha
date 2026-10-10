@@ -3,7 +3,9 @@
 
 Reads index.html, styles it loads, and the manifest icons.
 Writes sw.js ASSETS. Refuses the legacy lesson 4-2 packs and nonpast-engine.js:
-those files stay out of the browser. Run from the repo root:
+those files stay out of the browser. Each write also drops the install handler's
+unconditional skipWaiting so an open tab reloads only after ACTIVATE_UPDATE.
+Run from the repo root:
 
     python tools/build_offline.py --cache qazaq-offline-live-YYYYMMDD-name
     python tools/build_offline.py --check
@@ -102,6 +104,31 @@ def current_assets(text: str) -> list[str]:
     return json.loads(match.group(1))
 
 
+def strip_install_skip_waiting(text: str) -> str:
+    """Remove install-time `await self.skipWaiting()`.
+
+    The message handler keeps `ACTIVATE_UPDATE` → `self.skipWaiting()`.
+    `clients.claim()` in activate stays. Idempotent once the line is gone.
+    """
+    needle = "await self.skipWaiting();"
+    if needle not in text:
+        if "self.skipWaiting()" not in text or "ACTIVATE_UPDATE" not in text:
+            raise SystemExit("message-handler skipWaiting is missing")
+        if "clients.claim()" not in text:
+            raise SystemExit("clients.claim() is missing")
+        return text
+    if text.count(needle) != 1:
+        raise SystemExit("expected exactly one install await self.skipWaiting()")
+    text2, count = re.subn(r"\n[ \t]*await self\.skipWaiting\(\);", "", text, count=1)
+    if count != 1:
+        raise SystemExit("could not remove install skipWaiting")
+    if "ACTIVATE_UPDATE" not in text2 or "self.skipWaiting()" not in text2:
+        raise SystemExit("message-handler skipWaiting was removed")
+    if "clients.claim()" not in text2:
+        raise SystemExit("clients.claim() missing after rewrite")
+    return text2
+
+
 def write_sw(assets: list[str], cache: str) -> None:
     text = read(SW).replace("\r\n", "\n").replace("\r", "\n")
     text = re.sub(
@@ -115,6 +142,7 @@ def write_sw(assets: list[str], cache: str) -> None:
     text2, count = re.subn(r"const CACHE='[^']*',ASSETS=\[.*?\];", new_line, text, count=1)
     if count != 1:
         raise SystemExit("could not replace the CACHE/ASSETS line")
+    text2 = strip_install_skip_waiting(text2)
     SW.write_bytes(text2.encode("utf-8"))
 
 
