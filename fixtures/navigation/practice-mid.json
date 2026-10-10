@@ -1,0 +1,42 @@
+{
+  "topic": "sounds",
+  "mode": "ordered",
+  "sourceFilter": null,
+  "courseBlock": null,
+  "queue": [
+    "m1-1-1"
+  ],
+  "position": 0,
+  "answered": false,
+  "view": "practice",
+  "activeLesson": null,
+  "activeStep": null,
+  "practiceIds": [
+    "m1-1-1"
+  ],
+  "stepEvidence": {},
+  "variants": {},
+  "hinted": false,
+  "elapsed_ms": 1200,
+  "queueEpoch": 1700000000000,
+  "presented": null,
+  "draft": {
+    "token": "1700000000000:0",
+    "exerciseId": "m1-1-1",
+    "answers": [
+      ""
+    ]
+  },
+  "sessionAttempts": 1,
+  "sessionCorrect": 0,
+  "sessionAssisted": 0,
+  "remediation": null,
+  "hwLesson": null,
+  "hwPart": null,
+  "hwSection": 0,
+  "pathPracticeReturn": null,
+  "stageContext": null,
+  "trainerReturn": null,
+  "trainerEpoch": null,
+  "sessionOrigin": "today"
+}
