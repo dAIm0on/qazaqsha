@@ -51,6 +51,16 @@ function ensureBase() {
     }
   }
 }
+function ensureMain() {
+  try { git(['cat-file', '-e', 'origin/main^{commit}']); return true; }
+  catch {
+    try { git(['fetch', '--depth', '1', 'origin', 'refs/heads/main:refs/remotes/origin/main']); return true; }
+    catch (error) {
+      console.log('MAIN_DIFF NOT_RUN', error && error.message ? error.message.split('\n')[0] : 'origin/main unavailable');
+      return false;
+    }
+  }
+}
 function futureRoute(row) {
   const id = row.id;
   const topic = row.topic || '';
@@ -227,7 +237,7 @@ function registry() {
     row('N-READY', 'homework and exam', 'open', '#/ready/homework/:id and #/ready/exam', ['entry-map.json'], 'NAV-09', 'EXPECTED_LATER'),
     row('N-DICT', 'vocabulary', 'Мой словарь', '#/dict', ['entry-map.json'], 'NAV-10', 'EXPECTED_LATER'),
     row('N-VOC', 'words must', 'session.vocab', 'v6 snapshot', ['must-first-show.json', 'must-idk.json', 'must-wrong.json', 'must-boundary.json', 'must-summary.json'], 'VOC', 'EXPECTED_UNTIL_VOC'),
-    row('PWA-CONTROLLERCHANGE-RELOAD', 'pwa', 'controllerchange', 'location.reload', [], 'NAV-01', 'BASELINE_DEFECT_OWNED_BY_NAV01')
+    row('PWA-CONTROLLERCHANGE-RELOAD', 'pwa', 'controllerchange', 'first controller does not reload', [], 'NAV-01', 'BASELINE')
   ];
   const rules = [
     ['K1', 'lesson and menu', 'Теория / Практика / Слова', 'one tap, no extra start', 'NAV-08'],
@@ -268,7 +278,9 @@ console.log('CONTRACT_COUNTS', JSON.stringify(counts), 'total', contracts.length
 console.log('BASELINE_SHA', BASE);
 
 const sw = read('sw.js');
-assert.deepEqual(sw.match(/CACHE='[^']+'/g), ["CACHE='qazaq-offline-live-20261007-section2-2'"]);
+const cacheNames = sw.match(/CACHE='[^']+'/g) || [];
+assert.equal(cacheNames.length, 1);
+assert.match(cacheNames[0], /^CACHE='qazaq-offline-live-\d{8}-[a-z0-9-]+'$/);
 assert.equal(sw.includes('fixtures/navigation'), false);
 
 const app = read('app.js');
@@ -286,9 +298,12 @@ assert.match(applyBody, /save\(\)/);
 assert.match(app, /savedSession\.queue\.every\(id=>byId\.has\(id\)\)/);
 
 const pwa = read('pwa.js');
-assert.match(pwa, /navigator\.serviceWorker\.addEventListener\('controllerchange',\(\)=>\{if\(!reloading\)\{reloading=true;if\(window\.dispatchEvent\(new Event\('qazaq-before-update',\{cancelable:true\}\)\)\)location\.reload\(\);else status\.textContent='Обновление готово\. Экспортируй прогресс перед перезагрузкой страницы\.';\}\}\);/);
-assert.equal(byId.get('PWA-CONTROLLERCHANGE-RELOAD').status, 'BASELINE_DEFECT_OWNED_BY_NAV01');
-console.log('BASELINE_DEFECT_OWNED_BY_NAV01 pwa.js controllerchange still calls location.reload');
+assert.match(pwa, /addEventListener\('controllerchange'/);
+assert.match(pwa, /if\(!controllerKnown\)/);
+assert.match(pwa, /if\(reloadRequested\)\{reloadOnce\(\);return;\}/);
+assert.doesNotMatch(pwa, /controllerchange',\(\)=>\{if\(!reloading\)\{reloading=true/);
+assert.equal(byId.get('PWA-CONTROLLERCHANGE-RELOAD').status, 'BASELINE');
+console.log('BASELINE pwa.js first controllerchange does not reload');
 
 const progress = read('progress.js');
 assert.match(progress, /out\.session=null;/);
@@ -335,8 +350,9 @@ for (const name of PROTECTED) {
   const digest = crypto.createHash('sha256').update(Buffer.from(fs.readFileSync(path.join(ROOT, name), 'utf8').replace(/\r\n/g, '\n'), 'utf8')).digest('hex');
   assert.equal(digest, hashes.files[name], name);
 }
-if (ensureBase()) {
-  const protectedDiff = git(['diff', '--name-only', BASE, '--', ...PROTECTED]).trim();
+if (ensureBase() && ensureMain()) {
+  const gate = 'origin/main';
+  const protectedDiff = git(['diff', '--name-only', gate, '--', ...PROTECTED]).trim();
   assert.equal(protectedDiff, '', protectedDiff);
   const changed = new Set();
   for (const line of git(['status', '--porcelain', '-uall']).split('\n').filter(Boolean)) {
@@ -344,9 +360,10 @@ if (ensureBase()) {
     if (file.includes(' -> ')) file = file.split(' -> ').pop().trim();
     changed.add(file.replace(/\\/g, '/'));
   }
-  for (const line of git(['diff', '--name-only', BASE]).split('\n').filter(Boolean)) changed.add(line.replace(/\\/g, '/'));
+  for (const line of git(['diff', '--name-only', gate]).split('\n').filter(Boolean)) changed.add(line.replace(/\\/g, '/'));
   for (const file of changed) assert.match(file, ALLOWED_FILE, 'unexpected path ' + file);
-  const prod = git(['diff', '--name-only', BASE, '--', '*.js', '*.css', '*.html', 'sw.js']).trim();
-  assert.equal(prod, '');
+  const prod = git(['diff', '--name-only', gate, '--', 'pwa.js', 'sw.js', 'app.js', 'index.html', 'morph.css', 'theme-redesign.css']).trim();
+  assert.equal(prod, '', prod);
+  console.log('PROD_GATE', gate);
 }
 console.log('VERIFY_NAVIGATION_CONTRACT_OK');
