@@ -736,6 +736,35 @@
    if(!rec||!window.ReviewScheduler||typeof window.ReviewScheduler.retrievability!=='function')return null;
    try{const v=window.ReviewScheduler.retrievability(rec,Date.now());return v==null||Number.isNaN(v)?null:v;}catch(e){return null;}
  }
+ // Cards still in the plan are not an empty pool. Lower the pause until one fits.
+ // Do not open on the lemma just shown when another planned card can go first.
+ function relaxMustGap(ids,sitting,pool,core,minGap){
+   const VM=window.VocabMust;
+   if(!VM||!(ids&&ids.length))return [];
+   const byId=new Map((pool||[]).map(q=>[q.id,q]));
+   const lemOf=id=>core.lemmaKey(byId.get(id)||{id});
+   const recent=((sitting&&sitting.recent)||[]).map(x=>x.lemma||x.cardId);
+   const just=recent.length?recent[recent.length-1]:'';
+   for(let gap=(Number(minGap)||2)-1;gap>=1;gap--){
+     const passed=VM.enforceGap(ids,sitting,pool,core,gap);
+     if(!passed.length)continue;
+     const alt=just?passed.findIndex(id=>lemOf(id)!==just):-1;
+     if(alt>0)return passed.slice(alt).concat(passed.slice(0,alt));
+     return passed;
+   }
+   // enforceGap reads `minGap||2`, so the last step cannot ask it for a zero pause.
+   let older=null,olderDist=-1,same=null;
+   for(const id of ids){
+     const lem=lemOf(id);
+     let last=-1;
+     for(let i=0;i<recent.length;i++)if(recent[i]===lem)last=i;
+     const dist=last<0?recent.length+1:recent.length-1-last;
+     if(just&&lem===just){if(same==null)same=id;continue;}
+     if(older==null||dist>olderDist){older=id;olderDist=dist;}
+   }
+   const pick=older||same;
+   return pick?[pick]:[];
+ }
  function beginMustPortion(fresh){
    const VM=window.VocabMust;if(!VM)return false;
    if(fresh||!vocabSitting){vocabSitting=VM.emptySitting(Date.now());vocabClosed=[];sessionCorrect=0;sessionAssisted=0;}
@@ -743,7 +772,9 @@
    const pool=mustPool();
    const planned=VM.planPortion(pool,state,cfg,core,Date.now(),{rank:mustCourseRank,retrievability:mustRetrievability});
    if(!planned.ids.length)return false;
-   let ids=VM.enforceGap(planned.ids,vocabSitting,pool,core,cfg.schedule.learningIntervening||2);
+   const minGap=cfg.schedule.learningIntervening||2;
+   let ids=VM.enforceGap(planned.ids,vocabSitting,pool,core,minGap);
+   if(!ids.length)ids=relaxMustGap(planned.ids,vocabSitting,pool,core,minGap);
    if(!ids.length)return false;
    sessionAttempts=0;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);draft=null;presented=null;
    queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();trainerEpoch=(queueEpoch);

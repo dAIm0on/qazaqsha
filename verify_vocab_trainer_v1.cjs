@@ -459,6 +459,59 @@ assert.deepEqual(gapIds,[],'P0-GAP');
   }
 }
 
+// P0-GAP-NOT-EXHAUSTED: 1–2 just-shown cards must not paint «Все слова пройдены».
+// Mutation: put `return false` back on the empty enforceGap branch and this fails.
+function runGapScreen(cards,sitting,queue){
+  const rankSrc=app.slice(app.indexOf('function mustCourseRank'),app.indexOf('function paintMustRetry'));
+  const nextSrc=app.slice(app.indexOf('function nextQuestion'),app.indexOf('function homeworkOpts'));
+  const emptySrc=app.slice(app.indexOf('function renderEmpty'),app.indexOf('function startRemedy'));
+  const mustPred=app.slice(app.indexOf('function isVocabMustTrainer()'),app.indexOf('function mustPool()'));
+  assert.ok(rankSrc.includes('function relaxMustGap')&&rankSrc.includes('function beginMustPortion'),'P0-GAP-NOT-EXHAUSTED');
+  assert.ok(nextSrc.includes('beginMustPortion(false)'),'P0-GAP-NOT-EXHAUSTED');
+  assert.ok(emptySrc.includes('<h2>Все слова пройдены</h2>'),'P0-GAP-NOT-EXHAUSTED');
+  const body=[
+    'const window={VocabMust:VM,LESSON_V2_COMPILED:[]};',
+    'const cfg=start.cfg, core=start.core, state=start.state, records=state.records;',
+    'let mode="words", vocabRole="must", trainerReturn="vocab:must", queueEpoch=7, trainerEpoch=7;',
+    'let position=0, queue=start.queue.slice(), practiceIds=queue.slice();',
+    'let vocabSitting=start.sitting, vocabPlan=start.plan, vocabClosed=[], vocabRetry=null, vocabPoolReady=false, vocabReturnScheduled=false;',
+    'let sessionAttempts=0, sessionCorrect=0, sessionAssisted=0, sessionBlindFails=Object.create(null), sessionUnaided=Object.create(null);',
+    'let draft=null, presented=null, checked=false, hinted=false, retrying=false, retryAfterWrong=false;',
+    'let activeLesson=null, pathPracticeReturn=null, hwReturn=null, courseBlock=null;',
+    'const byId=new Map(start.cards.map(q=>[q.id,q]));',
+    'const nodes={};',
+    'function $(sel){if(!nodes[sel])nodes[sel]={innerHTML:"",onclick:null,scrollIntoView(){},focus(){},classList:{contains(){return false;},add(){},remove(){}}};return nodes[sel];}',
+    'const document={documentElement:{classList:{contains(){return false;}}},addEventListener(){},removeEventListener(){}};',
+    'function cancelAdvance(){} function abortTutor(){} function focusAnswer(){} function save(){} function showView(){}',
+    'function prepareVocabPool(){} function mustPool(){return start.cards;}',
+    'function render(){const q=byId.get(queue[position]);if(!q){renderEmpty();return;}$("#exercise").innerHTML="<h2 id=question-title>"+q.id+"</h2>";}',
+    mustPred,rankSrc,nextSrc,emptySrc,
+    'nextQuestion();',
+    'const q=byId.get(queue[position]);',
+    'return {html:$("#exercise").innerHTML,queue:queue.slice(),position,id:q?q.id:null};'
+  ].join('\n');
+  return new Function('start','VM',body)({cfg,core,state:state(),cards,sitting,plan:{budget:10,nNew:cards.length,baseLen:cards.length,newLemmas:[]},queue},VM);
+}
+const gapLeft=[card('X','word:x'),card('Y','word:y')];
+const gapLeftSit=VM.emptySitting(1);
+gapLeftSit.recent=[{cardId:'X',lemma:'word:x'},{cardId:'Y',lemma:'word:y'}];
+const gapLeftPlan=VM.planPortion(gapLeft,state(),cfg,core,1000);
+assert.ok(gapLeftPlan.ids.length>=1&&gapLeftPlan.ids.length<=2,'P0-GAP-NOT-EXHAUSTED');
+assert.deepEqual(VM.enforceGap(gapLeftPlan.ids,gapLeftSit,gapLeft,core,cfg.schedule.learningIntervening||2),[],'P0-GAP-NOT-EXHAUSTED');
+const gapLeftScreen=runGapScreen(gapLeft,gapLeftSit,['Y']);
+assert.ok(!gapLeftScreen.html.includes('Все слова пройдены'),'P0-GAP-NOT-EXHAUSTED');
+assert.ok(gapLeftScreen.html.includes('question-title'),'P0-GAP-NOT-EXHAUSTED');
+assert.equal(gapLeftScreen.id,'X','P0-GAP-NOT-EXHAUSTED');
+const gapOne=[card('Y','word:y')];
+const gapOneSit=VM.emptySitting(1);
+gapOneSit.recent=[{cardId:'Y',lemma:'word:y'}];
+const gapOnePlan=VM.planPortion(gapOne,state(),cfg,core,1000);
+assert.deepEqual(gapOnePlan.ids,['Y'],'P0-GAP-NOT-EXHAUSTED');
+assert.deepEqual(VM.enforceGap(gapOnePlan.ids,gapOneSit,gapOne,core,2),[],'P0-GAP-NOT-EXHAUSTED');
+const gapOneScreen=runGapScreen(gapOne,gapOneSit,['Y']);
+assert.ok(!gapOneScreen.html.includes('Все слова пройдены'),'P0-GAP-NOT-EXHAUSTED');
+assert.equal(gapOneScreen.id,'Y','P0-GAP-NOT-EXHAUSTED');
+
 function answerCard(st,sitting,cards,q,queue,position,plan,kind,now,sessionId){
   const res=VM.commitFirst({state:st,records:st.records,q,now,sessionId,presentation:position,kind,answers:kind==='good'?['ok']:[],elapsed:5,core,observe:()=>[],queue,position,pool:cards,plan,sitting,rating:kind==='good'?F.Rating.Good:F.Rating.Again,errors:[],result:{correct:kind==='good',parts:[kind==='good']},budget:plan.budget,minGap:2,appearCap:3,hinted:kind!=='good',recall:true});
   let spent=kind==='good'?1:0;
@@ -665,6 +718,10 @@ assert.ok(after32.partial.every(id=>freshPool.ids.includes(id)));
 assert.ok(after42.partial.every(id=>freshPool.ids.includes(id)));
 assert.equal(freshPool.foreign,0);
 assert.equal(freshPool.lemmas,freshPool.vocabIds);
+// TZ v6 pool. When lessons are added, update these three numbers together with the TZ.
+assert.equal(freshPool.ids.length,566);
+assert.equal(freshPool.lemmas,201);
+assert.equal(freshPool.vocabIds,201);
 assert.ok(freshPool.lemmas>0&&freshPool.lemmas<=freshPool.ids.length);
 assert.ok(freshPool.ids.every(id=>id));
 console.log('must pool from product path cards',freshPool.ids.length,'lemmaKey',freshPool.lemmas,'vocabIds',freshPool.vocabIds);

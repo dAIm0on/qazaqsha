@@ -34,7 +34,7 @@ ok('3-2 chapter_ids use v2-theory-* and revision r3');
   assert.ok(!/\blabel:'Zvuki'/.test(pe)&&!/\blabel:'MnozhChislo'/.test(pe),'latin trainer labels gone');
   assert.ok(read('learning.js').includes('PreExam.panelHtml'));
   assert.ok(read('index.html').includes('pre-exam.js'));
-  assert.ok(read('sw.js').includes('pre-exam.js')&&read('sw.js').includes("CACHE='qazaq-offline-live-20261011-vocab-pr2-review'"));
+  assert.ok(read('sw.js').includes('pre-exam.js')&&read('sw.js').includes("CACHE='qazaq-offline-live-20261011-vocab-pr2-gap'"));
 }
 ok('A–C: startPreExam safe; subset guarded; no HG in UI; RU labels; SW r7-51-7');
 console.log('verify_r7_ux63: '+passed+' checks passed');
