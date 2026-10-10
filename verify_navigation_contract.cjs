@@ -161,22 +161,22 @@ function row(id, sourceScreen, control, target, fixtures, owner, status) {
 }
 function registry() {
   const taps = [
-    ['N-TAP-01', 'today', 'lesson card', '#/lesson/theory', [], 'NAV-08', 'EXPECTED_LATER'],
-    ['N-TAP-02', 'path', 'continue / practice', '#/practice', ['theory-draft.json'], 'NAV-04', 'EXPECTED_LATER'],
-    ['N-TAP-03', 'practice', '#pause-session', 'previous course screen', ['practice-mid.json'], 'NAV-05', 'EXPECTED_LATER'],
-    ['N-TAP-04', 'bottom-nav', 'Слова', '#/words', ['entry-map.json'], 'NAV-08', 'EXPECTED_LATER'],
-    ['N-TAP-05', 'words', 'start must card', '#/words', ['must-first-show.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
-    ['N-TAP-06', 'bottom-nav', 'Практика', '#/practice', ['entry-map.json'], 'NAV-08', 'EXPECTED_LATER'],
-    ['N-TAP-07', 'personal', 'Буквы · кот', '#/practices/letters', ['entry-map.json'], 'NAV-07', 'EXPECTED_LATER'],
-    ['N-TAP-08', 'personal', 'Числа', '#/practices/numbers', ['entry-map.json'], 'NAV-07', 'EXPECTED_LATER'],
-    ['N-TAP-09', 'bottom-nav', 'Форма слова', '#/morph', ['entry-map.json'], 'NAV-08', 'EXPECTED_LATER'],
-    ['N-TAP-10', 'today', 'Домашка', '#/ready/homework/:id', ['entry-map.json'], 'NAV-09', 'EXPECTED_LATER'],
-    ['N-TAP-11', 'today', 'Экзамен', '#/ready/exam', ['entry-map.json'], 'NAV-09', 'EXPECTED_LATER'],
-    ['N-TAP-12', 'today', 'Мой словарь', '#/dict', ['entry-map.json'], 'NAV-10', 'EXPECTED_LATER'],
-    ['N-TAP-13', 'today', 'Мой результат', '#/results', ['entry-map.json'], 'NAV-10', 'EXPECTED_LATER'],
-    ['N-TAP-14', 'today', 'Материалы', '#/materials', ['entry-map.json'], 'NAV-10', 'EXPECTED_LATER'],
-    ['N-TAP-15', 'today', 'Правила', '#/rules', ['entry-map.json'], 'NAV-10', 'EXPECTED_LATER'],
-    ['N-TAP-16', 'any', '← Назад', 'previous entry', ['entry-map.json'], 'NAV-05', 'EXPECTED_LATER']
+    ['N-TAP-01', 'lesson', 'Теория блока', 'theory beat of the current lesson', ['clean.json', 'theory-draft.json'], 'NAV-04', 'EXPECTED_LATER'],
+    ['N-TAP-02', 'lesson', 'Практика блока', 'current lesson exercise', ['practice-mid.json'], 'NAV-04', 'EXPECTED_LATER'],
+    ['N-TAP-03', 'lesson', 'Слова по кругу', 'vocab:must card or restored retry', ['must-first-show.json', 'must-idk.json', 'must-wrong.json'], 'NAV-04', 'EXPECTED_LATER'],
+    ['N-TAP-04', 'visible main menu', 'Слова', 'same must launcher', ['must-first-show.json'], 'NAV-08', 'EXPECTED_LATER'],
+    ['N-TAP-05', 'visible main menu', 'Практика', 'current lesson practice', ['practice-mid.json'], 'NAV-08', 'EXPECTED_LATER'],
+    ['N-TAP-06', 'lesson hero', 'Продолжить when target is theory', 'promised chapter and beat', ['theory-draft.json'], 'NAV-04', 'EXPECTED_LATER'],
+    ['N-TAP-07', 'lesson hero', 'Продолжить when target is practice', 'promised course position', ['practice-mid.json'], 'NAV-04', 'EXPECTED_LATER'],
+    ['N-TAP-08', 'must summary', 'Продолжить', 'same sitting and open card', ['must-summary.json', 'must-idk.json', 'must-wrong.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
+    ['N-TAP-09', 'practices', 'secondary Слова по кругу', 'same must launcher', ['must-first-show.json'], 'NAV-05', 'EXPECTED_LATER'],
+    ['N-TAP-10', 'theory', 'Назад · пауза', 'origin, path kept', ['theory-draft.json'], 'NAV-04', 'EXPECTED_LATER'],
+    ['N-TAP-11', 'must', 'Назад · пауза', 'origin, no summary, sitting kept', ['must-first-show.json', 'must-idk.json', 'must-wrong.json'], 'NAV-04', 'EXPECTED_LATER'],
+    ['N-TAP-12', 'course practice', 'Назад · пауза', 'origin, queue and draft kept', ['practice-mid.json'], 'NAV-04', 'EXPECTED_LATER'],
+    ['N-TAP-13', 'must summary', 'К тренажёрам', 'practices and closed sitting', ['must-summary.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
+    ['N-TAP-14', 'visible main menu', 'Форма слова', 'existing morph', ['clean.json'], 'NAV-08', 'EXPECTED_LATER'],
+    ['N-TAP-15', 'visible main menu', 'Урок', 'lesson home', ['clean.json'], 'NAV-08', 'EXPECTED_LATER'],
+    ['N-TAP-16', 'header', 'Библиотека', 'library', ['clean.json'], 'NAV-06', 'EXPECTED_LATER']
   ].map(item => row(...item));
   const states = [
     ['course-pause-must-course', 'course practice', 'pause then must', 'course', ['practice-mid.json', 'must-first-show.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
@@ -193,12 +193,12 @@ function registry() {
     ['storage-unavailable', 'any', 'qazaq-before-update', 'preventDefault', [], 'NAV-01', 'BASELINE']
   ].map(item => row(...item));
   const history = [
-    ['N-HISTORY-1', 'path', 'back', '#/lesson/theory', ['theory-draft.json'], 'NAV-05', 'EXPECTED_LATER'],
-    ['N-HISTORY-2', 'words', 'back from catalog', '#/words', ['must-first-show.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
-    ['N-HISTORY-3', 'course', 'pause / must / pause', 'course', ['practice-mid.json', 'must-first-show.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
-    ['N-HISTORY-4', 'must wrong', 'pause then return', 'must retype', ['must-wrong.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
-    ['N-HISTORY-5', 'must summary', 'continue', 'same words stack', ['must-summary.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
-    ['N-HISTORY-6', 'must summary', 'trainers', 'personal replaces stack', ['must-summary.json'], 'NAV-08', 'EXPECTED_LATER']
+    ['N-HISTORY-1', 'lesson', 'library then results then Back Back Forward', 'one external entry per hop', ['clean.json'], 'NAV-03', 'EXPECTED_LATER'],
+    ['N-HISTORY-2', 'lesson', 'words, pause, practice, browser Back, Слова', 'must restored from parked, no second launch', ['must-first-show.json', 'practice-mid.json'], 'NAV-03', 'EXPECTED_LATER'],
+    ['N-HISTORY-3', 'lesson theory', 'Предыдущий шаг then pause', 'internal step is not an external history entry', ['theory-draft.json'], 'NAV-03', 'EXPECTED_LATER'],
+    ['N-HISTORY-4', 'lesson morph', 'internal nav2/fs2 then library then Back', 'morph stack survives the external trip', ['clean.json'], 'NAV-03', 'EXPECTED_LATER'],
+    ['N-HISTORY-5', 'practice', 'skip-link #main then browser Back', 'focus moves, queue does not restart', ['practice-mid.json'], 'NAV-03', 'EXPECTED_LATER'],
+    ['N-HISTORY-6', 'cold URL', '#/words with saved morph, #/lesson with saved must', 'explicit route wins, parked data stays', ['must-first-show.json'], 'NAV-03', 'EXPECTED_LATER']
   ].map(item => row(...item));
   const pwa = [
     ['N-PWA-01', 'two tabs', 'update on tab A', 'tab B does not reload', [], 'NAV-01', 'EXPECTED_LATER'],
@@ -220,13 +220,13 @@ function registry() {
     row('PWA-CONTROLLERCHANGE-RELOAD', 'pwa', 'controllerchange', 'location.reload', [], 'NAV-01', 'BASELINE_DEFECT_OWNED_BY_NAV01')
   ];
   const rules = [
-    ['K1', 'Общий принцип'],
-    ['K2', 'NEG'],
-    ['K3', 'PAST'],
-    ['K4', 'PTCP_GAN'],
-    ['K5', 'COND'],
-    ['K6', 'CVB_IP']
-  ].map(([id, name]) => row(id, 'morph-teaching', name, 'rule id only', [], 'NAV-00', 'RULE_REGISTERED'));
+    ['K1', 'lesson and menu', 'Теория / Практика / Слова', 'one tap, no extra start', 'NAV-08'],
+    ['K2', 'words', 'every words entry', 'launches v6 vocab:must only', 'NAV-02'],
+    ['K3', 'lesson', 'visible navigation copy', 'no daily goal or portion-end screen', 'NAV-08'],
+    ['K4', 'lesson', 'homework and tests', 'secondary, at most two taps', 'NAV-09'],
+    ['K5', 'session', 'pause and Back', 'exact resume and one-tap exit', 'NAV-02'],
+    ['K6', 'menu', 'Форма слова', 'existing morph module, no duplicate card', 'NAV-08']
+  ].map(([id, source, control, target, owner]) => row(id, source, control, target, [], owner, 'RULE_REGISTERED'));
   return [...taps, ...states, ...history, ...pwa, ...groups, ...rules];
 }
 
@@ -322,7 +322,7 @@ assert.equal(hashes.baseline, BASE);
 assert.equal(hashes.algorithm, 'sha256');
 assert.deepEqual(Object.keys(hashes.files), PROTECTED);
 for (const name of PROTECTED) {
-  const digest = crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, name))).digest('hex');
+  const digest = crypto.createHash('sha256').update(Buffer.from(fs.readFileSync(path.join(ROOT, name), 'utf8').replace(/\r\n/g, '\n'), 'utf8')).digest('hex');
   assert.equal(digest, hashes.files[name], name);
 }
 const protectedDiff = git(['diff', '--name-only', BASE, '--', ...PROTECTED]).trim();
