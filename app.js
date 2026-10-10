@@ -744,7 +744,7 @@
    const planned=VM.planPortion(pool,state,cfg,core,Date.now(),{rank:mustCourseRank,retrievability:mustRetrievability});
    if(!planned.ids.length)return false;
    let ids=VM.enforceGap(planned.ids,vocabSitting,pool,core,cfg.schedule.learningIntervening||2);
-   if(!ids.length)ids=planned.ids.slice();
+   if(!ids.length)return false;
    sessionAttempts=0;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);draft=null;presented=null;
    queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();trainerEpoch=(queueEpoch);
    vocabPlan=planned.plan;vocabSitting.sessions.push(String(queueEpoch));

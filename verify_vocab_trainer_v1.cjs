@@ -230,6 +230,7 @@ const beginSrc=app.slice(app.indexOf('function beginMustPortion'),app.indexOf('f
 assert.ok(beginSrc.includes('prepareVocabPool()'));
 assert.ok(beginSrc.indexOf('prepareVocabPool()')<beginSrc.indexOf('mustPool()'));
 assert.ok(!beginSrc.includes('loaded.length<3'));
+assert.ok(!beginSrc.includes('planned.ids.slice()'),'P0-GAP');
 const ensureSrc=app.slice(app.indexOf('function ensureV2'),app.indexOf('function openPathLesson'));
 assert.ok(ensureSrc.includes('slice(0,idx+1)'));
 const poolSrc=app.slice(app.indexOf('function prepareVocabPool'),app.indexOf('function mustCourseRank'));
@@ -420,6 +421,44 @@ assert.ok(!fillerPlan.ids.includes('N2'));
 assert.ok(fillerPlan.ids.indexOf('Low')>=0&&fillerPlan.ids.indexOf('Low')<fillerPlan.ids.indexOf('High'));
 assert.ok(fillerPlan.ids.indexOf('High')<fillerPlan.ids.indexOf('Mature'));
 
+// P0-FILLER-CARD-HISTORY: a -ru card with no answer of its own stays out.
+// The -kk sibling is mature and not due, so it can enter only as filler.
+function dirCard(id,lemma,skill){
+  return {id,topic:'vocab',wordRole:'must',kind:'fields',title:'t',stimulus:id,fields:[{answers:[id+'к'],kind:'text'}],vocabIds:[lemma],skillBindings:[{item_id:lemma,skill_type:skill,field:0}]};
+}
+const nolRu=dirCard('v2-1-2-vocab-nol-ru','word:nol','recognition');
+const nolKk=dirCard('v2-1-2-vocab-nol-kk','word:nol','production');
+const fillerHist=state();
+fillerHist.records[nolKk.id]={review_count:5,seen:5,needsReview:false,streak:5,next_review:999999999,dueAt:999999999};
+const fillerOwn=VM.planPortion([nolRu,nolKk,card('hw1-1-kk','word:h1'),card('hw1-2-kk','word:h2'),card('hw1-3-kk','word:h3')],fillerHist,cfg,core,1000);
+assert.ok(!fillerOwn.ids.includes(nolRu.id),'P0-FILLER-CARD-HISTORY');
+assert.ok(fillerOwn.ids.includes(nolKk.id),'P0-FILLER-CARD-HISTORY');
+const mateHigh=card('mate-high','word:mate');
+const mateLow=card('mate-low','word:mate');
+const mateState=state();
+for(const id of [mateHigh.id,mateLow.id])mateState.records[id]={review_count:3,seen:3,needsReview:false,streak:5,next_review:999999999,dueAt:999999999};
+const matePlan=VM.planPortion([mateHigh,mateLow,card('hw9-1-kk','word:j1'),card('hw9-2-kk','word:j2')],mateState,cfg,core,1000,{retrievability:q=>q.id===mateLow.id?0.2:q.id===mateHigh.id?0.8:null});
+assert.ok(matePlan.ids.includes(mateLow.id)&&!matePlan.ids.includes(mateHigh.id),'P0-FILLER-CARD-HISTORY');
+
+// P0-GAP: recent X and Y, and no other cards, so neither lemma is shown inside the pause.
+const gapPool=[card('X-ru','word:x'),card('Y-ru','word:y')];
+const gapSit=VM.emptySitting(1);
+gapSit.recent=[{cardId:'X',lemma:'word:x'},{cardId:'Y',lemma:'word:y'}];
+const gapPlan=VM.planPortion(gapPool,state(),cfg,core,1000);
+const gapIds=VM.enforceGap(gapPlan.ids,gapSit,gapPool,core,2);
+assert.deepEqual(gapIds,[],'P0-GAP');
+{
+  const byId=new Map(gapPool.map(q=>[q.id,q]));
+  const seq=gapSit.recent.map(x=>x.lemma||x.cardId);
+  for(const id of gapIds){
+    const lem=core.lemmaKey(byId.get(id)||{id});
+    let last=-1;
+    for(let i=0;i<seq.length;i++)if(seq[i]===lem)last=i;
+    assert.ok(last<0||seq.length-1-last>=2,'P0-GAP');
+    seq.push(lem);
+  }
+}
+
 function answerCard(st,sitting,cards,q,queue,position,plan,kind,now,sessionId){
   const res=VM.commitFirst({state:st,records:st.records,q,now,sessionId,presentation:position,kind,answers:kind==='good'?['ok']:[],elapsed:5,core,observe:()=>[],queue,position,pool:cards,plan,sitting,rating:kind==='good'?F.Rating.Good:F.Rating.Again,errors:[],result:{correct:kind==='good',parts:[kind==='good']},budget:plan.budget,minGap:2,appearCap:3,hinted:kind!=='good',recall:true});
   let spent=kind==='good'?1:0;
@@ -584,18 +623,36 @@ function bootMust(first,how){
     'const idsOf=list=>{const out=[];for(const q of list)if(q&&q.id!=null)out.push(String(q.id));out.sort();return out;};',
     'let partial=[];',
     'if('+JSON.stringify(first)+'){ensureV2('+JSON.stringify(first)+');partial=idsOf(mustPool());}',
-    how==='warm'?"document.readyState='complete';window.requestIdleCallback=function(cb){cb();return 1;};warmVocabPool();":'',
-    how==='early'?"document.readyState='complete';var __idle=0;window.requestIdleCallback=function(cb){if(__idle++>=2)return 0;cb();return 1;};warmVocabPool();":'',
-    'prepareVocabPool();',
+    how==='guard'?[
+      "const lessonQs=questions.filter(q=>q&&q.lessonId==='4-1'&&q.id);",
+      "if(lessonQs.length<3)throw new Error('P2-WARM-SAFE cards '+lessonQs.length);",
+      'const qids=lessonQs.slice(0,3).map(q=>q.id);',
+      'let queue=qids.slice();',
+      'let position=1;',
+      "let draft={token:'4-1:1',exerciseId:qids[1],answers:['\\u0431\\u0430\\u0440\\u0430\\u0434\\u044b']};",
+      'const beforeQ=queue.slice(),beforeP=position,beforeD=JSON.stringify(draft);',
+      'let saves=0;',
+      'function save(){saves++;}',
+      'window.save=save;',
+      "document.readyState='complete';",
+      'window.requestIdleCallback=function(cb){cb();return 1;};',
+      'warmVocabPool();',
+      'const guard={same:queue.length===beforeQ.length&&queue.every((id,i)=>id===beforeQ[i])&&position===beforeP&&JSON.stringify(draft)===beforeD&&saves===0,saves,n:qids.length};'
+    ].join('\n'):[
+      how==='warm'?"document.readyState='complete';window.requestIdleCallback=function(cb){cb();return 1;};warmVocabPool();":'',
+      how==='early'?"document.readyState='complete';var __idle=0;window.requestIdleCallback=function(cb){if(__idle++>=2)return 0;cb();return 1;};warmVocabPool();":'',
+      'prepareVocabPool();',
+      'const guard=null;'
+    ].join('\n'),
     'const pool=mustPool();',
     'const ids=idsOf(pool);',
     'const lemmas=new Set(pool.map(q=>window.TrainerCore.lemmaKey(q))).size;',
     'const vocabIds=new Set(pool.flatMap(q=>q.vocabIds||[])).size;',
     'const foreign=pool.filter(q=>!q||q.topic!=="vocab"||q.wordRole!=="must").length;',
-    '({partial,ids,lemmas,vocabIds,foreign,ready:vocabPoolReady});'
+    '({partial,ids,lemmas,vocabIds,foreign,ready:vocabPoolReady,guard});'
   ].join('\n');
   const result=vm.runInContext(body,ctx,{filename:'product-must-pool.js'});
-  return {partial:[...result.partial],ids:[...result.ids],lemmas:result.lemmas,vocabIds:result.vocabIds,foreign:result.foreign,ready:result.ready};
+  return {partial:[...result.partial],ids:[...result.ids],lemmas:result.lemmas,vocabIds:result.vocabIds,foreign:result.foreign,ready:result.ready,guard:result.guard};
 }
 const freshPool=bootMust(null);
 const after32=bootMust('3-2');
@@ -607,6 +664,7 @@ assert.ok(after42.partial.length>0&&after42.partial.length<freshPool.ids.length)
 assert.ok(after32.partial.every(id=>freshPool.ids.includes(id)));
 assert.ok(after42.partial.every(id=>freshPool.ids.includes(id)));
 assert.equal(freshPool.foreign,0);
+assert.equal(freshPool.lemmas,freshPool.vocabIds);
 assert.ok(freshPool.lemmas>0&&freshPool.lemmas<=freshPool.ids.length);
 assert.ok(freshPool.ids.every(id=>id));
 console.log('must pool from product path cards',freshPool.ids.length,'lemmaKey',freshPool.lemmas,'vocabIds',freshPool.vocabIds);
@@ -618,5 +676,11 @@ assert.equal(earlyTap.ready,true);
 assert.deepEqual(warmed.ids,freshPool.ids);
 assert.deepEqual(earlyTap.ids,freshPool.ids);
 console.log('warm pool matches sync',warmed.ids.length,'early matches',earlyTap.ids.length);
+const lessonGuard=bootMust('4-1','guard');
+assert.equal(lessonGuard.ready,true,'P2-WARM-SAFE');
+assert.equal(lessonGuard.guard&&lessonGuard.guard.same,true,'P2-WARM-SAFE');
+assert.equal(lessonGuard.guard.saves,0,'P2-WARM-SAFE');
+assert.ok(lessonGuard.guard.n>=3,'P2-WARM-SAFE');
+console.log('P2-WARM-SAFE ok cards',lessonGuard.guard.n,'saves',lessonGuard.guard.saves);
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');

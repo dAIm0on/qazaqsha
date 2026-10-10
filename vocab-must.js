@@ -137,20 +137,23 @@
    let room=Math.max(0,otherCap-out.filter(q=>!newSet.has(lk(q))).length);
    if(room>0&&out.length<limit){
      const retr=typeof opts.retrievability==='function'?opts.retrievability:()=>null;
-     const seenF=new Set(),filler=[];
-     for(const q of pool){
-       const lem=lk(q);
-       if(seenF.has(lem)||usedLem.has(lem)||newSet.has(lem))continue;
-       if(!H.lemma(lem))continue;
-       seenF.add(lem);filler.push(q);
-     }
-     filler.sort((a,b)=>{
+     const byRetr=(a,b)=>{
        const ra=retr(a),rb=retr(b);
        const an=ra==null||Number.isNaN(ra),bn=rb==null||Number.isNaN(rb);
        if(an!==bn)return an?1:-1;
        if(!an&&ra!==rb)return ra-rb;
        return String(a.id)<String(b.id)?-1:String(a.id)>String(b.id)?1:0;
-     });
+     };
+     // Filler is a card with its own answer history. A sibling's history does not qualify.
+     // Several history cards of one lemma: keep the least retrievable.
+     const best=new Map();
+     for(const q of pool){
+       const lem=lk(q);
+       if(usedLem.has(lem)||newSet.has(lem)||!H.card(q))continue;
+       const prev=best.get(lem);
+       if(!prev||byRetr(q,prev)<0)best.set(lem,q);
+     }
+     const filler=[...best.values()].sort(byRetr);
      for(const q of filler){if(room<=0||out.length>=limit)break;out.push(q);room--;}
    }
    const baseLen=out.length;

@@ -21,7 +21,7 @@ for(const s of L.stages){
 ok('micro stages RU titles');
 assert.ok(read('app.js').includes("['locative','Местный падеж «где»','09']"));
 ok('locative topic RU label in app.js');
-assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261011-vocab-pr2-d2'"));
+assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261011-vocab-pr2-review'"));
 ok('SW r7-51-7');
 assert.equal(L.status,'released');
 assert.equal(L.release&&L.release.approved,true);
