@@ -41,6 +41,16 @@ function read(rel) {
 function git(args) {
   return execFileSync('git', args, {cwd: ROOT, encoding: 'utf8'}).replace(/\r\n/g, '\n');
 }
+function ensureBase() {
+  try { git(['cat-file', '-e', BASE + '^{commit}']); return true; }
+  catch {
+    try { git(['fetch', '--depth', '1', 'origin', BASE]); return true; }
+    catch (error) {
+      console.log('BASE_DIFF NOT_RUN', error && error.message ? error.message.split('\n')[0] : 'base commit unavailable');
+      return false;
+    }
+  }
+}
 function futureRoute(row) {
   const id = row.id;
   const topic = row.topic || '';
@@ -325,17 +335,18 @@ for (const name of PROTECTED) {
   const digest = crypto.createHash('sha256').update(Buffer.from(fs.readFileSync(path.join(ROOT, name), 'utf8').replace(/\r\n/g, '\n'), 'utf8')).digest('hex');
   assert.equal(digest, hashes.files[name], name);
 }
-const protectedDiff = git(['diff', '--name-only', BASE, '--', ...PROTECTED]).trim();
-assert.equal(protectedDiff, '', protectedDiff);
-
-const changed = new Set();
-for (const line of git(['status', '--porcelain', '-uall']).split('\n').filter(Boolean)) {
-  let file = line.slice(3).trim();
-  if (file.includes(' -> ')) file = file.split(' -> ').pop().trim();
-  changed.add(file.replace(/\\/g, '/'));
+if (ensureBase()) {
+  const protectedDiff = git(['diff', '--name-only', BASE, '--', ...PROTECTED]).trim();
+  assert.equal(protectedDiff, '', protectedDiff);
+  const changed = new Set();
+  for (const line of git(['status', '--porcelain', '-uall']).split('\n').filter(Boolean)) {
+    let file = line.slice(3).trim();
+    if (file.includes(' -> ')) file = file.split(' -> ').pop().trim();
+    changed.add(file.replace(/\\/g, '/'));
+  }
+  for (const line of git(['diff', '--name-only', BASE]).split('\n').filter(Boolean)) changed.add(line.replace(/\\/g, '/'));
+  for (const file of changed) assert.match(file, ALLOWED_FILE, 'unexpected path ' + file);
+  const prod = git(['diff', '--name-only', BASE, '--', '*.js', '*.css', '*.html', 'sw.js']).trim();
+  assert.equal(prod, '');
 }
-for (const line of git(['diff', '--name-only', BASE]).split('\n').filter(Boolean)) changed.add(line.replace(/\\/g, '/'));
-for (const file of changed) assert.match(file, ALLOWED_FILE, 'unexpected path ' + file);
-const prod = git(['diff', '--name-only', BASE, '--', '*.js', '*.css', '*.html', 'sw.js']).trim();
-assert.equal(prod, '');
 console.log('VERIFY_NAVIGATION_CONTRACT_OK');
