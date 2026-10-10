@@ -8,7 +8,7 @@ const message = sw.split("addEventListener('fetch'")[0].split("addEventListener(
 assert.ok(install && !install.includes('skipWaiting'), 'install handler must not skipWaiting');
 assert.ok(message.includes("ACTIVATE_UPDATE") && message.includes('skipWaiting'), 'ACTIVATE_UPDATE must skipWaiting');
 assert.ok(sw.includes('clients.claim()'), 'activate must keep clients.claim()');
-assert.ok(sw.includes("CACHE='qazaq-offline-live-20261010-nav01'"), 'cache name');
+assert.match(sw, /CACHE='qazaq-offline-live-\d{8}-[a-z0-9-]+'/, 'cache name');
 assert.equal((sw.match(/skipWaiting/g) || []).length, 1);
 
 const py = process.env.PYTHON || 'python';

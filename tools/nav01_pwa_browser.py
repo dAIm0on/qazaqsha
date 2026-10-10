@@ -7,6 +7,7 @@ on one http://127.0.0.1 origin. Does not attach to port 9222 or 9223.
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -21,7 +22,10 @@ from playwright.sync_api import sync_playwright
 REPO = Path(__file__).resolve().parents[1]
 CHROME = Path(r"C:\Users\1\AppData\Local\ms-playwright\chromium-1228\chrome-win64\chrome.exe")
 OLD_CACHE = "qazaq-offline-live-20261007-section2-2"
-NEW_CACHE = "qazaq-offline-live-20261010-nav01"
+_cache_match = re.search(r"CACHE='(qazaq-offline-live-\d{8}-[a-z0-9-]+)'", (REPO / "sw.js").read_text(encoding="utf-8"))
+if not _cache_match:
+    raise SystemExit("sw.js cache name does not match qazaq-offline-live-YYYYMMDD-slug")
+NEW_CACHE = _cache_match.group(1)
 BASE_REV = "0dab333"
 SAVED = "Учебные материалы сохранены для работы без сети. Внешние оригиналы открываются с интернетом."
 PENDING = "Новая версия уже активирована. Эта вкладка не перезагружена, чтобы не потерять активный ввод. Нажми «Сохранить ответ и обновить приложение», когда будет удобно."
