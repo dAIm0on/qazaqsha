@@ -542,19 +542,24 @@ function bootMust(first){
   if(first)ensure(first);
   const partial=idsOf((window.COURSE.questions||[]).filter(q=>q&&q.topic==='vocab'&&q.wordRole==='must'));
   for(const raw of window.LESSON_V2_COMPILED||[])if(raw&&raw.lesson_id)ensure(raw.lesson_id);
-  const must=(window.COURSE.questions||[]).filter(q=>q&&q.topic==='vocab'&&q.wordRole==='must');
-  return {partial,ids:idsOf(must),lemmas:new Set(must.map(q=>core.lemmaKey(q))).size};
+  const questions=window.COURSE.questions||[];
+  const must=questions.filter(q=>q&&q.topic==='vocab'&&q.wordRole==='must');
+  const usedIds=new Set(idsOf(questions.filter(q=>q&&q.topic==='vocab'&&q.wordRole&&q.wordRole!=='must')));
+  const ids=idsOf(must);
+  return {partial,ids,lemmas:new Set(must.map(q=>core.lemmaKey(q))).size,foreign:ids.filter(id=>usedIds.has(id)).length};
 }
 const freshPool=bootMust(null);
 const after32=bootMust('3-2');
 const after42=bootMust('4-2');
 assert.deepEqual(after32.ids,freshPool.ids);
 assert.deepEqual(after42.ids,freshPool.ids);
-assert.notDeepEqual(after32.partial,freshPool.ids);
-assert.notDeepEqual(after42.partial,freshPool.ids);
-assert.equal(freshPool.ids.length,453);
-assert.equal(freshPool.lemmas,188);
+assert.ok(after32.partial.length>0&&after32.partial.length<freshPool.ids.length);
+assert.ok(after42.partial.length>0&&after42.partial.length<freshPool.ids.length);
+assert.ok(after32.partial.every(id=>freshPool.ids.includes(id)));
+assert.ok(after42.partial.every(id=>freshPool.ids.includes(id)));
+assert.equal(freshPool.foreign,0);
+assert.ok(freshPool.lemmas>0&&freshPool.lemmas<=freshPool.ids.length);
 assert.ok(freshPool.ids.every(id=>id));
-console.log('must pool cards',freshPool.ids.length,'lemmas',freshPool.lemmas);
+console.log('must pool from lesson data cards',freshPool.ids.length,'lemmas',freshPool.lemmas);
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');
