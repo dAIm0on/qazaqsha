@@ -1949,8 +1949,10 @@
    pauseTimer();const now=Date.now(),recall=(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='select');
    const F=window.FSRS;
    const mustNear=isVocabMustTrainer()&&!!(window.VocabMust&&!window.VocabMust.recordsMiss(result));
+   // A rule peek is help only inside vocab:must. Other trainers keep their old rating.
+   const mustAssist=isVocabMustTrainer()&&!!(hinted||rulePeeked);
    let rating;
-   if(!result.correct||hinted||examTimedOut)rating=F.Rating.Again;
+   if(!result.correct||examTimedOut||(!isVocabMustTrainer()&&hinted)||mustAssist)rating=F.Rating.Again;
    else if(mode==='exam'){
      if(elapsedMs<=cfg.session.examEasyMs)rating=F.Rating.Easy;
      else if(elapsedMs<=cfg.session.examHardMs)rating=F.Rating.Good;
@@ -2172,7 +2174,8 @@
      const next=$('#next-button'),check=$('#check-button');
      if(check)check.hidden=true;
      if(next){next.hidden=false;try{next.focus({preventScroll:true});}catch{}}
-     advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
+     // Near-miss stays until Дальше, so the spelling can be read. A fully correct answer still moves on.
+     if(!mustNear)advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
    }
  }
  function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;retryAfterWrong=false;vocabRetry=null;position++;if(isVocabMustTrainer()){const budget=vocabPlan&&vocabPlan.budget||(cfg.vocab&&cfg.vocab.answerBudget)||10;if(window.VocabMust&&window.VocabMust.portionDone(sessionAttempts,budget,position,queue.length)){if(!beginMustPortion(false))position=queue.length;}}else if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}focusAnswer();}

@@ -1270,4 +1270,64 @@ assert.ok(retrySrc.includes('core.evaluate(q,answers);')&&!retrySrc.includes('mu
 assert.ok(check.includes('if(!hinted&&!result.correct)sessionBlindFails'),'P5-BLIND-LINE');
 console.log('P5 cases',p5.join(' | '));
 
+function p5Rate(opts){
+  const src=check.slice(check.indexOf('const mustNear='),check.indexOf('const previous='));
+  const fn=new Function('result','hinted','rulePeeked','examTimedOut','mode','isVocabMustTrainer','F','window',src+'\nreturn rating;');
+  return fn(opts.result,!!opts.hinted,!!opts.rulePeeked,false,opts.mode||'words',()=>opts.must!==false,F,{VocabMust:VM});
+}
+function p5Pack(tag,result,opts){
+  const st=state();
+  st.records[girl.id]=Scheduler.migrate({needsReview:true,correct_streak:0,review_count:1,seen:1,correct_count:0,wrong_count:1},at);
+  st.skills['word:girl::recognition']=Scheduler.migrate({needsReview:true,correct_streak:0,review_count:1,seen:1,correct_count:0,wrong_count:1},at);
+  const helped=!!(opts.hinted||opts.rulePeeked);
+  const pack=VM.commitFirst({state:st,records:st.records,q:girl,now:at,sessionId:'s5'+tag,presentation:tag,kind:helped?'assisted':'good',answers:[opts.typed],elapsed:80,core,observe:(a,b,c,d,e,f)=>Knowledge.observe(a,b,c,d,e,f),queue:[girl.id],position:0,pool:[girl],plan:{budget:10,nNew:0,newLemmas:[]},sitting:VM.emptySitting(at),rating:p5Rate(Object.assign({result,must:opts.must},opts)),errors:[],result,hinted:helped,recall:true});
+  return {st,pack,line:VM.wordLine(st,VM.emptySitting(at),{cardId:girl.id,lemma:'word:girl'})};
+}
+const hintPack=p5Pack(1,nearGirl,{hinted:true,typed:'девушко'});
+assert.equal(hintPack.pack.record.fsrs_log.rating,F.Rating.Again,'P5-HINT-AGAIN');
+assert.equal(hintPack.line,'с подсказкой','P5-HINT-LINE');
+assert.equal(hintPack.pack.event.near_miss,1,'P5-HINT-FLAG');
+assert.equal(hintPack.st.errors.length,0,'P5-HINT-ERRORS');
+const peekNear=p5Pack(2,nearGirl,{rulePeeked:true,typed:'девушко'});
+assert.equal(peekNear.pack.record.fsrs_log.rating,F.Rating.Again,'P5-PEEK-NEAR');
+assert.equal(peekNear.pack.event.first_try_correct,0,'P5-PEEK-ASSISTED');
+assert.equal(peekNear.pack.event.hinted,true,'P5-PEEK-HINTED');
+assert.equal(peekNear.line,'с подсказкой','P5-PEEK-LINE');
+assert.equal(peekNear.pack.event.near_miss,1,'P5-PEEK-FLAG');
+assert.equal(peekNear.st.errors.length,0,'P5-PEEK-ERRORS');
+const exactGirl=ev(girl,'девушка');
+const peekExact=p5Pack(3,exactGirl,{rulePeeked:true,typed:'девушка'});
+assert.equal(peekExact.pack.record.fsrs_log.rating,F.Rating.Again,'P5-PEEK-EXACT');
+assert.equal(peekExact.line,'с подсказкой','P5-PEEK-EXACT-LINE');
+assert.equal(p5Rate({result:exactGirl,rulePeeked:true,must:false}),F.Rating.Good,'P5-OTHER-PEEK');
+function p5Advance(mustNear){
+  const start=check.lastIndexOf('cancelAdvance();');
+  let block=check.slice(start).trim();
+  if(block.endsWith('}'))block=block.slice(0,-1);
+  const fn=new Function('result','reveal','mustNear',`
+    let advanceTimer=null,moved=false,focused=false,delay=null,fire=null;
+    const nextBtn={hidden:true,focus(){focused=true;}};
+    const checkBtn={hidden:false};
+    const $=sel=>sel==='#next-button'?nextBtn:sel==='#check-button'?checkBtn:null;
+    function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}
+    function nextQuestion(){moved=true;}
+    const setTimeout=(cb,ms)=>{delay=ms;fire=cb;return 1;};
+    const clearTimeout=()=>{};
+    ${block}
+    return {nextBtn,armed(){return !!advanceTimer;},moved(){return moved;},focused(){return focused;},press(){nextQuestion();},delay:()=>delay,fire:()=>fire};
+  `);
+  return fn({correct:true},false,mustNear);
+}
+const stay=p5Advance(true);
+assert.equal(stay.moved(),false,'P5-NO-AUTO');
+assert.equal(stay.delay(),null,'P5-NO-AUTO-TIMER');
+assert.equal(stay.nextBtn.hidden,false,'P5-NEXT-SHOWN');
+assert.equal(stay.focused(),true,'P5-NEXT-FOCUS');
+stay.press();
+assert.equal(stay.moved(),true,'P5-NEXT-GOES');
+const go=p5Advance(false);
+assert.equal(go.delay(),400,'P5-AUTO-ARMED');
+go.fire()();
+assert.equal(go.moved(),true,'P5-AUTO');
+
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');
