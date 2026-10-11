@@ -442,7 +442,7 @@ function adjacentSame(api, ids) {
   console.log('P1-2 table (' + table.length + '):', table.join('; '));
 
   const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
-  assert.match(sw, /qazaq-offline-live-20261011-storage-p0b['"]/, 'sw.js CACHE is the storage-p0b cache');
+  assert.match(sw, /qazaq-offline-live-20261011-storage-p0c['"]/, 'sw.js CACHE is the storage-p0c cache');
   console.log('VERIFY_VOCAB_PR7_DRAFT_LEAK_OK');
 })().catch(err => {
   console.error(err && err.stack ? err.stack : err);

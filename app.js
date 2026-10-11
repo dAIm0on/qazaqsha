@@ -36,9 +36,10 @@ function qazaqAppBoot(bootMirror){
  // Storage P0: localStorage + IndexedDB mirror (store-idb.js). bootMirror = what IndexedDB held when the app started.
  const STORE=window.QazaqStore&&window.QazaqStore.available?window.QazaqStore:null,SNAPSHOT_KEYS=[BACKUP,R7_FREG_SNAPSHOT,R7_SNAPSHOT,MIGRATION];
  // rev: grows by one on every write (compared first at boot; saved_at is only a label). A page that could not read
- // IndexedDB at start (mirrorTrusted=false) never bumps rev and marks its writes pending, so the next normal start merges.
- const headOf=window.QazaqStore&&window.QazaqStore.headOf||(()=>({stamped:false,rev:0,saved_at:0,pending:false}));
- let lsOk=true,rescueState='idle',storeRev=0,lastRev=0,saveWatch=null;const mirrorTrusted=!!STORE&&bootMirror!==undefined;
+ // IndexedDB at start (mirrorTrusted=false) never creates a rev: it writes pending copies that carry what the user changed
+ // (_pending.touch) and the copy it started from (_pending.base); the next normal start reconciles (pickBootRaw).
+ const headOf=window.QazaqStore&&window.QazaqStore.headOf||(()=>({kind:'none',stamped:false,rev:0,saved_at:0,pending:false}));
+ let lsOk=true,rescueState='idle',storeRev=0,lastRev=0,saveWatch=null,pendingBaseState=null,pendingMeta=null;const mirrorTrusted=!!STORE&&bootMirror!==undefined;
  try{const raw=pickBootRaw(localStorage.getItem(KEY));if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);
    // r7: keep the exact pre-migration bytes once (best effort; the migration itself is additive).
    const r7=window.EvidenceState&&window.EvidenceState.MIGRATION_ID;if(r7&&!(saved.evidence&&saved.evidence.migrations&&saved.evidence.migrations[r7])&&!localStorage.getItem(R7_SNAPSHOT)){try{localStorage.setItem(R7_SNAPSHOT,raw);}catch{}}
@@ -1168,10 +1169,26 @@ function qazaqAppBoot(bootMirror){
  }
  // The header {"rev":n,"saved_at":ms[,"pending":1]} goes first so it can be read without parsing 2 MB (QazaqStore.headOf).
  function stamp(obj){
-   if(!STORE||mirrorTrusted)storeRev++;
-   const head={rev:storeRev,saved_at:Date.now()};if(STORE&&!mirrorTrusted)head.pending=1;
-   const body=Object.assign({},obj);delete body.rev;delete body.saved_at;delete body.pending;
-   lastRev=storeRev;return JSON.stringify(Object.assign(head,body));
+   const body=Object.assign({},obj);delete body.rev;delete body.saved_at;delete body.pending;delete body._pending;
+   // IndexedDB exists but was not read at start: never mint a revision we cannot prove is newer
+   if(STORE&&!mirrorTrusted){
+     pendingMeta=pendingMeta||{v:1,base:{kind:'none',rev:0,saved_at:0,activity:0},touch:{}};
+     pendingMeta.touch=P.pendingTouch(pendingBaseState||P.empty(),obj,pendingMeta.touch);
+     body._pending=pendingMeta;lastRev=storeRev;
+     return JSON.stringify(Object.assign({rev:storeRev,saved_at:Date.now(),pending:1},body));
+   }
+   storeRev++;lastRev=storeRev;
+   return JSON.stringify(Object.assign({rev:storeRev,saved_at:Date.now()},body));
+ }
+ function rawActivity(raw){try{return STORE.activityOf(P.migrate(JSON.parse(raw)));}catch{return 0;}}
+ // version of a stored copy: rev copies by rev, legacy {"saved_at"} copies by saved_at, unstamped by last answer
+ function versionOf(raw){const h=headOf(raw);return {kind:h.kind||'none',rev:Number(h.rev)||0,saved_at:Number(h.saved_at)||0,activity:h.kind==='none'?rawActivity(raw):0};}
+ function compareVersion(a,b){
+   const rank={none:0,legacy:1,rev:2};
+   if(a.kind!==b.kind)return (rank[a.kind]||0)-(rank[b.kind]||0);
+   if(a.kind==='rev')return (a.rev||0)-(b.rev||0);
+   if(a.kind==='legacy')return (a.saved_at||0)-(b.saved_at||0);
+   return (a.activity||0)-(b.activity||0);
  }
  // Every save goes to IndexedDB too: at once when localStorage failed, otherwise batched (pagehide flushes).
  function mirrorSave(raw){
@@ -1194,28 +1211,49 @@ function qazaqAppBoot(bootMirror){
    }catch(error){console.warn('storage rescue',error);}
    rescueState=ok?'idle':'done';save();
  }
- // Boot: the IndexedDB mirror is newer when it holds answers localStorage could not keep.
- // Stamped copies are compared by rev alone (no parse). A pending localStorage copy (written while IndexedDB was not
- // read) and a mirror with a higher rev are merged, so neither side's answers are lost. Old unstamped copy: newest answer.
+ // Boot (GPT fix design §6). Untrusted start: remember the copy the page starts from (pending base). Trusted start:
+ // a pending localStorage copy is the page itself when the mirror did not move past its base, otherwise the mirror plus
+ // only what the page changed (P.reconcilePending). Normal copies: higher version wins (rev > legacy > unstamped).
  function pickBootRaw(lsRaw){
-   const m=bootMirror,ls=headOf(lsRaw);
-   storeRev=Math.max(ls.rev,m&&Number(m.rev)||0);
-   if(!m||typeof m.raw!=='string')return lsRaw;
-   if(!lsRaw)return m.raw;
-   if(ls.stamped){
-     if(!(m.rev>ls.rev))return lsRaw;
-     if(!ls.pending)return m.raw;
-     try{const base=P.migrate(JSON.parse(m.raw)),page=P.migrate(JSON.parse(lsRaw)),out=P.merge(base,page);out.session=page.session;return JSON.stringify(out);}catch{return m.raw;}
+   const m=bootMirror,lh=headOf(lsRaw),mh=m&&typeof m.raw==='string'?headOf(m.raw):{kind:'none',rev:0,saved_at:0,pending:false};
+   storeRev=Math.max(Number(lh.rev)||0,Number(mh.rev)||0);
+   if(!mirrorTrusted){
+     if(!lsRaw){pendingBaseState=P.empty();pendingMeta={v:1,base:{kind:'none',rev:0,saved_at:0,activity:0},touch:{}};return null;}
+     let parsed=null;try{parsed=JSON.parse(lsRaw);}catch{return lsRaw;}
+     pendingBaseState=P.migrate(parsed);
+     // reload while IndexedDB is still unreadable: keep the first base and the changes so far
+     if(lh.pending&&parsed._pending&&parsed._pending.v===1)pendingMeta=parsed._pending;
+     else{const v=versionOf(lsRaw);pendingMeta={v:1,base:{kind:v.kind,rev:v.rev,saved_at:v.saved_at,activity:v.activity},touch:{}};}
+     return lsRaw;
    }
-   let lsActivity=0;try{lsActivity=STORE.activityOf(JSON.parse(lsRaw));}catch{return m.raw;}
-   return m.activity>lsActivity?m.raw:lsRaw;
+   if(!m||typeof m.raw!=='string'){pendingMeta=null;return lsRaw;}
+   if(!lsRaw){pendingMeta=null;return m.raw;}
+   if(lh.pending){
+     let pageRaw;try{pageRaw=JSON.parse(lsRaw);}catch{return m.raw;}
+     const page=P.migrate(pageRaw),authoritative=P.migrate(JSON.parse(m.raw)),meta=pageRaw._pending;
+     pendingMeta=null;
+     // c039451 pending copy (no _pending): keep the page's additive work, never its stale values
+     if(!meta||meta.v!==1||!meta.base)return JSON.stringify(P.reconcilePending(authoritative,page,{}));
+     if(compareVersion(versionOf(m.raw),meta.base)<=0)return JSON.stringify(page);
+     return JSON.stringify(P.reconcilePending(authoritative,page,meta.touch||{}));
+   }
+   pendingMeta=null;
+   const cmp=compareVersion(versionOf(lsRaw),versionOf(m.raw));
+   if(cmp>0)return lsRaw;
+   if(cmp<0)return m.raw;
+   if(lsRaw===m.raw)return lsRaw;
+   const la=rawActivity(lsRaw),ma=Number(m.activity)||rawActivity(m.raw);
+   return ma>la?m.raw:lsRaw;
  }
  // Import: the pre-import copy goes to IndexedDB first (localStorage may be full), and space is freed.
+ // Refused while IndexedDB was not read at start (its newer progress could be overwritten); the copy must be confirmed.
  async function prepareImport(){
-   window.__qzImportReady=false;if(!mirrorTrusted)return;
+   window.__qzImportReady=false;
+   if(STORE&&!mirrorTrusted)throw Error('Импорт временно недоступен: сначала нужно сверить сохранённый прогресс после сбоя хранилища.');
+   if(!STORE)return;
    save();
    try{await STORE.moveToArchive(localStorage,SNAPSHOT_KEYS);}catch{}
-   try{await STORE.archive(BACKUP,P.serialize(state));window.__qzImportReady=true;}catch{}
+   await STORE.archive(BACKUP,P.serialize(state));window.__qzImportReady=true;
  }
  window.__qzPersist=next=>{
    const raw=stamp(next);
@@ -3467,6 +3505,7 @@ function qazaqAppBoot(bootMirror){
  // Reset clears progress only after a full backup is confirmed (localStorage, or IndexedDB within 5 s); otherwise it is cancelled.
  async function resetProgress(){
    if(!window.confirm('Сбросить весь прогресс в этом браузере? Ответы, ошибки, заметки и ассоциации будут очищены.'))return;
+   if(STORE&&!mirrorTrusted){window.alert('Сброс временно недоступен: хранилище ещё не сверено. Перезагрузи страницу после восстановления сохранения.');return;}
    const backup=P.serialize(state);let kept=false;
    try{localStorage.setItem(BACKUP,backup);kept=true;}catch{}
    if(STORE){const copy=STORE.archive(BACKUP,backup);if(kept)copy.catch(()=>{});else try{await Promise.race([copy,new Promise((_,no)=>setTimeout(()=>no(Error('timeout')),5000))]);kept=true;}catch{}}

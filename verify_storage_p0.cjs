@@ -406,8 +406,8 @@ const DAY = 864e5;
     assert.equal(S.compactEvents(st, Date.now(), 14), 1);
     assert.deepEqual(st.events[0], {at: 0, response_time: 5, skills: [{skill_id: 'x', rating: 3}]});
     assert.ok(st.events[1].skills[0].fsrs_log);
-    assert.deepEqual(S.headOf('{"rev":4,"saved_at":123,"x":1}'), {stamped: true, rev: 4, saved_at: 123, pending: false});
-    assert.deepEqual(S.headOf('{"rev":4,"saved_at":123,"pending":1,"x":1}'), {stamped: true, rev: 4, saved_at: 123, pending: true});
+    assert.deepEqual(S.headOf('{"rev":4,"saved_at":123,"x":1}'), {kind: 'rev', stamped: true, rev: 4, saved_at: 123, pending: false});
+    assert.deepEqual(S.headOf('{"rev":4,"saved_at":123,"pending":1,"x":1}'), {kind: 'rev', stamped: true, rev: 4, saved_at: 123, pending: true});
     assert.equal(S.headOf('{"schema":7}').stamped, false);
   }
   // index.html loads store-idb.js before app.js; sw caches it
@@ -415,7 +415,7 @@ const DAY = 864e5;
   assert.ok(html.indexOf('src="store-idb.js"') > 0 && html.indexOf('src="store-idb.js"') < html.indexOf('src="app.js"'));
   assert.ok(fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8').includes('"store-idb.js"'));
   const dashSrc = fs.readFileSync(path.join(__dirname, 'dashboard.js'), 'utf8');
-  assert.ok(dashSrc.includes('if(api.prepareImport)api.prepareImport().then(go,go);else go();'), 'dashboard: pre-import copy to IndexedDB before import');
+  assert.ok(dashSrc.includes("if(api.prepareImport)api.prepareImport().then(go,error=>{preview.textContent=error&&error.message?error.message:'Импорт не выполнен.';});else go();"), 'dashboard: pre-import copy to IndexedDB first; a refused copy stops the import');
   console.log('verify_storage_p0: OK');
   process.exit(0);
 })().catch(e => { console.error(e); process.exit(1); });

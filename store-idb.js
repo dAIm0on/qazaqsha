@@ -31,7 +31,15 @@
  const keys=()=>run('readonly',s=>s.getAllKeys());
  // A stored progress string starts with {"rev":<n>,"saved_at":<ms>[,"pending":1],... (app.js stamp()). rev only grows;
  // pending = written by a page that could not read IndexedDB at start. Older writers have no header: rev 0.
- function headOf(raw){const m=/^\{"rev":(\d+),"saved_at":(\d+)(,"pending":1)?/.exec(String(raw||'').slice(0,60));return m?{stamped:true,rev:Number(m[1]),saved_at:Number(m[2]),pending:!!m[3]}:{stamped:false,rev:0,saved_at:0,pending:false};}
+ // Three header formats: {"rev":n,"saved_at":ms[,"pending":1]} (c039451+), legacy {"saved_at":ms} (9dcd838), none (older).
+ function headOf(raw){
+   const s=String(raw||'').slice(0,96);
+   let m=/^\{"rev":(\d+),"saved_at":(\d+)(,"pending":1)?/.exec(s);
+   if(m)return {kind:'rev',stamped:true,rev:Number(m[1]),saved_at:Number(m[2]),pending:!!m[3]};
+   m=/^\{"saved_at":(\d+)/.exec(s);
+   if(m)return {kind:'legacy',stamped:true,rev:0,saved_at:Number(m[1]),pending:false};
+   return {kind:'none',stamped:false,rev:0,saved_at:0,pending:false};
+ }
  const savedAtOf=raw=>headOf(raw).saved_at,revOf=raw=>headOf(raw).rev;
  // Last learning activity in a state object: the newest event time.
  function activityOf(state){let t=0;for(const e of (state&&state.events)||[])if(e&&Number(e.at)>t)t=Number(e.at);return t;}
@@ -62,7 +70,7 @@
  }
  // true once IndexedDB committed this revision (or a later one)
  const mirrored=rev=>rev>0&&okRev>=rev;
- const readMirror=()=>get('state').then(r=>r&&typeof r.raw==='string'?Object.assign(r,{rev:headOf(r.raw).rev}):null);
+ const readMirror=()=>get('state').then(r=>{if(!r||typeof r.raw!=='string')return null;const h=headOf(r.raw);return Object.assign(r,{rev:h.rev,format:h.kind,pending:h.pending});});
  // ---- archive: never deleted; the localStorage key is removed only after IndexedDB confirmed the write
  // archive:<name>:<ms>:<seq> — seq makes two copies in the same millisecond distinct (never overwritten)
  let seq=0;

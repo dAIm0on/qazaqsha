@@ -53,6 +53,22 @@ async function twoNewAnswers(a, ls) { a.window.TrainerCatalogBridge.launch('voca
     assert.match(head(ls.getItem(KEY)), /^\{"rev":[1-9]\d*,"saved_at":\d+,"schema"/, 'first real rev after reconcile, not pending');
   });
 
+  // T1b LEGACY_TIMEOUT_SECOND_RELOAD: newer legacy IDB copy differs only in values (note, step), same answers
+  await check('T1b legacy LS saved_at=100, legacy IDB saved_at=200 (note+step newer, same answers), timeout, answers, reload', async () => {
+    const ls = makeLS(), idb = makeIDB();
+    ls._d[KEY] = rehead(noSession(A, s => { s.learning.steps = {zz: 2}; s.learning.notes = {k: 'old'}; }), {saved_at: 100});
+    idb.data.set('state', mirrorRec(rehead(noSession(A, s => { s.learning.steps = {zz: 5}; s.learning.notes = {k: 'new'}; }), {saved_at: 200})));
+    const a = await blindStart({ls, idb}, 'hang');
+    await twoNewAnswers(a, ls);
+    const blind = ids(ls.getItem(KEY)).filter(id => !ids(A).includes(id));
+    await reboot({ls, idb});
+    const s = lastLS(ls);
+    assert.equal(s.learning.notes.k, 'new', 'IDB note');
+    assert.equal(s.learning.steps.zz, 5, 'IDB step');
+    for (const id of blind) assert.ok(ids(ls.getItem(KEY)).includes(id), 'blind answer kept');
+    assert.match(head(ls.getItem(KEY)), /^\{"rev":[1-9]\d*,"saved_at":\d+,"schema"/, 'rev 1+ after reconcile');
+  });
+
   // T2 same, blind page did nothing but auto-save: the newer IndexedDB copy stays whole
   await check('T2 legacy + IDB timeout, no user action on the blind page: B stays whole', async () => {
     const ls = makeLS(), idb = makeIDB();
@@ -139,9 +155,11 @@ async function twoNewAnswers(a, ls) { a.window.TrainerCatalogBridge.launch('voca
   // T17 trusted «Заменить» with fewer answers survives reload (higher rev beats the older mirror)
   await check('T17 trusted replace with fewer events stays after reload', async () => {
     const ls = makeLS(), idb = makeIDB(); ls._d[KEY] = B;
-    const a = await ready(start({ls, idb}));
+    const a = await ready(start({ls, idb})); a.saveNow(); await sleep(450);
+    const before = idb.data.get('state');
     const small = P.validate(P.serialize(JSON.parse(A)), new Set(a.window.COURSE.questions.map(q => q.id))).state;
     await a.dash().prepareImport(); a.dash().import(small, 'replace'); await sleep(450);
+    idb.data.set('state', before); // mirror still holds the bigger, older copy (write not landed)
     await reboot({ls, idb});
     assert.equal(events(ls.getItem(KEY)).length, 3, 'replace kept');
   });
