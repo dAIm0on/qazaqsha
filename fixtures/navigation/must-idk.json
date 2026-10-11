@@ -1,6 +1,6 @@
 {
   "capturedBy": "tools/capture_nav_must_fixtures.js",
-  "capturedFrom": "9a1fbc4714393c52f17f5f42abf4a01c58c94319",
+  "capturedFrom": "59cf6cf70ab235b34415e4707624a990b5c5274c",
   "scene": "idk",
   "session": {
     "topic": "vocab",
@@ -26,11 +26,11 @@
     "stepEvidence": {},
     "variants": {},
     "hinted": true,
-    "elapsed_ms": 25,
-    "queueEpoch": 1791717682664.296,
-    "presented": "1791717682664.296:0",
+    "elapsed_ms": 27,
+    "queueEpoch": 1791720226638.5183,
+    "presented": "1791720226638.5183:0",
     "draft": {
-      "token": "1791717682664.296:0",
+      "token": "1791720226638.5183:0",
       "exerciseId": "hw1-1-kk",
       "answers": [
         ""
@@ -47,7 +47,7 @@
     "stageContext": null,
     "vocabRole": "must",
     "trainerReturn": "vocab:must",
-    "trainerEpoch": 1791717682664.296,
+    "trainerEpoch": 1791720226638.5183,
     "sessionOrigin": "today",
     "vocab": {
       "plan": {
@@ -62,9 +62,9 @@
         "debt": 0
       },
       "sitting": {
-        "startedAt": 1791717682440,
+        "startedAt": 1791720226407,
         "sessions": [
-          "1791717682664.296"
+          "1791720226638.5183"
         ],
         "newLemmas": [
           "word:адам"
@@ -77,7 +77,7 @@
           {
             "cardId": "hw1-1-kk",
             "lemma": "word:адам",
-            "sessionId": "1791717682664.296",
+            "sessionId": "1791720226638.5183",
             "presentation": 0
           }
         ],
@@ -85,11 +85,11 @@
       },
       "retry": {
         "cardId": "hw1-1-kk",
-        "sessionId": "1791717682664.296",
+        "sessionId": "1791720226638.5183",
         "presentation": 0,
         "kind": "idk",
         "typed": [],
-        "answerEventId": "ans:1791717682664.296:0:hw1-1-kk"
+        "answerEventId": "ans:1791720226638.5183:0:hw1-1-kk"
       },
       "closed": [],
       "unaided": {},

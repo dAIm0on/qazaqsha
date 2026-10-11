@@ -87,6 +87,39 @@ function hasVocab(session) {
 function cardId(session) {
   return session.queue[session.position];
 }
+function normVocab(v) {
+  const plan = v && v.plan || {};
+  const sitting = v && v.sitting || {};
+  return {
+    plan: {budget: plan.budget, nNew: plan.nNew, baseLen: plan.baseLen, newLemmas: plan.newLemmas || [], debt: plan.debt},
+    sitting: {
+      startedAt: sitting.startedAt,
+      sessions: sitting.sessions || [],
+      newLemmas: sitting.newLemmas || [],
+      answers: sitting.answers,
+      shown: sitting.shown || [],
+      recent: sitting.recent || [],
+      legacy: sitting.legacy
+    },
+    retry: v.retry,
+    closed: v.closed || [],
+    unaided: v.unaided || {},
+    blindFails: v.blindFails || {},
+    nearMiss: v.nearMiss
+  };
+}
+function normDraft(d) {
+  if (!d) return null;
+  return {token: d.token, exerciseId: d.exerciseId, answers: d.answers || []};
+}
+function previousAnswer(api, session) {
+  if (!session || session.position < 1) return null;
+  return api.answerOf(api.cardOf({queue: session.queue, position: session.position - 1}));
+}
+function draftLeaked(draft, answer) {
+  if (!answer) return false;
+  return ((draft && draft.answers) || []).some(item => item === answer);
+}
 
 (async () => {
   const fixtures = {};
@@ -162,12 +195,38 @@ function cardId(session) {
     assert.equal(got.sessionAttempts, fixture.session.sessionAttempts, name + ' attempts');
     assert.equal(got.queueEpoch, fixture.session.queueEpoch, name + ' epoch');
     assert.equal(got.queue.length, fixture.session.queue.length, name + ' queue');
-    assert.equal(JSON.stringify(got.vocab.sitting.shown), JSON.stringify(fixture.session.vocab.sitting.shown), name + ' shown');
-    assert.equal(JSON.stringify(got.vocab.retry), JSON.stringify(fixture.session.vocab.retry), name + ' retry');
-    assert.equal(got.vocab.plan.budget, fixture.session.vocab.plan.budget, name + ' budget');
+    const prevAnswer = previousAnswer(again, fixture.session);
+    assert.equal(draftLeaked(fixture.session.draft, prevAnswer), false, name + ' fixture draft leaked ' + prevAnswer);
+    assert.equal(draftLeaked(got.draft, prevAnswer), false, name + ' restored draft leaked ' + prevAnswer);
+    assert.deepEqual(normVocab(got.vocab), normVocab(fixture.session.vocab), name + ' vocab');
+    const retry = fixture.session.vocab.retry;
+    if (retry && retry.kind === 'wrong') {
+      assert.deepEqual(fixture.session.draft.answers, retry.typed, name + ' typed answer is on the capture');
+      assert.deepEqual((got.draft && got.draft.answers) || [], retry.typed.map(() => ''), name + ' restore clears the field');
+      assert.equal(got.draft && got.draft.exerciseId, fixture.session.draft.exerciseId, name + ' draft card');
+    } else {
+      assert.deepEqual(normDraft(got.draft), normDraft(fixture.session.draft), name + ' draft');
+    }
     assert.equal(again.window.VocabMust.portionDone(got.sessionAttempts, got.vocab.plan.budget, got.position, got.queue.length), false, name + ' portion rolled');
     console.log('BASELINE restore', name);
   }
+
+  const walked = boot();
+  walked.window.TrainerCatalogBridge.launch('vocab:must');
+  for (let i = 0; i < 2; i++) {
+    walked.saveNow();
+    const step = walked.session();
+    const answer = walked.answerOf(walked.cardOf(step));
+    assert.ok(answer, 'walk card has an answer');
+    walked.submit(answer);
+    await sleep(700);
+  }
+  walked.saveNow();
+  const walkedSession = walked.session();
+  assert.ok(walkedSession.position > 0, 'walk left the first card');
+  const walkedPrev = previousAnswer(walked, walkedSession);
+  assert.equal(draftLeaked(walkedSession.draft, walkedPrev), false, 'live draft leaked previous answer ' + walkedPrev);
+  console.log('BASELINE current draft is not the previous card answer');
 
   const leave = boot();
   leave.window.TrainerCatalogBridge.launch('vocab:must');

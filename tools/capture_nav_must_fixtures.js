@@ -23,6 +23,14 @@ const MUST_FILES = Object.freeze({
 function boot(seed, prep) {
   const nodes = new Map();
   const kids = [];
+  // A real browser destroys the old subtree on innerHTML. Reusing answer-0 kept the previous card's text.
+  function destroyId(id) {
+    const old = nodes.get(id);
+    if (!old) return;
+    const owned = Array.isArray(old._ownedIds) ? old._ownedIds.slice() : [];
+    nodes.delete(id);
+    for (const child of owned) destroyId(child);
+  }
   function makeEl(key) {
     if (nodes.has(key)) return nodes.get(key);
     const bag = {
@@ -50,11 +58,22 @@ function boot(seed, prep) {
         };
       },
       set(t, p, v) {
-        t[p] = v;
         if (p === 'innerHTML') {
-          const html = String(v);
-          for (const m of html.matchAll(/\sid="([^"]+)"/g)) if (!nodes.has(m[1])) makeEl(m[1]);
+          const prev = Array.isArray(t._ownedIds) ? t._ownedIds.slice() : [];
+          t._ownedIds = [];
+          for (const id of prev) if (id !== t.id) destroyId(id);
+          t.innerHTML = String(v);
+          const ids = [];
+          for (const m of String(v).matchAll(/\sid="([^"]+)"/g)) ids.push(m[1]);
+          for (const id of ids) {
+            if (id === t.id) continue;
+            destroyId(id);
+            makeEl(id);
+            t._ownedIds.push(id);
+          }
+          return true;
         }
+        t[p] = v;
         return true;
       }
     });

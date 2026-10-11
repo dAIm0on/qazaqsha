@@ -1,6 +1,6 @@
 {
   "capturedBy": "tools/capture_nav_must_fixtures.js",
-  "capturedFrom": "9a1fbc4714393c52f17f5f42abf4a01c58c94319",
+  "capturedFrom": "59cf6cf70ab235b34415e4707624a990b5c5274c",
   "scene": "boundary",
   "session": {
     "topic": "vocab",
@@ -25,14 +25,14 @@
     "stepEvidence": {},
     "variants": {},
     "hinted": false,
-    "elapsed_ms": 283,
-    "queueEpoch": 1791717683718.6604,
-    "presented": "1791717683718.6604:2",
+    "elapsed_ms": 286,
+    "queueEpoch": 1791720227690.697,
+    "presented": "1791720227690.697:2",
     "draft": {
-      "token": "1791717683718.6604:2",
+      "token": "1791720227690.697:2",
       "exerciseId": "hw1-3-kk",
       "answers": [
-        "Қыз"
+        ""
       ]
     },
     "sessionAttempts": 2,
@@ -46,7 +46,7 @@
     "stageContext": null,
     "vocabRole": "must",
     "trainerReturn": "vocab:must",
-    "trainerEpoch": 1791717683718.6604,
+    "trainerEpoch": 1791720227690.697,
     "sessionOrigin": "today",
     "vocab": {
       "plan": {
@@ -61,9 +61,9 @@
         "debt": 0
       },
       "sitting": {
-        "startedAt": 1791717683497,
+        "startedAt": 1791720227468,
         "sessions": [
-          "1791717683718.6604"
+          "1791720227690.697"
         ],
         "newLemmas": [
           "word:адам",
@@ -79,19 +79,19 @@
           {
             "cardId": "hw1-1-kk",
             "lemma": "word:адам",
-            "sessionId": "1791717683718.6604",
+            "sessionId": "1791720227690.697",
             "presentation": 0
           },
           {
             "cardId": "hw1-2-kk",
             "lemma": "word:қыз",
-            "sessionId": "1791717683718.6604",
+            "sessionId": "1791720227690.697",
             "presentation": 1
           },
           {
             "cardId": "hw1-3-kk",
             "lemma": "word:ұл",
-            "sessionId": "1791717683718.6604",
+            "sessionId": "1791720227690.697",
             "presentation": 2
           }
         ],

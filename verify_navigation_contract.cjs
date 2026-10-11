@@ -199,12 +199,15 @@ function registry() {
     ['N-TAP-16', 'header', 'Библиотека', 'library', ['clean.json'], 'NAV-06', 'EXPECTED_LATER']
   ].map(item => row(...item));
   const states = [
-    ['course-pause-must-course', 'course practice', 'must save beside it', 'non-must omits vocab; must writes vocab', ['practice-mid.json', 'must-first-show.json'], 'VOC', 'BASELINE'],
-    ['must-wrong-pause-course-must', 'must retype', 'pause', 'learn, then the same retype', ['must-wrong.json'], 'VOC', 'BASELINE'],
+    ['course-pause-must-course', 'course practice', 'pause then must', 'course', ['practice-mid.json', 'must-first-show.json'], 'NAV-02', 'EXPECTED_LATER'],
+    ['must-save-writes-vocab', 'words must', 'save', 'non-must omits vocab; must writes vocab', ['practice-mid.json', 'must-first-show.json'], 'VOC', 'BASELINE'],
+    ['must-wrong-pause-course-must', 'must retype', 'pause', 'course then must', ['must-wrong.json'], 'NAV-04', 'EXPECTED_LATER'],
+    ['must-retype-across-learn', 'must retype', 'learn then must', 'learn, then the same retype', ['must-wrong.json'], 'VOC', 'BASELINE'],
     ['theory-practice-words-theory', 'path', 'practice then words', 'theory', ['theory-draft.json'], 'NAV-05', 'EXPECTED_LATER'],
     ['words-catalog-back', 'words', 'catalog', 'words', ['must-first-show.json'], 'VOC', 'BASELINE'],
     ['must-boundary-pause', 'must boundary', 'pause', 'same must portion', ['must-boundary.json'], 'VOC', 'BASELINE'],
-    ['summary-continue', 'must summary', 'continue', 'live words session, same card', ['must-summary.json'], 'VOC', 'BASELINE'],
+    ['summary-continue', 'must summary', 'continue', '#/words', ['must-summary.json'], 'NAV-03', 'EXPECTED_LATER'],
+    ['summary-continue-card', 'must summary', 'continue', 'live words session, same card', ['must-summary.json'], 'VOC', 'BASELINE'],
     ['summary-to-trainers', 'must summary', 'trainers', 'personal', ['must-summary.json'], 'NAV-08', 'EXPECTED_LATER'],
     ['reload-three-sessions', 'three open sessions', 'reload', 'each session restored', ['clean.json', 'theory-draft.json', 'practice-mid.json'], 'NAV-02', 'EXPECTED_LATER'],
     ['import-replace-merge', 'progress import', 'merge', 'session cleared', ['practice-mid.json'], 'NAV-02', 'BASELINE'],
@@ -256,7 +259,7 @@ if (require.main !== module) return;
 
 const required = [];
 for (let n = 1; n <= 16; n++) required.push('N-TAP-' + String(n).padStart(2, '0'));
-for (const id of ['course-pause-must-course', 'must-wrong-pause-course-must', 'theory-practice-words-theory', 'words-catalog-back', 'must-boundary-pause', 'summary-continue', 'summary-to-trainers', 'reload-three-sessions', 'import-replace-merge', 'applyRemote-during-retry', 'double-click-launcher', 'storage-unavailable']) required.push(id);
+for (const id of ['course-pause-must-course', 'must-save-writes-vocab', 'must-wrong-pause-course-must', 'must-retype-across-learn', 'theory-practice-words-theory', 'words-catalog-back', 'must-boundary-pause', 'summary-continue', 'summary-continue-card', 'summary-to-trainers', 'reload-three-sessions', 'import-replace-merge', 'applyRemote-during-retry', 'double-click-launcher', 'storage-unavailable']) required.push(id);
 for (let n = 1; n <= 6; n++) required.push('N-HISTORY-' + n);
 for (let n = 1; n <= 7; n++) required.push('N-PWA-0' + n);
 for (const id of ['N-REACH', 'N-MORPH', 'N-TEXT', 'N-UI', 'N-READY', 'N-DICT', 'N-VOC', 'K1', 'K2', 'K3', 'K4', 'K5', 'K6']) required.push(id);
@@ -273,10 +276,23 @@ for (const item of contracts) {
   console.log('CONTRACT', item.id, item.status, item.owner, item.sourceScreen, '->', item.target);
 }
 assert.equal(contracts.some(item => item.status === 'EXPECTED_UNTIL_VOC'), false);
-for (const id of ['N-TAP-08', 'N-TAP-13', 'course-pause-must-course', 'must-wrong-pause-course-must', 'words-catalog-back', 'must-boundary-pause', 'summary-continue', 'applyRemote-during-retry', 'N-VOC']) {
+for (const id of ['N-TAP-08', 'N-TAP-13', 'must-save-writes-vocab', 'must-retype-across-learn', 'words-catalog-back', 'must-boundary-pause', 'summary-continue-card', 'applyRemote-during-retry', 'N-VOC']) {
   assert.equal(byId.get(id).status, 'BASELINE', id);
   assert.equal(byId.get(id).owner, 'VOC', id);
 }
+assert.equal(byId.get('course-pause-must-course').status, 'EXPECTED_LATER');
+assert.equal(byId.get('course-pause-must-course').owner, 'NAV-02');
+assert.equal(byId.get('course-pause-must-course').control, 'pause then must');
+assert.equal(byId.get('course-pause-must-course').target, 'course');
+assert.equal(byId.get('must-wrong-pause-course-must').status, 'EXPECTED_LATER');
+assert.equal(byId.get('must-wrong-pause-course-must').owner, 'NAV-04');
+assert.equal(byId.get('must-wrong-pause-course-must').target, 'course then must');
+assert.equal(byId.get('summary-continue').status, 'EXPECTED_LATER');
+assert.equal(byId.get('summary-continue').owner, 'NAV-03');
+assert.equal(byId.get('summary-continue').target, '#/words');
+assert.equal(byId.get('must-save-writes-vocab').target, 'non-must omits vocab; must writes vocab');
+assert.equal(byId.get('must-retype-across-learn').target, 'learn, then the same retype');
+assert.equal(byId.get('summary-continue-card').target, 'live words session, same card');
 for (const id of ['N-TAP-03', 'N-TAP-04', 'N-TAP-09', 'N-TAP-11', 'summary-to-trainers', 'N-HISTORY-2', 'N-HISTORY-6']) {
   assert.equal(byId.get(id).status, 'EXPECTED_LATER', id);
 }
@@ -420,7 +436,7 @@ function hasVocab(session) {
   assert.equal(hasVocab(midLive.session()), false);
   assert.equal(midLive.session().queue[0], 'm1-1-1');
   assert.equal(midLive.session().mode, 'ordered');
-  console.log('BASELINE course-pause-must-course: practice-mid omits vocab, must writes it. Course-queue parking stays in lesson practice and is not a second session.');
+  console.log('BASELINE must-save-writes-vocab: practice-mid omits vocab, must writes it');
 
   async function continueFrom(setup) {
     const api = boot();
@@ -444,7 +460,7 @@ function hasVocab(session) {
   await continueFrom(null);
   await continueFrom(api => { api.makeEl('reveal-button').onclick(); });
   await continueFrom(api => { api.submit('неттакого'); });
-  console.log('BASELINE N-TAP-08 and summary-continue keep the card. Hash #/words is not this check.');
+  console.log('BASELINE N-TAP-08 and summary-continue-card keep the card');
 
   const summary = boot();
   summary.window.TrainerCatalogBridge.launch('vocab:must');
@@ -503,14 +519,21 @@ function hasVocab(session) {
   assert.equal(tripAfter.vocab.retry.cardId, tripBefore.vocab.retry.cardId);
   assert.equal(tripAfter.queue[tripAfter.position], tripBefore.queue[tripBefore.position]);
   assert.equal(tripAfter.queueEpoch, tripBefore.queueEpoch);
-  console.log('BASELINE must-wrong-pause-course-must keeps the retype across a learn visit');
+  console.log('BASELINE must-retype-across-learn keeps the retype across a learn visit');
 
+  let pulls = 0;
   const remote = boot(null, w => {
     w.QazaqCloud = {
       configured: true,
       user: null,
       async start() {},
-      async pull() { return JSON.parse(w.localStorage.getItem(KEY)); },
+      async pull() {
+        pulls += 1;
+        const live = JSON.parse(w.localStorage.getItem(KEY));
+        live.records = live.records || {};
+        live.records['nav-remote-marker'] = {navRemote: 1};
+        return live;
+      },
       async push() {},
       async login() {},
       async logout() {},
@@ -522,10 +545,25 @@ function hasVocab(session) {
   remote.saveNow();
   const remoteBefore = remote.session();
   assert.equal(remoteBefore.vocab.retry.kind, 'idk');
+  const heard = Date.now() + 2000;
+  while (!(remote.listeners['qazaq-cloud-user'] || []).length) {
+    if (Date.now() > heard) throw new Error('qazaq-cloud-user listener was not registered');
+    await sleep(10);
+  }
   remote.window.QazaqCloud.user = {email: 'nav@example.com'};
   remote.window.dispatchEvent(new remote.window.CustomEvent('qazaq-cloud-user'));
-  await sleep(200);
-  remote.saveNow();
+  const applied = Date.now() + 2000;
+  function remoteMarker() {
+    const raw = remote.window.localStorage.getItem(KEY);
+    const records = raw && JSON.parse(raw).records;
+    return records && records['nav-remote-marker'];
+  }
+  while (pulls < 1 || !remoteMarker()) {
+    if (Date.now() > applied) break;
+    await sleep(10);
+  }
+  assert.equal(pulls, 1, 'pull count');
+  assert.equal(remoteMarker() && remoteMarker().navRemote, 1, 'remote marker applied');
   const remoteAfter = remote.session();
   assert.ok(remoteAfter && remoteAfter.vocab && remoteAfter.vocab.retry);
   assert.equal(remoteAfter.vocab.retry.kind, 'idk');

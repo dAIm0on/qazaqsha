@@ -1,6 +1,6 @@
 {
   "capturedBy": "tools/capture_nav_must_fixtures.js",
-  "capturedFrom": "9a1fbc4714393c52f17f5f42abf4a01c58c94319",
+  "capturedFrom": "59cf6cf70ab235b34415e4707624a990b5c5274c",
   "scene": "first-show",
   "session": {
     "topic": "vocab",
@@ -25,11 +25,11 @@
     "stepEvidence": {},
     "variants": {},
     "hinted": false,
-    "elapsed_ms": 0,
-    "queueEpoch": 1791717682124.2634,
-    "presented": "1791717682124.2634:0",
+    "elapsed_ms": 1,
+    "queueEpoch": 1791720226126.0315,
+    "presented": "1791720226126.0315:0",
     "draft": {
-      "token": "1791717682124.2634:0",
+      "token": "1791720226126.0315:0",
       "exerciseId": "hw1-1-kk",
       "answers": [
         ""
@@ -46,7 +46,7 @@
     "stageContext": null,
     "vocabRole": "must",
     "trainerReturn": "vocab:must",
-    "trainerEpoch": 1791717682124.2634,
+    "trainerEpoch": 1791720226126.0315,
     "sessionOrigin": "today",
     "vocab": {
       "plan": {
@@ -61,9 +61,9 @@
         "debt": 0
       },
       "sitting": {
-        "startedAt": 1791717681874,
+        "startedAt": 1791720225882,
         "sessions": [
-          "1791717682124.2634"
+          "1791720226126.0315"
         ],
         "newLemmas": [],
         "answers": 0,
@@ -74,7 +74,7 @@
           {
             "cardId": "hw1-1-kk",
             "lemma": "word:адам",
-            "sessionId": "1791717682124.2634",
+            "sessionId": "1791720226126.0315",
             "presentation": 0
           }
         ],
