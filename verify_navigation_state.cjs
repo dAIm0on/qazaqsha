@@ -594,11 +594,16 @@ function draftLeaked(draft, answer) {
   remoteNav.window.QazaqCloud.user = {email: 'nav@example.com'};
   remoteNav.window.dispatchEvent(new remoteNav.window.CustomEvent('qazaq-cloud-user'));
   const appliedNav = Date.now() + 2000;
-  while (remotePulls < 1) {
+  function parkedMust() {
+    const resume = stored(remoteNav).navigationResume;
+    return resume && resume.slots && resume.slots['vocab:must'];
+  }
+  while (remotePulls < 1 || !parkedMust()) {
     if (Date.now() > appliedNav) break;
     await sleep(10);
   }
   assert.equal(remotePulls, 1);
+  assert.equal(parkedMust().snapshot.session.queue[0], 'other');
   remoteNav.saveNow();
   assert.equal(remoteNav.session().queueEpoch, remoteEpoch);
   assert.equal(cardId(remoteNav.session()), remoteCard);
