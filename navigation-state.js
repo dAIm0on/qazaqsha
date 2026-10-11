@@ -14,6 +14,10 @@
  }
  const PAUSED_CAP=24;
  const SNAPSHOT_MAX=65536;
+ // Whole navigationResume budget (characters of JSON). 24 paused slots x 64 KiB would be ~1.5 M chars,
+ // too much next to the main progress JSON in ~5 MB WebKit storage, so the oldest paused slots are
+ // evicted until the namespace fits. Real slots are ~1-1.5 K chars, so this only bites on outliers.
+ const RESUME_MAX=262144;
  function part(value){
    return String(value==null?'':value).toLowerCase().replace(/[^a-z0-9._-]/g,'').slice(0,48);
  }
@@ -62,7 +66,9 @@
      if(Array.isArray(session.practiceIds)&&session.practiceIds.length>400)session.practiceIds=session.practiceIds.slice(0,400);
      snapshot.trimmed=true;
    }
-   return snapshot;
+   // SNAPSHOT_MAX is a hard cap: a snapshot still too big after trimming is rejected, not stored.
+   text=JSON.stringify(snapshot);
+   return typeof text==='string'&&text.length<=SNAPSHOT_MAX?snapshot:null;
  }
  function tidySlot(slot){
    if(!slot||typeof slot!=='object'||Array.isArray(slot))return null;
@@ -78,14 +84,26 @@
    out.snapshot=snapshot;
    return out;
  }
+ function oldestPaused(resume,keepKey){
+   return Object.entries(resume.slots).filter(([key,slot])=>slot&&slot.status==='paused'&&key!==keepKey).sort((a,b)=>(a[1].updatedAt||0)-(b[1].updatedAt||0)||(a[0]<b[0]?-1:1));
+ }
  function enforcePausedCap(resume,keepKey){
    let guard=0;
    while(guard++<80){
      const paused=Object.entries(resume.slots).filter(([,slot])=>slot&&slot.status==='paused');
-     if(paused.length<=PAUSED_CAP)return;
-     const victims=paused.filter(([key])=>key!==keepKey).sort((a,b)=>(a[1].updatedAt||0)-(b[1].updatedAt||0)||(a[0]<b[0]?-1:1));
-     if(!victims.length)return;
+     if(paused.length<=PAUSED_CAP)break;
+     const victims=oldestPaused(resume,keepKey);
+     if(!victims.length)break;
      delete resume.slots[victims[0][0]];
+   }
+   const sizes=Object.create(null);
+   let total=0;
+   for(const [key,slot] of Object.entries(resume.slots)){sizes[key]=key.length+JSON.stringify(slot).length+4;total+=sizes[key];}
+   if(total<=RESUME_MAX)return;
+   for(const [key] of oldestPaused(resume,keepKey)){
+     if(total<=RESUME_MAX)break;
+     total-=sizes[key];
+     delete resume.slots[key];
    }
  }
  function adopt(raw){
@@ -188,6 +206,6 @@
    if(!out.lastRoute&&incoming.lastRoute)out.lastRoute=incoming.lastRoute;
    return out;
  }
- const api={emptyResume,adopt,seedLegacy,keyFromSession,launchKeyFromRuntime,sliceKey,repairKey,contrastKey,customKey,examKey,lessonKey,genericQueueKey,shortHash,put,get,mergeSlots,validKey,clone,PAUSED_CAP,SNAPSHOT_MAX};
+ const api={emptyResume,adopt,seedLegacy,keyFromSession,launchKeyFromRuntime,sliceKey,repairKey,contrastKey,customKey,examKey,lessonKey,genericQueueKey,shortHash,put,get,mergeSlots,validKey,clone,PAUSED_CAP,SNAPSHOT_MAX,RESUME_MAX};
  if(node)module.exports=api;else root.NavigationState=api;
 })(typeof window!=='undefined'?window:globalThis);

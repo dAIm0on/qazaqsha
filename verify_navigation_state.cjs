@@ -669,6 +669,35 @@ function draftLeaked(draft, answer) {
   assert.equal(closedMerge.navigationResume.slots['vocab:must'].snapshot, undefined);
   console.log('N-STATE paused cap evicts the oldest; a closed tombstone has no snapshot and cloud does not revive it');
 
+  // r3 P2: SNAPSHOT_MAX is enforced after trimming, and the whole namespace has a budget.
+  const sizeState = P.migrate({records: {}}, NOW);
+  const bigUntrimmable = {status: 'paused', updatedAt: 5, origin: 'park', snapshot: {kind: 'session', session: {mode: 'ordered', topic: 'sounds', queue: ['m1-1-1'], position: 0, view: 'practice', presented: 'x'.repeat(NS.SNAPSHOT_MAX + 10)}}};
+  assert.equal(NS.put(sizeState, 'queue:ordered:big', bigUntrimmable), false);
+  assert.equal(sizeState.navigationResume.slots['queue:ordered:big'], undefined);
+  const adoptedBig = NS.adopt({slots: {'queue:ordered:big': bigUntrimmable}});
+  assert.equal(adoptedBig.slots['queue:ordered:big'], undefined);
+  const bigTrimmable = {status: 'paused', updatedAt: 6, origin: 'park', snapshot: {kind: 'session', session: {mode: 'ordered', topic: 'sounds', queue: ['m1-1-1'], position: 0, view: 'practice', variants: {v: 'y'.repeat(NS.SNAPSHOT_MAX + 10)}}}};
+  assert.equal(NS.put(sizeState, 'queue:ordered:trim', bigTrimmable), true);
+  const trimmedSlot = sizeState.navigationResume.slots['queue:ordered:trim'];
+  assert.equal(trimmedSlot.snapshot.trimmed, true);
+  assert.equal(trimmedSlot.snapshot.session.variants, undefined);
+  assert.ok(JSON.stringify(trimmedSlot.snapshot).length <= NS.SNAPSHOT_MAX);
+  assert.ok(NS.RESUME_MAX * 4 <= 1048576, 'navigationResume budget stays well under 1 MB');
+  const budgetState = P.migrate({records: {}}, NOW);
+  NS.put(budgetState, 'vocab:must', {status: 'closed', updatedAt: 1, origin: 'close'});
+  const near = NS.SNAPSHOT_MAX - 400;
+  for (let i = 0; i < NS.PAUSED_CAP; i++) {
+    assert.equal(NS.put(budgetState, 'queue:ordered:b' + i, {status: 'paused', updatedAt: 10 + i, origin: 'park', snapshot: {kind: 'session', session: {mode: 'ordered', topic: 'sounds', queue: ['m1-1-1'], position: 0, view: 'practice', presented: 'z'.repeat(near)}}}), true);
+    assert.ok(JSON.stringify(budgetState.navigationResume).length <= NS.RESUME_MAX, 'budget after put ' + i);
+    assert.ok(budgetState.navigationResume.slots['queue:ordered:b' + i], 'newest slot kept ' + i);
+  }
+  assert.equal(budgetState.navigationResume.slots['queue:ordered:b0'], undefined);
+  assert.equal(budgetState.navigationResume.slots['vocab:must'].status, 'closed');
+  const budgetAdopt = NS.adopt(JSON.parse(JSON.stringify(Object.assign({}, budgetState.navigationResume, {slots: Object.assign({}, budgetState.navigationResume.slots, {'queue:ordered:old': {status: 'paused', updatedAt: 1, origin: 'park', snapshot: {kind: 'session', session: {mode: 'ordered', queue: ['m1-1-1'], position: 0, presented: 'q'.repeat(near)}}}})}))));
+  assert.ok(JSON.stringify(budgetAdopt).length <= NS.RESUME_MAX);
+  assert.equal(budgetAdopt.slots['queue:ordered:old'], undefined);
+  console.log('N-STATE snapshot cap is enforced after trimming; namespace budget evicts the oldest paused, keeps closed');
+
   function rowOf(launcher, entry, page) {
     page.saveNow();
     const saved = JSON.parse(page.window.localStorage.getItem(KEY));
@@ -753,6 +782,49 @@ function draftLeaked(draft, answer) {
   } else {
     throw new Error('contrast pair A produced no queue');
   }
+
+  // r3 P1: course -> transfer and pause:prep keep the key they were guarded with.
+  const transferPage = boot();
+  transferPage.window.QazaqShell.startCourse('1-1');
+  assert.equal(transferPage.window.QazaqShell.key(), 'course:1-1');
+  transferPage.window.QazaqShell.startTransfer();
+  assert.equal(transferPage.session().mode, 'transfer');
+  assert.ok(transferPage.session().queue.length > 0, 'transfer 1-1 builds a queue');
+  const transferEpoch = transferPage.session().queueEpoch;
+  assert.equal(transferPage.window.QazaqShell.resume().slots['course:1-1'].snapshot.kind, 'ref');
+  rowOf('startTransfer after course', 'transfer:1-1', transferPage);
+  transferPage.window.QazaqShell.startCourse('1-1');
+  assert.equal(transferPage.window.QazaqShell.key(), 'course:1-1');
+  assert.equal(transferPage.window.QazaqShell.resume().slots['course:1-1'].snapshot.kind, 'ref');
+  const transferSlot = transferPage.window.QazaqShell.resume().slots['transfer:1-1'];
+  assert.ok(transferSlot && transferSlot.snapshot.kind === 'session');
+  assert.equal(transferSlot.snapshot.session.mode, 'transfer');
+  assert.equal(transferSlot.snapshot.session.queueEpoch, transferEpoch);
+  transferPage.window.QazaqShell.startTransfer();
+  assert.equal(transferPage.session().queueEpoch, transferEpoch);
+  console.log('N-STATE course -> transfer parks the course under course:, transfer under transfer:');
+
+  // Harness stub: every card counts as pause-ready, so pause:prep has a queue without hand-built FSRS records.
+  const pausePage = boot();
+  if (!(pausePage.window.TrainerCore && pausePage.window.TrainerCore.pauseReady)) throw new Error('TrainerCore.pauseReady missing');
+  pausePage.window.TrainerCore.pauseReady = () => true;
+  pausePage.window.QazaqShell.startCourse('1-1');
+  pausePage.window.QazaqShell.startPausePrep();
+  assert.equal(pausePage.session().mode, 'ordered');
+  assert.ok(pausePage.session().queue.length > 0, 'pause:prep builds a queue');
+  assert.equal(pausePage.window.QazaqShell.key(), 'pause:prep');
+  assert.notEqual(pausePage.window.QazaqShell.key(), 'course:1-1');
+  assert.ok(pausePage.window.QazaqShell.resume().slots['course:1-1']);
+  const pauseEpoch = pausePage.session().queueEpoch;
+  pausePage.saveNow();
+  assert.equal(NS.launchKeyFromRuntime(JSON.parse(pausePage.window.localStorage.getItem(KEY)).session), 'pause:prep');
+  assert.equal(boot(pausePage.window.localStorage.getItem(KEY)).window.QazaqShell.key(), 'pause:prep');
+  pausePage.window.QazaqShell.startCourse('1-1');
+  const pauseSlot = pausePage.window.QazaqShell.resume().slots['pause:prep'];
+  assert.ok(pauseSlot && pauseSlot.snapshot.kind === 'session');
+  assert.equal(pauseSlot.snapshot.session.queueEpoch, pauseEpoch);
+  assert.equal(pausePage.window.QazaqShell.resume().slots['queue:ordered:all'], undefined);
+  console.log('KEY startPausePrep', 'pause:prep', 'pause:prep');
 
   const examPage = boot();
   examPage.window.QazaqShell.startExam({topic: 'sounds'});

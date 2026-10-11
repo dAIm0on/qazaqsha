@@ -1535,6 +1535,7 @@ function qazaqAppBoot(bootMirror){
    if(!list.length)list=T.session(rule,{catalog:window.CURRICULUM})||[];
    list=list.filter(q=>byId.has(q.id));
    if(!list.length)return;
+   launchKey=courseBlock?('transfer:'+courseBlock):'transfer:all';
    mode='transfer';topic='all';sourceFilter=null;activeLesson=null;activeStep=null;
    queue=list.map(q=>q.id);practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
    render();showView('practice');
@@ -1554,6 +1555,7 @@ function qazaqAppBoot(bootMirror){
   try{
    const now=Date.now();
    const ids=questions.filter(q=>eligible(q)&&core.pauseReady(records[q.id],now)).map(q=>q.id);
+   launchKey='pause:prep';
    mode='ordered';topic='all';sourceFilter=null;activeLesson=null;
    queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
    render();showView('practice');
@@ -4009,7 +4011,7 @@ function qazaqAppBoot(bootMirror){
      save();return true;
    }
  };
- window.QazaqShell={show:showView,startCourse,startLesson,startCustom,startHomework,startPreExam,startSlice,startContrast,launchRepair,startExam,openPath:openPathLesson,import:importProgress,key(){return currentLaunchKey();},resume(){return state.navigationResume;},restore(key){const gate=guardLaunch(key);if(gate!=='nested')endLaunch(gate);return gate;}};
+ window.QazaqShell={show:showView,startCourse,startLesson,startCustom,startHomework,startPreExam,startSlice,startContrast,launchRepair,startExam,startTransfer,startPausePrep,openPath:openPathLesson,import:importProgress,key(){return currentLaunchKey();},resume(){return state.navigationResume;},restore(key){const gate=guardLaunch(key);if(gate!=='nested')endLaunch(gate);return gate;}};
  window.TrainerCatalogBridge={
    launch:launchCatalogTrainer,
    numberTracks:catalogNumberTracks,
