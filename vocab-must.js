@@ -218,6 +218,39 @@
    }
    return representative(chosen.cards,records,H);
  }
+ function lemmaInDebt(cards,records,H,now){
+   const groups=new Map();
+   for(const q of cards||[]){
+     const key=groupKeyOf(q);
+     let g=groups.get(key);
+     if(!g)groups.set(key,g=[]);
+     g.push(q);
+   }
+   for(const list of groups.values()){
+     let earliest=null,needs=false,any=false;
+     for(const q of list){
+       if(!H.card(q))continue;
+       any=true;
+       const r=records[q.id]||{};
+       if(r.needsReview)needs=true;
+       const nr=Number(r.next_review);
+       if(Number.isFinite(nr)&&(earliest==null||nr<earliest))earliest=nr;
+     }
+     if(any&&(needs||(earliest!=null&&earliest<=now)))return true;
+   }
+   return false;
+ }
+ function debtLemmas(pool,state,core,now){
+   pool=(pool||[]).filter(q=>q&&q.wordRole!=='used');
+   const H=historyIndex(state||{},pool,core);
+   const records=(state&&state.records)||{};
+   const byLemma=new Map();
+   for(const q of pool){const lem=H.lk(q);let list=byLemma.get(lem);if(!list)byLemma.set(lem,list=[]);list.push(q);}
+   const out=[];
+   for(const [lem,cards] of byLemma)if(lemmaInDebt(cards,records,H,now))out.push(lem);
+   out.sort();
+   return out;
+ }
  function planPortion(pool,state,cfg,core,now,opts){
    opts=opts||{};
    pool=(pool||[]).filter(q=>q&&q.wordRole!=='used');
@@ -250,13 +283,34 @@
    const limit=nNew+otherCap;
    const pickedIds=new Set(picked.map(q=>q.id));
    const bucket=picked.concat(reviewReps.filter(q=>!pickedIds.has(q.id)));
+   const retr=typeof opts.retrievability==='function'?opts.retrievability:()=>null;
+   const dueStamp=q=>{
+     const r=records[q.id]||{};
+     const nr=Number(r.next_review);
+     if(Number.isFinite(nr))return nr;
+     const d=Number(r.dueAt);
+     return Number.isFinite(d)?d:null;
+   };
+   // NeedsReview, then due. Inside each, low retrievability first.
+   // A missing R is not a measured probability, so those cards sort by due and id on their own.
+   const orderWithin=(a,b)=>{
+     const ra=retr(a),rb=retr(b);
+     const an=ra==null||Number.isNaN(ra),bn=rb==null||Number.isNaN(rb);
+     if(an!==bn)return an?1:-1;
+     if(!an&&ra!==rb)return ra-rb;
+     const ad=dueStamp(a),bd=dueStamp(b);
+     const af=ad!=null,bf=bd!=null;
+     if(af!==bf)return af?-1:1;
+     if(af&&ad!==bd)return ad-bd;
+     return String(a.id)<String(b.id)?-1:String(a.id)>String(b.id)?1:0;
+   };
    let out=[];
    if(core&&typeof core.chooseShortSession==='function'){
-     out=core.chooseShortSession(bucket,records,now,limit,{newLimit:nNew,isNew:q=>pickedIds.has(q.id)});
+     out=core.chooseShortSession(bucket,records,now,limit,{newLimit:nNew,isNew:q=>pickedIds.has(q.id),orderWithin});
    }else{
      const others=reviewReps.filter(q=>!newSet.has(lk(q)));
-     const errors=others.filter(q=>records[q.id]&&records[q.id].needsReview);
-     const due=others.filter(q=>records[q.id]&&!records[q.id].needsReview&&core.isDue(records[q.id],now)).sort((a,b)=>(Number(records[a.id].dueAt)||0)-(Number(records[b.id].dueAt)||0));
+     const errors=others.filter(q=>records[q.id]&&records[q.id].needsReview).sort(orderWithin);
+     const due=others.filter(q=>records[q.id]&&!records[q.id].needsReview&&core.isDue(records[q.id],now)).sort(orderWithin);
      const learning=others.filter(q=>{const r=records[q.id];return r&&!r.needsReview&&!core.isDue(r,now)&&(Number(r.streak)||0)<2;});
      const review=[];const reviewSeen=new Set();
      for(const q of [...errors,...due]){const k=lk(q);if(reviewSeen.has(k))continue;reviewSeen.add(k);review.push(q);}
@@ -277,7 +331,6 @@
    const usedLem=new Set(out.map(q=>lk(q)));
    let room=Math.max(0,otherCap-out.filter(q=>!newSet.has(lk(q))).length);
    if(room>0&&out.length<limit){
-     const retr=typeof opts.retrievability==='function'?opts.retrievability:()=>null;
      const byRetr=(a,b)=>{
        const ra=retr(a),rb=retr(b);
        const an=ra==null||Number.isNaN(ra),bn=rb==null||Number.isNaN(rb);
@@ -301,7 +354,8 @@
    }
    const baseLen=out.length;
    const budget=Math.min(answerBudget,baseLen+2*nNew);
-   return {ids:out.map(q=>q.id),plan:{budget,nNew,baseLen,newLemmas}};
+   const debt=debtLemmas(pool,state,core,now).length;
+   return {ids:out.map(q=>q.id),plan:{budget,nNew,baseLen,newLemmas,debt}};
  }
  function gapOk(seq,lemma,minGap){
    let last=-1;
@@ -541,6 +595,6 @@
    if(local&&local.mustUnfinished)return {action:'keep-local'};
    return {action:'reset'};
  }
- const api={TEXT,clone,emptySitting,emptyPlan,isMustTrainer,isSavedMust,lemmaKey,mustCounterText,idkNote,statusNote,learnerTextOk,findEvent,cardHasHistory,lemmaHasHistory,poolHasAnswerHistory,planPortion,enforceGap,scheduleReturn,commitFirst,commitRetype,noteShown,noteRecent,recount,wordLine,portionDone,snapshot,restoreSaved,importPlan,retryFromAnswer};
+ const api={TEXT,clone,emptySitting,emptyPlan,isMustTrainer,isSavedMust,lemmaKey,mustCounterText,idkNote,statusNote,learnerTextOk,findEvent,cardHasHistory,lemmaHasHistory,poolHasAnswerHistory,debtLemmas,planPortion,enforceGap,scheduleReturn,commitFirst,commitRetype,noteShown,noteRecent,recount,wordLine,portionDone,snapshot,restoreSaved,importPlan,retryFromAnswer};
  if(node)module.exports=api;else root.VocabMust=api;
 })(typeof window!=='undefined'?window:globalThis);

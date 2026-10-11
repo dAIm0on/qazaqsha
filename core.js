@@ -200,7 +200,10 @@
     const newLimit=opts.newLimit!=null?Math.max(0,Number(opts.newLimit)||0):Math.max(0,Number(config.session.newLimit)||0);
     const isNew=typeof opts.isNew==='function'?opts.isNew:(q=>{const r=records&&records[q.id];return !(r&&r.seen);});
     const errors=items.filter(q=>records[q.id]?.needsReview);
-    const due=items.filter(q=>!records[q.id]?.needsReview&&isDue(records[q.id],now)).sort((a,b)=>(records[a.id].dueAt||0)-(records[b.id].dueAt||0));
+    const due=items.filter(q=>!records[q.id]?.needsReview&&isDue(records[q.id],now));
+    // Vocab passes orderWithin. Every other caller keeps the old due-date order.
+    if(typeof opts.orderWithin==='function'){errors.sort(opts.orderWithin);due.sort(opts.orderWithin);}
+    else due.sort((a,b)=>(records[a.id].dueAt||0)-(records[b.id].dueAt||0));
     const fresh=items.filter(isNew);
     const learning=items.filter(q=>!isNew(q)&&!records[q.id]?.needsReview&&!isDue(records[q.id],now)&&(records[q.id]?.streak||0)<2);
     const review=dedupeByLemma([...errors,...due]);
