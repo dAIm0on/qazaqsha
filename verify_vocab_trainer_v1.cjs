@@ -212,7 +212,8 @@ assert.ok(app.includes("next.session=null"));
 assert.ok(!/dayNewCap|vocabDay|vocabMode/.test(app+fs.readFileSync(path.join(__dirname,'config.js'),'utf8')));
 const remote=app.split('function applyRemote')[1].split('function paintAccount')[0];
 assert.ok(!/queue=\[\]/.test(remote));
-assert.ok(app.includes('state.session.vocab'));
+assert.ok(app.includes('session.vocab=window.VocabMust.snapshot'));
+assert.ok(app.includes('state.session=captureSessionObject()'));
 assert.ok(peek.includes('analytics:answerAnalytics'));
 assert.ok(check.includes('analytics:answerAnalytics'));
 assert.ok(app.includes("function isVocabMustTrainer(){return mode==='words'&&vocabRole==='must'&&trainerReturn==='vocab:must'&&queueEpoch===trainerEpoch;}"));
@@ -381,6 +382,11 @@ assert.equal(keptLocal.mode,'words');
 assert.equal(keptLocal.kind,'idk');
 assert.equal(keptLocal.cardId,'LOCAL');
 assert.deepEqual(keptLocal.views,['practice']);
+const ordinary=runImport(app,knownStart(['A'],{mode:'ordered',queue:['A'],position:0,view:'practice'}),{records:{},session:{mode:'words',queue:['OTHER'],position:0}},'merge');
+assert.deepEqual(ordinary.queue,['A']);
+assert.equal(ordinary.mode,'ordered');
+assert.equal(ordinary.position,0);
+assert.deepEqual(ordinary.views,['practice']);
 
 const seenOnly=state();
 seenOnly.records.A={seen:1,review_count:0,next_review:1,dueAt:1};
@@ -1482,7 +1488,7 @@ function p6fHarness(){
     'function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}',
     'function pauseTimer(){elapsedMs=elapsed();timerSince=null;cancelAdvance();}',
     'function hintEvent(q,kind){state.events.push({type:"hint",card_id:q.id,hint_kind:kind});hinted=true;}',
-    'function captureDraft(){} function refillCardDraft(){} function renderStats(){} function activateCard(){} function save(){} function syncKbInset(){} function markPlace(){} function shellTab(){return "today";}',
+    'function captureDraft(){} function parkPause(){} function refillCardDraft(){} function renderStats(){} function activateCard(){} function save(){} function syncKbInset(){} function markPlace(){} function shellTab(){return "today";}',
     'function $$(sel){return [];}',
     'const learning={render(){}}; const dashboard={render(){}};',
     'function renderMaterials(){} function renderExam(){} function renderHomework(){} function renderPath(){}',
@@ -1653,7 +1659,7 @@ function p6cHarness(){
     'function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}',
     'function pauseTimer(){elapsedMs=elapsed();timerSince=null;cancelAdvance();}',
     'function hintEvent(q,kind){state.events.push({type:"hint",card_id:q.id,hint_kind:kind});hinted=true;}',
-    'function captureDraft(){} function refillCardDraft(){} function renderStats(){} function activateCard(){} function save(){} function syncKbInset(){} function markPlace(){} function shellTab(){return "today";}',
+    'function captureDraft(){} function parkPause(){} function refillCardDraft(){} function renderStats(){} function activateCard(){} function save(){} function syncKbInset(){} function markPlace(){} function shellTab(){return "today";}',
     'function $$(sel){return [];}',
     'const learning={render(){}}; const dashboard={render(){}};',
     'function renderMaterials(){} function renderExam(){} function renderHomework(){} function renderPath(){}',
