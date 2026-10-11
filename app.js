@@ -1201,7 +1201,8 @@ function qazaqAppBoot(bootMirror){
  }
 
  function captureSessionObject(){
-   const session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,pathPracticeReturn:pathPracticeReturn?JSON.parse(JSON.stringify(pathPracticeReturn)):null,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null,vocabRole,trainerReturn,trainerEpoch,sessionOrigin,launchKey,contrastPair:contrastPair?JSON.parse(JSON.stringify(contrastPair)):null,repairIds:Array.isArray(repairIds)?repairIds.slice():null,sliceBlock:state.sliceBlock||null};
+   const session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,pathPracticeReturn:pathPracticeReturn?JSON.parse(JSON.stringify(pathPracticeReturn)):null,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null,vocabRole,trainerReturn,trainerEpoch,sessionOrigin};
+   session.launchKey=launchKey;session.contrastPair=contrastPair?JSON.parse(JSON.stringify(contrastPair)):null;session.repairIds=Array.isArray(repairIds)?repairIds.slice():null;session.sliceBlock=state.sliceBlock||null;
    if(isVocabMustTrainer()&&window.VocabMust)session.vocab=window.VocabMust.snapshot({plan:vocabPlan,sitting:vocabSitting,retry:vocabRetry,closed:vocabClosed,unaided:sessionUnaided,blindFails:sessionBlindFails});
    return session;
  }
