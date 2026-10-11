@@ -76,7 +76,7 @@ function qazaqAppBoot(bootMirror){
  const ORIGIN_VIEWS=['today','learn','path','homework','personal','exam','review','vocabulary','materials','morph'],ORIGIN_LABEL={today:'Сегодня',learn:'Учёба',path:'Уроки',homework:'Домашка',personal:'Тренажёры',exam:'Экзамен',review:'Повторение',vocabulary:'Словарь',materials:'Материалы',morph:'Правила'};
  let sessionOrigin=null,trainerEpoch=null; // trainerEpoch: the queue a catalog trainer started; trainerReturn is valid only for it
  let vocabPlan=null,vocabSitting=null,vocabRetry=null,vocabClosed=[],retryAfterWrong=false,vocabPoolReady=false,vocabReturnScheduled=false,vocabSummary=false,vocabNear=null,vocabCardHold=null;
- let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null,stageContext=null,practiceHold=null,restoredEnded=false;
+ let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null,stageContext=null,practiceHold=null,restoredEnded=false,launchGate=0,launchKey=null,contrastPair=null,repairIds=null;
  let hwOrigin='today';
  function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
  function currentLessonId(q){
@@ -420,11 +420,14 @@ function qazaqAppBoot(bootMirror){
  function captureDraft(){
    const pathInput=$('#path-answer');
    const gp=state.grammarPath;
-   if(pathInput&&gp){
+   if(view==='path'&&pathInput&&gp&&!launchGate&&pathInput.dataset.lesson){
      const beat=Number(pathInput.dataset.beat);
      gp.pathDraft={lessonId:pathInput.dataset.lesson||gp.lessonId,chapterId:pathInput.dataset.chapter||gp.chapterId,beat:Number.isInteger(beat)?beat:gp.beat,value:pathInput.value};
    }
-   const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form')&&formIsCard(q)&&!showClosed(q)){draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};stashCard(q,false);}
+   const q=byId.get(queue[position]);
+   const answerForm=$('#answer-form');
+   const practiceOpen=view==='practice'&&answerForm&&!answerForm.hidden&&!($('#practice-view')&&$('#practice-view').hidden);
+   if(practiceOpen&&!checked&&q&&formIsCard(q)&&!showClosed(q)){draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};stashCard(q,false);}
    const ask=$('#rules-ask-q');
    if(ask){
      if(ask.value)state.rulesDraft={article:rulesArticle||'',value:ask.value.slice(0,400)};
@@ -687,15 +690,27 @@ function qazaqAppBoot(bootMirror){
    // r7 X3/step: on a cold start the v2 cards of this lesson are not installed yet, so the saved practice
    // («шаг 10 из 18») looked missing and «Начать / Продолжить» fell back to theory. Install them first.
    ensureV2(id);
+   const owned=!launchGate;let gate='nested';
+   if(owned){
+     const aim=resumeTarget(id);
+     gate=guardLaunch(aim.kind==='theory'?'theory:'+id:'course:'+id);
+     if(gate==='blocked'||gate==='same'||gate==='nested')return;
+     if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+     practiceHold=null;
+   }
+   if(owned)launchKey=resumeTarget(id).kind==='theory'?launchKey:'course:'+id;
+   try{
    const t=resumeTarget(id);
    if(t.kind==='practice'&&restoreLessonPractice(id)){
      markLessonStarted(id,'practice');render();showView('practice');return;
    }
+   if(practiceHold&&practiceHold.lessonId===id){showPracticeHold();return;}
    if(t.kind==='theory'){openPathLesson(id,{meaningful:true});return;}
    const nxt=P.nextRegistered&&P.nextRegistered(id,state.events);
    if(beginPacked(id))return;
    if(nxt&&beginStaged(id,nxt))return;
    openPathLesson(id,{meaningful:true});
+   }finally{if(owned)endLaunch(gate);}
  }
  function resetCounts(){sessionAttempts=0;sessionCorrect=0;sessionAssisted=0;draft=null;remediation=null;sessionUnaided=Object.create(null);}
  // r7 QA F2: «было → стало» only when both sides exist and differ; the slot line only when a slot is set.
@@ -851,6 +866,9 @@ function qazaqAppBoot(bootMirror){
    if(auto&&checked&&!advanceTimer)advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
  }
  function endMustToTrainers(){
+   const key=currentLaunchKey()||(isVocabMustTrainer()?'vocab:must':null);
+   if(key&&!parkLive(key,'closed'))return;
+   launchKey=null;
    vocabSummary=false;vocabNear=null;vocabCardHold=null;vocabSitting=null;vocabPlan=null;vocabRetry=null;vocabClosed=[];
    trainerReturn=null;trainerEpoch=null;vocabRole=null;
    queue=[];practiceIds=[];position=0;mode='ordered';
@@ -1058,6 +1076,16 @@ function qazaqAppBoot(bootMirror){
    $$('#exam-content [data-slice]').forEach(b=>b.onclick=()=>startSlice(b.dataset.slice));
  }
  function startSlice(block){
+  const sliceLaunch=window.NavigationState.sliceKey(block);
+  const owned=!launchGate;
+  let gate='nested';
+  if(owned){
+    gate=guardLaunch(sliceLaunch);
+    if(gate==='blocked'||gate==='same'||gate==='nested')return;
+    if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+    practiceHold=null;
+  }
+  try{
    const P=window.ProbeItems;if(!P)return;
    course.sources=course.sources||{};
    if(!course.sources.slice)course.sources.slice={title:'Проверка дыр',url:'#',additional:true};
@@ -1065,8 +1093,11 @@ function qazaqAppBoot(bootMirror){
    for(const q of list){if(!byId.has(q.id)){course.questions.push(q);byId.set(q.id,q);}}
    mode='slice';topic='all';sourceFilter=null;activeLesson=null;courseBlock=null;vocabRole=null;
    queue=list.map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;
-   state.sliceRun=[];state.sliceBlock=block;resetCounts();render();showView('practice');
+   state.sliceRun=[];state.sliceBlock=block;launchKey=sliceLaunch;resetCounts();render();showView('practice');
+ 
+  }finally{if(owned)endLaunch(gate);}
  }
+
  function showSliceResult(){
    const P=window.ProbeItems;
    const holes=P?P.summarize(state.sliceRun||[]):[];
@@ -1079,13 +1110,29 @@ function qazaqAppBoot(bootMirror){
    $$('#exam-content [data-repair]').forEach(b=>b.onclick=()=>beginRepair(b.dataset.repair));
  }
  function launchRepair(list){
+  const repairIdsNow=(list||[]).map(q=>q&&q.id).filter(Boolean);
+  const repairLaunch=window.NavigationState.repairKey(repairIdsNow);
+  const owned=!launchGate;
+  let gate='nested';
+  if(owned){
+    gate=guardLaunch(repairLaunch);
+    if(gate==='blocked'||gate==='same'||gate==='nested')return;
+    if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+    practiceHold=null;
+  }
+  try{
+  launchKey=repairLaunch;
+  repairIds=(list||[]).map(q=>q&&q.id).filter(Boolean);
   course.sources=course.sources||{};
   if(!course.sources.repair)course.sources.repair={title:'Разберём',url:'#',additional:true};
   for(const q of list){if(!byId.has(q.id)){course.questions.push(q);byId.set(q.id,q);}}
   mode='repair';topic='all';sourceFilter=null;activeLesson=null;courseBlock=null;vocabRole=null;
   queue=list.map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;
-  state.sliceRun=[];resetCounts();render();showView('practice');
+  state.sliceRun=[];launchKey=repairLaunch;resetCounts();render();showView('practice');
+ 
+  }finally{if(owned)endLaunch(gate);}
  }
+
  function beginRepair(ruleId){
   const R=window.RepairState;if(!R||!ruleId)return false;
   const cards=R.day0Cards(ruleId);
@@ -1144,18 +1191,156 @@ function qazaqAppBoot(bootMirror){
      <div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>name?`<button type="button" class="chip" data-exam="${id}">${esc(name)}</button>`:'').join('')}</div>
      <div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-exam-course="${b.id}">${esc(b.title)}</button>`).join('')}</div>
      <p><button type="button" class="secondary-button" id="exam-rules">Только правила (другие основы)</button></p></div>`;
-   const go=()=>{mode='exam';sourceFilter=null;vocabRole=null;activeLesson=null;startQueue({all:true});showView('practice');};
-   $('#exam-start').onclick=go;
-   $$('#exam-content [data-exam]').forEach(b=>b.onclick=()=>{topic=b.dataset.exam;go();});
-   $$('#exam-content [data-exam-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.examCourse;go();});
-   $('#exam-rules').onclick=()=>{topic='rules';courseBlock=null;go();};
+   const go=extra=>launchPatch(Object.assign({mode:'exam',sourceFilter:null,vocabRole:null,activeLesson:null,fn(){startQueue({all:true});showView('practice');}},extra||{},{key:(extra&&extra.key)||('exam:'+(topic||'all'))}));
+   $('#exam-start').onclick=()=>go();
+   $$('#exam-content [data-exam]').forEach(b=>b.onclick=()=>go({topic:b.dataset.exam,key:'exam:'+b.dataset.exam}));
+   $$('#exam-content [data-exam-course]').forEach(b=>b.onclick=()=>go({courseBlock:b.dataset.examCourse,key:'exam:'+(topic||'all')+':course:'+b.dataset.examCourse}));
+   $('#exam-rules').onclick=()=>go({topic:'rules',courseBlock:null,key:'exam:rules'});
    $('#exam-content').insertAdjacentHTML('beforeend',slicePanel());
    bindSlice();
  }
+
+ function captureSessionObject(){
+   const session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,pathPracticeReturn:pathPracticeReturn?JSON.parse(JSON.stringify(pathPracticeReturn)):null,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null,vocabRole,trainerReturn,trainerEpoch,sessionOrigin};
+   session.launchKey=launchKey;session.contrastPair=contrastPair?JSON.parse(JSON.stringify(contrastPair)):null;session.repairIds=Array.isArray(repairIds)?repairIds.slice():null;session.sliceBlock=state.sliceBlock||null;
+   if(isVocabMustTrainer()&&window.VocabMust)session.vocab=window.VocabMust.snapshot({plan:vocabPlan,sitting:vocabSitting,retry:vocabRetry,closed:vocabClosed,unaided:sessionUnaided,blindFails:sessionBlindFails});
+   return session;
+ }
+ function genericQueueKey(mode2,topic2,course2,source2,vocab2){
+   return window.NavigationState.genericQueueKey(mode2,topic2,course2,source2,vocab2);
+ }
+ function currentLaunchKey(){
+   return window.NavigationState.launchKeyFromRuntime({view,launchKey,mode,topic,sourceFilter,courseBlock,activeLesson,vocabRole,trainerReturn,trainerEpoch,queueEpoch,hwLesson,hwPart,hwSection,queue,sliceBlock:state.sliceBlock,contrastPair,repairIds,grammarLesson:state.grammarPath&&state.grammarPath.lessonId});
+ }
+ function noteLaunchBlocked(){
+   const el=$('#launch-block');
+   if(!el)return;
+   el.hidden=false;
+   el.textContent='Не получается сохранить текущее занятие — память браузера переполнена. Закончи его или освободи место, потом открой снова.';
+ }
+ function clearLaunchBlocked(){
+   const el=$('#launch-block');
+   if(!el)return;
+   el.hidden=true;
+   el.textContent='';
+ }
+ function liveOpen(){
+   if(view==='path'&&state.grammarPath&&state.grammarPath.lessonId)return true;
+   if(vocabSummary&&trainerReturn==='vocab:must')return true;
+   return queue.length>position;
+ }
+ function slotSnapshot(key){
+   if(String(key||'').indexOf('course:')===0)return {kind:'ref',store:'practiceSession',lessonId:key.slice(7)};
+   if(String(key||'').indexOf('theory:')===0)return {kind:'ref',store:'path',lessonId:key.slice(7)};
+   return {kind:'session',session:JSON.parse(JSON.stringify(captureSessionObject()))};
+ }
+ function parkLive(key,status){
+   const Nav=window.NavigationState;
+   if(!Nav||!key)return false;
+   captureDraft();persistLessonPath();persistLessonPractice();
+   const ok=Nav.put(state,key,{status:status==='closed'?'closed':'paused',updatedAt:Date.now(),origin:status==='closed'?'close':'park',snapshot:slotSnapshot(key)});
+   if(!ok)return false;
+   save();
+   if(!storageAvailable){try{delete state.navigationResume.slots[key];}catch(e){}return false;}
+   return true;
+ }
+ function noteReplaced(key){
+   const Nav=window.NavigationState;if(!Nav||!key)return;
+   const prev=Nav.get(state,key);
+   if(!(prev&&prev.status==='closed'))return;
+   Nav.put(state,key,{status:'paused',updatedAt:Date.now(),origin:'launch',snapshot:slotSnapshot(key)});
+ }
+ function showPracticeHold(){
+   const hold=practiceHold;if(!hold)return;
+   if(view!=='practice'){const kept=practiceHold;showView('practice');practiceHold=kept;}
+   const missing=(hold.missing||[]).join(', ');
+   const ex=$('#exercise');
+   if(ex)ex.innerHTML='<div class="empty-state"><h2>Сохранённая очередь на месте</h2><p>В снимке есть задание, которого нет в этой версии: '+esc(missing)+'. Очередь не пересобрана.</p><div class="finish-actions"><button type="button" class="secondary-button" id="hold-lessons">Выбрать занятие</button></div></div>';
+   const btn=$('#hold-lessons');if(btn)btn.onclick=()=>{practiceHold=null;showView('learn');};
+ }
+ function noteDamaged(){
+   const el=$('#save-status');
+   if(!el)return;
+   el.hidden=false;
+   el.textContent='Снимок очереди повреждён. Новая очередь не собрана.';
+ }
+ function restoreParked(key,slot){
+   const snap=slot&&slot.snapshot;
+   if(!snap||typeof snap!=='object'){noteDamaged();return 'damaged';}
+   if(snap.kind==='ref'&&snap.store==='practiceSession'){
+     launchKey='course:'+snap.lessonId;
+     ensureV2(snap.lessonId);
+     if(restoreLessonPractice(snap.lessonId)){vocabRole=null;trainerReturn=null;trainerEpoch=null;markLessonStarted(snap.lessonId,'practice');render();showView('practice');return 'ok';}
+     if(practiceHold&&practiceHold.lessonId===snap.lessonId){showPracticeHold();return 'held';}
+     noteDamaged();return 'damaged';
+   }
+   if(snap.kind==='ref'&&snap.store==='path'){
+     ensureV2(snap.lessonId);
+     const gp=loadLessonPath(snap.lessonId);
+     if(!gp){noteDamaged();return 'damaged';}
+     showView('path');return 'ok';
+   }
+   if(snap.kind==='session'&&snap.session&&typeof snap.session==='object'&&Array.isArray(snap.session.queue)){
+     const missing=snap.session.queue.filter(id=>!byId.has(id));
+     if(missing.length){
+       practiceHold={lessonId:snap.session.courseBlock||'parked',missing,kept:snap.session.queue.slice()};
+       showPracticeHold();return 'held';
+     }
+     if(snap.session.mode==='words'&&snap.session.trainerReturn==='vocab:must')prepareVocabPool();
+     applyValidSession(snap.session);
+     showView(snap.session.view==='path'?'path':'practice');
+     return 'ok';
+   }
+   noteDamaged();return 'damaged';
+ }
+ function guardLaunch(nextKey,opts){
+   if(launchGate)return 'nested';
+   const source=currentLaunchKey();
+   if(source&&source===nextKey&&liveOpen())return 'same';
+   cancelAdvance();abortTutor();captureDraft();
+   launchGate=1;
+   if(source&&source!==nextKey){
+     if(!parkLive(source,'paused')){launchGate=0;noteLaunchBlocked();return 'blocked';}
+   }
+   const restore=!(opts&&opts.restore===false);
+   const Nav=window.NavigationState;
+   const slot=restore&&Nav&&nextKey?Nav.get(state,nextKey):null;
+   if(slot&&slot.status==='paused'){
+     const how=restoreParked(nextKey,slot);
+     launchGate=0;
+     return how;
+   }
+   return 'create';
+ }
+ function endLaunch(gate){if(gate!=='nested')launchGate=0;}
+ function launchPatch(patch){
+   const gate=guardLaunch(patch.key);
+   if(gate==='blocked'||gate==='same'||gate==='nested')return gate;
+   if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return gate;}
+   try{
+     if(patch.key)launchKey=patch.key;
+     if('mode' in patch)mode=patch.mode;
+     if('topic' in patch)topic=patch.topic;
+     if('courseBlock' in patch)courseBlock=patch.courseBlock;
+     if('sourceFilter' in patch)sourceFilter=patch.sourceFilter;
+     if('vocabRole' in patch)vocabRole=patch.vocabRole;
+     if('activeLesson' in patch)activeLesson=patch.activeLesson;
+     if('trainerReturn' in patch)trainerReturn=patch.trainerReturn;
+     if(patch.fn)patch.fn();
+   }finally{endLaunch(gate);}
+   return gate;
+ }
+ function parkPause(next){
+   if(launchGate||next===view||next==='practice')return;
+   const key=currentLaunchKey();
+   if(!key||!liveOpen())return;
+   const prev=window.NavigationState&&window.NavigationState.get(state,key);
+   if(prev&&prev.status==='closed')return;
+   parkLive(key,'paused');
+ }
  function save(){
    captureDraft();persistLessonPath();persistLessonPractice();if(window.AiTutor&&window.AiTutor.snapshot)state.aiTutor=window.AiTutor.snapshot();state.records=records;state.learning=learningState;
-   state.session={topic,mode,sourceFilter,courseBlock,queue,position,answered:checked,view,activeLesson,activeStep,practiceIds,stepEvidence,variants,hinted,elapsed_ms:elapsed(),queueEpoch,presented,draft,sessionAttempts,sessionCorrect,sessionAssisted,remediation,hwLesson,hwPart,hwSection,pathPracticeReturn:pathPracticeReturn?JSON.parse(JSON.stringify(pathPracticeReturn)):null,stageContext:stageContext?JSON.parse(JSON.stringify(stageContext)):null,vocabRole,trainerReturn,trainerEpoch,sessionOrigin};
-   if(isVocabMustTrainer()&&window.VocabMust)state.session.vocab=window.VocabMust.snapshot({plan:vocabPlan,sitting:vocabSitting,retry:vocabRetry,closed:vocabClosed,unaided:sessionUnaided,blindFails:sessionBlindFails});
+   if(!(practiceHold&&Array.isArray(practiceHold.kept)))state.session=captureSessionObject();
    let raw=null;
    try{if(storageReadError)throw storageReadError;raw=stamp(state);localStorage.setItem(KEY,raw);lsOk=true;}catch{lsOk=false;if(!storageReadError&&raw)rescueStorage();}
    if(raw&&mirrorTrusted)mirrorSave(raw);
@@ -1275,24 +1460,30 @@ function qazaqAppBoot(bootMirror){
    return list;
  }
  function startCourse(block){
+  const owned=!launchGate;
+  let gate='nested';
+  if(owned){
+    gate=guardLaunch('course:'+block);
+    if(gate==='blocked'||gate==='same'||gate==='nested')return;
+    if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+  }
+  try{
+   launchKey='course:'+block;
    ensureV2(block);
    if(!P.courseIds().includes(block))return;
    viewOnlyPathLesson=null;
    persistLessonPractice();persistLessonPath();
-   courseBlock=block;vocabRole=null;sourceFilter=null;activeLesson=null;activeStep=null;if(view!=='practice'&&view!=='exam')topic='all';
+   courseBlock=block;vocabRole=null;trainerReturn=null;trainerEpoch=null;sourceFilter=null;activeLesson=null;activeStep=null;if(view!=='practice'&&view!=='exam')topic='all';
    if(restoreLessonPractice(block)){
      markLessonStarted(block,'practice');render();showView('practice');return;
    }
+   if(practiceHold&&practiceHold.lessonId===block){showPracticeHold();return;}
    if(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(block)){
      const nextStage=P.nextRegistered&&P.nextRegistered(block,state.events);
      if(nextStage&&beginStaged(block,nextStage))return;
    }
-   if(practiceHold&&practiceHold.lessonId===block){
-     const hold=practiceHold;
-     $('#exercise').innerHTML='<div class="empty-state"><h2>Сохранённая очередь на месте</h2><p>В снимке есть задание, которого нет в этой версии: '+esc(hold.missing.join(', '))+'. Очередь не пересобрана.</p><div class="finish-actions"><button type="button" class="secondary-button" id="hold-lessons">Выбрать занятие</button></div></div>';
-     $('#hold-lessons').onclick=()=>showView('learn');
-     showView('practice');save();return;
-   }
+   if(practiceHold&&practiceHold.lessonId===block){showPracticeHold();return;}
+   practiceHold=null;
    const first=window.LEARNING.lessons.find(l=>l.courseLesson===block);
    if(first)learningState.lessonId=first.id;
    if(mode!=='exam'&&beginPacked(block))return;
@@ -1314,7 +1505,10 @@ function qazaqAppBoot(bootMirror){
    }
    markLessonStarted(block,'practice');
    mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');
+ 
+  }finally{if(owned)endLaunch(gate);}
  }
+
  function beginPacked(id){
    if(window.LessonV2Runtime&&window.LessonV2Runtime.isV2(id))return false;
    if(id==='4-2'&&!(window.LessonRegistry&&window.LessonRegistry.byId('4-2')))return false;
@@ -1324,6 +1518,15 @@ function qazaqAppBoot(bootMirror){
    return !!(built&&built.stage&&beginStaged(id,Object.assign({},built.stage,{extraIds:built.remediationIds||[]})));
  }
  function startTransfer(){
+  const owned=!launchGate;
+  let gate='nested';
+  if(owned){
+    gate=guardLaunch(courseBlock?('transfer:'+courseBlock):'transfer:all');
+    if(gate==='blocked'||gate==='same'||gate==='nested')return;
+    if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+    practiceHold=null;
+  }
+  try{
    const T=window.TransferItems;if(!T)return;
    if(courseBlock==='3-3')return;
    const rule=courseBlock==='3-2'&&window.Lesson32Pack&&window.Lesson32Pack.transferRule?window.Lesson32Pack.transferRule({stageId:stageContext&&stageContext.stageId,events:state.events}):courseBlock==='3-1'?'T20_POSS':courseBlock==='2-1'?'T6_PERSON_SG':courseBlock==='1-3'?'T4_NO_PLURAL_AFTER_NUMBER':'T2_PLURAL_LDT';
@@ -1332,17 +1535,34 @@ function qazaqAppBoot(bootMirror){
    if(!list.length)list=T.session(rule,{catalog:window.CURRICULUM})||[];
    list=list.filter(q=>byId.has(q.id));
    if(!list.length)return;
+   launchKey=courseBlock?('transfer:'+courseBlock):'transfer:all';
    mode='transfer';topic='all';sourceFilter=null;activeLesson=null;activeStep=null;
    queue=list.map(q=>q.id);practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
    render();showView('practice');
+ 
+  }finally{if(owned)endLaunch(gate);}
  }
+
  function startPausePrep(){
+  const owned=!launchGate;
+  let gate='nested';
+  if(owned){
+    gate=guardLaunch('pause:prep');
+    if(gate==='blocked'||gate==='same'||gate==='nested')return;
+    if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+    practiceHold=null;
+  }
+  try{
    const now=Date.now();
    const ids=questions.filter(q=>eligible(q)&&core.pauseReady(records[q.id],now)).map(q=>q.id);
+   launchKey='pause:prep';
    mode='ordered';topic='all';sourceFilter=null;activeLesson=null;
    queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
    render();showView('practice');
+ 
+  }finally{if(owned)endLaunch(gate);}
  }
+
  function shuffled(items){
    const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
  }
@@ -1358,6 +1578,15 @@ function qazaqAppBoot(bootMirror){
  }
  function examReady(r){return window.MemoryPolicy?window.MemoryPolicy.examReady(r):!!r&&(r.recall_review_successes||0)>=2;}
  function startQueue({all=false}={}){
+  const owned=!launchGate;
+  let gate='nested';
+  if(owned){
+    gate=guardLaunch(currentLaunchKey());
+    if(gate==='blocked'||gate==='same'||gate==='nested')return;
+    if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+    practiceHold=null;
+  }
+  try{
    if(courseBlock)ensureV2(courseBlock);
    activeLesson=null;activeStep=null;stepEvidence={};
    if(topic==='phrase'&&courseBlock&&window.PhraseDrill&&mode!=='exam'){
@@ -1406,7 +1635,10 @@ function qazaqAppBoot(bootMirror){
    if(window.MemoryPolicy)ids=window.MemoryPolicy.breakRuns(ids,questions);
    if(window.MemoryPolicy&&window.MemoryPolicy.mixRulesProbes&&['smart','review','ordered'].includes(mode))ids=window.MemoryPolicy.mixRulesProbes(ids,questions,state,{lessonId:courseBlock||null,topic});
    queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;sessionBlindFails=Object.create(null);resetCounts();render();
+ 
+  }finally{if(owned)endLaunch(gate);}
  }
+
  // r7 Q5-A (QA): in a lesson hub «Слова, которые задали выучить» is THAT lesson's homework words
  // (homework.word_question_ids → T13 for 4-2), not the global must-track that starts with 1-1.
  const HW_WORDS_PREFIX='hw-words-';
@@ -1471,15 +1703,32 @@ function qazaqAppBoot(bootMirror){
      }
      if(!lesson.chunks[step])step=Math.min(Math.max(0,step),lesson.chunks.length-1);
    }
+   const parkKey=lesson.topic==='numbers'||String(id).indexOf('numbers')===0?'number:'+id:'lesson:'+id;
+   const owned=!launchGate;let gate='nested';
+   if(owned){gate=guardLaunch(parkKey);if(gate==='blocked'||gate==='same'||gate==='nested')return;if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}practiceHold=null;}
+   try{
+   launchKey=parkKey;
    courseBlock=lesson.courseLesson||courseBlock;
-   activeLesson=id;activeStep=step;learningState.lessonId=id;learningState.steps[id]=step;topic=lesson.topic;mode=opts&&opts.voluntary?'voluntary':'lesson';sourceFilter=null;
+   activeLesson=id;activeStep=step;learningState.lessonId=id;learningState.steps[id]=step;topic=lesson.topic;mode=opts&&opts.voluntary?'voluntary':'lesson';sourceFilter=null;trainerReturn=parkKey.indexOf('number:')===0?parkKey:null;trainerEpoch=null;
    queue=lesson.topic==='numbers'?shuffled(stepIds):stepIds;practiceIds=[...queue];stepEvidence={};queueEpoch=Date.now()+Math.random();
    position=0;variants={};checked=false;resetCounts();render();
    // r7 ux60 #1: «Сборник» / track opened from Учёба — Back returns to «Выбрать занятие», not to the lesson overview.
    if(view==='learn')try{history.pushState({qzView:'practice'},'');}catch{}
    showView('practice');$('#exercise').scrollIntoView({block:'start'});
+   }finally{if(owned)endLaunch(gate);}
  }
  function startContrast(pair){
+  const contrastLaunch=window.NavigationState.contrastKey(pair);
+  const owned=!launchGate;
+  let gate='nested';
+  if(owned){
+    gate=guardLaunch(contrastLaunch);
+    if(gate==='blocked'||gate==='same'||gate==='nested')return;
+    if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+    practiceHold=null;
+  }
+  try{
+   contrastPair=pair&&typeof pair==='object'?{expected_answer:pair.expected_answer||'',wrong_answer_given:pair.wrong_answer_given||'',card_ids:Array.isArray(pair.card_ids)?pair.card_ids.slice():[]}:null;
    activeLesson=null;activeStep=null;topic='all';sourceFilter=null;mode='contrast';
    const ids=P.contrastIds(pair,confusionIndex,questions).filter(id=>{
      const q=byId.get(id);
@@ -1488,9 +1737,12 @@ function qazaqAppBoot(bootMirror){
      return true;
    });
    if(!ids.length)return;
-   queue=shuffled(ids);practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;resetCounts();
+   queue=shuffled(ids);practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;launchKey=contrastLaunch;resetCounts();
    render();showView('practice');
+ 
+  }finally{if(owned)endLaunch(gate);}
  }
+
  const RULE_TRACKS={
    T1_HARMONY:['harmony-syllables','harmony-pairs'],
    T2_PLURAL_LDT:['plural-1','plural-2']
@@ -1516,7 +1768,9 @@ function qazaqAppBoot(bootMirror){
    startCustom(ids,'voluntary');
  }
  function showView(next){
+   clearLaunchBlocked();
    captureDraft();
+   parkPause(next);
    const leavingSummary=!!(vocabSummary&&next!=='practice');
    const resumeHeld=next==='practice'&&view!=='practice'&&!!vocabCardHold&&!vocabSummary;
    if(leavingSummary){cancelAdvance();vocabSummary=false;}
@@ -1621,6 +1875,15 @@ function qazaqAppBoot(bootMirror){
    return {lessonId,surface:t.surface,kind:t.kind,title:(lp&&lp.status==='not_started'?'Начать урок ':'Продолжить урок ')+lessonId,hint:t.hint};
  }
   function startPreExam(){
+  const owned=!launchGate;
+  let gate='nested';
+  if(owned){
+    gate=guardLaunch('preexam:3-3');
+    if(gate==='blocked'||gate==='same'||gate==='nested')return;
+    if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+    practiceHold=null;
+  }
+  try{
    // r7 ux63 HG-19: interleaved answers across 1-1…3-3 (not a score).
    // activeLesson stays null — '3-3' is not a LEARNING.lessons track id (subset/renderStats would throw).
    if(!(window.PreExam&&window.PreExam.pickQueue))return;
@@ -1630,15 +1893,22 @@ function qazaqAppBoot(bootMirror){
    viewOnlyPathLesson=null;persistLessonPractice();persistLessonPath();
    mode='course';topic='all';courseBlock=null;sourceFilter=null;vocabRole=null;activeLesson=null;activeStep=null;stepEvidence={};
    queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();variants={};position=0;checked=false;hinted=false;
-   sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);resetCounts();
+   sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);launchKey='preexam:3-3';resetCounts();
    markLessonStarted('3-3','practice');markPlace('practice','3-3');save();render();showView('practice');
+ 
+  }finally{if(owned)endLaunch(gate);}
  }
+
  function continueStep(){
    const s=stepNow();
    if(s.kind==='done'){showView('path');return;}
    continueLesson(s.lessonId);
  }
  function openChapter(lessonId,chapterId){
+   const owned=!launchGate&&currentLaunchKey()&&currentLaunchKey()!=='theory:'+lessonId;
+   let gate='nested';
+   if(owned){gate=guardLaunch('theory:'+lessonId,{restore:false});if(gate==='blocked')return;}
+   try{
    ensureV2(lessonId);
    const G=window.GrammarPath;
    if(!G||!P.courseIds().includes(lessonId))return;
@@ -1651,6 +1921,7 @@ function qazaqAppBoot(bootMirror){
    captureDraft();persistLessonPath();
    G.startChapter(state,lessonId,chapterId);
    if(changesResume)markLessonStarted(lessonId,'path');markPlace('path',lessonId);save();renderPath();
+   }finally{if(owned)endLaunch(gate);}
  }
  function ensureV2(lessonId){
   try{
@@ -1673,6 +1944,15 @@ function qazaqAppBoot(bootMirror){
   }catch(e){}
 }
  function openPathLesson(lessonId,options){
+  const owned=!launchGate;
+  let gate='nested';
+  if(owned){
+    gate=guardLaunch('theory:'+lessonId);
+    if(gate==='blocked'||gate==='same'||gate==='nested')return;
+    if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+    practiceHold=null;
+  }
+  try{
    ensureV2(lessonId);setHubLesson(lessonId);
    const G=window.GrammarPath;if(!G){showView('path');return;}
    if(!P.courseIds().includes(lessonId))return;
@@ -1692,7 +1972,10 @@ function qazaqAppBoot(bootMirror){
      }
    }
    markPlace('path',lessonId);save();showView('path');
+ 
+  }finally{if(owned)endLaunch(gate);}
  }
+
  function filterSummary(){
    const t=topics.find(x=>x[0]===topic);
    const bankTrack=isBankSession()&&window.LEARNING.lessons.find(l=>l.id===activeLesson);
@@ -1783,9 +2066,9 @@ function qazaqAppBoot(bootMirror){
      if(courseBlock){
        const b=COURSE_BLOCKS.find(x=>x.id===courseBlock);
        sf.hidden=false;sf.innerHTML=`<span>Урок ${esc(b?b.title:courseBlock)} · ${esc(b?b.hint:'')}</span><button type="button">Все уроки</button>`;
-       sf.querySelector('button').onclick=()=>{courseBlock=null;startQueue();};
+       sf.querySelector('button').onclick=()=>{launchPatch({key:genericQueueKey(mode,topic,null,sourceFilter,vocabRole),courseBlock:null,fn(){startQueue();}});};
      }else if(sourceFilter){
-       sf.hidden=false;sf.innerHTML=`<span>${esc(course.sources[sourceFilter].title)}</span><button type="button">Все материалы</button>`;sf.querySelector('button').onclick=()=>{sourceFilter=null;startQueue();};
+       sf.hidden=false;sf.innerHTML=`<span>${esc(course.sources[sourceFilter].title)}</span><button type="button">Все материалы</button>`;sf.querySelector('button').onclick=()=>{launchPatch({key:genericQueueKey(mode,topic,courseBlock,null,vocabRole),sourceFilter:null,fn(){startQueue();}});};
      }else sf.hidden=true;
    }
    renderJumpBar();
@@ -1794,8 +2077,8 @@ function qazaqAppBoot(bootMirror){
    const bar=$('#jump-bar');if(!bar)return;
    bar.innerHTML=`<div class="jump-row"><span>Тип</span>${topics.map(([id,name])=>name?`<button type="button" class="chip" data-jump-topic="${id}" ${topic===id?'aria-pressed="true"':''}>${esc(name)}</button>`:'').join('')}</div><div class="jump-row"><span>Урок</span>${COURSE_BLOCKS.map(b=>`<button type="button" class="chip" data-jump-course="${b.id}" ${courseBlock===b.id?'aria-pressed="true"':''}>${esc(b.title)}</button>`).join('')}<button type="button" class="chip" data-jump-course="" ${courseBlock?'':'aria-pressed="true"'}>Все</button></div><div class="jump-row"><span>След</span><button type="button" class="chip" data-jump-transfer ${mode==='transfer'?'aria-pressed="true"':''}>Перенос</button><button type="button" class="chip" data-jump-pause>Скоро пауза</button></div>`;
    const closeFilter=()=>{const dlg=$('#practice-filter');if(dlg&&dlg.open&&dlg.close)dlg.close();};
-   $$('#jump-bar [data-jump-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.jumpTopic;activeLesson=null;vocabRole=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');closeFilter();});
-   $$('#jump-bar [data-jump-course]').forEach(b=>b.onclick=()=>{courseBlock=b.dataset.jumpCourse||null;activeLesson=null;mode=mode==='exam'?'exam':'ordered';startQueue({all:true});showView('practice');closeFilter();});
+   $$('#jump-bar [data-jump-topic]').forEach(b=>b.onclick=()=>{const nextMode=mode==='exam'?'exam':'ordered';launchPatch({key:nextMode==='exam'?('exam:'+b.dataset.jumpTopic):genericQueueKey(nextMode,b.dataset.jumpTopic,courseBlock,sourceFilter,null),topic:b.dataset.jumpTopic,activeLesson:null,vocabRole:null,mode:nextMode,fn(){startQueue({all:true});showView('practice');closeFilter();}});});
+   $$('#jump-bar [data-jump-course]').forEach(b=>b.onclick=()=>{const nextMode=mode==='exam'?'exam':'ordered';const block=b.dataset.jumpCourse||null;launchPatch({key:genericQueueKey(nextMode,topic,block,sourceFilter,vocabRole),courseBlock:block,activeLesson:null,mode:nextMode,fn(){startQueue({all:true});showView('practice');closeFilter();}});});
    const tr=$('#jump-bar [data-jump-transfer]');if(tr)tr.onclick=()=>{startTransfer();closeFilter();};
    const soon=$('#jump-bar [data-jump-pause]');if(soon)soon.onclick=()=>{startPausePrep();closeFilter();};
  }
@@ -2403,13 +2686,17 @@ function qazaqAppBoot(bootMirror){
    ensureV2(lessonId);
    const H=window.Homework,pack=(H.packs(questions,course,homeworkOpts()).find(p=>p.lesson_id===lessonId));
    if(!pack)return;
-   hwLesson=lessonId;hwPart=part||'exercises';mode='homework';topic='all';sourceFilter=null;vocabRole=null;activeLesson=null;activeStep=null;courseBlock=lessonId;
+   const partName=part||'exercises';
    const attempt=H.ensureAttempt(state,lessonId);
-   const all=(part==='words'?pack.homework.word_question_ids||[]:pack.homework.exercise_ids).filter(id=>byId.has(id));
+   const all=(partName==='words'?pack.homework.word_question_ids||[]:pack.homework.exercise_ids).filter(id=>byId.has(id));
    const n=H.sectionCount(all);
    let sec=section==null?H.sectionOf(H.resumeIndex(all,attempt)):Math.floor(Number(section)||0);
    sec=Math.max(0,Math.min(n-1,sec));
-   // Always rebuild from attempt progress — never reuse a stale in-memory queue/position.
+   const owned=!launchGate;let gate='nested';
+   if(owned){gate=guardLaunch('homework:'+lessonId+':'+partName+':'+sec);if(gate==='blocked'||gate==='same'||gate==='nested')return;if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}practiceHold=null;}
+   try{
+   launchKey='homework:'+lessonId+':'+partName+':'+sec;
+   hwLesson=lessonId;hwPart=partName;mode='homework';topic='all';sourceFilter=null;vocabRole=null;activeLesson=null;activeStep=null;courseBlock=lessonId;trainerReturn=null;trainerEpoch=null;
    hwSection=sec;
    queue=H.sliceSection(all,sec);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();
    position=H.resumeIndex(queue,attempt);checked=false;resetCounts();
@@ -2421,6 +2708,7 @@ function qazaqAppBoot(bootMirror){
    }
    if(!queue.length||position>=queue.length){renderHomework();showView('homework');return;}
    render();showView('practice');
+   }finally{if(owned)endLaunch(gate);}
  }
  function startBlockReview(failedId){
    const q=byId.get(failedId);if(!q||!window.Homework)return;
@@ -3091,7 +3379,7 @@ function qazaqAppBoot(bootMirror){
    const waiting=practiceIds.filter(id=>(records[id]?.streak||0)<cfg.schedule.cleanAnswersToConsolidate).length;
    const help=window.LearningSupport.suggestions(state,questions)[0];
    $('#exercise').innerHTML='<div class="empty-state"><h2>Ещё один шаг. Уже твой.</h2><p>'+(complete?'Проверка идеи пройдена. ':'Подход завершён. ')+'Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'. Ошибок: '+(sessionAttempts-sessionCorrect-sessionAssisted)+'.</p><p>'+(waiting?'Ещё закрепляем '+core.ruCount(waiting,['карточку','карточки','карточек'])+'. '+(waiting===1?'Она сохраняется':'Они сохраняются')+' для повторения.':'Можно остановиться; карточки вернутся по расписанию.')+'</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">'+(lesson?(complete?(activeStep<lesson.chunks.length-1?'Следующая идея':'Выбрать следующий урок'):'Вернуться к объяснению'):'Ещё несколько заданий')+'</button><button type="button" class="secondary-button" id="back-to-learning">Закончить</button></div>'+(help?'<div class="panel"><h3>'+esc(help.title)+'</h3><p>Эта ошибка повторялась. Можно отдельно потренировать трудный шаг.</p><button type="button" class="secondary-button" id="start-remedy">Разобрать и проверить</button></div>':'')+'</div>';
-   $('#restart').onclick=()=>{if(lesson){if(complete&&activeStep<lesson.chunks.length-1)learningState.steps[lesson.id]=activeStep+1;else if(complete){const next=window.LEARNING.lessons[window.LEARNING.lessons.indexOf(lesson)+1];if(next)learningState.lessonId=next.id;}showView('learn');}else{mode='smart';startQueue();showView('practice');}};
+   $('#restart').onclick=()=>{if(lesson){if(complete&&activeStep<lesson.chunks.length-1)learningState.steps[lesson.id]=activeStep+1;else if(complete){const next=window.LEARNING.lessons[window.LEARNING.lessons.indexOf(lesson)+1];if(next)learningState.lessonId=next.id;}showView('learn');}else{launchPatch({key:genericQueueKey('smart',topic,courseBlock,sourceFilter,null),mode:'smart',fn(){startQueue();showView('practice');}});}};
    $('#back-to-learning').onclick=()=>showView('today');
    if($('#start-remedy'))$('#start-remedy').onclick=()=>startRemedy(help.type);
    save();
@@ -3104,9 +3392,24 @@ function qazaqAppBoot(bootMirror){
    $('#remedy-check').onclick=()=>{remediationNote='';startCustom(help.ids,'remediation');remediation=type;save();};
  }
  function startCustom(ids,kind='words'){
+  const customLaunch=window.NavigationState.customKey(kind, ids);
+  const owned=!launchGate;
+  let gate='nested';
+  if(owned){
+    gate=guardLaunch(customLaunch);
+    if(gate==='blocked'||gate==='same'||gate==='nested')return;
+    if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+    practiceHold=null;
+  }
+  try{
+   launchKey=customLaunch;
+   repairIds=String(kind||'')==='remediation'&&Array.isArray(ids)?ids.slice():null;
    activeLesson=null;activeStep=null;sourceFilter=null;topic='all';mode=kind;
    queue=kind==='remediation'?ids.filter(id=>byId.has(id)):ids.filter(eligible);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;checked=false;resetCounts();render();showView('practice');
+ 
+  }finally{if(owned)endLaunch(gate);}
  }
+
  function catalogNumberTracks(){
    const order=window.NumberLadder&&window.NumberLadder.ORDER||[];
    const by=new Map((window.LEARNING&&window.LEARNING.lessons||[]).map(l=>[l.id,l]));
@@ -3148,27 +3451,48 @@ function qazaqAppBoot(bootMirror){
    return ids.slice(0,limit);
  }
  function startCatalogTrainer(kind){
+  const owned=!launchGate;
+  let gate='nested';
+  if(owned){
+    gate=guardLaunch(kind);
+    if(gate==='blocked'||gate==='same'||gate==='nested')return;
+    if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+    practiceHold=null;
+  }
+  try{
+   launchKey=kind;
    trainerReturn=kind;
    if(String(kind).startsWith('number:')){
      const id=String(kind).slice(7),lesson=(window.LEARNING&&window.LEARNING.lessons||[]).find(l=>l.id===id);
      const ids=(lesson&&lesson.questionIds||[]).filter(qid=>{const q=byId.get(qid);return q&&eligible(q)&&(!window.NumberLadder||window.NumberLadder.allowed(q,state));});
      activeLesson=null;activeStep=null;sourceFilter=null;courseBlock=null;topic='numbers';vocabRole=null;mode='numbers';
      queue=shuffled(ids);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();trainerEpoch=queueEpoch;position=0;checked=false;resetCounts();
-     if(!queue.length){trainerReturn=null;showView('personal');return;}
+     if(!queue.length){launchKey=null;trainerReturn=null;showView('personal');return;}
      render();showView('practice');return;
    }
    const role=kind==='vocab:used'?'used':'must';
    activeLesson=null;activeStep=null;sourceFilter=null;courseBlock=null;topic='vocab';vocabRole=role;mode='words';
    if(role==='must'){
      const ok=beginMustPortion(true);
-     if(!ok){trainerReturn=null;showView('personal');return;}
+     if(!ok){launchKey=null;trainerReturn=null;showView('personal');return;}
+     noteReplaced('vocab:must');
      render();showView('practice');return;
    }
    queue=catalogVocabIds(role);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();trainerEpoch=queueEpoch;position=0;checked=false;resetCounts();
-   if(!queue.length){trainerReturn=null;showView('personal');return;}
+   if(!queue.length){launchKey=null;trainerReturn=null;showView('personal');return;}
    render();showView('practice');
+ 
+  }finally{if(owned)endLaunch(gate);}
  }
+ function startExam(opts){
+   const topicName=opts&&opts.topic||'all';
+   const block=opts&&Object.prototype.hasOwnProperty.call(opts,'courseBlock')?opts.courseBlock:null;
+   const key=window.NavigationState.examKey(topicName, block);
+   return launchPatch({mode:'exam',topic:topicName,courseBlock:block,sourceFilter:null,vocabRole:null,activeLesson:null,key,fn(){startQueue({all:true});showView('practice');}});
+ }
+
  function launchCatalogTrainer(kind){
+   if(launchGate)return;
    if(trainerReturn===kind&&queueEpoch===trainerEpoch&&queue.length>position){showView('practice');return;}
    startCatalogTrainer(kind);
  }
@@ -3241,6 +3565,7 @@ function qazaqAppBoot(bootMirror){
      if(!queue.length){mode='ordered';vocabRole=null;trainerReturn=null;trainerEpoch=null;vocabPlan=null;vocabSitting=null;vocabRetry=null;vocabClosed=[];position=0;practiceIds=[];pauseTimer();elapsedMs=0;save();render();showView('today');return;}
      pauseTimer();elapsedMs=0;save();render();showView('practice');return;
    }
+   if(importMode!=='replace'){const keep=captureMustLive();const next=P.merge(state,incoming);next.session=null;next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);if(window.__qzPersist)window.__qzPersist(next);else try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);restoreMustLive(keep);save();render();showView(keep.view||'today');return;}
    const next=importMode==='replace'?P.migrate(incoming):P.merge(state,incoming);next.session=null;next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
    if(window.__qzPersist)window.__qzPersist(next);else try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
    state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;
@@ -3430,9 +3755,9 @@ function qazaqAppBoot(bootMirror){
        out.textContent=(local&&local.message_ru)||'Смотри текст правила выше.';
      }).finally(()=>{rulesSend.disabled=false;});
    };
-   $$('[data-rule-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.ruleTopic;sourceFilter=null;mode='ordered';showView('practice');startQueue();});
-   $$('#rules-content [data-source]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.source;vocabRole=null;topic='all';mode='ordered';showView('practice');startQueue();});
-   $$('#rules-content [data-vocab]').forEach(b=>b.onclick=()=>{vocabRole=b.dataset.vocab;courseBlock=null;sourceFilter=null;topic='vocab';mode='ordered';startQueue({all:true});showView('practice');});
+   $$('[data-rule-topic]').forEach(b=>b.onclick=()=>{launchPatch({key:genericQueueKey('ordered',b.dataset.ruleTopic,courseBlock,null,null),topic:b.dataset.ruleTopic,sourceFilter:null,mode:'ordered',fn(){showView('practice');startQueue();}});});
+   $$('#rules-content [data-source]').forEach(b=>b.onclick=()=>{launchPatch({key:genericQueueKey('ordered','all',courseBlock,b.dataset.source,null),sourceFilter:b.dataset.source,vocabRole:null,topic:'all',mode:'ordered',fn(){showView('practice');startQueue();}});});
+   $$('#rules-content [data-vocab]').forEach(b=>b.onclick=()=>{launchPatch({key:genericQueueKey('ordered','vocab',null,null,b.dataset.vocab),vocabRole:b.dataset.vocab,courseBlock:null,sourceFilter:null,topic:'vocab',mode:'ordered',fn(){startQueue({all:true});showView('practice');}});});
  }
  function renderMaterials(){
    const lessonOpts=['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'].map(id=>`<option value="${id}"${materialsLesson===id?' selected':''}>${id.replace('-','–')}</option>`).join('');
@@ -3444,7 +3769,7 @@ function qazaqAppBoot(bootMirror){
    }).join('');
    $('#materials-content').innerHTML=`<div class="panel rules-search"><label for="materials-q">Найти по названию, форме или примеру</label><input id="materials-q" type="search" value="${esc(materialsQuery)}" placeholder="менің, мой отец, кітапым" autocomplete="off" enterkeyhint="search"><div class="jump-row"><label>Урок <select id="materials-lesson"><option value="">Все</option>${lessonOpts}</select></label><label>Тип <select id="materials-kind"><option value="">Всё</option><option value="rule"${materialsKind==='rule'?' selected':''}>Правило</option><option value="word"${materialsKind==='word'?' selected':''}>Слово</option><option value="example"${materialsKind==='example'?' selected':''}>Пример</option></select></label></div><p class="small">Ищет по уже записанным правилам, словам, примерам и полным объяснениям. Новая статья не создаётся.</p><div id="materials-search-out"></div></div><div class="panel"><div class="coverage-stats"><div><span class="coverage-number">15</span><p>файлов проверено</p></div><div><span class="coverage-number">${Object.keys(course.sources).filter(k=>!course.sources[k].additional).length}</span><p>источников в практике</p></div><div><span class="coverage-number">${questions.filter(q=>!q.source||q.source!=='plus').length}</span><p>карточек по урокам</p></div></div><p>Дополнительно: ${core.ruCount(window.LEARNING.lessons.length,['маленький урок','маленьких урока','маленьких уроков'])} и ${core.ruCount(questions.filter(q=>q.source==='plus').length,['карточка','карточки','карточек'])} и шаблонов для постепенного обучения. Они разработаны для тренажёра и не выданы за задания автора курса.</p><p>Включены упражнения уроков 1–1, 1–2, 1–3 и 2–2. Слова домашки 2–2 и новые прилагательные/профессии тренируются в обе стороны. Расхождения ключей 2–2 (мұғалімбіз, кәсіпкерлер, бастықтармыз) отмечены в карточках: принимается и ключ, и форма по правилу урока.</p><p class="coverage-note">Новые PDF лежат в «Казахский / учебные материалы». Файлы с Диска в тренажёр сами не подмешиваются.</p><a href="${course.folder}" target="_blank" rel="noopener noreferrer">Открыть папку с исходными материалами</a></div><div class="panel"><h2>Упражнения и домашняя работа</h2>${cards}</div><div class="panel"><h2>Остальные файлы учтены</h2><p><a href="https://drive.google.com/file/d/1HIVPE51FqFOcHBOOXFNfsmDKxvfCKpui/view" target="_blank" rel="noopener noreferrer">«Мягкие и твёрдые.pdf»</a> — шпаргалка; её схема включена в «Правила».</p><p><a href="https://docs.google.com/document/d/1Y-dWGwCJL04Pbp015V3_T91_n2f15-ep/edit" target="_blank" rel="noopener noreferrer">Uroki_1_1_Otvety.docx</a> — ответы к сборнику 1–1; использованы для сверки.</p><p><a href="https://drive.google.com/file/d/1P45V0RTvcpKEAjutHpPXM6KARx1MZbgd/view" target="_blank" rel="noopener noreferrer">Вторая копия методички 1–1</a> — текст полностью совпадает с первой. Задания не удваивались.</p><p class="small">Ключи воспроизведены по курсу, для перевода добавлены допустимые синонимы. Исправлена опечатка «Дукен» → «дүкен». Особенность задания с -мен объяснена прямо в карточке.</p></div><div class="panel"><h2>Завершение домашней работы на сайте курса</h2><p>Чтобы преподаватель получил результат, выполни официальный тест и нажми «Зафиксировать результат» на сайте BatylBol. При необходимости войди в свой аккаунт.</p><div class="link-list"><a href="https://batylbol.kz/test/Zvuki.html" target="_blank" rel="noopener noreferrer">BatylBol · твёрдые и мягкие звуки</a><a href="https://batylbol.kz/test/MnozhChislo.html" target="_blank" rel="noopener noreferrer">BatylBol · множественное число</a><a href="https://batylbol.kz/test/LichnyeLitso1-2.html" target="_blank" rel="noopener noreferrer">BatylBol · біз, сендер, сіздер</a><a href="https://batylbol.kz/test/LichnyeEdChislo.html" target="_blank" rel="noopener noreferrer">BatylBol · мен, сен, сіз</a></div><p class="small">Эти внешние банки вопросов не были доступны для переноса. Здесь сохранены ссылки из домашней работы; результаты личной тренировки в BatylBol не передаются.</p><p>Для заданий на письмо используй казахскую раскладку или кнопки букв под ответом. Шпаргалка всегда доступна в разделе «Правила».</p><details><summary>Дополнительные ссылки из методичек</summary><div class="link-list"><a href="https://kaz-tili.kz/su_fonetika.htm" target="_blank" rel="noopener noreferrer">Фонетика</a><a href="https://kaz-tili.kz/su_prav.htm" target="_blank" rel="noopener noreferrer">Мягкие и твёрдые слова</a><a href="https://kaz-tili.kz/progd/prog_mnozhestv_chislo.html" target="_blank" rel="noopener noreferrer">Множественное число · первый уровень</a><a href="https://kaz-tili.kz/prog/prog_mnozhestv_chislo.html" target="_blank" rel="noopener noreferrer">Множественное число · второй уровень</a><a href="https://sozdik.kz/" target="_blank" rel="noopener noreferrer">Русско-казахский словарь</a></div></details></div>`;
    renderPackageImport();
-   $$('[data-source]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.source;topic='all';mode='voluntary';showView('practice');startQueue();});
+   $$('[data-source]').forEach(b=>b.onclick=()=>{launchPatch({key:genericQueueKey('voluntary','all',courseBlock,b.dataset.source,null),sourceFilter:b.dataset.source,topic:'all',mode:'voluntary',fn(){showView('practice');startQueue();}});});
    $$('#materials-content [data-open-canon]').forEach(b=>b.onclick=()=>openSearchedRule(b.dataset.openCanon));
    const materialsQ=$('#materials-q'),materialsLes=$('#materials-lesson'),materialsType=$('#materials-kind');
    const drawMaterialSearch=()=>{
@@ -3498,7 +3823,7 @@ function qazaqAppBoot(bootMirror){
   const kind=b.dataset.chromeBack;
   showView(kind==='homework'?(hwOrigin==='learn'?'learn':'today'):(kind||'today'));
  }));
- $$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;startQueue();showView('practice');const dlg=$('#practice-filter');if(dlg&&dlg.open&&dlg.close)dlg.close();}));
+ $$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{launchPatch({key:genericQueueKey(b.dataset.mode,topic,courseBlock,sourceFilter,vocabRole),mode:b.dataset.mode,fn(){startQueue();showView('practice');const dlg=$('#practice-filter');if(dlg&&dlg.open&&dlg.close)dlg.close();}});}));
  const filterOpen=$('#practice-filter-open'),filterClose=$('#practice-filter-close'),filterDlg=$('#practice-filter');
  if(filterOpen&&filterDlg)filterOpen.onclick=()=>{if(filterDlg.showModal)filterDlg.showModal();else filterDlg.setAttribute('open','');};
  if(filterClose&&filterDlg)filterClose.onclick=()=>{if(filterDlg.close)filterDlg.close();else filterDlg.removeAttribute('open');};
@@ -3545,7 +3870,7 @@ function qazaqAppBoot(bootMirror){
        });
        return;
      }
-     if(next.startsWith('number:')){activeLesson=null;activeStep=null;sourceFilter=null;topic='numbers';mode='numbers';queue=window.NumberPractice.session(next.split(':')[1],state).filter(eligible).map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();position=0;resetCounts();render();showView('practice');return;}
+     if(next.startsWith('number:')){const range=String(next.split(':')[1]||'track').toLowerCase().replace(/[^a-z0-9._-]/g,'')||'track';const key='number:'+range;launchPatch({key,trainerReturn:key,mode:'numbers',topic:'numbers',sourceFilter:null,activeLesson:null,fn(){activeStep=null;queue=window.NumberPractice.session(next.split(':')[1],state).filter(eligible).map(q=>q.id);practiceIds=[...queue];variants={};queueEpoch=Date.now()+Math.random();trainerEpoch=queueEpoch;position=0;resetCounts();render();showView('practice');}});return;}
      if(next==='reset'){resetProgress();return;}
      if(next==='new'){
        const lessons=[...window.LEARNING.lessons].sort((a,b)=>(b.id===learningState.lessonId?1:0)-(a.id===learningState.lessonId?1:0));
@@ -3562,7 +3887,7 @@ function qazaqAppBoot(bootMirror){
      if(next==='continue'||next==='learn'||next==='resume'){continueStep();return;}
      if(['today','vocabulary','materials'].includes(next)){showView(next);return;}
      if(next==='confusions'){showView('review');return;}
-     topic='all';sourceFilter=null;activeLesson=null;mode=next;startQueue();showView('practice');
+     launchPatch({key:genericQueueKey(next,'all',null,null,null),topic:'all',sourceFilter:null,activeLesson:null,mode:next,fn(){startQueue();showView('practice');}});
    },
    contrast:startContrast,setAssociation,promote,export:()=>{save();downloadProgress(P.serialize(state));},import:(incoming,importMode)=>{try{return importProgress(incoming,importMode);}finally{window.__qzImportReady=false;}},prepareImport,
    restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(R7_FREG_SNAPSHOT)||localStorage.getItem(R7_SNAPSHOT)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else if(STORE)STORE.latestArchive(SNAPSHOT_KEYS).then(raw=>raw?downloadProgress(raw,'progress-before-import.json'):window.alert('Предыдущей резервной копии пока нет.'),()=>window.alert('Предыдущей резервной копии пока нет.'));else window.alert('Предыдущей резервной копии пока нет.');}
@@ -3686,7 +4011,7 @@ function qazaqAppBoot(bootMirror){
      save();return true;
    }
  };
- window.QazaqShell={show:showView};
+ window.QazaqShell={show:showView,startCourse,startLesson,startCustom,startHomework,startPreExam,startSlice,startContrast,launchRepair,startExam,startTransfer,startPausePrep,openPath:openPathLesson,import:importProgress,key(){return currentLaunchKey();},resume(){return state.navigationResume;},restore(key){const gate=guardLaunch(key);if(gate!=='nested')endLaunch(gate);return gate;}};
  window.TrainerCatalogBridge={
    launch:launchCatalogTrainer,
    numberTracks:catalogNumberTracks,
@@ -3699,6 +4024,7 @@ function qazaqAppBoot(bootMirror){
    const resumeLessons=new Set([savedSession.courseBlock,savedSession.hwLesson,
      savedSession.pathPracticeReturn&&savedSession.pathPracticeReturn.lessonId,
      savedSession.view==='path'&&state.grammarPath&&state.grammarPath.lessonId]);
+   if(savedSession.launchKey==='preexam:3-3'&&window.PreExam&&window.PreExam.LESSONS){for(const id of window.PreExam.LESSONS)resumeLessons.add(id);}
    for(const id of resumeLessons)if(id)ensureV2(id);
  }
  // r7 ux59b #3: «Повторить сегодня» counted only cards of lessons installed so far (lazy v2 banks): 28 before a reload,
@@ -3711,24 +4037,35 @@ function qazaqAppBoot(bootMirror){
  if(savedSession&&savedSession.mode==='lesson'&&String(savedSession.activeLesson||'').startsWith(HW_WORDS_PREFIX))homeworkWordsTrack(String(savedSession.activeLesson).slice(HW_WORDS_PREFIX.length));
  if(savedSession&&savedSession.mode==='words'&&savedSession.trainerReturn==='vocab:must'&&typeof prepareVocabPool==='function')prepareVocabPool();
  if(typeof warmVocabPool==='function')warmVocabPool();
- const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','course','phrase','transfer','contrast','numbers','remediation','words','exam','homework','chunks'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
+ const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','course','phrase','transfer','contrast','numbers','remediation','words','exam','homework','chunks','slice','repair','voluntary'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){
+   applyValidSession(savedSession);
+ }else if(savedSession&&Array.isArray(savedSession.queue)&&savedSession.queue.some(id=>!byId.has(id))){
+   const missing=savedSession.queue.filter(id=>!byId.has(id));
+   practiceHold={lessonId:savedSession.courseBlock||'parked',missing,kept:savedSession.queue.slice()};
+   const navBoot=window.NavigationState,parkKey=navBoot&&navBoot.keyFromSession(savedSession);
+   if(navBoot&&parkKey)navBoot.put(state,parkKey,{status:'paused',updatedAt:0,origin:'incompatible',snapshot:{kind:'session',session:JSON.parse(JSON.stringify(savedSession))}});
+ }else{queue=[];practiceIds=[];renderStats();}
+ function applyValidSession(savedSession){
    variants=savedSession.variants||{};
    queueEpoch=typeof savedSession.queueEpoch==='number'?savedSession.queueEpoch:queueEpoch;
    presented=typeof savedSession.presented==='string'?savedSession.presented:null;
    sessionAttempts=Math.max(0,Number(savedSession.sessionAttempts)||0);sessionCorrect=Math.min(sessionAttempts,Math.max(0,Number(savedSession.sessionCorrect)||0));sessionAssisted=Math.min(sessionAttempts-sessionCorrect,Math.max(0,Number(savedSession.sessionAssisted)||0));
    draft=savedSession.draft&&Array.isArray(savedSession.draft.answers)?savedSession.draft:null;remediation=savedSession.remediation||null;
    stageContext=P.normalizeStageContext?P.normalizeStageContext(savedSession.stageContext):null;
-   topic=savedSession.topic;mode=savedSession.mode;sourceFilter=savedSession.sourceFilter||null;courseBlock=savedSession.courseBlock||null;hwLesson=savedSession.hwLesson||((mode==='homework'||savedSession.view==='homework')?savedSession.courseBlock||null:null);hwPart=savedSession.hwPart||null;hwSection=Math.max(0,Number(savedSession.hwSection)||0);pathPracticeReturn=savedSession.pathPracticeReturn&&savedSession.pathPracticeReturn.lessonId?savedSession.pathPracticeReturn:null;trainerReturn=savedSession.trainerReturn||null;trainerEpoch=typeof savedSession.trainerEpoch==='number'?savedSession.trainerEpoch:(trainerReturn&&['numbers','words'].includes(savedSession.mode)?savedSession.queueEpoch:null);sessionOrigin=/^(today|learn|path|homework|personal|exam|review|vocabulary|materials|morph)$/.test(savedSession.sessionOrigin||'')?savedSession.sessionOrigin:null;activeLesson=mode==='lesson'?savedSession.activeLesson:null;
+   topic=savedSession.topic;mode=savedSession.mode;sourceFilter=savedSession.sourceFilter||null;courseBlock=savedSession.courseBlock||null;hwLesson=savedSession.hwLesson||((mode==='homework'||savedSession.view==='homework')?savedSession.courseBlock||null:null);hwPart=savedSession.hwPart||null;hwSection=Math.max(0,Number(savedSession.hwSection)||0);pathPracticeReturn=savedSession.pathPracticeReturn&&savedSession.pathPracticeReturn.lessonId?savedSession.pathPracticeReturn:null;trainerReturn=savedSession.trainerReturn||null;vocabRole=savedSession.vocabRole||null;trainerEpoch=typeof savedSession.trainerEpoch==='number'?savedSession.trainerEpoch:(trainerReturn&&['numbers','words'].includes(savedSession.mode)?savedSession.queueEpoch:null);sessionOrigin=/^(today|learn|path|homework|personal|exam|review|vocabulary|materials|morph)$/.test(savedSession.sessionOrigin||'')?savedSession.sessionOrigin:null;activeLesson=mode==='lesson'?savedSession.activeLesson:null;
    activeStep=activeLesson?Math.min(window.LEARNING.lessons.find(l=>l.id===activeLesson).chunks.length-1,Math.max(0,Number(savedSession.activeStep)||0)):null;
+   if(mode==='voluntary'&&savedSession.activeLesson&&window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson)){activeLesson=savedSession.activeLesson;const voluntaryLesson=window.LEARNING.lessons.find(l=>l.id===activeLesson);activeStep=Math.min(voluntaryLesson.chunks.length-1,Math.max(0,Number(savedSession.activeStep)||0));}
+   launchKey=typeof savedSession.launchKey==='string'?savedSession.launchKey:null;contrastPair=savedSession.contrastPair||null;repairIds=Array.isArray(savedSession.repairIds)?savedSession.repairIds.slice():null;if(savedSession.sliceBlock)state.sliceBlock=savedSession.sliceBlock;
    queue=savedSession.queue;practiceIds=Array.isArray(savedSession.practiceIds)?savedSession.practiceIds.filter(id=>byId.has(id)):[...new Set(queue)];
    stepEvidence=savedSession.stepEvidence&&typeof savedSession.stepEvidence==='object'?savedSession.stepEvidence:{};
    position=Math.min(queue.length,savedSession.position+(savedSession.answered?1:0));restoredEnded=mode==='course'&&!stageContext&&position>=queue.length;if(savedSession.answered&&!['ordered','shuffle','homework','course','phrase','transfer'].includes(mode)){const mustCap=mode==='words'&&savedSession.trainerReturn==='vocab:must'&&savedSession.vocab&&savedSession.vocab.plan?Number(savedSession.vocab.plan.budget):cfg.session.maxAttempts;if(sessionAttempts>=mustCap)position=queue.length;}if(mode==='words'&&trainerReturn==='vocab:must')vocabRole='must';if(mode==='words'&&trainerReturn==='vocab:must'&&typeof applySavedMust==='function'){applySavedMust(savedSession);if(typeof beginMustPortion==='function'&&window.VocabMust&&vocabPlan&&window.VocabMust.portionDone(sessionAttempts,vocabPlan.budget,position,queue.length))beginMustPortion(false);}render();
    if(!savedSession.answered){hinted=!!savedSession.hinted;elapsedMs=Number.isFinite(savedSession.elapsed_ms)?Math.max(0,savedSession.elapsed_ms):0;}
- }else{queue=[];practiceIds=[];renderStats();}
+ }
  const hasMorphResume=!!(state.morphTrainer&&(state.morphTrainer.session||(state.morphTrainer.teaching&&state.morphTrainer.teaching.resume)));
  const resumeView=window.MorphState.resumeSurface(savedSession&&savedSession.view,hasMorphResume,!!validSaved,['practice','homework','learn','path','review']);
  showView(resumeView);
+ if(practiceHold&&practiceHold.kept)showPracticeHold();
  if(window.FreePractice&&window.FreePractice.resumeIfOpen())showView('morph');
  if(window.MorphTrainer&&window.MorphTrainer.restoreReading&&window.MorphTrainer.restoreReading())showView('morph');
  if(view!=='morph'&&savedSession&&savedSession.view==='morph'){

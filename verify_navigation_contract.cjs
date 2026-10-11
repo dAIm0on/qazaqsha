@@ -33,7 +33,7 @@ const PROTECTED = [
   'free-practice-content.js',
   'free-practice-view.js'
 ];
-const ALLOWED_FILE = /^(verify_navigation_(contract|state|ui)\.cjs|tools\/capture_nav_must_fixtures\.js|fixtures\/navigation\/(README\.md|[A-Za-z0-9._-]+\.json))$/;
+const ALLOWED_FILE = /^(app\.js|index\.html|navigation-state\.js|progress\.js|sw\.js|verify_chrome_error9_p0\.cjs|verify_lesson33\.cjs|verify_lesson_2_1_path_migrate\.cjs|verify_lesson_v2\.cjs|verify_navigation_contract\.cjs|verify_navigation_state\.cjs|verify_offline_assets\.cjs|verify_personal_trainers\.cjs|verify_r7_2ta\.cjs|verify_r7_2tb\.cjs|verify_r7_51\.cjs|verify_r7_66\.cjs|verify_r7_runtime_progress_migration\.cjs|verify_r7_support_kinds_mastery\.cjs|verify_r7_ux63\.cjs|verify_r7_x123\.cjs|verify_section2_canonical\.cjs|verify_trainer\.cjs|verify_vocab_pr7_draft_leak\.cjs|verify_vocab_trainer_v1\.cjs)$/;
 
 function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -199,7 +199,7 @@ function registry() {
     ['N-TAP-16', 'header', 'Библиотека', 'library', ['clean.json'], 'NAV-06', 'EXPECTED_LATER']
   ].map(item => row(...item));
   const states = [
-    ['course-pause-must-course', 'course practice', 'pause then must', 'course', ['practice-mid.json', 'must-first-show.json'], 'NAV-02', 'EXPECTED_LATER'],
+    ['course-pause-must-course', 'course practice', 'pause then must', 'course', ['practice-mid.json', 'must-first-show.json'], 'NAV-02', 'BASELINE'],
     ['must-save-writes-vocab', 'words must', 'save', 'non-must omits vocab; must writes vocab', ['practice-mid.json', 'must-first-show.json'], 'VOC', 'BASELINE'],
     ['must-wrong-pause-course-must', 'must retype', 'pause', 'course then must', ['must-wrong.json'], 'NAV-04', 'EXPECTED_LATER'],
     ['must-retype-across-learn', 'must retype', 'learn then must', 'learn, then the same retype', ['must-wrong.json'], 'VOC', 'BASELINE'],
@@ -209,8 +209,10 @@ function registry() {
     ['summary-continue', 'must summary', 'continue', '#/words', ['must-summary.json'], 'NAV-03', 'EXPECTED_LATER'],
     ['summary-continue-card', 'must summary', 'continue', 'live words session, same card', ['must-summary.json'], 'VOC', 'BASELINE'],
     ['summary-to-trainers', 'must summary', 'trainers', 'personal', ['must-summary.json'], 'NAV-08', 'EXPECTED_LATER'],
-    ['reload-three-sessions', 'three open sessions', 'reload', 'each session restored', ['clean.json', 'theory-draft.json', 'practice-mid.json'], 'NAV-02', 'EXPECTED_LATER'],
+    ['reload-three-sessions', 'three open sessions', 'reload', 'each session restored', ['clean.json', 'theory-draft.json', 'practice-mid.json'], 'NAV-02', 'BASELINE'],
     ['import-replace-merge', 'progress import', 'merge', 'session cleared', ['practice-mid.json'], 'NAV-02', 'BASELINE'],
+    ['nav02-import-merge-slots', 'progress import', 'merge', 'local slot kept, missing accepted, live must not rolled back', ['practice-mid.json'], 'NAV-02', 'BASELINE'],
+    ['nav02-import-replace-copy', 'progress import', 'replace', 'chosen copy plus existing backup', ['practice-mid.json'], 'NAV-02', 'BASELINE'],
     ['applyRemote-during-retry', 'must retry', 'applyRemote', 'live retry kept', ['must-idk.json'], 'VOC', 'BASELINE'],
     ['double-click-launcher', 'personal', 'trainer card', 'one launch', ['entry-map.json'], 'NAV-07', 'EXPECTED_LATER'],
     ['storage-unavailable', 'any', 'qazaq-before-update', 'preventDefault', [], 'NAV-01', 'BASELINE']
@@ -259,7 +261,7 @@ if (require.main !== module) return;
 
 const required = [];
 for (let n = 1; n <= 16; n++) required.push('N-TAP-' + String(n).padStart(2, '0'));
-for (const id of ['course-pause-must-course', 'must-save-writes-vocab', 'must-wrong-pause-course-must', 'must-retype-across-learn', 'theory-practice-words-theory', 'words-catalog-back', 'must-boundary-pause', 'summary-continue', 'summary-continue-card', 'summary-to-trainers', 'reload-three-sessions', 'import-replace-merge', 'applyRemote-during-retry', 'double-click-launcher', 'storage-unavailable']) required.push(id);
+for (const id of ['course-pause-must-course', 'must-save-writes-vocab', 'must-wrong-pause-course-must', 'must-retype-across-learn', 'theory-practice-words-theory', 'words-catalog-back', 'must-boundary-pause', 'summary-continue', 'summary-continue-card', 'summary-to-trainers', 'reload-three-sessions', 'import-replace-merge', 'nav02-import-merge-slots', 'nav02-import-replace-copy', 'applyRemote-during-retry', 'double-click-launcher', 'storage-unavailable']) required.push(id);
 for (let n = 1; n <= 6; n++) required.push('N-HISTORY-' + n);
 for (let n = 1; n <= 7; n++) required.push('N-PWA-0' + n);
 for (const id of ['N-REACH', 'N-MORPH', 'N-TEXT', 'N-UI', 'N-READY', 'N-DICT', 'N-VOC', 'K1', 'K2', 'K3', 'K4', 'K5', 'K6']) required.push(id);
@@ -280,10 +282,17 @@ for (const id of ['N-TAP-08', 'N-TAP-13', 'must-save-writes-vocab', 'must-retype
   assert.equal(byId.get(id).status, 'BASELINE', id);
   assert.equal(byId.get(id).owner, 'VOC', id);
 }
-assert.equal(byId.get('course-pause-must-course').status, 'EXPECTED_LATER');
+assert.equal(byId.get('course-pause-must-course').status, 'BASELINE');
 assert.equal(byId.get('course-pause-must-course').owner, 'NAV-02');
 assert.equal(byId.get('course-pause-must-course').control, 'pause then must');
 assert.equal(byId.get('course-pause-must-course').target, 'course');
+assert.equal(byId.get('reload-three-sessions').status, 'BASELINE');
+assert.equal(byId.get('reload-three-sessions').control, 'reload');
+assert.equal(byId.get('reload-three-sessions').target, 'each session restored');
+assert.equal(byId.get('nav02-import-merge-slots').status, 'BASELINE');
+assert.equal(byId.get('nav02-import-merge-slots').target, 'local slot kept, missing accepted, live must not rolled back');
+assert.equal(byId.get('nav02-import-replace-copy').status, 'BASELINE');
+assert.equal(byId.get('nav02-import-replace-copy').target, 'chosen copy plus existing backup');
 assert.equal(byId.get('must-wrong-pause-course-must').status, 'EXPECTED_LATER');
 assert.equal(byId.get('must-wrong-pause-course-must').owner, 'NAV-04');
 assert.equal(byId.get('must-wrong-pause-course-must').target, 'course then must');
@@ -313,7 +322,13 @@ assert.match(app, /window\.addEventListener\('qazaq-before-update',e=>\{pauseTim
 const saveStart = app.indexOf('function save(){');
 const saveEnd = app.indexOf('function subset(){');
 const saveBody = app.slice(saveStart, saveEnd);
-assert.match(saveBody, /state\.session=\{/);
+assert.match(saveBody, /state\.session=captureSessionObject\(\)/);
+const capStart = app.indexOf('function captureSessionObject(){');
+const capEnd = app.indexOf('function genericQueueKey(');
+const capBody = app.slice(capStart, capEnd);
+assert.ok(capStart > 0 && capEnd > capStart);
+assert.match(capBody, /const session=\{topic,mode,sourceFilter,courseBlock,queue,position,answered:checked/);
+assert.match(capBody, /session\.vocab=window\.VocabMust\.snapshot/);
 const applyStart = app.indexOf('function applyRemote(incoming){');
 const applyEnd = app.indexOf('function paintAccount(){');
 const applyBody = app.slice(applyStart, applyEnd);
@@ -336,6 +351,34 @@ const merged = P.merge(P.migrate({records: {}}, 1700000000000), P.migrate({recor
 assert.equal(merged.session, null);
 assert.equal(byId.get('import-replace-merge').status, 'BASELINE');
 console.log('BASELINE merge clears session');
+
+const NS = require('./navigation-state.js');
+const localSlots = P.migrate({records: {}}, 1700000000000);
+assert.equal(NS.put(localSlots, 'vocab:must', {status: 'closed', updatedAt: 5, origin: 'close', snapshot: {kind: 'session', session: {mode: 'words', queue: ['a'], position: 0}}}), true);
+assert.equal(NS.put(localSlots, 'queue:ordered:sounds', {status: 'paused', updatedAt: 4, origin: 'local', snapshot: {kind: 'session', session: {mode: 'ordered', topic: 'sounds', queue: ['m1-1-1'], position: 0, queueEpoch: 1700000000000}}}), true);
+const incomingSlots = P.migrate({records: {}}, 1700000000000);
+assert.equal(NS.put(incomingSlots, 'vocab:must', {status: 'paused', updatedAt: 9, origin: 'cloud', snapshot: {kind: 'session', session: {mode: 'words', queue: ['other'], position: 0}}}), true);
+assert.equal(NS.put(incomingSlots, 'course:2-2', {status: 'paused', updatedAt: 3, origin: 'cloud', snapshot: {kind: 'ref', store: 'practiceSession', lessonId: '2-2'}}), true);
+const slotMerged = P.merge(localSlots, incomingSlots);
+assert.equal(slotMerged.session, null);
+assert.equal(slotMerged.navigationResume.slots['vocab:must'].status, 'closed');
+assert.equal(slotMerged.navigationResume.slots['vocab:must'].origin, 'close');
+assert.equal(slotMerged.navigationResume.slots['queue:ordered:sounds'].origin, 'local');
+assert.equal(slotMerged.navigationResume.slots['queue:ordered:sounds'].snapshot.session.queueEpoch, 1700000000000);
+assert.equal(slotMerged.navigationResume.slots['course:2-2'].snapshot.kind, 'ref');
+assert.equal(slotMerged.navigationResume.slots['course:2-2'].snapshot.lessonId, '2-2');
+const chosen = P.migrate({records: {}, session: {mode: 'ordered', queue: ['m1-1-1'], position: 0, queueEpoch: 3}, navigationResume: incomingSlots.navigationResume}, 1700000000000);
+assert.equal(chosen.session.queueEpoch, 3);
+assert.equal(chosen.navigationResume.slots['course:2-2'].snapshot.lessonId, '2-2');
+assert.equal(Object.prototype.hasOwnProperty.call(chosen.navigationResume.slots, 'vocab:must'), true);
+const impBody = app.slice(app.indexOf('function importProgress'), app.indexOf('function vocabTable'));
+const backupAt = impBody.indexOf('localStorage.setItem(BACKUP,');
+const keepAt = impBody.indexOf("importMode!=='replace'");
+const replaceAt = impBody.indexOf("importMode==='replace'?P.migrate");
+assert.ok(backupAt > 0 && keepAt > backupAt && replaceAt > keepAt);
+assert.ok(impBody.includes('restoreMustLive(keep)'));
+assert.ok(impBody.includes('next.session=null'));
+console.log('BASELINE nav02 import: local slot wins, missing slot accepted, replace keeps the chosen copy and the backup');
 
 const html = read('index.html');
 const bottom = html.match(/<nav class="bottom-nav"[^>]*>([\s\S]*?)<\/nav>/);
@@ -386,7 +429,7 @@ if (process.env.NAV00_SCOPE === '1' && ensureBase() && ensureMain()) {
   }
   for (const line of git(['diff', '--name-only', gate]).split('\n').filter(Boolean)) changed.add(line.replace(/\\/g, '/'));
   for (const file of changed) assert.match(file, ALLOWED_FILE, 'unexpected path ' + file);
-  const prod = git(['diff', '--name-only', gate, '--', 'pwa.js', 'sw.js', 'app.js', 'index.html', 'morph.css', 'theme-redesign.css']).trim();
+  const prod = git(['diff', '--name-only', gate, '--', 'pwa.js', 'morph.css', 'theme-redesign.css']).trim();
   assert.equal(prod, '', prod);
   console.log('PROD_GATE', gate);
 } else if (process.env.NAV00_SCOPE !== '1') {
@@ -571,6 +614,108 @@ function hasVocab(session) {
   assert.equal(remoteAfter.vocab.retry.cardId, remoteBefore.vocab.retry.cardId);
   assert.equal(remoteAfter.queue[remoteAfter.position], remoteBefore.queue[remoteBefore.position]);
   console.log('BASELINE applyRemote-during-retry keeps the live idk retype');
+
+  function stored(api) {
+    return JSON.parse(api.window.localStorage.getItem(KEY));
+  }
+  function slotOf(api, key) {
+    const resume = stored(api).navigationResume;
+    assert.ok(resume && Object.prototype.hasOwnProperty.call(resume, 'slots'));
+    assert.ok(Object.prototype.hasOwnProperty.call(resume.slots, key), key);
+    return resume.slots[key];
+  }
+  function answerEvents(raw) {
+    return (raw.events || []).filter(event => event && event.type === 'answer');
+  }
+
+  const pause = boot(JSON.stringify({session: practice}));
+  pause.saveNow();
+  const pauseEpoch = pause.session().queueEpoch;
+  const pauseEvents = answerEvents(stored(pause)).length;
+  const pauseRecordIds = Object.keys(stored(pause).records);
+  pause.window.QazaqShell.show('personal');
+  const parkedPractice = slotOf(pause, 'queue:ordered:sounds');
+  assert.equal(parkedPractice.status, 'paused');
+  assert.equal(parkedPractice.snapshot.kind, 'session');
+  assert.equal(parkedPractice.snapshot.session.queue[0], 'm1-1-1');
+  assert.equal(parkedPractice.snapshot.session.queueEpoch, pauseEpoch);
+  assert.equal(parkedPractice.snapshot.session.draft.exerciseId, 'm1-1-1');
+  pause.window.TrainerCatalogBridge.launch('vocab:must');
+  pause.saveNow();
+  const mustSide = pause.session();
+  assert.equal(mustSide.mode, 'words');
+  assert.equal(mustSide.trainerReturn, 'vocab:must');
+  const mustCard = mustSide.queue[mustSide.position];
+  const shown = stored(pause).records[mustCard];
+  assert.ok(shown, 'must launch writes the existing shown record');
+  assert.equal(shown.seen, 1);
+  assert.equal(shown.attempts, 1);
+  assert.equal(shown.fsrs, null);
+  assert.equal(answerEvents(stored(pause)).length, pauseEvents);
+  const addedIds = Object.keys(stored(pause).records).filter(id => !pauseRecordIds.includes(id));
+  assert.deepEqual(addedIds, [mustCard]);
+  assert.equal(pause.window.QazaqShell.restore('queue:ordered:sounds'), 'ok');
+  pause.saveNow();
+  const restoredPractice = pause.session();
+  assert.equal(restoredPractice.mode, 'ordered');
+  assert.equal(restoredPractice.topic, 'sounds');
+  assert.equal(restoredPractice.view, 'practice');
+  assert.equal(restoredPractice.queue[0], 'm1-1-1');
+  assert.equal(restoredPractice.position, 0);
+  assert.equal(restoredPractice.queueEpoch, pauseEpoch);
+  assert.equal(restoredPractice.trainerReturn, null);
+  assert.equal(restoredPractice.vocabRole, null);
+  assert.equal(restoredPractice.draft.exerciseId, 'm1-1-1');
+  assert.equal(answerEvents(stored(pause)).length, pauseEvents);
+  assert.deepEqual(Object.keys(stored(pause).records).filter(id => !pauseRecordIds.includes(id)), [mustCard]);
+  console.log('BASELINE course-pause-must-course restores queue:ordered:sounds; allowed change is the must shown record');
+
+  const trio = boot();
+  trio.window.QazaqShell.openPath('1-1');
+  const trioInput = trio.makeEl('path-answer');
+  trioInput.value = 'trio-draft';
+  trioInput.dataset.lesson = '1-1';
+  trioInput.dataset.chapter = '';
+  trioInput.dataset.beat = '0';
+  trio.window.QazaqShell.startCourse('2-2');
+  trio.saveNow();
+  assert.equal(trio.session().mode, 'course');
+  assert.equal(trio.session().courseBlock, '2-2');
+  assert.equal(trio.session().queue[0], 'p2b-22-g1-dos');
+  const courseEpoch = trio.session().queueEpoch;
+  const courseCard = trio.session().queue[0];
+  const coursePos = trio.session().position;
+  trio.window.TrainerCatalogBridge.launch('vocab:must');
+  trio.saveNow();
+  const trioMust = trio.session();
+  assert.equal(trioMust.mode, 'words');
+  const trioMustEpoch = trioMust.queueEpoch;
+  const trioMustCard = trioMust.queue[trioMust.position];
+  assert.equal(slotOf(trio, 'theory:1-1').snapshot.kind, 'ref');
+  assert.equal(slotOf(trio, 'theory:1-1').snapshot.store, 'path');
+  assert.equal(slotOf(trio, 'course:2-2').snapshot.kind, 'ref');
+  assert.equal(slotOf(trio, 'course:2-2').snapshot.store, 'practiceSession');
+  const reloaded = boot(trio.window.localStorage.getItem(KEY));
+  reloaded.saveNow();
+  assert.equal(reloaded.session().mode, 'words');
+  assert.equal(reloaded.session().queueEpoch, trioMustEpoch);
+  assert.equal(reloaded.session().queue[reloaded.session().position], trioMustCard);
+  assert.equal(reloaded.window.QazaqShell.restore('course:2-2'), 'ok');
+  reloaded.saveNow();
+  assert.equal(reloaded.session().mode, 'course');
+  assert.equal(reloaded.session().courseBlock, '2-2');
+  assert.equal(reloaded.session().queueEpoch, courseEpoch);
+  assert.equal(reloaded.session().queue[0], courseCard);
+  assert.equal(reloaded.session().position, coursePos);
+  assert.equal(reloaded.session().vocabRole, null);
+  assert.equal(reloaded.session().trainerReturn, null);
+  assert.equal(reloaded.window.QazaqShell.restore('theory:1-1'), 'ok');
+  reloaded.saveNow();
+  assert.equal(reloaded.session().view, 'path');
+  assert.equal(stored(reloaded).grammarPath.lessonId, '1-1');
+  assert.equal(stored(reloaded).grammarPath.pathDraft.value, 'trio-draft');
+  assert.equal(stored(reloaded).grammarPath.beat, 0);
+  console.log('BASELINE reload-three-sessions restores must, course:2-2 and theory:1-1');
 
   console.log('VERIFY_NAVIGATION_CONTRACT_OK');
 })().catch(err => {

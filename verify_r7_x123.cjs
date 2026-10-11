@@ -95,7 +95,9 @@ ok('X2 first-try / peek-rate / transfer-rate are not shown (no developer mode ex
   assert.ok(!/position--/.test(h),'← Назад no longer steps to the previous card');
   assert.ok(/const back=pauseTarget\(\);[^\n]*\n\s*showView\(trainerReturn\?'personal':back\)/.test(h));
   assert.ok(appSrc.includes("if(next==='practice'&&trainerReturn&&queueEpoch!==trainerEpoch)trainerReturn=null;"),'entering practice with another queue drops trainerReturn');
-  assert.equal((appSrc.match(/trainerEpoch=queueEpoch;/g)||[]).length,2,'both catalog trainer starts bind their queue');
+  assert.equal((appSrc.match(/queue=shuffled\(ids\);practiceIds=\[\.\.\.queue\];variants=\{\};queueEpoch=Date\.now\(\)\+Math\.random\(\);trainerEpoch=queueEpoch;/g)||[]).length,1,'catalog custom start still binds its queue');
+  assert.equal((appSrc.match(/queue=catalogVocabIds\(role\);practiceIds=\[\.\.\.queue\];variants=\{\};queueEpoch=Date\.now\(\)\+Math\.random\(\);trainerEpoch=queueEpoch;/g)||[]).length,1,'catalog vocab start still binds its queue');
+  assert.equal((appSrc.match(/trainerEpoch=queueEpoch;/g)||[]).length,3,'two catalog trainer starts plus the number dashboard range bind their queue');
   assert.ok(/trainerReturn,trainerEpoch,sessionOrigin\};/.test(appSrc)&&appSrc.includes('trainerEpoch=typeof savedSession.trainerEpoch'),'binding saved and restored');
   assert.ok(/if\(next==='practice'&&view!=='practice'&&ORIGIN_VIEWS\.includes\(view\)\)sessionOrigin=view;/.test(appSrc),'showView remembers the origin');
   assert.ok(/trainerEpoch,sessionOrigin\};/.test(appSrc)&&/sessionOrigin=\/\^\(today\|learn\|path\|homework/.test(appSrc),'origin saved with the session and restored');
