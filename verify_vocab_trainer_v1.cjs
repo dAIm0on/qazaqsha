@@ -609,7 +609,7 @@ function runGapScreen(cards,sitting,queue){
     'const cfg=start.cfg, core=start.core, state=start.state, records=state.records;',
     'let mode="words", vocabRole="must", trainerReturn="vocab:must", queueEpoch=7, trainerEpoch=7;',
     'let position=0, queue=start.queue.slice(), practiceIds=queue.slice();',
-    'let vocabSitting=start.sitting, vocabPlan=start.plan, vocabClosed=[], vocabRetry=null, vocabPoolReady=false, vocabReturnScheduled=false;',
+    'let vocabSitting=start.sitting, vocabPlan=start.plan, vocabClosed=[], vocabRetry=null, vocabPoolReady=false, vocabReturnScheduled=false, vocabSummary=false, vocabNear=null;',
     'let sessionAttempts=0, sessionCorrect=0, sessionAssisted=0, sessionBlindFails=Object.create(null), sessionUnaided=Object.create(null);',
     'let draft=null, presented=null, checked=false, hinted=false, retrying=false, retryAfterWrong=false;',
     'let activeLesson=null, pathPracticeReturn=null, hwReturn=null, courseBlock=null;',
@@ -1246,7 +1246,7 @@ assert.equal(p5Skill.fsrs_log.rating,F.Rating.Hard,'P5-SKILL-LOG');
 assert.equal(pack.record.next_review,p5Skill.next_review,'P5-NEXT-REVIEW');
 assert.equal(p5Skill.needsReview,true,'P5-SKILL-NEEDS');
 assert.equal(p5Skill.correct_streak,1,'P5-SKILL-STREAK');
-assert.equal(VM.wordLine(packState,p5Sitting,{cardId:girl.id,lemma:'word:girl'}),'самостоятельно','P5-WORDLINE');
+assert.equal(VM.wordLine(packState,p5Sitting,{cardId:girl.id,lemma:'word:girl'}),'почти точно','P5-WORDLINE');
 assert.equal(packState.errors.length,0,'P5-COMMIT-ERRORS');
 const p5Kept=progress.migrate(packState);
 const keptEvent=p5Kept.events.find(e=>e.card_id===girl.id);
@@ -1329,5 +1329,138 @@ const go=p5Advance(false);
 assert.equal(go.delay(),400,'P5-AUTO-ARMED');
 go.fire()();
 assert.equal(go.moved(),true,'P5-AUTO');
+
+const p6Sit=()=>{const s=VM.emptySitting(1);s.sessions=['s'];return s;};
+const p6Ans=(cardId,patch)=>Object.assign({type:'answer',session_id:'s',presentation:0,card_id:cardId,correct:true,hinted:false,idk:0,peek:0,rule_peek:0,at:1},patch||{});
+VM.noteShown(p6Sit(),'word:a');
+const shownOnce=p6Sit();
+VM.noteShown(shownOnce,'word:a');
+VM.noteShown(shownOnce,'word:a');
+assert.deepEqual(shownOnce.shown,['word:a'],'P6-SHOWN-ONCE');
+const shownPlan=p6Sit();
+shownPlan.shown=['word:a'];
+const planOnly=VM.summaryRows(state(),shownPlan,[card('A','word:a'),card('C','word:c')],core,1000);
+assert.deepEqual(planOnly.rows.map(r=>r.lemma),['word:a'],'P6-SHOWN-NOT-PLAN');
+const worstState=state();
+const worstSit=p6Sit();
+worstSit.shown=['word:a'];
+worstSit.newLemmas=['word:a'];
+worstState.events=[
+  p6Ans('A',{presentation:0,correct:false,idk:1,hinted:true,at:1}),
+  {type:'retry_close',session_id:'s',presentation:0,card_id:'A',correct:true,hinted:true,at:2},
+  p6Ans('A',{presentation:1,correct:true,at:3}),
+  p6Ans('A',{presentation:2,correct:true,at:4})
+];
+assert.equal(VM.wordLine(worstState,worstSit,{cardId:'A',lemma:'word:a'}),'с подсказкой','P6-WORST');
+const worstRow=VM.summaryRows(worstState,worstSit,[card('A','word:a')],core,1000).rows[0];
+assert.equal(worstRow.label,'с подсказкой','P6-WORST');
+assert.equal(worstRow.fresh,true,'P6-NEW');
+const nearState=state();
+const nearSit=p6Sit();
+nearSit.shown=['word:a'];
+nearSit.sessions=['p1','p2'];
+nearState.events=[p6Ans('A',{session_id:'p1',near_miss:1,at:1})];
+assert.equal(VM.wordLine(nearState,nearSit,{cardId:'A',lemma:'word:a'}),'почти точно','P6-NEAR');
+const nearModel=VM.summaryRows(nearState,nearSit,[card('A','word:a')],core,1000);
+assert.equal(nearModel.rows[0].label,'почти точно','P6-NEAR');
+assert.equal(nearModel.unaided,1,'P6-TALLY');
+assert.equal(nearModel.assisted,0,'P6-TALLY');
+const cleanModel=VM.summaryRows(state(),Object.assign(p6Sit(),{shown:['word:b'],sessions:['s']}),[card('B','word:b')],core,1000);
+cleanModel; // shown only, no events
+const cleanState=state();
+const cleanSit=p6Sit();
+cleanSit.shown=['word:b'];
+cleanState.events=[p6Ans('B',{at:1})];
+const cleanRow=VM.summaryRows(cleanState,cleanSit,[card('B','word:b')],core,1000);
+assert.equal(cleanRow.rows[0].label,'вспомнила сама','P6-TALLY');
+assert.equal(VM.wordLine(cleanState,cleanSit,{cardId:'B',lemma:'word:b'}),'самостоятельно','P6-TALLY');
+assert.equal(cleanRow.unaided,1,'P6-TALLY');
+const p6LegacySit=p6Sit();
+p6LegacySit.shown=['word:h'];
+p6LegacySit.legacy={sessionCorrect:0,sessionAssisted:0,boundaryAt:0,openIdk:{cardId:'H',lemma:'word:h'}};
+const legacyModel=VM.summaryRows(state(),p6LegacySit,[card('H','word:h')],core,1000);
+assert.equal(VM.wordLine(state(),p6LegacySit,{cardId:'H',lemma:'word:h'}),'с подсказкой','P6-LEGACY');
+assert.equal(legacyModel.rows[0].label,'с подсказкой','P6-LEGACY');
+assert.equal(legacyModel.rows[0].fresh,false,'P6-LEGACY');
+assert.equal(legacyModel.assisted,0,'P6-LEGACY');
+assert.equal(legacyModel.unaided,0,'P6-LEGACY');
+const cloudSit=p6Sit();
+cloudSit.sessions=['local'];
+cloudSit.shown=['word:a'];
+const cloudState=state();
+cloudState.events=[p6Ans('A',{session_id:'cloud',correct:true,at:1})];
+assert.equal(VM.wordLine(cloudState,cloudSit,{cardId:'A',lemma:'word:a'}),'Без ответа','P6-CLOUD');
+assert.equal(VM.summaryRows(cloudState,cloudSit,[card('A','word:a')],core,1000).rows[0].label,'Без ответа','P6-CLOUD');
+assert.equal(VM.recount(cloudState,cloudSit).closed,0,'P6-CLOUD');
+function p6When(id,lemma,record,events,pool,now){
+  const st=state();
+  st.records[id]=record;
+  st.events=events||[];
+  const sit=VM.emptySitting(now);
+  sit.sessions=['s'];
+  sit.shown=[lemma];
+  return VM.summaryRows(st,sit,pool,core,now).rows[0].when;
+}
+const soonNow=new Date(2026,9,11,15,0,0).getTime();
+const soonLater=new Date(2026,9,21,15,0,0).getTime();
+assert.equal(p6When('soon','word:soon',{review_count:1,needsReview:true,next_review:soonLater,last_answer:soonNow-86400000},[{type:'answer',card_id:'soon',at:soonNow-86400000,correct:true}],[card('soon','word:soon')],soonNow),'скоро','P6-WHEN-SOON');
+const dayNow6=new Date(2026,9,11,15,0,0).getTime();
+const tomorrow6=new Date(2026,9,12,9,0,0).getTime();
+const plus3=new Date(2026,9,14,9,0,0).getTime();
+assert.equal(p6When('day','word:day',{review_count:1,needsReview:false,next_review:tomorrow6,last_answer:dayNow6-86400000},[{type:'answer',card_id:'day',at:dayNow6-86400000,correct:true}],[card('day','word:day')],dayNow6),'завтра','P6-WHEN-DAY');
+assert.equal(p6When('day3','word:day3',{review_count:1,needsReview:false,next_review:plus3,last_answer:dayNow6-86400000},[{type:'answer',card_id:'day3',at:dayNow6-86400000,correct:true}],[card('day3','word:day3')],dayNow6),'через 3 дня','P6-WHEN-DAY');
+assert.equal(p6When('none','word:none',{review_count:1,needsReview:false,last_answer:dayNow6-86400000},[{type:'answer',card_id:'none',at:dayNow6-86400000,correct:true}],[card('none','word:none')],dayNow6),'','P6-WHEN-NONE');
+const buryNow=new Date(2026,9,11,15,0,0).getTime();
+const buryTomorrow=new Date(2026,9,12,9,0,0).getTime();
+const buryLater=new Date(2026,9,16,9,0,0).getTime();
+const buryKk=dirCard('bury-kk','word:bury','production');
+const buryRu=dirCard('bury-ru','word:bury','recognition');
+const buryState=state();
+buryState.records[buryKk.id]={review_count:1,needsReview:false,next_review:buryTomorrow,last_answer:buryNow};
+buryState.records[buryRu.id]={review_count:0,needsReview:false,next_review:buryLater};
+buryState.events=[{type:'answer',card_id:buryKk.id,at:buryNow,correct:true}];
+const burySit=VM.emptySitting(buryNow);
+burySit.sessions=['s'];
+burySit.shown=['word:bury'];
+assert.equal(VM.summaryRows(buryState,burySit,[buryKk,buryRu],core,buryNow).rows[0].when,'завтра','P6-WHEN-BURY');
+const rowSit=p6Sit();
+rowSit.shown=['word:a','word:a','word:b'];
+const rowPool=[card('A','word:a'),card('B','word:b'),card('C','word:c')];
+for(let i=0;i<28;i++){rowSit.shown.push('word:n'+i);rowPool.push(card('N'+i,'word:n'+i));}
+const rowModel=VM.summaryRows(state(),rowSit,rowPool,core,1000);
+assert.equal(rowModel.rows.length,30,'P6-ROWS');
+assert.deepEqual(rowModel.rows.map(r=>r.lemma).slice(0,2),['word:a','word:b'],'P6-ROWS');
+assert.ok(!rowModel.rows.some(r=>r.lemma==='word:c'),'P6-ROWS');
+const keptShown=rowSit.shown.slice();
+const p6Snap=VM.snapshot({plan:VM.emptyPlan(10),sitting:rowSit,retry:null,closed:[],unaided:{},blindFails:{}});
+const p6Restored=VM.restoreSaved({mode:'words',trainerReturn:'vocab:must',queue:['A'],position:0,queueEpoch:'s',vocab:p6Snap},state(),cfg,5);
+assert.deepEqual(p6Restored.vocab.sitting.shown,keptShown,'P6-ROWS');
+const shownBefore=p6Restored.vocab.sitting.shown.length;
+VM.noteShown(p6Restored.vocab.sitting,'word:a');
+assert.equal(p6Restored.vocab.sitting.shown.length,shownBefore,'P6-ROWS');
+const paintSrc=app.slice(app.indexOf('function paintVocabSummary'),app.indexOf('function continueVocabSummary'));
+const contSrc=app.slice(app.indexOf('function continueVocabSummary'),app.indexOf('function endMustToTrainers'));
+const endSrc=app.slice(app.indexOf('function endMustToTrainers'),app.indexOf('function openVocabSummary'));
+const openSrc=app.slice(app.indexOf('function openVocabSummary'),app.indexOf('function captureMustLive'));
+assert.ok(paintSrc.indexOf('vocab-summary-continue')<paintSrc.indexOf('vocab-summary-list'),'P6-BUTTONS-ABOVE');
+assert.ok(paintSrc.includes('<h2>Итог</h2>'),'P6-TEXT');
+assert.ok(paintSrc.includes('Самостоятельно: '), 'P6-TEXT');
+assert.ok(paintSrc.includes('С подсказкой: '), 'P6-TEXT');
+assert.ok(paintSrc.includes('Когда вернётся: '), 'P6-TEXT');
+assert.ok(!/интервал|FSRS|из N|закончились|на сегодня всё|retrieval|Again/.test(paintSrc+contSrc+endSrc+openSrc),'P6-TEXT');
+assert.ok(contSrc.includes('render()'),'P6-CONTINUE-SRC');
+assert.ok(!contSrc.includes('resetCounts'),'P6-CONTINUE-SRC');
+assert.ok(!contSrc.includes('beginMustPortion(true)'),'P6-CONTINUE-SRC');
+assert.ok(!/commitFirst|noteShown/.test(paintSrc+contSrc+endSrc+openSrc),'P6-NO-GRADE');
+const head=indexHtml.slice(indexHtml.indexOf('class="practice-head"'),indexHtml.indexOf('id="session-position"'));
+assert.ok(head.includes('id="vocab-finish"')&&head.includes('practice-head-tools')&&head.includes('>Закончить</button>'),'P6-FINISH-BTN');
+assert.ok(!head.includes('secondary-actions'),'P6-FINISH-BTN');
+const dockAt=app.indexOf('id="practice-dock"');
+const dock=app.slice(dockAt,dockAt+1400);
+assert.ok(dock.includes('secondary-actions')&&!dock.includes('vocab-finish'),'P6-FINISH-BTN');
+const tools=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8').split('.practice-head-tools{')[1].split('}')[0];
+assert.ok(tools&&!/#|rgb|hsl/.test(tools),'P6-COLOR');
+const rendSrc=app.slice(app.indexOf('function render()'),app.indexOf('function hintEvent'));
+assert.ok(rendSrc.includes('vocabNear')&&rendSrc.includes('nearMissFeedbackHtml')&&!rendSrc.includes('advanceTimer=setTimeout'),'P6-CONTINUE-SRC');
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');

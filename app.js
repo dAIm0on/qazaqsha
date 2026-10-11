@@ -67,7 +67,7 @@
  // r7 X3: where the learner came from into this session (← Назад / «Сделать паузу» returns there).
  const ORIGIN_VIEWS=['today','learn','path','homework','personal','exam','review','vocabulary','materials','morph'],ORIGIN_LABEL={today:'Сегодня',learn:'Учёба',path:'Уроки',homework:'Домашка',personal:'Тренажёры',exam:'Экзамен',review:'Повторение',vocabulary:'Словарь',materials:'Материалы',morph:'Правила'};
  let sessionOrigin=null,trainerEpoch=null; // trainerEpoch: the queue a catalog trainer started; trainerReturn is valid only for it
- let vocabPlan=null,vocabSitting=null,vocabRetry=null,vocabClosed=[],retryAfterWrong=false,vocabPoolReady=false,vocabReturnScheduled=false;
+ let vocabPlan=null,vocabSitting=null,vocabRetry=null,vocabClosed=[],retryAfterWrong=false,vocabPoolReady=false,vocabReturnScheduled=false,vocabSummary=false,vocabNear=null;
  let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null,stageContext=null,practiceHold=null,restoredEnded=false;
  let hwOrigin='today';
  function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
@@ -767,7 +767,7 @@
  }
  function beginMustPortion(fresh){
    const VM=window.VocabMust;if(!VM)return false;
-   if(fresh||!vocabSitting){vocabSitting=VM.emptySitting(Date.now());vocabClosed=[];sessionCorrect=0;sessionAssisted=0;}
+   if(fresh||!vocabSitting){vocabSitting=VM.emptySitting(Date.now());vocabClosed=[];sessionCorrect=0;sessionAssisted=0;vocabSummary=false;vocabNear=null;}
    prepareVocabPool();
    const pool=mustPool();
    const planned=VM.planPortion(pool,state,cfg,core,Date.now(),{rank:mustCourseRank,retrievability:mustRetrievability});
@@ -795,6 +795,38 @@
    if($('#reveal-button'))$('#reveal-button').disabled=true;
    if($('#hint-button'))$('#hint-button').disabled=true;
    focusAnswer();
+ }
+ function paintVocabSummary(){
+   const VM=window.VocabMust;
+   const model=VM&&VM.summaryRows?VM.summaryRows(state,vocabSitting,mustPool(),core,Date.now()):{unaided:0,assisted:0,rows:[]};
+   const rows=(model.rows||[]).map(row=>{
+     const mark=row.label==='с подсказкой'?'hinted':(row.label==='Без ответа'?'':'valid');
+     const markHtml=mark?'<span class="'+mark+'">'+esc(row.label)+'</span>':'<span>'+esc(row.label)+'</span>';
+     const fresh=row.fresh?' · новое':'';
+     const when=row.when?' · Когда вернётся: '+esc(row.when):'';
+     return '<p class="question-note"><span lang="kk">'+esc(row.kk)+'</span>'+(row.ru?' — '+esc(row.ru):'')+' · '+markHtml+fresh+when+'</p>';
+   }).join('');
+   $('#exercise').innerHTML='<div class="empty-state" id="vocab-summary"><h2>Итог</h2><p id="vocab-summary-tally">Самостоятельно: '+model.unaided+'. С подсказкой: '+model.assisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="vocab-summary-continue">Продолжить</button><button type="button" class="secondary-button" id="vocab-summary-trainers">К тренажёрам</button></div><div id="vocab-summary-list">'+rows+'</div></div>';
+   $('#vocab-summary-continue').onclick=continueVocabSummary;
+   $('#vocab-summary-trainers').onclick=endMustToTrainers;
+   const fin=$('#vocab-finish');if(fin)fin.hidden=true;
+ }
+ function continueVocabSummary(){
+   vocabSummary=false;
+   render();
+ }
+ function endMustToTrainers(){
+   vocabSummary=false;vocabNear=null;vocabSitting=null;vocabPlan=null;vocabRetry=null;vocabClosed=[];
+   trainerReturn=null;trainerEpoch=null;vocabRole=null;
+   queue=[];practiceIds=[];position=0;mode='ordered';
+   showView('personal');
+   if(window.PersonalTrainers&&window.PersonalTrainers.openCatalog)window.PersonalTrainers.openCatalog();
+   save();
+ }
+ function openVocabSummary(){
+   if(!isVocabMustTrainer()||!vocabSitting)return;
+   vocabSummary=true;
+   render();
  }
  function captureMustLive(){
    return {queue:[...queue],position,queueEpoch,trainerEpoch,trainerReturn,vocabRole,mode,topic,courseBlock,sourceFilter,view,practiceIds:[...practiceIds],vocabPlan,vocabSitting,vocabRetry,vocabClosed:[...vocabClosed],sessionAttempts,sessionCorrect,sessionAssisted,sessionUnaided:Object.assign(Object.create(null),sessionUnaided),sessionBlindFails:Object.assign(Object.create(null),sessionBlindFails),retryAfterWrong,checked,hinted,presented};
@@ -1325,6 +1357,7 @@
  }
  function showView(next){
    captureDraft();
+   if(vocabSummary&&next!=='practice'){vocabSummary=false;if(view==='practice')render();}
    if(next==='practice'&&trainerReturn&&queueEpoch!==trainerEpoch)trainerReturn=null; // r7 X3: bank/words from Учёба were labelled «Тренажёры»
    if(next==='practice'&&view!=='practice'&&ORIGIN_VIEWS.includes(view))sessionOrigin=view;
    pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
@@ -1552,6 +1585,8 @@
      pause.textContent='← Назад';
      pause.setAttribute('aria-label','Сделать паузу · '+ORIGIN_LABEL[pauseTarget()]);
    }
+   const fin=$('#vocab-finish');
+   if(fin)fin.hidden=!(isVocabMustTrainer()&&view==='practice'&&!vocabSummary);
    const scope=subset(), tried=scope.filter(q=>records[q.id]?.attempts>0).length;
    const sp=$('#session-position');
    if(sp){
@@ -1670,6 +1705,7 @@
    return i;
  }
  function render(){
+   if(vocabSummary&&isVocabMustTrainer()){paintVocabSummary();renderStats();return;}
    retrying=false;
    introOpen=false;pauseTimer();elapsedMs=0;checked=false;hinted=false;rulePeeked=false;lastTextInput=null;renderStats();
    const q=byId.get(queue[position]);
@@ -1766,6 +1802,19 @@
     });
     window.TutorUI.syncView(mode==='homework'?'homework':'practice');
     if(window.TutorUI.bindWordTaps)window.TutorUI.bindWordTaps(document.getElementById('exercise'));
+  }
+  if(isVocabMustTrainer()&&vocabNear&&queue[position]===vocabNear.cardId&&!(vocabRetry&&vocabRetry.cardId===queue[position])){
+    checked=true;
+    const nearBox=$('#feedback');
+    if(nearBox&&window.VocabMust){
+      nearBox.className='feedback';
+      nearBox.removeAttribute('data-vocab-compact');
+      nearBox.innerHTML=window.VocabMust.nearMissFeedbackHtml(vocabNear.expected,esc);
+      nearBox.hidden=false;
+    }
+    const nearNext=$('#next-button'),nearCheck=$('#check-button');
+    if(nearCheck)nearCheck.hidden=true;
+    if(nearNext){nearNext.hidden=false;try{nearNext.focus({preventScroll:true});}catch{}}
   }
  }
  function hintEvent(q,kind){state.events.push({type:'hint',card_id:q.id,at:Date.now(),hint_kind:kind,response_time_ms:elapsed(),hinted:true});}
@@ -2105,6 +2154,7 @@
    const morph=!result.correct&&!supportKind(q)?morphemeRow(errors,answerLine,answers.join(' ')):'';
    const supportDiff=(!result.correct&&!reveal&&supportKind(q)&&userAnswer?'<p data-error-diff>'+esc(window.ResponseKinds.answerLead(q))+': <span lang="kk">'+esc(userAnswer)+'</span>.</p>':'')+(!result.correct&&supportKind(q)&&q.why_wrong?'<p data-why-wrong>'+esc(q.why_wrong)+'</p>':''); // r7 X minor: one line why, without the answer
    const vocabWrong=isVocabWordsMode()&&!result.correct;
+   vocabNear=mustNear&&result.nearMiss?{cardId:q.id,expected:result.nearMiss.expected}:null;
    if(mustNear){
      feedback.className='feedback';
      feedback.removeAttribute('data-vocab-compact');
@@ -2178,7 +2228,7 @@
      if(!mustNear)advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
    }
  }
- function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;retryAfterWrong=false;vocabRetry=null;position++;if(isVocabMustTrainer()){const budget=vocabPlan&&vocabPlan.budget||(cfg.vocab&&cfg.vocab.answerBudget)||10;if(window.VocabMust&&window.VocabMust.portionDone(sessionAttempts,budget,position,queue.length)){if(!beginMustPortion(false))position=queue.length;}}else if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}focusAnswer();}
+ function nextQuestion(){cancelAdvance();abortTutor();vocabNear=null;draft=null;retrying=false;retryAfterWrong=false;vocabRetry=null;position++;if(isVocabMustTrainer()){const budget=vocabPlan&&vocabPlan.budget||(cfg.vocab&&cfg.vocab.answerBudget)||10;if(window.VocabMust&&window.VocabMust.portionDone(sessionAttempts,budget,position,queue.length)){if(!beginMustPortion(false))position=queue.length;}}else if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}focusAnswer();}
  function homeworkOpts(){
    const sessionGUnlocked=!!(window.Lesson31Pack?.sessionG?.().length)&&window.Lesson31Pack.sessionG().every(q=>records[q.id]?.seen);
    return {sessionGUnlocked,events:state.events};
@@ -3388,6 +3438,8 @@
    const back=pauseTarget(); // drops a trainerReturn left over from an earlier trainer queue
    showView(trainerReturn?'personal':back);
  };
+ const vocabFinish=$('#vocab-finish');
+ if(vocabFinish)vocabFinish.onclick=()=>openVocabSummary();
  const lettersPref=$('#pref-letters');
  if(lettersPref){lettersPref.checked=!!state.prefs.letters;lettersPref.onchange=()=>{state.prefs.letters=lettersPref.checked;state.prefs.lettersChosen=true;save();if(view==='practice')render();};}
  function issueContext(){

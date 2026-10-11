@@ -539,19 +539,85 @@
    if(sitting.legacy){u+=Number(sitting.legacy.sessionCorrect)||0;a+=Number(sitting.legacy.sessionAssisted)||0;}
    return {unaided:u,assisted:a,closed:u+a};
  }
+ function eventToken(e){
+   if(!e)return 0;
+   if(e.type==='retry_close')return 3;
+   if(e.type!=='answer')return 0;
+   if(e.idk||e.correct===false||e.hinted||e.peek||e.rule_peek)return 3;
+   if(e.near_miss)return 2;
+   if(e.correct)return 1;
+   return 0;
+ }
+ function tokenOf(rank){
+   if(rank>=3)return 'с подсказкой';
+   if(rank===2)return 'почти точно';
+   if(rank===1)return 'самостоятельно';
+   return 'Без ответа';
+ }
  function wordLine(state,sitting,card){
    sitting=sitting||emptySitting(0);
    const cardId=card&&(card.cardId||card.id);
    const lemma=card&&card.lemma;
-   if(sitting.legacy&&sitting.legacy.openIdk&&sitting.legacy.openIdk.cardId===cardId)return 'с подсказкой';
+   let rank=0;
+   if(sitting.legacy&&sitting.legacy.openIdk&&sitting.legacy.openIdk.cardId===cardId)rank=3;
    const events=((state&&state.events)||[]).filter(e=>e&&e.card_id===cardId&&inSitting(sitting,e));
-   if(events.some(e=>e.type==='retry_close'))return 'с подсказкой';
-   const ans=events.find(e=>e.type==='answer');
-   if(ans&&ans.correct&&!ans.idk&&(ans.hinted||ans.peek||ans.rule_peek))return 'с подсказкой';
-   if(ans&&ans.correct&&!ans.hinted&&!ans.idk&&!ans.rule_peek&&!ans.peek)return 'самостоятельно';
-   if((sitting.shown||[]).includes(lemma)&&!ans)return 'Без ответа';
-   if(!ans)return 'Без ответа';
+   for(const e of events){const t=eventToken(e);if(t>rank)rank=t;}
+   if(rank)return tokenOf(rank);
+   if((sitting.shown||[]).includes(lemma))return 'Без ответа';
    return 'Без ответа';
+ }
+ function pairOf(q){
+   if(!q)return {kk:'',ru:''};
+   const stim=String(q.stimulus||'');
+   const ans=String((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'');
+   if(String(q.title||'').includes('на казахский'))return {kk:ans,ru:stim};
+   return {kk:stim,ru:ans};
+ }
+ function whenPhrase(rep,records,now){
+   if(!rep)return '';
+   const r=(records&&records[rep.id])||{};
+   if(r.needsReview)return 'скоро';
+   const nr=Number(r.next_review);
+   if(!Number.isFinite(nr))return '';
+   const a=new Date(nr),b=new Date(Number(now)||0);
+   if(!Number.isFinite(a.getTime())||!Number.isFinite(b.getTime()))return '';
+   a.setHours(0,0,0,0);b.setHours(0,0,0,0);
+   const days=Math.round((a.getTime()-b.getTime())/86400000);
+   if(days<=0)return 'сегодня';
+   if(days===1)return 'завтра';
+   const n=Math.abs(days),x=n%100,y=n%10;
+   const w=x>10&&x<20?'дней':y===1?'день':y>=2&&y<=4?'дня':'дней';
+   return 'через '+n+' '+w;
+ }
+ function summaryRows(state,sitting,pool,core,now){
+   sitting=sitting||emptySitting(0);
+   const tally=recount(state,sitting);
+   const records=(state&&state.records)||{};
+   const H=historyIndex(state||{},pool||[],core);
+   const byLemma=new Map();
+   for(const q of pool||[]){const lem=lemmaKey(core,q);let list=byLemma.get(lem);if(!list)byLemma.set(lem,list=[]);list.push(q);}
+   const fresh=new Set(sitting.newLemmas||[]);
+   const rows=[];
+   const seen=new Set();
+   for(const lemma of sitting.shown||[]){
+     if(!lemma||seen.has(lemma))continue;
+     seen.add(lemma);
+     const cards=byLemma.get(lemma)||[];
+     const ids=new Set(cards.map(q=>q.id));
+     let rank=0;
+     const open=sitting.legacy&&sitting.legacy.openIdk;
+     if(open&&(open.lemma===lemma||ids.has(open.cardId)))rank=3;
+     for(const e of (state&&state.events)||[]){
+       if(!e||!inSitting(sitting,e)||!ids.has(e.card_id))continue;
+       const t=eventToken(e);if(t>rank)rank=t;
+     }
+     const token=rank?tokenOf(rank):'Без ответа';
+     const rep=cards.length?lemmaRepresentative(lemma,cards,state||{},records,H,core,now):null;
+     const face=rep||cards[0]||null;
+     const pair=pairOf(face);
+     rows.push({lemma,kk:pair.kk,ru:pair.ru,label:token==='самостоятельно'?'вспомнила сама':token,fresh:fresh.has(lemma),when:whenPhrase(rep,records,now)});
+   }
+   return {unaided:tally.unaided,assisted:tally.assisted,rows};
  }
  function portionDone(sessionAttempts,budget,position,queueLength){
    return Number(sessionAttempts)>=Number(budget)||Number(position)>=Number(queueLength);
@@ -605,6 +671,6 @@
    if(local&&local.mustUnfinished)return {action:'keep-local'};
    return {action:'reset'};
  }
- const api={TEXT,clone,emptySitting,emptyPlan,isMustTrainer,isSavedMust,lemmaKey,mustCounterText,idkNote,statusNote,learnerTextOk,recordsMiss,nearMissFeedbackHtml,findEvent,cardHasHistory,lemmaHasHistory,poolHasAnswerHistory,debtLemmas,planPortion,enforceGap,scheduleReturn,commitFirst,commitRetype,noteShown,noteRecent,recount,wordLine,portionDone,snapshot,restoreSaved,importPlan,retryFromAnswer};
+ const api={TEXT,clone,emptySitting,emptyPlan,isMustTrainer,isSavedMust,lemmaKey,mustCounterText,idkNote,statusNote,learnerTextOk,recordsMiss,nearMissFeedbackHtml,findEvent,cardHasHistory,lemmaHasHistory,poolHasAnswerHistory,debtLemmas,planPortion,enforceGap,scheduleReturn,commitFirst,commitRetype,noteShown,noteRecent,recount,wordLine,summaryRows,portionDone,snapshot,restoreSaved,importPlan,retryFromAnswer};
  if(node)module.exports=api;else root.VocabMust=api;
 })(typeof window!=='undefined'?window:globalThis);
