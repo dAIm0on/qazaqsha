@@ -672,10 +672,16 @@
    // r7 X3/step: on a cold start the v2 cards of this lesson are not installed yet, so the saved practice
    // («шаг 10 из 18») looked missing and «Начать / Продолжить» fell back to theory. Install them first.
    ensureV2(id);
-   const t=resumeTarget(id);
    const owned=!launchGate;let gate='nested';
-   if(owned){gate=guardLaunch(t.kind==='theory'?'theory:'+id:'course:'+id);if(gate==='blocked'||gate==='same'||gate==='nested')return;if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}practiceHold=null;}
+   if(owned){
+     const aim=resumeTarget(id);
+     gate=guardLaunch(aim.kind==='theory'?'theory:'+id:'course:'+id);
+     if(gate==='blocked'||gate==='same'||gate==='nested')return;
+     if(gate==='ok'||gate==='held'||gate==='damaged'){endLaunch(gate);return;}
+     practiceHold=null;
+   }
    try{
+   const t=resumeTarget(id);
    if(t.kind==='practice'&&restoreLessonPractice(id)){
      markLessonStarted(id,'practice');render();showView('practice');return;
    }
