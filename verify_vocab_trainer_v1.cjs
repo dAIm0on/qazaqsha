@@ -609,7 +609,7 @@ function runGapScreen(cards,sitting,queue){
     'const cfg=start.cfg, core=start.core, state=start.state, records=state.records;',
     'let mode="words", vocabRole="must", trainerReturn="vocab:must", queueEpoch=7, trainerEpoch=7;',
     'let position=0, queue=start.queue.slice(), practiceIds=queue.slice();',
-    'let vocabSitting=start.sitting, vocabPlan=start.plan, vocabClosed=[], vocabRetry=null, vocabPoolReady=false, vocabReturnScheduled=false;',
+    'let vocabSitting=start.sitting, vocabPlan=start.plan, vocabClosed=[], vocabRetry=null, vocabPoolReady=false, vocabReturnScheduled=false, vocabSummary=false, vocabNear=null, vocabCardHold=null;',
     'let sessionAttempts=0, sessionCorrect=0, sessionAssisted=0, sessionBlindFails=Object.create(null), sessionUnaided=Object.create(null);',
     'let draft=null, presented=null, checked=false, hinted=false, retrying=false, retryAfterWrong=false;',
     'let activeLesson=null, pathPracticeReturn=null, hwReturn=null, courseBlock=null;',
@@ -1246,7 +1246,7 @@ assert.equal(p5Skill.fsrs_log.rating,F.Rating.Hard,'P5-SKILL-LOG');
 assert.equal(pack.record.next_review,p5Skill.next_review,'P5-NEXT-REVIEW');
 assert.equal(p5Skill.needsReview,true,'P5-SKILL-NEEDS');
 assert.equal(p5Skill.correct_streak,1,'P5-SKILL-STREAK');
-assert.equal(VM.wordLine(packState,p5Sitting,{cardId:girl.id,lemma:'word:girl'}),'самостоятельно','P5-WORDLINE');
+assert.equal(VM.wordLine(packState,p5Sitting,{cardId:girl.id,lemma:'word:girl'}),'почти точно','P5-WORDLINE');
 assert.equal(packState.errors.length,0,'P5-COMMIT-ERRORS');
 const p5Kept=progress.migrate(packState);
 const keptEvent=p5Kept.events.find(e=>e.card_id===girl.id);
@@ -1329,5 +1329,424 @@ const go=p5Advance(false);
 assert.equal(go.delay(),400,'P5-AUTO-ARMED');
 go.fire()();
 assert.equal(go.moved(),true,'P5-AUTO');
+
+const p6Sit=()=>{const s=VM.emptySitting(1);s.sessions=['s'];return s;};
+const p6Ans=(cardId,patch)=>Object.assign({type:'answer',session_id:'s',presentation:0,card_id:cardId,correct:true,hinted:false,idk:0,peek:0,rule_peek:0,at:1},patch||{});
+VM.noteShown(p6Sit(),'word:a');
+const shownOnce=p6Sit();
+VM.noteShown(shownOnce,'word:a');
+VM.noteShown(shownOnce,'word:a');
+assert.deepEqual(shownOnce.shown,['word:a'],'P6-SHOWN-ONCE');
+const shownPlan=p6Sit();
+shownPlan.shown=['word:a'];
+const planOnly=VM.summaryRows(state(),shownPlan,[card('A','word:a'),card('C','word:c')],core,1000);
+assert.deepEqual(planOnly.rows.map(r=>r.lemma),['word:a'],'P6-SHOWN-NOT-PLAN');
+const worstState=state();
+const worstSit=p6Sit();
+worstSit.shown=['word:a'];
+worstSit.newLemmas=['word:a'];
+worstState.events=[
+  p6Ans('A',{presentation:0,correct:false,idk:1,hinted:true,at:1}),
+  {type:'retry_close',session_id:'s',presentation:0,card_id:'A',correct:true,hinted:true,at:2},
+  p6Ans('A',{presentation:1,correct:true,at:3}),
+  p6Ans('A',{presentation:2,correct:true,at:4})
+];
+assert.equal(VM.wordLine(worstState,worstSit,{cardId:'A',lemma:'word:a'}),'с подсказкой','P6-WORST');
+const worstRow=VM.summaryRows(worstState,worstSit,[card('A','word:a')],core,1000).rows[0];
+assert.equal(worstRow.label,'с подсказкой','P6-WORST');
+assert.equal(worstRow.fresh,true,'P6-NEW');
+const nearState=state();
+const nearSit=p6Sit();
+nearSit.shown=['word:a'];
+nearSit.sessions=['p1','p2'];
+nearState.events=[p6Ans('A',{session_id:'p1',near_miss:1,at:1})];
+assert.equal(VM.wordLine(nearState,nearSit,{cardId:'A',lemma:'word:a'}),'почти точно','P6-NEAR');
+const nearModel=VM.summaryRows(nearState,nearSit,[card('A','word:a')],core,1000);
+assert.equal(nearModel.rows[0].label,'почти точно','P6-NEAR');
+assert.equal(nearModel.unaided,1,'P6-TALLY');
+assert.equal(nearModel.assisted,0,'P6-TALLY');
+const cleanModel=VM.summaryRows(state(),Object.assign(p6Sit(),{shown:['word:b'],sessions:['s']}),[card('B','word:b')],core,1000);
+cleanModel; // shown only, no events
+const cleanState=state();
+const cleanSit=p6Sit();
+cleanSit.shown=['word:b'];
+cleanState.events=[p6Ans('B',{at:1})];
+const cleanRow=VM.summaryRows(cleanState,cleanSit,[card('B','word:b')],core,1000);
+assert.equal(cleanRow.rows[0].label,'вспомнила сама','P6-TALLY');
+assert.equal(VM.wordLine(cleanState,cleanSit,{cardId:'B',lemma:'word:b'}),'самостоятельно','P6-TALLY');
+assert.equal(cleanRow.unaided,1,'P6-TALLY');
+const p6LegacySit=p6Sit();
+p6LegacySit.shown=['word:h'];
+p6LegacySit.legacy={sessionCorrect:0,sessionAssisted:0,boundaryAt:0,openIdk:{cardId:'H',lemma:'word:h'}};
+const legacyModel=VM.summaryRows(state(),p6LegacySit,[card('H','word:h')],core,1000);
+assert.equal(VM.wordLine(state(),p6LegacySit,{cardId:'H',lemma:'word:h'}),'с подсказкой','P6-LEGACY');
+assert.equal(legacyModel.rows[0].label,'с подсказкой','P6-LEGACY');
+assert.equal(legacyModel.rows[0].fresh,false,'P6-LEGACY');
+assert.equal(legacyModel.assisted,0,'P6-LEGACY');
+assert.equal(legacyModel.unaided,0,'P6-LEGACY');
+const cloudSit=p6Sit();
+cloudSit.sessions=['local'];
+cloudSit.shown=['word:a'];
+const cloudState=state();
+cloudState.events=[p6Ans('A',{session_id:'cloud',correct:true,at:1})];
+assert.equal(VM.wordLine(cloudState,cloudSit,{cardId:'A',lemma:'word:a'}),'Без ответа','P6-CLOUD');
+assert.equal(VM.summaryRows(cloudState,cloudSit,[card('A','word:a')],core,1000).rows[0].label,'Без ответа','P6-CLOUD');
+assert.equal(VM.recount(cloudState,cloudSit).closed,0,'P6-CLOUD');
+function p6When(id,lemma,record,events,pool,now){
+  const st=state();
+  st.records[id]=record;
+  st.events=events||[];
+  const sit=VM.emptySitting(now);
+  sit.sessions=['s'];
+  sit.shown=[lemma];
+  return VM.summaryRows(st,sit,pool,core,now).rows[0].when;
+}
+const soonNow=new Date(2026,9,11,15,0,0).getTime();
+const soonLater=new Date(2026,9,21,15,0,0).getTime();
+assert.equal(p6When('soon','word:soon',{review_count:1,needsReview:true,next_review:soonLater,last_answer:soonNow-86400000},[{type:'answer',card_id:'soon',at:soonNow-86400000,correct:true}],[card('soon','word:soon')],soonNow),'скоро','P6-WHEN-SOON');
+const dayNow6=new Date(2026,9,11,15,0,0).getTime();
+const tomorrow6=new Date(2026,9,12,9,0,0).getTime();
+const plus3=new Date(2026,9,14,9,0,0).getTime();
+assert.equal(p6When('day','word:day',{review_count:1,needsReview:false,next_review:tomorrow6,last_answer:dayNow6-86400000},[{type:'answer',card_id:'day',at:dayNow6-86400000,correct:true}],[card('day','word:day')],dayNow6),'завтра','P6-WHEN-DAY');
+assert.equal(p6When('day3','word:day3',{review_count:1,needsReview:false,next_review:plus3,last_answer:dayNow6-86400000},[{type:'answer',card_id:'day3',at:dayNow6-86400000,correct:true}],[card('day3','word:day3')],dayNow6),'через 3 дня','P6-WHEN-DAY');
+assert.equal(p6When('none','word:none',{review_count:1,needsReview:false,last_answer:dayNow6-86400000},[{type:'answer',card_id:'none',at:dayNow6-86400000,correct:true}],[card('none','word:none')],dayNow6),'','P6-WHEN-NONE');
+const buryNow=new Date(2026,9,11,15,0,0).getTime();
+const buryTomorrow=new Date(2026,9,12,9,0,0).getTime();
+const buryLater=new Date(2026,9,16,9,0,0).getTime();
+const buryKk=dirCard('bury-kk','word:bury','production');
+const buryRu=dirCard('bury-ru','word:bury','recognition');
+const buryState=state();
+buryState.records[buryKk.id]={review_count:1,needsReview:false,next_review:buryTomorrow,last_answer:buryNow};
+buryState.records[buryRu.id]={review_count:0,needsReview:false,next_review:buryLater};
+buryState.events=[{type:'answer',card_id:buryKk.id,at:buryNow,correct:true}];
+const burySit=VM.emptySitting(buryNow);
+burySit.sessions=['s'];
+burySit.shown=['word:bury'];
+assert.equal(VM.summaryRows(buryState,burySit,[buryKk,buryRu],core,buryNow).rows[0].when,'завтра','P6-WHEN-BURY');
+const rowSit=p6Sit();
+rowSit.shown=['word:a','word:a','word:b'];
+const rowPool=[card('A','word:a'),card('B','word:b'),card('C','word:c')];
+for(let i=0;i<28;i++){rowSit.shown.push('word:n'+i);rowPool.push(card('N'+i,'word:n'+i));}
+const rowModel=VM.summaryRows(state(),rowSit,rowPool,core,1000);
+assert.equal(rowModel.rows.length,30,'P6-ROWS');
+assert.deepEqual(rowModel.rows.map(r=>r.lemma).slice(0,2),['word:a','word:b'],'P6-ROWS');
+assert.ok(!rowModel.rows.some(r=>r.lemma==='word:c'),'P6-ROWS');
+const keptShown=rowSit.shown.slice();
+const p6Snap=VM.snapshot({plan:VM.emptyPlan(10),sitting:rowSit,retry:null,closed:[],unaided:{},blindFails:{}});
+const p6Restored=VM.restoreSaved({mode:'words',trainerReturn:'vocab:must',queue:['A'],position:0,queueEpoch:'s',vocab:p6Snap},state(),cfg,5);
+assert.deepEqual(p6Restored.vocab.sitting.shown,keptShown,'P6-ROWS');
+const shownBefore=p6Restored.vocab.sitting.shown.length;
+VM.noteShown(p6Restored.vocab.sitting,'word:a');
+assert.equal(p6Restored.vocab.sitting.shown.length,shownBefore,'P6-ROWS');
+const paintSrc=app.slice(app.indexOf('function paintVocabSummary'),app.indexOf('function continueVocabSummary'));
+const contSrc=app.slice(app.indexOf('function continueVocabSummary'),app.indexOf('function endMustToTrainers'));
+const endSrc=app.slice(app.indexOf('function endMustToTrainers'),app.indexOf('function openVocabSummary'));
+const openSrc=app.slice(app.indexOf('function openVocabSummary'),app.indexOf('function captureMustLive'));
+assert.ok(paintSrc.indexOf('vocab-summary-continue')<paintSrc.indexOf('vocab-summary-list'),'P6-BUTTONS-ABOVE');
+assert.ok(paintSrc.includes('<h2>Итог</h2>'),'P6-TEXT');
+assert.ok(paintSrc.includes('Самостоятельно: '), 'P6-TEXT');
+assert.ok(paintSrc.includes('С подсказкой: '), 'P6-TEXT');
+assert.ok(paintSrc.includes('Когда вернётся: '), 'P6-TEXT');
+assert.ok(!/интервал|FSRS|из N|закончились|на сегодня всё|retrieval|Again/.test(paintSrc+contSrc+endSrc+openSrc),'P6-TEXT');
+assert.ok(contSrc.includes('render()'),'P6-CONTINUE-SRC');
+assert.ok(!contSrc.includes('resetCounts'),'P6-CONTINUE-SRC');
+assert.ok(!contSrc.includes('beginMustPortion(true)'),'P6-CONTINUE-SRC');
+assert.ok(!/commitFirst|noteShown/.test(paintSrc+contSrc+endSrc+openSrc),'P6-NO-GRADE');
+const head=indexHtml.slice(indexHtml.indexOf('class="practice-head"'),indexHtml.indexOf('id="session-position"'));
+assert.ok(head.includes('id="vocab-finish"')&&head.includes('practice-head-tools')&&head.includes('>Закончить</button>'),'P6-FINISH-BTN');
+assert.ok(!head.includes('secondary-actions'),'P6-FINISH-BTN');
+const dockAt=app.indexOf('id="practice-dock"');
+const dock=app.slice(dockAt,dockAt+1400);
+assert.ok(dock.includes('secondary-actions')&&!dock.includes('vocab-finish'),'P6-FINISH-BTN');
+const tools=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8').split('.practice-head-tools{')[1].split('}')[0];
+assert.ok(tools&&!/#|rgb|hsl/.test(tools),'P6-COLOR');
+const rendSrc=app.slice(app.indexOf('function render()'),app.indexOf('function hintEvent'));
+assert.ok(rendSrc.includes('vocabNear')&&rendSrc.includes('nearMissFeedbackHtml')&&!rendSrc.includes('advanceTimer=setTimeout'),'P6-CONTINUE-SRC');
+
+function p6fHarness(){
+  const showSrc=app.slice(app.indexOf('function showView(next){'),app.indexOf('function shellTab(next){'));
+  const openSrc=app.slice(app.indexOf('function openVocabSummary(){'),app.indexOf('function rememberVocabCard(){'));
+  const contSrcF=app.slice(app.indexOf('function continueVocabSummary(){'),app.indexOf('function endMustToTrainers(){'));
+  const body=[
+    'const ORIGIN_VIEWS=["today","learn","path","homework","personal","exam","review","vocabulary","materials","morph"];',
+    'const state={events:[],grammarPath:null};',
+    'const window={TutorUI:null,PersonalTrainers:null,MorphTrainer:null};',
+    'const document={body:{dataset:{},classList:{toggle(){}}},querySelectorAll(){return [];}};',
+    'const history={state:null,replaceState(s){history.state=s;}};',
+    'let vocabSummary=false, vocabCardHold=null, view="practice", checked=false, hinted=false, rulePeeked=false, elapsedMs=1800, timerSince=null, advanceTimer=null;',
+    'let position=0, queue=["hw1-1-kk","hw1-2-kk"], trainerReturn="vocab:must", queueEpoch=1, trainerEpoch=1, mode="words", vocabSitting={}, typingFocus=false;',
+    'let hwLesson=null, courseBlock=null, sessionOrigin=null, resets=0;',
+    'const byId=new Map([["hw1-1-kk",{id:"hw1-1-kk"}],["hw1-2-kk",{id:"hw1-2-kk"}]]);',
+    'function isVocabMustTrainer(){return true;}',
+    'function elapsed(){return elapsedMs;}',
+    'function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}',
+    'function pauseTimer(){elapsedMs=elapsed();timerSince=null;cancelAdvance();}',
+    'function hintEvent(q,kind){state.events.push({type:"hint",card_id:q.id,hint_kind:kind});hinted=true;}',
+    'function captureDraft(){} function refillCardDraft(){} function renderStats(){} function activateCard(){} function save(){} function syncKbInset(){} function markPlace(){} function shellTab(){return "today";}',
+    'function $$(sel){return [];}',
+    'const learning={render(){}}; const dashboard={render(){}};',
+    'function renderMaterials(){} function renderExam(){} function renderHomework(){} function renderPath(){}',
+    'function render(){if(vocabSummary&&isVocabMustTrainer())return; resets++; checked=false; hinted=false; rulePeeked=false; elapsedMs=0;}',
+    'function rememberVocabCard(){vocabCardHold={cardId:queue[position]||null,checked:!!checked,hinted:!!hinted,rulePeeked:!!rulePeeked,elapsedMs:elapsed()};}',
+    openSrc, contSrcF, showSrc,
+    'function boot(extra){state.events.length=0; vocabSummary=false; vocabCardHold=null; view="practice"; checked=false; hinted=false; rulePeeked=false; elapsedMs=1800; position=0; queue=["hw1-1-kk","hw1-2-kk"]; resets=0; advanceTimer=null; if(extra&&extra.checked)checked=true; if(extra&&extra.hinted)hinted=true;}',
+    'function arm(){advanceTimer=setTimeout(function(){position=1;checked=false;advanceTimer=null;},400);}',
+    'function fire(){if(!advanceTimer)return; clearTimeout(advanceTimer); position=1; checked=false; advanceTimer=null;}',
+    'function snap(){return {events:state.events.map(function(e){return e.card_id+":"+e.hint_kind;}), hinted:hinted, checked:checked, rulePeeked:rulePeeked, elapsedMs:elapsedMs, position:position, resets:resets, advance:advanceTimer};}',
+    'return {boot:boot, open:openVocabSummary, show:showView, cont:continueVocabSummary, snap:snap, arm:arm, fire:fire};'
+  ].join('\n');
+  return new Function(body)();
+}
+const p6f=p6fHarness();
+for(const dest of ['vocabulary','learn','review']){
+  p6f.boot();
+  p6f.open();
+  p6f.show(dest);
+  const left=p6f.snap();
+  assert.deepEqual(left.events,[],'P6F-LEAVE');
+  assert.equal(left.hinted,false,'P6F-LEAVE');
+  assert.equal(left.resets,0,'P6F-LEAVE');
+  p6f.show('practice');
+  const back=p6f.snap();
+  assert.deepEqual(back.events,[],'P6F-LEAVE');
+  assert.equal(back.hinted,false,'P6F-LEAVE');
+  assert.equal(p5Rate({result:{correct:true,parts:[true]},hinted:back.hinted,rulePeeked:back.rulePeeked}),F.Rating.Good,'P6F-LEAVE');
+}
+p6f.boot({checked:true});
+p6f.arm();
+p6f.open();
+p6f.fire();
+p6f.show('vocabulary');
+const auto=p6f.snap();
+assert.equal(auto.advance,null,'P6F-NO-AUTO');
+assert.equal(auto.position,0,'P6F-NO-AUTO');
+assert.deepEqual(auto.events,[],'P6F-NO-AUTO');
+assert.equal(auto.checked,true,'P6F-NO-AUTO');
+assert.equal(auto.resets,0,'P6F-NO-AUTO');
+p6f.boot();
+p6f.show('vocabulary');
+const bare=p6f.snap();
+assert.deepEqual(bare.events,['hw1-1-kk:reference'],'P6F-CONTROL');
+assert.equal(bare.hinted,true,'P6F-CONTROL');
+function p6fKeep(kind){
+  const rememberSrc=app.slice(app.indexOf('function rememberVocabCard(){'),app.indexOf('function captureMustLive(){'));
+  const tailStart=app.lastIndexOf('if(isVocabMustTrainer()&&vocabNear&&queue[position]===vocabNear.cardId');
+  const tailEnd=app.indexOf('function hintEvent',tailStart);
+  let tail=app.slice(tailStart,tailEnd).trim();
+  assert.ok(tail.endsWith('}'),'P6F-KEEP');
+  tail=tail.slice(0,tail.lastIndexOf('}')).trim();
+  const nodes={
+    '#hint-box':{innerHTML:kind==='rule'?'правило':'подсказка',hidden:false},
+    '#hint-button':{disabled:kind!=='rule'},
+    '#rule-button':{disabled:kind==='rule'},
+    '#feedback':{innerHTML:'',hidden:true,className:'feedback'},
+    '#check-button':{hidden:false},
+    '#next-button':{hidden:true}
+  };
+  const body=[
+    'let checked=false, hinted='+(kind==='hint'?'true':'false')+', rulePeeked='+(kind==='rule'?'true':'false')+', elapsedMs=3200, position=0;',
+    'let queueEpoch=1;',
+    'const queue=["hw1-1-kk"];',
+    'let vocabCardHold=null, vocabNear=null, vocabRetry=null;',
+    'const window={VocabMust:null};',
+    'function isVocabMustTrainer(){return true;}',
+    'function $(sel){return nodes[sel]||null;}',
+    'function elapsed(){return elapsedMs;}',
+    'function esc(s){return String(s);}',
+    rememberSrc,
+    'rememberVocabCard();',
+    'checked=false; hinted=false; rulePeeked=false; elapsedMs=0;',
+    'nodes["#hint-box"]={innerHTML:"",hidden:true};',
+    'nodes["#hint-button"]={disabled:false};',
+    'nodes["#rule-button"]={disabled:false};',
+    'nodes["#feedback"]={innerHTML:"",hidden:true,className:"feedback"};',
+    'nodes["#check-button"]={hidden:false};',
+    'nodes["#next-button"]={hidden:true};',
+    tail,
+    'return {checked:checked, hinted:hinted, rulePeeked:rulePeeked, elapsedMs:elapsedMs, hintDisabled:nodes["#hint-button"].disabled, ruleDisabled:nodes["#rule-button"].disabled, hintHtml:nodes["#hint-box"].innerHTML, hintHidden:nodes["#hint-box"].hidden};'
+  ].join('\n');
+  return new Function('nodes',body)(nodes);
+}
+const keptHint=p6fKeep('hint');
+assert.equal(keptHint.hinted,true,'P6F-KEEP');
+assert.equal(keptHint.rulePeeked,false,'P6F-KEEP');
+assert.equal(keptHint.elapsedMs,3200,'P6F-KEEP');
+assert.equal(keptHint.hintDisabled,true,'P6F-KEEP');
+assert.equal(keptHint.hintHidden,false,'P6F-KEEP');
+assert.equal(keptHint.hintHtml,'подсказка','P6F-KEEP');
+assert.equal(p5Rate({result:{correct:true,parts:[true]},hinted:keptHint.hinted,rulePeeked:false}),F.Rating.Again,'P6F-KEEP');
+const keepQ=card('keep','word:keep');
+const keepSt=state();
+const keepSit=VM.emptySitting(1);
+keepSit.sessions=['s'];
+keepSit.shown=['word:keep'];
+VM.commitFirst({state:keepSt,records:keepSt.records,q:keepQ,now:10,sessionId:'s',presentation:0,kind:'assisted',answers:['keepк'],elapsed:keptHint.elapsedMs,core,observe:()=>[],queue:['keep'],position:0,pool:[keepQ],plan:{budget:9,nNew:1,baseLen:1,newLemmas:['word:keep']},sitting:keepSit,rating:F.Rating.Again,errors:[],result:{correct:true,parts:[true]},budget:9,minGap:2,appearCap:3,hinted:true,recall:true});
+assert.equal(VM.summaryRows(keepSt,keepSit,[keepQ],core,10).rows[0].label,'с подсказкой','P6F-KEEP');
+const keptRule=p6fKeep('rule');
+assert.equal(keptRule.rulePeeked,true,'P6F-PEEK');
+assert.equal(keptRule.ruleDisabled,true,'P6F-PEEK');
+assert.equal(keptRule.elapsedMs,3200,'P6F-PEEK');
+assert.equal(keptRule.rulePeeked?1:0,1,'P6F-PEEK');
+assert.equal(p5Rate({result:{correct:true,parts:[true]},hinted:false,rulePeeked:keptRule.rulePeeked}),F.Rating.Again,'P6F-PEEK');
+assert.ok(app.includes('rule_peek:rulePeeked?1:0'),'P6F-PEEK');
+const peekSt=state();
+const peekSit=VM.emptySitting(1);
+peekSit.sessions=['s'];
+peekSit.shown=['word:keep'];
+peekSt.events=[{type:'answer',card_id:'keep',at:10,correct:true,rule_peek:1,session_id:'s'}];
+assert.equal(VM.summaryRows(peekSt,peekSit,[keepQ],core,10).rows[0].label,'с подсказкой','P6F-PEEK');
+const pairFn=fs.readFileSync(path.join(__dirname,'vocab-must.js'),'utf8');
+const pairBody=pairFn.slice(pairFn.indexOf('function pairOf'),pairFn.indexOf('function whenPhrase'));
+assert.ok(pairBody.includes('answerLang')&&!pairBody.includes('на казахский'),'P6F-PAIR-SRC');
+function p6fRow(q){
+  const sit=VM.emptySitting(1);
+  sit.shown=[core.lemmaKey(q)];
+  return VM.summaryRows(state(),sit,[q],core,1).rows[0];
+}
+const pairIds=['learn-word-2','v2-4-1-vocab-also-kk-set','v2-4-2-vocab-qalaisyn-kk-form-1','hw1-1-kk-rev','hw1-1-ru'];
+for(const id of pairIds)assert.ok(product.pool.some(q=>q.id===id),'P6F-PAIR '+id);
+for(const q of product.pool){
+  const lang=core.answerLang(q,0);
+  const stim=String(q.stimulus||'');
+  const ans=String((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'');
+  const row=p6fRow(q);
+  if(lang==='kk'){
+    assert.equal(String(row.kk),ans,'P6F-PAIR '+q.id);
+    assert.equal(String(row.ru),stim,'P6F-PAIR '+q.id);
+  }else{
+    assert.equal(String(row.kk),stim,'P6F-PAIR '+q.id);
+    assert.equal(String(row.ru),ans,'P6F-PAIR '+q.id);
+  }
+}
+for(const id of pairIds){
+  const q=product.pool.find(item=>item.id===id);
+  const row=p6fRow(q);
+  assert.ok(row&&(row.kk||row.ru),'P6F-PAIR '+id);
+}
+
+// P6F-HOLD-* / P6F-AUTO-RESUME: the summary snapshot is one-shot, scoped to one showing, and Продолжить keeps the PR-5 auto-advance.
+function p6cHarness(){
+  const showSrc=app.slice(app.indexOf('function showView(next){'),app.indexOf('function shellTab(next){'));
+  const openSrc=app.slice(app.indexOf('function openVocabSummary(){'),app.indexOf('function rememberVocabCard(){'));
+  const contSrc=app.slice(app.indexOf('function continueVocabSummary(){'),app.indexOf('function endMustToTrainers(){'));
+  const holdSrc=app.slice(app.indexOf('function rememberVocabCard(){'),app.indexOf('function captureMustLive(){'));
+  const rendSrc=app.slice(app.indexOf('function render(){'),app.indexOf('function hintEvent'));
+  const holdLine=rendSrc.split('\n').find(l=>l.includes('vocabCardHold&&'));
+  assert.ok(holdLine,'P6F-HOLD-SRC');
+  const body=[
+    'const ORIGIN_VIEWS=["today","learn","path","homework","personal","exam","review","vocabulary","materials","morph"];',
+    'const state={events:[],grammarPath:null};',
+    'const window={TutorUI:null,PersonalTrainers:null,MorphTrainer:null,VocabMust:null};',
+    'const document={body:{dataset:{},classList:{toggle(){}}},querySelectorAll(){return [];}};',
+    'const history={state:null,replaceState(s){history.state=s;}};',
+    'const timers=[]; function setTimeout(fn,ms){timers.push({fn:fn,ms:ms});return timers.length;} function clearTimeout(id){if(id)timers[id-1]=null;}',
+    'let nodes={};',
+    'function fresh(){nodes={"#hint-box":{innerHTML:"",hidden:true},"#hint-button":{disabled:false},"#rule-button":{disabled:false},"#feedback":{innerHTML:"",hidden:true,className:"feedback"},"#check-button":{hidden:false},"#next-button":{hidden:true}};}',
+    'function $(sel){return nodes[sel]||null;}',
+    'let vocabSummary=false, vocabCardHold=null, vocabNear=null, vocabRetry=null, view="practice", checked=false, hinted=false, rulePeeked=false, elapsedMs=0, timerSince=null, advanceTimer=null, mustOn=true;',
+    'let position=0, queue=["hw1-1-kk","hw1-2-kk"], trainerReturn="vocab:must", queueEpoch=1, trainerEpoch=1, mode="words", vocabSitting={}, typingFocus=false;',
+    'let hwLesson=null, courseBlock=null, sessionOrigin=null, resets=0;',
+    'const byId=new Map([["hw1-1-kk",{id:"hw1-1-kk"}],["hw1-2-kk",{id:"hw1-2-kk"}]]);',
+    'function isVocabMustTrainer(){return mustOn;}',
+    'function elapsed(){return elapsedMs;}',
+    'function esc(s){return String(s);}',
+    'function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}',
+    'function pauseTimer(){elapsedMs=elapsed();timerSince=null;cancelAdvance();}',
+    'function hintEvent(q,kind){state.events.push({type:"hint",card_id:q.id,hint_kind:kind});hinted=true;}',
+    'function captureDraft(){} function refillCardDraft(){} function renderStats(){} function activateCard(){} function save(){} function syncKbInset(){} function markPlace(){} function shellTab(){return "today";}',
+    'function $$(sel){return [];}',
+    'const learning={render(){}}; const dashboard={render(){}};',
+    'function renderMaterials(){} function renderExam(){} function renderHomework(){} function renderPath(){}',
+    'function render(){if(vocabSummary&&isVocabMustTrainer())return;',
+    holdLine,
+    ' resets++; pauseTimer(); elapsedMs=0; checked=false; hinted=false; rulePeeked=false; fresh();',
+    ' if(isVocabMustTrainer()&&vocabNear&&queue[position]===vocabNear.cardId){checked=true;nodes["#check-button"].hidden=true;nodes["#next-button"].hidden=false;}',
+    ' resumeVocabCard();}',
+    'function nextQuestion(){cancelAdvance();vocabNear=null;vocabCardHold=null;position++;render();}',
+    holdSrc, openSrc, contSrc, showSrc,
+    'function boot(extra){extra=extra||{};state.events.length=0;timers.length=0;vocabSummary=false;vocabCardHold=null;vocabNear=null;view="practice";mustOn=true;queueEpoch=1;trainerEpoch=1;position=0;queue=extra.queue||["hw1-1-kk","hw1-2-kk"];resets=0;advanceTimer=null;fresh();checked=!!extra.checked;hinted=!!extra.hinted;rulePeeked=false;elapsedMs=extra.elapsed||1800;if(hinted){nodes["#hint-box"]={innerHTML:"подсказка",hidden:false};nodes["#hint-button"].disabled=true;}}',
+    'function arm(){advanceTimer=setTimeout(function(){advanceTimer=null;nextQuestion();},400);}',
+    'function pending(){return timers.filter(Boolean);}',
+    'function runPending(){const t=pending();timers.length=0;t.forEach(function(x){x.fn();});}',
+    'function snap(){return {events:state.events.map(function(e){return e.card_id+":"+e.hint_kind;}),hinted:hinted,checked:checked,rulePeeked:rulePeeked,elapsedMs:elapsedMs,position:position,resets:resets,hold:vocabCardHold,advance:advanceTimer,pending:pending().map(function(t){return t.ms;}),hintBox:!nodes["#hint-box"].hidden,next:!nodes["#next-button"].hidden,check:!nodes["#check-button"].hidden};}',
+    'function set(k,v){if(k==="hinted"){hinted=v;nodes["#hint-box"]={innerHTML:"подсказка",hidden:false};nodes["#hint-button"].disabled=true;}else if(k==="near"){vocabNear={cardId:queue[position],expected:"x"};checked=true;nodes["#check-button"].hidden=true;nodes["#next-button"].hidden=false;}else if(k==="epoch")queueEpoch=v;else if(k==="position")position=v;else if(k==="must")mustOn=v;else if(k==="summary")vocabSummary=v;}',
+    'return {boot:boot,open:openVocabSummary,cont:continueVocabSummary,show:showView,render:render,snap:snap,arm:arm,runPending:runPending,set:set};'
+  ].join('\n');
+  return new Function(body)();
+}
+const p6c=p6cHarness();
+// restore once → the live card changes → a later render does not roll it back
+p6c.boot();
+p6c.open();
+p6c.cont();
+let once=p6c.snap();
+assert.equal(once.hold,null,'P6F-HOLD-ONCE');
+p6c.set('near');
+p6c.render();
+once=p6c.snap();
+assert.equal(once.checked,true,'P6F-HOLD-ONCE');
+assert.equal(once.next,true,'P6F-HOLD-ONCE');
+assert.equal(once.check,false,'P6F-HOLD-ONCE');
+// restored card → hint → Словарь → back: hint kept, no re-render, answer stays assisted
+p6c.boot();
+p6c.open();
+p6c.cont();
+const r0=p6c.snap().resets;
+p6c.set('hinted',true);
+p6c.show('vocabulary');
+p6c.show('practice');
+once=p6c.snap();
+assert.equal(once.resets,r0,'P6F-HOLD-ONCE');
+assert.equal(once.hinted,true,'P6F-HOLD-ONCE');
+assert.equal(once.hintBox,true,'P6F-HOLD-ONCE');
+assert.equal(p5Rate({result:{correct:true,parts:[true]},hinted:once.hinted,rulePeeked:once.rulePeeked}),F.Rating.Again,'P6F-HOLD-ONCE');
+// leaving the open summary still keeps the snapshot until the card is shown again (P6F-LEAVE path)
+p6c.boot({hinted:true});
+p6c.open();
+p6c.show('vocabulary');
+assert.ok(p6c.snap().hold,'P6F-HOLD-ONCE');
+p6c.show('practice');
+once=p6c.snap();
+assert.equal(once.hold,null,'P6F-HOLD-ONCE');
+assert.equal(once.hinted,true,'P6F-HOLD-ONCE');
+assert.deepEqual(once.events,[],'P6F-HOLD-ONCE');
+// another portion / another place / another trainer with the same cardId never gets the snapshot
+for(const [k,v] of [['epoch',2],['position',2],['must',false]]){
+  p6c.boot({hinted:true,elapsed:3200,queue:['hw1-1-kk','hw1-2-kk','hw1-1-kk']});
+  p6c.open();
+  p6c.set('summary',false);
+  p6c.set(k,v);
+  p6c.render();
+  const other=p6c.snap();
+  assert.equal(other.hold,null,'P6F-HOLD-SCOPE '+k);
+  assert.equal(other.hinted,false,'P6F-HOLD-SCOPE '+k);
+  assert.equal(other.hintBox,false,'P6F-HOLD-SCOPE '+k);
+  assert.equal(other.elapsedMs,0,'P6F-HOLD-SCOPE '+k);
+}
+assert.ok(app.slice(app.indexOf('function nextQuestion(){'),app.indexOf('function homeworkOpts(){')).includes('vocabCardHold=null'),'P6F-HOLD-SCOPE');
+// fully correct → Закончить within 400 ms → Продолжить → auto-advance as in PR-5
+p6c.boot({checked:true});
+p6c.arm();
+p6c.open();
+assert.equal(p6c.snap().pending.length,0,'P6F-AUTO-RESUME');
+p6c.cont();
+const ar=p6c.snap();
+assert.equal(ar.checked,true,'P6F-AUTO-RESUME');
+assert.deepEqual(ar.pending,[400],'P6F-AUTO-RESUME');
+assert.equal(ar.position,0,'P6F-AUTO-RESUME');
+p6c.runPending();
+assert.equal(p6c.snap().position,1,'P6F-AUTO-RESUME');
+assert.equal(p6c.snap().checked,false,'P6F-AUTO-RESUME');
+// no auto-advance was planned (near-miss / Дальше already waiting) → Продолжить plans none
+p6c.boot({checked:true});
+p6c.open();
+p6c.cont();
+assert.deepEqual(p6c.snap().pending,[],'P6F-AUTO-RESUME');
+assert.equal(p6c.snap().position,0,'P6F-AUTO-RESUME');
+// unanswered card → Продолжить never auto-advances
+p6c.boot();
+p6c.open();
+p6c.cont();
+assert.deepEqual(p6c.snap().pending,[],'P6F-AUTO-RESUME');
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');
