@@ -609,7 +609,7 @@ function runGapScreen(cards,sitting,queue){
     'const cfg=start.cfg, core=start.core, state=start.state, records=state.records;',
     'let mode="words", vocabRole="must", trainerReturn="vocab:must", queueEpoch=7, trainerEpoch=7;',
     'let position=0, queue=start.queue.slice(), practiceIds=queue.slice();',
-    'let vocabSitting=start.sitting, vocabPlan=start.plan, vocabClosed=[], vocabRetry=null, vocabPoolReady=false, vocabReturnScheduled=false, vocabSummary=false, vocabNear=null;',
+    'let vocabSitting=start.sitting, vocabPlan=start.plan, vocabClosed=[], vocabRetry=null, vocabPoolReady=false, vocabReturnScheduled=false, vocabSummary=false, vocabNear=null, vocabCardHold=null;',
     'let sessionAttempts=0, sessionCorrect=0, sessionAssisted=0, sessionBlindFails=Object.create(null), sessionUnaided=Object.create(null);',
     'let draft=null, presented=null, checked=false, hinted=false, retrying=false, retryAfterWrong=false;',
     'let activeLesson=null, pathPracticeReturn=null, hwReturn=null, courseBlock=null;',
@@ -1462,5 +1462,165 @@ const tools=fs.readFileSync(path.join(__dirname,'theme-redesign.css'),'utf8').sp
 assert.ok(tools&&!/#|rgb|hsl/.test(tools),'P6-COLOR');
 const rendSrc=app.slice(app.indexOf('function render()'),app.indexOf('function hintEvent'));
 assert.ok(rendSrc.includes('vocabNear')&&rendSrc.includes('nearMissFeedbackHtml')&&!rendSrc.includes('advanceTimer=setTimeout'),'P6-CONTINUE-SRC');
+
+function p6fHarness(){
+  const showSrc=app.slice(app.indexOf('function showView(next){'),app.indexOf('function shellTab(next){'));
+  const openSrc=app.slice(app.indexOf('function openVocabSummary(){'),app.indexOf('function rememberVocabCard(){'));
+  const contSrcF=app.slice(app.indexOf('function continueVocabSummary(){'),app.indexOf('function endMustToTrainers(){'));
+  const body=[
+    'const ORIGIN_VIEWS=["today","learn","path","homework","personal","exam","review","vocabulary","materials","morph"];',
+    'const state={events:[],grammarPath:null};',
+    'const window={TutorUI:null,PersonalTrainers:null,MorphTrainer:null};',
+    'const document={body:{dataset:{},classList:{toggle(){}}},querySelectorAll(){return [];}};',
+    'const history={state:null,replaceState(s){history.state=s;}};',
+    'let vocabSummary=false, vocabCardHold=null, view="practice", checked=false, hinted=false, rulePeeked=false, elapsedMs=1800, timerSince=null, advanceTimer=null;',
+    'let position=0, queue=["hw1-1-kk","hw1-2-kk"], trainerReturn="vocab:must", queueEpoch=1, trainerEpoch=1, mode="words", vocabSitting={}, typingFocus=false;',
+    'let hwLesson=null, courseBlock=null, sessionOrigin=null, resets=0;',
+    'const byId=new Map([["hw1-1-kk",{id:"hw1-1-kk"}],["hw1-2-kk",{id:"hw1-2-kk"}]]);',
+    'function isVocabMustTrainer(){return true;}',
+    'function elapsed(){return elapsedMs;}',
+    'function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}',
+    'function pauseTimer(){elapsedMs=elapsed();timerSince=null;cancelAdvance();}',
+    'function hintEvent(q,kind){state.events.push({type:"hint",card_id:q.id,hint_kind:kind});hinted=true;}',
+    'function captureDraft(){} function refillCardDraft(){} function renderStats(){} function activateCard(){} function save(){} function syncKbInset(){} function markPlace(){} function shellTab(){return "today";}',
+    'function $$(sel){return [];}',
+    'const learning={render(){}}; const dashboard={render(){}};',
+    'function renderMaterials(){} function renderExam(){} function renderHomework(){} function renderPath(){}',
+    'function render(){if(vocabSummary&&isVocabMustTrainer())return; resets++; checked=false; hinted=false; rulePeeked=false; elapsedMs=0;}',
+    'function rememberVocabCard(){vocabCardHold={cardId:queue[position]||null,checked:!!checked,hinted:!!hinted,rulePeeked:!!rulePeeked,elapsedMs:elapsed()};}',
+    openSrc, contSrcF, showSrc,
+    'function boot(extra){state.events.length=0; vocabSummary=false; vocabCardHold=null; view="practice"; checked=false; hinted=false; rulePeeked=false; elapsedMs=1800; position=0; queue=["hw1-1-kk","hw1-2-kk"]; resets=0; advanceTimer=null; if(extra&&extra.checked)checked=true; if(extra&&extra.hinted)hinted=true;}',
+    'function arm(){advanceTimer=setTimeout(function(){position=1;checked=false;advanceTimer=null;},400);}',
+    'function fire(){if(!advanceTimer)return; clearTimeout(advanceTimer); position=1; checked=false; advanceTimer=null;}',
+    'function snap(){return {events:state.events.map(function(e){return e.card_id+":"+e.hint_kind;}), hinted:hinted, checked:checked, rulePeeked:rulePeeked, elapsedMs:elapsedMs, position:position, resets:resets, advance:advanceTimer};}',
+    'return {boot:boot, open:openVocabSummary, show:showView, cont:continueVocabSummary, snap:snap, arm:arm, fire:fire};'
+  ].join('\n');
+  return new Function(body)();
+}
+const p6f=p6fHarness();
+for(const dest of ['vocabulary','learn','review']){
+  p6f.boot();
+  p6f.open();
+  p6f.show(dest);
+  const left=p6f.snap();
+  assert.deepEqual(left.events,[],'P6F-LEAVE');
+  assert.equal(left.hinted,false,'P6F-LEAVE');
+  assert.equal(left.resets,0,'P6F-LEAVE');
+  p6f.show('practice');
+  const back=p6f.snap();
+  assert.deepEqual(back.events,[],'P6F-LEAVE');
+  assert.equal(back.hinted,false,'P6F-LEAVE');
+  assert.equal(p5Rate({result:{correct:true,parts:[true]},hinted:back.hinted,rulePeeked:back.rulePeeked}),F.Rating.Good,'P6F-LEAVE');
+}
+p6f.boot({checked:true});
+p6f.arm();
+p6f.open();
+p6f.fire();
+p6f.show('vocabulary');
+const auto=p6f.snap();
+assert.equal(auto.advance,null,'P6F-NO-AUTO');
+assert.equal(auto.position,0,'P6F-NO-AUTO');
+assert.deepEqual(auto.events,[],'P6F-NO-AUTO');
+assert.equal(auto.checked,true,'P6F-NO-AUTO');
+assert.equal(auto.resets,0,'P6F-NO-AUTO');
+p6f.boot();
+p6f.show('vocabulary');
+const bare=p6f.snap();
+assert.deepEqual(bare.events,['hw1-1-kk:reference'],'P6F-CONTROL');
+assert.equal(bare.hinted,true,'P6F-CONTROL');
+function p6fKeep(kind){
+  const rememberSrc=app.slice(app.indexOf('function rememberVocabCard(){'),app.indexOf('function captureMustLive(){'));
+  const tailStart=app.lastIndexOf('if(isVocabMustTrainer()&&vocabNear&&queue[position]===vocabNear.cardId');
+  const tailEnd=app.indexOf('function hintEvent',tailStart);
+  let tail=app.slice(tailStart,tailEnd).trim();
+  assert.ok(tail.endsWith('}'),'P6F-KEEP');
+  tail=tail.slice(0,tail.lastIndexOf('}')).trim();
+  const nodes={
+    '#hint-box':{innerHTML:kind==='rule'?'правило':'подсказка',hidden:false},
+    '#hint-button':{disabled:kind!=='rule'},
+    '#rule-button':{disabled:kind==='rule'},
+    '#feedback':{innerHTML:'',hidden:true,className:'feedback'},
+    '#check-button':{hidden:false},
+    '#next-button':{hidden:true}
+  };
+  const body=[
+    'let checked=false, hinted='+(kind==='hint'?'true':'false')+', rulePeeked='+(kind==='rule'?'true':'false')+', elapsedMs=3200, position=0;',
+    'const queue=["hw1-1-kk"];',
+    'let vocabCardHold=null, vocabNear=null, vocabRetry=null;',
+    'const window={VocabMust:null};',
+    'function isVocabMustTrainer(){return true;}',
+    'function $(sel){return nodes[sel]||null;}',
+    'function elapsed(){return elapsedMs;}',
+    'function esc(s){return String(s);}',
+    rememberSrc,
+    'rememberVocabCard();',
+    'checked=false; hinted=false; rulePeeked=false; elapsedMs=0;',
+    'nodes["#hint-box"]={innerHTML:"",hidden:true};',
+    'nodes["#hint-button"]={disabled:false};',
+    'nodes["#rule-button"]={disabled:false};',
+    'nodes["#feedback"]={innerHTML:"",hidden:true,className:"feedback"};',
+    'nodes["#check-button"]={hidden:false};',
+    'nodes["#next-button"]={hidden:true};',
+    tail,
+    'return {checked:checked, hinted:hinted, rulePeeked:rulePeeked, elapsedMs:elapsedMs, hintDisabled:nodes["#hint-button"].disabled, ruleDisabled:nodes["#rule-button"].disabled, hintHtml:nodes["#hint-box"].innerHTML, hintHidden:nodes["#hint-box"].hidden};'
+  ].join('\n');
+  return new Function('nodes',body)(nodes);
+}
+const keptHint=p6fKeep('hint');
+assert.equal(keptHint.hinted,true,'P6F-KEEP');
+assert.equal(keptHint.rulePeeked,false,'P6F-KEEP');
+assert.equal(keptHint.elapsedMs,3200,'P6F-KEEP');
+assert.equal(keptHint.hintDisabled,true,'P6F-KEEP');
+assert.equal(keptHint.hintHidden,false,'P6F-KEEP');
+assert.equal(keptHint.hintHtml,'подсказка','P6F-KEEP');
+assert.equal(p5Rate({result:{correct:true,parts:[true]},hinted:keptHint.hinted,rulePeeked:false}),F.Rating.Again,'P6F-KEEP');
+const keepQ=card('keep','word:keep');
+const keepSt=state();
+const keepSit=VM.emptySitting(1);
+keepSit.sessions=['s'];
+keepSit.shown=['word:keep'];
+VM.commitFirst({state:keepSt,records:keepSt.records,q:keepQ,now:10,sessionId:'s',presentation:0,kind:'assisted',answers:['keepк'],elapsed:keptHint.elapsedMs,core,observe:()=>[],queue:['keep'],position:0,pool:[keepQ],plan:{budget:9,nNew:1,baseLen:1,newLemmas:['word:keep']},sitting:keepSit,rating:F.Rating.Again,errors:[],result:{correct:true,parts:[true]},budget:9,minGap:2,appearCap:3,hinted:true,recall:true});
+assert.equal(VM.summaryRows(keepSt,keepSit,[keepQ],core,10).rows[0].label,'с подсказкой','P6F-KEEP');
+const keptRule=p6fKeep('rule');
+assert.equal(keptRule.rulePeeked,true,'P6F-PEEK');
+assert.equal(keptRule.ruleDisabled,true,'P6F-PEEK');
+assert.equal(keptRule.elapsedMs,3200,'P6F-PEEK');
+assert.equal(keptRule.rulePeeked?1:0,1,'P6F-PEEK');
+assert.equal(p5Rate({result:{correct:true,parts:[true]},hinted:false,rulePeeked:keptRule.rulePeeked}),F.Rating.Again,'P6F-PEEK');
+assert.ok(app.includes('rule_peek:rulePeeked?1:0'),'P6F-PEEK');
+const peekSt=state();
+const peekSit=VM.emptySitting(1);
+peekSit.sessions=['s'];
+peekSit.shown=['word:keep'];
+peekSt.events=[{type:'answer',card_id:'keep',at:10,correct:true,rule_peek:1,session_id:'s'}];
+assert.equal(VM.summaryRows(peekSt,peekSit,[keepQ],core,10).rows[0].label,'с подсказкой','P6F-PEEK');
+const pairFn=fs.readFileSync(path.join(__dirname,'vocab-must.js'),'utf8');
+const pairBody=pairFn.slice(pairFn.indexOf('function pairOf'),pairFn.indexOf('function whenPhrase'));
+assert.ok(pairBody.includes('answerLang')&&!pairBody.includes('на казахский'),'P6F-PAIR-SRC');
+function p6fRow(q){
+  const sit=VM.emptySitting(1);
+  sit.shown=[core.lemmaKey(q)];
+  return VM.summaryRows(state(),sit,[q],core,1).rows[0];
+}
+const pairIds=['learn-word-2','v2-4-1-vocab-also-kk-set','v2-4-2-vocab-qalaisyn-kk-form-1','hw1-1-kk-rev','hw1-1-ru'];
+for(const id of pairIds)assert.ok(product.pool.some(q=>q.id===id),'P6F-PAIR '+id);
+for(const q of product.pool){
+  const lang=core.answerLang(q,0);
+  const stim=String(q.stimulus||'');
+  const ans=String((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'');
+  const row=p6fRow(q);
+  if(lang==='kk'){
+    assert.equal(String(row.kk),ans,'P6F-PAIR '+q.id);
+    assert.equal(String(row.ru),stim,'P6F-PAIR '+q.id);
+  }else{
+    assert.equal(String(row.kk),stim,'P6F-PAIR '+q.id);
+    assert.equal(String(row.ru),ans,'P6F-PAIR '+q.id);
+  }
+}
+for(const id of pairIds){
+  const q=product.pool.find(item=>item.id===id);
+  const row=p6fRow(q);
+  assert.ok(row&&(row.kk||row.ru),'P6F-PAIR '+id);
+}
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');

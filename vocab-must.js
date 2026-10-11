@@ -566,11 +566,12 @@
    if((sitting.shown||[]).includes(lemma))return 'Без ответа';
    return 'Без ответа';
  }
- function pairOf(q){
+ function pairOf(q,core){
    if(!q)return {kk:'',ru:''};
    const stim=String(q.stimulus||'');
    const ans=String((q.fields&&q.fields[0]&&q.fields[0].answers&&q.fields[0].answers[0])||'');
-   if(String(q.title||'').includes('на казахский'))return {kk:ans,ru:stim};
+   const lang=core&&typeof core.answerLang==='function'?core.answerLang(q,0):'';
+   if(lang==='kk')return {kk:ans,ru:stim};
    return {kk:stim,ru:ans};
  }
  function whenPhrase(rep,records,now){
@@ -614,7 +615,7 @@
      const token=rank?tokenOf(rank):'Без ответа';
      const rep=cards.length?lemmaRepresentative(lemma,cards,state||{},records,H,core,now):null;
      const face=rep||cards[0]||null;
-     const pair=pairOf(face);
+     const pair=pairOf(face,core);
      rows.push({lemma,kk:pair.kk,ru:pair.ru,label:token==='самостоятельно'?'вспомнила сама':token,fresh:fresh.has(lemma),when:whenPhrase(rep,records,now)});
    }
    return {unaided:tally.unaided,assisted:tally.assisted,rows};

@@ -67,7 +67,7 @@
  // r7 X3: where the learner came from into this session (← Назад / «Сделать паузу» returns there).
  const ORIGIN_VIEWS=['today','learn','path','homework','personal','exam','review','vocabulary','materials','morph'],ORIGIN_LABEL={today:'Сегодня',learn:'Учёба',path:'Уроки',homework:'Домашка',personal:'Тренажёры',exam:'Экзамен',review:'Повторение',vocabulary:'Словарь',materials:'Материалы',morph:'Правила'};
  let sessionOrigin=null,trainerEpoch=null; // trainerEpoch: the queue a catalog trainer started; trainerReturn is valid only for it
- let vocabPlan=null,vocabSitting=null,vocabRetry=null,vocabClosed=[],retryAfterWrong=false,vocabPoolReady=false,vocabReturnScheduled=false,vocabSummary=false,vocabNear=null;
+ let vocabPlan=null,vocabSitting=null,vocabRetry=null,vocabClosed=[],retryAfterWrong=false,vocabPoolReady=false,vocabReturnScheduled=false,vocabSummary=false,vocabNear=null,vocabCardHold=null;
  let tutorToken=0,tutorAbort=null,viewOnlyPathLesson=null,stageContext=null,practiceHold=null,restoredEnded=false;
  let hwOrigin='today';
  function abortTutor(){tutorToken++;try{if(tutorAbort)tutorAbort.abort();}catch{}tutorAbort=null;}
@@ -767,7 +767,7 @@
  }
  function beginMustPortion(fresh){
    const VM=window.VocabMust;if(!VM)return false;
-   if(fresh||!vocabSitting){vocabSitting=VM.emptySitting(Date.now());vocabClosed=[];sessionCorrect=0;sessionAssisted=0;vocabSummary=false;vocabNear=null;}
+   if(fresh||!vocabSitting){vocabSitting=VM.emptySitting(Date.now());vocabClosed=[];sessionCorrect=0;sessionAssisted=0;vocabSummary=false;vocabNear=null;vocabCardHold=null;}
    prepareVocabPool();
    const pool=mustPool();
    const planned=VM.planPortion(pool,state,cfg,core,Date.now(),{rank:mustCourseRank,retrievability:mustRetrievability});
@@ -816,7 +816,7 @@
    render();
  }
  function endMustToTrainers(){
-   vocabSummary=false;vocabNear=null;vocabSitting=null;vocabPlan=null;vocabRetry=null;vocabClosed=[];
+   vocabSummary=false;vocabNear=null;vocabCardHold=null;vocabSitting=null;vocabPlan=null;vocabRetry=null;vocabClosed=[];
    trainerReturn=null;trainerEpoch=null;vocabRole=null;
    queue=[];practiceIds=[];position=0;mode='ordered';
    showView('personal');
@@ -825,8 +825,27 @@
  }
  function openVocabSummary(){
    if(!isVocabMustTrainer()||!vocabSitting)return;
+   cancelAdvance();
+   pauseTimer();
+   rememberVocabCard();
    vocabSummary=true;
    render();
+ }
+ function rememberVocabCard(){
+   const box=$('#hint-box'),fb=$('#feedback'),hintBtn=$('#hint-button'),ruleBtn=$('#rule-button');
+   vocabCardHold={cardId:queue[position]||null,checked:!!checked,hinted:!!hinted,rulePeeked:!!rulePeeked,elapsedMs:elapsed(),hintHtml:box&&!box.hidden?box.innerHTML:'',hintDisabled:!!(hintBtn&&hintBtn.disabled),ruleDisabled:!!(ruleBtn&&ruleBtn.disabled),feedbackHtml:fb&&!fb.hidden?fb.innerHTML:'',feedbackClass:fb&&fb.className||'feedback'};
+ }
+ function resumeVocabCard(){
+   const hold=vocabCardHold;
+   if(!hold||hold.cardId!==(queue[position]||null))return;
+   checked=!!hold.checked;hinted=!!hold.hinted;rulePeeked=!!hold.rulePeeked;elapsedMs=hold.elapsedMs;
+   const box=$('#hint-box');
+   if(box&&hold.hintHtml){box.innerHTML=hold.hintHtml;box.hidden=false;}
+   if($('#hint-button')&&hold.hintDisabled)$('#hint-button').disabled=true;
+   if($('#rule-button')&&hold.ruleDisabled)$('#rule-button').disabled=true;
+   const fb=$('#feedback');
+   if(fb&&hold.feedbackHtml){fb.className=hold.feedbackClass||'feedback';fb.innerHTML=hold.feedbackHtml;fb.hidden=false;}
+   if(hold.checked){const next=$('#next-button'),check=$('#check-button');if(check)check.hidden=true;if(next)next.hidden=false;}
  }
  function captureMustLive(){
    return {queue:[...queue],position,queueEpoch,trainerEpoch,trainerReturn,vocabRole,mode,topic,courseBlock,sourceFilter,view,practiceIds:[...practiceIds],vocabPlan,vocabSitting,vocabRetry,vocabClosed:[...vocabClosed],sessionAttempts,sessionCorrect,sessionAssisted,sessionUnaided:Object.assign(Object.create(null),sessionUnaided),sessionBlindFails:Object.assign(Object.create(null),sessionBlindFails),retryAfterWrong,checked,hinted,presented};
@@ -1357,10 +1376,12 @@
  }
  function showView(next){
    captureDraft();
-   if(vocabSummary&&next!=='practice'){vocabSummary=false;if(view==='practice')render();}
+   const leavingSummary=!!(vocabSummary&&next!=='practice');
+   const resumeHeld=next==='practice'&&view!=='practice'&&!!vocabCardHold&&!vocabSummary;
+   if(leavingSummary){cancelAdvance();vocabSummary=false;}
    if(next==='practice'&&trainerReturn&&queueEpoch!==trainerEpoch)trainerReturn=null; // r7 X3: bank/words from Учёба were labelled «Тренажёры»
    if(next==='practice'&&view!=='practice'&&ORIGIN_VIEWS.includes(view))sessionOrigin=view;
-   pauseTimer();if(view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
+   pauseTimer();if(!leavingSummary&&view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
    const prevView=view;view=next;document.body.dataset.view=next;
    // r7 ux60 #1: keep the current history entry tagged with the screen we are on, so browser «Назад»
    // never hits a stale qzView that equals the current view (first Back did nothing after the logo pushState).
@@ -1374,7 +1395,7 @@
    if(next==='practice')refillCardDraft();
    const tab=shellTab(next);
    $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-   renderStats();if(next==='learn')learning.render();if(next==='personal'&&window.PersonalTrainers)window.PersonalTrainers.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='materials')renderMaterials();if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(next==='practice')activateCard();if(next==='morph'&&window.MorphTrainer)window.MorphTrainer.render();
+   renderStats();if(next==='learn')learning.render();if(next==='personal'&&window.PersonalTrainers)window.PersonalTrainers.render();if(['today','review','vocabulary'].includes(next))dashboard.render(next);if(next==='materials')renderMaterials();if(next==='exam')renderExam();if(next==='homework')renderHomework();if(next==='path')renderPath();if(resumeHeld)render();if(next==='practice')activateCard();if(next==='morph'&&window.MorphTrainer)window.MorphTrainer.render();
    if(next==='practice'&&['homework','course','lesson','phrase','transfer','remediation'].includes(mode)){const id=mode==='homework'?hwLesson:(courseBlock||(state.grammarPath&&state.grammarPath.lessonId)||null);if(id)markPlace(mode==='homework'?'homework':'practice',id);}
    if(next==='path'&&state.grammarPath&&state.grammarPath.phase==='beat'&&state.grammarPath.lessonId)markPlace('path',state.grammarPath.lessonId);
    if(window.TutorUI){
@@ -1706,6 +1727,7 @@
  }
  function render(){
    if(vocabSummary&&isVocabMustTrainer()){paintVocabSummary();renderStats();return;}
+   if(vocabCardHold&&vocabCardHold.cardId!==(queue[position]||null))vocabCardHold=null;
    retrying=false;
    introOpen=false;pauseTimer();elapsedMs=0;checked=false;hinted=false;rulePeeked=false;lastTextInput=null;renderStats();
    const q=byId.get(queue[position]);
@@ -1816,6 +1838,7 @@
     if(nearCheck)nearCheck.hidden=true;
     if(nearNext){nearNext.hidden=false;try{nearNext.focus({preventScroll:true});}catch{}}
   }
+  resumeVocabCard();
  }
  function hintEvent(q,kind){state.events.push({type:'hint',card_id:q.id,at:Date.now(),hint_kind:kind,response_time_ms:elapsed(),hinted:true});}
  function showRule(q){
