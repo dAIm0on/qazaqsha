@@ -166,7 +166,9 @@ ok('minors: Russian counts, explicit «отметь» prompts + one-line why, «
   const store={};const localStorage={getItem:k=>k in store?store[k]:null,setItem:(k,v)=>{store[k]=String(v);},removeItem:k=>{delete store[k];}};
   const body=appSrc.slice(i,j).replace(/ try\{new MutationObserver[^\n]*\n/,'').replace(/ document\.addEventListener\('(input|submit)'[^\n]*\n/g,'');
   const ctx={KEY:'qazaq-kris-course-v1',localStorage,box:{},mode:'homework',hwLesson:'4-2',hwPart:'words',trainerReturn:null,trainerEpoch:null,queueEpoch:1,courseBlock:'4-2',activeLesson:null,checked:false,retrying:false,
-    supportKind:q=>!!q.payload,readAnswers:q=>q._a,Date,JSON,Object,Array,String,Number};
+    supportKind:q=>!!q.payload,readAnswers:q=>q._a,Date,JSON,Object,Array,String,Number,
+    // PR-7: the card show tag on #answer-form and the closed-show list of vocab:must
+    position:0,vocabClosed:[],isVocabMustTrainer:()=>false,$:()=>({dataset:{}})};
   vm.runInNewContext(body+'\nbox.put=draftPut;box.get=draftGet;box.key=cardDraftKey;box.stash=stashCard;box.drop=dropCardDraft;',ctx);
   const q={id:'v2-4-2-vocab-oilau-kk',stimulus:'думать',fields:[{answers:['ойлау']}],_a:['проба']};
   ctx.box.stash(q,false);assert.deepEqual(ctx.box.get(ctx.box.key(q)),['проба'],'typed text kept per card');
@@ -175,6 +177,7 @@ ok('minors: Russian counts, explicit «отметь» prompts + one-line why, «
   ctx.mode='homework';ctx.trainerReturn=null;ctx.checked=true;ctx.box.stash(q,true);assert.deepEqual(ctx.box.get(ctx.box.key(q)),['проба'],'nothing stashed after Проверить');
   ctx.checked=false;q._a=[''];ctx.box.stash(q,false);assert.deepEqual(ctx.box.get(ctx.box.key(q)),['проба'],'a blur-cleared field does not erase the draft');
   ctx.box.drop(q);assert.equal(ctx.box.get(ctx.box.key(q)),null,'Проверить / Показать ответ clears it');
+  ctx.$=()=>({dataset:{pres:'1:5:other'}});q._a=['чужое'];ctx.box.stash(q,true);assert.equal(ctx.box.get(ctx.box.key(q)),null,'PR-7: a form of another card show is not stashed');ctx.$=()=>({dataset:{}});
   for(let n=0;n<80;n++)ctx.box.put('k'+n,['x']);assert.ok(Object.keys(JSON.parse(store['qazaq-kris-course-v1-drafts'])).length<=60,'capped');
   assert.equal(ctx.box.key({id:'b',payload:{},fields:[]}),'','word-bank / tap / choice cards have no typed draft');
   // wiring

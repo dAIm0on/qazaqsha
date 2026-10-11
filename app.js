@@ -335,9 +335,9 @@
     Kept per card in its own key (never in records/evidence): it is not an answer, not a try, not a hint. Cleared on Проверить / Показать ответ. */
  const DRAFT_KEY=KEY+'-drafts',DRAFT_TTL=14*864e5,DRAFT_CAP=60;
  function draftBook(){try{const b=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}');return b&&typeof b==='object'&&!Array.isArray(b)?b:{};}catch{return {};}}
- function draftPut(k,a){
+ function draftPut(k,a,p){
    if(!k)return;const b=draftBook(),now=Date.now();
-   if(!Array.isArray(a)||!a.some(x=>String(x||'').trim()))delete b[k];else b[k]={a:a.slice(0,8).map(x=>String(x||'').slice(0,200)),t:now};
+   if(!Array.isArray(a)||!a.some(x=>String(x||'').trim()))delete b[k];else{b[k]={a:a.slice(0,8).map(x=>String(x||'').slice(0,200)),t:now};if(p)b[k].p=String(p);}
    const keep=Object.entries(b).filter(([,r])=>r&&Array.isArray(r.a)&&now-(Number(r.t)||0)<DRAFT_TTL).sort((x,y)=>y[1].t-x[1].t).slice(0,DRAFT_CAP);
    try{if(keep.length)localStorage.setItem(DRAFT_KEY,JSON.stringify(Object.fromEntries(keep)));else localStorage.removeItem(DRAFT_KEY);}catch{}
  }
@@ -346,11 +346,18 @@
  // Scoped to the session kind: a draft typed in ДЗ words does not pop up in Тренажёры for the same card.
  function draftScope(){return String(mode||'')+':'+String((trainerReturn&&queueEpoch===trainerEpoch?'t-'+trainerReturn:'')||(mode==='homework'?hwLesson+'/'+hwPart:'')||courseBlock||activeLesson||'');}
  function cardDraftKey(q){return typedCard(q)?'q|'+draftScope()+'|'+q.id+'|'+String(q.stimulus||'').slice(0,80):'';}
- function stashCard(q,keepEmpty){if(!typedCard(q)||checked||retrying)return;const a=readAnswers(q);if(!keepEmpty&&!a.some(x=>String(x||'').trim()))return;draftPut(cardDraftKey(q),a);}
+ /* PR-7 D1: one show of a card = queueEpoch:position:id. The form carries it, so a late change event from the
+    removed form never writes into the next card. A closed show (retype done) keeps no draft. In vocab:must a card
+    draft refills only the same show, so a returned card never comes with an answer typed on an earlier show. */
+ function presToken(q){return String(queueEpoch)+':'+position+':'+String(q&&q.id||'');}
+ function formIsCard(q){const f=$('#answer-form');return !!f&&!(f.dataset&&f.dataset.pres&&f.dataset.pres!==presToken(q));}
+ function showClosed(q){return isVocabMustTrainer()&&!!q&&vocabClosed.includes(String(queueEpoch)+'|'+position+'|'+q.id);}
+ function stashCard(q,keepEmpty){if(!typedCard(q)||checked||retrying||showClosed(q)||!formIsCard(q))return;const a=readAnswers(q);if(!keepEmpty&&!a.some(x=>String(x||'').trim()))return;draftPut(cardDraftKey(q),a,presToken(q));}
  function dropCardDraft(q){if(typedCard(q))draftPut(cardDraftKey(q),null);}
  function refillCardDraft(){
    const q=byId.get(queue[position]);if(!typedCard(q)||checked||!$('#answer-form'))return false;
    const a=draftGet(cardDraftKey(q));if(!a)return false;
+   if(isVocabMustTrainer()){const r=draftBook()[cardDraftKey(q)];if(!r||r.p!==presToken(q))return false;}
    const els=q.fields.map((f,i)=>$('#answer-'+i));if(els.some(el=>!el||el.disabled||el.value))return false;
    els.forEach((el,i)=>{el.value=String(a[i]||'');});return true;
  }
@@ -409,7 +416,7 @@
      const beat=Number(pathInput.dataset.beat);
      gp.pathDraft={lessonId:pathInput.dataset.lesson||gp.lessonId,chapterId:pathInput.dataset.chapter||gp.chapterId,beat:Number.isInteger(beat)?beat:gp.beat,value:pathInput.value};
    }
-   const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form')){draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};stashCard(q,false);}
+   const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form')&&formIsCard(q)&&!showClosed(q)){draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};stashCard(q,false);}
    const ask=$('#rules-ask-q');
    if(ask){
      if(ask.value)state.rulesDraft={article:rulesArticle||'',value:ask.value.slice(0,400)};
@@ -1798,6 +1805,7 @@
      save();
    }));
    if(supportKind(q))$$('#answer-form .rk button').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();if(checked)return;if(window.ResponseKinds.click($('#answer-form'),q,b))save();}));
+   $('#answer-form').dataset.pres=presToken(q);
    if(draft?.token===queueEpoch+':'+position&&draft.exerciseId===q.id){
      if(supportKind(q)){const el=$('#rk-response');if(el){el.value=JSON.stringify((draft.answers||[]).map(String));window.ResponseKinds.paint($('#answer-form'),q);}}
      else if(q.kind==='multi')$$('input[name=choice]').forEach(el=>{el.checked=draft.answers.includes(el.value);});
@@ -1993,7 +2001,7 @@
          const key=String(queueEpoch)+'|'+position+'|'+q.id;
          if(!vocabClosed.includes(key))vocabClosed.push(key);
        }
-       vocabRetry=null;retryAfterWrong=false;retrying=false;
+       vocabRetry=null;retryAfterWrong=false;retrying=false;dropCardDraft(q);draft=null;
        save();nextQuestion();return;
      }
      if(result.correct){
