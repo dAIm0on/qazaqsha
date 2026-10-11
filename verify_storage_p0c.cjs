@@ -17,8 +17,8 @@ const ids = raw => events(raw).map(e => e.id).sort();
 const lastLS = ls => JSON.parse(ls.getItem(KEY));
 const head = raw => String(raw).slice(0, 80);
 async function ready(a) { for (let i = 0; i < 100 && !a.dash(); i++) await sleep(20); assert.ok(a.dash(), 'app booted'); return a; }
-async function reboot(env, wait) { const a = start(env); await sleep(wait || 80); a.saveNow(); await sleep(450); return a; }
-async function blindStart(env, kind) { (kind === 'fail' ? failOnce : hangOnce)(env.idb); const a = start(env); await sleep(kind === 'fail' ? 80 : 1700); return a; }
+async function reboot(env, wait) { const a = await ready(start(env)); await sleep(wait || 80); a.saveNow(); await sleep(450); return a; }
+async function blindStart(env, kind) { (kind === 'fail' ? failOnce : hangOnce)(env.idb); const a = start(env); await sleep(kind === 'fail' ? 80 : 1700); return ready(a); }
 // two answers in a fresh sitting (stored session is null, so these are answers the mirror cannot have)
 async function twoNewAnswers(a, ls) { a.window.TrainerCatalogBridge.launch('vocab:must'); a.saveNow(); await sleep(30); await answer(a, 2, () => JSON.parse(ls.getItem(KEY)).session); a.saveNow(); await sleep(30); }
 
@@ -211,6 +211,71 @@ async function twoNewAnswers(a, ls) { a.window.TrainerCatalogBridge.launch('voca
     assert.equal(S.headOf('{"saved_at":123,"schema":7}').kind, 'legacy');
     assert.equal(S.headOf('{"rev":2,"saved_at":5,"schema":7}').kind, 'rev');
     assert.equal(S.headOf('{"schema":7}').kind, 'none');
+  });
+
+  // ---------- round 3 (GPT review 3): namespaces that P.merge replaces wholesale must not roll back on recovery
+  const S = require('./morph-state.js'), E = require('./morph-engine.js');
+  const morphAt = (m, n, at) => { for (let k = 0; k < n; k++) { const q = E.getItem(m.session.queue[m.session.cursor].id); const r = S.accept(m, E.answer(m.session, q.expected, 100, at + k)); assert.ok(r.accepted, 'morph answer accepted'); m = S.putSession(r.state, E.next(r.state.session)); } return m; };
+  const m0 = S.putSession(S.empty(), E.createSession({seed: 7, limit: 10}));
+  const m2 = morphAt(m0, 2, 1000), m5 = morphAt(m2, 3, 2000), m6 = morphAt(m2, 4, 3000);
+  const hw = (ids, extra) => ({'1-1': Object.assign({lessonId: '1-1', started_at: 5000, items: ids.map((id, i) => ({id, answers: ['x'], correct: true, at: 5000 + i * 10 + (extra && extra.shift || 0)})), rule_peeks: ids.length, answer_peeks: 0, submitted_at: null, export_rev: 0, cursor: ids[ids.length - 1], checklist: {method: ids.length > 2, exercises: false, words: false, external_test: false, keyboard: false, cheat: false}, previous: []}, extra || {})});
+  await check('T21 homework: IDB [q1,q2,q3] vs stale LS [q1] same started_at, blind save, reload -> q1,q2,q3', async () => {
+    const ls = makeLS(), idb = makeIDB();
+    ls._d[KEY] = rehead(noSession(A, s => { s.homeworkAttempts = hw(['q1']); }), {rev: 10, saved_at: 100});
+    idb.data.set('state', mirrorRec(rehead(noSession(B, s => { s.homeworkAttempts = hw(['q1', 'q2', 'q3']); }), {rev: 11, saved_at: 100})));
+    const a = await blindStart({ls, idb}, 'fail'); a.saveNow(); await sleep(30);
+    await reboot({ls, idb});
+    const at = lastLS(ls).homeworkAttempts['1-1'];
+    assert.deepEqual(at.items.map(i => i.id), ['q1', 'q2', 'q3'], 'IDB items kept');
+    assert.equal(at.rule_peeks, 3, 'peek counter not back'); assert.equal(at.checklist.method, true, 'checklist not back'); assert.equal(at.cursor, 'q3', 'cursor not back');
+  });
+  await check('T22 homework: blind page continued the same attempt (q4) -> q1..q4, counters max, checklist OR', async () => {
+    const Ab = base(); Ab.homeworkAttempts = hw(['q1', 'q2', 'q3']);
+    const S0 = base(); S0.homeworkAttempts = hw(['q1']);
+    const Pg = base(); Pg.homeworkAttempts = hw(['q1', 'q4']); Pg.homeworkAttempts['1-1'].checklist.words = true; Pg.homeworkAttempts['1-1'].items[1].at = 9000;
+    const at = P.reconcilePending(Ab, Pg, P.pendingTouch(S0, Pg)).homeworkAttempts['1-1'];
+    assert.deepEqual(at.items.map(i => i.id).sort(), ['q1', 'q2', 'q3', 'q4']);
+    assert.equal(at.rule_peeks, 3); assert.equal(at.checklist.method, true); assert.equal(at.checklist.words, true); assert.equal(at.cursor, 'q4');
+  });
+  await check('T23 homework: blind page started a new attempt -> new attempt, old one kept in previous', async () => {
+    const Ab = base(); Ab.homeworkAttempts = hw(['q1', 'q2', 'q3']);
+    const S0 = base(); S0.homeworkAttempts = hw(['q1']);
+    const Pg = base(); Pg.homeworkAttempts = hw(['q9'], {started_at: 8000});
+    const at = P.reconcilePending(Ab, Pg, P.pendingTouch(S0, Pg)).homeworkAttempts['1-1'];
+    assert.equal(at.started_at, 8000);
+    assert.ok(at.previous.some(p => p.started_at === 5000 && p.items.length === 3), 'IDB attempt in previous');
+  });
+  await check('T24 morph: IDB cursor5 + stale LS cursor2, blind advances to 6, reload -> cursor 6 + all events', async () => {
+    const ls = makeLS(), idb = makeIDB();
+    ls._d[KEY] = rehead(noSession(A, s => { s.morphTrainer = m2; }), {rev: 10, saved_at: 100});
+    idb.data.set('state', mirrorRec(rehead(noSession(B, s => { s.morphTrainer = m5; }), {rev: 11, saved_at: 100})));
+    const a = await blindStart({ls, idb}, 'fail');
+    const W = a.window;
+    for (let k = 0; k < 4; k++) { const st = W.MorphState.migrate(JSON.parse(ls.getItem(KEY)).morphTrainer).session; const q = W.MorphEngine.getItem(st.queue[st.cursor].id); assert.ok(W.MorphBridge.answer(W.MorphEngine.answer(st, q.expected, 100, 4000 + k)), 'blind answer'); W.MorphBridge.session(W.MorphEngine.next(W.MorphState.migrate(JSON.parse(ls.getItem(KEY)).morphTrainer).session)); }
+    assert.equal(JSON.parse(ls.getItem(KEY)).morphTrainer.session.cursor, 6, 'blind page at 6');
+    await reboot({ls, idb});
+    const mt = lastLS(ls).morphTrainer;
+    assert.equal(mt.session.cursor, 6, 'cursor 6');
+    assert.deepEqual(mt.events.map(e => e.eventId.split(':').pop()).sort(), ['0', '1', '2', '3', '4', '5'], 'all events');
+  });
+  await check('T25 morph unit: blind 2->6 vs IDB 5 -> 6; untouched stale 2 -> 5', async () => {
+    const mk = m => { const s = base(); s.morphTrainer = m; return s; };
+    assert.equal(P.reconcilePending(mk(m5), mk(m6), P.pendingTouch(mk(m2), mk(m6))).morphTrainer.session.cursor, 6);
+    assert.equal(P.reconcilePending(mk(m5), mk(m2), P.pendingTouch(mk(m2), mk(m2))).morphTrainer.session.cursor, 5);
+  });
+  await check('T26 morph: IDB session closed (null), stale page untouched at cursor 2 -> stays closed', async () => {
+    const mk = m => { const s = base(); s.morphTrainer = m; return s; };
+    const closed = S.putSession(m5, null);
+    assert.equal(P.reconcilePending(mk(closed), mk(m2), P.pendingTouch(mk(m2), mk(m2))).morphTrainer.session, null);
+  });
+  await check('T27 lesson package differing between copies does not break the start (IDB copy kept)', async () => {
+    const Ab = base(), Pg = base();
+    const ex = n => ({id: 'pk-q' + n, topic: 'vocab', title: 'Переведи', stimulus: 'сөз', explanation: 'объяснение', fields: [{kind: 'text', label: 'Ответ', answers: ['слово']}]});
+    const pk = {app: 'qazaq-lesson', format_version: 1, lesson_id: 'pk-1', lesson_title: 'Пакет', source: {title: 'Источник', url: 'https://example.org/a'}, dependencies: ['pk-0'], words: [{kazakh: 'сөз', translation: ['слово']}], exercises: [ex(1), ex(2)], blocks: [{title: 'Шаг', explanation: 'Объяснение', examples: [{kazakh: 'сөз', translation: 'слово'}], question_ids: ['pk-q1', 'pk-q2']}]};
+    Ab.lesson_packages = [pk]; Pg.lesson_packages = [Object.assign({}, pk, {lesson_title: 'Пакет (старый)'})];
+    assert.equal(P.migrate(Ab).lesson_packages.length, 1, 'fixture package valid');
+    const r = P.reconcilePending(Ab, Pg, P.pendingTouch(base(), Pg));
+    assert.equal(JSON.stringify(r.lesson_packages), JSON.stringify(P.migrate(Ab).lesson_packages));
   });
 
   for (const r of results) console.log(r.join('  '));
