@@ -317,7 +317,8 @@ assert.match(cacheNames[0], /^CACHE='qazaq-offline-live-\d{8}-[a-z0-9-]+'$/);
 assert.equal(sw.includes('fixtures/navigation'), false);
 
 const app = read('app.js');
-assert.match(app, /window\.addEventListener\('qazaq-before-update',e=>\{pauseTimer\(\);save\(\);if\(!storageAvailable\)e\.preventDefault\(\);\}\);/);
+// storage-p0: still blocked unless localStorage saved; with a full localStorage it waits for the IndexedDB mirror, then retries.
+assert.match(app, /window\.addEventListener\('qazaq-before-update',e=>\{pauseTimer\(\);if\(updateMirrored\)\{updateMirrored=false;return;\}save\(\);if\(lsOk&&storageAvailable\)return;e\.preventDefault\(\);/);
 const saveStart = app.indexOf('function save(){');
 const saveEnd = app.indexOf('function subset(){');
 const saveBody = app.slice(saveStart, saveEnd);

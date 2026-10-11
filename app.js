@@ -1,5 +1,6 @@
 /* All answers are checked locally against the reviewed course key. */
 (function(){
+function qazaqAppBoot(bootMirror){
  'use strict';
  const course=window.COURSE, core=window.TrainerCore;
  try{if(!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-1')))window.Lesson31Pack?.install?.(course,window.CURRICULUM);}catch{}
@@ -32,7 +33,14 @@
  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  let state=P.empty(),savedSession=null,storageAvailable=true,storageReadError=null;
- try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);
+ // Storage P0: localStorage + IndexedDB mirror (store-idb.js). bootMirror = what IndexedDB held when the app started.
+ const STORE=window.QazaqStore&&window.QazaqStore.available?window.QazaqStore:null,SNAPSHOT_KEYS=[BACKUP,R7_FREG_SNAPSHOT,R7_SNAPSHOT,MIGRATION];
+ // rev: grows by one on every write (compared first at boot; saved_at is only a label). A page that could not read
+ // IndexedDB at start (mirrorTrusted=false) never creates a rev: it writes pending copies that carry what the user changed
+ // (_pending.touch) and the copy it started from (_pending.base); the next normal start reconciles (pickBootRaw).
+ const headOf=window.QazaqStore&&window.QazaqStore.headOf||(()=>({kind:'none',stamped:false,rev:0,saved_at:0,pending:false}));
+ let lsOk=true,rescueState='idle',storeRev=0,lastRev=0,saveWatch=null,pendingBaseState=null,pendingMeta=null;const mirrorTrusted=!!STORE&&bootMirror!==undefined;
+ try{const raw=pickBootRaw(localStorage.getItem(KEY));if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);
    // r7: keep the exact pre-migration bytes once (best effort; the migration itself is additive).
    const r7=window.EvidenceState&&window.EvidenceState.MIGRATION_ID;if(r7&&!(saved.evidence&&saved.evidence.migrations&&saved.evidence.migrations[r7])&&!localStorage.getItem(R7_SNAPSHOT)){try{localStorage.setItem(R7_SNAPSHOT,raw);}catch{}}
    // r7 2b FREG: the same one-time full snapshot before the field-key migration (restore = whole state, not only FSRS).
@@ -1332,10 +1340,111 @@
  function save(){
    captureDraft();persistLessonPath();persistLessonPractice();if(window.AiTutor&&window.AiTutor.snapshot)state.aiTutor=window.AiTutor.snapshot();state.records=records;state.learning=learningState;
    if(!(practiceHold&&Array.isArray(practiceHold.kept)))state.session=captureSessionObject();
-   try{if(storageReadError)throw storageReadError;localStorage.setItem(KEY,JSON.stringify(state));storageAvailable=true;}catch{storageAvailable=false;}
-   $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
+   let raw=null;
+   try{if(storageReadError)throw storageReadError;raw=stamp(state);localStorage.setItem(KEY,raw);lsOk=true;}catch{lsOk=false;if(!storageReadError&&raw)rescueStorage();}
+   if(raw&&mirrorTrusted)mirrorSave(raw);
+   // honest status: saved = localStorage took it, or IndexedDB committed exactly this revision (not just "worked before")
+   storageAvailable=!storageReadError&&(lsOk||(mirrorTrusted&&STORE.mirrored(lastRev)));
+   if(storageAvailable||!raw||!mirrorTrusted)paintSaveStatus();else armSaveWatch(lastRev);
    if(!cloudApplying)window.QazaqCloud?.pushSoon?.(state);
  }
+ function paintSaveStatus(){
+   $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
+ }
+ // The header {"rev":n,"saved_at":ms[,"pending":1]} goes first so it can be read without parsing 2 MB (QazaqStore.headOf).
+ function stamp(obj){
+   const body=Object.assign({},obj);delete body.rev;delete body.saved_at;delete body.pending;delete body._pending;
+   // IndexedDB exists but was not read at start: never mint a revision we cannot prove is newer
+   if(STORE&&!mirrorTrusted){
+     pendingMeta=pendingMeta||{v:1,base:{kind:'none',rev:0,saved_at:0,activity:0},touch:{}};
+     pendingMeta.touch=P.pendingTouch(pendingBaseState||P.empty(),obj,pendingMeta.touch);
+     body._pending=pendingMeta;lastRev=storeRev;
+     return JSON.stringify(Object.assign({rev:storeRev,saved_at:Date.now(),pending:1},body));
+   }
+   storeRev++;lastRev=storeRev;
+   return JSON.stringify(Object.assign({rev:storeRev,saved_at:Date.now()},body));
+ }
+ function rawActivity(raw){try{return STORE.activityOf(P.migrate(JSON.parse(raw)));}catch{return 0;}}
+ // version of a stored copy: rev copies by rev, legacy {"saved_at"} copies by saved_at, unstamped by last answer
+ function versionOf(raw){const h=headOf(raw);return {kind:h.kind||'none',rev:Number(h.rev)||0,saved_at:Number(h.saved_at)||0,activity:h.kind==='none'?rawActivity(raw):0};}
+ function compareVersion(a,b){
+   const rank={none:0,legacy:1,rev:2};
+   if(a.kind!==b.kind)return (rank[a.kind]||0)-(rank[b.kind]||0);
+   if(a.kind==='rev')return (a.rev||0)-(b.rev||0);
+   if(a.kind==='legacy')return (a.saved_at||0)-(b.saved_at||0);
+   return (a.activity||0)-(b.activity||0);
+ }
+ // Every save goes to IndexedDB too: at once when localStorage failed, otherwise batched (pagehide flushes).
+ function mirrorSave(raw){
+   STORE.mirror(raw,STORE.activityOf(state),lsOk?400:0).then(()=>{if(!lsOk&&STORE.mirrored(lastRev)){storageAvailable=!storageReadError;paintSaveStatus();}},()=>{if(!lsOk){storageAvailable=false;paintSaveStatus();}});
+ }
+ // localStorage failed and IndexedDB has not confirmed this revision yet: banner if it is still unconfirmed in 3 s (hung write).
+ function armSaveWatch(rev){
+   clearTimeout(saveWatch);
+   saveWatch=setTimeout(()=>{if(!lsOk&&!STORE.mirrored(rev)){storageAvailable=false;paintSaveStatus();}},3000);
+ }
+ // localStorage is full: move the backup copies to IndexedDB (removed only after IndexedDB confirmed them), retry;
+ // then compact answers older than 14 days (fields nobody reads; the full copy is archived first), retry. Nothing is lost.
+ async function rescueStorage(){
+   if(rescueState!=='idle'||!STORE)return;
+   rescueState='running';let ok=false;
+   const retry=()=>{try{localStorage.setItem(KEY,stamp(state));return true;}catch{return false;}};
+   try{
+     await STORE.moveToArchive(localStorage,SNAPSHOT_KEYS);ok=retry();
+     if(!ok&&STORE.countCompactable(state,Date.now(),14)){await STORE.archive('before-compact',stamp(state));STORE.compactEvents(state,Date.now(),14);ok=retry();}
+   }catch(error){console.warn('storage rescue',error);}
+   rescueState=ok?'idle':'done';save();
+ }
+ // Boot (GPT fix design §6). Untrusted start: remember the copy the page starts from (pending base). Trusted start:
+ // a pending localStorage copy is the page itself when the mirror did not move past its base, otherwise the mirror plus
+ // only what the page changed (P.reconcilePending). Normal copies: higher version wins (rev > legacy > unstamped).
+ function pickBootRaw(lsRaw){
+   const m=bootMirror,lh=headOf(lsRaw),mh=m&&typeof m.raw==='string'?headOf(m.raw):{kind:'none',rev:0,saved_at:0,pending:false};
+   storeRev=Math.max(Number(lh.rev)||0,Number(mh.rev)||0);
+   if(!mirrorTrusted){
+     if(!lsRaw){pendingBaseState=P.empty();pendingMeta={v:1,base:{kind:'none',rev:0,saved_at:0,activity:0},touch:{}};return null;}
+     let parsed=null;try{parsed=JSON.parse(lsRaw);}catch{return lsRaw;}
+     pendingBaseState=P.migrate(parsed);
+     // reload while IndexedDB is still unreadable: keep the first base and the changes so far
+     if(lh.pending&&parsed._pending&&parsed._pending.v===1)pendingMeta=parsed._pending;
+     else{const v=versionOf(lsRaw);pendingMeta={v:1,base:{kind:v.kind,rev:v.rev,saved_at:v.saved_at,activity:v.activity},touch:{}};}
+     return lsRaw;
+   }
+   if(!m||typeof m.raw!=='string'){pendingMeta=null;return lsRaw;}
+   if(!lsRaw){pendingMeta=null;return m.raw;}
+   if(lh.pending){
+     let pageRaw;try{pageRaw=JSON.parse(lsRaw);}catch{return m.raw;}
+     const page=P.migrate(pageRaw),authoritative=P.migrate(JSON.parse(m.raw)),meta=pageRaw._pending;
+     pendingMeta=null;
+     // c039451 pending copy (no _pending): keep the page's additive work, never its stale values
+     if(!meta||meta.v!==1||!meta.base)return JSON.stringify(P.reconcilePending(authoritative,page,{}));
+     if(compareVersion(versionOf(m.raw),meta.base)<=0)return JSON.stringify(page);
+     return JSON.stringify(P.reconcilePending(authoritative,page,meta.touch||{}));
+   }
+   pendingMeta=null;
+   const cmp=compareVersion(versionOf(lsRaw),versionOf(m.raw));
+   if(cmp>0)return lsRaw;
+   if(cmp<0)return m.raw;
+   if(lsRaw===m.raw)return lsRaw;
+   const la=rawActivity(lsRaw),ma=Number(m.activity)||rawActivity(m.raw);
+   return ma>la?m.raw:lsRaw;
+ }
+ // Import: the pre-import copy goes to IndexedDB first (localStorage may be full), and space is freed.
+ // Refused while IndexedDB was not read at start (its newer progress could be overwritten); the copy must be confirmed.
+ async function prepareImport(){
+   window.__qzImportReady=false;
+   if(STORE&&!mirrorTrusted)throw Error('Импорт временно недоступен: сначала нужно сверить сохранённый прогресс после сбоя хранилища.');
+   if(!STORE)return;
+   save();
+   try{await STORE.moveToArchive(localStorage,SNAPSHOT_KEYS);}catch{}
+   await STORE.archive(BACKUP,P.serialize(state));window.__qzImportReady=true;
+ }
+ window.__qzPersist=next=>{
+   const raw=stamp(next);
+   try{localStorage.setItem(KEY,raw);lsOk=true;return;}catch{}
+   if(mirrorTrusted&&window.__qzImportReady){lsOk=false;STORE.mirror(raw,STORE.activityOf(next),0).catch(()=>{});return;}
+   throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');
+ };
  function subset(){
    if(activeLesson){const les=(window.LEARNING&&window.LEARNING.lessons||[]).find(l=>l.id===activeLesson);if(!les||!Array.isArray(les.questionIds))return [];const ids=new Set(les.questionIds);return questions.filter(q=>ids.has(q.id));}
    let list=questions.filter(q=>eligible(q));
@@ -3422,11 +3531,11 @@
  function importProgress(incoming,importMode){
    const plan=window.VocabMust?window.VocabMust.importPlan({mustUnfinished:isVocabMustTrainer()&&position<queue.length,position,queueEpoch,retry:vocabRetry},incoming,importMode):{action:'reset'};
    const backup=P.serialize(state);
-   try{localStorage.setItem(BACKUP,backup);}catch{throw Error('Не удалось сохранить копию перед импортом. Сначала скачай текущий прогресс; импорт не выполнен.');}
+   if(!window.__qzImportReady)try{localStorage.setItem(BACKUP,backup);}catch{throw Error('Не удалось сохранить копию перед импортом. Сначала скачай текущий прогресс; импорт не выполнен.');}
    if(plan.action==='keep-local'){
      const keep=captureMustLive();
      const next=P.merge(state,incoming);next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
-     try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
+     if(window.__qzPersist)window.__qzPersist(next);else try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
      state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;
      if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
      window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);
@@ -3434,7 +3543,7 @@
    }
    if(plan.action==='restore'){
      const next=P.migrate(incoming);next.session=plan.session;next.lesson_packages=window.LessonPackageSchema.merge([],next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
-     try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
+     if(window.__qzPersist)window.__qzPersist(next);else try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
      state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;
      if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
      window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);
@@ -3453,8 +3562,9 @@
      if(!queue.length){mode='ordered';vocabRole=null;trainerReturn=null;trainerEpoch=null;vocabPlan=null;vocabSitting=null;vocabRetry=null;vocabClosed=[];position=0;practiceIds=[];pauseTimer();elapsedMs=0;save();render();showView('today');return;}
      pauseTimer();elapsedMs=0;save();render();showView('practice');return;
    }
-   if(importMode!=='replace'){const keep=captureMustLive();const next=P.merge(state,incoming);next.session=null;next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);restoreMustLive(keep);save();render();showView(keep.view||'today');return;}const next=importMode==='replace'?P.migrate(incoming):P.merge(state,incoming);next.session=null;next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
-   try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
+   if(importMode!=='replace'){const keep=captureMustLive();const next=P.merge(state,incoming);next.session=null;next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);if(window.__qzPersist)window.__qzPersist(next);else try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);restoreMustLive(keep);save();render();showView(keep.view||'today');return;}
+   const next=importMode==='replace'?P.migrate(incoming):P.merge(state,incoming);next.session=null;next.lesson_packages=window.LessonPackageSchema.merge(state.lesson_packages,next.lesson_packages);window.LessonPackages.prepare(next.lesson_packages);
+   if(window.__qzPersist)window.__qzPersist(next);else try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Не хватает места для импортированных данных. Текущий прогресс не изменён.');}
    state=next;records=state.records;learningState=state.learning;storageReadError=null;storageAvailable=true;
    if(state.aiTutor&&window.AiTutor&&window.AiTutor.restore)window.AiTutor.restore(state.aiTutor);
    window.LessonPackages.install(state.lesson_packages);catalog.activatePromotions(state);window.Knowledge.hydrate(state,questions);for(const q of questions)byId.set(q.id,q);confusionIndex=P.answerIndex(questions);
@@ -3714,9 +3824,15 @@
  const filterOpen=$('#practice-filter-open'),filterClose=$('#practice-filter-close'),filterDlg=$('#practice-filter');
  if(filterOpen&&filterDlg)filterOpen.onclick=()=>{if(filterDlg.showModal)filterDlg.showModal();else filterDlg.setAttribute('open','');};
  if(filterClose&&filterDlg)filterClose.onclick=()=>{if(filterDlg.close)filterDlg.close();else filterDlg.removeAttribute('open');};
- function resetProgress(){
+ // Reset clears progress only after a full backup is confirmed (localStorage, or IndexedDB within 5 s); otherwise it is cancelled.
+ async function resetProgress(){
    if(!window.confirm('Сбросить весь прогресс в этом браузере? Ответы, ошибки, заметки и ассоциации будут очищены.'))return;
-   try{localStorage.setItem(BACKUP,P.serialize(state));}catch{}try{localStorage.removeItem(DRAFT_KEY);}catch{}const retainedPackages=state.lesson_packages;state=P.empty();state.lesson_packages=retainedPackages;records=state.records;learningState=state.learning;storageReadError=null;topic='all';mode='smart';sourceFilter=null;activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;showView('today');
+   if(STORE&&!mirrorTrusted){window.alert('Сброс временно недоступен: хранилище ещё не сверено. Перезагрузи страницу после восстановления сохранения.');return;}
+   const backup=P.serialize(state);let kept=false;
+   try{localStorage.setItem(BACKUP,backup);kept=true;}catch{}
+   if(STORE){const copy=STORE.archive(BACKUP,backup);if(kept)copy.catch(()=>{});else try{await Promise.race([copy,new Promise((_,no)=>setTimeout(()=>no(Error('timeout')),5000))]);kept=true;}catch{}}
+   if(!kept){window.alert('Сброс отменён: не удалось сохранить резервную копию. Сначала сделай «Экспорт прогресса».');return;}
+   try{localStorage.removeItem(DRAFT_KEY);}catch{}const retainedPackages=state.lesson_packages;state=P.empty();state.lesson_packages=retainedPackages;records=state.records;learningState=state.learning;storageReadError=null;topic='all';mode='smart';sourceFilter=null;activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;showView('today');
  }
  const learning=window.LearningUI.create({
    get state(){return learningState;},save,startLesson,startCourse,courseJumpMarkup,bindCourseJump,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today'),
@@ -3770,8 +3886,8 @@
      if(next==='confusions'){showView('review');return;}
      launchPatch({key:genericQueueKey(next,'all',null,null,null),topic:'all',sourceFilter:null,activeLesson:null,mode:next,fn(){startQueue();showView('practice');}});
    },
-   contrast:startContrast,setAssociation,promote,export:()=>{save();downloadProgress(P.serialize(state));},import:importProgress,
-   restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(R7_FREG_SNAPSHOT)||localStorage.getItem(R7_SNAPSHOT)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else window.alert('Предыдущей резервной копии пока нет.');}
+   contrast:startContrast,setAssociation,promote,export:()=>{save();downloadProgress(P.serialize(state));},import:(incoming,importMode)=>{try{return importProgress(incoming,importMode);}finally{window.__qzImportReady=false;}},prepareImport,
+   restoreBackup(){const data=localStorage.getItem(BACKUP)||localStorage.getItem(R7_FREG_SNAPSHOT)||localStorage.getItem(R7_SNAPSHOT)||localStorage.getItem(MIGRATION);if(data)downloadProgress(data,'progress-before-import.json');else if(STORE)STORE.latestArchive(SNAPSHOT_KEYS).then(raw=>raw?downloadProgress(raw,'progress-before-import.json'):window.alert('Предыдущей резервной копии пока нет.'),()=>window.alert('Предыдущей резервной копии пока нет.'));else window.alert('Предыдущей резервной копии пока нет.');}
  });
  // r7 X3: ← Назад / «Сделать паузу» leaves the session for the place the learner came from (homework, hub, lesson);
  // it no longer steps to the previous card. The queue, position and typed answer stay saved.
@@ -3956,8 +4072,11 @@
   if(navScreen||surface==='calc')showView('morph');
  }
  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else{renderStats();if(view==='practice')activateCard();if(['today','review','vocabulary'].includes(view))dashboard.render(view);}save();});
- window.addEventListener('qazaq-before-update',e=>{pauseTimer();save();if(!storageAvailable)e.preventDefault();});
- window.addEventListener('blur',pauseTimer);window.addEventListener('focus',startTimer);window.addEventListener('pagehide',()=>{pauseTimer();save();});
+ let updateMirrored=false;
+ window.addEventListener('qazaq-before-update',e=>{pauseTimer();if(updateMirrored){updateMirrored=false;return;}save();if(lsOk&&storageAvailable)return;e.preventDefault();
+   // localStorage is full: update only once the IndexedDB mirror holds this exact state (then press the button again).
+   if(mirrorTrusted&&!storageReadError)STORE.flush().then(()=>{updateMirrored=true;storageAvailable=true;paintSaveStatus();const b=document.getElementById('update-app');if(b)b.click();else updateMirrored=false;},()=>{});});
+ window.addEventListener('blur',pauseTimer);window.addEventListener('focus',startTimer);window.addEventListener('pagehide',()=>{pauseTimer();save();if(STORE)STORE.flush().catch(()=>{});});
  function applyRemote(incoming){
    if(!incoming)return;
    cloudApplying=true;
@@ -4002,4 +4121,10 @@
      if(cloud.user){try{const remote=await cloud.pull();applyRemote(remote);await cloud.push(state);}catch{}}
    });
  })();
+}
+// Storage P0: read the IndexedDB mirror first, so the app starts from the newest copy (a full localStorage can be stale).
+// null = read, no mirror yet; undefined = IndexedDB did not answer: start from localStorage and do not write the mirror.
+const S=window.QazaqStore;
+if(!S||!S.available)qazaqAppBoot(undefined);
+else{let started=false;const go=m=>{if(started)return;started=true;qazaqAppBoot(m);};setTimeout(()=>go(undefined),1500);S.readMirror().then(m=>go(m||null),()=>go(undefined));}
 })();

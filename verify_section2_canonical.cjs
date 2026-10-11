@@ -103,7 +103,7 @@ assert.match(app,/answerTokens[\s\S]{0,900}safe=/,'practice reference must filte
 
 const sw=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
 assert.match(sw,/compiled-lessons-v2\.js/,'service worker must cache compiled lessons');
-assert.match(sw,/section2-canonical|section2-1|section2-2|20261007-section2|20261002|20261007-51-live|51-live|s2-core-clean|20261010-nav01|20261010-vocab-qa|20261010-vocab-pr2|20261011-vocab-pr2-d2|20261011-vocab-pr2-review|20261011-vocab-pr2-gap|20261011-vocab-pr3|20261011-vocab-pr3-delta|20261011-vocab-pr3b|20261011-vocab-pr4|20261011-vocab-pr5|20261011-vocab-pr5b|20261011-vocab-pr6|20261011-vocab-pr6c|20261011-vocab-pr7|20261011-nav02c/i,'service worker cache version must be bumped for section 2');
+assert.match(sw,/section2-canonical|section2-1|section2-2|20261007-section2|20261002|20261007-51-live|51-live|s2-core-clean|20261010-nav01|20261010-vocab-qa|20261010-vocab-pr2|20261011-vocab-pr2-d2|20261011-vocab-pr2-review|20261011-vocab-pr2-gap|20261011-vocab-pr3|20261011-vocab-pr3-delta|20261011-vocab-pr3b|20261011-vocab-pr4|20261011-vocab-pr5|20261011-vocab-pr5b|20261011-vocab-pr6|20261011-vocab-pr6c|20261011-vocab-pr7|20261011-storage-p0|20261011-storage-p0b|20261011-storage-p0c|20261012-storage-p0d|20261011-nav02c|20261011-nav02d/i,'service worker cache version must be bumped for section 2');
 
 console.log('SECTION2_CANONICAL_VERIFY_OK',{
   lessons:Object.keys(expected),
