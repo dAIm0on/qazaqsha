@@ -1,32 +1,108 @@
 {
-  "fixtureStatus": "EXPECTED_UNTIL_VOC",
-  "structural": true,
-  "note": "v6 session.vocab is not on baseline 0dab333adac7c95c2dd486b85eaaf1c20cff6f5f. Structural placeholder only. Not product behavior.",
+  "capturedBy": "tools/capture_nav_must_fixtures.js",
+  "capturedFrom": "9a1fbc4714393c52f17f5f42abf4a01c58c94319",
+  "scene": "boundary",
   "session": {
+    "topic": "vocab",
     "mode": "words",
-    "trainerReturn": "vocab:must",
-    "vocabRole": "must",
-    "position": 0,
+    "sourceFilter": null,
+    "courseBlock": null,
+    "queue": [
+      "hw1-1-kk",
+      "hw1-2-kk",
+      "hw1-3-kk"
+    ],
+    "position": 2,
     "answered": false,
+    "view": "practice",
+    "activeLesson": null,
+    "activeStep": null,
+    "practiceIds": [
+      "hw1-1-kk",
+      "hw1-2-kk",
+      "hw1-3-kk"
+    ],
+    "stepEvidence": {},
+    "variants": {},
+    "hinted": false,
+    "elapsed_ms": 283,
+    "queueEpoch": 1791717683718.6604,
+    "presented": "1791717683718.6604:2",
+    "draft": {
+      "token": "1791717683718.6604:2",
+      "exerciseId": "hw1-3-kk",
+      "answers": [
+        "Қыз"
+      ]
+    },
+    "sessionAttempts": 2,
+    "sessionCorrect": 2,
+    "sessionAssisted": 0,
+    "remediation": null,
+    "hwLesson": null,
+    "hwPart": null,
+    "hwSection": 0,
+    "pathPracticeReturn": null,
+    "stageContext": null,
+    "vocabRole": "must",
+    "trainerReturn": "vocab:must",
+    "trainerEpoch": 1791717683718.6604,
+    "sessionOrigin": "today",
     "vocab": {
       "plan": {
-        "budget": 10,
+        "budget": 9,
         "nNew": 3,
         "baseLen": 3,
-        "newLemmas": []
+        "newLemmas": [
+          "word:адам",
+          "word:қыз",
+          "word:ұл"
+        ],
+        "debt": 0
       },
       "sitting": {
-        "startedAt": null,
-        "sessions": [],
-        "newLemmas": [],
-        "answers": 10,
-        "shown": [],
-        "recent": [],
+        "startedAt": 1791717683497,
+        "sessions": [
+          "1791717683718.6604"
+        ],
+        "newLemmas": [
+          "word:адам",
+          "word:қыз"
+        ],
+        "answers": 2,
+        "shown": [
+          "word:адам",
+          "word:қыз",
+          "word:ұл"
+        ],
+        "recent": [
+          {
+            "cardId": "hw1-1-kk",
+            "lemma": "word:адам",
+            "sessionId": "1791717683718.6604",
+            "presentation": 0
+          },
+          {
+            "cardId": "hw1-2-kk",
+            "lemma": "word:қыз",
+            "sessionId": "1791717683718.6604",
+            "presentation": 1
+          },
+          {
+            "cardId": "hw1-3-kk",
+            "lemma": "word:ұл",
+            "sessionId": "1791717683718.6604",
+            "presentation": 2
+          }
+        ],
         "legacy": null
       },
       "retry": null,
       "closed": [],
-      "unaided": {},
+      "unaided": {
+        "hw1-1-kk": 1,
+        "hw1-2-kk": 1
+      },
       "blindFails": {},
       "nearMiss": null
     }

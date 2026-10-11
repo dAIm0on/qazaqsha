@@ -78,17 +78,148 @@ assert.equal(merged.session, null);
 assert.match(fs.readFileSync(path.join(ROOT, 'progress.js'), 'utf8'), /out\.session=null;/);
 console.log('BASELINE merge clears session');
 
-for (const name of ['must-first-show.json', 'must-idk.json', 'must-wrong.json', 'must-boundary.json', 'must-summary.json']) {
-  const fixture = load(name);
-  assert.equal(fixture.fixtureStatus, 'EXPECTED_UNTIL_VOC');
-  assert.equal(fixture.structural, true);
-  assert.equal(fixture.session.mode, 'words');
-  assert.equal(fixture.session.trainerReturn, 'vocab:must');
-  assert.ok(fixture.session.vocab);
-  console.log('EXPECTED_UNTIL_VOC', name, 'structural placeholder, not product behavior');
+const {boot, sleep} = require('./tools/capture_nav_must_fixtures.js');
+const MUST_NAMES = ['must-first-show.json', 'must-idk.json', 'must-wrong.json', 'must-boundary.json', 'must-summary.json'];
+
+function hasVocab(session) {
+  return !!session && Object.prototype.hasOwnProperty.call(session, 'vocab');
 }
-const saveBody = app.slice(app.indexOf('function save(){'), app.indexOf('function subset(){'));
-assert.match(saveBody, /state\.session=\{/);
-assert.doesNotMatch(saveBody, /\bvocab\s*:/);
-console.log('EXPECTED_UNTIL_VOC save() does not write session.vocab on this baseline');
-console.log('VERIFY_NAVIGATION_STATE_OK');
+function cardId(session) {
+  return session.queue[session.position];
+}
+
+(async () => {
+  const fixtures = {};
+  for (const name of MUST_NAMES) {
+    const fixture = load(name);
+    assert.equal(Object.prototype.hasOwnProperty.call(fixture, 'fixtureStatus'), false, name);
+    assert.equal(Object.prototype.hasOwnProperty.call(fixture, 'structural'), false, name);
+    assert.equal(fixture.capturedBy, 'tools/capture_nav_must_fixtures.js', name);
+    assert.match(fixture.capturedFrom, /^[0-9a-f]{40}$/, name);
+    assert.equal(fixture.session.mode, 'words', name);
+    assert.equal(fixture.session.trainerReturn, 'vocab:must', name);
+    assert.equal(fixture.session.vocabRole, 'must', name);
+    assert.equal(fixture.session.topic, 'vocab', name);
+    assert.ok(fixture.session.vocab && fixture.session.vocab.plan && fixture.session.vocab.sitting, name);
+    assert.equal(fixture.session.vocab.nearMiss, null, name);
+    assert.equal(fixture.session.vocab.sitting.legacy, null, name);
+    assert.ok(fixture.session.vocab.sitting.shown.length > 0, name);
+    assert.equal(Object.prototype.hasOwnProperty.call(fixture.session, 'vocabSummary'), false, name);
+    assert.equal(String(fixture.session.queue[0]).includes('structural'), false, name);
+    fixtures[name] = fixture;
+    console.log('BASELINE', name, fixture.scene, 'card', cardId(fixture.session));
+  }
+  assert.equal(fixtures['must-first-show.json'].session.vocab.retry, null);
+  assert.equal(fixtures['must-idk.json'].session.vocab.retry.kind, 'idk');
+  assert.equal(fixtures['must-idk.json'].session.hinted, true);
+  assert.equal(fixtures['must-idk.json'].session.sessionAttempts, 0);
+  assert.equal(fixtures['must-wrong.json'].session.vocab.retry.kind, 'wrong');
+  assert.equal(fixtures['must-wrong.json'].session.hinted, false);
+  assert.equal(fixtures['must-wrong.json'].session.sessionAttempts, 0);
+  const boundary = fixtures['must-boundary.json'].session;
+  assert.equal(boundary.position, boundary.queue.length - 1);
+  assert.ok(boundary.sessionAttempts < boundary.vocab.plan.budget);
+  assert.equal(boundary.vocab.retry, null);
+
+  const live = boot();
+  live.window.TrainerCatalogBridge.launch('vocab:must');
+  live.saveNow();
+  const saved = live.session();
+  assert.equal(saved.mode, 'words');
+  assert.equal(saved.trainerReturn, 'vocab:must');
+  assert.equal(saved.vocabRole, 'must');
+  assert.equal(hasVocab(saved), true);
+  assert.ok(saved.vocab.plan && saved.vocab.sitting);
+  assert.equal(saved.vocab.nearMiss, null);
+  assert.equal(saved.vocab.sitting.legacy, null);
+  assert.ok(saved.vocab.sitting.shown.length > 0);
+  assert.equal(saved.queueEpoch, saved.trainerEpoch);
+  console.log('BASELINE must save() writes session.vocab');
+
+  const plain = boot();
+  plain.saveNow();
+  assert.equal(hasVocab(plain.session()), false);
+  assert.notEqual(plain.session().mode, 'words');
+  console.log('BASELINE non-must save() omits session.vocab');
+
+  const midLive = boot(JSON.stringify({session: mid}));
+  midLive.saveNow();
+  const midSaved = midLive.session();
+  assert.equal(hasVocab(midSaved), false);
+  assert.equal(midSaved.mode, 'ordered');
+  assert.equal(midSaved.queue[0], 'm1-1-1');
+  console.log('BASELINE practice-mid restore still omits session.vocab');
+
+  for (const name of MUST_NAMES) {
+    const fixture = fixtures[name];
+    const again = boot(JSON.stringify({session: fixture.session}));
+    again.saveNow();
+    const got = again.session();
+    assert.equal(got.mode, 'words', name);
+    assert.equal(got.trainerReturn, 'vocab:must', name);
+    assert.equal(cardId(got), cardId(fixture.session), name + ' card');
+    assert.equal(got.position, fixture.session.position, name + ' position');
+    assert.equal(got.sessionAttempts, fixture.session.sessionAttempts, name + ' attempts');
+    assert.equal(got.queueEpoch, fixture.session.queueEpoch, name + ' epoch');
+    assert.equal(got.queue.length, fixture.session.queue.length, name + ' queue');
+    assert.equal(JSON.stringify(got.vocab.sitting.shown), JSON.stringify(fixture.session.vocab.sitting.shown), name + ' shown');
+    assert.equal(JSON.stringify(got.vocab.retry), JSON.stringify(fixture.session.vocab.retry), name + ' retry');
+    assert.equal(got.vocab.plan.budget, fixture.session.vocab.plan.budget, name + ' budget');
+    assert.equal(again.window.VocabMust.portionDone(got.sessionAttempts, got.vocab.plan.budget, got.position, got.queue.length), false, name + ' portion rolled');
+    console.log('BASELINE restore', name);
+  }
+
+  const leave = boot();
+  leave.window.TrainerCatalogBridge.launch('vocab:must');
+  leave.saveNow();
+  const beforeEvents = JSON.parse(leave.window.localStorage.getItem('qazaq-kris-course-v1')).events.length;
+  leave.makeEl('vocab-finish').onclick();
+  leave.window.QazaqShell.show('vocabulary');
+  leave.saveNow();
+  const afterEvents = JSON.parse(leave.window.localStorage.getItem('qazaq-kris-course-v1')).events;
+  assert.equal(afterEvents.length, beforeEvents);
+  assert.equal(afterEvents.filter(e => e && (e.hint_kind === 'reference' || e.type === 'hint')).length, 0);
+  console.log('BASELINE open summary leave writes no hint');
+
+  const once = boot();
+  once.window.TrainerCatalogBridge.launch('vocab:must');
+  once.saveNow();
+  const holdCard = cardId(once.session());
+  once.makeEl('vocab-finish').onclick();
+  once.makeEl('vocab-summary-continue').onclick();
+  once.makeEl('hint-button').onclick();
+  once.window.QazaqShell.show('vocabulary');
+  once.window.QazaqShell.show('practice');
+  once.saveNow();
+  assert.equal(once.session().hinted, true);
+  assert.equal(cardId(once.session()), holdCard);
+  console.log('BASELINE continue consumes the one-shot hold; a later hint stays');
+
+  const auto = boot();
+  auto.window.TrainerCatalogBridge.launch('vocab:must');
+  auto.saveNow();
+  const autoCard = auto.cardOf(auto.session());
+  const autoAnswer = auto.answerOf(autoCard);
+  assert.ok(autoAnswer, 'first card has an answer');
+  auto.submit(autoAnswer);
+  auto.makeEl('vocab-finish').onclick();
+  auto.makeEl('vocab-summary-continue').onclick();
+  await sleep(1000);
+  auto.saveNow();
+  const autoSaved = auto.session();
+  assert.equal(autoSaved.position, 1);
+  assert.equal(autoSaved.sessionAttempts, 1);
+  assert.notEqual(cardId(autoSaved), autoCard.id);
+  assert.equal(hasVocab(autoSaved), true);
+  console.log('BASELINE continue restarts the scheduled advance');
+
+  const rev = live.window.COURSE.questions.find(q => /-kk-rev$/.test(q.id) && q.wordRole === 'must');
+  assert.ok(rev, 'must -kk-rev card');
+  assert.equal(live.window.TrainerCore.answerLang(rev, 0), 'ru');
+  console.log('BASELINE', rev.id, 'answerLang ru');
+
+  console.log('VERIFY_NAVIGATION_STATE_OK');
+})().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

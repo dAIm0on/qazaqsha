@@ -1,42 +1,105 @@
 {
-  "fixtureStatus": "EXPECTED_UNTIL_VOC",
-  "structural": true,
-  "note": "v6 session.vocab is not on baseline 0dab333adac7c95c2dd486b85eaaf1c20cff6f5f. Structural placeholder only. Not product behavior.",
+  "capturedBy": "tools/capture_nav_must_fixtures.js",
+  "capturedFrom": "9a1fbc4714393c52f17f5f42abf4a01c58c94319",
+  "scene": "wrong",
   "session": {
+    "topic": "vocab",
     "mode": "words",
-    "trainerReturn": "vocab:must",
-    "vocabRole": "must",
+    "sourceFilter": null,
+    "courseBlock": null,
+    "queue": [
+      "hw1-1-kk",
+      "hw1-2-kk",
+      "hw1-3-kk",
+      "hw1-1-kk"
+    ],
     "position": 0,
     "answered": false,
+    "view": "practice",
+    "activeLesson": null,
+    "activeStep": null,
+    "practiceIds": [
+      "hw1-1-kk",
+      "hw1-2-kk",
+      "hw1-3-kk"
+    ],
+    "stepEvidence": {},
+    "variants": {},
+    "hinted": false,
+    "elapsed_ms": 0,
+    "queueEpoch": 1791717683191.7368,
+    "presented": "1791717683191.7368:0",
+    "draft": {
+      "token": "1791717683191.7368:0",
+      "exerciseId": "hw1-1-kk",
+      "answers": [
+        "неттакого"
+      ]
+    },
+    "sessionAttempts": 0,
+    "sessionCorrect": 0,
+    "sessionAssisted": 0,
+    "remediation": null,
+    "hwLesson": null,
+    "hwPart": null,
+    "hwSection": 0,
+    "pathPracticeReturn": null,
+    "stageContext": null,
+    "vocabRole": "must",
+    "trainerReturn": "vocab:must",
+    "trainerEpoch": 1791717683191.7368,
+    "sessionOrigin": "today",
     "vocab": {
       "plan": {
-        "budget": 10,
+        "budget": 9,
         "nNew": 3,
         "baseLen": 3,
-        "newLemmas": []
+        "newLemmas": [
+          "word:адам",
+          "word:қыз",
+          "word:ұл"
+        ],
+        "debt": 0
       },
       "sitting": {
-        "startedAt": null,
-        "sessions": [],
-        "newLemmas": [],
+        "startedAt": 1791717682968,
+        "sessions": [
+          "1791717683191.7368"
+        ],
+        "newLemmas": [
+          "word:адам"
+        ],
         "answers": 0,
-        "shown": [],
-        "recent": [],
+        "shown": [
+          "word:адам"
+        ],
+        "recent": [
+          {
+            "cardId": "hw1-1-kk",
+            "lemma": "word:адам",
+            "sessionId": "1791717683191.7368",
+            "presentation": 0
+          }
+        ],
         "legacy": null
       },
       "retry": {
-        "cardId": "structural-card",
-        "sessionId": "structural",
+        "cardId": "hw1-1-kk",
+        "sessionId": "1791717683191.7368",
         "presentation": 0,
         "kind": "wrong",
         "typed": [
-          "structural"
+          "неттакого"
         ],
-        "answerEventId": null
+        "answerEventId": "ans:1791717683191.7368:0:hw1-1-kk"
       },
       "closed": [],
-      "unaided": {},
-      "blindFails": {},
+      "unaided": {
+        "hw1-1-kk": 0
+      },
+      "blindFails": {
+        "hw1-1-kk": 1
+      },
       "nearMiss": null
     }
   }

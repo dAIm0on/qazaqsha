@@ -8,7 +8,7 @@ Baseline `0dab333adac7c95c2dd486b85eaaf1c20cff6f5f`. These files are not linked 
 
 `practice-incompatible.json` is the same shape with queue id `missing-question-nav00`. Today's `validSaved` rejects unknown ids (`byId.has`). `migrate` keeps the id; nothing here rewrites it.
 
-`must-*.json` are structural placeholders, status `EXPECTED_UNTIL_VOC`. v6 `session.vocab` is not on this baseline and these files are not product behavior.
+`must-*.json` are `save()` sessions captured from the product on main `9a1fbc4714393c52f17f5f42abf4a01c58c94319`. Production cache `qazaq-offline-live-20261011-vocab-pr6c` is unchanged: this capture does not edit the product. Recapture with `node tools/capture_nav_must_fixtures.js`. `queueEpoch`, `trainerEpoch`, `elapsed_ms` and sitting timestamps are whatever that run wrote. Checks restore the committed file. They do not byte-compare two captures. `session.vocab` is the v6 snapshot (`plan`, `sitting`, `retry`, `closed`, `unaided`, `blindFails`, `nearMiss` null). On these fresh sessions `sitting.legacy` is null and `sitting.shown` lists the lemmas actually shown. An open summary is not stored. `must-summary.json` is the session saved while that summary was on screen, and a reload returns to that card. The capture keeps the queue `planPortion` built, including a repeated tail when the product queues one.
 
 `entry-map.json` maps current track and trainer ids, plus the current shell screens, onto the future public routes. Those routes are not implemented here.
 

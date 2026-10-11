@@ -33,7 +33,7 @@ const PROTECTED = [
   'free-practice-content.js',
   'free-practice-view.js'
 ];
-const ALLOWED_FILE = /^(verify_navigation_(contract|state|ui)\.cjs|fixtures\/navigation\/(README\.md|[A-Za-z0-9._-]+\.json))$/;
+const ALLOWED_FILE = /^(verify_navigation_(contract|state|ui)\.cjs|tools\/capture_nav_must_fixtures\.js|fixtures\/navigation\/(README\.md|[A-Za-z0-9._-]+\.json))$/;
 
 function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -188,27 +188,27 @@ function registry() {
     ['N-TAP-05', 'visible main menu', 'Практика', 'current lesson practice', ['practice-mid.json'], 'NAV-08', 'EXPECTED_LATER'],
     ['N-TAP-06', 'lesson hero', 'Продолжить when target is theory', 'promised chapter and beat', ['theory-draft.json'], 'NAV-04', 'EXPECTED_LATER'],
     ['N-TAP-07', 'lesson hero', 'Продолжить when target is practice', 'promised course position', ['practice-mid.json'], 'NAV-04', 'EXPECTED_LATER'],
-    ['N-TAP-08', 'must summary', 'Продолжить', 'same sitting and open card', ['must-summary.json', 'must-idk.json', 'must-wrong.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
+    ['N-TAP-08', 'must summary', 'Продолжить', 'same sitting and open card', ['must-summary.json', 'must-idk.json', 'must-wrong.json'], 'VOC', 'BASELINE'],
     ['N-TAP-09', 'practices', 'secondary Слова по кругу', 'same must launcher', ['must-first-show.json'], 'NAV-05', 'EXPECTED_LATER'],
     ['N-TAP-10', 'theory', 'Назад · пауза', 'origin, path kept', ['theory-draft.json'], 'NAV-04', 'EXPECTED_LATER'],
     ['N-TAP-11', 'must', 'Назад · пауза', 'origin, no summary, sitting kept', ['must-first-show.json', 'must-idk.json', 'must-wrong.json'], 'NAV-04', 'EXPECTED_LATER'],
     ['N-TAP-12', 'course practice', 'Назад · пауза', 'origin, queue and draft kept', ['practice-mid.json'], 'NAV-04', 'EXPECTED_LATER'],
-    ['N-TAP-13', 'must summary', 'К тренажёрам', 'practices and closed sitting', ['must-summary.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
+    ['N-TAP-13', 'must summary', 'К тренажёрам', 'practices and closed sitting', ['must-summary.json'], 'VOC', 'BASELINE'],
     ['N-TAP-14', 'visible main menu', 'Форма слова', 'existing morph', ['clean.json'], 'NAV-08', 'EXPECTED_LATER'],
     ['N-TAP-15', 'visible main menu', 'Урок', 'lesson home', ['clean.json'], 'NAV-08', 'EXPECTED_LATER'],
     ['N-TAP-16', 'header', 'Библиотека', 'library', ['clean.json'], 'NAV-06', 'EXPECTED_LATER']
   ].map(item => row(...item));
   const states = [
-    ['course-pause-must-course', 'course practice', 'pause then must', 'course', ['practice-mid.json', 'must-first-show.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
-    ['must-wrong-pause-course-must', 'must retype', 'pause', 'course then must', ['must-wrong.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
+    ['course-pause-must-course', 'course practice', 'must save beside it', 'non-must omits vocab; must writes vocab', ['practice-mid.json', 'must-first-show.json'], 'VOC', 'BASELINE'],
+    ['must-wrong-pause-course-must', 'must retype', 'pause', 'learn, then the same retype', ['must-wrong.json'], 'VOC', 'BASELINE'],
     ['theory-practice-words-theory', 'path', 'practice then words', 'theory', ['theory-draft.json'], 'NAV-05', 'EXPECTED_LATER'],
-    ['words-catalog-back', 'words', 'catalog', 'words', ['must-first-show.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
-    ['must-boundary-pause', 'must boundary', 'pause', 'same must portion', ['must-boundary.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
-    ['summary-continue', 'must summary', 'continue', '#/words', ['must-summary.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
+    ['words-catalog-back', 'words', 'catalog', 'words', ['must-first-show.json'], 'VOC', 'BASELINE'],
+    ['must-boundary-pause', 'must boundary', 'pause', 'same must portion', ['must-boundary.json'], 'VOC', 'BASELINE'],
+    ['summary-continue', 'must summary', 'continue', 'live words session, same card', ['must-summary.json'], 'VOC', 'BASELINE'],
     ['summary-to-trainers', 'must summary', 'trainers', 'personal', ['must-summary.json'], 'NAV-08', 'EXPECTED_LATER'],
     ['reload-three-sessions', 'three open sessions', 'reload', 'each session restored', ['clean.json', 'theory-draft.json', 'practice-mid.json'], 'NAV-02', 'EXPECTED_LATER'],
     ['import-replace-merge', 'progress import', 'merge', 'session cleared', ['practice-mid.json'], 'NAV-02', 'BASELINE'],
-    ['applyRemote-during-retry', 'must retry', 'applyRemote', 'live retry kept', ['must-idk.json'], 'VOC', 'EXPECTED_UNTIL_VOC'],
+    ['applyRemote-during-retry', 'must retry', 'applyRemote', 'live retry kept', ['must-idk.json'], 'VOC', 'BASELINE'],
     ['double-click-launcher', 'personal', 'trainer card', 'one launch', ['entry-map.json'], 'NAV-07', 'EXPECTED_LATER'],
     ['storage-unavailable', 'any', 'qazaq-before-update', 'preventDefault', [], 'NAV-01', 'BASELINE']
   ].map(item => row(...item));
@@ -236,7 +236,7 @@ function registry() {
     row('N-UI', 'bottom-nav', 'future 4-item menu', 'Урок / Слова / Практика / Форма слова', [], 'NAV-08', 'EXPECTED_LATER'),
     row('N-READY', 'homework and exam', 'open', '#/ready/homework/:id and #/ready/exam', ['entry-map.json'], 'NAV-09', 'EXPECTED_LATER'),
     row('N-DICT', 'vocabulary', 'Мой словарь', '#/dict', ['entry-map.json'], 'NAV-10', 'EXPECTED_LATER'),
-    row('N-VOC', 'words must', 'session.vocab', 'v6 snapshot', ['must-first-show.json', 'must-idk.json', 'must-wrong.json', 'must-boundary.json', 'must-summary.json'], 'VOC', 'EXPECTED_UNTIL_VOC'),
+    row('N-VOC', 'words must', 'session.vocab', 'v6 snapshot', ['must-first-show.json', 'must-idk.json', 'must-wrong.json', 'must-boundary.json', 'must-summary.json'], 'VOC', 'BASELINE'),
     row('PWA-CONTROLLERCHANGE-RELOAD', 'pwa', 'controllerchange', 'first controller does not reload', [], 'NAV-01', 'BASELINE')
   ];
   const rules = [
@@ -268,9 +268,17 @@ for (const id of required) assert.ok(byId.has(id), 'missing contract ' + id);
 for (const item of contracts) {
   for (const key of ['id', 'sourceScreen', 'control', 'target', 'fixtures', 'owner', 'status']) assert.ok(Object.prototype.hasOwnProperty.call(item, key), item.id + ' ' + key);
   assert.match(item.owner, /^(NAV-(0\d|10)|VOC)$/);
-  assert.ok(['BASELINE', 'BASELINE_DEFECT_OWNED_BY_NAV01', 'EXPECTED_LATER', 'EXPECTED_UNTIL_VOC', 'RULE_REGISTERED'].includes(item.status), item.status);
+  assert.ok(['BASELINE', 'BASELINE_DEFECT_OWNED_BY_NAV01', 'EXPECTED_LATER', 'RULE_REGISTERED'].includes(item.status), item.status);
   if (/^K[1-6]$/.test(item.id)) assert.equal(item.status, 'RULE_REGISTERED', item.id + ' must not be claimed as passing');
   console.log('CONTRACT', item.id, item.status, item.owner, item.sourceScreen, '->', item.target);
+}
+assert.equal(contracts.some(item => item.status === 'EXPECTED_UNTIL_VOC'), false);
+for (const id of ['N-TAP-08', 'N-TAP-13', 'course-pause-must-course', 'must-wrong-pause-course-must', 'words-catalog-back', 'must-boundary-pause', 'summary-continue', 'applyRemote-during-retry', 'N-VOC']) {
+  assert.equal(byId.get(id).status, 'BASELINE', id);
+  assert.equal(byId.get(id).owner, 'VOC', id);
+}
+for (const id of ['N-TAP-03', 'N-TAP-04', 'N-TAP-09', 'N-TAP-11', 'summary-to-trainers', 'N-HISTORY-2', 'N-HISTORY-6']) {
+  assert.equal(byId.get(id).status, 'EXPECTED_LATER', id);
 }
 const counts = {};
 for (const item of contracts) counts[item.status] = (counts[item.status] || 0) + 1;
@@ -289,7 +297,6 @@ const saveStart = app.indexOf('function save(){');
 const saveEnd = app.indexOf('function subset(){');
 const saveBody = app.slice(saveStart, saveEnd);
 assert.match(saveBody, /state\.session=\{/);
-assert.doesNotMatch(saveBody, /\bvocab\s*:/);
 const applyStart = app.indexOf('function applyRemote(incoming){');
 const applyEnd = app.indexOf('function paintAccount(){');
 const applyBody = app.slice(applyStart, applyEnd);
@@ -368,4 +375,166 @@ if (process.env.NAV00_SCOPE === '1' && ensureBase() && ensureMain()) {
 } else if (process.env.NAV00_SCOPE !== '1') {
   console.log('PROD_GATE SKIP set NAV00_SCOPE=1 to compare product files with origin/main');
 }
-console.log('VERIFY_NAVIGATION_CONTRACT_OK');
+
+const {boot, sleep, KEY} = require('./tools/capture_nav_must_fixtures.js');
+
+function hasVocab(session) {
+  return !!session && Object.prototype.hasOwnProperty.call(session, 'vocab');
+}
+
+(async () => {
+  const mustNames = ['must-first-show.json', 'must-idk.json', 'must-wrong.json', 'must-boundary.json', 'must-summary.json'];
+  const fixtures = {};
+  for (const name of mustNames) {
+    const fixture = JSON.parse(fs.readFileSync(path.join(FIX, name), 'utf8'));
+    assert.equal(Object.prototype.hasOwnProperty.call(fixture, 'fixtureStatus'), false, name);
+    assert.equal(Object.prototype.hasOwnProperty.call(fixture, 'structural'), false, name);
+    assert.equal(fixture.session.mode, 'words', name);
+    assert.equal(fixture.session.trainerReturn, 'vocab:must', name);
+    assert.ok(fixture.session.vocab && fixture.session.vocab.sitting.shown.length > 0, name);
+    assert.equal(fixture.session.vocab.sitting.legacy, null, name);
+    assert.equal(fixture.session.vocab.nearMiss, null, name);
+    assert.equal(Object.prototype.hasOwnProperty.call(fixture.session, 'vocabSummary'), false, name);
+    fixtures[name] = fixture;
+  }
+  assert.equal(fixtures['must-idk.json'].session.vocab.retry.kind, 'idk');
+  assert.equal(fixtures['must-wrong.json'].session.vocab.retry.kind, 'wrong');
+  console.log('BASELINE N-VOC five captured v6 snapshots');
+
+  const plain = boot();
+  plain.saveNow();
+  assert.equal(hasVocab(plain.session()), false);
+  const mustLive = boot();
+  mustLive.window.TrainerCatalogBridge.launch('vocab:must');
+  mustLive.saveNow();
+  assert.equal(hasVocab(mustLive.session()), true);
+  assert.equal(mustLive.session().mode, 'words');
+  assert.equal(mustLive.session().trainerReturn, 'vocab:must');
+  console.log('BASELINE must save() writes session.vocab; a non-must save omits it');
+
+  const practice = JSON.parse(fs.readFileSync(path.join(FIX, 'practice-mid.json'), 'utf8'));
+  assert.equal(hasVocab(practice), false);
+  assert.equal(hasVocab(fixtures['must-first-show.json'].session), true);
+  const midLive = boot(JSON.stringify({session: practice}));
+  midLive.saveNow();
+  assert.equal(hasVocab(midLive.session()), false);
+  assert.equal(midLive.session().queue[0], 'm1-1-1');
+  assert.equal(midLive.session().mode, 'ordered');
+  console.log('BASELINE course-pause-must-course: practice-mid omits vocab, must writes it. Course-queue parking stays in lesson practice and is not a second session.');
+
+  async function continueFrom(setup) {
+    const api = boot();
+    api.window.TrainerCatalogBridge.launch('vocab:must');
+    if (setup) setup(api);
+    api.saveNow();
+    const before = api.session();
+    api.makeEl('vocab-finish').onclick();
+    api.makeEl('vocab-summary-continue').onclick();
+    api.saveNow();
+    const after = api.session();
+    assert.equal(after.queue[after.position], before.queue[before.position]);
+    assert.equal(after.queueEpoch, before.queueEpoch);
+    assert.equal(JSON.stringify(after.vocab.sitting.shown), JSON.stringify(before.vocab.sitting.shown));
+    assert.equal(JSON.stringify(after.vocab.retry), JSON.stringify(before.vocab.retry));
+    assert.equal(after.view, 'practice');
+    assert.equal(after.mode, 'words');
+    assert.equal(after.trainerReturn, 'vocab:must');
+    assert.equal(api.window.location.hash, '');
+  }
+  await continueFrom(null);
+  await continueFrom(api => { api.makeEl('reveal-button').onclick(); });
+  await continueFrom(api => { api.submit('неттакого'); });
+  console.log('BASELINE N-TAP-08 and summary-continue keep the card. Hash #/words is not this check.');
+
+  const summary = boot();
+  summary.window.TrainerCatalogBridge.launch('vocab:must');
+  summary.makeEl('vocab-finish').onclick();
+  assert.ok(String(summary.makeEl('exercise').innerHTML).includes('Итог'));
+  summary.saveNow();
+  assert.equal(Object.prototype.hasOwnProperty.call(summary.session(), 'vocabSummary'), false);
+  assert.equal(summary.session().view, 'practice');
+  console.log('BASELINE open summary is on screen and is not stored in session.vocab');
+
+  const end = boot();
+  end.window.TrainerCatalogBridge.launch('vocab:must');
+  end.makeEl('vocab-finish').onclick();
+  end.makeEl('vocab-summary-trainers').onclick();
+  end.saveNow();
+  assert.equal(end.session().view, 'personal');
+  assert.equal(hasVocab(end.session()), false);
+  assert.equal(end.session().mode, 'ordered');
+  console.log('BASELINE N-TAP-13 К тренажёрам closes the must sitting');
+
+  const back = boot();
+  back.window.TrainerCatalogBridge.launch('vocab:must');
+  back.saveNow();
+  const epoch = back.session().queueEpoch;
+  const card = back.session().queue[back.session().position];
+  back.window.QazaqShell.show('personal');
+  back.window.TrainerCatalogBridge.launch('vocab:must');
+  back.saveNow();
+  assert.equal(back.session().queueEpoch, epoch);
+  assert.equal(back.session().queue[back.session().position], card);
+  assert.equal(back.session().view, 'practice');
+  console.log('BASELINE words-catalog-back keeps the open must card');
+
+  const boundaryFx = fixtures['must-boundary.json'];
+  const boundary = boot(JSON.stringify({session: boundaryFx.session}));
+  boundary.saveNow();
+  const kept = boundary.session();
+  assert.equal(kept.queueEpoch, boundaryFx.session.queueEpoch);
+  assert.equal(kept.position, boundaryFx.session.position);
+  assert.equal(kept.queue[kept.position], boundaryFx.session.queue[boundaryFx.session.position]);
+  assert.equal(kept.sessionAttempts, boundaryFx.session.sessionAttempts);
+  assert.equal(boundary.window.VocabMust.portionDone(kept.sessionAttempts, kept.vocab.plan.budget, kept.position, kept.queue.length), false);
+  console.log('BASELINE must-boundary-pause restores the same portion');
+
+  const trip = boot();
+  trip.window.TrainerCatalogBridge.launch('vocab:must');
+  trip.submit('неттакого');
+  trip.saveNow();
+  const tripBefore = trip.session();
+  assert.equal(tripBefore.vocab.retry.kind, 'wrong');
+  trip.window.QazaqShell.show('learn');
+  trip.window.TrainerCatalogBridge.launch('vocab:must');
+  trip.saveNow();
+  const tripAfter = trip.session();
+  assert.equal(tripAfter.vocab.retry.kind, 'wrong');
+  assert.equal(tripAfter.vocab.retry.cardId, tripBefore.vocab.retry.cardId);
+  assert.equal(tripAfter.queue[tripAfter.position], tripBefore.queue[tripBefore.position]);
+  assert.equal(tripAfter.queueEpoch, tripBefore.queueEpoch);
+  console.log('BASELINE must-wrong-pause-course-must keeps the retype across a learn visit');
+
+  const remote = boot(null, w => {
+    w.QazaqCloud = {
+      configured: true,
+      user: null,
+      async start() {},
+      async pull() { return JSON.parse(w.localStorage.getItem(KEY)); },
+      async push() {},
+      async login() {},
+      async logout() {},
+      async register() {}
+    };
+  });
+  remote.window.TrainerCatalogBridge.launch('vocab:must');
+  remote.makeEl('reveal-button').onclick();
+  remote.saveNow();
+  const remoteBefore = remote.session();
+  assert.equal(remoteBefore.vocab.retry.kind, 'idk');
+  remote.window.QazaqCloud.user = {email: 'nav@example.com'};
+  remote.window.dispatchEvent(new remote.window.CustomEvent('qazaq-cloud-user'));
+  await sleep(200);
+  remote.saveNow();
+  const remoteAfter = remote.session();
+  assert.ok(remoteAfter && remoteAfter.vocab && remoteAfter.vocab.retry);
+  assert.equal(remoteAfter.vocab.retry.kind, 'idk');
+  assert.equal(remoteAfter.vocab.retry.cardId, remoteBefore.vocab.retry.cardId);
+  assert.equal(remoteAfter.queue[remoteAfter.position], remoteBefore.queue[remoteBefore.position]);
+  console.log('BASELINE applyRemote-during-retry keeps the live idk retype');
+
+  console.log('VERIFY_NAVIGATION_CONTRACT_OK');
+})().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
