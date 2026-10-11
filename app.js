@@ -335,9 +335,9 @@
     Kept per card in its own key (never in records/evidence): it is not an answer, not a try, not a hint. Cleared on Проверить / Показать ответ. */
  const DRAFT_KEY=KEY+'-drafts',DRAFT_TTL=14*864e5,DRAFT_CAP=60;
  function draftBook(){try{const b=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}');return b&&typeof b==='object'&&!Array.isArray(b)?b:{};}catch{return {};}}
- function draftPut(k,a){
+ function draftPut(k,a,p){
    if(!k)return;const b=draftBook(),now=Date.now();
-   if(!Array.isArray(a)||!a.some(x=>String(x||'').trim()))delete b[k];else b[k]={a:a.slice(0,8).map(x=>String(x||'').slice(0,200)),t:now};
+   if(!Array.isArray(a)||!a.some(x=>String(x||'').trim()))delete b[k];else{b[k]={a:a.slice(0,8).map(x=>String(x||'').slice(0,200)),t:now};if(p)b[k].p=String(p);}
    const keep=Object.entries(b).filter(([,r])=>r&&Array.isArray(r.a)&&now-(Number(r.t)||0)<DRAFT_TTL).sort((x,y)=>y[1].t-x[1].t).slice(0,DRAFT_CAP);
    try{if(keep.length)localStorage.setItem(DRAFT_KEY,JSON.stringify(Object.fromEntries(keep)));else localStorage.removeItem(DRAFT_KEY);}catch{}
  }
@@ -346,11 +346,18 @@
  // Scoped to the session kind: a draft typed in ДЗ words does not pop up in Тренажёры for the same card.
  function draftScope(){return String(mode||'')+':'+String((trainerReturn&&queueEpoch===trainerEpoch?'t-'+trainerReturn:'')||(mode==='homework'?hwLesson+'/'+hwPart:'')||courseBlock||activeLesson||'');}
  function cardDraftKey(q){return typedCard(q)?'q|'+draftScope()+'|'+q.id+'|'+String(q.stimulus||'').slice(0,80):'';}
- function stashCard(q,keepEmpty){if(!typedCard(q)||checked||retrying)return;const a=readAnswers(q);if(!keepEmpty&&!a.some(x=>String(x||'').trim()))return;draftPut(cardDraftKey(q),a);}
+ /* PR-7 D1: one show of a card = queueEpoch:position:id. The form carries it, so a late change event from the
+    removed form never writes into the next card. A closed show (retype done) keeps no draft. In vocab:must a card
+    draft refills only the same show, so a returned card never comes with an answer typed on an earlier show. */
+ function presToken(q){return String(queueEpoch)+':'+position+':'+String(q&&q.id||'');}
+ function formIsCard(q){const f=$('#answer-form');return !!f&&!(f.dataset&&f.dataset.pres&&f.dataset.pres!==presToken(q));}
+ function showClosed(q){return isVocabMustTrainer()&&!!q&&vocabClosed.includes(String(queueEpoch)+'|'+position+'|'+q.id);}
+ function stashCard(q,keepEmpty){if(!typedCard(q)||checked||retrying||showClosed(q)||!formIsCard(q))return;const a=readAnswers(q);if(!keepEmpty&&!a.some(x=>String(x||'').trim()))return;draftPut(cardDraftKey(q),a,presToken(q));}
  function dropCardDraft(q){if(typedCard(q))draftPut(cardDraftKey(q),null);}
  function refillCardDraft(){
    const q=byId.get(queue[position]);if(!typedCard(q)||checked||!$('#answer-form'))return false;
    const a=draftGet(cardDraftKey(q));if(!a)return false;
+   if(isVocabMustTrainer()){const r=draftBook()[cardDraftKey(q)];if(!r||r.p!==presToken(q))return false;}
    const els=q.fields.map((f,i)=>$('#answer-'+i));if(els.some(el=>!el||el.disabled||el.value))return false;
    els.forEach((el,i)=>{el.value=String(a[i]||'');});return true;
  }
@@ -409,7 +416,7 @@
      const beat=Number(pathInput.dataset.beat);
      gp.pathDraft={lessonId:pathInput.dataset.lesson||gp.lessonId,chapterId:pathInput.dataset.chapter||gp.chapterId,beat:Number.isInteger(beat)?beat:gp.beat,value:pathInput.value};
    }
-   const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form')){draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};stashCard(q,false);}
+   const q=byId.get(queue[position]);if(!checked&&q&&$('#answer-form')&&formIsCard(q)&&!showClosed(q)){draft={token:queueEpoch+':'+position,exerciseId:q.id,answers:readAnswers(q)};stashCard(q,false);}
    const ask=$('#rules-ask-q');
    if(ask){
      if(ask.value)state.rulesDraft={article:rulesArticle||'',value:ask.value.slice(0,400)};
@@ -781,6 +788,23 @@
    vocabPlan=planned.plan;vocabSitting.sessions.push(String(queueEpoch));
    position=0;checked=false;hinted=false;retrying=false;vocabRetry=null;retryAfterWrong=false;vocabReturnScheduled=false;
    return true;
+ }
+ /* PR-7 GPT P1-2 (general): commitFirst found the show's first answer (another tab via applyRemote, or this tab).
+    One place for «Проверить» and «Не знаю»: nothing is counted, nothing is written, no draft is kept.
+    alreadyHandled — the show is closed here too and the trainer moves on (as after a duplicate retry_close);
+    otherwise — the retype the first answer opened, with that answer's own retry record. The queue is the one
+    settleExisting returned (the first answer's return). */
+ function settleMustDuplicate(q,pack){
+   queue=pack.queue;vocabReturnScheduled=!!pack.scheduled;
+   if(pack.alreadyHandled){
+     const key=String(queueEpoch)+'|'+position+'|'+q.id;
+     if(!vocabClosed.includes(key))vocabClosed.push(key);
+     dropCardDraft(q);draft=null;
+     vocabRetry=null;retryAfterWrong=false;retrying=false;checked=false;
+     save();nextQuestion();return;
+   }
+   vocabRetry=pack.retry;dropCardDraft(q);draft=null;
+   checked=false;retrying=true;paintMustRetry(q);save();
  }
  function paintMustRetry(q){
    if(!q||!vocabRetry)return;
@@ -1798,6 +1822,7 @@
      save();
    }));
    if(supportKind(q))$$('#answer-form .rk button').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();if(checked)return;if(window.ResponseKinds.click($('#answer-form'),q,b))save();}));
+   $('#answer-form').dataset.pres=presToken(q);
    if(draft?.token===queueEpoch+':'+position&&draft.exerciseId===q.id){
      if(supportKind(q)){const el=$('#rk-response');if(el){el.value=JSON.stringify((draft.answers||[]).map(String));window.ResponseKinds.paint($('#answer-form'),q);}}
      else if(q.kind==='multi')$$('input[name=choice]').forEach(el=>{el.checked=draft.answers.includes(el.value);});
@@ -1910,6 +1935,7 @@
    if(isVocabMustTrainer()&&window.VocabMust){
      const answers=readAnswers(q),now=Date.now();
      const pack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:'idk',answers,elapsed:elapsed(),core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating:window.FSRS.Rating.Again,errors:[],result:{correct:false,parts:(q.fields||[]).map(()=>false)},budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:true,recall:true,analytics:answerAnalytics(q,{correct:false,parts:(q.fields||[]).map(()=>false)},answers,now,elapsed(),true)});
+     if(pack.duplicate){settleMustDuplicate(q,pack);return;}
      queue=pack.queue;vocabRetry=pack.retry;vocabReturnScheduled=!!pack.scheduled;hinted=true;retrying=true;checked=false;retryAfterWrong=false;
      paintVocabLemmaFeedback($('#feedback'),q,[],{note:'<p class="small">'+esc(window.VocabMust.idkNote(!!pack.scheduled))+'</p>'});
      (q.fields||[]).forEach((_,i)=>{const el=$('#answer-'+i);if(el){el.value='';el.classList.add('invalid');el.disabled=false;}});
@@ -1993,7 +2019,7 @@
          const key=String(queueEpoch)+'|'+position+'|'+q.id;
          if(!vocabClosed.includes(key))vocabClosed.push(key);
        }
-       vocabRetry=null;retryAfterWrong=false;retrying=false;
+       vocabRetry=null;retryAfterWrong=false;retrying=false;dropCardDraft(q);draft=null;
        save();nextQuestion();return;
      }
      if(result.correct){
@@ -2049,10 +2075,10 @@
    let mustPack=null;
    if(isVocabMustTrainer()&&!reveal&&window.VocabMust){
      mustPack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:!result.correct?'wrong':(hinted||rulePeeked)?'assisted':'good',answers,elapsed:elapsedMs,core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating,errors,result,budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:!!(hinted||rulePeeked),recall,analytics:answerAnalytics(q,result,answers,now,elapsedMs,!!(hinted||rulePeeked))});
+     if(mustPack.duplicate){settleMustDuplicate(q,mustPack);return;}
      queue=mustPack.queue;vocabReturnScheduled=!!mustPack.scheduled;
      if(mustPack.retry){vocabRetry=mustPack.retry;retryAfterWrong=mustPack.retry.kind==='wrong';}
      else retryAfterWrong=false;
-     if(mustPack.duplicate){checked=false;retrying=true;paintMustRetry(q);save();return;}
    }
    state.errors.push(...errors);
    let rec=previous||core.migrateRecord({},now);
