@@ -998,4 +998,138 @@ console.log('answerLang mismatches',mismatches.length);
 assert.ok(!mismatches.some(m=>/-kk-rev /.test(m)),'kk-rev mismatches');
 if(mismatches.length)console.log(mismatches.join('\n'));
 
+// PR-4 §4.7. Debt is a lemma count for the log. It does not change nNew.
+const bannedWords=['vocabMode','debtEnter','debtExit','debtSessionNewCap','debtDayNewCap','Сначала вспомним','Новых слов сегодня немного'];
+for(const file of ['vocab-must.js','core.js','app.js','config.js','scheduler.js']){
+  const src=fs.readFileSync(path.join(__dirname,file),'utf8');
+  for(const word of bannedWords)assert.ok(!src.includes(word),'P4-NO-MODE '+file+' '+word);
+}
+const dueA=card('due-a','word:da'),dueB=card('due-b','word:db');
+const dueOrderState=state();
+dueOrderState.records['due-a']={review_count:2,seen:2,needsReview:false,streak:4,next_review:dayNow-DAY,dueAt:dayNow-DAY,last_answer:dayNow-2*DAY};
+dueOrderState.records['due-b']={review_count:2,seen:2,needsReview:false,streak:4,next_review:dayNow-3*DAY,dueAt:dayNow-3*DAY,last_answer:dayNow-2*DAY};
+assert.deepEqual(core.chooseShortSession([dueA,dueB],dueOrderState.records,dayNow,10,{}).map(q=>q.id),['due-b','due-a'],'chooseShortSession default due order');
+
+function p4Rec(patch){return Object.assign({review_count:3,seen:3,needsReview:false,streak:4,last_answer:dayNow-2*DAY},patch);}
+const nrHigh=card('nr-high','word:nrh'),nrNone=card('nr-none','word:nrn'),nrLow=card('nr-low','word:nrl');
+const dueHigh=card('due-high','word:dh'),dueLow=card('due-low','word:dl'),learnLow=card('learn-low','word:ll');
+const newB=card('new-b','word:nb'),newA=card('new-a','word:na');
+const bucketPool=[newB,newA,nrHigh,nrNone,nrLow,dueHigh,dueLow,learnLow];
+const bucketState=state();
+bucketState.records['nr-high']=p4Rec({needsReview:true,streak:0,next_review:dayNow-10*DAY,dueAt:dayNow-10*DAY});
+bucketState.records['nr-none']=p4Rec({needsReview:true,streak:0,next_review:dayNow-20*DAY,dueAt:dayNow-20*DAY});
+bucketState.records['nr-low']=p4Rec({needsReview:true,streak:0,next_review:dayNow-DAY,dueAt:dayNow-DAY});
+bucketState.records['due-high']=p4Rec({next_review:dayNow-3*DAY,dueAt:dayNow-3*DAY});
+bucketState.records['due-low']=p4Rec({next_review:dayNow-2*DAY,dueAt:dayNow-2*DAY});
+bucketState.records['learn-low']=p4Rec({streak:1,next_review:dayNow+10*DAY,dueAt:dayNow+10*DAY});
+const bucketR={ 'nr-low':0.2,'nr-high':0.9,'nr-none':null,'due-low':0.1,'due-high':0.95,'learn-low':0.01 };
+const bucketPlan=VM.planPortion(bucketPool,bucketState,cfg,core,dayNow,{retrievability:q=>bucketR[q.id]});
+assert.equal(bucketPlan.plan.nNew,2,'P4-NNEW-WITH-DEBT');
+assert.ok(bucketPlan.plan.debt>=3,'P4-DEBT-ON-PLAN '+bucketPlan.plan.debt);
+assert.ok(bucketPlan.ids.indexOf('nr-low')<bucketPlan.ids.indexOf('nr-high'),'P4-BUCKET-ORDER');
+assert.ok(bucketPlan.ids.indexOf('nr-high')<bucketPlan.ids.indexOf('nr-none'),'P4-NULL-R');
+assert.deepEqual(bucketPlan.ids,['nr-low','nr-high','nr-none','due-low','new-b','new-a'],'P4-BUCKET-ORDER');
+assert.ok(!bucketPlan.ids.includes('due-high')&&!bucketPlan.ids.includes('learn-low'),'P4-BUCKET-ORDER dropped');
+
+const tieB=card('tie-b','word:tb'),tieA=card('tie-a','word:ta');
+const tieState=state();
+tieState.records['tie-b']=p4Rec({needsReview:true,streak:0,next_review:dayNow-DAY,dueAt:dayNow-DAY});
+tieState.records['tie-a']=p4Rec({needsReview:true,streak:0,next_review:dayNow-DAY,dueAt:dayNow-DAY});
+const tiePlan=VM.planPortion([tieB,tieA,card('tie-new-1','word:tn1'),card('tie-new-2','word:tn2')],tieState,cfg,core,dayNow,{retrievability:()=>0.5});
+assert.deepEqual(tiePlan.ids.slice(0,2),['tie-a','tie-b'],'P4-TIE-ID');
+const earlyDue=card('z-early','word:ze'),lateDue=card('a-late','word:al');
+const dueTieState=state();
+dueTieState.records['z-early']=p4Rec({next_review:dayNow-5*DAY,dueAt:dayNow-5*DAY});
+dueTieState.records['a-late']=p4Rec({next_review:dayNow-DAY,dueAt:dayNow-DAY});
+const dueTiePlan=VM.planPortion([lateDue,earlyDue,card('due-new-1','word:dn1'),card('due-new-2','word:dn2')],dueTieState,cfg,core,dayNow,{retrievability:()=>0.4});
+assert.deepEqual(dueTiePlan.ids.slice(0,2),['z-early','a-late'],'P4-TIE-DUE');
+
+const twinA=card('hw-twin','word:twin'),twinB=card('bank-twin','word:twin');
+const laterCard=card('later','word:later'),needCard=card('need','word:need'),freshCard=card('fresh-1','word:fresh');
+const debtState=state();
+debtState.records[twinA.id]=p4Rec({next_review:dayNow-DAY,dueAt:dayNow-DAY});
+debtState.records[twinB.id]=p4Rec({next_review:dayNow-2*DAY,dueAt:dayNow-2*DAY});
+debtState.records[laterCard.id]=p4Rec({next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY});
+debtState.records[needCard.id]=p4Rec({needsReview:true,streak:0,next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY});
+const debtPool=[twinA,twinB,laterCard,needCard,freshCard];
+assert.deepEqual(VM.debtLemmas(debtPool,debtState,core,dayNow),['word:need','word:twin'],'P4-DEBT-LEMMA');
+assert.equal(VM.planPortion(debtPool,debtState,cfg,core,dayNow).plan.debt,2,'P4-DEBT-LEMMA');
+
+// 30-day break: 5 days × 3 portions, then +30 days. Seed is the fixed clock and the 4-of-5 Good sequence.
+const p4Start=new Date(2026,0,5,12,0,0).getTime();
+const p4Pool=[];
+for(let i=0;i<40;i++)p4Pool.push(card('p4-'+String(i).padStart(2,'0'),'word:p4-'+String(i).padStart(2,'0')));
+const p4State={records:Object.create(null),skills:Object.create(null),events:[]};
+function p4Answer(portion,now,tag,correctAt){
+  portion.ids.forEach((id,i)=>{
+    const q=p4Pool.find(c=>c.id===id);
+    const correct=correctAt(i);
+    VM.commitFirst({state:p4State,records:p4State.records,q,now:now+i*60000,sessionId:'p4',presentation:tag*100+i,kind:correct?'good':'wrong',answers:['ok'],elapsed:4,core,observe:()=>[],queue:portion.ids,position:i,pool:p4Pool,plan:portion.plan,sitting:VM.emptySitting(now),rating:correct?F.Rating.Good:F.Rating.Again,errors:[],result:{correct,parts:[correct]},budget:portion.plan.budget,minGap:2,appearCap:3,hinted:false,recall:true});
+  });
+}
+for(let day=0;day<5;day++){
+  for(let p=0;p<3;p++){
+    const now=p4Start+day*DAY+p*3600000;
+    const portion=VM.planPortion(p4Pool,p4State,cfg,core,now,{retrievability:q=>Scheduler.retrievability(p4State.records[q.id],now)});
+    p4Answer(portion,now,day*10+p,()=>true);
+  }
+}
+const breakNow=p4Start+4*DAY+30*DAY;
+const cohort=VM.debtLemmas(p4Pool,p4State,core,breakNow);
+assert.ok(cohort.length>0,'P4-COHORT-MELTS start '+cohort.length);
+function p4NrLemmas(){
+  const out=new Set();
+  for(const q of p4Pool){
+    const rec=p4State.records[q.id];
+    if(rec&&rec.needsReview)out.add(core.lemmaKey(q));
+  }
+  return out;
+}
+const nrAtBreak=p4NrLemmas();
+function p4NewLeft(){
+  const seen=new Set();
+  let n=0;
+  for(const q of p4Pool){
+    const lem=core.lemmaKey(q);
+    if(seen.has(lem))continue;
+    seen.add(lem);
+    const rec=p4State.records[q.id];
+    if(!(rec&&Number(rec.review_count)>0))n++;
+  }
+  return n;
+}
+console.log('P4 break debt',cohort.length);
+for(let p=0;p<10;p++){
+  const now=breakNow+p*3600000;
+  const leftBefore=p4NewLeft();
+  const portion=VM.planPortion(p4Pool,p4State,cfg,core,now,{retrievability:q=>Scheduler.retrievability(p4State.records[q.id],now)});
+  assert.equal(portion.plan.nNew,Math.min(2,leftBefore),'P4-NNEW-WITH-DEBT portion '+p);
+  const reviews=portion.ids.filter(id=>!portion.plan.newLemmas.includes(core.lemmaKey(p4Pool.find(c=>c.id===id)||{id})));
+  const still=VM.debtLemmas(p4Pool,p4State,core,now).filter(lem=>cohort.includes(lem)).length;
+  const nrNow=p4NrLemmas();
+  let freshNr=0;
+  for(const lem of nrNow)if(!nrAtBreak.has(lem))freshNr++;
+  console.log('P4 portion',p,'debt',portion.plan.debt,'cohort',still,'new',portion.plan.nNew,'reviews',reviews.length,'freshNr',freshNr,'newLemmas',portion.plan.newLemmas.length);
+  if(p===0){
+    let prevBucket=-1,lastR=null,missing=false;
+    for(const id of reviews){
+      const rec=p4State.records[id]||{};
+      const bucket=rec.needsReview?0:(core.isDue(rec,now)?1:2);
+      assert.ok(bucket>=prevBucket,'P4-BUCKET-ORDER live '+id);
+      if(bucket!==prevBucket){lastR=null;missing=false;prevBucket=bucket;}
+      if(bucket>1)continue;
+      const R=Scheduler.retrievability(rec,now);
+      const none=R==null||Number.isNaN(R);
+      if(none){missing=true;continue;}
+      assert.ok(!missing,'P4-NULL-R '+id);
+      if(lastR!=null)assert.ok(R+1e-9>=lastR,'P4-BUCKET-ORDER R '+id);
+      lastR=R;
+    }
+  }
+  p4Answer(portion,now,1000+p,i=>i%5!==4);
+}
+const cohortLeft=VM.debtLemmas(p4Pool,p4State,core,breakNow+10*3600000).filter(lem=>cohort.includes(lem));
+assert.ok(cohortLeft.length<cohort.length,'P4-COHORT-MELTS '+cohortLeft.length+'/'+cohort.length);
+console.log('P4 cohort',cohort.length,'->',cohortLeft.length);
+
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');
