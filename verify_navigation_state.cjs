@@ -108,6 +108,34 @@ function normVocab(v) {
     nearMiss: v.nearMiss
   };
 }
+// v6 format of session.vocab as written by save() -> VocabMust.snapshot() (vocab-must.js) and of session.draft
+// (app.js captureDraft). Presence is checked with hasOwnProperty before any comparison, so a field that save()
+// stops writing fails here instead of being filled back in by a default.
+const V6_VOCAB_KEYS = ['plan', 'sitting', 'retry', 'closed', 'unaided', 'blindFails', 'nearMiss'];
+const V6_PLAN_KEYS = ['budget', 'nNew', 'baseLen', 'newLemmas', 'debt'];
+const V6_SITTING_KEYS = ['startedAt', 'sessions', 'newLemmas', 'answers', 'shown', 'recent', 'legacy'];
+const V6_DRAFT_KEYS = ['token', 'exerciseId', 'answers'];
+function own(obj, key) {
+  return !!obj && typeof obj === 'object' && Object.prototype.hasOwnProperty.call(obj, key);
+}
+function assertKeys(obj, keys, label) {
+  assert.ok(obj && typeof obj === 'object' && !Array.isArray(obj), label + ' is an object');
+  for (const key of keys) assert.ok(own(obj, key), label + ' missing ' + key);
+  assert.deepEqual(Object.keys(obj).sort(), keys.slice().sort(), label + ' keys');
+}
+function assertV6Vocab(v, label) {
+  assertKeys(v, V6_VOCAB_KEYS, label + ' vocab');
+  assertKeys(v.plan, V6_PLAN_KEYS, label + ' vocab.plan');
+  assertKeys(v.sitting, V6_SITTING_KEYS, label + ' vocab.sitting');
+  for (const key of ['closed']) assert.ok(Array.isArray(v[key]), label + ' vocab.' + key + ' array');
+  for (const key of ['unaided', 'blindFails']) assert.ok(v[key] && typeof v[key] === 'object' && !Array.isArray(v[key]), label + ' vocab.' + key + ' object');
+  assert.ok(Array.isArray(v.plan.newLemmas), label + ' vocab.plan.newLemmas array');
+  for (const key of ['sessions', 'newLemmas', 'shown', 'recent']) assert.ok(Array.isArray(v.sitting[key]), label + ' vocab.sitting.' + key + ' array');
+}
+function assertV6Draft(d, label) {
+  assertKeys(d, V6_DRAFT_KEYS, label + ' draft');
+  assert.ok(Array.isArray(d.answers), label + ' draft.answers array');
+}
 function normDraft(d) {
   if (!d) return null;
   return {token: d.token, exerciseId: d.exerciseId, answers: d.answers || []};
@@ -134,6 +162,8 @@ function draftLeaked(draft, answer) {
     assert.equal(fixture.session.vocabRole, 'must', name);
     assert.equal(fixture.session.topic, 'vocab', name);
     assert.ok(fixture.session.vocab && fixture.session.vocab.plan && fixture.session.vocab.sitting, name);
+    assertV6Vocab(fixture.session.vocab, name + ' fixture');
+    assertV6Draft(fixture.session.draft, name + ' fixture');
     assert.equal(fixture.session.vocab.nearMiss, null, name);
     assert.equal(fixture.session.vocab.sitting.legacy, null, name);
     assert.ok(fixture.session.vocab.sitting.shown.length > 0, name);
@@ -163,6 +193,7 @@ function draftLeaked(draft, answer) {
   assert.equal(saved.vocabRole, 'must');
   assert.equal(hasVocab(saved), true);
   assert.ok(saved.vocab.plan && saved.vocab.sitting);
+  assertV6Vocab(saved.vocab, 'live save()');
   assert.equal(saved.vocab.nearMiss, null);
   assert.equal(saved.vocab.sitting.legacy, null);
   assert.ok(saved.vocab.sitting.shown.length > 0);
@@ -198,7 +229,10 @@ function draftLeaked(draft, answer) {
     const prevAnswer = previousAnswer(again, fixture.session);
     assert.equal(draftLeaked(fixture.session.draft, prevAnswer), false, name + ' fixture draft leaked ' + prevAnswer);
     assert.equal(draftLeaked(got.draft, prevAnswer), false, name + ' restored draft leaked ' + prevAnswer);
+    assertV6Vocab(got.vocab, name + ' restored');
+    assertV6Draft(got.draft, name + ' restored');
     assert.deepEqual(normVocab(got.vocab), normVocab(fixture.session.vocab), name + ' vocab');
+    assert.deepEqual(canon(got.vocab), canon(fixture.session.vocab), name + ' vocab exact');
     const retry = fixture.session.vocab.retry;
     if (retry && retry.kind === 'wrong') {
       assert.deepEqual(fixture.session.draft.answers, retry.typed, name + ' typed answer is on the capture');
@@ -206,6 +240,7 @@ function draftLeaked(draft, answer) {
       assert.equal(got.draft && got.draft.exerciseId, fixture.session.draft.exerciseId, name + ' draft card');
     } else {
       assert.deepEqual(normDraft(got.draft), normDraft(fixture.session.draft), name + ' draft');
+      assert.deepEqual(canon(got.draft), canon(fixture.session.draft), name + ' draft exact');
     }
     assert.equal(again.window.VocabMust.portionDone(got.sessionAttempts, got.vocab.plan.budget, got.position, got.queue.length), false, name + ' portion rolled');
     console.log('BASELINE restore', name);
