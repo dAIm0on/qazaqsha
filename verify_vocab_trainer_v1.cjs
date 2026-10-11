@@ -591,7 +591,7 @@ const manyPlan=VM.planPortion(many,state(),cfg,core,dayNow);
 assert.deepEqual(manyPlan.ids,['hw9-1-kk']);
 assert.equal(new Set(manyPlan.ids.map(id=>core.lemmaKey(many.find(q=>q.id===id)))).size,manyPlan.ids.length);
 
-const table=[['v2-4-1-vocab-also-kk-set','kk'],['v2-4-2-vocab-qalaisyn-kk-form-1','kk'],['hw3-17-ru','ru'],['hw3-19-ru','ru'],['hw3-8-ru','ru'],['hw3-8-kk','kk'],['learn-word-3','kk'],['learn-word-3-ru','ru'],['bank-8-kk','kk'],['bank-8-ru','ru']];
+const table=[['hw1-1-kk-rev','ru'],['hw2-22-kk-rev','ru'],['v2-4-1-vocab-also-kk-set','kk'],['v2-4-2-vocab-qalaisyn-kk-form-1','kk'],['hw3-17-ru','ru'],['hw3-19-ru','ru'],['hw3-8-ru','ru'],['hw3-8-kk','kk'],['learn-word-3','kk'],['learn-word-3-ru','ru'],['bank-8-kk','kk'],['bank-8-ru','ru']];
 for(const [id,lang] of table)assert.equal(core.answerLang({id,title:'Напиши все формы'}),lang,id);
 
 // P0-GAP-NOT-EXHAUSTED: 1–2 just-shown cards must not paint «Все слова пройдены».
@@ -912,8 +912,19 @@ const loaded=JSON.parse(product.live.localStorage.getItem('qazaq-s2-pr3'));
 assert.equal(loaded.now,s2Now);
 assert.equal(loaded.seed,null);
 const s2State={records:loaded.records,skills:{},events:[]};
-const s2RecordKeys=Object.keys(s2State.records);
+// P2: S2 starts with real skill keys, so the «skills survive» check below is not empty.
+for(const q of livePool){
+  if(Object.keys(s2State.skills).length>=8)break;
+  if(!s2State.records[q.id])continue;
+  for(const b of KnowledgeLive.bindings(q)){
+    const k=KnowledgeLive.key?KnowledgeLive.key(b):b.item_id+'::'+b.skill_type;
+    if(!k.startsWith('word:')||s2State.skills[k])continue;
+    s2State.skills[k]={review_count:2,next_review:s2Now+2*DAY,needsReview:false,streak:2,mastery_level:'LEARNING',item_id:b.item_id,skill_type:b.skill_type};
+  }
+}
 const s2SkillKeys=Object.keys(s2State.skills);
+assert.ok(s2SkillKeys.length>=5,'S2 skills seeded: '+s2SkillKeys.length);
+const s2RecordKeys=Object.keys(s2State.records);
 const s2Portions=[];
 let s2Clock=s2Now;
 for(let pass=0;pass<3;pass++){
@@ -940,6 +951,35 @@ assert.notDeepEqual(s2Portions[1],s2Portions[0]);
 assert.notDeepEqual(s2Portions[2],s2Portions[0]);
 for(const key of s2RecordKeys)assert.ok(Object.prototype.hasOwnProperty.call(s2State.records,key),key);
 for(const key of s2SkillKeys)assert.ok(Object.prototype.hasOwnProperty.call(s2State.skills,key),key);
+
+// P0-KK-REV-DIR: -kk-rev answers in Russian. A first answer today on hw1-1-kk-rev
+// buries hw1-1-kk (the other direction) until tomorrow. Old regex (-kk-rev → kk) fails here.
+assert.equal(core.answerLang({id:'hw1-1-kk-rev'}),'ru');
+assert.equal(core.answerLang({id:'hw1-1-kk'}),'kk');
+const revQ=livePool.find(q=>q.id==='hw1-1-kk-rev');
+const revKk=livePool.find(q=>q.id==='hw1-1-kk');
+assert.ok(revQ&&revKk,'hw1-1 pair in live pool');
+assert.equal(core.lemmaKey(revQ),core.lemmaKey(revKk));
+const revPool=[revQ,revKk];
+const revState={records:Object.create(null),skills:Object.create(null),events:[]};
+const revStart=VM.planPortion(revPool,revState,cfg,core,dayNow);
+const revFirst=revPool.find(q=>q.id==='hw1-1-kk-rev');
+VM.commitFirst({state:revState,records:revState.records,q:revFirst,now:dayNow,sessionId:'rev',presentation:0,kind:'good',answers:['Человек'],elapsed:4,core,observe:(s,card,result,event,errors,trainer)=>KnowledgeLive.observe(s,card,result,event,errors,Object.assign({},trainer,{must:true})),queue:[revFirst.id],position:0,pool:revPool,plan:revStart.plan,sitting:VM.emptySitting(dayNow),rating:F.Rating.Good,errors:[],result:{correct:true,parts:[true]},budget:revStart.plan.budget,minGap:2,appearCap:3,hinted:false,recall:true});
+KnowledgeLive.sync(revState,revPool);
+assert.ok(Number((revState.records[revQ.id]||{}).review_count)>0,'rev answered');
+// +5 min: the rev card is not due yet, so only the bury keeps hw1-1-kk out.
+const revSameDay=VM.planPortion(revPool,revState,cfg,core,dayNow+5*60*1000);
+assert.ok(!revSameDay.ids.includes('hw1-1-kk'),'P0-KK-REV-DIR same day: '+revSameDay.ids.join(','));
+// Second good answer after the learning step pushes the rev card past tomorrow.
+const revAt2=dayNow+20*60*1000;
+const revPlan2=VM.planPortion(revPool,revState,cfg,core,revAt2);
+assert.ok(!revPlan2.ids.includes('hw1-1-kk'),'P0-KK-REV-DIR same day 2: '+revPlan2.ids.join(','));
+VM.commitFirst({state:revState,records:revState.records,q:revFirst,now:revAt2,sessionId:'rev2',presentation:0,kind:'good',answers:['Человек'],elapsed:4,core,observe:(s,card,result,event,errors,trainer)=>KnowledgeLive.observe(s,card,result,event,errors,Object.assign({},trainer,{must:true})),queue:[revFirst.id],position:0,pool:revPool,plan:revPlan2.plan,sitting:VM.emptySitting(revAt2),rating:F.Rating.Good,errors:[],result:{correct:true,parts:[true]},budget:revPlan2.plan.budget,minGap:2,appearCap:3,hinted:false,recall:true});
+KnowledgeLive.sync(revState,revPool);
+assert.ok(revState.records[revQ.id].next_review>dayNow+DAY,'rev not due tomorrow');
+const revNextDay=VM.planPortion(revPool,revState,cfg,core,dayNow+DAY);
+assert.ok(revNextDay.ids.includes('hw1-1-kk'),'P0-KK-REV-DIR next day: '+revNextDay.ids.join(','));
+
 const kkSet=livePool.filter(q=>/-kk-set$/.test(q.id));
 const kkForm=livePool.filter(q=>/-kk-form-\d+$/.test(q.id));
 assert.equal(kkSet.length,7);
@@ -955,6 +995,7 @@ for(const q of livePool){
   if(word.skill_type!==expect)mismatches.push(q.id+' '+lang+' '+word.skill_type);
 }
 console.log('answerLang mismatches',mismatches.length);
+assert.ok(!mismatches.some(m=>/-kk-rev /.test(m)),'kk-rev mismatches');
 if(mismatches.length)console.log(mismatches.join('\n'));
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');

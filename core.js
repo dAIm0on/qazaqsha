@@ -301,7 +301,9 @@
   function answerLang(q,i){
     const id=String(q&&q.id||'');
     if(/(?:^|-)ru(?:-\d+)?$/.test(id))return 'ru';
-    if(/(?:^|-)kk(?:-rev|-set|-form-\d+)?$/.test(id))return 'kk';
+    // -kk-rev: stimulus is Kazakh, answer is Russian (title «Переведи на русский").
+    if(/(?:^|-)kk-rev$/.test(id))return 'ru';
+    if(/(?:^|-)kk(?:-set|-form-\d+)?$/.test(id))return 'kk';
     if(/^learn-word-\d+$/.test(id))return 'kk';
     if(/^bank-\d+-kk$/.test(id))return 'kk';
     if(/^bank-\d+-ru$/.test(id))return 'ru';
