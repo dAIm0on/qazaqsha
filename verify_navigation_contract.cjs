@@ -33,7 +33,7 @@ const PROTECTED = [
   'free-practice-content.js',
   'free-practice-view.js'
 ];
-const ALLOWED_FILE = /^(verify_.*\.cjs|tools\/capture_nav_must_fixtures\.js|fixtures\/navigation\/(README\.md|[A-Za-z0-9._-]+\.json)|navigation-state\.js|app\.js|progress\.js|index\.html|sw\.js)$/;
+const ALLOWED_FILE = /^(app\.js|index\.html|navigation-state\.js|progress\.js|sw\.js|verify_chrome_error9_p0\.cjs|verify_lesson33\.cjs|verify_lesson_2_1_path_migrate\.cjs|verify_lesson_v2\.cjs|verify_navigation_contract\.cjs|verify_navigation_state\.cjs|verify_offline_assets\.cjs|verify_personal_trainers\.cjs|verify_r7_2ta\.cjs|verify_r7_2tb\.cjs|verify_r7_51\.cjs|verify_r7_66\.cjs|verify_r7_runtime_progress_migration\.cjs|verify_r7_support_kinds_mastery\.cjs|verify_r7_ux63\.cjs|verify_r7_x123\.cjs|verify_section2_canonical\.cjs|verify_trainer\.cjs|verify_vocab_pr7_draft_leak\.cjs|verify_vocab_trainer_v1\.cjs)$/;
 
 function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');

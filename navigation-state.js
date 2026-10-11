@@ -12,17 +12,81 @@
    const parts=key.split(':');
    return parts.every(part=>part.length>0&&!BAD.has(part));
  }
+ const PAUSED_CAP=24;
+ const SNAPSHOT_MAX=65536;
+ function part(value){
+   return String(value==null?'':value).toLowerCase().replace(/[^a-z0-9._-]/g,'').slice(0,48);
+ }
+ function shortHash(ids){
+   const text=(Array.isArray(ids)?ids:[]).map(id=>String(id)).join('\n');
+   let h=2166136261;
+   for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619);}
+   return (h>>>0).toString(16).padStart(8,'0');
+ }
+ function sliceKey(block){const key='slice:'+(part(block)||'block');return validKey(key)?key:null;}
+ function repairKey(ids){const key='repair:'+shortHash(ids);return validKey(key)?key:null;}
+ function contrastKey(pair){
+   const bits=pair&&typeof pair==='object'?[pair.expected_answer,pair.wrong_answer_given].concat(pair.card_ids||[]):[pair];
+   const key='contrast:'+shortHash(bits);
+   return validKey(key)?key:null;
+ }
+ function customKey(kind,ids){
+   const k=part(kind)||'words';
+   const key=(k==='remediation'?'remediation:':'custom:'+k+':')+shortHash(ids);
+   return validKey(key)?key:null;
+ }
+ function examKey(topic,courseBlock){
+   let key='exam:'+(part(topic)||'all');
+   if(courseBlock)key+=':course:'+part(courseBlock);
+   return validKey(key)?key:null;
+ }
+ function lessonKey(id){
+   const raw=String(id||'');
+   const key=raw.indexOf('numbers')===0?'number:'+part(raw):'lesson:'+part(raw);
+   return validKey(key)?key:null;
+ }
+ function genericQueueKey(mode,topic,course,source,vocab){
+   let key='queue:'+(mode||'ordered')+':'+(topic||'all');
+   if(course)key+=':course:'+course;
+   if(source)key+=':source:'+source;
+   if(vocab)key+=':vocab:'+vocab;
+   return validKey(key)?key:null;
+ }
+ function fitSnapshot(snapshot){
+   let text=JSON.stringify(snapshot);
+   if(text.length<=SNAPSHOT_MAX)return snapshot;
+   const session=snapshot.session;
+   if(session&&typeof session==='object'){
+     delete session.variants;delete session.stepEvidence;delete session.remediation;
+     if(Array.isArray(session.queue)&&session.queue.length>400)session.queue=session.queue.slice(0,400);
+     if(Array.isArray(session.practiceIds)&&session.practiceIds.length>400)session.practiceIds=session.practiceIds.slice(0,400);
+     snapshot.trimmed=true;
+   }
+   return snapshot;
+ }
  function tidySlot(slot){
    if(!slot||typeof slot!=='object'||Array.isArray(slot))return null;
    if(slot.status!=='paused'&&slot.status!=='closed')return null;
-   if(!slot.snapshot||typeof slot.snapshot!=='object'||Array.isArray(slot.snapshot))return null;
-   const snapshot=clone(slot.snapshot);
-   if(!snapshot)return null;
-   const out={status:slot.status,updatedAt:Number(slot.updatedAt)||0,origin:typeof slot.origin==='string'?slot.origin.slice(0,40):'park',snapshot};
+   const out={status:slot.status,updatedAt:Number(slot.updatedAt)||0,origin:typeof slot.origin==='string'?slot.origin.slice(0,40):'park'};
    if(typeof slot.lessonId==='string'&&slot.lessonId)out.lessonId=slot.lessonId.slice(0,40);
    if(typeof slot.part==='string'&&slot.part)out.part=slot.part.slice(0,40);
    if(slot.section!=null&&Number.isFinite(Number(slot.section)))out.section=Math.max(0,Math.floor(Number(slot.section)));
+   if(slot.status==='closed')return out;
+   if(!slot.snapshot||typeof slot.snapshot!=='object'||Array.isArray(slot.snapshot))return null;
+   const snapshot=fitSnapshot(clone(slot.snapshot));
+   if(!snapshot)return null;
+   out.snapshot=snapshot;
    return out;
+ }
+ function enforcePausedCap(resume,keepKey){
+   let guard=0;
+   while(guard++<80){
+     const paused=Object.entries(resume.slots).filter(([,slot])=>slot&&slot.status==='paused');
+     if(paused.length<=PAUSED_CAP)return;
+     const victims=paused.filter(([key])=>key!==keepKey).sort((a,b)=>(a[1].updatedAt||0)-(b[1].updatedAt||0)||(a[0]<b[0]?-1:1));
+     if(!victims.length)return;
+     delete resume.slots[victims[0][0]];
+   }
  }
  function adopt(raw){
    const resume=emptyResume();
@@ -36,33 +100,49 @@
        if(tidy)resume.slots[key]=tidy;
      }
    }
+   enforcePausedCap(resume,null);
    return resume;
  }
- function keyFromSession(session){
-   const s=session;
+ function epochsAllow(rt){
+   if(typeof rt.queueEpoch!=='number'||typeof rt.trainerEpoch!=='number')return true;
+   return rt.queueEpoch===rt.trainerEpoch;
+ }
+ function launchKeyFromRuntime(rt){
+   const s=rt;
    if(!s||typeof s!=='object')return null;
-   if(s.view==='path')return null;
-   if(s.mode==='words'&&s.vocabRole==='must'&&s.trainerReturn==='vocab:must')return 'vocab:must';
-   if(s.mode==='words'&&s.vocabRole==='used'&&s.trainerReturn==='vocab:used')return 'vocab:used';
-   if(typeof s.trainerReturn==='string'&&/^number:[a-z0-9._-]{1,80}$/.test(s.trainerReturn))return s.trainerReturn;
+   if(s.view==='morph')return null;
+   if(s.view==='path'){
+     const grammar=typeof s.grammarLesson==='string'?s.grammarLesson:(s.grammarPath&&typeof s.grammarPath.lessonId==='string'?s.grammarPath.lessonId:null);
+     if(!grammar)return null;
+     const key='theory:'+grammar;
+     return validKey(key)?key:null;
+   }
+   const stamped=typeof s.launchKey==='string'&&validKey(s.launchKey)?s.launchKey:null;
+   if(stamped&&(s.view==='practice'||s.view==='homework'))return stamped;
+   if(s.mode==='words'&&s.vocabRole==='must'&&s.trainerReturn==='vocab:must'&&epochsAllow(s))return 'vocab:must';
+   if(s.mode==='words'&&s.vocabRole==='used'&&s.trainerReturn==='vocab:used'&&epochsAllow(s))return 'vocab:used';
+   if(typeof s.trainerReturn==='string'&&/^number:[a-z0-9._-]{1,80}$/.test(s.trainerReturn)&&epochsAllow(s))return s.trainerReturn;
    if(s.mode==='homework'&&s.hwLesson)return 'homework:'+s.hwLesson+':'+(s.hwPart||'exercises')+':'+String(s.hwSection||0);
    if(s.mode==='course'&&s.courseBlock&&!s.activeLesson)return 'course:'+s.courseBlock;
    if(s.mode==='phrase'&&s.courseBlock)return 'phrase:'+s.courseBlock;
    if(s.mode==='transfer'&&s.courseBlock)return 'transfer:'+s.courseBlock;
-   if(s.mode==='lesson'&&s.activeLesson)return String(s.activeLesson).indexOf('numbers')===0?'number:'+s.activeLesson:'lesson:'+s.activeLesson;
-   if(s.mode==='exam')return 'exam:'+(s.topic||'all');
-   if(s.mode==='slice')return 'slice:probe';
-   if(s.mode==='repair')return 'repair:day';
-   if(s.mode==='contrast')return 'contrast:pair';
+   if(s.mode==='remediation')return customKey('remediation',Array.isArray(s.repairIds)?s.repairIds:(Array.isArray(s.queue)?s.queue:[]));
+   if(s.mode==='voluntary'&&s.activeLesson)return lessonKey(s.activeLesson);
+   if(s.mode==='lesson'&&s.activeLesson)return lessonKey(s.activeLesson);
+   if(s.mode==='exam')return examKey(s.topic,s.courseBlock);
+   if(s.mode==='slice')return s.sliceBlock?sliceKey(s.sliceBlock):'slice:probe';
+   if(s.mode==='repair'){const ids=Array.isArray(s.repairIds)?s.repairIds:(Array.isArray(s.queue)?s.queue:[]);return ids.length?repairKey(ids):'repair:day';}
+   if(s.mode==='contrast')return s.contrastPair?contrastKey(s.contrastPair):'contrast:pair';
    if(s.mode==='numbers')return 'number:'+(s.activeLesson||s.topic||'track');
-   if(Array.isArray(s.queue)&&s.queue.length){
-     let key='queue:'+(s.mode||'ordered')+':'+(s.topic||'all');
-     if(s.courseBlock)key+=':course:'+s.courseBlock;
-     if(s.sourceFilter)key+=':source:'+s.sourceFilter;
-     if(s.vocabRole)key+=':vocab:'+s.vocabRole;
-     return validKey(key)?key:null;
+   if(s.mode==='preexam')return validKey('preexam:3-3')?'preexam:3-3':null;
+   if((s.view==='practice'||s.view==='homework')&&Array.isArray(s.queue)&&s.queue.length){
+     if(s.mode==='words'||s.mode==='voluntary'||s.mode==='chunks')return customKey(s.mode,s.queue);
+     return genericQueueKey(s.mode,s.topic,s.courseBlock,s.sourceFilter,s.vocabRole);
    }
    return null;
+ }
+ function keyFromSession(session){
+   return launchKeyFromRuntime(session);
  }
  function seedLegacy(state){
    if(!state||!state.session||typeof state.session!=='object')return;
@@ -89,6 +169,7 @@
    state.navigationResume=adopt(state.navigationResume);
    state.navigationResume.slots[key]=tidy;
    state.navigationResume.lastRoute=key;
+   enforcePausedCap(state.navigationResume,key);
    return true;
  }
  function get(state,key){
@@ -98,10 +179,15 @@
  function mergeSlots(localResume,incomingResume){
    const out=adopt(localResume);
    const incoming=adopt(incomingResume);
-   for(const [key,slot] of Object.entries(incoming.slots))if(!out.slots[key])out.slots[key]=slot;
+   for(const [key,slot] of Object.entries(incoming.slots)){
+     const local=out.slots[key];
+     if(local&&local.status==='closed')continue;
+     if(!local)out.slots[key]=slot;
+   }
+   enforcePausedCap(out,null);
    if(!out.lastRoute&&incoming.lastRoute)out.lastRoute=incoming.lastRoute;
    return out;
  }
- const api={emptyResume,adopt,seedLegacy,keyFromSession,put,get,mergeSlots,validKey,clone};
+ const api={emptyResume,adopt,seedLegacy,keyFromSession,launchKeyFromRuntime,sliceKey,repairKey,contrastKey,customKey,examKey,lessonKey,genericQueueKey,shortHash,put,get,mergeSlots,validKey,clone,PAUSED_CAP,SNAPSHOT_MAX};
  if(node)module.exports=api;else root.NavigationState=api;
 })(typeof window!=='undefined'?window:globalThis);

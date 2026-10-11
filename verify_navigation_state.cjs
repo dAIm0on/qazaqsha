@@ -496,7 +496,7 @@ function draftLeaked(draft, answer) {
   tomb.makeEl('vocab-summary-trainers').onclick();
   tomb.saveNow();
   assert.equal(slotOf(tomb, 'vocab:must').status, 'closed');
-  assert.equal(slotOf(tomb, 'vocab:must').snapshot.kind, 'session');
+  assert.equal(Object.prototype.hasOwnProperty.call(slotOf(tomb, 'vocab:must'), 'snapshot'), false);
   assert.equal(tomb.session().view, 'personal');
   assert.equal(hasVocab(tomb.session()), false);
   tomb.window.TrainerCatalogBridge.launch('vocab:must');
@@ -649,6 +649,226 @@ function draftLeaked(draft, answer) {
   assert.equal(damagedNext.session().queueEpoch, damagedEpoch);
   assert.equal(slotOf(damagedNext, 'queue:ordered:x').status, 'paused');
   console.log('N-STATE damaged slot is kept and does not start a new queue');
+
+  const capState = P.migrate({records: {}}, NOW);
+  for (let i = 0; i < NS.PAUSED_CAP + 1; i++) {
+    assert.equal(NS.put(capState, 'queue:ordered:k' + i, {status: 'paused', updatedAt: i + 1, origin: 'park', snapshot: {kind: 'session', session: {mode: 'ordered', topic: 'sounds', queue: ['m1-1-1'], position: 0, view: 'practice'}}}), true);
+  }
+  const pausedLeft = Object.entries(capState.navigationResume.slots).filter(([, slot]) => slot.status === 'paused');
+  assert.equal(pausedLeft.length, NS.PAUSED_CAP);
+  assert.equal(capState.navigationResume.slots['queue:ordered:k0'], undefined);
+  assert.ok(capState.navigationResume.slots['queue:ordered:k' + NS.PAUSED_CAP]);
+  const closedOnly = P.migrate({records: {}}, NOW);
+  assert.equal(NS.put(closedOnly, 'vocab:must', {status: 'closed', updatedAt: 2, origin: 'close', snapshot: {kind: 'session', session: {mode: 'words', queue: ['secret-card'], position: 0}}}), true);
+  assert.equal(closedOnly.navigationResume.slots['vocab:must'].status, 'closed');
+  assert.equal(Object.prototype.hasOwnProperty.call(closedOnly.navigationResume.slots['vocab:must'], 'snapshot'), false);
+  const cloudPaused = P.migrate({records: {}}, NOW);
+  NS.put(cloudPaused, 'vocab:must', {status: 'paused', updatedAt: 9, origin: 'cloud', snapshot: {kind: 'session', session: {mode: 'words', queue: ['other'], position: 0}}});
+  const closedMerge = P.merge(closedOnly, cloudPaused);
+  assert.equal(closedMerge.navigationResume.slots['vocab:must'].status, 'closed');
+  assert.equal(closedMerge.navigationResume.slots['vocab:must'].snapshot, undefined);
+  console.log('N-STATE paused cap evicts the oldest; a closed tombstone has no snapshot and cloud does not revive it');
+
+  function rowOf(launcher, entry, page) {
+    page.saveNow();
+    const saved = JSON.parse(page.window.localStorage.getItem(KEY));
+    const again = boot(page.window.localStorage.getItem(KEY));
+    const after = page.window.QazaqShell.key();
+    const reloaded = NS.launchKeyFromRuntime(saved.session);
+    assert.equal(after, entry, launcher + ' currentLaunchKey');
+    assert.equal(reloaded, entry, launcher + ' reload');
+    assert.equal(again.window.QazaqShell.key(), entry, launcher + ' boot key');
+    console.log('KEY', launcher, entry, after, reloaded);
+    return again;
+  }
+  const ids = boot().window.COURSE.questions.map(q => q.id).filter(Boolean);
+  const customA = [ids[0]];
+  const customB = [ids.find(id => id !== ids[0])];
+  const customPage = boot();
+  const customKeyA = NS.customKey('words', customA);
+  const customKeyB = NS.customKey('words', customB);
+  customPage.window.QazaqShell.startCustom(customA, 'words');
+  const customEpochA = customPage.session().queueEpoch;
+  const customQueueA = customPage.session().queue.slice();
+  assert.notEqual(customKeyA, 'custom:words');
+  rowOf('startCustom A', customKeyA, customPage);
+  customPage.window.QazaqShell.startCustom(customB, 'words');
+  assert.equal(customPage.window.QazaqShell.key(), customKeyB);
+  assert.notEqual(customKeyA, customKeyB);
+  assert.equal(customPage.window.QazaqShell.resume().slots[customKeyA].snapshot.session.queueEpoch, customEpochA);
+  customPage.window.QazaqShell.startCustom(customA, 'words');
+  assert.equal(customPage.session().queueEpoch, customEpochA);
+  assert.deepEqual(customPage.session().queue, customQueueA);
+  console.log('N-STATE two custom queues keep two slots');
+
+  const slicePage = boot();
+  const sliceA = NS.sliceKey('A');
+  const sliceB = NS.sliceKey('B');
+  slicePage.window.QazaqShell.startSlice('A');
+  const sliceEpochA = slicePage.session().queueEpoch;
+  const sliceQueueA = slicePage.session().queue.slice();
+  assert.notEqual(sliceA, 'slice:probe');
+  assert.equal(slicePage.window.QazaqShell.key(), sliceA);
+  slicePage.saveNow();
+  assert.equal(NS.launchKeyFromRuntime(JSON.parse(slicePage.window.localStorage.getItem(KEY)).session), sliceA);
+  slicePage.window.QazaqShell.startSlice('B');
+  assert.equal(slicePage.window.QazaqShell.key(), sliceB);
+  assert.notEqual(sliceA, sliceB);
+  slicePage.window.QazaqShell.startSlice('A');
+  assert.equal(slicePage.session().queueEpoch, sliceEpochA);
+  assert.deepEqual(slicePage.session().queue, sliceQueueA);
+  console.log('KEY startSlice', sliceA, slicePage.window.QazaqShell.key(), sliceA);
+
+  const repairPage = boot();
+  const repairListA = [{id: ids[0]}];
+  const repairListB = [{id: customB[0]}];
+  const repairA = NS.repairKey([ids[0]]);
+  const repairB = NS.repairKey([customB[0]]);
+  repairPage.window.QazaqShell.launchRepair(repairListA);
+  const repairEpochA = repairPage.session().queueEpoch;
+  assert.notEqual(repairA, 'repair:day');
+  assert.equal(repairPage.window.QazaqShell.key(), repairA);
+  repairPage.window.QazaqShell.launchRepair(repairListB);
+  assert.equal(repairPage.window.QazaqShell.key(), repairB);
+  repairPage.window.QazaqShell.launchRepair(repairListA);
+  assert.equal(repairPage.session().queueEpoch, repairEpochA);
+  assert.equal(repairPage.session().queue[0], ids[0]);
+  console.log('KEY launchRepair', repairA, repairPage.window.QazaqShell.key(), repairA);
+
+  const contrastPage = boot();
+  const pairA = {expected_answer: 'bir', wrong_answer_given: 'alty', card_ids: [ids[0]]};
+  const pairB = {expected_answer: 'eki', wrong_answer_given: 'zheti', card_ids: [customB[0]]};
+  const contrastA = NS.contrastKey(pairA);
+  const contrastB = NS.contrastKey(pairB);
+  contrastPage.window.QazaqShell.startContrast(pairA);
+  assert.notEqual(contrastA, 'contrast:pair');
+  if (contrastPage.session() && contrastPage.session().queue && contrastPage.session().queue.length) {
+    const contrastEpochA = contrastPage.session().queueEpoch;
+    assert.equal(contrastPage.window.QazaqShell.key(), contrastA);
+    contrastPage.window.QazaqShell.startContrast(pairB);
+    assert.equal(contrastPage.window.QazaqShell.key(), contrastB);
+    contrastPage.window.QazaqShell.startContrast(pairA);
+    assert.equal(contrastPage.session().queueEpoch, contrastEpochA);
+    console.log('KEY startContrast', contrastA, contrastPage.window.QazaqShell.key(), contrastA);
+  } else {
+    throw new Error('contrast pair A produced no queue');
+  }
+
+  const examPage = boot();
+  examPage.window.QazaqShell.startExam({topic: 'sounds'});
+  const examPlain = NS.examKey('sounds', null);
+  assert.equal(examPage.window.QazaqShell.key(), examPlain);
+  examPage.saveNow();
+  assert.equal(NS.launchKeyFromRuntime(JSON.parse(examPage.window.localStorage.getItem(KEY)).session), examPlain);
+  examPage.window.QazaqShell.startExam({topic: 'sounds', courseBlock: '1-1'});
+  const examScoped = NS.examKey('sounds', '1-1');
+  assert.equal(examPage.window.QazaqShell.key(), examScoped);
+  assert.notEqual(examPlain, examScoped);
+  console.log('KEY startExam', examScoped, examPage.window.QazaqShell.key(), examScoped);
+
+  const voluntaryPage = boot();
+  const voluntaryKey = NS.lessonKey('plural-1');
+  voluntaryPage.window.QazaqShell.startLesson('plural-1', 0, {voluntary: true});
+  assert.equal(voluntaryPage.window.QazaqShell.key(), voluntaryKey);
+  assert.notEqual(voluntaryKey, null);
+  voluntaryPage.saveNow();
+  const voluntaryBoot = boot(voluntaryPage.window.localStorage.getItem(KEY));
+  assert.equal(voluntaryBoot.window.QazaqShell.key(), voluntaryKey);
+  console.log('KEY startLesson voluntary', voluntaryKey, voluntaryPage.window.QazaqShell.key(), voluntaryBoot.window.QazaqShell.key());
+
+  const prePage = boot();
+  prePage.window.alert = () => {};
+  prePage.window.QazaqShell.startPreExam();
+  assert.equal(prePage.window.QazaqShell.key(), 'preexam:3-3');
+  assert.notEqual(prePage.window.QazaqShell.key(), 'queue:course:all');
+  prePage.saveNow();
+  const preBoot = boot(prePage.window.localStorage.getItem(KEY));
+  assert.equal(preBoot.window.QazaqShell.key(), 'preexam:3-3');
+  console.log('KEY startPreExam', 'preexam:3-3', prePage.window.QazaqShell.key(), preBoot.window.QazaqShell.key());
+
+  const coursePage = boot();
+  coursePage.window.QazaqShell.startCourse('2-2');
+  coursePage.saveNow();
+  const courseBoot = boot(coursePage.window.localStorage.getItem(KEY));
+  assert.equal(coursePage.window.QazaqShell.key(), 'course:2-2');
+  assert.equal(courseBoot.window.QazaqShell.key(), 'course:2-2');
+  console.log('KEY startCourse', 'course:2-2', coursePage.window.QazaqShell.key(), courseBoot.window.QazaqShell.key());
+
+  const mustPage = boot();
+  mustPage.window.TrainerCatalogBridge.launch('vocab:must');
+  mustPage.saveNow();
+  const mustBoot = boot(mustPage.window.localStorage.getItem(KEY));
+  assert.equal(mustPage.window.QazaqShell.key(), 'vocab:must');
+  assert.equal(mustBoot.window.QazaqShell.key(), 'vocab:must');
+  console.log('KEY vocab:must', 'vocab:must', mustPage.window.QazaqShell.key(), mustBoot.window.QazaqShell.key());
+
+  const hidden = boot();
+  hidden.window.TrainerCatalogBridge.launch('vocab:must');
+  hidden.makeEl('answer-0').value = 'visible-a';
+  hidden.saveNow();
+  const visibleDraft = hidden.session().draft && hidden.session().draft.answers.slice();
+  assert.ok(visibleDraft && visibleDraft.indexOf('visible-a') >= 0);
+  hidden.makeEl('practice-view').hidden = true;
+  hidden.makeEl('answer-form').hidden = true;
+  hidden.makeEl('answer-0').value = 'hidden-stale';
+  hidden.window.QazaqShell.startCourse('2-2');
+  const hiddenSlot = hidden.window.QazaqShell.resume().slots['vocab:must'];
+  assert.deepEqual(hiddenSlot.snapshot.session.draft.answers, visibleDraft);
+  assert.equal(JSON.stringify(hiddenSlot.snapshot.session.draft).includes('hidden-stale'), false);
+  console.log('N-STATE hidden practice form does not rewrite the parked draft');
+
+  const replaceLeft = boot();
+  replaceLeft.window.QazaqShell.startCourse('2-2');
+  replaceLeft.window.TrainerCatalogBridge.launch('vocab:must');
+  replaceLeft.saveNow();
+  const chosenCopy = JSON.parse(replaceLeft.window.localStorage.getItem(KEY));
+  assert.ok(chosenCopy.navigationResume.slots['course:2-2']);
+  const replaceRight = boot();
+  replaceRight.window.QazaqShell.startCourse('1-1');
+  replaceRight.window.TrainerCatalogBridge.launch('vocab:must');
+  replaceRight.saveNow();
+  assert.ok(replaceRight.window.QazaqShell.resume().slots['course:1-1']);
+  replaceRight.window.QazaqShell.import(chosenCopy, 'replace');
+  const backupRaw = replaceRight.window.localStorage.getItem(KEY + '-before-import');
+  assert.ok(backupRaw);
+  const backupSlots = JSON.parse(backupRaw).navigationResume.slots;
+  assert.ok(backupSlots['course:1-1']);
+  const replaceBoot = boot(replaceRight.window.localStorage.getItem(KEY));
+  assert.ok(replaceBoot.window.QazaqShell.resume().slots['course:2-2']);
+  assert.equal(replaceBoot.window.QazaqShell.resume().slots['course:1-1'], undefined);
+  console.log('N-STATE import replace keeps the chosen slots and the backup');
+
+  const mergeHost = boot();
+  mergeHost.window.QazaqShell.startCourse('2-2');
+  mergeHost.window.TrainerCatalogBridge.launch('vocab:must');
+  mergeHost.saveNow();
+  const mergeIncoming = boot();
+  mergeIncoming.window.QazaqShell.startCourse('1-1');
+  mergeIncoming.window.QazaqShell.show('today');
+  mergeIncoming.saveNow();
+  mergeHost.window.QazaqShell.import(JSON.parse(mergeIncoming.window.localStorage.getItem(KEY)), 'merge');
+  const mergeBoot = boot(mergeHost.window.localStorage.getItem(KEY));
+  assert.ok(mergeBoot.window.QazaqShell.resume().slots['course:2-2']);
+  assert.ok(mergeBoot.window.QazaqShell.resume().slots['course:1-1']);
+  console.log('N-STATE import merge keeps the local slot and accepts the missing one');
+
+  const quiet = boot();
+  quiet.window.TrainerCatalogBridge.launch('vocab:must');
+  quiet.makeEl('answer-0').value = 'keep-me';
+  quiet.saveNow();
+  const quietEpoch = quiet.session().queueEpoch;
+  const quietDraft = quiet.session().draft;
+  const quietView = quiet.session().view;
+  quiet.window.localStorage.setItem = () => { throw new Error('full'); };
+  quiet.window.QazaqShell.startCourse('2-2');
+  assert.equal(quiet.session().mode, 'words');
+  assert.equal(quiet.session().view, quietView);
+  assert.equal(quiet.session().queueEpoch, quietEpoch);
+  assert.deepEqual(quiet.session().draft, quietDraft);
+  assert.equal(quiet.makeEl('launch-block').hidden, false);
+  assert.match(quiet.makeEl('launch-block').textContent, /Не получается сохранить текущее занятие/);
+  assert.equal(quiet.makeEl('save-status').textContent, 'Сохранение недоступно. Экспортируй прогресс перед закрытием.');
+  console.log('N-STATE storage block stays on the same screen and says why');
 
   console.log('VERIFY_NAVIGATION_STATE_OK');
 })().catch(err => {
