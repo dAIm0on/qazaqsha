@@ -408,6 +408,30 @@
    for(let i=position+1;i<list.length;i++){if(list[i]===cardId)return seen>=minGap;if(lemOf(list[i])!==lem)seen++;}
    return true;
  }
+ /* Gaps of every repeat that ends after `from`: for each card, the number of other-lemma cards between each pair of
+    its neighbouring shows (in show order). A swap never moves two shows of one card past each other. */
+ function repeatGaps(list,from,lemOf){
+   const gaps=new Map(),last=new Map();
+   for(let i=0;i<list.length;i++){
+     const id=list[i];
+     if(last.has(id)&&i>from){
+       const lem=lemOf(id);let n=0;
+       for(let k=last.get(id)+1;k<i;k++)if(lemOf(list[k])!==lem)n++;
+       if(!gaps.has(id))gaps.set(id,[]);
+       gaps.get(id).push(n);
+     }
+     last.set(id,i);
+   }
+   return gaps;
+ }
+ // PR-7 GPT P1-1: a swap must not bring any already scheduled repeat closer than minGap (or than it already was).
+ function repeatGapsKept(before,after,minGap){
+   for(const [id,list] of before){
+     const now=after.get(id)||[];
+     for(let k=0;k<list.length;k++)if((now[k]==null?Infinity:now[k])<Math.min(list[k],minGap))return false;
+   }
+   return true;
+ }
  function unstick(list,from,lemOf,ok){
    let out=list.slice(),pairs=adjacentPairs(out,from,lemOf),guard=0;
    while(pairs&&guard++<list.length*list.length){
@@ -461,7 +485,9 @@
    if(budget&&queue.length+added+1>budget)return {queue:original,scheduled:false};
    let seen=0,at=seq.length;
    for(let i=0;i<seq.length;i++){if(lemOf(seq[i])!==lem)seen++;if(seen>=minGap){at=i+1;break;}}
-   const next=unstick(queue.slice(0,position+1).concat(seq.slice(0,at),[cardId],seq.slice(at)),position,lemOf,t=>returnGapOk(t,position,cardId,lem,lemOf,minGap));
+   const placed=queue.slice(0,position+1).concat(seq.slice(0,at),[cardId],seq.slice(at));
+   const gaps0=repeatGaps(placed,position,lemOf);
+   const next=unstick(placed,position,lemOf,t=>returnGapOk(t,position,cardId,lem,lemOf,minGap)&&repeatGapsKept(gaps0,repeatGaps(t,position,lemOf),minGap));
    // No swap helps (too few lemmas in the portion): put one more pause card between the pair, if the budget allows.
    for(let i=position+1,extra=0;i<next.length&&extra<3;i++){
      if(lemOf(next[i])!==lemOf(next[i-1]))continue;

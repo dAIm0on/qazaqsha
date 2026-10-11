@@ -789,6 +789,16 @@
    position=0;checked=false;hinted=false;retrying=false;vocabRetry=null;retryAfterWrong=false;vocabReturnScheduled=false;
    return true;
  }
+ /* PR-7 GPT P1-2: another tab (applyRemote) already answered this show right (same session, presentation, card).
+    There is nothing to retype: the show is closed here too, no draft is kept, nothing is counted twice, no retry_close;
+    the trainer moves on to the next card, as after a duplicate retry_close. */
+ function closeRemoteShow(q){
+   const key=String(queueEpoch)+'|'+position+'|'+q.id;
+   if(!vocabClosed.includes(key))vocabClosed.push(key);
+   dropCardDraft(q);draft=null;
+   vocabRetry=null;retryAfterWrong=false;retrying=false;checked=false;
+   save();nextQuestion();
+ }
  function paintMustRetry(q){
    if(!q||!vocabRetry)return;
    retrying=true;hinted=vocabRetry.kind==='idk';retryAfterWrong=vocabRetry.kind==='wrong';checked=false;
@@ -1918,6 +1928,7 @@
    if(isVocabMustTrainer()&&window.VocabMust){
      const answers=readAnswers(q),now=Date.now();
      const pack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:'idk',answers,elapsed:elapsed(),core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating:window.FSRS.Rating.Again,errors:[],result:{correct:false,parts:(q.fields||[]).map(()=>false)},budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:true,recall:true,analytics:answerAnalytics(q,{correct:false,parts:(q.fields||[]).map(()=>false)},answers,now,elapsed(),true)});
+     if(pack.duplicate&&!pack.retry){closeRemoteShow(q);return;}
      queue=pack.queue;vocabRetry=pack.retry;vocabReturnScheduled=!!pack.scheduled;hinted=true;retrying=true;checked=false;retryAfterWrong=false;
      paintVocabLemmaFeedback($('#feedback'),q,[],{note:'<p class="small">'+esc(window.VocabMust.idkNote(!!pack.scheduled))+'</p>'});
      (q.fields||[]).forEach((_,i)=>{const el=$('#answer-'+i);if(el){el.value='';el.classList.add('invalid');el.disabled=false;}});
@@ -2060,6 +2071,7 @@
      queue=mustPack.queue;vocabReturnScheduled=!!mustPack.scheduled;
      if(mustPack.retry){vocabRetry=mustPack.retry;retryAfterWrong=mustPack.retry.kind==='wrong';}
      else retryAfterWrong=false;
+     if(mustPack.duplicate&&!mustPack.retry){closeRemoteShow(q);return;}
      if(mustPack.duplicate){checked=false;retrying=true;paintMustRetry(q);save();return;}
    }
    state.errors.push(...errors);

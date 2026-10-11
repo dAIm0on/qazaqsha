@@ -219,6 +219,38 @@ function adjacentSame(api, ids) {
     r = VM.scheduleReturn({queue: ['a-kk', 'b-kk', 'b-ru'], position: 0, cardId: 'a-kk', pool: ['a-kk', 'b-kk', 'b-ru'].map(id => ({id, wordRole: 'must'})), plan: {newLemmas: ['a', 'b']}, core: fake, minGap: 1});
     assert.equal(r.scheduled, true, 'D3 fallback still schedules the return');
     assert.equal(r.queue.filter(id => id === 'a-kk').length, 2, 'D3 fallback returns the card once');
+    // GPT P1-1 regression: a swap must not bring an already scheduled repeat (a-ru → a-ru) closer than minGap.
+    const gapsOf = (q, from) => {
+      const out = [];
+      const last = new Map();
+      q.forEach((id, i) => {
+        if (last.has(id) && i > from) { let n = 0; for (let k = last.get(id) + 1; k < i; k++) if (lem(q[k]) !== lem(id)) n++; out.push([id, last.get(id), i, n]); }
+        last.set(id, i);
+      });
+      return out;
+    };
+    const gapsKept = (before, after, from, minGap) => {
+      const b = gapsOf(before, from), a = gapsOf(after, from);
+      for (const [id] of b) {
+        const bl = b.filter(x => x[0] === id).map(x => x[3]), al = a.filter(x => x[0] === id).map(x => x[3]);
+        for (let k = 0; k < bl.length; k++) if (al[k] != null && al[k] < Math.min(bl[k], minGap)) return id + ' gap ' + al[k] + ' < ' + Math.min(bl[k], minGap);
+      }
+      return null;
+    };
+    {
+      const q0 = ['d-ru', 'a-ru', 'b-kk', 'b-ru', 'a-ru', 'd-kk'];
+      const p5 = ['a-ru', 'b-kk', 'b-ru', 'd-ru', 'd-kk'].map(id => ({id, wordRole: 'must'}));
+      r = VM.scheduleReturn({queue: q0, position: 2, cardId: 'b-kk', pool: p5, plan: {newLemmas: ['a', 'b', 'd']}, core: fake, minGap: 2});
+      assert.equal(r.scheduled, true, 'P1-1 case schedules the return');
+      assert.ok(gapBefore(r.queue, 1, 'a-ru') >= 2, 'P1-1 case: a-ru → a-ru keeps 2 cards between ' + r.queue.join(','));
+      assert.deepEqual(r.queue, ['d-ru', 'a-ru', 'b-kk', 'b-ru', 'a-ru', 'd-kk', 'b-kk'], 'P1-1 case: no swap breaks the a-ru gap ' + r.queue.join(','));
+      assert.ok(gapBefore(r.queue, 2, 'b-kk') >= 2, 'P1-1 case: return gap of b-kk ' + r.queue.join(','));
+      // with one more known pause card the pair b-kk/b-ru is split by an insert, not by a swap that hurts a-ru
+      r = VM.scheduleReturn({queue: q0, position: 2, cardId: 'b-kk', pool: p5.concat([{id: 'e-kk', wordRole: 'must'}]), plan: {newLemmas: ['a', 'b', 'd']}, state: {records: {}, skills: {}, events: [{type: 'answer', card_id: 'e-kk'}]}, core: fake, minGap: 2});
+      assert.equal(adj(r.queue, 2), null, 'P1-1 case + pause card: adjacent ' + r.queue.join(','));
+      assert.equal(gapsKept(q0, r.queue, 2, 2), null, 'P1-1 case + pause card: ' + r.queue.join(','));
+      console.log('P1-1 regression: a-ru repeat keeps its gap', r.queue.join(','));
+    }
     // randomized: no new adjacency, gap kept, same multiset
     let seed = 7;
     const rnd = n => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed % n; };
@@ -236,8 +268,31 @@ function adjacentSame(api, ids) {
       fixedRuns++;
       assert.equal(adj(out.queue, 0), null, 'D3 random ' + q.join(',') + ' -> ' + out.queue.join(','));
       assert.ok(gapBefore(out.queue, 0, card) >= 2, 'D3 random gap ' + out.queue.join(','));
+      const base = q.filter((id, i) => i === 0 || id !== card);
+      const bad = gapsKept(base, out.queue, 0, 2);
+      assert.equal(bad, null, 'D3 random all-repeat gap ' + q.join(',') + ' -> ' + out.queue.join(','));
     }
     assert.ok(fixedRuns > 100, 'D3 random runs scheduled ' + fixedRuns);
+    // randomized (GPT P1-1): any position, shown history before it, repeats of other cards already in the tail.
+    // No repeat of any card that ends after the shown card gets closer than min(minGap, what it had).
+    let gapRuns = 0;
+    for (let n = 0; n < 400; n++) {
+      const pre = Array.from({length: rnd(4)}, () => ids[rnd(ids.length)]);
+      const card = ids[rnd(ids.length)];
+      const tail = Array.from({length: 2 + rnd(6)}, () => ids[rnd(ids.length)]);
+      const q = pre.concat([card], tail);
+      const position = pre.length;
+      const out = VM.scheduleReturn({queue: q, position, cardId: card, pool: bigPool, plan: {newLemmas: [...new Set(q.map(lem))]}, state: seen, core: fake, minGap: 2});
+      if (!out.scheduled) continue;
+      gapRuns++;
+      assert.deepEqual(out.queue.slice(0, position + 1), q.slice(0, position + 1), 'P1-1 random: shown part untouched');
+      assert.ok(gapBefore(out.queue, position, card) >= 2, 'P1-1 random return gap ' + q.join(',') + ' @' + position + ' -> ' + out.queue.join(','));
+      const base = q.filter((id, i) => i <= position || id !== card);
+      const bad = gapsKept(base, out.queue, position, 2);
+      assert.equal(bad, null, 'P1-1 random all-repeat gap ' + q.join(',') + ' @' + position + ' -> ' + out.queue.join(',') + ' : ' + bad);
+    }
+    assert.ok(gapRuns > 100, 'P1-1 random runs scheduled ' + gapRuns);
+    console.log('P1-1 random: all repeats keep their gap in', gapRuns, 'returns at random positions');
     console.log('D3 scheduleReturn: no side-by-side lemma in', fixedRuns, 'random returns; gap kept');
   }
 
@@ -262,6 +317,96 @@ function adjacentSame(api, ids) {
     assert.equal(pair, null, 'D3 walk shows one lemma twice in a row: ' + (pair || []).join(' → ') + ' in ' + shown.join(' '));
     console.log('D3 walk', shown.join(' '), 'no lemma twice in a row');
   }
+
+  // GPT P1-2: two tabs on one show (same queueEpoch/position). Tab A answers it right (plain or near-miss), the cloud
+  // sync (applyRemote) brings that answer into tab B, B still has the card on screen and presses «Проверить» or
+  // «Не знаю». B must not open a retype, keep a draft, count it again or write a retry_close: it moves on.
+  async function twoTabs(aText, bAct) {
+    const fakeCloud = w => {
+      w.QazaqCloud = {configured: true, user: null, remote: null, async start() {}, async pull() { return JSON.parse(JSON.stringify(this.remote)); }, async push() {}, async login() {}, async logout() {}};
+    };
+    const A = boot(null, fakeCloud);
+    A.window.TrainerCatalogBridge.launch('vocab:must');
+    A.saveNow();
+    // near-miss exists for Russian answers only: «Не знаю» + retype on the first card brings its Russian side in;
+    // walk A with right answers to the first such card
+    if (aText === 'near') {
+      A.submit(A.answerOf(A.cardOf(A.session()))); await sleep(700); A.saveNow();
+      const c = A.cardOf(A.session()); A.makeEl('reveal-button').onclick(); retype(A, A.answerOf(c)); A.saveNow();
+    }
+    for (let step = 0; aText === 'near' && step < 10; step++) {
+      const c = A.cardOf(A.session());
+      if (/русском/.test(c.fields[0].label || '')) break;
+      A.submit(A.answerOf(c));
+      await sleep(700);
+      A.saveNow();
+    }
+    const store = Object.assign({}, A.window.localStorage._d);
+    const B = boot(null, w => { fakeCloud(w); Object.assign(w.localStorage._d, store); });
+    await sleep(20);
+    B.saveNow();
+    const s0 = B.session();
+    const q = B.cardOf(s0);
+    assert.equal(A.session().queueEpoch, s0.queueEpoch, 'P1-2 tabs share the session');
+    assert.equal(A.session().position, s0.position, 'P1-2 tabs share the position');
+    const answer = B.answerOf(q);
+    const text = aText === 'near' ? answer + answer.slice(-1) : aText === 'wrong' ? 'неттакогослова' : answer;
+    A.submit(text);
+    A.saveNow();
+    const remote = JSON.parse(A.window.localStorage.getItem(KEY));
+    const key = e => String(e.session_id) + '|' + e.presentation + '|' + e.card_id;
+    const showKey = String(s0.queueEpoch) + '|' + s0.position + '|' + q.id;
+    const aEv = remote.events.filter(e => e.type === 'answer' && key(e) === showKey);
+    assert.equal(aEv.length, 1, 'P1-2 tab A wrote the answer');
+    if (aText === 'near') assert.equal(aEv[0].near_miss, 1, 'P1-2 tab A answer is a near-miss ' + text);
+    // B types into the still open card, then the sync lands.
+    B.makeEl('answer-0').value = answer;
+    for (const fn of B.makeEl('answer-form')._ev.input || []) fn({type: 'input'});
+    B.window.QazaqCloud.remote = remote;
+    B.window.QazaqCloud.user = {email: 'x@y'};
+    B.window.dispatchEvent(new B.window.CustomEvent('qazaq-cloud-user'));
+    await sleep(30);
+    B.saveNow();
+    const merged = JSON.parse(B.window.localStorage.getItem(KEY));
+    assert.equal(merged.events.filter(e => e.type === 'answer' && key(e) === showKey).length, 1, 'P1-2 B merged the remote answer');
+    assert.equal(B.session().position, s0.position, 'P1-2 B card still on screen after the sync');
+    const answersBefore = (B.session().vocab.sitting || {}).answers || 0;
+    if (bAct === 'idk') B.makeEl('reveal-button').onclick();
+    else B.submit(answer);
+    B.saveNow();
+    let s = B.session();
+    if (aText === 'wrong') {
+      // remote wrong: the show is open for a retype in B too (unchanged behaviour)
+      assert.equal(s.position, s0.position, 'P1-2 remote wrong: B stays on the card');
+      assert.ok(s.vocab.retry && s.vocab.retry.kind === 'wrong', 'P1-2 remote wrong: B opens the retype');
+      console.log('P1-2 remote wrong + B check: B keeps the retype of', q.id, '(as before)');
+      return;
+    }
+    const tag = 'P1-2 remote ' + aText + ' + B ' + bAct + ': ';
+    assert.equal(s.position, s0.position + 1, tag + 'B moved to the next card');
+    assert.equal(s.vocab.retry, null, tag + 'no retype open');
+    assert.equal(B.makeEl('answer-0').value, '', tag + 'next card field empty');
+    assert.ok(!draftHas(B, q.id, answer), tag + 'no card draft of the closed show');
+    assert.ok(!(s.draft && (s.draft.answers || []).includes(answer)), tag + 'no session draft with the answer');
+    assert.ok((s.vocab.closed || []).includes(showKey), tag + 'show marked closed');
+    assert.equal((s.vocab.sitting || {}).answers || 0, answersBefore, tag + 'not counted twice');
+    // the next Enter answers the next card, never a retype of the remote show
+    const next = B.cardOf(s);
+    B.submit(B.answerOf(next));
+    await sleep(700);
+    B.saveNow();
+    const ev = JSON.parse(B.window.localStorage.getItem(KEY)).events;
+    const rcBefore = remote.events.filter(e => e.type === 'retry_close').length;
+    assert.equal(ev.filter(e => e.type === 'retry_close' && key(e) === showKey).length, 0, tag + 'no retry_close for the show');
+    assert.equal(ev.filter(e => e.type === 'retry_close').length, rcBefore, tag + 'no new retry_close');
+    assert.equal(ev.filter(e => e.type === 'answer' && key(e) === showKey).length, 1, tag + 'one answer for the show');
+    assert.equal(ev.filter(e => e.type === 'answer' && e.card_id === next.id && String(e.session_id) === String(s0.queueEpoch) && e.presentation === s0.position + 1).length, 1, tag + 'next card answered once');
+    console.log(tag + 'B moved on to', next.id, 'with no retype, draft or retry_close');
+  }
+  await twoTabs('right', 'check');
+  await twoTabs('near', 'check');
+  await twoTabs('right', 'idk');
+  await twoTabs('wrong', 'check');
 
   const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
   assert.match(sw, /qazaq-offline-live-20261011-vocab-pr7['"]/, 'sw.js CACHE is the PR-7 cache');
