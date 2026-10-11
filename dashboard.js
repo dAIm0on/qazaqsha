@@ -154,7 +154,7 @@
          if(file.size>cfg.storage.maxImportBytes)throw Error('Файл слишком большой: максимум 20 МБ.');
          const pending=progress.validate(await file.text(),new Set(api.questions().map(q=>q.id))),s=pending.summary;
          preview.innerHTML=`<p>Карточек: ${s.cards}; ассоциаций: ${s.associations}; событий: ${s.events}. ${esc(pending.warning)}</p><label>Как перенести<select class="import-mode"><option value="merge">Объединить: более свежие записи</option><option value="replace">Заменить текущий прогресс</option></select></label><button type="button" class="primary-button confirm-import">Импортировать</button>`;
-         preview.querySelector('.confirm-import').onclick=()=>{const mode=preview.querySelector('.import-mode').value;if(!window.confirm(mode==='replace'?'Заменить текущий прогресс этой копией? Прежние данные сохранятся в резервной копии браузера.':'Объединить данные? Для каждой карточки останется более свежая запись.'))return;try{api.import(pending.state,mode);}catch(error){preview.textContent=error.message;}};
+         preview.querySelector('.confirm-import').onclick=()=>{const mode=preview.querySelector('.import-mode').value;if(!window.confirm(mode==='replace'?'Заменить текущий прогресс этой копией? Прежние данные сохранятся в резервной копии браузера.':'Объединить данные? Для каждой карточки останется более свежая запись.'))return;const go=()=>{try{api.import(pending.state,mode);}catch(error){preview.textContent=error.message;}};if(api.prepareImport)api.prepareImport().then(go,error=>{preview.textContent=error&&error.message?error.message:'Импорт не выполнен.';});else go();};
        }catch(error){preview.textContent=error.message;}
      };
    }

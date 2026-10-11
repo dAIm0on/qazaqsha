@@ -139,8 +139,10 @@
      showIds.add(id);return true;
    }).slice(-cfg.storage.maxEvents);
    out.prefs={letters:!!(incoming.prefs&&incoming.prefs.letters)||!!out.prefs.letters,lettersChosen:!!(incoming.prefs&&incoming.prefs.lettersChosen)||!!out.prefs.lettersChosen};
-   Object.assign(out.learning.steps,incoming.learning.steps);
-   Object.assign(out.learning.notes,incoming.learning.notes);Object.assign(out.learning.completedSteps,incoming.learning.completedSteps);
+   // storage p0c (GPT design §3): a lesson step never goes back on merge; completedSteps only ever gains true.
+   for(const [id,n] of Object.entries(incoming.learning.steps||{}))out.learning.steps[id]=Math.max(Number(out.learning.steps[id])||0,Number(n)||0);
+   Object.assign(out.learning.notes,incoming.learning.notes);
+   for(const [id,v] of Object.entries(incoming.learning.completedSteps||{}))if(v===true)out.learning.completedSteps[id]=true;
    if(incoming.incidentalWeek){
      const a=out.incidentalWeek||{key:'',added:0},b=incoming.incidentalWeek;
      out.incidentalWeek=a.key===b.key?{key:a.key,added:Math.max(a.added||0,b.added||0)}:(b.key||'')>(a.key||'')?{key:b.key,added:b.added||0}:a;
@@ -153,8 +155,8 @@
    if(incoming.homeworkAttempts){
      out.homeworkAttempts=out.homeworkAttempts||Object.create(null);
      for(const [lesson,a] of Object.entries(incoming.homeworkAttempts)){
-       const old=out.homeworkAttempts[lesson];
-       if(!old||(a.started_at||0)>=(old.started_at||0))out.homeworkAttempts[lesson]=a;
+       // storage p0d: the same attempt (same started_at) is merged item by item, never replaced by an older copy
+       out.homeworkAttempts[lesson]=mergeAttempt(out.homeworkAttempts[lesson],a);
      }
    }
    if(Array.isArray(incoming.issueLog)){
@@ -245,6 +247,174 @@
    const ids=questions.filter(q=>samePair(q,pair)&&byId.has(q.id)).map(q=>q.id);
    return [...new Set(ids)].slice(0,cfg.session.size);
  }
- const api={empty,migrate,serialize,validate,merge,answerIndex,observeConfusions,pairs,contrastIds,samePair,memoryStats,courseIds:courseProgress.courseIds,ensureCourseProgress:courseProgress.ensure,ensureLessonProgress:courseProgress.ensureLesson,setResumePointer:courseProgress.setResume,markLessonStarted:courseProgress.markStarted,markLessonCompleted:courseProgress.markCompleted,saveLessonPath:courseProgress.savePath,saveLessonPractice:courseProgress.savePractice,clearLessonPractice:courseProgress.clearPractice,normalizePracticeSession:courseProgress.normalizePractice,normalizeStageContext:courseProgress.normalizeStageContext,evaluateStage:courseProgress.evaluateStage,lessonStatusAfterStage:courseProgress.lessonStatusAfterStage,pushStageCompletion:courseProgress.pushStageCompletion,registerStages:courseProgress.registerStages,nextRegistered:courseProgress.nextRegistered,unknownQueueIds:courseProgress.unknownQueueIds,STAGE_REVISION:courseProgress.STAGE_REVISION};
+ // ---------- storage p0c (GPT fix design §3): a page that could not read IndexedDB at start ("pending") records
+ // which values the user actually changed (pendingTouch, against the copy it started from). The next normal start
+ // applies only that delta on top of the newer mirror (reconcilePending): additive parts are merged, monotonic
+ // values take the max, other values come from the page only when touched. updatedAt alone is not a change
+ // (save() refreshes it itself).
+ function clone(v){return v==null?v:JSON.parse(JSON.stringify(v));}
+ function sameValue(a,b){return JSON.stringify(a)===JSON.stringify(b);}
+ function changedKeys(a,b){a=obj(a)?a:{};b=obj(b)?b:{};const out=[];for(const k of new Set([...Object.keys(a),...Object.keys(b)]))if(!sameValue(a[k],b[k]))out.push(k);return out;}
+ function unionList(a,b){return [...new Set([...(a||[]),...(b||[])])];}
+ function pendingTouch(base,current,prior){
+   const a=migrate(base),b=migrate(current);
+   const t=clone(prior)||{learning:{lessonId:false,steps:[],notes:[],completedSteps:[]},prefs:false,explainDepth:[],preExam:[],savings:[],repair:false,place:false,rulesDraft:false,grammarPath:[],coursePath:[],coursePractice:[],courseResume:false};
+   t.learning=t.learning||{lessonId:false,steps:[],notes:[],completedSteps:[]};
+   if(a.learning.lessonId!==b.learning.lessonId)t.learning.lessonId=true;
+   t.learning.steps=unionList(t.learning.steps,changedKeys(a.learning.steps,b.learning.steps));
+   t.learning.notes=unionList(t.learning.notes,changedKeys(a.learning.notes,b.learning.notes));
+   t.learning.completedSteps=unionList(t.learning.completedSteps,changedKeys(a.learning.completedSteps,b.learning.completedSteps));
+   if(!sameValue(a.prefs,b.prefs))t.prefs=true;
+   t.explainDepth=unionList(t.explainDepth,changedKeys(a.explainDepth,b.explainDepth));
+   t.preExam=unionList(t.preExam,changedKeys(a.preExam&&a.preExam.trainers,b.preExam&&b.preExam.trainers));
+   t.savings=unionList(t.savings,changedKeys(a.savings,b.savings));
+   if(!sameValue(a.repair,b.repair))t.repair=true;
+   if(!sameValue(a.place,b.place))t.place=true;
+   if(!sameValue(a.rulesDraft,b.rulesDraft))t.rulesDraft=true;
+   t.grammarPath=t.grammarPath||[];
+   for(const k of ['topicId','step','phase','queue','index','blocked','lessonId','chapterId','beat','contentRevision','pathNeedsReplay','pathDraft','canonShownFor'])
+     if(!sameValue(a.grammarPath&&a.grammarPath[k],b.grammarPath&&b.grammarPath[k])&&!t.grammarPath.includes(k))t.grammarPath.push(k);
+   const ac=a.courseProgress||{lessons:{},resumePointer:null},bc=b.courseProgress||{lessons:{},resumePointer:null};
+   t.coursePath=t.coursePath||[];t.coursePractice=t.coursePractice||[];
+   for(const id of new Set([...Object.keys(ac.lessons||{}),...Object.keys(bc.lessons||{})])){
+     const x=ac.lessons&&ac.lessons[id]||{},y=bc.lessons&&bc.lessons[id]||{};
+     const xp=clone(x.path)||{},yp=clone(y.path)||{};delete xp.updatedAt;delete yp.updatedAt;
+     if(!sameValue(xp,yp)&&!t.coursePath.includes(id))t.coursePath.push(id);
+     const xs=clone(x.practiceSession),ys=clone(y.practiceSession);if(xs)delete xs.updatedAt;if(ys)delete ys.updatedAt;
+     if(!sameValue(xs,ys)&&!t.coursePractice.includes(id))t.coursePractice.push(id);
+   }
+   const ar=clone(ac.resumePointer)||{},br=clone(bc.resumePointer)||{};delete ar.updatedAt;delete br.updatedAt;
+   if(!sameValue(ar,br))t.courseResume=true;
+   // storage p0d (GPT review 3): homework attempts and the «Формы слова» runtime are touched values too
+   t.homework=unionList(t.homework,changedKeys(a.homeworkAttempts,b.homeworkAttempts));
+   t.morph=t.morph||{session:false,chain:false,resume:false};
+   const am=a.morphTrainer||{},bm=b.morphTrainer||{},strip=v=>{const c=clone(v);if(c&&typeof c==='object')delete c.updatedAt;return c;};
+   if(!sameValue(strip(am.session),strip(bm.session)))t.morph.session=true;
+   if(!sameValue(strip(am.chain),strip(bm.chain)))t.morph.chain=true;
+   if(!sameValue(strip(am.teaching&&am.teaching.resume),strip(bm.teaching&&bm.teaching.resume)))t.morph.resume=true;
+   return t;
+ }
+ function applyTouchedDict(target,page,keys){
+   target=clone(target)||Object.create(null);page=page||{};
+   for(const k of keys||[]){if(Object.prototype.hasOwnProperty.call(page,k))target[k]=clone(page[k]);else delete target[k];}
+   return target;
+ }
+ function mergeRepair(a,b,touched){
+   if(!touched)return clone(a);
+   if(!a)return clone(b);
+   if(!b)return null;
+   if(a.rule_id!==b.rule_id)return clone(b);
+   return {...clone(b),attempts:Math.max(Number(a.attempts)||0,Number(b.attempts)||0),blinds:Math.max(Number(a.blinds)||0,Number(b.blinds)||0),quiet_until:Math.max(Number(a.quiet_until)||0,Number(b.quiet_until)||0),roots_used:unionList(a.roots_used,b.roots_used).slice(0,8)};
+ }
+ function pathForward(a,b,touched){
+   if(!touched)return clone(a);
+   if(!a||!a.chapterId)return clone(b);
+   if(!b||!b.chapterId)return clone(a);
+   // same chapter: beat only moves forward
+   if(a.chapterId===b.chapterId&&(a.contentRevision||null)===(b.contentRevision||null)){
+     if((Number(b.beat)||0)>(Number(a.beat)||0))return clone(b);
+     const out=clone(a);out.beat=Math.max(Number(a.beat)||0,Number(b.beat)||0);out.pathNeedsReplay=!!(a.pathNeedsReplay||b.pathNeedsReplay);return out;
+   }
+   // different chapters cannot be ordered here: keep the durable pointer (page.session still resumes the page)
+   return clone(a);
+ }
+ function practiceForward(a,b,touched){
+   if(!touched)return clone(a);
+   if(!a)return clone(b);
+   if(!b)return clone(a);
+   if(a.queueEpoch!=null&&b.queueEpoch!=null&&a.queueEpoch===b.queueEpoch)return (Number(b.position)||0)>(Number(a.position)||0)?clone(b):clone(a);
+   return clone(a);
+ }
+ // One homework attempt from two copies. Different started_at: the newer attempt, the older one kept in previous.
+ // Same attempt: items by id (newer at wins), counters and export_rev never go back, checklist only gains ticks.
+ function attemptSnapshot(a){return {started_at:a.started_at,items:clone(a.items||[]),rule_peeks:a.rule_peeks||0,answer_peeks:a.answer_peeks||0,submitted_at:a.submitted_at||null,export_rev:a.export_rev||0,checklist:clone(a.checklist||{})};}
+ function unionPrevious(...lists){const m=new Map();for(const list of lists)for(const p of list||[])if(obj(p)&&!m.has(p.started_at))m.set(p.started_at,clone(p));return [...m.values()].sort((x,y)=>(x.started_at||0)-(y.started_at||0)).slice(-30);}
+ function mergeAttempt(a,b){
+   if(!obj(a))return clone(b);
+   if(!obj(b))return clone(a);
+   if((a.started_at||0)!==(b.started_at||0)){
+     const newer=(b.started_at||0)>(a.started_at||0)?b:a,older=newer===b?a:b,out=clone(newer);
+     out.previous=unionPrevious(older.previous,newer.previous,(older.items||[]).length||older.submitted_at?[attemptSnapshot(older)]:[]).filter(p=>p.started_at!==newer.started_at);
+     return out;
+   }
+   const out=clone(a),items=(out.items||[]).slice(),index=new Map(items.map((it,i)=>[it.id,i]));
+   for(const it of b.items||[]){const i=index.get(it.id);if(i===undefined){index.set(it.id,items.length);items.push(clone(it));}else if((Number(it.at)||0)>(Number(items[i].at)||0))items[i]=clone(it);}
+   out.items=items;
+   for(const k of ['rule_peeks','answer_peeks','export_rev'])out[k]=Math.max(Number(a[k])||0,Number(b[k])||0);
+   out.submitted_at=Math.max(Number(a.submitted_at)||0,Number(b.submitted_at)||0)||null;
+   const last=list=>Math.max(0,...(list||[]).map(it=>Number(it.at)||0));
+   out.cursor=last(b.items)>last(a.items)?b.cursor:a.cursor;
+   out.checklist=Object.assign({},a.checklist||{});for(const [k,v] of Object.entries(b.checklist||{}))if(v===true)out.checklist[k]=true;
+   out.previous=unionPrevious(a.previous,b.previous);
+   return out;
+ }
+ // «Формы слова» session touched on the blind page: same session moves only forward; another session = the page's.
+ function morphSessionForward(a,b,touched){
+   if(!touched)return clone(a);
+   if(!a||!b)return clone(b);
+   if(a.id!==b.id)return clone(b);
+   const rank={question:0,feedback:1,complete:2},ka=(a.cursor||0)*3+(rank[a.phase]||0),kb=(b.cursor||0)*3+(rank[b.phase]||0);
+   return kb>=ka?clone(b):clone(a);
+ }
+ function reconcilePending(authoritative,page,touch){
+   const A=migrate(authoritative),B=migrate(page),t=touch||{};
+   // a lesson package that differs between the copies keeps the mirror's version (P.merge would throw and block the start)
+   const aPk=new Map((A.lesson_packages||[]).map(p=>[p.lesson_id,JSON.stringify(p)]));
+   const Bm=Object.assign({},B,{lesson_packages:(B.lesson_packages||[]).filter(p=>!aPk.has(p.lesson_id)||aPk.get(p.lesson_id)===JSON.stringify(p))});
+   const out=merge(A,Bm);
+   // homework: untouched attempts stay as in the mirror; touched ones are merged item by item
+   const hw=Object.assign(Object.create(null),clone(A.homeworkAttempts)||{});
+   for(const [id,att] of Object.entries(B.homeworkAttempts||{}))if(!hw[id])hw[id]=clone(att);
+   for(const id of t.homework||[])hw[id]=mergeAttempt(A.homeworkAttempts&&A.homeworkAttempts[id],B.homeworkAttempts&&B.homeworkAttempts[id]);
+   out.homeworkAttempts=hw;
+   // «Формы слова»: events/exposed/teaching events stay merged; the runtime pointers follow touch
+   const tm=t.morph||{},am=A.morphTrainer||{},bm=B.morphTrainer||{};
+   out.morphTrainer.session=morphSessionForward(am.session||null,bm.session||null,tm.session);
+   if(!tm.chain)out.morphTrainer.chain=clone(am.chain||null);
+   if(!tm.resume&&out.morphTrainer.teaching)out.morphTrainer.teaching.resume=clone(am.teaching&&am.teaching.resume||null);
+   out.learning=clone(A.learning);
+   if(t.learning&&t.learning.lessonId)out.learning.lessonId=B.learning.lessonId;
+   for(const id of (t.learning&&t.learning.steps)||[])out.learning.steps[id]=Math.max(Number(A.learning.steps[id])||0,Number(B.learning.steps[id])||0);
+   out.learning.notes=applyTouchedDict(A.learning.notes,B.learning.notes,t.learning&&t.learning.notes);
+   for(const id of (t.learning&&t.learning.completedSteps)||[])if(A.learning.completedSteps[id]===true||B.learning.completedSteps[id]===true)out.learning.completedSteps[id]=true;
+   out.prefs=t.prefs?clone(B.prefs):clone(A.prefs);
+   out.explainDepth=applyTouchedDict(A.explainDepth,B.explainDepth,t.explainDepth);
+   out.place=t.place?clone(B.place):clone(A.place);
+   out.rulesDraft=t.rulesDraft?clone(B.rulesDraft):clone(A.rulesDraft);
+   out.repair=mergeRepair(A.repair,B.repair,t.repair);
+   out.savings=clone(A.savings)||Object.create(null);
+   for(const id of t.savings||[])out.savings[id]=Math.max(Number(A.savings&&A.savings[id])||0,Number(B.savings&&B.savings[id])||0);
+   out.preExam=clone(A.preExam)||{trainers:Object.create(null),updatedAt:0};out.preExam.trainers=out.preExam.trainers||Object.create(null);
+   for(const id of t.preExam||[])out.preExam.trainers[id]=!!(A.preExam&&A.preExam.trainers&&A.preExam.trainers[id]||B.preExam&&B.preExam.trainers&&B.preExam.trainers[id]);
+   out.preExam.updatedAt=Math.max(Number(A.preExam&&A.preExam.updatedAt)||0,Number(B.preExam&&B.preExam.updatedAt)||0);
+   const ga=A.grammarPath||{},gb=B.grammarPath||{},g=clone(ga);
+   g.completed=unionList(ga.completed,gb.completed).slice(0,40);
+   g.legacyCompleted=unionList(ga.legacyCompleted,gb.legacyCompleted).slice(0,80);
+   g.completedChapters=Object.assign(Object.create(null),ga.completedChapters||{},gb.completedChapters||{});
+   for(const name of ['peeks','fails']){g[name]=Object.assign(Object.create(null),ga[name]||{});for(const [k,v] of Object.entries(gb[name]||{}))g[name][k]=Math.max(Number(g[name][k])||0,Number(v)||0);}
+   g.passed=Object.assign(Object.create(null),ga.passed||{},gb.passed||{});
+   const touchedGp=new Set(t.grammarPath||[]);
+   for(const k of ['topicId','phase','queue','blocked','lessonId','chapterId','contentRevision','pathDraft','canonShownFor'])if(touchedGp.has(k))g[k]=clone(gb[k]);
+   const sameLesson=(ga.lessonId||null)===(gb.lessonId||null),sameChapter=(ga.chapterId||null)===(gb.chapterId||null);
+   if(touchedGp.has('step'))g.step=sameLesson?Math.max(Number(ga.step)||0,Number(gb.step)||0):Number(gb.step)||0;
+   if(touchedGp.has('beat'))g.beat=sameLesson&&sameChapter?Math.max(Number(ga.beat)||0,Number(gb.beat)||0):Number(gb.beat)||0;
+   if(touchedGp.has('index'))g.index=sameLesson?Math.max(Number(ga.index)||0,Number(gb.index)||0):Number(gb.index)||0;
+   g.pathNeedsReplay=!!(ga.pathNeedsReplay||gb.pathNeedsReplay);
+   out.grammarPath=g;
+   const cp=out.courseProgress;
+   for(const id of Object.keys(cp.lessons||{})){
+     const aa=A.courseProgress&&A.courseProgress.lessons&&A.courseProgress.lessons[id],bb=B.courseProgress&&B.courseProgress.lessons&&B.courseProgress.lessons[id];
+     if(!aa||!bb)continue;
+     cp.lessons[id].path=pathForward(aa.path,bb.path,(t.coursePath||[]).includes(id));
+     cp.lessons[id].practiceSession=practiceForward(aa.practiceSession,bb.practiceSession,(t.coursePractice||[]).includes(id));
+   }
+   cp.resumePointer=t.courseResume?clone(B.courseProgress.resumePointer):clone(A.courseProgress.resumePointer);
+   out.courseProgress=cp;
+   // the user goes on with the session of the page where they kept working
+   out.session=clone(B.session);
+   out.schema=7;
+   return out;
+ }
+ const api={empty,migrate,serialize,validate,merge,pendingTouch,reconcilePending,answerIndex,observeConfusions,pairs,contrastIds,samePair,memoryStats,courseIds:courseProgress.courseIds,ensureCourseProgress:courseProgress.ensure,ensureLessonProgress:courseProgress.ensureLesson,setResumePointer:courseProgress.setResume,markLessonStarted:courseProgress.markStarted,markLessonCompleted:courseProgress.markCompleted,saveLessonPath:courseProgress.savePath,saveLessonPractice:courseProgress.savePractice,clearLessonPractice:courseProgress.clearPractice,normalizePracticeSession:courseProgress.normalizePractice,normalizeStageContext:courseProgress.normalizeStageContext,evaluateStage:courseProgress.evaluateStage,lessonStatusAfterStage:courseProgress.lessonStatusAfterStage,pushStageCompletion:courseProgress.pushStageCompletion,registerStages:courseProgress.registerStages,nextRegistered:courseProgress.nextRegistered,unknownQueueIds:courseProgress.unknownQueueIds,STAGE_REVISION:courseProgress.STAGE_REVISION};
  if(node)module.exports=api;else root.ProgressStore=api;
 })(typeof window!=='undefined'?window:globalThis);
