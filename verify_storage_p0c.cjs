@@ -278,6 +278,11 @@ async function twoNewAnswers(a, ls) { a.window.TrainerCatalogBridge.launch('voca
     assert.equal(JSON.stringify(r.lesson_packages), JSON.stringify(P.migrate(Ab).lesson_packages));
   });
 
+  await check('T28 P.merge (import «Объединить»): same homework attempt merged item by item', async () => {
+    const x = base(); x.homeworkAttempts = hw(['q1', 'q2', 'q3']); const y = base(); y.homeworkAttempts = hw(['q1']);
+    assert.deepEqual(P.merge(x, y).homeworkAttempts['1-1'].items.map(i => i.id), ['q1', 'q2', 'q3']);
+  });
+
   for (const r of results) console.log(r.join('  '));
   const failed = results.filter(r => r[0] === 'FAIL').length;
   console.log('verify_storage_p0c: ' + (failed ? failed + ' FAILED' : 'OK') + ' (' + results.length + ' scenarios)');

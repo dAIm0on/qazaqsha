@@ -155,8 +155,8 @@
    if(incoming.homeworkAttempts){
      out.homeworkAttempts=out.homeworkAttempts||Object.create(null);
      for(const [lesson,a] of Object.entries(incoming.homeworkAttempts)){
-       const old=out.homeworkAttempts[lesson];
-       if(!old||(a.started_at||0)>=(old.started_at||0))out.homeworkAttempts[lesson]=a;
+       // storage p0d: the same attempt (same started_at) is merged item by item, never replaced by an older copy
+       out.homeworkAttempts[lesson]=mergeAttempt(out.homeworkAttempts[lesson],a);
      }
    }
    if(Array.isArray(incoming.issueLog)){
@@ -285,6 +285,13 @@
    }
    const ar=clone(ac.resumePointer)||{},br=clone(bc.resumePointer)||{};delete ar.updatedAt;delete br.updatedAt;
    if(!sameValue(ar,br))t.courseResume=true;
+   // storage p0d (GPT review 3): homework attempts and the «Формы слова» runtime are touched values too
+   t.homework=unionList(t.homework,changedKeys(a.homeworkAttempts,b.homeworkAttempts));
+   t.morph=t.morph||{session:false,chain:false,resume:false};
+   const am=a.morphTrainer||{},bm=b.morphTrainer||{},strip=v=>{const c=clone(v);if(c&&typeof c==='object')delete c.updatedAt;return c;};
+   if(!sameValue(strip(am.session),strip(bm.session)))t.morph.session=true;
+   if(!sameValue(strip(am.chain),strip(bm.chain)))t.morph.chain=true;
+   if(!sameValue(strip(am.teaching&&am.teaching.resume),strip(bm.teaching&&bm.teaching.resume)))t.morph.resume=true;
    return t;
  }
  function applyTouchedDict(target,page,keys){
@@ -318,9 +325,53 @@
    if(a.queueEpoch!=null&&b.queueEpoch!=null&&a.queueEpoch===b.queueEpoch)return (Number(b.position)||0)>(Number(a.position)||0)?clone(b):clone(a);
    return clone(a);
  }
+ // One homework attempt from two copies. Different started_at: the newer attempt, the older one kept in previous.
+ // Same attempt: items by id (newer at wins), counters and export_rev never go back, checklist only gains ticks.
+ function attemptSnapshot(a){return {started_at:a.started_at,items:clone(a.items||[]),rule_peeks:a.rule_peeks||0,answer_peeks:a.answer_peeks||0,submitted_at:a.submitted_at||null,export_rev:a.export_rev||0,checklist:clone(a.checklist||{})};}
+ function unionPrevious(...lists){const m=new Map();for(const list of lists)for(const p of list||[])if(obj(p)&&!m.has(p.started_at))m.set(p.started_at,clone(p));return [...m.values()].sort((x,y)=>(x.started_at||0)-(y.started_at||0)).slice(-30);}
+ function mergeAttempt(a,b){
+   if(!obj(a))return clone(b);
+   if(!obj(b))return clone(a);
+   if((a.started_at||0)!==(b.started_at||0)){
+     const newer=(b.started_at||0)>(a.started_at||0)?b:a,older=newer===b?a:b,out=clone(newer);
+     out.previous=unionPrevious(older.previous,newer.previous,(older.items||[]).length||older.submitted_at?[attemptSnapshot(older)]:[]).filter(p=>p.started_at!==newer.started_at);
+     return out;
+   }
+   const out=clone(a),items=(out.items||[]).slice(),index=new Map(items.map((it,i)=>[it.id,i]));
+   for(const it of b.items||[]){const i=index.get(it.id);if(i===undefined){index.set(it.id,items.length);items.push(clone(it));}else if((Number(it.at)||0)>(Number(items[i].at)||0))items[i]=clone(it);}
+   out.items=items;
+   for(const k of ['rule_peeks','answer_peeks','export_rev'])out[k]=Math.max(Number(a[k])||0,Number(b[k])||0);
+   out.submitted_at=Math.max(Number(a.submitted_at)||0,Number(b.submitted_at)||0)||null;
+   const last=list=>Math.max(0,...(list||[]).map(it=>Number(it.at)||0));
+   out.cursor=last(b.items)>last(a.items)?b.cursor:a.cursor;
+   out.checklist=Object.assign({},a.checklist||{});for(const [k,v] of Object.entries(b.checklist||{}))if(v===true)out.checklist[k]=true;
+   out.previous=unionPrevious(a.previous,b.previous);
+   return out;
+ }
+ // «Формы слова» session touched on the blind page: same session moves only forward; another session = the page's.
+ function morphSessionForward(a,b,touched){
+   if(!touched)return clone(a);
+   if(!a||!b)return clone(b);
+   if(a.id!==b.id)return clone(b);
+   const rank={question:0,feedback:1,complete:2},ka=(a.cursor||0)*3+(rank[a.phase]||0),kb=(b.cursor||0)*3+(rank[b.phase]||0);
+   return kb>=ka?clone(b):clone(a);
+ }
  function reconcilePending(authoritative,page,touch){
    const A=migrate(authoritative),B=migrate(page),t=touch||{};
-   const out=merge(A,B);
+   // a lesson package that differs between the copies keeps the mirror's version (P.merge would throw and block the start)
+   const aPk=new Map((A.lesson_packages||[]).map(p=>[p.lesson_id,JSON.stringify(p)]));
+   const Bm=Object.assign({},B,{lesson_packages:(B.lesson_packages||[]).filter(p=>!aPk.has(p.lesson_id)||aPk.get(p.lesson_id)===JSON.stringify(p))});
+   const out=merge(A,Bm);
+   // homework: untouched attempts stay as in the mirror; touched ones are merged item by item
+   const hw=Object.assign(Object.create(null),clone(A.homeworkAttempts)||{});
+   for(const [id,att] of Object.entries(B.homeworkAttempts||{}))if(!hw[id])hw[id]=clone(att);
+   for(const id of t.homework||[])hw[id]=mergeAttempt(A.homeworkAttempts&&A.homeworkAttempts[id],B.homeworkAttempts&&B.homeworkAttempts[id]);
+   out.homeworkAttempts=hw;
+   // «Формы слова»: events/exposed/teaching events stay merged; the runtime pointers follow touch
+   const tm=t.morph||{},am=A.morphTrainer||{},bm=B.morphTrainer||{};
+   out.morphTrainer.session=morphSessionForward(am.session||null,bm.session||null,tm.session);
+   if(!tm.chain)out.morphTrainer.chain=clone(am.chain||null);
+   if(!tm.resume&&out.morphTrainer.teaching)out.morphTrainer.teaching.resume=clone(am.teaching&&am.teaching.resume||null);
    out.learning=clone(A.learning);
    if(t.learning&&t.learning.lessonId)out.learning.lessonId=B.learning.lessonId;
    for(const id of (t.learning&&t.learning.steps)||[])out.learning.steps[id]=Math.max(Number(A.learning.steps[id])||0,Number(B.learning.steps[id])||0);
