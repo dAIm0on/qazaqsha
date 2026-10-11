@@ -318,28 +318,41 @@ function adjacentSame(api, ids) {
     console.log('D3 walk', shown.join(' '), 'no lemma twice in a row');
   }
 
-  // GPT P1-2: two tabs on one show (same queueEpoch/position). Tab A answers it right (plain or near-miss), the cloud
-  // sync (applyRemote) brings that answer into tab B, B still has the card on screen and presses «Проверить» or
-  // «Не знаю». B must not open a retype, keep a draft, count it again or write a retry_close: it moves on.
-  async function twoTabs(aText, bAct) {
-    const fakeCloud = w => {
-      w.QazaqCloud = {configured: true, user: null, remote: null, async start() {}, async pull() { return JSON.parse(JSON.stringify(this.remote)); }, async push() {}, async login() {}, async logout() {}};
-    };
+  // GPT P1-2 (general): two tabs on one show (same queueEpoch/position). Tab A gives the first answer of every kind,
+  // the cloud sync (applyRemote) brings it into tab B, where the card is still on screen with B's own typing, and B
+  // presses «Проверить» (right or wrong) or «Не знаю». Table: first answer × B action. B must not count anything,
+  // not write an answer/retry_close/draft, and must end with the queue (return) of the one-tab outcome. A first
+  // answer that is done (right, near-miss, assisted, rule-viewed, closed retype) moves B on; an open retype is the
+  // same retype in B (the first answer's retry), and across both tabs only one retry_close survives the sync.
+  const fakeCloud = w => {
+    w.QazaqCloud = {configured: true, user: null, remote: null, async start() {}, async pull() { return JSON.parse(JSON.stringify(this.remote)); }, async push() {}, async login() {}, async logout() {}};
+  };
+  const stateOf = api => { api.saveNow(); return JSON.parse(api.window.localStorage.getItem(KEY)); };
+  async function sync(to, from) {
+    to.window.QazaqCloud.remote = stateOf(from);
+    to.window.QazaqCloud.user = {email: 'x@y'};
+    to.window.dispatchEvent(new to.window.CustomEvent('qazaq-cloud-user'));
+    await sleep(30);
+    to.saveNow();
+  }
+  const showOf = e => String(e.session_id) + '|' + e.presentation + '|' + e.card_id;
+  const countOf = (api, type, key) => stateOf(api).events.filter(e => e.type === type && showOf(e) === key).length;
+  const counters = s => [s.sessionAttempts || 0, s.sessionCorrect || 0, s.sessionAssisted || 0, (s.vocab.sitting || {}).answers || 0].join('/');
+  const table = [];
+  async function combo(first, bAct) {
+    const tag = 'P1-2 [' + first + ' × B ' + bAct + ']: ';
     const A = boot(null, fakeCloud);
     A.window.TrainerCatalogBridge.launch('vocab:must');
     A.saveNow();
-    // near-miss exists for Russian answers only: «Не знаю» + retype on the first card brings its Russian side in;
-    // walk A with right answers to the first such card
-    if (aText === 'near') {
+    if (first === 'near') {
+      // near-miss exists for Russian answers only: right, then «Не знаю» + retype brings a Russian side in
       A.submit(A.answerOf(A.cardOf(A.session()))); await sleep(700); A.saveNow();
       const c = A.cardOf(A.session()); A.makeEl('reveal-button').onclick(); retype(A, A.answerOf(c)); A.saveNow();
-    }
-    for (let step = 0; aText === 'near' && step < 10; step++) {
-      const c = A.cardOf(A.session());
-      if (/русском/.test(c.fields[0].label || '')) break;
-      A.submit(A.answerOf(c));
-      await sleep(700);
-      A.saveNow();
+      for (let step = 0; step < 10; step++) {
+        const c2 = A.cardOf(A.session());
+        if (/русском/.test(c2.fields[0].label || '')) break;
+        A.submit(A.answerOf(c2)); await sleep(700); A.saveNow();
+      }
     }
     const store = Object.assign({}, A.window.localStorage._d);
     const B = boot(null, w => { fakeCloud(w); Object.assign(w.localStorage._d, store); });
@@ -347,66 +360,86 @@ function adjacentSame(api, ids) {
     B.saveNow();
     const s0 = B.session();
     const q = B.cardOf(s0);
-    assert.equal(A.session().queueEpoch, s0.queueEpoch, 'P1-2 tabs share the session');
-    assert.equal(A.session().position, s0.position, 'P1-2 tabs share the position');
     const answer = B.answerOf(q);
-    const text = aText === 'near' ? answer + answer.slice(-1) : aText === 'wrong' ? 'неттакогослова' : answer;
-    A.submit(text);
-    A.saveNow();
-    const remote = JSON.parse(A.window.localStorage.getItem(KEY));
-    const key = e => String(e.session_id) + '|' + e.presentation + '|' + e.card_id;
-    const showKey = String(s0.queueEpoch) + '|' + s0.position + '|' + q.id;
-    const aEv = remote.events.filter(e => e.type === 'answer' && key(e) === showKey);
-    assert.equal(aEv.length, 1, 'P1-2 tab A wrote the answer');
-    if (aText === 'near') assert.equal(aEv[0].near_miss, 1, 'P1-2 tab A answer is a near-miss ' + text);
-    // B types into the still open card, then the sync lands.
-    B.makeEl('answer-0').value = answer;
-    for (const fn of B.makeEl('answer-form')._ev.input || []) fn({type: 'input'});
-    B.window.QazaqCloud.remote = remote;
-    B.window.QazaqCloud.user = {email: 'x@y'};
-    B.window.dispatchEvent(new B.window.CustomEvent('qazaq-cloud-user'));
-    await sleep(30);
-    B.saveNow();
-    const merged = JSON.parse(B.window.localStorage.getItem(KEY));
-    assert.equal(merged.events.filter(e => e.type === 'answer' && key(e) === showKey).length, 1, 'P1-2 B merged the remote answer');
-    assert.equal(B.session().position, s0.position, 'P1-2 B card still on screen after the sync');
-    const answersBefore = (B.session().vocab.sitting || {}).answers || 0;
-    if (bAct === 'idk') B.makeEl('reveal-button').onclick();
-    else B.submit(answer);
-    B.saveNow();
-    let s = B.session();
-    if (aText === 'wrong') {
-      // remote wrong: the show is open for a retype in B too (unchanged behaviour)
-      assert.equal(s.position, s0.position, 'P1-2 remote wrong: B stays on the card');
-      assert.ok(s.vocab.retry && s.vocab.retry.kind === 'wrong', 'P1-2 remote wrong: B opens the retype');
-      console.log('P1-2 remote wrong + B check: B keeps the retype of', q.id, '(as before)');
-      return;
+    const key = String(s0.queueEpoch) + '|' + s0.position + '|' + q.id;
+    assert.equal(A.session().queueEpoch, s0.queueEpoch, tag + 'tabs share the session');
+    assert.equal(A.session().position, s0.position, tag + 'tabs share the position');
+    // Tab A: the first answer, exactly as in one tab.
+    if (first === 'assisted') A.makeEl('hint-button').onclick();
+    if (first === 'rule') {
+      // hw1 cards carry no rule text; give this card one so «Правило» opens (sets rulePeeked) as on a rule card
+      const H = A.window.Homework, own = H.ruleText;
+      H.ruleText = c => (c && c.id === q.id ? 'Правило: проверочный текст.' : own.call(H, c));
+      A.makeEl('rule-button').onclick();
     }
-    const tag = 'P1-2 remote ' + aText + ' + B ' + bAct + ': ';
-    assert.equal(s.position, s0.position + 1, tag + 'B moved to the next card');
-    assert.equal(s.vocab.retry, null, tag + 'no retype open');
-    assert.equal(B.makeEl('answer-0').value, '', tag + 'next card field empty');
-    assert.ok(!draftHas(B, q.id, answer), tag + 'no card draft of the closed show');
-    assert.ok(!(s.draft && (s.draft.answers || []).includes(answer)), tag + 'no session draft with the answer');
-    assert.ok((s.vocab.closed || []).includes(showKey), tag + 'show marked closed');
-    assert.equal((s.vocab.sitting || {}).answers || 0, answersBefore, tag + 'not counted twice');
-    // the next Enter answers the next card, never a retype of the remote show
-    const next = B.cardOf(s);
-    B.submit(B.answerOf(next));
-    await sleep(700);
+    if (first.startsWith('idk')) A.makeEl('reveal-button').onclick();
+    else A.submit(first.startsWith('wrong') ? 'неттакогослова' : first === 'near' ? answer + answer.slice(-1) : answer);
+    A.saveNow();
+    const refQueue = A.session().queue.slice();
+    if (first.endsWith('-closed')) { retype(A, answer); A.saveNow(); }
+    const aEv = stateOf(A).events.filter(e => e.type === 'answer' && showOf(e) === key);
+    assert.equal(aEv.length, 1, tag + 'A wrote the first answer');
+    const ev = aEv[0];
+    const want = {right: [true, false, 0], near: [true, false, 0], assisted: [true, true, 0], rule: [true, true, 0], wrong: [false, false, 0], 'wrong-closed': [false, false, 0], idk: [false, true, 1], 'idk-closed': [false, true, 1]}[first];
+    assert.deepEqual([!!ev.correct, !!ev.hinted, ev.idk ? 1 : 0], want, tag + 'A answer kind ' + JSON.stringify(ev));
+    if (first === 'near') assert.equal(ev.near_miss, 1, tag + 'A answer is a near-miss');
+    if (first === 'rule') assert.ok(stateOf(A).events.some(e => e.type === 'rule_peek' && e.card_id === q.id), tag + 'A viewed the rule');
+    const good = first === 'right' || first === 'near';
+    assert.equal(refQueue.slice(s0.position + 1).includes(q.id), !good, tag + 'one-tab return planned: ' + refQueue.join(','));
+    const aRc = countOf(A, 'retry_close', key);
+    assert.equal(aRc, first.endsWith('-closed') ? 1 : 0, tag + 'A retry_close');
+    // Tab B: typing on the still open card, then the sync lands.
+    const bText = bAct === 'right' ? answer : bAct === 'wrong' ? 'неттакогослова' : 'аа';
+    B.makeEl('answer-0').value = bText;
+    for (const fn of B.makeEl('answer-form')._ev.input || []) fn({type: 'input'});
+    await sync(B, A);
+    assert.equal(countOf(B, 'answer', key), 1, tag + 'B merged the first answer');
+    assert.equal(B.session().position, s0.position, tag + 'B card still on screen after the sync');
+    const before = counters(B.session());
+    if (bAct === 'idk') B.makeEl('reveal-button').onclick();
+    else B.submit(bText);
     B.saveNow();
-    const ev = JSON.parse(B.window.localStorage.getItem(KEY)).events;
-    const rcBefore = remote.events.filter(e => e.type === 'retry_close').length;
-    assert.equal(ev.filter(e => e.type === 'retry_close' && key(e) === showKey).length, 0, tag + 'no retry_close for the show');
-    assert.equal(ev.filter(e => e.type === 'retry_close').length, rcBefore, tag + 'no new retry_close');
-    assert.equal(ev.filter(e => e.type === 'answer' && key(e) === showKey).length, 1, tag + 'one answer for the show');
-    assert.equal(ev.filter(e => e.type === 'answer' && e.card_id === next.id && String(e.session_id) === String(s0.queueEpoch) && e.presentation === s0.position + 1).length, 1, tag + 'next card answered once');
-    console.log(tag + 'B moved on to', next.id, 'with no retype, draft or retry_close');
+    const s = B.session();
+    const open = first === 'wrong' || first === 'idk';
+    assert.deepEqual(s.queue, refQueue, tag + 'B queue = one-tab queue ' + s.queue.join(','));
+    assert.equal(countOf(B, 'answer', key), 1, tag + 'no second answer');
+    assert.equal(countOf(B, 'retry_close', key), aRc, tag + 'no new retry_close');
+    assert.equal(counters(s), before, tag + 'nothing counted');
+    assert.ok(!draftHas(B, q.id, bText), tag + 'no card draft with B text');
+    assert.ok(!(s.draft && (s.draft.answers || []).includes(bText)), tag + 'no session draft with B text');
+    assert.equal(B.makeEl('answer-0').value, '', tag + 'field empty');
+    if (!open) {
+      assert.equal(s.position, s0.position + 1, tag + 'B moved on');
+      assert.equal(s.vocab.retry, null, tag + 'no retype');
+      assert.ok((s.vocab.closed || []).includes(key), tag + 'show closed in B');
+      const next = B.cardOf(s);
+      B.submit(B.answerOf(next));
+      await sleep(700);
+      B.saveNow();
+      assert.equal(stateOf(B).events.filter(e => e.type === 'answer' && String(e.session_id) === String(s0.queueEpoch) && e.presentation === s0.position + 1).length, 1, tag + 'next Enter answers the next card once');
+      assert.equal(countOf(B, 'retry_close', key), aRc, tag + 'still no new retry_close');
+      table.push(first + ' × ' + bAct + ' → moved on');
+    } else {
+      assert.equal(s.position, s0.position, tag + 'B stays on the card');
+      assert.ok(s.vocab.retry, tag + 'retype open');
+      assert.equal(s.vocab.retry.kind, first, tag + 'the first answer kind, not a new one');
+      assert.equal(s.vocab.retry.answerEventId, ev.id, tag + 'the first answer retry record');
+      // both tabs close the same retype (B, then A offline), then sync both ways: one retry_close
+      retype(B, answer); B.saveNow();
+      assert.equal(B.session().position, s0.position + 1, tag + 'B retype closed the show');
+      assert.equal(countOf(B, 'retry_close', key), 1, tag + 'B wrote the close');
+      retype(A, answer); A.saveNow();
+      await sync(A, B); await sync(B, A);
+      assert.equal(countOf(A, 'retry_close', key), 1, tag + 'one retry_close in A after the sync');
+      assert.equal(countOf(B, 'retry_close', key), 1, tag + 'one retry_close in B after the sync');
+      assert.equal(countOf(B, 'answer', key), 1, tag + 'one answer after the sync');
+      table.push(first + ' × ' + bAct + ' → same retype');
+    }
+    if (first.endsWith('-closed')) { await sync(A, B); assert.equal(countOf(A, 'retry_close', key), 1, tag + 'one retry_close in A'); }
   }
-  await twoTabs('right', 'check');
-  await twoTabs('near', 'check');
-  await twoTabs('right', 'idk');
-  await twoTabs('wrong', 'check');
+  for (const first of ['right', 'near', 'assisted', 'rule', 'wrong', 'wrong-closed', 'idk', 'idk-closed'])
+    for (const bAct of ['right', 'wrong', 'idk']) await combo(first, bAct);
+  console.log('P1-2 table (' + table.length + '):', table.join('; '));
 
   const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
   assert.match(sw, /qazaq-offline-live-20261011-vocab-pr7['"]/, 'sw.js CACHE is the PR-7 cache');

@@ -129,7 +129,15 @@
      const old=out.vocabulary[id];out.vocabulary[id]=old?{times_seen:Math.max(old.times_seen,v.times_seen),last_seen:Math.max(old.last_seen,v.last_seen),last_seen_lesson:old.last_seen>v.last_seen?old.last_seen_lesson:v.last_seen_lesson,target_or_context:old.target_or_context==='target'||v.target_or_context==='target'?'target':'context'}:v;
    }
    const eventMap=new Map([...out.events,...incoming.events].map(e=>[JSON.stringify([e.type,e.card_id,e.at,e.answers,e.correct]),e]));
-   out.events=courseProgress.dedupeStageEvents([...eventMap.values()]).sort((a,b)=>a.at-b.at).slice(-cfg.storage.maxEvents);
+   // PR-7 GPT P1-2: a vocab:must show has one first answer and one retype close («ans:/rc:» + session:presentation:card).
+   // Two tabs can each write the same one at a different moment; after the merge only the earliest stays.
+   const showIds=new Set();
+   out.events=courseProgress.dedupeStageEvents([...eventMap.values()]).sort((a,b)=>a.at-b.at).filter(e=>{
+     const id=e&&typeof e.id==='string'&&/^(ans|rc):/.test(e.id)?e.id:null;
+     if(!id)return true;
+     if(showIds.has(id))return false;
+     showIds.add(id);return true;
+   }).slice(-cfg.storage.maxEvents);
    out.prefs={letters:!!(incoming.prefs&&incoming.prefs.letters)||!!out.prefs.letters,lettersChosen:!!(incoming.prefs&&incoming.prefs.lettersChosen)||!!out.prefs.lettersChosen};
    Object.assign(out.learning.steps,incoming.learning.steps);
    Object.assign(out.learning.notes,incoming.learning.notes);Object.assign(out.learning.completedSteps,incoming.learning.completedSteps);

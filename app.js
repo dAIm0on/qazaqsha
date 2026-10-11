@@ -789,15 +789,22 @@
    position=0;checked=false;hinted=false;retrying=false;vocabRetry=null;retryAfterWrong=false;vocabReturnScheduled=false;
    return true;
  }
- /* PR-7 GPT P1-2: another tab (applyRemote) already answered this show right (same session, presentation, card).
-    There is nothing to retype: the show is closed here too, no draft is kept, nothing is counted twice, no retry_close;
-    the trainer moves on to the next card, as after a duplicate retry_close. */
- function closeRemoteShow(q){
-   const key=String(queueEpoch)+'|'+position+'|'+q.id;
-   if(!vocabClosed.includes(key))vocabClosed.push(key);
-   dropCardDraft(q);draft=null;
-   vocabRetry=null;retryAfterWrong=false;retrying=false;checked=false;
-   save();nextQuestion();
+ /* PR-7 GPT P1-2 (general): commitFirst found the show's first answer (another tab via applyRemote, or this tab).
+    One place for «Проверить» and «Не знаю»: nothing is counted, nothing is written, no draft is kept.
+    alreadyHandled — the show is closed here too and the trainer moves on (as after a duplicate retry_close);
+    otherwise — the retype the first answer opened, with that answer's own retry record. The queue is the one
+    settleExisting returned (the first answer's return). */
+ function settleMustDuplicate(q,pack){
+   queue=pack.queue;vocabReturnScheduled=!!pack.scheduled;
+   if(pack.alreadyHandled){
+     const key=String(queueEpoch)+'|'+position+'|'+q.id;
+     if(!vocabClosed.includes(key))vocabClosed.push(key);
+     dropCardDraft(q);draft=null;
+     vocabRetry=null;retryAfterWrong=false;retrying=false;checked=false;
+     save();nextQuestion();return;
+   }
+   vocabRetry=pack.retry;dropCardDraft(q);draft=null;
+   checked=false;retrying=true;paintMustRetry(q);save();
  }
  function paintMustRetry(q){
    if(!q||!vocabRetry)return;
@@ -1928,7 +1935,7 @@
    if(isVocabMustTrainer()&&window.VocabMust){
      const answers=readAnswers(q),now=Date.now();
      const pack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:'idk',answers,elapsed:elapsed(),core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating:window.FSRS.Rating.Again,errors:[],result:{correct:false,parts:(q.fields||[]).map(()=>false)},budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:true,recall:true,analytics:answerAnalytics(q,{correct:false,parts:(q.fields||[]).map(()=>false)},answers,now,elapsed(),true)});
-     if(pack.duplicate&&!pack.retry){closeRemoteShow(q);return;}
+     if(pack.duplicate){settleMustDuplicate(q,pack);return;}
      queue=pack.queue;vocabRetry=pack.retry;vocabReturnScheduled=!!pack.scheduled;hinted=true;retrying=true;checked=false;retryAfterWrong=false;
      paintVocabLemmaFeedback($('#feedback'),q,[],{note:'<p class="small">'+esc(window.VocabMust.idkNote(!!pack.scheduled))+'</p>'});
      (q.fields||[]).forEach((_,i)=>{const el=$('#answer-'+i);if(el){el.value='';el.classList.add('invalid');el.disabled=false;}});
@@ -2068,11 +2075,10 @@
    let mustPack=null;
    if(isVocabMustTrainer()&&!reveal&&window.VocabMust){
      mustPack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:!result.correct?'wrong':(hinted||rulePeeked)?'assisted':'good',answers,elapsed:elapsedMs,core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating,errors,result,budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:!!(hinted||rulePeeked),recall,analytics:answerAnalytics(q,result,answers,now,elapsedMs,!!(hinted||rulePeeked))});
+     if(mustPack.duplicate){settleMustDuplicate(q,mustPack);return;}
      queue=mustPack.queue;vocabReturnScheduled=!!mustPack.scheduled;
      if(mustPack.retry){vocabRetry=mustPack.retry;retryAfterWrong=mustPack.retry.kind==='wrong';}
      else retryAfterWrong=false;
-     if(mustPack.duplicate&&!mustPack.retry){closeRemoteShow(q);return;}
-     if(mustPack.duplicate){checked=false;retrying=true;paintMustRetry(q);save();return;}
    }
    state.errors.push(...errors);
    let rec=previous||core.migrateRecord({},now);

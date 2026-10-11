@@ -513,14 +513,34 @@
    if(!event)return null;
    return {cardId:event.card_id,sessionId:String(event.session_id),presentation:Number(event.presentation),kind:event.idk?'idk':'wrong',typed:Array.isArray(event.answers)?event.answers.slice():[],answerEventId:event.id||null};
  }
+ /* PR-7 GPT P1-2 (general): the show (session_id + presentation + card_id) already has its first answer, from this
+    tab or from another one (applyRemote). Whatever is pressed now (Проверить right/wrong, Не знаю) is not a new
+    answer: nothing is counted, no event is written, no new retry is made. The outcome follows the first answer:
+    - right / near-miss / assisted (hint or rule) — the show is done: alreadyHandled, retry null;
+    - wrong / idk with a retry_close already written — done as well;
+    - wrong / idk still open — the same retry the first answer made (retryFromAnswer of that event), never a new kind.
+    The return in this portion is the one the first answer decided (scheduleReturn with the same inputs) — only if the
+    queue here does not already hold it. */
+ function settleExisting(ctx,existing){
+   const state=ctx.state,records=ctx.records||state.records,q=ctx.q;
+   const sessionId=String(ctx.sessionId),presentation=Number(ctx.presentation);
+   let queue=(ctx.queue||[]).slice(),scheduled=queue.slice(ctx.position+1).includes(q.id);
+   const firstWasGood=!!existing.correct&&!existing.hinted&&!existing.idk;
+   if(!firstWasGood&&!scheduled){
+     const pool=ctx.pool||[],core=ctx.core;
+     const sched=scheduleReturn({queue,position:ctx.position,cardId:q.id,pool,plan:ctx.plan,sitting:ctx.sitting,state,core,budget:ctx.budget,minGap:ctx.minGap||2,appearCap:ctx.appearCap||3,lemma:lemmaKey(core,q)});
+     queue=sched.queue;scheduled=sched.scheduled;
+   }
+   const needsRetype=!existing.correct||!!existing.idk;
+   const closed=findEvent(state.events,'retry_close',sessionId,presentation,q.id);
+   const retry=needsRetype&&!closed?retryFromAnswer(existing):null;
+   return {duplicate:true,alreadyHandled:!retry,event:existing,record:records[q.id],queue,scheduled,retry};
+ }
  function commitFirst(ctx){
    const state=ctx.state,records=ctx.records||state.records,q=ctx.q;
    const sessionId=String(ctx.sessionId),presentation=Number(ctx.presentation),kind=ctx.kind;
    const existing=findEvent(state.events,'answer',sessionId,presentation,q.id);
-   if(existing){
-     const scheduled=(ctx.queue||[]).slice(ctx.position+1).includes(q.id);
-     return {duplicate:true,event:existing,record:records[q.id],queue:(ctx.queue||[]).slice(),scheduled,retry:existing.correct&&!existing.hinted&&!existing.idk?null:retryFromAnswer(existing)};
-   }
+   if(existing)return settleExisting(ctx,existing);
    const core=ctx.core,pool=ctx.pool||[],sitting=ctx.sitting;
    const lem=lemmaKey(core,q);
    if(sitting&&!sitting.newLemmas.includes(lem)&&!lemmaHasHistory(state,pool,core,lem))sitting.newLemmas.push(lem);
