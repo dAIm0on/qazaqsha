@@ -101,12 +101,81 @@
     const parts=a.split(/\s*[\/,;]\s*/).filter(Boolean);
     return parts.length>1&&parts.every(p=>ok.has(p));
   }
+  // ё→е is a full Russian match only inside vocab:must (evaluate ctx). Global normalize stays ё≠е.
+  function foldYo(value){return String(value??'').replace(/ё/g,'е');}
+  function ruKey(value){return foldYo(normalize(value,'text'));}
+  function ruForms(field){
+    const out=[];
+    for(const a of (field&&field.answers)||[]){
+      for(const raw of glossVariants(a)){
+        const show=String(raw||'').trim();
+        const key=ruKey(show);
+        if(key)out.push({show,key});
+      }
+    }
+    return out;
+  }
+  // Damerau–Levenshtein == 1: one substitution, insertion, deletion, or adjacent transposition.
+  function oneEdit(a,b){
+    if(a===b)return false;
+    const n=a.length,m=b.length;
+    if(Math.abs(n-m)>1)return false;
+    if(n===m){
+      const diff=[];
+      for(let i=0;i<n;i++)if(a[i]!==b[i])diff.push(i);
+      if(diff.length===1)return true;
+      if(diff.length===2){
+        const i=diff[0],j=diff[1];
+        return j===i+1&&a[i]===b[j]&&a[j]===b[i];
+      }
+      return false;
+    }
+    const sh=n<m?a:b,lo=n<m?b:a;
+    let i=0,j=0,used=false;
+    while(i<sh.length&&j<lo.length){
+      if(sh[i]===lo[j]){i++;j++;continue;}
+      if(used)return false;
+      used=true;j++;
+    }
+    return true;
+  }
+  // Russian answers of other lemmas. Kazakh fields stay out. Not P.answerIndex.
+  function ruAnswerOwners(questions){
+    const map=new Map();
+    for(const q of questions||[]){
+      if(!q||!q.fields)continue;
+      const lem=lemmaKey(q);
+      q.fields.forEach((f,i)=>{
+        if((f.kind&&f.kind!=='text')||answerLang(q,i)!=='ru')return;
+        for(const form of ruForms(f)){
+          let set=map.get(form.key);
+          if(!set)map.set(form.key,set=new Set());
+          set.add(lem);
+        }
+      });
+    }
+    return map;
+  }
+  function ruFieldJudge(q,field,index,actual,owners){
+    const forms=ruForms(field);
+    const key=ruKey(actual);
+    if(!key||!forms.length)return null;
+    if(forms.some(form=>form.key===key))return {exact:true};
+    const pieces=key.split(/\s*[\/,;]\s*/).filter(Boolean);
+    if(pieces.length>1&&pieces.every(p=>forms.some(form=>form.key===p)))return {exact:true};
+    let best=null;
+    for(const form of forms)if(oneEdit(key,form.key)){best=form;break;}
+    if(!best)return null;
+    const who=owners&&owners.get(key);
+    if(who)for(const other of who)if(other!==lemmaKey(q))return {blocked:true};
+    return {near:{field:index,typed:String(actual??''),expected:best.show}};
+  }
   function numberMatch(expected,actual,kind){
     if(normalize(expected,kind)===normalize(actual,kind))return true;
     const ev=numberValue(actual),ex=numberValue(expected);
     return ev!=null&&ex!=null&&ev===ex;
   }
-  function evaluate(q,answers){
+  function evaluate(q,answers,ctx){
     const kinds=typeof module!=='undefined'&&module.exports?require('./response-kinds.js'):root.ResponseKinds;
     if(kinds&&kinds.isSupportKind(q.kind))return kinds.evaluate(q,answers);
     if(q.kind==='multi'){
@@ -115,16 +184,28 @@
       const correct=actual.size===expected.size&&[...expected].every(x=>actual.has(x));
       return {correct,parts:q.options.map(x=>actual.has(normalize(x))===expected.has(normalize(x)))};
     }
+    const must=!!(ctx&&(ctx.must||ctx.trainer==='vocab:must'));
+    const owners=must?ruAnswerOwners(ctx.questions):null;
     const phone=!!(q.ruleIds||[]).includes('phone-groups')||(q.skillBindings||[]).some(b=>b.item_id==='rule:phone-groups');
-    const parts=q.fields.map((f,i)=>{
-      if(f.kind==='set-text')return sameSet(tokens(answers[i]),expectedTokens(f));
-      if(f.answers.some(a=>normalize(a,f.kind)===normalize(answers[i],f.kind)))return true;
-      if((phone||f.kind==='number-text'||q.topic==='numbers')&&f.answers.some(a=>numberMatch(a,answers[i],f.kind)))return true;
-      if((!f.kind||f.kind==='text'||f.kind==='number-text')&&f.answers.some(a=>digitWordMatch(a,answers[i])))return true;
-      if(glossMatch(f.answers,answers[i],f.kind||'text'))return true;
+    let near=null;
+    const parts=(q.fields||[]).map((f,i)=>{
+      const actual=answers&&answers[i];
+      if(f.kind==='set-text')return sameSet(tokens(actual),expectedTokens(f));
+      if(f.answers.some(a=>normalize(a,f.kind)===normalize(actual,f.kind)))return true;
+      if((phone||f.kind==='number-text'||q.topic==='numbers')&&f.answers.some(a=>numberMatch(a,actual,f.kind)))return true;
+      if((!f.kind||f.kind==='text'||f.kind==='number-text')&&f.answers.some(a=>digitWordMatch(a,actual)))return true;
+      if(glossMatch(f.answers,actual,f.kind||'text'))return true;
+      // Near-miss only for a Russian text field of vocab:must. No length cutoff. No ctx → strict, as before.
+      if(must&&answerLang(q,i)==='ru'&&(f.kind||'text')==='text'){
+        const judged=ruFieldJudge(q,f,i,actual,owners);
+        if(judged&&judged.exact)return true;
+        if(judged&&judged.near){if(!near)near=judged.near;return true;}
+      }
       return false;
     });
-    return {correct:parts.every(Boolean),parts};
+    const result={correct:parts.every(Boolean),parts};
+    if(near)result.nearMiss=near;
+    return result;
   }
   const DAY=86400000;
   function migrateRecord(previous,now=Date.now()){

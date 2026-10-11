@@ -18,6 +18,11 @@
  function idkNote(scheduled){return scheduled?TEXT.idkReturn:TEXT.saved;}
  function statusNote(scheduled){return scheduled?TEXT.queued:TEXT.saved;}
  function learnerTextOk(s){return !/FSRS|интервал|retrieval|Again/.test(String(s||''));}
+ function recordsMiss(result){return !(result&&result.correct&&result.nearMiss);}
+ function nearMissFeedbackHtml(expected,esc){
+   const e=typeof esc==='function'?esc:v=>String(v??'');
+   return '<h3>Почти точно</h3><p>Правильно пишется: <strong>'+e(expected)+'</strong></p>';
+ }
  function findEvent(events,type,sessionId,presentation,cardId){
    return (events||[]).find(e=>e&&e.type===type&&String(e.session_id)===String(sessionId)&&Number(e.presentation)===Number(presentation)&&e.card_id===cardId)||null;
  }
@@ -461,8 +466,13 @@
    records[q.id]=rec;
    const event={id:'ans:'+sessionId+':'+presentation+':'+q.id,at:now,type:'answer',session_id:sessionId,presentation,card_id:q.id,answers:Array.isArray(ctx.answers)?ctx.answers.slice():[],correct:correctFlag,hinted:hintedFlag,peek:hintedFlag?1:0,first_try_correct:kind==='good'?1:0,idk:kind==='idk'?1:0,rating:ctx.rating,response_time_ms:ctx.elapsed,response_time:ctx.elapsed,latency_ms:ctx.elapsed,recall:ctx.recall!==false};
    if(ctx.analytics&&typeof ctx.analytics==='object'){
-     const reserved={id:1,at:1,type:1,session_id:1,presentation:1,card_id:1,answers:1,correct:1,hinted:1,peek:1,first_try_correct:1,idk:1,rating:1,response_time_ms:1,response_time:1,latency_ms:1,recall:1,skills:1};
+     const reserved={id:1,at:1,type:1,session_id:1,presentation:1,card_id:1,answers:1,correct:1,hinted:1,peek:1,first_try_correct:1,idk:1,rating:1,response_time_ms:1,response_time:1,latency_ms:1,recall:1,skills:1,near_miss:1,typed:1,expected:1};
      for(const key of Object.keys(ctx.analytics))if(!reserved[key])event[key]=ctx.analytics[key];
+   }
+   if(correctFlag&&ctx.result&&ctx.result.nearMiss){
+     event.near_miss=1;
+     event.typed=String(ctx.result.nearMiss.typed??'');
+     event.expected=String(ctx.result.nearMiss.expected??'');
    }
    if(ctx.observe)event.skills=ctx.observe(state,q,ctx.result||{correct:correctFlag,parts:[]},event,ctx.errors||[],{must:true});
    state.events.push(event);
@@ -595,6 +605,6 @@
    if(local&&local.mustUnfinished)return {action:'keep-local'};
    return {action:'reset'};
  }
- const api={TEXT,clone,emptySitting,emptyPlan,isMustTrainer,isSavedMust,lemmaKey,mustCounterText,idkNote,statusNote,learnerTextOk,findEvent,cardHasHistory,lemmaHasHistory,poolHasAnswerHistory,debtLemmas,planPortion,enforceGap,scheduleReturn,commitFirst,commitRetype,noteShown,noteRecent,recount,wordLine,portionDone,snapshot,restoreSaved,importPlan,retryFromAnswer};
+ const api={TEXT,clone,emptySitting,emptyPlan,isMustTrainer,isSavedMust,lemmaKey,mustCounterText,idkNote,statusNote,learnerTextOk,recordsMiss,nearMissFeedbackHtml,findEvent,cardHasHistory,lemmaHasHistory,poolHasAnswerHistory,debtLemmas,planPortion,enforceGap,scheduleReturn,commitFirst,commitRetype,noteShown,noteRecent,recount,wordLine,portionDone,snapshot,restoreSaved,importPlan,retryFromAnswer};
  if(node)module.exports=api;else root.VocabMust=api;
 })(typeof window!=='undefined'?window:globalThis);

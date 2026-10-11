@@ -1944,24 +1944,28 @@
      if(missing){warning.textContent=support?'Сначала выбери ответ — проверим целиком.':q.kind==='multi'?'Выбери хотя бы один вариант.':'Заполни все поля — проверим разбор целиком.';warning.hidden=false;if(!support&&q.kind!=='multi')$('#answer-'+answers.findIndex(a=>!a.trim())).focus();return;}
    }
    warning.hidden=true;
-   const result=reveal?{correct:false,parts:supportKind(q)?[]:q.kind==='multi'?q.options.map(()=>false):q.fields.map(()=>false)}:core.evaluate(q,answers);
+   const result=reveal?{correct:false,parts:supportKind(q)?[]:q.kind==='multi'?q.options.map(()=>false):q.fields.map(()=>false)}:core.evaluate(q,answers,isVocabMustTrainer()?{must:true,questions}:undefined);
    checked=true;dropCardDraft(q);if(reveal){hintEvent(q,'reveal');hinted=true;}
    pauseTimer();const now=Date.now(),recall=(q.kind==='fields'||q.kind==='phrase')&&q.fields.some(f=>f.kind!=='select');
    const F=window.FSRS;
+   const mustNear=isVocabMustTrainer()&&!!(window.VocabMust&&!window.VocabMust.recordsMiss(result));
+   // A rule peek is help only inside vocab:must. Other trainers keep their old rating.
+   const mustAssist=isVocabMustTrainer()&&!!(hinted||rulePeeked);
    let rating;
-   if(!result.correct||hinted||examTimedOut)rating=F.Rating.Again;
+   if(!result.correct||examTimedOut||(!isVocabMustTrainer()&&hinted)||mustAssist)rating=F.Rating.Again;
    else if(mode==='exam'){
      if(elapsedMs<=cfg.session.examEasyMs)rating=F.Rating.Easy;
      else if(elapsedMs<=cfg.session.examHardMs)rating=F.Rating.Good;
      else rating=F.Rating.Hard;
-   }else rating=F.Rating.Good;
+   }else if(mustNear)rating=F.Rating.Hard;
+   else rating=F.Rating.Good;
    const previous=records[q.id];
    const predicted=window.ReviewScheduler.retrievability?window.ReviewScheduler.retrievability(previous,now):null;
    const hours=previous?.last_correct?(now-previous.last_correct)/3600000:null;
    const homeworkMode=mode==='homework';
    const voluntary=mode==='voluntary';
    const aiRemed=String(q.id||'').startsWith('ai-remed:');
-   const errors=reveal||supportKind(q)?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);
+   const errors=reveal||supportKind(q)||mustNear?[]:window.ErrorDiagnostics.diagnose(q,answers,result,now);
    let mustPack=null;
    if(isVocabMustTrainer()&&!reveal&&window.VocabMust){
      mustPack=window.VocabMust.commitFirst({state,records,q,now,sessionId:String(queueEpoch),presentation:position,kind:!result.correct?'wrong':(hinted||rulePeeked)?'assisted':'good',answers,elapsed:elapsedMs,core,observe:(a,b,c,d,e,f)=>window.Knowledge.observe(a,b,c,d,e,f),queue,position,pool:mustPool(),plan:vocabPlan,sitting:vocabSitting,rating,errors,result,budget:vocabPlan&&vocabPlan.budget,minGap:cfg.schedule.learningIntervening||2,appearCap:cfg.schedule.learningSessionBlinds||3,hinted:!!(hinted||rulePeeked),recall,analytics:answerAnalytics(q,result,answers,now,elapsedMs,!!(hinted||rulePeeked))});
@@ -2012,7 +2016,7 @@
      window.Homework.recordItem(state,hwLesson,{id:q.id,answers,correct:result.correct,rule_peek:rulePeeked,answer_peek:hinted,skipped:!!reveal,expected,event_id:eventId},now);
      if(hwPart==='words'&&q.formCheck&&pendingFormCards(hwLesson,[q.id]).length&&!queue.slice(position+1).includes(q.id))queue.push(q.id);
    }
-   if(!voluntary&&!supportKind(q))P.observeConfusions(state,q,answers,result,now,confusionIndex,hinted||reveal||rulePeeked);
+   if(!voluntary&&!supportKind(q)&&!mustNear)P.observeConfusions(state,q,answers,result,now,confusionIndex,hinted||reveal||rulePeeked);
    for(const pair of Object.values(state.confusions)){pair.expected_item=[...confusionIndex.get(pair.expected_answer)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.given_item=[...confusionIndex.get(pair.wrong_answer_given)||[]].flatMap(id=>window.Knowledge.bindings(byId.get(id))).map(b=>b.item_id);pair.last_confused=pair.last_wrong;}
    if(activeLesson&&practiceIds.includes(q.id))stepEvidence[q.id]=result.correct&&!hinted&&!rulePeeked;
    const countSessionAttempt=!(isVocabWordsMode()&&!result.correct&&!reveal);
@@ -2101,7 +2105,12 @@
    const morph=!result.correct&&!supportKind(q)?morphemeRow(errors,answerLine,answers.join(' ')):'';
    const supportDiff=(!result.correct&&!reveal&&supportKind(q)&&userAnswer?'<p data-error-diff>'+esc(window.ResponseKinds.answerLead(q))+': <span lang="kk">'+esc(userAnswer)+'</span>.</p>':'')+(!result.correct&&supportKind(q)&&q.why_wrong?'<p data-why-wrong>'+esc(q.why_wrong)+'</p>':''); // r7 X minor: one line why, without the answer
    const vocabWrong=isVocabWordsMode()&&!result.correct;
-   if(vocabWrong){
+   if(mustNear){
+     feedback.className='feedback';
+     feedback.removeAttribute('data-vocab-compact');
+     feedback.innerHTML=window.VocabMust.nearMissFeedbackHtml(result.nearMiss.expected,esc);
+     feedback.hidden=false;
+   }else if(vocabWrong){
      // P0: strike attempt + orange #FF5A1F h3 sticker with lemma; bottom Ещё раз only; no Why/правило/skill-links.
      const opts=isVocabMustTrainer()&&window.VocabMust?{note:'<p class="small">'+esc(window.VocabMust.statusNote(!!vocabReturnScheduled))+'</p>'}:{};
      paintVocabLemmaFeedback(feedback,q,answers,opts);
@@ -2165,7 +2174,8 @@
      const next=$('#next-button'),check=$('#check-button');
      if(check)check.hidden=true;
      if(next){next.hidden=false;try{next.focus({preventScroll:true});}catch{}}
-     advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
+     // Near-miss stays until Дальше, so the spelling can be read. A fully correct answer still moves on.
+     if(!mustNear)advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
    }
  }
  function nextQuestion(){cancelAdvance();abortTutor();draft=null;retrying=false;retryAfterWrong=false;vocabRetry=null;position++;if(isVocabMustTrainer()){const budget=vocabPlan&&vocabPlan.budget||(cfg.vocab&&cfg.vocab.answerBudget)||10;if(window.VocabMust&&window.VocabMust.portionDone(sessionAttempts,budget,position,queue.length)){if(!beginMustPortion(false))position=queue.length;}}else if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}focusAnswer();}
