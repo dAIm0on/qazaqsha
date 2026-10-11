@@ -35,7 +35,10 @@ function qazaqAppBoot(bootMirror){
  let state=P.empty(),savedSession=null,storageAvailable=true,storageReadError=null;
  // Storage P0: localStorage + IndexedDB mirror (store-idb.js). bootMirror = what IndexedDB held when the app started.
  const STORE=window.QazaqStore&&window.QazaqStore.available?window.QazaqStore:null,SNAPSHOT_KEYS=[BACKUP,R7_FREG_SNAPSHOT,R7_SNAPSHOT,MIGRATION];
- let lsOk=true,mirrorOk=false,rescueState='idle';const mirrorTrusted=!!STORE&&bootMirror!==undefined;
+ // rev: grows by one on every write (compared first at boot; saved_at is only a label). A page that could not read
+ // IndexedDB at start (mirrorTrusted=false) never bumps rev and marks its writes pending, so the next normal start merges.
+ const headOf=window.QazaqStore&&window.QazaqStore.headOf||(()=>({stamped:false,rev:0,saved_at:0,pending:false}));
+ let lsOk=true,rescueState='idle',storeRev=0,lastRev=0,saveWatch=null;const mirrorTrusted=!!STORE&&bootMirror!==undefined;
  try{const raw=pickBootRaw(localStorage.getItem(KEY));if(raw){const saved=JSON.parse(raw);state=P.migrate(saved);savedSession=state.session;if((saved.schema||1)<5&&!localStorage.getItem(MIGRATION))localStorage.setItem(MIGRATION,raw);
    // r7: keep the exact pre-migration bytes once (best effort; the migration itself is additive).
    const r7=window.EvidenceState&&window.EvidenceState.MIGRATION_ID;if(r7&&!(saved.evidence&&saved.evidence.migrations&&saved.evidence.migrations[r7])&&!localStorage.getItem(R7_SNAPSHOT)){try{localStorage.setItem(R7_SNAPSHOT,raw);}catch{}}
@@ -1155,18 +1158,29 @@ function qazaqAppBoot(bootMirror){
    let raw=null;
    try{if(storageReadError)throw storageReadError;raw=stamp(state);localStorage.setItem(KEY,raw);lsOk=true;}catch{lsOk=false;if(!storageReadError&&raw)rescueStorage();}
    if(raw&&mirrorTrusted)mirrorSave(raw);
-   storageAvailable=!storageReadError&&(lsOk||mirrorOk);
-   paintSaveStatus();
+   // honest status: saved = localStorage took it, or IndexedDB committed exactly this revision (not just "worked before")
+   storageAvailable=!storageReadError&&(lsOk||(mirrorTrusted&&STORE.mirrored(lastRev)));
+   if(storageAvailable||!raw||!mirrorTrusted)paintSaveStatus();else armSaveWatch(lastRev);
    if(!cloudApplying)window.QazaqCloud?.pushSoon?.(state);
  }
  function paintSaveStatus(){
    $('#save-status').hidden=storageAvailable;$('#save-status').textContent=storageAvailable?(window.QazaqCloud?.user?'Прогресс в аккаунте и в этом браузере.':'Прогресс в этом браузере · резервная копия в «Сегодня».'):'Сохранение недоступно. Экспортируй прогресс перед закрытием.';
  }
- // saved_at goes first so the stamp can be read without parsing 2 MB (QazaqStore.savedAtOf).
- function stamp(obj){const now=Date.now();return JSON.stringify(Object.assign({saved_at:now},obj,{saved_at:now}));}
+ // The header {"rev":n,"saved_at":ms[,"pending":1]} goes first so it can be read without parsing 2 MB (QazaqStore.headOf).
+ function stamp(obj){
+   if(!STORE||mirrorTrusted)storeRev++;
+   const head={rev:storeRev,saved_at:Date.now()};if(STORE&&!mirrorTrusted)head.pending=1;
+   const body=Object.assign({},obj);delete body.rev;delete body.saved_at;delete body.pending;
+   lastRev=storeRev;return JSON.stringify(Object.assign(head,body));
+ }
  // Every save goes to IndexedDB too: at once when localStorage failed, otherwise batched (pagehide flushes).
  function mirrorSave(raw){
-   STORE.mirror(raw,STORE.activityOf(state),lsOk?400:0).then(()=>{if(!mirrorOk){mirrorOk=true;storageAvailable=!storageReadError;paintSaveStatus();}},()=>{mirrorOk=false;if(!lsOk){storageAvailable=false;paintSaveStatus();}});
+   STORE.mirror(raw,STORE.activityOf(state),lsOk?400:0).then(()=>{if(!lsOk&&STORE.mirrored(lastRev)){storageAvailable=!storageReadError;paintSaveStatus();}},()=>{if(!lsOk){storageAvailable=false;paintSaveStatus();}});
+ }
+ // localStorage failed and IndexedDB has not confirmed this revision yet: banner if it is still unconfirmed in 3 s (hung write).
+ function armSaveWatch(rev){
+   clearTimeout(saveWatch);
+   saveWatch=setTimeout(()=>{if(!lsOk&&!STORE.mirrored(rev)){storageAvailable=false;paintSaveStatus();}},3000);
  }
  // localStorage is full: move the backup copies to IndexedDB (removed only after IndexedDB confirmed them), retry;
  // then compact answers older than 14 days (fields nobody reads; the full copy is archived first), retry. Nothing is lost.
@@ -1181,22 +1195,27 @@ function qazaqAppBoot(bootMirror){
    rescueState=ok?'idle':'done';save();
  }
  // Boot: the IndexedDB mirror is newer when it holds answers localStorage could not keep.
+ // Stamped copies are compared by rev alone (no parse). A pending localStorage copy (written while IndexedDB was not
+ // read) and a mirror with a higher rev are merged, so neither side's answers are lost. Old unstamped copy: newest answer.
  function pickBootRaw(lsRaw){
-   const m=bootMirror;
+   const m=bootMirror,ls=headOf(lsRaw);
+   storeRev=Math.max(ls.rev,m&&Number(m.rev)||0);
    if(!m||typeof m.raw!=='string')return lsRaw;
    if(!lsRaw)return m.raw;
+   if(ls.stamped){
+     if(!(m.rev>ls.rev))return lsRaw;
+     if(!ls.pending)return m.raw;
+     try{const base=P.migrate(JSON.parse(m.raw)),page=P.migrate(JSON.parse(lsRaw)),out=P.merge(base,page);out.session=page.session;return JSON.stringify(out);}catch{return m.raw;}
+   }
    let lsActivity=0;try{lsActivity=STORE.activityOf(JSON.parse(lsRaw));}catch{return m.raw;}
-   const lsAt=STORE.savedAtOf(lsRaw);
-   // Both stamped: the later write wins (a reset or «Заменить» is newer even with older answers). Old unstamped copy: newest answer.
-   if(lsAt>0)return m.saved_at>lsAt?m.raw:lsRaw;
    return m.activity>lsActivity?m.raw:lsRaw;
  }
  // Import: the pre-import copy goes to IndexedDB first (localStorage may be full), and space is freed.
  async function prepareImport(){
    window.__qzImportReady=false;if(!mirrorTrusted)return;
    save();
-   try{await STORE.archive(BACKUP,P.serialize(state));window.__qzImportReady=true;}catch{return;}
    try{await STORE.moveToArchive(localStorage,SNAPSHOT_KEYS);}catch{}
+   try{await STORE.archive(BACKUP,P.serialize(state));window.__qzImportReady=true;}catch{}
  }
  window.__qzPersist=next=>{
    const raw=stamp(next);
@@ -3445,9 +3464,14 @@ function qazaqAppBoot(bootMirror){
  const filterOpen=$('#practice-filter-open'),filterClose=$('#practice-filter-close'),filterDlg=$('#practice-filter');
  if(filterOpen&&filterDlg)filterOpen.onclick=()=>{if(filterDlg.showModal)filterDlg.showModal();else filterDlg.setAttribute('open','');};
  if(filterClose&&filterDlg)filterClose.onclick=()=>{if(filterDlg.close)filterDlg.close();else filterDlg.removeAttribute('open');};
- function resetProgress(){
+ // Reset clears progress only after a full backup is confirmed (localStorage, or IndexedDB within 5 s); otherwise it is cancelled.
+ async function resetProgress(){
    if(!window.confirm('Сбросить весь прогресс в этом браузере? Ответы, ошибки, заметки и ассоциации будут очищены.'))return;
-   if(STORE)STORE.archive(BACKUP,P.serialize(state)).catch(()=>{});try{localStorage.setItem(BACKUP,P.serialize(state));}catch{}try{localStorage.removeItem(DRAFT_KEY);}catch{}const retainedPackages=state.lesson_packages;state=P.empty();state.lesson_packages=retainedPackages;records=state.records;learningState=state.learning;storageReadError=null;topic='all';mode='smart';sourceFilter=null;activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;showView('today');
+   const backup=P.serialize(state);let kept=false;
+   try{localStorage.setItem(BACKUP,backup);kept=true;}catch{}
+   if(STORE){const copy=STORE.archive(BACKUP,backup);if(kept)copy.catch(()=>{});else try{await Promise.race([copy,new Promise((_,no)=>setTimeout(()=>no(Error('timeout')),5000))]);kept=true;}catch{}}
+   if(!kept){window.alert('Сброс отменён: не удалось сохранить резервную копию. Сначала сделай «Экспорт прогресса».');return;}
+   try{localStorage.removeItem(DRAFT_KEY);}catch{}const retainedPackages=state.lesson_packages;state=P.empty();state.lesson_packages=retainedPackages;records=state.records;learningState=state.learning;storageReadError=null;topic='all';mode='smart';sourceFilter=null;activeLesson=null;activeStep=null;queue=[];practiceIds=[];position=0;showView('today');
  }
  const learning=window.LearningUI.create({
    get state(){return learningState;},save,startLesson,startCourse,courseJumpMarkup,bindCourseJump,eligible,missing:ids=>[...new Set(ids.flatMap(id=>catalog.missingPrerequisites(byId.get(id),state)))],practiceWords,association:key=>state.associations[key]?.text||'',setAssociation,today:()=>showView('today'),

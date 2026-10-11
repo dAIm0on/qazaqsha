@@ -27,7 +27,8 @@ function makeSS() { const d = Object.create(null); return {getItem: k => (k in d
 // Minimal IndexedDB: one database, one object store, structured clone by JSON, async like the real one.
 function makeIDB() {
   const data = new Map();
-  const idb = {data, failWrites: false, opens: 0};
+  const idb = {data, failWrites: false, opens: 0, hang: false, _held: []};
+  idb.release = () => { const h = idb._held.splice(0); h.forEach(fn => fn()); };
   const later = fn => setTimeout(fn, 1);
   idb.open = () => {
     idb.opens++;
@@ -42,7 +43,11 @@ function makeIDB() {
           const done = () => later(() => { if (failed) { tx.error = quotaError(); tx.onerror && tx.onerror(); } else tx.oncomplete && tx.oncomplete(); });
           const wrap = fn => { const r = {}; pendingReq++; later(() => { try { r.result = fn(); r.onsuccess && r.onsuccess(); } catch (e) { failed = true; } if (--pendingReq === 0) done(); }); return r; };
           tx.objectStore = () => ({
-            put(value, key) { if (mode !== 'readwrite') throw new Error('readonly'); return wrap(() => { if (idb.failWrites) throw quotaError(); data.set(key, JSON.parse(JSON.stringify(value))); return key; }); },
+            put(value, key) {
+              if (mode !== 'readwrite') throw new Error('readonly');
+              if (idb.hang) { const r = {}; pendingReq++; idb._held.push(() => { data.set(key, JSON.parse(JSON.stringify(value))); r.onsuccess && r.onsuccess(); if (--pendingReq === 0) done(); }); return r; }
+              return wrap(() => { if (idb.failWrites) throw quotaError(); data.set(key, JSON.parse(JSON.stringify(value))); return key; });
+            },
             get(key) { return wrap(() => (data.has(key) ? JSON.parse(JSON.stringify(data.get(key))) : undefined)); },
             getAllKeys() { return wrap(() => [...data.keys()]); }
           });
@@ -95,7 +100,7 @@ const events = raw => JSON.parse(raw).events;
   await answer(a0, 3, () => a0.session());
   await sleep(450);
   const base = baseEnv.ls.getItem(KEY);
-  assert.ok(/^\{"saved_at":\d+,/.test(base), 'saved_at is the first key');
+  assert.ok(/^\{"rev":\d+,"saved_at":\d+,"schema"/.test(base), 'rev header first, not pending');
   assert.equal(mirrorRaw(baseEnv.idb), base, 'P2: IndexedDB mirrors exactly what localStorage holds');
   assert.equal(baseEnv.idb.data.get('state').activity, Math.max(...events(base).map(e => e.at)), 'mirror records last activity');
   assert.equal(events(base).length, 3);
@@ -203,6 +208,7 @@ const events = raw => JSON.parse(raw).events;
     assert.equal(prevented, 1, 'P3: second pass not blocked');
     assert.equal(events(mirrorRaw(idb)).length, 6);
     Object.assign(stuck, {state: JSON.parse(JSON.stringify(idb.data.get('state')))});
+    assert.ok(stuck.state.rev > JSON.parse(base).rev, 'mirror carries a higher rev');
     // reload (same full localStorage): the mirror is newer and is used, nothing lost
     const b = start({ls, idb});
     await sleep(80);
@@ -239,7 +245,7 @@ const events = raw => JSON.parse(raw).events;
   {
     const ls = makeLS(); ls._d[KEY] = base;
     const idb = makeIDB(); idb.data.set('state', JSON.parse(JSON.stringify(stuck.state)));
-    idb.open = () => ({});
+    const realOpen = idb.open; idb.open = () => ({});
     const a = start({ls, idb});
     await sleep(200);
     assert.equal(a.window.TrainerCatalogBridge, undefined, 'app waits for IndexedDB');
@@ -248,11 +254,21 @@ const events = raw => JSON.parse(raw).events;
     a.saveNow(); await sleep(450);
     assert.equal(events(ls.getItem(KEY)).length, 3, 'started from localStorage');
     assert.equal(events(idb.data.get('state').raw).length, 6, 'P2: an unread mirror is never overwritten by older data');
+    assert.ok(/^\{"rev":\d+,"saved_at":\d+,"pending":1,/.test(ls.getItem(KEY)), 'P0-1: writes of an untrusted page are marked pending');
+    assert.equal(JSON.parse(ls.getItem(KEY)).rev, JSON.parse(base).rev, 'P0-1: an untrusted page never raises rev');
+    // P0-1: next start with a working IndexedDB: the newer mirror is not beaten by the re-saved old copy
+    idb.open = realOpen;
+    const b = start({ls, idb});
+    await sleep(80); b.saveNow(); await sleep(450);
+    assert.equal(events(mirrorRaw(idb)).length, 6, 'P0-1: mirror answers survive the second reload');
+    assert.equal(events(ls.getItem(KEY)).length, 6, 'P0-1: localStorage gets the merged progress');
+    assert.ok(!/"pending":1/.test(ls.getItem(KEY).slice(0, 60)), 'pending cleared after a normal start');
   }
 
   // ---------- P2: IndexedDB read fails at boot (then recovers): never write the mirror from this page.
   {
-    const ls = makeLS(); ls._d[KEY] = base;
+    // stored copy without an open sitting, so this page answers in a new session (answers the mirror does not have)
+    const ls = makeLS(); const noSitting = JSON.parse(base); noSitting.session = null; ls._d[KEY] = JSON.stringify(noSitting);
     const idb = makeIDB(); idb.data.set('state', JSON.parse(JSON.stringify(stuck.state)));
     const realOpen = idb.open; let first = true;
     idb.open = () => { if (!first) return realOpen(); first = false; const req = {}; setTimeout(() => { req.error = new Error('boom'); req.onerror && req.onerror(); }, 1); return req; };
@@ -261,6 +277,19 @@ const events = raw => JSON.parse(raw).events;
     a.saveNow(); await sleep(450);
     assert.equal(events(ls.getItem(KEY)).length, 3, 'started from localStorage');
     assert.equal(events(idb.data.get('state').raw).length, 6, 'P2: an unread mirror is never overwritten (read error)');
+    // P0-1: answer on the untrusted page, then reload normally: both the mirror answers and the new ones are kept
+    a.window.TrainerCatalogBridge.launch('vocab:must');
+    a.saveNow(); await sleep(30);
+    await answer(a, 2, () => JSON.parse(ls.getItem(KEY)).session);
+    const pageIds = events(ls.getItem(KEY)).map(e => e.id);
+    assert.equal(events(ls.getItem(KEY)).length, 5);
+    const b = start({ls, idb});
+    await sleep(80); b.saveNow(); await sleep(450);
+    const got = events(ls.getItem(KEY));
+    const union = new Set(pageIds.concat(events(stuck.state.raw).map(e => e.id)));
+    assert.equal(union.size, 8, 'fixture: 2 answers only the untrusted page has');
+    assert.deepEqual(got.map(e => e.id).sort(), [...union].sort(), 'P0-1: merge keeps every answer of the mirror and of the untrusted page');
+    assert.deepEqual(events(mirrorRaw(idb)).map(e => e.id).sort(), [...union].sort(), 'P0-1: mirror holds the merge');
   }
 
   // ---------- P2: an older mirror never overwrites newer localStorage
@@ -278,8 +307,8 @@ const events = raw => JSON.parse(raw).events;
   // ---------- P2: a newer localStorage write with fewer answers (reset / «Заменить») beats an older mirror
   {
     const ls = makeLS(); const idb = makeIDB();
-    const fresh = JSON.parse(base); fresh.events = []; fresh.saved_at = Date.now() + 1000;
-    ls._d[KEY] = JSON.stringify(Object.assign({saved_at: fresh.saved_at}, fresh));
+    const fresh = JSON.parse(base); fresh.events = []; fresh.rev = stuck.state.rev + 1; fresh.saved_at = 1;  // clock went back: rev decides
+    ls._d[KEY] = JSON.stringify(Object.assign({rev: fresh.rev, saved_at: 1}, fresh));
     idb.data.set('state', JSON.parse(JSON.stringify(stuck.state)));
     const a = start({ls, idb});
     await sleep(80); a.saveNow(); await sleep(60);
@@ -288,7 +317,7 @@ const events = raw => JSON.parse(raw).events;
   // ---------- P2: old unstamped localStorage (first run of this version) vs a mirror with newer answers
   {
     const ls = makeLS(); const idb = makeIDB();
-    const legacy = JSON.parse(base); delete legacy.saved_at; ls._d[KEY] = JSON.stringify(legacy);
+    const legacy = JSON.parse(base); delete legacy.saved_at; delete legacy.rev; ls._d[KEY] = JSON.stringify(legacy);
     idb.data.set('state', JSON.parse(JSON.stringify(stuck.state)));
     const a = start({ls, idb});
     await sleep(80); a.saveNow(); await sleep(60);
@@ -349,6 +378,77 @@ const events = raw => JSON.parse(raw).events;
     assert.equal(events(mirrorRaw(idb)).length, 6, 'P3b: merged progress survives reload');
   }
 
+  // ---------- P1-1: same millisecond / clock back: rev decides, never saved_at
+  {
+    const A = JSON.parse(base), B = JSON.parse(stuck.state.raw);
+    const ls = makeLS(); ls._d[KEY] = JSON.stringify(Object.assign({rev: 50, saved_at: 1000}, A, {rev: 50, saved_at: 1000}));
+    const idb = makeIDB(); const braw = JSON.stringify(Object.assign({rev: 51, saved_at: 1000}, B, {rev: 51, saved_at: 1000}));
+    idb.data.set('state', {raw: braw, saved_at: 1000, activity: 0});
+    const a = start({ls, idb}); await sleep(80); a.saveNow(); await sleep(60);
+    assert.equal(events(ls.getItem(KEY)).length, 6, 'P1-1: equal saved_at, higher rev in IndexedDB wins');
+    assert.ok(JSON.parse(ls.getItem(KEY)).rev > 51, 'P1-1: next writes continue above the mirror revision');
+    const ls2 = makeLS(); ls2._d[KEY] = JSON.stringify(Object.assign({rev: 51, saved_at: 9e12}, A, {rev: 51, saved_at: 9e12}));
+    const idb2 = makeIDB(); idb2.data.set('state', {raw: JSON.stringify(Object.assign({rev: 52, saved_at: 5}, B, {rev: 52, saved_at: 5})), saved_at: 5, activity: 0});
+    const b = start({ls: ls2, idb: idb2}); await sleep(80); b.saveNow(); await sleep(60);
+    assert.equal(events(ls2.getItem(KEY)).length, 6, 'P1-1: clock moved back: still the higher rev');
+  }
+
+  // ---------- P1-2: localStorage full, an IndexedDB write hangs after earlier success: banner within seconds
+  {
+    const ls = makeLS(); ls._d[KEY] = base; ls.limit = ls.size() + 10;
+    const idb = makeIDB();
+    const a = start({ls, idb});
+    await sleep(60);
+    a.window.TrainerCatalogBridge.launch('vocab:must');
+    a.saveNow(); await sleep(80);
+    assert.equal(banner(a).hidden, true, 'mirror confirmed: no banner');
+    idb.hang = true;
+    await answer(a, 1, () => JSON.parse(mirrorRaw(idb)).session);
+    a.saveNow(); await sleep(100);
+    let prevented = 0; a.makeEl('update-app').click = () => {};
+    a.window.dispatchEvent({type: 'qazaq-before-update', preventDefault() { prevented++; }});
+    assert.equal(prevented, 1, 'P1-2: update blocked while this revision is unconfirmed');
+    await sleep(3200);
+    assert.equal(banner(a).hidden, false, 'P1-2: hung write -> banner (state honest)');
+    idb.hang = false; idb.release();
+    await sleep(100);
+    assert.equal(banner(a).hidden, true, 'P1-2: banner goes away once this revision is committed');
+  }
+
+  // ---------- P0-2: reset with full localStorage and a failing IndexedDB archive is cancelled; nothing cleared
+  {
+    const ls = makeLS(); ls._d[KEY] = base; ls.limit = ls.size() + 10;
+    const idb = makeIDB();
+    const a = start({ls, idb});
+    await sleep(60);
+    const alerts = []; a.window.confirm = () => true; a.window.alert = t => alerts.push(t);
+    idb.failWrites = true;
+    a.dash().action('reset');
+    await sleep(100);
+    assert.equal(alerts.length, 1, 'P0-2: reset cancelled with a message');
+    a.saveNow(); await sleep(60);
+    assert.equal(events(ls.getItem(KEY)).length, 3, 'P0-2: progress not cleared');
+    idb.failWrites = false;
+    a.dash().action('reset');
+    await sleep(100);
+    const keys = archives(idb, SNAP[0]);
+    assert.equal(keys.length, 1, 'P0-2: reset goes on once the IndexedDB backup is confirmed');
+    assert.equal(events(idb.data.get(keys[0]).raw).length, 3, 'P0-2: backup is the full old progress');
+    a.saveNow(); await sleep(60);
+    assert.equal(events(ls.getItem(KEY)).length, 0, 'reset done');
+  }
+
+  // ---------- P2-1: two archive copies in the same millisecond never overwrite each other
+  {
+    const idb = makeIDB(); const a = start({ls: makeLS(), idb}); await sleep(40);
+    const S = a.window.QazaqStore;
+    const realNow = Date.now; a.window.Date.now = () => 777;
+    await Promise.all([S.archive('x', 'old'), S.archive('x', 'new')]);
+    a.window.Date.now = realNow;
+    assert.equal(archives(idb, 'x').length, 2, 'P2-1: distinct keys');
+    assert.equal(await S.latestArchive(['x']), 'new', 'P2-1: the later copy is the latest');
+  }
+
   // ---------- both stores broken: banner shows, update blocked (old behaviour, no false «saved»)
   {
     const ls = makeLS(); ls._d[KEY] = base; ls.limit = ls.size() + 10;
@@ -387,8 +487,9 @@ const events = raw => JSON.parse(raw).events;
     assert.equal(S.compactEvents(st, Date.now(), 14), 1);
     assert.deepEqual(st.events[0], {at: 0, response_time: 5, skills: [{skill_id: 'x', rating: 3}]});
     assert.ok(st.events[1].skills[0].fsrs_log);
-    assert.equal(S.savedAtOf('{"saved_at":123,"x":1}'), 123);
-    assert.equal(S.savedAtOf('{"schema":7}'), 0);
+    assert.deepEqual(S.headOf('{"rev":4,"saved_at":123,"x":1}'), {stamped: true, rev: 4, saved_at: 123, pending: false});
+    assert.deepEqual(S.headOf('{"rev":4,"saved_at":123,"pending":1,"x":1}'), {stamped: true, rev: 4, saved_at: 123, pending: true});
+    assert.equal(S.headOf('{"schema":7}').stamped, false);
   }
   // index.html loads store-idb.js before app.js; sw caches it
   const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');

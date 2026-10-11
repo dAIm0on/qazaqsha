@@ -29,16 +29,18 @@
  const put=(key,value)=>run('readwrite',s=>s.put(value,key));
  const get=key=>run('readonly',s=>s.get(key));
  const keys=()=>run('readonly',s=>s.getAllKeys());
- // A stored progress string starts with {"saved_at":<ms>,... (app.js stamp()). Older writers have no stamp: 0.
- function savedAtOf(raw){const m=/^\{"saved_at":(\d+)/.exec(String(raw||'').slice(0,40));return m?Number(m[1]):0;}
+ // A stored progress string starts with {"rev":<n>,"saved_at":<ms>[,"pending":1],... (app.js stamp()). rev only grows;
+ // pending = written by a page that could not read IndexedDB at start. Older writers have no header: rev 0.
+ function headOf(raw){const m=/^\{"rev":(\d+),"saved_at":(\d+)(,"pending":1)?/.exec(String(raw||'').slice(0,60));return m?{stamped:true,rev:Number(m[1]),saved_at:Number(m[2]),pending:!!m[3]}:{stamped:false,rev:0,saved_at:0,pending:false};}
+ const savedAtOf=raw=>headOf(raw).saved_at,revOf=raw=>headOf(raw).rev;
  // Last learning activity in a state object: the newest event time.
  function activityOf(state){let t=0;for(const e of (state&&state.events)||[])if(e&&Number(e.at)>t)t=Number(e.at);return t;}
  // ---- mirror: coalesced, the latest string wins; flush() waits for it
- let pending=null,timer=null,writing=null,okAt=0,lastError=null;
+ let pending=null,timer=null,writing=null,okRev=0,lastError=null;
  function writeLoop(){
    writing=(async()=>{
      try{
-       while(pending){const job=pending;pending=null;await put('state',job);okAt=Math.max(okAt,job.saved_at);lastError=null;}
+       while(pending){const job=pending;pending=null;await put('state',job);okRev=Math.max(okRev,job.rev);lastError=null;}
      }catch(error){lastError=error;throw error;}
      finally{writing=null;}
    })();
@@ -46,7 +48,7 @@
  }
  function mirror(raw,activity,delay){
    if(!idb)return Promise.reject(Error('IndexedDB unavailable'));
-   pending={raw:String(raw),saved_at:savedAtOf(raw),activity:Number(activity)||0};
+   const head=headOf(raw);pending={raw:String(raw),rev:head.rev,saved_at:head.saved_at,activity:Number(activity)||0};
    clearTimeout(timer);
    if(delay>0){
      return new Promise((resolve,reject)=>{timer=setTimeout(()=>{timer=null;flush().then(resolve,reject);},delay);});
@@ -58,10 +60,14 @@
    if(writing)return writing.then(()=>pending?writeLoop():undefined);
    return pending?writeLoop():Promise.resolve();
  }
- const mirrored=savedAt=>okAt>=savedAt&&savedAt>0;
- const readMirror=()=>get('state').then(r=>r&&typeof r.raw==='string'?r:null);
+ // true once IndexedDB committed this revision (or a later one)
+ const mirrored=rev=>rev>0&&okRev>=rev;
+ const readMirror=()=>get('state').then(r=>r&&typeof r.raw==='string'?Object.assign(r,{rev:headOf(r.raw).rev}):null);
  // ---- archive: never deleted; the localStorage key is removed only after IndexedDB confirmed the write
- function archive(name,raw){const at=Date.now();return put('archive:'+name+':'+at,{name,raw:String(raw),at});}
+ // archive:<name>:<ms>:<seq> — seq makes two copies in the same millisecond distinct (never overwritten)
+ let seq=0;
+ function archive(name,raw){const at=Date.now(),n=++seq;return put('archive:'+name+':'+at+':'+n,{name,raw:String(raw),at,seq:n});}
+ const archiveOrder=k=>{const p=String(k).split(':');return [Number(p[2])||0,Number(p[3])||0];};
  async function moveToArchive(storage,names){
    const moved=[];
    for(const name of names){
@@ -78,7 +84,7 @@
  async function latestArchive(names){
    const all=(await keys())||[];
    for(const name of names){
-     const mine=all.filter(k=>typeof k==='string'&&k.startsWith('archive:'+name+':')).sort((a,b)=>Number(b.split(':').pop())-Number(a.split(':').pop()));
+     const mine=all.filter(k=>typeof k==='string'&&k.startsWith('archive:'+name+':')).sort((a,b)=>{const x=archiveOrder(a),y=archiveOrder(b);return y[0]-x[0]||y[1]-x[1];});
      if(mine.length){const r=await get(mine[0]);if(r&&typeof r.raw==='string')return r.raw;}
    }
    return null;
@@ -100,7 +106,7 @@
    for(const e of (state&&state.events)||[])if(e&&Number(e.at)<edge&&Array.isArray(e.skills)&&e.skills.some(s=>s&&typeof s==='object'&&('fsrs_log' in s||'fsrs_state' in s)))n++;
    return n;
  }
- const api={available:!!idb,savedAtOf,activityOf,mirror,flush,mirrored,readMirror,archive,moveToArchive,latestArchive,compactEvents,countCompactable,lastError:()=>lastError};
+ const api={available:!!idb,headOf,revOf,savedAtOf,activityOf,mirror,flush,mirrored,readMirror,archive,moveToArchive,latestArchive,compactEvents,countCompactable,lastError:()=>lastError};
  root.QazaqStore=api;
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
