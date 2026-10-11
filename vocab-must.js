@@ -80,8 +80,7 @@
    return {lk,card,lemma,any};
  }
  function answerDir(core,q){
-   const lang=core&&typeof core.answerLang==='function'?core.answerLang(q):'unknown';
-   if(lang==='kk'||lang==='ru')return lang;
+   if(core&&typeof core.answerLang==='function')return core.answerLang(q);
    const binds=q&&q.skillBindings||[];
    const b=binds.find(x=>x&&String(x.item_id||'').startsWith('word:'))||binds[0];
    if(!b)return 'unknown';
@@ -93,8 +92,6 @@
    const binds=q&&q.skillBindings||[];
    const word=binds.find(b=>b&&String(b.item_id||'').startsWith('word:'));
    if(word)return word.item_id+'::'+word.skill_type;
-   const fb=binds[0];
-   if(fb&&fb.item_id)return String(fb.item_id)+'::'+fb.skill_type;
    return 'exercise:'+(q&&q.id);
  }
  function idClass(id){
@@ -104,26 +101,46 @@
    if(id.startsWith('bank-'))return 3;
    return 2;
  }
- function dayStamp(ts){
-   const n=Number(ts);
-   if(!Number.isFinite(n))return '';
-   const d=new Date(n);
-   return Number.isFinite(d.getTime())?d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate():'';
- }
- function firstAnswerAt(lemma,cards,state){
-   let best=null;
+ // True only when every recorded answer is today and the event log covers each card's review_count.
+ // A missing earlier mark, a truncated log, or no timestamps at all means the first answer was not today.
+ function firstAnsweredToday(lemma,cards,state,now){
    const ids=new Set((cards||[]).map(q=>q.id));
-   const consider=t=>{t=Number(t);if(!Number.isFinite(t)||t<=0)return;if(best==null||t<best)best=t;};
-   for(const e of (state&&state.events)||[])if(e&&e.type==='answer'&&ids.has(e.card_id))consider(e.at);
-   if(best==null){
-     for(const q of cards||[]){const r=state&&state.records&&state.records[q.id];if(r&&Number(r.review_count)>0)consider(r.last_answer);}
-     if(state&&state.skills)for(const [k,sk] of Object.entries(state.skills)){
-       if(!(sk&&Number(sk.review_count)>0))continue;
-       if(!(k===lemma||String(k).startsWith(lemma+'::')))continue;
-       consider(sk.last_answer);
-     }
+   const day=new Date(Number(now));
+   if(!Number.isFinite(day.getTime()))return {today:false,dirCard:null};
+   day.setHours(0,0,0,0);
+   const day0=day.getTime();
+   let history=false,timed=false,older=false,truncated=false;
+   const eventCount=new Map();
+   let best=null,bestAt=null;
+   for(const e of (state&&state.events)||[]){
+     if(!e||e.type!=='answer'||!ids.has(e.card_id))continue;
+     history=true;
+     eventCount.set(e.card_id,(eventCount.get(e.card_id)||0)+1);
+     const t=Number(e.at);
+     if(!(Number.isFinite(t)&&t>0))continue;
+     timed=true;
+     if(t<day0)older=true;
+     const q=(cards||[]).find(c=>c.id===e.card_id);
+     if(!q)continue;
+     if(bestAt==null||t<bestAt||(t===bestAt&&String(q.id)<String(best.id))){bestAt=t;best=q;}
    }
-   return best;
+   for(const q of cards||[]){
+     const r=state&&state.records&&state.records[q.id];
+     if(!(r&&Number(r.review_count)>0))continue;
+     history=true;
+     if(Number(r.review_count)>(eventCount.get(q.id)||0))truncated=true;
+     const t=Number(r.last_answer);
+     if(Number.isFinite(t)&&t>0){timed=true;if(t<day0)older=true;}
+   }
+   if(state&&state.skills)for(const [k,sk] of Object.entries(state.skills)){
+     if(!(sk&&Number(sk.review_count)>0))continue;
+     if(!(k===lemma||String(k).startsWith(lemma+'::')))continue;
+     history=true;
+     const t=Number(sk.last_answer);
+     if(Number.isFinite(t)&&t>0){timed=true;if(t<day0)older=true;}
+   }
+   const today=!!(history&&timed&&!older&&!truncated);
+   return {today,dirCard:today?best:null};
  }
  function representative(cards,records,H){
    const hist=cards.filter(q=>H.card(q));
@@ -171,24 +188,10 @@
    }
    if(!built.length)return null;
    const started=H.lemma(lem);
-   const firstAt=started?firstAnswerAt(lem,cards,state):null;
-   let firstDir='unknown',best=null;
-   if(firstAt!=null){
-     for(const e of (state&&state.events)||[]){
-       if(!e||e.type!=='answer'||Number(e.at)!==firstAt)continue;
-       const q=(cards||[]).find(c=>c.id===e.card_id);
-       if(q&&(!best||String(q.id)<String(best.id)))best=q;
-     }
-     if(!best)for(const q of cards||[]){
-       const r=records[q.id];
-       if(!(r&&Number(r.review_count)>0&&Number(r.last_answer)===firstAt))continue;
-       if(!best||String(q.id)<String(best.id))best=q;
-     }
-     if(best)firstDir=answerDir(core,best);
-   }
-   const sameDay=!!(firstAt!=null&&dayStamp(firstAt)&&dayStamp(firstAt)===dayStamp(now));
+   const first=started?firstAnsweredToday(lem,cards,state,now):{today:false,dirCard:null};
+   const firstDir=first.dirCard?answerDir(core,first.dirCard):'unknown';
    const buried=new Set();
-   if(started&&sameDay&&firstDir!=='unknown'){
+   if(started&&first.today&&firstDir!=='unknown'){
      for(const g of built)if(!g.any&&g.dir!=='unknown'&&g.dir!==firstDir)buried.add(g.key);
    }
    const open=built.filter(g=>!buried.has(g.key));
@@ -205,7 +208,13 @@
    else{
      const due=open.filter(g=>g.earliest!=null&&g.earliest<=now);
      if(due.length){due.sort((a,b)=>a.earliest-b.earliest||byAge(a,b));chosen=due[0];}
-     else{open.sort(byAge);chosen=open[0];}
+     else{
+       // Unanswered eligible groups count as answered longer ago than every answered group.
+       const byKey=(a,b)=>a.key<b.key?-1:a.key>b.key?1:0;
+       const unanswered=open.filter(g=>!g.any).sort(byKey);
+       if(unanswered.length)chosen=unanswered[0];
+       else{open.sort(byAge);chosen=open[0];}
+     }
    }
    return representative(chosen.cards,records,H);
  }
