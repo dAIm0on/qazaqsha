@@ -396,6 +396,57 @@
    for(const id of seq)if(lemOf(id)!==lemma&&!ids.includes(id))ids.push(id);
    return ids.length;
  }
+ /* PR-7 D3: two cards of one lemma must not stand next to each other after the shown card (the answer would be
+    on screen one card earlier). Swap later cards while the return gap holds; if no swap helps, keep the order. */
+ function adjacentPairs(list,from,lemOf){
+   let n=0;
+   for(let i=Math.max(1,from+1);i<list.length;i++)if(lemOf(list[i])===lemOf(list[i-1]))n++;
+   return n;
+ }
+ function returnGapOk(list,position,cardId,lem,lemOf,minGap){
+   let seen=0;
+   for(let i=position+1;i<list.length;i++){if(list[i]===cardId)return seen>=minGap;if(lemOf(list[i])!==lem)seen++;}
+   return true;
+ }
+ /* Gaps of every repeat that ends after `from`: for each card, the number of other-lemma cards between each pair of
+    its neighbouring shows (in show order). A swap never moves two shows of one card past each other. */
+ function repeatGaps(list,from,lemOf){
+   const gaps=new Map(),last=new Map();
+   for(let i=0;i<list.length;i++){
+     const id=list[i];
+     if(last.has(id)&&i>from){
+       const lem=lemOf(id);let n=0;
+       for(let k=last.get(id)+1;k<i;k++)if(lemOf(list[k])!==lem)n++;
+       if(!gaps.has(id))gaps.set(id,[]);
+       gaps.get(id).push(n);
+     }
+     last.set(id,i);
+   }
+   return gaps;
+ }
+ // PR-7 GPT P1-1: a swap must not bring any already scheduled repeat closer than minGap (or than it already was).
+ function repeatGapsKept(before,after,minGap){
+   for(const [id,list] of before){
+     const now=after.get(id)||[];
+     for(let k=0;k<list.length;k++)if((now[k]==null?Infinity:now[k])<Math.min(list[k],minGap))return false;
+   }
+   return true;
+ }
+ function unstick(list,from,lemOf,ok){
+   let out=list.slice(),pairs=adjacentPairs(out,from,lemOf),guard=0;
+   while(pairs&&guard++<list.length*list.length){
+     let best=null;
+     for(let i=from+1;i<out.length&&!best;i++)for(let j=i+1;j<out.length;j++){
+       if(lemOf(out[i])===lemOf(out[j]))continue;
+       const t=out.slice();t[i]=out[j];t[j]=out[i];
+       const n=adjacentPairs(t,from,lemOf);
+       if(n<pairs&&ok(t)){best=t;pairs=n;break;}
+     }
+     if(!best)break;
+     out=best;
+   }
+   return out;
+ }
  function scheduleReturn(opts){
    const original=(opts.queue||[]).slice();
    const queue=original.slice();
@@ -417,20 +468,34 @@
    const seq=queue.slice(position+1);
    const inQ=new Set(queue);
    let added=0;
-   for(const item of pool){
-     if(otherCount(seq,lem,lemOf)>=minGap)break;
-     if(!item||item.id===cardId||item.wordRole==='used'||inQ.has(item.id))continue;
-     const il=lemmaKey(core,item);
-     if(il===lem)continue;
-     if(!allowed.has(il)&&!lemmaHasHistory(state,pool,core,il))continue;
-     if(budget&&queue.length+added+1>budget)break;
-     seq.push(item.id);added++;inQ.add(item.id);
+   // PR-7 D3: a pause card first avoids the lemma of the card it would follow; the second pass is the old fallback.
+   for(const apart of [true,false]){
+     for(const item of pool){
+       if(otherCount(seq,lem,lemOf)>=minGap)break;
+       if(!item||item.id===cardId||item.wordRole==='used'||inQ.has(item.id))continue;
+       const il=lemmaKey(core,item);
+       if(il===lem)continue;
+       if(apart&&il===lemOf(seq.length?seq[seq.length-1]:queue[position]))continue;
+       if(!allowed.has(il)&&!lemmaHasHistory(state,pool,core,il))continue;
+       if(budget&&queue.length+added+1>budget)break;
+       seq.push(item.id);added++;inQ.add(item.id);
+     }
    }
    if(otherCount(seq,lem,lemOf)<minGap)return {queue:original,scheduled:false};
    if(budget&&queue.length+added+1>budget)return {queue:original,scheduled:false};
    let seen=0,at=seq.length;
    for(let i=0;i<seq.length;i++){if(lemOf(seq[i])!==lem)seen++;if(seen>=minGap){at=i+1;break;}}
-   const next=queue.slice(0,position+1).concat(seq.slice(0,at),[cardId],seq.slice(at));
+   const placed=queue.slice(0,position+1).concat(seq.slice(0,at),[cardId],seq.slice(at));
+   const gaps0=repeatGaps(placed,position,lemOf);
+   const next=unstick(placed,position,lemOf,t=>returnGapOk(t,position,cardId,lem,lemOf,minGap)&&repeatGapsKept(gaps0,repeatGaps(t,position,lemOf),minGap));
+   // No swap helps (too few lemmas in the portion): put one more pause card between the pair, if the budget allows.
+   for(let i=position+1,extra=0;i<next.length&&extra<3;i++){
+     if(lemOf(next[i])!==lemOf(next[i-1]))continue;
+     const around=[lemOf(next[i-1]),lemOf(next[i])];
+     const item=pool.find(it=>it&&it.id!==cardId&&it.wordRole!=='used'&&!next.includes(it.id)&&!around.includes(lemmaKey(core,it))&&lemmaKey(core,it)!==lem&&(allowed.has(lemmaKey(core,it))||lemmaHasHistory(state,pool,core,lemmaKey(core,it))));
+     if(!item||(budget&&next.length+1>budget))break;
+     next.splice(i,0,item.id);extra++;
+   }
    if(budget&&next.length>budget)return {queue:original,scheduled:false};
    if(next.filter(id=>id===cardId).length>appearCap)return {queue:original,scheduled:false};
    const shown=new Set();
@@ -448,14 +513,34 @@
    if(!event)return null;
    return {cardId:event.card_id,sessionId:String(event.session_id),presentation:Number(event.presentation),kind:event.idk?'idk':'wrong',typed:Array.isArray(event.answers)?event.answers.slice():[],answerEventId:event.id||null};
  }
+ /* PR-7 GPT P1-2 (general): the show (session_id + presentation + card_id) already has its first answer, from this
+    tab or from another one (applyRemote). Whatever is pressed now (Проверить right/wrong, Не знаю) is not a new
+    answer: nothing is counted, no event is written, no new retry is made. The outcome follows the first answer:
+    - right / near-miss / assisted (hint or rule) — the show is done: alreadyHandled, retry null;
+    - wrong / idk with a retry_close already written — done as well;
+    - wrong / idk still open — the same retry the first answer made (retryFromAnswer of that event), never a new kind.
+    The return in this portion is the one the first answer decided (scheduleReturn with the same inputs) — only if the
+    queue here does not already hold it. */
+ function settleExisting(ctx,existing){
+   const state=ctx.state,records=ctx.records||state.records,q=ctx.q;
+   const sessionId=String(ctx.sessionId),presentation=Number(ctx.presentation);
+   let queue=(ctx.queue||[]).slice(),scheduled=queue.slice(ctx.position+1).includes(q.id);
+   const firstWasGood=!!existing.correct&&!existing.hinted&&!existing.idk;
+   if(!firstWasGood&&!scheduled){
+     const pool=ctx.pool||[],core=ctx.core;
+     const sched=scheduleReturn({queue,position:ctx.position,cardId:q.id,pool,plan:ctx.plan,sitting:ctx.sitting,state,core,budget:ctx.budget,minGap:ctx.minGap||2,appearCap:ctx.appearCap||3,lemma:lemmaKey(core,q)});
+     queue=sched.queue;scheduled=sched.scheduled;
+   }
+   const needsRetype=!existing.correct||!!existing.idk;
+   const closed=findEvent(state.events,'retry_close',sessionId,presentation,q.id);
+   const retry=needsRetype&&!closed?retryFromAnswer(existing):null;
+   return {duplicate:true,alreadyHandled:!retry,event:existing,record:records[q.id],queue,scheduled,retry};
+ }
  function commitFirst(ctx){
    const state=ctx.state,records=ctx.records||state.records,q=ctx.q;
    const sessionId=String(ctx.sessionId),presentation=Number(ctx.presentation),kind=ctx.kind;
    const existing=findEvent(state.events,'answer',sessionId,presentation,q.id);
-   if(existing){
-     const scheduled=(ctx.queue||[]).slice(ctx.position+1).includes(q.id);
-     return {duplicate:true,event:existing,record:records[q.id],queue:(ctx.queue||[]).slice(),scheduled,retry:existing.correct&&!existing.hinted&&!existing.idk?null:retryFromAnswer(existing)};
-   }
+   if(existing)return settleExisting(ctx,existing);
    const core=ctx.core,pool=ctx.pool||[],sitting=ctx.sitting;
    const lem=lemmaKey(core,q);
    if(sitting&&!sitting.newLemmas.includes(lem)&&!lemmaHasHistory(state,pool,core,lem))sitting.newLemmas.push(lem);
