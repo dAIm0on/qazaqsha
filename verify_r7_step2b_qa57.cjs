@@ -129,7 +129,7 @@ ok('B3 жазбады explanation · B4 neutral жаздымыз options · m1 �
   const ca=grab(appSrc,'checkAnswer');
   assert.ok(/return String\(activeLesson\|\|''\)\.startsWith\('b34-track-'\)&&\(mode==='lesson'\|\|mode==='voluntary'\);\}/.test(grab(appSrc,'isBankSession')),'isBankSession');
   assert.match(ca,/const bankRun=isBankSession\(\);\s*if\(bankRun\)\{[\s\S]{0,200}if\(!result\.correct&&!queue\.slice\(position\+1\)\.includes\(q\.id\)\)queue\.push\(q\.id\);\s*\}else if\(stageContext\)/);
-  assert.match(ca,/if\(!stageContext&&!bankRun&&mate&&!result\.correct&&!hinted\)/);
+  assert.match(ca,/if\(!stageContext&&!bankRun&&!isVocabMustTrainer\(\)&&mate&&!result\.correct&&!hinted\)/);
   assert.match(ca,/if\(mode!=='homework'&&!homeworkMode&&!bankRun&&!q\.bank\)\{\s*const extra=window\.AiTutor\.takeRemediation/);
   // functional: the bank counter
   const rs=grab(appSrc,'renderStats');assert.match(rs,/else if\(isBankSession\(\)\)\{const total=new Set\(practiceIds\)\.size,reached=new Set\(queue\.slice\(0,position\+1\)\.filter\(id=>practiceIds\.includes\(id\)\)\)\.size;/);

@@ -221,7 +221,22 @@ assert.ok(!app.includes('function importProgress(incoming,mode)'));
 assert.ok(app.includes("vocab:'Не открывай готовое слово — иначе это не вспоминание.'"));
 assert.ok(!app.includes("vocab:'Сначала слепая попытка"));
 assert.ok(!app.includes('Пока всё'));
-assert.ok(app.includes('<h2>Можно продолжить</h2>'));
+assert.ok(app.includes('<h2>Все слова пройдены</h2>'));
+assert.ok(!app.includes('<h2>Можно продолжить</h2>'));
+assert.ok(app.includes('Можно продолжить урок'));
+assert.ok(!app.includes('Ещё слова'));
+assert.ok(!app.includes('На сегодня новые слова закончились'));
+const beginSrc=app.slice(app.indexOf('function beginMustPortion'),app.indexOf('function paintMustRetry'));
+assert.ok(beginSrc.includes('prepareVocabPool()'));
+assert.ok(beginSrc.indexOf('prepareVocabPool()')<beginSrc.indexOf('mustPool()'));
+assert.ok(!beginSrc.includes('loaded.length<3'));
+assert.ok(!beginSrc.includes('planned.ids.slice()'),'P0-GAP');
+const ensureSrc=app.slice(app.indexOf('function ensureV2'),app.indexOf('function openPathLesson'));
+assert.ok(ensureSrc.includes('slice(0,idx+1)'));
+const poolSrc=app.slice(app.indexOf('function prepareVocabPool'),app.indexOf('function mustCourseRank'));
+assert.ok(poolSrc.includes('ensureV2(id)'));
+assert.ok(!/for\s*\(const raw of window\.LESSON_V2_COMPILED/.test(poolSrc));
+assert.ok(check.includes('!isVocabMustTrainer()&&mate&&!result.correct&&!hinted'));
 const indexHtml=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
 const dashboard=fs.readFileSync(path.join(__dirname,'dashboard.js'),'utf8');
 const personal=fs.readFileSync(path.join(__dirname,'personal-trainers.js'),'utf8');
@@ -366,5 +381,363 @@ assert.equal(keptLocal.mode,'words');
 assert.equal(keptLocal.kind,'idk');
 assert.equal(keptLocal.cardId,'LOCAL');
 assert.deepEqual(keptLocal.views,['practice']);
+
+const seenOnly=state();
+seenOnly.records.A={seen:1,review_count:0,next_review:1,dueAt:1};
+seenOnly.skills['word:a::production']={review_count:0};
+const seenPlan=VM.planPortion(pool,seenOnly,cfg,core,5000);
+assert.equal(seenPlan.plan.nNew,3);
+assert.ok(seenPlan.plan.newLemmas.includes('word:a'));
+const skilled=state();
+skilled.skills['word:a::production']={review_count:1};
+const skilledPlan=VM.planPortion(pool,skilled,cfg,core,5000);
+assert.equal(skilledPlan.plan.nNew,2);
+assert.ok(!skilledPlan.plan.newLemmas.includes('word:a'));
+
+const openedState=state();
+const openedPlan=VM.planPortion(pool,openedState,cfg,core,1000);
+const openedLemma=openedPlan.plan.newLemmas[0];
+openedState.records[openedPlan.ids[0]]=Scheduler.shown(null,1000);
+const reopened=VM.planPortion(pool,openedState,cfg,core,2000);
+assert.ok(reopened.plan.newLemmas.includes(openedLemma));
+
+const oldSave=VM.restoreSaved({mode:'words',trainerReturn:'vocab:must',queue:['A'],position:0,queueEpoch:1,sessionCorrect:1,sessionAssisted:0},state(),cfg,3000);
+assert.equal(oldSave.legacy,true);
+assert.ok(oldSave.vocab&&oldSave.vocab.plan);
+
+const late=card('L','word:l');late.lessonId='2-1';
+const early=card('E','word:e');early.lessonId='1-1';
+const ranked=VM.planPortion([late,early],state(),cfg,core,1000,{rank:q=>q.lessonId==='1-1'?1:2});
+assert.deepEqual(ranked.ids,['E','L']);
+assert.deepEqual(ranked.plan.newLemmas,['word:e','word:l']);
+
+const fillerPool=[card('N3','word:n3'),card('N1','word:n1'),card('N2','word:n2'),card('High','word:high'),card('Low','word:low'),card('Mature','word:mature')];
+const fillerState=state();
+for(const id of ['High','Low','Mature'])fillerState.records[id]={review_count:2,seen:2,needsReview:false,streak:5,next_review:999999999,dueAt:999999999};
+const fillerPlan=VM.planPortion(fillerPool,fillerState,cfg,core,1000,{retrievability:q=>q.id==='Low'?0.1:q.id==='High'?0.9:null});
+assert.equal(fillerPlan.plan.nNew,2);
+assert.deepEqual(fillerPlan.plan.newLemmas,['word:n3','word:n1']);
+assert.ok(!fillerPlan.ids.includes('N2'));
+assert.ok(fillerPlan.ids.indexOf('Low')>=0&&fillerPlan.ids.indexOf('Low')<fillerPlan.ids.indexOf('High'));
+assert.ok(fillerPlan.ids.indexOf('High')<fillerPlan.ids.indexOf('Mature'));
+
+// P0-FILLER-CARD-HISTORY: a -ru card with no answer of its own stays out.
+// The -kk sibling is mature and not due, so it can enter only as filler.
+function dirCard(id,lemma,skill){
+  return {id,topic:'vocab',wordRole:'must',kind:'fields',title:'t',stimulus:id,fields:[{answers:[id+'к'],kind:'text'}],vocabIds:[lemma],skillBindings:[{item_id:lemma,skill_type:skill,field:0}]};
+}
+const nolRu=dirCard('v2-1-2-vocab-nol-ru','word:nol','recognition');
+const nolKk=dirCard('v2-1-2-vocab-nol-kk','word:nol','production');
+const fillerHist=state();
+fillerHist.records[nolKk.id]={review_count:5,seen:5,needsReview:false,streak:5,next_review:999999999,dueAt:999999999};
+const fillerOwn=VM.planPortion([nolRu,nolKk,card('hw1-1-kk','word:h1'),card('hw1-2-kk','word:h2'),card('hw1-3-kk','word:h3')],fillerHist,cfg,core,1000);
+assert.ok(!fillerOwn.ids.includes(nolRu.id),'P0-FILLER-CARD-HISTORY');
+assert.ok(fillerOwn.ids.includes(nolKk.id),'P0-FILLER-CARD-HISTORY');
+const mateHigh=card('mate-high','word:mate');
+const mateLow=card('mate-low','word:mate');
+const mateState=state();
+for(const id of [mateHigh.id,mateLow.id])mateState.records[id]={review_count:3,seen:3,needsReview:false,streak:5,next_review:999999999,dueAt:999999999};
+const matePlan=VM.planPortion([mateHigh,mateLow,card('hw9-1-kk','word:j1'),card('hw9-2-kk','word:j2')],mateState,cfg,core,1000,{retrievability:q=>q.id===mateLow.id?0.2:q.id===mateHigh.id?0.8:null});
+assert.ok(matePlan.ids.includes(mateLow.id)&&!matePlan.ids.includes(mateHigh.id),'P0-FILLER-CARD-HISTORY');
+
+// P0-GAP: recent X and Y, and no other cards, so neither lemma is shown inside the pause.
+const gapPool=[card('X-ru','word:x'),card('Y-ru','word:y')];
+const gapSit=VM.emptySitting(1);
+gapSit.recent=[{cardId:'X',lemma:'word:x'},{cardId:'Y',lemma:'word:y'}];
+const gapPlan=VM.planPortion(gapPool,state(),cfg,core,1000);
+const gapIds=VM.enforceGap(gapPlan.ids,gapSit,gapPool,core,2);
+assert.deepEqual(gapIds,[],'P0-GAP');
+{
+  const byId=new Map(gapPool.map(q=>[q.id,q]));
+  const seq=gapSit.recent.map(x=>x.lemma||x.cardId);
+  for(const id of gapIds){
+    const lem=core.lemmaKey(byId.get(id)||{id});
+    let last=-1;
+    for(let i=0;i<seq.length;i++)if(seq[i]===lem)last=i;
+    assert.ok(last<0||seq.length-1-last>=2,'P0-GAP');
+    seq.push(lem);
+  }
+}
+
+// P0-GAP-NOT-EXHAUSTED: 1–2 just-shown cards must not paint «Все слова пройдены».
+// Mutation: put `return false` back on the empty enforceGap branch and this fails.
+function runGapScreen(cards,sitting,queue){
+  const rankSrc=app.slice(app.indexOf('function mustCourseRank'),app.indexOf('function paintMustRetry'));
+  const nextSrc=app.slice(app.indexOf('function nextQuestion'),app.indexOf('function homeworkOpts'));
+  const emptySrc=app.slice(app.indexOf('function renderEmpty'),app.indexOf('function startRemedy'));
+  const mustPred=app.slice(app.indexOf('function isVocabMustTrainer()'),app.indexOf('function mustPool()'));
+  assert.ok(rankSrc.includes('function relaxMustGap')&&rankSrc.includes('function beginMustPortion'),'P0-GAP-NOT-EXHAUSTED');
+  assert.ok(nextSrc.includes('beginMustPortion(false)'),'P0-GAP-NOT-EXHAUSTED');
+  assert.ok(emptySrc.includes('<h2>Все слова пройдены</h2>'),'P0-GAP-NOT-EXHAUSTED');
+  const body=[
+    'const window={VocabMust:VM,LESSON_V2_COMPILED:[]};',
+    'const cfg=start.cfg, core=start.core, state=start.state, records=state.records;',
+    'let mode="words", vocabRole="must", trainerReturn="vocab:must", queueEpoch=7, trainerEpoch=7;',
+    'let position=0, queue=start.queue.slice(), practiceIds=queue.slice();',
+    'let vocabSitting=start.sitting, vocabPlan=start.plan, vocabClosed=[], vocabRetry=null, vocabPoolReady=false, vocabReturnScheduled=false;',
+    'let sessionAttempts=0, sessionCorrect=0, sessionAssisted=0, sessionBlindFails=Object.create(null), sessionUnaided=Object.create(null);',
+    'let draft=null, presented=null, checked=false, hinted=false, retrying=false, retryAfterWrong=false;',
+    'let activeLesson=null, pathPracticeReturn=null, hwReturn=null, courseBlock=null;',
+    'const byId=new Map(start.cards.map(q=>[q.id,q]));',
+    'const nodes={};',
+    'function $(sel){if(!nodes[sel])nodes[sel]={innerHTML:"",onclick:null,scrollIntoView(){},focus(){},classList:{contains(){return false;},add(){},remove(){}}};return nodes[sel];}',
+    'const document={documentElement:{classList:{contains(){return false;}}},addEventListener(){},removeEventListener(){}};',
+    'function cancelAdvance(){} function abortTutor(){} function focusAnswer(){} function save(){} function showView(){}',
+    'function prepareVocabPool(){} function mustPool(){return start.cards;}',
+    'function render(){const q=byId.get(queue[position]);if(!q){renderEmpty();return;}$("#exercise").innerHTML="<h2 id=question-title>"+q.id+"</h2>";}',
+    mustPred,rankSrc,nextSrc,emptySrc,
+    'nextQuestion();',
+    'const q=byId.get(queue[position]);',
+    'return {html:$("#exercise").innerHTML,queue:queue.slice(),position,id:q?q.id:null};'
+  ].join('\n');
+  return new Function('start','VM',body)({cfg,core,state:state(),cards,sitting,plan:{budget:10,nNew:cards.length,baseLen:cards.length,newLemmas:[]},queue},VM);
+}
+const gapLeft=[card('X','word:x'),card('Y','word:y')];
+const gapLeftSit=VM.emptySitting(1);
+gapLeftSit.recent=[{cardId:'X',lemma:'word:x'},{cardId:'Y',lemma:'word:y'}];
+const gapLeftPlan=VM.planPortion(gapLeft,state(),cfg,core,1000);
+assert.ok(gapLeftPlan.ids.length>=1&&gapLeftPlan.ids.length<=2,'P0-GAP-NOT-EXHAUSTED');
+assert.deepEqual(VM.enforceGap(gapLeftPlan.ids,gapLeftSit,gapLeft,core,cfg.schedule.learningIntervening||2),[],'P0-GAP-NOT-EXHAUSTED');
+const gapLeftScreen=runGapScreen(gapLeft,gapLeftSit,['Y']);
+assert.ok(!gapLeftScreen.html.includes('Все слова пройдены'),'P0-GAP-NOT-EXHAUSTED');
+assert.ok(gapLeftScreen.html.includes('question-title'),'P0-GAP-NOT-EXHAUSTED');
+assert.equal(gapLeftScreen.id,'X','P0-GAP-NOT-EXHAUSTED');
+const gapOne=[card('Y','word:y')];
+const gapOneSit=VM.emptySitting(1);
+gapOneSit.recent=[{cardId:'Y',lemma:'word:y'}];
+const gapOnePlan=VM.planPortion(gapOne,state(),cfg,core,1000);
+assert.deepEqual(gapOnePlan.ids,['Y'],'P0-GAP-NOT-EXHAUSTED');
+assert.deepEqual(VM.enforceGap(gapOnePlan.ids,gapOneSit,gapOne,core,2),[],'P0-GAP-NOT-EXHAUSTED');
+const gapOneScreen=runGapScreen(gapOne,gapOneSit,['Y']);
+assert.ok(!gapOneScreen.html.includes('Все слова пройдены'),'P0-GAP-NOT-EXHAUSTED');
+assert.equal(gapOneScreen.id,'Y','P0-GAP-NOT-EXHAUSTED');
+
+function answerCard(st,sitting,cards,q,queue,position,plan,kind,now,sessionId){
+  const res=VM.commitFirst({state:st,records:st.records,q,now,sessionId,presentation:position,kind,answers:kind==='good'?['ok']:[],elapsed:5,core,observe:()=>[],queue,position,pool:cards,plan,sitting,rating:kind==='good'?F.Rating.Good:F.Rating.Again,errors:[],result:{correct:kind==='good',parts:[kind==='good']},budget:plan.budget,minGap:2,appearCap:3,hinted:kind!=='good',recall:true});
+  let spent=kind==='good'?1:0;
+  if(kind!=='good'&&res.retry){
+    const closed=VM.commitRetype({state:st,sitting,retry:res.retry,sessionId,presentation:position,cardId:q.id,answers:['ok'],result:{correct:true,parts:[true]},now:now+1});
+    if(closed.closed)spent=1;
+  }
+  return {queue:res.queue,spent,scheduled:res.scheduled};
+}
+const dPool=['A','B','C','D','N1','N2'].map(id=>card(id,'word:'+id.toLowerCase()));
+const dState=state();
+for(const id of ['A','B','C','D'])dState.records[id]={review_count:1,seen:1,needsReview:true,streak:0,next_review:1,dueAt:1};
+const dPlan=VM.planPortion(dPool,dState,cfg,core,5000);
+assert.equal(dPlan.plan.nNew,2);
+assert.deepEqual(dPlan.plan.newLemmas,['word:n1','word:n2']);
+assert.ok(dPlan.ids.includes('N2')&&dPlan.ids.indexOf('N2')<dPlan.plan.budget);
+let dQueue=dPlan.ids.slice();
+const dSit=VM.emptySitting(1);dSit.sessions=['d05'];
+let dPos=0,dAttempts=0,dDeferred=0;
+const dShown=new Set(),dErrored=new Set();
+while(dPos<dQueue.length&&dAttempts<dPlan.plan.budget){
+  const id=dQueue[dPos];
+  const q=dPool.find(c=>c.id===id);
+  const kind=['A','B','C','D','N1'].includes(id)&&!dErrored.has(id)?'wrong':'good';
+  if(kind==='wrong')dErrored.add(id);
+  const step=answerCard(dState,dSit,dPool,q,dQueue,dPos,dPlan.plan,kind,6000+dPos,'d05');
+  if(kind!=='good'&&step.scheduled===false)dDeferred++;
+  dQueue=step.queue;dAttempts+=step.spent;dShown.add(core.lemmaKey(q));dPos++;
+}
+assert.ok(dShown.has('word:n2'));
+assert.ok(dDeferred>0);
+console.log('D05 deferred old returns',dDeferred);
+
+const desk=[];
+for(let i=0;i<40;i++)desk.push(card('T'+i,'word:t'+i));
+const deskState=state();
+let deskNew=0,deskEmpty=0;
+for(let portion=0;portion<10;portion++){
+  const planned=VM.planPortion(desk,deskState,cfg,core,100000+portion*1000);
+  if(!planned.ids.length){deskEmpty++;break;}
+  if(portion===0){assert.equal(planned.plan.nNew,3);assert.equal(planned.plan.budget,9);}
+  else assert.equal(planned.plan.nNew,2);
+  deskNew+=planned.plan.nNew;
+  let queue=planned.ids.slice(),pos=0,attempts=0;
+  const sit=VM.emptySitting(1);sit.sessions=['desk'+portion];
+  const shown=new Set();
+  while(pos<queue.length&&attempts<planned.plan.budget){
+    const q=desk.find(c=>c.id===queue[pos]);
+    const step=answerCard(deskState,sit,desk,q,queue,pos,planned.plan,'good',100000+portion*1000+pos,'desk'+portion);
+    queue=step.queue;attempts+=step.spent;
+    if(planned.plan.newLemmas.includes(core.lemmaKey(q)))shown.add(core.lemmaKey(q));
+    pos++;
+  }
+  for(const lem of planned.plan.newLemmas)assert.ok(shown.has(lem),lem);
+}
+assert.ok(deskNew>=20);
+assert.equal(deskEmpty,0);
+console.log('desk portions new',deskNew);
+
+function mulberry32(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+const rand=mulberry32(0xC0FFEE);
+const runCards=[];
+for(let i=0;i<45;i++)runCards.push(card('R'+i,'word:r'+i));
+const runState=state();
+let runEmpty=0;
+const missedOld=[];
+for(let portion=0;portion<20;portion++){
+  const planned=VM.planPortion(runCards,runState,cfg,core,200000+portion*1000);
+  if(!planned.ids.length){runEmpty++;break;}
+  assert.ok(planned.plan.nNew>0);
+  let queue=planned.ids.slice(),pos=0,attempts=0,closed=0;
+  const sit=VM.emptySitting(1);sit.sessions=['run'+portion];
+  const shownNew=new Set(),shownIds=new Set();
+  while(pos<queue.length&&attempts<planned.plan.budget){
+    const id=queue[pos];
+    const q=runCards.find(c=>c.id===id);
+    const lem=core.lemmaKey(q);
+    const had=VM.lemmaHasHistory(runState,runCards,core,lem);
+    const roll=rand();
+    const kind=roll<0.70?'good':roll<0.85?'wrong':'idk';
+    const step=answerCard(runState,sit,runCards,q,queue,pos,planned.plan,kind,200000+portion*1000+pos,'run'+portion);
+    queue=step.queue;attempts+=step.spent;closed+=step.spent;shownIds.add(id);
+    if(planned.plan.newLemmas.includes(lem))shownNew.add(lem);
+    else if(!had)assert.fail('new lemma from filler '+id);
+    pos++;
+  }
+  assert.ok(closed<=planned.plan.budget);
+  for(const lem of planned.plan.newLemmas)assert.ok(shownNew.has(lem),lem+' portion '+portion);
+  for(const id of planned.ids){
+    if(shownIds.has(id))continue;
+    const q=runCards.find(c=>c.id===id);
+    if(!planned.plan.newLemmas.includes(core.lemmaKey(q)))missedOld.push(portion+':'+id);
+  }
+}
+assert.equal(runEmpty,0);
+console.log('20 portions missed old',missedOld.join(',')||'(none)');
+
+const contrastBlock=app.slice(app.indexOf('const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);'),app.indexOf('const deferred='));
+function contrastQueue(isMust){
+  const policy=require('./memory-policy.js');
+  const q={id:'v2-1-2-vocab-togyz-kk',topic:'vocab',wordRole:'must',title:'Переведи на русский',stimulus:'тоғыз',fields:[{answers:['девять']}]};
+  const other={id:'hw2-19-kk',topic:'vocab',wordRole:'',title:'Переведи на русский',stimulus:'тоқсан',fields:[{answers:['девяносто']}]};
+  const fillers=['a','b','c','d','e'].map(id=>({id,topic:'vocab',wordRole:'must',stimulus:id,fields:[{answers:[id]}]}));
+  const questions=[q,other,...fillers];
+  const mustIds=new Set([q.id,...fillers.map(x=>x.id)]);
+  let queue=[q.id,...fillers.map(x=>x.id)];
+  const position=0,result={correct:false},hinted=false,stageContext=null,bankRun=false;
+  const window={MemoryPolicy:policy};
+  function isVocabMustTrainer(){return isMust;}
+  eval(contrastBlock);
+  return {queue,mustIds,other:other.id};
+}
+const leaked=contrastQueue(false);
+assert.ok(leaked.queue.includes(leaked.other));
+assert.ok(!leaked.mustIds.has(leaked.other));
+const held=contrastQueue(true);
+assert.ok(!held.queue.includes(held.other));
+assert.deepEqual(held.queue,['v2-1-2-vocab-togyz-kk','a','b','c','d','e']);
+
+function bootMust(first,how){
+  // curriculum.js installs LESSON_PACKS when it loads. A shorter file list never sees lesson-pack-*.js,
+  // so those homework cards stay out and v2 `taken` builds a different, smaller must pool.
+  const window={
+    document:{documentElement:{getAttribute(){return null;},classList:{contains(){return false;},add(){},remove(){}}},querySelector(){return null;},querySelectorAll(){return [];},getElementById(){return null;},addEventListener(){},body:{appendChild(){}},head:{},createElement(){return {style:{},classList:{add(){},remove(){},toggle(){}},setAttribute(){},appendChild(){},addEventListener(){}};}},
+    localStorage:{_d:Object.create(null),getItem(k){return this._d[k]??null;},setItem(k,v){this._d[k]=String(v);},removeItem(k){delete this._d[k];}},
+    sessionStorage:{getItem(){return null;},setItem(){},removeItem(){}},
+    navigator:{userAgent:'node',language:'ru'},
+    location:{hostname:'localhost',href:'http://127.0.0.1/',origin:'http://127.0.0.1',protocol:'http:'},
+    matchMedia(){return {matches:false,addListener(){},addEventListener(){}};},
+    console,setTimeout,clearTimeout,Date,Math,JSON,Object,Array,Map,Set,WeakMap,WeakSet,Promise,Number,String,Boolean,RegExp,Error,parseInt,parseFloat,isNaN,isFinite,Infinity,NaN,undefined,URL,URLSearchParams,Intl,TextEncoder,TextDecoder,
+    performance:{now(){return Date.now();}},requestAnimationFrame(){return 0;},cancelAnimationFrame(){},addEventListener(){},removeEventListener(){}
+  };
+  window.window=window;window.globalThis=window;window.self=window;
+  const ctx=vm.createContext(window);
+  const skip=new Set(['app.js','pwa.js','design-ui.js','cloud.js','firebase-config.js','dashboard.js','morph-ui.js','morph-nav2.js','personal-trainers.js','free-practice-view.js','tutor-ui.js']);
+  const files=fs.readFileSync(path.join(__dirname,'index.html'),'utf8').match(/src="([^"]+\.js)"/g).map(s=>s.slice(5,-1)).filter(f=>!skip.has(f));
+  for(const f of files)vm.runInContext(fs.readFileSync(path.join(__dirname,f),'utf8'),ctx,{filename:f});
+  const startupStart=app.indexOf("try{if(!(window.LessonV2Runtime&&window.LessonV2Runtime.isV2('3-1')))window.Lesson31Pack?.install?.(course,window.CURRICULUM);}");
+  const startupEnd=app.indexOf('const questions=course.questions;');
+  assert.ok(startupStart>0&&startupEnd>startupStart);
+  const coerceSrc=app.slice(app.indexOf('function coerceTyped('),app.indexOf('for(const q of questions)coerceTyped'));
+  const eligSrc=app.slice(app.indexOf('function eligible('),app.indexOf('function activateCard('));
+  const mustSrc=app.slice(app.indexOf('function mustPool('),app.indexOf('function prepareVocabPool('));
+  const prepSrc=app.slice(app.indexOf('function prepareVocabPool('),app.indexOf('function mustCourseRank('));
+  const ensureFn=app.slice(app.indexOf('function ensureV2('),app.indexOf('function openPathLesson('));
+  const body=[
+    'const course=window.COURSE;',
+    app.slice(startupStart,startupEnd),
+    'const questions=course.questions;',
+    coerceSrc,
+    "let mode='words';",
+    'let state=window.ProgressStore.empty();',
+    'let records=state.records;',
+    'const catalog=window.CURRICULUM;',
+    'try{catalog.activatePromotions(state);}catch(e){}',
+    'const byId=new Map(questions.map(q=>[q.id,q]));',
+    'for(const q of questions){coerceTyped(q);byId.set(q.id,q);}',
+    'let confusionIndex=null;',
+    'const P=window.ProgressStore;',
+    'let vocabPoolReady=false;',
+    eligSrc,mustSrc,prepSrc,ensureFn,
+    'const idsOf=list=>{const out=[];for(const q of list)if(q&&q.id!=null)out.push(String(q.id));out.sort();return out;};',
+    'let partial=[];',
+    'if('+JSON.stringify(first)+'){ensureV2('+JSON.stringify(first)+');partial=idsOf(mustPool());}',
+    how==='guard'?[
+      "const lessonQs=questions.filter(q=>q&&q.lessonId==='4-1'&&q.id);",
+      "if(lessonQs.length<3)throw new Error('P2-WARM-SAFE cards '+lessonQs.length);",
+      'const qids=lessonQs.slice(0,3).map(q=>q.id);',
+      'let queue=qids.slice();',
+      'let position=1;',
+      "let draft={token:'4-1:1',exerciseId:qids[1],answers:['\\u0431\\u0430\\u0440\\u0430\\u0434\\u044b']};",
+      'const beforeQ=queue.slice(),beforeP=position,beforeD=JSON.stringify(draft);',
+      'let saves=0;',
+      'function save(){saves++;}',
+      'window.save=save;',
+      "document.readyState='complete';",
+      'window.requestIdleCallback=function(cb){cb();return 1;};',
+      'warmVocabPool();',
+      'const guard={same:queue.length===beforeQ.length&&queue.every((id,i)=>id===beforeQ[i])&&position===beforeP&&JSON.stringify(draft)===beforeD&&saves===0,saves,n:qids.length};'
+    ].join('\n'):[
+      how==='warm'?"document.readyState='complete';window.requestIdleCallback=function(cb){cb();return 1;};warmVocabPool();":'',
+      how==='early'?"document.readyState='complete';var __idle=0;window.requestIdleCallback=function(cb){if(__idle++>=2)return 0;cb();return 1;};warmVocabPool();":'',
+      'prepareVocabPool();',
+      'const guard=null;'
+    ].join('\n'),
+    'const pool=mustPool();',
+    'const ids=idsOf(pool);',
+    'const lemmas=new Set(pool.map(q=>window.TrainerCore.lemmaKey(q))).size;',
+    'const vocabIds=new Set(pool.flatMap(q=>q.vocabIds||[])).size;',
+    'const foreign=pool.filter(q=>!q||q.topic!=="vocab"||q.wordRole!=="must").length;',
+    '({partial,ids,lemmas,vocabIds,foreign,ready:vocabPoolReady,guard});'
+  ].join('\n');
+  const result=vm.runInContext(body,ctx,{filename:'product-must-pool.js'});
+  return {partial:[...result.partial],ids:[...result.ids],lemmas:result.lemmas,vocabIds:result.vocabIds,foreign:result.foreign,ready:result.ready,guard:result.guard};
+}
+const freshPool=bootMust(null);
+const after32=bootMust('3-2');
+const after42=bootMust('4-2');
+assert.deepEqual(after32.ids,freshPool.ids);
+assert.deepEqual(after42.ids,freshPool.ids);
+assert.ok(after32.partial.length>0&&after32.partial.length<freshPool.ids.length);
+assert.ok(after42.partial.length>0&&after42.partial.length<freshPool.ids.length);
+assert.ok(after32.partial.every(id=>freshPool.ids.includes(id)));
+assert.ok(after42.partial.every(id=>freshPool.ids.includes(id)));
+assert.equal(freshPool.foreign,0);
+assert.equal(freshPool.lemmas,freshPool.vocabIds);
+// TZ v6 pool. When lessons are added, update these three numbers together with the TZ.
+assert.equal(freshPool.ids.length,566);
+assert.equal(freshPool.lemmas,201);
+assert.equal(freshPool.vocabIds,201);
+assert.ok(freshPool.lemmas>0&&freshPool.lemmas<=freshPool.ids.length);
+assert.ok(freshPool.ids.every(id=>id));
+console.log('must pool from product path cards',freshPool.ids.length,'lemmaKey',freshPool.lemmas,'vocabIds',freshPool.vocabIds);
+const warmed=bootMust(null,'warm');
+const earlyTap=bootMust(null,'early');
+assert.equal(freshPool.ready,true);
+assert.equal(warmed.ready,true);
+assert.equal(earlyTap.ready,true);
+assert.deepEqual(warmed.ids,freshPool.ids);
+assert.deepEqual(earlyTap.ids,freshPool.ids);
+console.log('warm pool matches sync',warmed.ids.length,'early matches',earlyTap.ids.length);
+const lessonGuard=bootMust('4-1','guard');
+assert.equal(lessonGuard.ready,true,'P2-WARM-SAFE');
+assert.equal(lessonGuard.guard&&lessonGuard.guard.same,true,'P2-WARM-SAFE');
+assert.equal(lessonGuard.guard.saves,0,'P2-WARM-SAFE');
+assert.ok(lessonGuard.guard.n>=3,'P2-WARM-SAFE');
+console.log('P2-WARM-SAFE ok cards',lessonGuard.guard.n,'saves',lessonGuard.guard.saves);
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');

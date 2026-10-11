@@ -72,7 +72,7 @@ ok('mastery D: D1+D2+D3 required; D-7 аулада+далада; D-1=A; no reviv
   assert.ok(c.includes('"content_revision": "5-1.r2"')||c.includes('"content_revision":"5-1.r2"'));
   assert.ok(!c.includes('example.invalid'));
   assert.ok(!read('explain-bank-adapter.js').includes("{id:'5-1'}"),'5-1 not in legacy COURSE');
-  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261010-vocab-qa'"));
+  assert.ok(read('sw.js').includes("CACHE='qazaq-offline-live-20261011-vocab-pr2-gap'"));
   assert.ok(read('lesson-registry.js').includes('qaV2Preview')&&read('lesson-v2-runtime.js').includes('v2qa=1'));
 }
 ok('compiled r2 + SW section2-2 + release-gate intact');

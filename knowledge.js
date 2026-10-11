@@ -39,7 +39,7 @@
    q.skillBindings=out;return out;
  }
  function key(b){return b.item_id+'::'+b.skill_type;}
- function register(q){q.vocabIds=q.vocabIds||C.words.filter(w=>w.aliases.includes(core.normalize(q.stimulus))).map(w=>w.id);for(const id of q.vocabIds){const w=C.words.find(w=>w.id===id);if(w&&!w.card_ids.includes(q.id))w.card_ids.push(q.id);}
+ function register(q){if(!q.vocabIds){const stim=core.normalize(q.stimulus);q.vocabIds=C.words.filter(w=>w.aliases.includes(stim)).map(w=>w.id);}for(const id of q.vocabIds){const w=C.words.find(w=>w.id===id);if(w&&!w.card_ids.includes(q.id))w.card_ids.push(q.id);}
    q.associationKeys=q.associationKeys||[...q.vocabIds,...bindings(q).map(b=>b.item_id),'card:'+q.id];
    for(const b of bindings(q)){if(!items.has(b.item_id))items.set(b.item_id,{item_id:b.item_id,lesson_id:q.lessonId,item_type:b.item_id.startsWith('word:')?(q.topic==='numbers'?'number':'word'):b.item_id.startsWith('rule:')?'rule':'example',skills:{},card_ids:[]});const item=items.get(b.item_id);item.skills[b.skill_type]=key(b);if(!item.card_ids.includes(q.id))item.card_ids.push(q.id);}return q;}
  function hydrate(state,questions){

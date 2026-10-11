@@ -2,7 +2,17 @@
   'use strict';
   const scheduler=typeof module!=='undefined'&&module.exports?require('./scheduler.js'):root.ReviewScheduler;
   const config=typeof module!=='undefined'&&module.exports?require('./config.js'):root.TRAINER_CONFIG;
+  // Pure function; hot in lesson install and Knowledge.register (per word × per card). Memoize string inputs.
+  const normalizeMemo=new Map();
   function normalize(value,kind='text'){
+    if(typeof value!=='string')return normalizeRaw(value,kind);
+    const key=kind+'\u0000'+value,hit=normalizeMemo.get(key);
+    if(hit!==undefined)return hit;
+    const out=normalizeRaw(value,kind);
+    if(normalizeMemo.size>=50000)normalizeMemo.clear();
+    normalizeMemo.set(key,out);return out;
+  }
+  function normalizeRaw(value,kind){
     let s=String(value??'').normalize('NFC').toLocaleLowerCase('ru').trim();
     if(kind==='syllables')return s.replace(/[\s\u2010-\u2015/·.]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
     if(kind==='number-text')return s.replace(/\s+/g,'');
@@ -187,8 +197,8 @@
   }
   function chooseShortSession(items,records,now=Date.now(),limit=config.session.size,opts={}){
     items=(items||[]).filter(q=>q&&!q.contextOnly&&(opts.allowUsed||q.wordRole!=='used')&&!String(q.id||'').startsWith('learn-compose-')&&!assembleOnly(q)&&!letterBreakdownOnly(q));
-    const newLimit=Math.max(0,Number(config.session.newLimit)||0);
-    const isNew=q=>{const r=records&&records[q.id];return !(r&&r.seen);};
+    const newLimit=opts.newLimit!=null?Math.max(0,Number(opts.newLimit)||0):Math.max(0,Number(config.session.newLimit)||0);
+    const isNew=typeof opts.isNew==='function'?opts.isNew:(q=>{const r=records&&records[q.id];return !(r&&r.seen);});
     const errors=items.filter(q=>records[q.id]?.needsReview);
     const due=items.filter(q=>!records[q.id]?.needsReview&&isDue(records[q.id],now)).sort((a,b)=>(records[a.id].dueAt||0)-(records[b.id].dueAt||0));
     const fresh=items.filter(isNew);

@@ -33,6 +33,10 @@ function boot(session,grammarPath){
 }
 
 assert.equal(boot(null).root.LessonV2Runtime.installed.size,0,'fresh visitor loads no banks');
+function prefixIds(lessonId){
+  const idx=rows.findIndex(r=>r&&r.lesson_id===lessonId);
+  return rows.slice(0,idx+1).map(r=>r.lesson_id);
+}
 for(const [lessonId,mode] of [['4-1','course'],['4-2','homework']]){
   const row=rows.find(r=>r.lesson_id===lessonId);
   const queue=row.homework.exercise_ids.slice(0,20);
@@ -43,7 +47,10 @@ for(const [lessonId,mode] of [['4-1','course'],['4-2','homework']]){
   const before=JSON.stringify(session);
   const {ctx,root}=boot(session);
   assert.equal(ctx.valid,true,lessonId+' saved queue resolves after lazy hydration');
-  assert.equal(root.LessonV2Runtime.installed.size,1,'only the resumed lesson is loaded');
+  const expect=prefixIds(lessonId);
+  assert.equal(root.LessonV2Runtime.installed.size,expect.length,'resume hydrates the course prefix through '+lessonId+' so vocab card ids stay stable');
+  for(const id of expect)assert.ok(root.LessonV2Runtime.byId(id),id);
+  for(const id of rows.slice(expect.length).map(r=>r.lesson_id))assert.equal(root.LessonV2Runtime.byId(id),null,id+' stays lazy');
   assert.equal(ctx.position,1);
   assert.equal(ctx.queue[ctx.position],queue[1]);
   assert.equal(JSON.stringify(ctx.draft),JSON.stringify(session.draft),'draft and token retained');
@@ -54,5 +61,6 @@ for(const [lessonId,mode] of [['4-1','course'],['4-2','homework']]){
   console.log('PASS',lessonId,'cold reload restores queue, position and unfinished answer');
 }
 const path=boot({topic:'all',mode:'ordered',view:'path',queue:[],position:0},{lessonId:'4-1'});
-assert.equal(path.root.LessonV2Runtime.installed.size,1,'resumed theory hydrates only its lesson');
+assert.equal(path.root.LessonV2Runtime.installed.size,prefixIds('4-1').length,'resumed theory hydrates the course prefix through its lesson');
+assert.equal(path.root.LessonV2Runtime.byId('5-1'),null);
 console.log('VERIFY_V2_SESSION_RESUME_P0_OK');

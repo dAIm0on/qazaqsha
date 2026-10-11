@@ -692,17 +692,89 @@
  function prepareVocabPool(){
    if(vocabPoolReady)return;
    vocabPoolReady=true;
-   try{for(const raw of window.LESSON_V2_COMPILED||[]){const id=raw&&raw.lesson_id;if(id)ensureV2(id);}}catch(e){}
+   // Last lesson's prefix is the whole course. One ensureV2 syncs byId, hydrate and answerIndex once.
+   try{
+     const list=window.LESSON_V2_COMPILED||[];
+     const last=list.length?list[list.length-1]:null;
+     const id=last&&last.lesson_id;
+     if(id)ensureV2(id);
+   }catch(e){}
+ }
+ // §4.3: the tap on «Новые слова» must not install the whole course. After start-up the course is installed
+ // lesson by lesson in idle time, in the same order as the ensureV2 prefix, then prepareVocabPool() runs once.
+ // A tap before the warm-up ends finishes the remaining lessons synchronously, exactly as before.
+ function warmVocabPool(){
+   if(vocabPoolReady||typeof window.addEventListener!=='function')return;
+   const ids=(window.LESSON_V2_COMPILED||[]).map(raw=>raw&&raw.lesson_id).filter(Boolean);
+   const later=cb=>window.requestIdleCallback?window.requestIdleCallback(cb,{timeout:1500}):setTimeout(cb,30);
+   let i=0;
+   const step=()=>{
+     if(vocabPoolReady)return;
+     if(i<ids.length){ensureV2(ids[i++]);later(step);return;}
+     prepareVocabPool();
+   };
+   const start=()=>later(step);
+   if(document.readyState==='complete')start();else window.addEventListener('load',start,{once:true});
+ }
+ function mustCourseRank(q){
+   const lessons=window.LESSON_V2_COMPILED||[];
+   const li=lessons.findIndex(raw=>raw&&raw.lesson_id===q.lessonId);
+   const lessonRank=li<0?lessons.length:li;
+   let wordRank=100000;
+   const pack=window.LessonV2Runtime&&window.LessonV2Runtime.byId&&window.LessonV2Runtime.byId(q.lessonId);
+   const ids=pack&&pack.homework&&pack.homework.word_ids||[];
+   const bindings=pack&&pack.vocab_bindings||{};
+   const wanted=q.vocabIds||[];
+   for(let i=0;i<ids.length;i++){
+     const cat=bindings[ids[i]];
+     if(cat&&wanted.includes(cat)){wordRank=i;break;}
+   }
+   return lessonRank*100000+wordRank;
+ }
+ function mustRetrievability(q){
+   const rec=records[q.id];
+   if(!rec||!window.ReviewScheduler||typeof window.ReviewScheduler.retrievability!=='function')return null;
+   try{const v=window.ReviewScheduler.retrievability(rec,Date.now());return v==null||Number.isNaN(v)?null:v;}catch(e){return null;}
+ }
+ // Cards still in the plan are not an empty pool. Lower the pause until one fits.
+ // Do not open on the lemma just shown when another planned card can go first.
+ function relaxMustGap(ids,sitting,pool,core,minGap){
+   const VM=window.VocabMust;
+   if(!VM||!(ids&&ids.length))return [];
+   const byId=new Map((pool||[]).map(q=>[q.id,q]));
+   const lemOf=id=>core.lemmaKey(byId.get(id)||{id});
+   const recent=((sitting&&sitting.recent)||[]).map(x=>x.lemma||x.cardId);
+   const just=recent.length?recent[recent.length-1]:'';
+   for(let gap=(Number(minGap)||2)-1;gap>=1;gap--){
+     const passed=VM.enforceGap(ids,sitting,pool,core,gap);
+     if(!passed.length)continue;
+     const alt=just?passed.findIndex(id=>lemOf(id)!==just):-1;
+     if(alt>0)return passed.slice(alt).concat(passed.slice(0,alt));
+     return passed;
+   }
+   // enforceGap reads `minGap||2`, so the last step cannot ask it for a zero pause.
+   let older=null,olderDist=-1,same=null;
+   for(const id of ids){
+     const lem=lemOf(id);
+     let last=-1;
+     for(let i=0;i<recent.length;i++)if(recent[i]===lem)last=i;
+     const dist=last<0?recent.length+1:recent.length-1-last;
+     if(just&&lem===just){if(same==null)same=id;continue;}
+     if(older==null||dist>olderDist){older=id;olderDist=dist;}
+   }
+   const pick=older||same;
+   return pick?[pick]:[];
  }
  function beginMustPortion(fresh){
    const VM=window.VocabMust;if(!VM)return false;
    if(fresh||!vocabSitting){vocabSitting=VM.emptySitting(Date.now());vocabClosed=[];sessionCorrect=0;sessionAssisted=0;}
-   const loaded=questions.filter(q=>q&&q.topic==='vocab'&&q.wordRole==='must');
-   if(loaded.length<3)prepareVocabPool();
+   prepareVocabPool();
    const pool=mustPool();
-   const planned=VM.planPortion(pool,state,cfg,core,Date.now());
+   const planned=VM.planPortion(pool,state,cfg,core,Date.now(),{rank:mustCourseRank,retrievability:mustRetrievability});
    if(!planned.ids.length)return false;
-   const ids=VM.enforceGap(planned.ids,vocabSitting,pool,core,cfg.schedule.learningIntervening||2);
+   const minGap=cfg.schedule.learningIntervening||2;
+   let ids=VM.enforceGap(planned.ids,vocabSitting,pool,core,minGap);
+   if(!ids.length)ids=relaxMustGap(planned.ids,vocabSitting,pool,core,minGap);
    if(!ids.length)return false;
    sessionAttempts=0;sessionBlindFails=Object.create(null);sessionUnaided=Object.create(null);draft=null;presented=null;
    queue=ids;practiceIds=[...queue];queueEpoch=Date.now()+Math.random();trainerEpoch=(queueEpoch);
@@ -1388,7 +1460,12 @@
  function ensureV2(lessonId){
   try{
     if(!(window.LessonV2Runtime&&window.LessonV2Runtime.ensure&&lessonId))return;
-    window.LessonV2Runtime.ensure(lessonId);
+    // Vocab card ids depend on earlier lessons already being installed (taken / -hw-).
+    // Always install the course prefix first so a later lesson opened alone cannot change the must pool.
+    const list=window.LESSON_V2_COMPILED||[];
+    const idx=list.findIndex(raw=>raw&&raw.lesson_id===lessonId);
+    const ids=idx<0?[lessonId]:list.slice(0,idx+1).map(raw=>raw&&raw.lesson_id).filter(Boolean);
+    for(const id of ids){try{window.LessonV2Runtime.ensure(id);}catch(e){}}
     // Lazy install pushes into COURSE.questions; keep app byId / Knowledge in sync.
     let added=false;
     for(const q of course.questions){
@@ -1960,7 +2037,7 @@
      /* vocab:must return is planned once inside commitFirst; do not write a second FSRS row here */
    }else if(!homeworkMode&&mode!=='phrase'&&(sessionBlindFails[q.id]||0)<2&&lemmaSessionCount(q.id)<(cfg.schedule.learningSessionBlinds||3))core.scheduleRepeat(queue,position,q.id,rec.streak,[...practiceIds,...questions.filter(x=>eligible(x)&&records[x.id]?.seen&&x.id!==q.id).map(x=>x.id)].filter(id=>id!==q.id),{learning:day0,review:!day0,sessionBlinds:sessionUnaided[q.id]||0,lemmaAppearCap:cfg.schedule.learningSessionBlinds||3});
    const mate=window.MemoryPolicy&&window.MemoryPolicy.contrastSide(q);
-   if(!stageContext&&!bankRun&&mate&&!result.correct&&!hinted){
+   if(!stageContext&&!bankRun&&!isVocabMustTrainer()&&mate&&!result.correct&&!hinted){
      const other=questions.find(x=>x.id!==q.id&&window.MemoryPolicy.contrastSide(x)?.pair===mate.pair&&window.MemoryPolicy.contrastSide(x)?.side!==mate.side);
      if(other&&!queue.slice(position+1).includes(other.id))queue.splice(Math.min(position+4,queue.length),0,other.id);
    }
@@ -2776,9 +2853,11 @@
    if(trainerReturn){
      const returnKind=trainerReturn;
      if(isVocabMustTrainer()&&window.VocabMust){
-       const t=window.VocabMust.recount(state,vocabSitting||{});
-       $('#exercise').innerHTML='<div class="empty-state"><h2>Можно продолжить</h2><p>Самостоятельно: '+t.unaided+'. С подсказкой: '+t.assisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё слова</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
-     }else $('#exercise').innerHTML='<div class="empty-state"><h2>Подход завершён</h2><p>Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё подход</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
+       $('#exercise').innerHTML='<div class="empty-state"><h2>Все слова пройдены</h2><div class="finish-actions"><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
+       $('#back-to-learning').onclick=()=>{trainerReturn=null;showView('personal');if(window.PersonalTrainers&&window.PersonalTrainers.openCatalog)window.PersonalTrainers.openCatalog();};
+       save();return;
+     }
+     $('#exercise').innerHTML='<div class="empty-state"><h2>Подход завершён</h2><p>Самостоятельно: '+sessionCorrect+' из '+sessionAttempts+'. С подсказкой: '+sessionAssisted+'.</p><div class="finish-actions"><button type="button" class="primary-button" id="restart">Ещё подход</button><button type="button" class="secondary-button" id="back-to-learning">К тренажёрам</button></div></div>';
      $('#restart').onclick=()=>startCatalogTrainer(returnKind);
      $('#back-to-learning').onclick=()=>{trainerReturn=null;showView('personal');if(window.PersonalTrainers&&window.PersonalTrainers.openCatalog)window.PersonalTrainers.openCatalog();};
      save();return;
@@ -2821,15 +2900,10 @@
    const limit=Math.max(2,(cfg.session.size||10)+(cfg.session.newLimit||0));
    let list;
    if(role==='must'){
-     // due/needsReview first, reserved NEW (newLimit), then learning — not pure random
-     list=core.chooseShortSession(pool,records,Date.now(),limit);
-     if(list.length<limit){
-       const have=new Set(list.map(q=>q.id));
-       const fillers=pool.filter(q=>!have.has(q.id));
-       const more=window.Knowledge&&window.Knowledge.choose?window.Knowledge.choose(shuffled(fillers),state,limit-list.length):shuffled(fillers).slice(0,limit-list.length);
-       list=list.concat(more);
-     }
-     if(window.Knowledge&&window.Knowledge.choose)list=window.Knowledge.choose(list,state,limit);
+     prepareVocabPool();
+     const full=questions.filter(q=>eligible(q)&&q.topic==='vocab'&&q.wordRole==='must');
+     if(window.VocabMust)return window.VocabMust.planPortion(full,state,cfg,core,Date.now(),{rank:mustCourseRank,retrievability:mustRetrievability}).ids;
+     return [];
    }else{
      list=window.Knowledge&&window.Knowledge.choose?window.Knowledge.choose(shuffled(pool),state,Infinity):shuffled(pool);
      const recognize=shuffled(list.filter(q=>/-ru$/.test(q.id)));
@@ -3402,6 +3476,7 @@
  }catch(e){}
  if(savedSession&&savedSession.mode==='lesson'&&String(savedSession.activeLesson||'').startsWith(HW_WORDS_PREFIX))homeworkWordsTrack(String(savedSession.activeLesson).slice(HW_WORDS_PREFIX.length));
  if(savedSession&&savedSession.mode==='words'&&savedSession.trainerReturn==='vocab:must'&&typeof prepareVocabPool==='function')prepareVocabPool();
+ if(typeof warmVocabPool==='function')warmVocabPool();
  const validSaved=savedSession&&topics.some(t=>t[0]===savedSession.topic)&&['ordered','shuffle','mistakes','smart','review','lesson','course','phrase','transfer','contrast','numbers','remediation','words','exam','homework','chunks'].includes(savedSession.mode)&&Array.isArray(savedSession.queue)&&savedSession.queue.every(id=>byId.has(id))&&Number.isInteger(savedSession.position)&&savedSession.position>=0&&savedSession.position<=savedSession.queue.length&&(!savedSession.sourceFilter||course.sources[savedSession.sourceFilter])&&(savedSession.mode!=='lesson'||window.LEARNING.lessons.some(l=>l.id===savedSession.activeLesson));
  if(validSaved){
    variants=savedSession.variants||{};
