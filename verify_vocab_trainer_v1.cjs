@@ -417,19 +417,22 @@ for(const id of ['High','Low','Mature'])fillerState.records[id]={review_count:2,
 const fillerPlan=VM.planPortion(fillerPool,fillerState,cfg,core,1000,{retrievability:q=>q.id==='Low'?0.1:q.id==='High'?0.9:null});
 assert.equal(fillerPlan.plan.nNew,2);
 assert.deepEqual(fillerPlan.plan.newLemmas,['word:n3','word:n1']);
+// N2 has no answer of its own, so the filler cannot take it. The new-word cap already left it out.
 assert.ok(!fillerPlan.ids.includes('N2'));
 assert.ok(fillerPlan.ids.indexOf('Low')>=0&&fillerPlan.ids.indexOf('Low')<fillerPlan.ids.indexOf('High'));
 assert.ok(fillerPlan.ids.indexOf('High')<fillerPlan.ids.indexOf('Mature'));
 
 // P0-FILLER-CARD-HISTORY: a -ru card with no answer of its own stays out.
-// The -kk sibling is mature and not due, so it can enter only as filler.
+// nolKk's first recorded answer is today, so the other direction stays buried.
+// nolKk is mature and not due, so it can enter only as filler.
 function dirCard(id,lemma,skill){
   return {id,topic:'vocab',wordRole:'must',kind:'fields',title:'t',stimulus:id,fields:[{answers:[id+'к'],kind:'text'}],vocabIds:[lemma],skillBindings:[{item_id:lemma,skill_type:skill,field:0}]};
 }
 const nolRu=dirCard('v2-1-2-vocab-nol-ru','word:nol','recognition');
 const nolKk=dirCard('v2-1-2-vocab-nol-kk','word:nol','production');
 const fillerHist=state();
-fillerHist.records[nolKk.id]={review_count:5,seen:5,needsReview:false,streak:5,next_review:999999999,dueAt:999999999};
+fillerHist.records[nolKk.id]={review_count:1,seen:1,needsReview:false,streak:5,next_review:999999999,dueAt:999999999,last_answer:1000};
+fillerHist.events=[{type:'answer',card_id:nolKk.id,at:1000}];
 const fillerOwn=VM.planPortion([nolRu,nolKk,card('hw1-1-kk','word:h1'),card('hw1-2-kk','word:h2'),card('hw1-3-kk','word:h3')],fillerHist,cfg,core,1000);
 assert.ok(!fillerOwn.ids.includes(nolRu.id),'P0-FILLER-CARD-HISTORY');
 assert.ok(fillerOwn.ids.includes(nolKk.id),'P0-FILLER-CARD-HISTORY');
@@ -458,6 +461,138 @@ assert.deepEqual(gapIds,[],'P0-GAP');
     seq.push(lem);
   }
 }
+function bind(id,lemma,skill){
+  const q=card(id,lemma);
+  q.skillBindings=[{item_id:lemma,skill_type:skill,field:0}];
+  return q;
+}
+function rec(patch){return Object.assign({review_count:1,seen:1,needsReview:false,streak:1,last_answer:1},patch);}
+const DAY=86400000;
+const dayNow=new Date(2026,9,11,12,0,0).getTime();
+const earlyCard=bind('hw-early','word:due','production');
+const lateCard=bind('bank-late','word:due','production');
+const dueState=state();
+dueState.records[earlyCard.id]=rec({next_review:dayNow-1000,dueAt:dayNow-1000,last_answer:dayNow-DAY});
+dueState.records[lateCard.id]=rec({next_review:dayNow+5000,dueAt:dayNow+5000,last_answer:dayNow-2*DAY});
+const duePlan=VM.planPortion([lateCard,earlyCard],dueState,cfg,core,dayNow);
+assert.deepEqual(duePlan.ids,[earlyCard.id]);
+assert.equal(duePlan.plan.nNew,0);
+const snapBefore=JSON.stringify(dueState.records);
+VM.planPortion([lateCard,earlyCard],dueState,cfg,core,dayNow);
+assert.equal(JSON.stringify(dueState.records),snapBefore);
+
+const far=bind('g-far','word:syn','production');
+const overdue=bind('g-over','word:syn','recognition');
+const loss=state();
+loss.records[far.id]=rec({next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY,last_answer:dayNow-5*DAY});
+loss.records[overdue.id]=rec({next_review:dayNow-3*DAY,dueAt:dayNow-3*DAY,needsReview:false,last_answer:dayNow-4*DAY});
+loss.skills['word:syn::production']={review_count:1,item_id:'word:syn',skill_type:'production',next_review:dayNow+5*DAY};
+const farSkill=JSON.stringify(loss.skills['word:syn::production']);
+const farRec=JSON.stringify(loss.records[far.id]);
+const lossPlan=VM.planPortion([far,overdue],loss,cfg,core,dayNow);
+assert.deepEqual(lossPlan.ids,[overdue.id]);
+assert.equal(JSON.stringify(loss.records[far.id]),farRec);
+assert.equal(JSON.stringify(loss.skills['word:syn::production']),farSkill);
+VM.commitFirst({state:loss,records:loss.records,q:overdue,now:dayNow,sessionId:'syn',presentation:0,kind:'good',answers:['ok'],elapsed:4,core,observe:()=>[],queue:[overdue.id],position:0,pool:[far,overdue],plan:lossPlan.plan,sitting:VM.emptySitting(dayNow),rating:F.Rating.Good,errors:[],result:{correct:true,parts:[true]},budget:lossPlan.plan.budget,minGap:2,appearCap:3,hinted:false,recall:true});
+assert.equal(JSON.stringify(loss.records[far.id]),farRec);
+assert.equal(JSON.stringify(loss.skills['word:syn::production']),farSkill);
+
+const kkOnly=bind('hw-kk','word:dir','production');
+const ruOnly=bind('v-ru','word:dir','recognition');
+const dirState=state();
+dirState.records[kkOnly.id]=rec({next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY,last_answer:dayNow-DAY});
+dirState.records[ruOnly.id]=rec({next_review:dayNow-DAY,dueAt:dayNow-DAY,last_answer:dayNow-2*DAY});
+const dirPlan=VM.planPortion([kkOnly,ruOnly],dirState,cfg,core,dayNow);
+assert.deepEqual(dirPlan.ids,[ruOnly.id]);
+
+const bury=state();
+bury.records[kkOnly.id]=rec({next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY,last_answer:dayNow});
+bury.events=[{type:'answer',card_id:kkOnly.id,at:dayNow}];
+const buried=VM.planPortion([kkOnly,ruOnly],bury,cfg,core,dayNow);
+assert.ok(buried.ids.includes(kkOnly.id));
+assert.ok(!buried.ids.includes(ruOnly.id));
+assert.ok(!buried.plan.newLemmas.includes('word:dir'));
+
+function vocabFn(name,next){
+  const src=fs.readFileSync(path.join(__dirname,'vocab-must.js'),'utf8');
+  const start=src.indexOf('function '+name+'(');
+  const end=src.indexOf('\n function '+next+'(');
+  assert.ok(start>=0&&end>start,name);
+  return new Function(src.slice(start,end)+'\nreturn '+name+';')();
+}
+const n1kk=bind('w-kk','word:n1dir','production');
+const n1ru=bind('w-ru','word:n1dir','recognition');
+const n1Yesterday=state();
+n1Yesterday.records[n1kk.id]=rec({next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY,last_answer:dayNow-DAY,review_count:1});
+n1Yesterday.events=[{type:'answer',card_id:n1kk.id,at:dayNow-DAY}];
+const n1Next=VM.planPortion([n1kk,n1ru],n1Yesterday,cfg,core,dayNow);
+assert.ok(n1Next.ids.includes(n1ru.id),'N1-SECOND-DIR-NEXT-DAY');
+assert.ok(!n1Next.plan.newLemmas.includes('word:n1dir'),'N1-SECOND-DIR-NEXT-DAY');
+const n1Today=state();
+n1Today.records[n1kk.id]=rec({next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY,last_answer:dayNow,review_count:1});
+n1Today.events=[{type:'answer',card_id:n1kk.id,at:dayNow}];
+const n1Same=VM.planPortion([n1kk,n1ru],n1Today,cfg,core,dayNow);
+assert.ok(!n1Same.ids.includes(n1ru.id),'N1-SECOND-DIR-NEXT-DAY');
+
+const answerDir=vocabFn('answerDir','groupKeyOf');
+const genA={id:'gen-a',topic:'vocab',wordRole:'must',kind:'fields',title:'t',stimulus:'gen-a',fields:[{answers:['а'],kind:'text',answerLang:'ru'}],vocabIds:['word:gen'],skillBindings:[{item_id:'word:gen',skill_type:'recognition',field:0}]};
+const genB={id:'gen-b',topic:'vocab',wordRole:'must',kind:'fields',title:'t',stimulus:'gen-b',fields:[{answers:['б'],kind:'text'}],vocabIds:['word:gen'],skillBindings:[{item_id:'word:gen',skill_type:'production',field:0}]};
+assert.equal(answerDir(core,genB),'unknown','P1-UNKNOWN-NOT-BURIED');
+const unkState=state();
+unkState.records[genA.id]=rec({next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY,last_answer:dayNow,review_count:1});
+unkState.events=[{type:'answer',card_id:genA.id,at:dayNow}];
+const unkPlan=VM.planPortion([genA,genB],unkState,cfg,core,dayNow);
+assert.ok(unkPlan.ids.includes(genB.id),'P1-UNKNOWN-NOT-BURIED');
+assert.ok(!unkPlan.plan.newLemmas.includes('word:gen'),'P1-UNKNOWN-NOT-BURIED');
+
+function barePair(id){
+  return {id,topic:'vocab',wordRole:'must',kind:'fields',title:'t',stimulus:id,fields:[{answers:[id],kind:'text'}],vocabIds:['word:own'],skillBindings:[{item_id:'exercise:shared',skill_type:'application',field:0}]};
+}
+const ownWait=barePair('hw-wait');
+const ownOver=barePair('bank-over');
+const groupKeyOf=vocabFn('groupKeyOf','idClass');
+assert.notEqual(groupKeyOf(ownWait),groupKeyOf(ownOver),'P1-FALLBACK-GROUP-OWN');
+assert.equal(groupKeyOf(ownOver),'exercise:'+ownOver.id,'P1-FALLBACK-GROUP-OWN');
+const ownState=state();
+ownState.records[ownWait.id]=rec({next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY,last_answer:dayNow-5*DAY});
+ownState.records[ownOver.id]=rec({next_review:dayNow-3*DAY,dueAt:dayNow-3*DAY,last_answer:dayNow-4*DAY});
+const ownSnap=JSON.stringify(ownState.records[ownWait.id]);
+const ownPlan=VM.planPortion([ownWait,ownOver],ownState,cfg,core,dayNow);
+assert.deepEqual(ownPlan.ids,[ownOver.id],'P1-FALLBACK-GROUP-OWN');
+assert.equal(JSON.stringify(ownState.records[ownWait.id]),ownSnap,'P1-FALLBACK-GROUP-OWN');
+
+function legacyPlan(setup){
+  const kk=bind('leg-kk','word:leg','production');
+  const ru=bind('leg-ru','word:leg','recognition');
+  const st=state();
+  setup(st,kk);
+  return VM.planPortion([kk,ru],st,cfg,core,dayNow);
+}
+const legacyA=legacyPlan((st,kk)=>{st.records[kk.id]=rec({review_count:5,last_answer:dayNow,next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY,streak:5});});
+assert.ok(legacyA.ids.includes('leg-ru'),'P1-LEGACY-LAST-ANSWER a');
+const legacyB=legacyPlan((st,kk)=>{
+  st.records[kk.id]=rec({review_count:5,last_answer:dayNow,next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY,streak:5});
+  st.events=[{type:'answer',card_id:kk.id,at:dayNow}];
+});
+assert.ok(legacyB.ids.includes('leg-ru'),'P1-LEGACY-LAST-ANSWER b');
+const legacyC=legacyPlan((st,kk)=>{
+  st.records[kk.id]=rec({review_count:2,next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY,streak:5});
+  delete st.records[kk.id].last_answer;
+});
+assert.ok(legacyC.ids.includes('leg-ru'),'P1-LEGACY-LAST-ANSWER c');
+const legacyCtrl=legacyPlan((st,kk)=>{
+  st.records[kk.id]=rec({review_count:1,last_answer:dayNow,next_review:dayNow+5*DAY,dueAt:dayNow+5*DAY});
+  st.events=[{type:'answer',card_id:kk.id,at:dayNow}];
+});
+assert.ok(!legacyCtrl.ids.includes('leg-ru'),'P1-LEGACY-LAST-ANSWER control');
+
+const many=[bind('bank-9-kk','word:many','production'),bind('learn-word-4','word:many','production'),bind('v2-x','word:many','production'),bind('hw9-1-kk','word:many','production'),bind('other','word:many','production')];
+const manyPlan=VM.planPortion(many,state(),cfg,core,dayNow);
+assert.deepEqual(manyPlan.ids,['hw9-1-kk']);
+assert.equal(new Set(manyPlan.ids.map(id=>core.lemmaKey(many.find(q=>q.id===id)))).size,manyPlan.ids.length);
+
+const table=[['hw1-1-kk-rev','ru'],['hw2-22-kk-rev','ru'],['v2-4-1-vocab-also-kk-set','kk'],['v2-4-2-vocab-qalaisyn-kk-form-1','kk'],['hw3-17-ru','ru'],['hw3-19-ru','ru'],['hw3-8-ru','ru'],['hw3-8-kk','kk'],['learn-word-3','kk'],['learn-word-3-ru','ru'],['bank-8-kk','kk'],['bank-8-ru','ru']];
+for(const [id,lang] of table)assert.equal(core.answerLang({id,title:'Напиши все формы'}),lang,id);
 
 // P0-GAP-NOT-EXHAUSTED: 1–2 just-shown cards must not paint «Все слова пройдены».
 // Mutation: put `return false` back on the empty enforceGap branch and this fails.
@@ -702,10 +837,12 @@ function bootMust(first,how){
     'const lemmas=new Set(pool.map(q=>window.TrainerCore.lemmaKey(q))).size;',
     'const vocabIds=new Set(pool.flatMap(q=>q.vocabIds||[])).size;',
     'const foreign=pool.filter(q=>!q||q.topic!=="vocab"||q.wordRole!=="must").length;',
-    '({partial,ids,lemmas,vocabIds,foreign,ready:vocabPoolReady,guard});'
+    how==='live'?'({partial,ids,lemmas,vocabIds,foreign,ready:vocabPoolReady,pool,questions,live:window,guard});':'({partial,ids,lemmas,vocabIds,foreign,ready:vocabPoolReady,guard});'
   ].join('\n');
   const result=vm.runInContext(body,ctx,{filename:'product-must-pool.js'});
-  return {partial:[...result.partial],ids:[...result.ids],lemmas:result.lemmas,vocabIds:result.vocabIds,foreign:result.foreign,ready:result.ready,guard:result.guard};
+  const out={partial:[...result.partial],ids:[...result.ids],lemmas:result.lemmas,vocabIds:result.vocabIds,foreign:result.foreign,ready:result.ready,guard:result.guard};
+  if(how==='live'){out.pool=result.pool;out.questions=result.questions;out.live=result.live;}
+  return out;
 }
 const freshPool=bootMust(null);
 const after32=bootMust('3-2');
@@ -739,5 +876,126 @@ assert.equal(lessonGuard.guard&&lessonGuard.guard.same,true,'P2-WARM-SAFE');
 assert.equal(lessonGuard.guard.saves,0,'P2-WARM-SAFE');
 assert.ok(lessonGuard.guard.n>=3,'P2-WARM-SAFE');
 console.log('P2-WARM-SAFE ok cards',lessonGuard.guard.n,'saves',lessonGuard.guard.saves);
+
+const product=bootMust(null,'live');
+const livePool=product.pool.filter(q=>q&&q.wordRole!=='used');
+const KnowledgeLive=product.live.Knowledge;
+for(const q of product.questions){if(q&&q.topic==='vocab'&&!q.skillBindings){try{KnowledgeLive.register(q);}catch(e){}}}
+const hw=product.questions.find(q=>q.id==='hw31-02-kk');
+const bank=product.questions.find(q=>q.id==='bank-8-kk');
+assert.ok(hw&&bank);
+const hwKeys=KnowledgeLive.bindings(hw).map(b=>KnowledgeLive.key?KnowledgeLive.key(b):b.item_id+'::'+b.skill_type);
+const bankKeys=KnowledgeLive.bindings(bank).map(b=>KnowledgeLive.key?KnowledgeLive.key(b):b.item_id+'::'+b.skill_type);
+const shared=hwKeys.find(k=>k.startsWith('word:')&&bankKeys.includes(k));
+assert.ok(shared,hwKeys.join(',')+' vs '+bankKeys.join(','));
+const pairState={records:Object.create(null),skills:Object.create(null),events:[]};
+pairState.skills[shared]={review_count:2,next_review:dayNow+1000,needsReview:false,streak:2,mastery_level:'LEARNING',item_id:shared.split('::')[0],skill_type:shared.split('::')[1]};
+KnowledgeLive.sync(pairState,[hw,bank]);
+assert.equal(pairState.records[hw.id].next_review,dayNow+1000);
+assert.equal(pairState.records[bank.id].next_review,dayNow+1000);
+const pairPlan=VM.planPortion([Object.assign({},hw,{wordRole:'must'}),Object.assign({},bank,{wordRole:'must'})],pairState,cfg,core,dayNow);
+assert.equal(pairPlan.ids.length,1);
+assert.ok(pairPlan.ids[0].startsWith('hw'));
+
+const rankOf=lesson=>{const m=String(lesson||'').match(/^(\d+)-(\d+)$/);return m?Number(m[1])*100+Number(m[2]):9999;};
+const s2Now=new Date(2026,9,11,12,0,0).getTime();
+const s2={records:Object.create(null),skills:Object.create(null),events:[],now:s2Now,seed:null};
+const Sched=product.live.ReviewScheduler;
+for(const q of livePool){
+  if(rankOf(q.lessonId)>303)continue;
+  let r=Sched.answer({},{at:s2Now-5*DAY,correct:true,hinted:false,recall:true});
+  r=Sched.answer(r,{at:s2Now-3*DAY,correct:true,hinted:false,recall:true});
+  s2.records[q.id]=r;
+}
+product.live.localStorage.setItem('qazaq-s2-pr3',JSON.stringify({now:s2.now,seed:s2.seed,records:s2.records}));
+const loaded=JSON.parse(product.live.localStorage.getItem('qazaq-s2-pr3'));
+assert.equal(loaded.now,s2Now);
+assert.equal(loaded.seed,null);
+const s2State={records:loaded.records,skills:{},events:[]};
+// P2: S2 starts with real skill keys, so the «skills survive» check below is not empty.
+for(const q of livePool){
+  if(Object.keys(s2State.skills).length>=8)break;
+  if(!s2State.records[q.id])continue;
+  for(const b of KnowledgeLive.bindings(q)){
+    const k=KnowledgeLive.key?KnowledgeLive.key(b):b.item_id+'::'+b.skill_type;
+    if(!k.startsWith('word:')||s2State.skills[k])continue;
+    s2State.skills[k]={review_count:2,next_review:s2Now+2*DAY,needsReview:false,streak:2,mastery_level:'LEARNING',item_id:b.item_id,skill_type:b.skill_type};
+  }
+}
+const s2SkillKeys=Object.keys(s2State.skills);
+assert.ok(s2SkillKeys.length>=5,'S2 skills seeded: '+s2SkillKeys.length);
+const s2RecordKeys=Object.keys(s2State.records);
+const s2Portions=[];
+let s2Clock=s2Now;
+for(let pass=0;pass<3;pass++){
+  const portion=VM.planPortion(livePool,s2State,cfg,core,s2Clock);
+  s2Portions.push(portion.ids.slice());
+  const lemmas=portion.ids.map(id=>core.lemmaKey(livePool.find(q=>q.id===id)||{id}));
+  assert.equal(new Set(lemmas).size,lemmas.length);
+  for(const id of portion.ids){
+    if(!String(id).startsWith('bank-'))continue;
+    const lem=core.lemmaKey(livePool.find(q=>q.id===id)||{id});
+    assert.ok(!portion.plan.newLemmas.includes(lem),id);
+  }
+  const before={};
+  for(const id of portion.ids)before[id]=Number((s2State.records[id]||{}).review_count)||0;
+  portion.ids.forEach((id,i)=>{
+    const q=livePool.find(x=>x.id===id);
+    VM.commitFirst({state:s2State,records:s2State.records,q,now:s2Clock,sessionId:'s2',presentation:pass*100+i,kind:'good',answers:['ok'],elapsed:4,core,observe:(s,card,result,event,errors,trainer)=>KnowledgeLive.observe(s,card,result,event,errors,Object.assign({},trainer,{must:true})),queue:portion.ids,position:i,pool:livePool,plan:portion.plan,sitting:VM.emptySitting(s2Clock),rating:F.Rating.Good,errors:[],result:{correct:true,parts:[true]},budget:portion.plan.budget,minGap:2,appearCap:3,hinted:false,recall:true});
+    s2Clock+=10*60*1000;
+  });
+  KnowledgeLive.sync(s2State,livePool);
+  for(const id of portion.ids)assert.ok(Number((s2State.records[id]||{}).review_count)>before[id],id);
+}
+assert.notDeepEqual(s2Portions[1],s2Portions[0]);
+assert.notDeepEqual(s2Portions[2],s2Portions[0]);
+for(const key of s2RecordKeys)assert.ok(Object.prototype.hasOwnProperty.call(s2State.records,key),key);
+for(const key of s2SkillKeys)assert.ok(Object.prototype.hasOwnProperty.call(s2State.skills,key),key);
+
+// P0-KK-REV-DIR: -kk-rev answers in Russian. A first answer today on hw1-1-kk-rev
+// buries hw1-1-kk (the other direction) until tomorrow. Old regex (-kk-rev → kk) fails here.
+assert.equal(core.answerLang({id:'hw1-1-kk-rev'}),'ru');
+assert.equal(core.answerLang({id:'hw1-1-kk'}),'kk');
+const revQ=livePool.find(q=>q.id==='hw1-1-kk-rev');
+const revKk=livePool.find(q=>q.id==='hw1-1-kk');
+assert.ok(revQ&&revKk,'hw1-1 pair in live pool');
+assert.equal(core.lemmaKey(revQ),core.lemmaKey(revKk));
+const revPool=[revQ,revKk];
+const revState={records:Object.create(null),skills:Object.create(null),events:[]};
+const revStart=VM.planPortion(revPool,revState,cfg,core,dayNow);
+const revFirst=revPool.find(q=>q.id==='hw1-1-kk-rev');
+VM.commitFirst({state:revState,records:revState.records,q:revFirst,now:dayNow,sessionId:'rev',presentation:0,kind:'good',answers:['Человек'],elapsed:4,core,observe:(s,card,result,event,errors,trainer)=>KnowledgeLive.observe(s,card,result,event,errors,Object.assign({},trainer,{must:true})),queue:[revFirst.id],position:0,pool:revPool,plan:revStart.plan,sitting:VM.emptySitting(dayNow),rating:F.Rating.Good,errors:[],result:{correct:true,parts:[true]},budget:revStart.plan.budget,minGap:2,appearCap:3,hinted:false,recall:true});
+KnowledgeLive.sync(revState,revPool);
+assert.ok(Number((revState.records[revQ.id]||{}).review_count)>0,'rev answered');
+// +5 min: the rev card is not due yet, so only the bury keeps hw1-1-kk out.
+const revSameDay=VM.planPortion(revPool,revState,cfg,core,dayNow+5*60*1000);
+assert.ok(!revSameDay.ids.includes('hw1-1-kk'),'P0-KK-REV-DIR same day: '+revSameDay.ids.join(','));
+// Second good answer after the learning step pushes the rev card past tomorrow.
+const revAt2=dayNow+20*60*1000;
+const revPlan2=VM.planPortion(revPool,revState,cfg,core,revAt2);
+assert.ok(!revPlan2.ids.includes('hw1-1-kk'),'P0-KK-REV-DIR same day 2: '+revPlan2.ids.join(','));
+VM.commitFirst({state:revState,records:revState.records,q:revFirst,now:revAt2,sessionId:'rev2',presentation:0,kind:'good',answers:['Человек'],elapsed:4,core,observe:(s,card,result,event,errors,trainer)=>KnowledgeLive.observe(s,card,result,event,errors,Object.assign({},trainer,{must:true})),queue:[revFirst.id],position:0,pool:revPool,plan:revPlan2.plan,sitting:VM.emptySitting(revAt2),rating:F.Rating.Good,errors:[],result:{correct:true,parts:[true]},budget:revPlan2.plan.budget,minGap:2,appearCap:3,hinted:false,recall:true});
+KnowledgeLive.sync(revState,revPool);
+assert.ok(revState.records[revQ.id].next_review>dayNow+DAY,'rev not due tomorrow');
+const revNextDay=VM.planPortion(revPool,revState,cfg,core,dayNow+DAY);
+assert.ok(revNextDay.ids.includes('hw1-1-kk'),'P0-KK-REV-DIR next day: '+revNextDay.ids.join(','));
+
+const kkSet=livePool.filter(q=>/-kk-set$/.test(q.id));
+const kkForm=livePool.filter(q=>/-kk-form-\d+$/.test(q.id));
+assert.equal(kkSet.length,7);
+assert.equal(kkForm.length,4);
+const mismatches=[];
+for(const q of livePool){
+  const lang=core.answerLang(q);
+  const word=(q.skillBindings||[]).find(b=>b&&String(b.item_id||'').startsWith('word:'));
+  if(!word)continue;
+  const expect=lang==='kk'?'production':lang==='ru'?'recognition':null;
+  const numbers=word.skill_type==='digit_to_word'||word.skill_type==='word_to_digit';
+  if(!expect||numbers)continue;
+  if(word.skill_type!==expect)mismatches.push(q.id+' '+lang+' '+word.skill_type);
+}
+console.log('answerLang mismatches',mismatches.length);
+assert.ok(!mismatches.some(m=>/-kk-rev /.test(m)),'kk-rev mismatches');
+if(mismatches.length)console.log(mismatches.join('\n'));
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');

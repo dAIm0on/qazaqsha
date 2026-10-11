@@ -79,6 +79,145 @@
    const any=()=>(pool||[]).some(q=>card(q)||lemma(lk(q)));
    return {lk,card,lemma,any};
  }
+ function answerDir(core,q){
+   if(core&&typeof core.answerLang==='function')return core.answerLang(q);
+   const binds=q&&q.skillBindings||[];
+   const b=binds.find(x=>x&&String(x.item_id||'').startsWith('word:'))||binds[0];
+   if(!b)return 'unknown';
+   if(b.skill_type==='production'||b.skill_type==='digit_to_word')return 'kk';
+   if(b.skill_type==='recognition'||b.skill_type==='word_to_digit')return 'ru';
+   return 'unknown';
+ }
+ function groupKeyOf(q){
+   const binds=q&&q.skillBindings||[];
+   const word=binds.find(b=>b&&String(b.item_id||'').startsWith('word:'));
+   if(word)return word.item_id+'::'+word.skill_type;
+   return 'exercise:'+(q&&q.id);
+ }
+ function idClass(id){
+   id=String(id||'');
+   if(id.startsWith('hw'))return 0;
+   if(id.startsWith('learn-word-'))return 1;
+   if(id.startsWith('bank-'))return 3;
+   return 2;
+ }
+ // True only when every recorded answer is today and the event log covers each card's review_count.
+ // A missing earlier mark, a truncated log, or no timestamps at all means the first answer was not today.
+ function firstAnsweredToday(lemma,cards,state,now){
+   const ids=new Set((cards||[]).map(q=>q.id));
+   const day=new Date(Number(now));
+   if(!Number.isFinite(day.getTime()))return {today:false,dirCard:null};
+   day.setHours(0,0,0,0);
+   const day0=day.getTime();
+   let history=false,timed=false,older=false,truncated=false;
+   const eventCount=new Map();
+   let best=null,bestAt=null;
+   for(const e of (state&&state.events)||[]){
+     if(!e||e.type!=='answer'||!ids.has(e.card_id))continue;
+     history=true;
+     eventCount.set(e.card_id,(eventCount.get(e.card_id)||0)+1);
+     const t=Number(e.at);
+     if(!(Number.isFinite(t)&&t>0))continue;
+     timed=true;
+     if(t<day0)older=true;
+     const q=(cards||[]).find(c=>c.id===e.card_id);
+     if(!q)continue;
+     if(bestAt==null||t<bestAt||(t===bestAt&&String(q.id)<String(best.id))){bestAt=t;best=q;}
+   }
+   for(const q of cards||[]){
+     const r=state&&state.records&&state.records[q.id];
+     if(!(r&&Number(r.review_count)>0))continue;
+     history=true;
+     if(Number(r.review_count)>(eventCount.get(q.id)||0))truncated=true;
+     const t=Number(r.last_answer);
+     if(Number.isFinite(t)&&t>0){timed=true;if(t<day0)older=true;}
+   }
+   if(state&&state.skills)for(const [k,sk] of Object.entries(state.skills)){
+     if(!(sk&&Number(sk.review_count)>0))continue;
+     if(!(k===lemma||String(k).startsWith(lemma+'::')))continue;
+     history=true;
+     const t=Number(sk.last_answer);
+     if(Number.isFinite(t)&&t>0){timed=true;if(t<day0)older=true;}
+   }
+   const today=!!(history&&timed&&!older&&!truncated);
+   return {today,dirCard:today?best:null};
+ }
+ function representative(cards,records,H){
+   const hist=cards.filter(q=>H.card(q));
+   const list=(hist.length?hist:cards).slice();
+   list.sort((a,b)=>{
+     if(hist.length){
+       const ar=records[a.id]||{},br=records[b.id]||{};
+       const an=!!ar.needsReview,bn=!!br.needsReview;
+       if(an!==bn)return an?-1:1;
+       const ad=Number(ar.next_review),bd=Number(br.next_review);
+       const af=Number.isFinite(ad),bf=Number.isFinite(bd);
+       if(af!==bf)return af?-1:1;
+       if(af&&ad!==bd)return ad-bd;
+       const al=Number(ar.last_answer)||0,bl=Number(br.last_answer)||0;
+       if(al!==bl)return bl-al;
+     }
+     const pa=idClass(a.id),pb=idClass(b.id);
+     if(pa!==pb)return pa-pb;
+     return String(a.id)<String(b.id)?-1:String(a.id)>String(b.id)?1:0;
+   });
+   return list[0]||null;
+ }
+ function lemmaRepresentative(lem,cards,state,records,H,core,now){
+   const groups=new Map();
+   for(const q of cards||[]){
+     const key=groupKeyOf(q);
+     let g=groups.get(key);
+     if(!g)groups.set(key,g={key,cards:[],dir:answerDir(core,q)});
+     g.cards.push(q);
+   }
+   const built=[];
+   for(const g of groups.values()){
+     let earliest=null,needs=false,lastAnswer=null,any=false;
+     for(const q of g.cards){
+       if(!H.card(q))continue;
+       any=true;
+       const r=records[q.id]||{};
+       if(r.needsReview)needs=true;
+       const nr=Number(r.next_review);
+       if(Number.isFinite(nr)&&(earliest==null||nr<earliest))earliest=nr;
+       const la=Number(r.last_answer);
+       if(Number.isFinite(la)&&(lastAnswer==null||la>lastAnswer))lastAnswer=la;
+     }
+     built.push({key:g.key,cards:g.cards,dir:g.dir,earliest,needs,lastAnswer,any});
+   }
+   if(!built.length)return null;
+   const started=H.lemma(lem);
+   const first=started?firstAnsweredToday(lem,cards,state,now):{today:false,dirCard:null};
+   const firstDir=first.dirCard?answerDir(core,first.dirCard):'unknown';
+   const buried=new Set();
+   if(started&&first.today&&firstDir!=='unknown'){
+     for(const g of built)if(!g.any&&g.dir!=='unknown'&&g.dir!==firstDir)buried.add(g.key);
+   }
+   const open=built.filter(g=>!buried.has(g.key));
+   if(!open.length)return null;
+   const byAge=(a,b)=>{
+     const af=Number.isFinite(a.lastAnswer),bf=Number.isFinite(b.lastAnswer);
+     if(af!==bf)return af?-1:1;
+     if(af&&a.lastAnswer!==b.lastAnswer)return a.lastAnswer-b.lastAnswer;
+     return a.key<b.key?-1:a.key>b.key?1:0;
+   };
+   const needs=open.filter(g=>g.needs);
+   let chosen;
+   if(needs.length){needs.sort(byAge);chosen=needs[0];}
+   else{
+     const due=open.filter(g=>g.earliest!=null&&g.earliest<=now);
+     if(due.length){due.sort((a,b)=>a.earliest-b.earliest||byAge(a,b));chosen=due[0];}
+     else{
+       // Unanswered eligible groups count as answered longer ago than every answered group.
+       const byKey=(a,b)=>a.key<b.key?-1:a.key>b.key?1:0;
+       const unanswered=open.filter(g=>!g.any).sort(byKey);
+       if(unanswered.length)chosen=unanswered[0];
+       else{open.sort(byAge);chosen=open[0];}
+     }
+   }
+   return representative(chosen.cards,records,H);
+ }
  function planPortion(pool,state,cfg,core,now,opts){
    opts=opts||{};
    pool=(pool||[]).filter(q=>q&&q.wordRole!=='used');
@@ -93,13 +232,15 @@
      if(d)return d;
      return String(a.id)<String(b.id)?-1:String(a.id)>String(b.id)?1:0;
    }):pool.slice();
-   const seen=new Set(),newCards=[];
-   for(const q of ordered){
-     const lem=lk(q);
-     if(seen.has(lem))continue;
-     seen.add(lem);
-     if(H.lemma(lem))continue;
-     newCards.push(q);
+   const byLemma=new Map();
+   for(const q of pool){const lem=lk(q);let list=byLemma.get(lem);if(!list)byLemma.set(lem,list=[]);list.push(q);}
+   const lemmaOrder=[],seenLem=new Set();
+   for(const q of ordered){const lem=lk(q);if(seenLem.has(lem))continue;seenLem.add(lem);lemmaOrder.push(lem);}
+   const newCards=[],reviewReps=[];
+   for(const lem of lemmaOrder){
+     const rep=lemmaRepresentative(lem,byLemma.get(lem)||[],state||{},records,H,core,now);
+     if(!rep)continue;
+     if(H.lemma(lem))reviewReps.push(rep);else newCards.push(rep);
    }
    const nNew=clean?Math.min(3,newCards.length):Math.min(sessionNewCap,newCards.length);
    const picked=newCards.slice(0,nNew);
@@ -108,12 +249,12 @@
    const otherCap=Math.max(0,answerBudget-3*nNew);
    const limit=nNew+otherCap;
    const pickedIds=new Set(picked.map(q=>q.id));
-   const bucket=pool.filter(q=>pickedIds.has(q.id)||H.card(q));
+   const bucket=picked.concat(reviewReps.filter(q=>!pickedIds.has(q.id)));
    let out=[];
    if(core&&typeof core.chooseShortSession==='function'){
      out=core.chooseShortSession(bucket,records,now,limit,{newLimit:nNew,isNew:q=>pickedIds.has(q.id)});
    }else{
-     const others=pool.filter(q=>!newSet.has(lk(q))&&H.card(q));
+     const others=reviewReps.filter(q=>!newSet.has(lk(q)));
      const errors=others.filter(q=>records[q.id]&&records[q.id].needsReview);
      const due=others.filter(q=>records[q.id]&&!records[q.id].needsReview&&core.isDue(records[q.id],now)).sort((a,b)=>(Number(records[a.id].dueAt)||0)-(Number(records[b.id].dueAt)||0));
      const learning=others.filter(q=>{const r=records[q.id];return r&&!r.needsReview&&!core.isDue(r,now)&&(Number(r.streak)||0)<2;});
@@ -142,6 +283,8 @@
        const an=ra==null||Number.isNaN(ra),bn=rb==null||Number.isNaN(rb);
        if(an!==bn)return an?1:-1;
        if(!an&&ra!==rb)return ra-rb;
+       const pa=idClass(a.id),pb=idClass(b.id);
+       if(pa!==pb)return pa-pb;
        return String(a.id)<String(b.id)?-1:String(a.id)>String(b.id)?1:0;
      };
      // Filler is a card with its own answer history. A sibling's history does not qualify.
