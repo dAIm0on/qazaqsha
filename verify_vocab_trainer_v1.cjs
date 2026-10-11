@@ -1545,6 +1545,7 @@ function p6fKeep(kind){
   };
   const body=[
     'let checked=false, hinted='+(kind==='hint'?'true':'false')+', rulePeeked='+(kind==='rule'?'true':'false')+', elapsedMs=3200, position=0;',
+    'let queueEpoch=1;',
     'const queue=["hw1-1-kk"];',
     'let vocabCardHold=null, vocabNear=null, vocabRetry=null;',
     'const window={VocabMust:null};',
@@ -1622,5 +1623,130 @@ for(const id of pairIds){
   const row=p6fRow(q);
   assert.ok(row&&(row.kk||row.ru),'P6F-PAIR '+id);
 }
+
+// P6F-HOLD-* / P6F-AUTO-RESUME: the summary snapshot is one-shot, scoped to one showing, and Продолжить keeps the PR-5 auto-advance.
+function p6cHarness(){
+  const showSrc=app.slice(app.indexOf('function showView(next){'),app.indexOf('function shellTab(next){'));
+  const openSrc=app.slice(app.indexOf('function openVocabSummary(){'),app.indexOf('function rememberVocabCard(){'));
+  const contSrc=app.slice(app.indexOf('function continueVocabSummary(){'),app.indexOf('function endMustToTrainers(){'));
+  const holdSrc=app.slice(app.indexOf('function rememberVocabCard(){'),app.indexOf('function captureMustLive(){'));
+  const rendSrc=app.slice(app.indexOf('function render(){'),app.indexOf('function hintEvent'));
+  const holdLine=rendSrc.split('\n').find(l=>l.includes('vocabCardHold&&'));
+  assert.ok(holdLine,'P6F-HOLD-SRC');
+  const body=[
+    'const ORIGIN_VIEWS=["today","learn","path","homework","personal","exam","review","vocabulary","materials","morph"];',
+    'const state={events:[],grammarPath:null};',
+    'const window={TutorUI:null,PersonalTrainers:null,MorphTrainer:null,VocabMust:null};',
+    'const document={body:{dataset:{},classList:{toggle(){}}},querySelectorAll(){return [];}};',
+    'const history={state:null,replaceState(s){history.state=s;}};',
+    'const timers=[]; function setTimeout(fn,ms){timers.push({fn:fn,ms:ms});return timers.length;} function clearTimeout(id){if(id)timers[id-1]=null;}',
+    'let nodes={};',
+    'function fresh(){nodes={"#hint-box":{innerHTML:"",hidden:true},"#hint-button":{disabled:false},"#rule-button":{disabled:false},"#feedback":{innerHTML:"",hidden:true,className:"feedback"},"#check-button":{hidden:false},"#next-button":{hidden:true}};}',
+    'function $(sel){return nodes[sel]||null;}',
+    'let vocabSummary=false, vocabCardHold=null, vocabNear=null, vocabRetry=null, view="practice", checked=false, hinted=false, rulePeeked=false, elapsedMs=0, timerSince=null, advanceTimer=null, mustOn=true;',
+    'let position=0, queue=["hw1-1-kk","hw1-2-kk"], trainerReturn="vocab:must", queueEpoch=1, trainerEpoch=1, mode="words", vocabSitting={}, typingFocus=false;',
+    'let hwLesson=null, courseBlock=null, sessionOrigin=null, resets=0;',
+    'const byId=new Map([["hw1-1-kk",{id:"hw1-1-kk"}],["hw1-2-kk",{id:"hw1-2-kk"}]]);',
+    'function isVocabMustTrainer(){return mustOn;}',
+    'function elapsed(){return elapsedMs;}',
+    'function esc(s){return String(s);}',
+    'function cancelAdvance(){if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null;}}',
+    'function pauseTimer(){elapsedMs=elapsed();timerSince=null;cancelAdvance();}',
+    'function hintEvent(q,kind){state.events.push({type:"hint",card_id:q.id,hint_kind:kind});hinted=true;}',
+    'function captureDraft(){} function refillCardDraft(){} function renderStats(){} function activateCard(){} function save(){} function syncKbInset(){} function markPlace(){} function shellTab(){return "today";}',
+    'function $$(sel){return [];}',
+    'const learning={render(){}}; const dashboard={render(){}};',
+    'function renderMaterials(){} function renderExam(){} function renderHomework(){} function renderPath(){}',
+    'function render(){if(vocabSummary&&isVocabMustTrainer())return;',
+    holdLine,
+    ' resets++; pauseTimer(); elapsedMs=0; checked=false; hinted=false; rulePeeked=false; fresh();',
+    ' if(isVocabMustTrainer()&&vocabNear&&queue[position]===vocabNear.cardId){checked=true;nodes["#check-button"].hidden=true;nodes["#next-button"].hidden=false;}',
+    ' resumeVocabCard();}',
+    'function nextQuestion(){cancelAdvance();vocabNear=null;vocabCardHold=null;position++;render();}',
+    holdSrc, openSrc, contSrc, showSrc,
+    'function boot(extra){extra=extra||{};state.events.length=0;timers.length=0;vocabSummary=false;vocabCardHold=null;vocabNear=null;view="practice";mustOn=true;queueEpoch=1;trainerEpoch=1;position=0;queue=extra.queue||["hw1-1-kk","hw1-2-kk"];resets=0;advanceTimer=null;fresh();checked=!!extra.checked;hinted=!!extra.hinted;rulePeeked=false;elapsedMs=extra.elapsed||1800;if(hinted){nodes["#hint-box"]={innerHTML:"подсказка",hidden:false};nodes["#hint-button"].disabled=true;}}',
+    'function arm(){advanceTimer=setTimeout(function(){advanceTimer=null;nextQuestion();},400);}',
+    'function pending(){return timers.filter(Boolean);}',
+    'function runPending(){const t=pending();timers.length=0;t.forEach(function(x){x.fn();});}',
+    'function snap(){return {events:state.events.map(function(e){return e.card_id+":"+e.hint_kind;}),hinted:hinted,checked:checked,rulePeeked:rulePeeked,elapsedMs:elapsedMs,position:position,resets:resets,hold:vocabCardHold,advance:advanceTimer,pending:pending().map(function(t){return t.ms;}),hintBox:!nodes["#hint-box"].hidden,next:!nodes["#next-button"].hidden,check:!nodes["#check-button"].hidden};}',
+    'function set(k,v){if(k==="hinted"){hinted=v;nodes["#hint-box"]={innerHTML:"подсказка",hidden:false};nodes["#hint-button"].disabled=true;}else if(k==="near"){vocabNear={cardId:queue[position],expected:"x"};checked=true;nodes["#check-button"].hidden=true;nodes["#next-button"].hidden=false;}else if(k==="epoch")queueEpoch=v;else if(k==="position")position=v;else if(k==="must")mustOn=v;else if(k==="summary")vocabSummary=v;}',
+    'return {boot:boot,open:openVocabSummary,cont:continueVocabSummary,show:showView,render:render,snap:snap,arm:arm,runPending:runPending,set:set};'
+  ].join('\n');
+  return new Function(body)();
+}
+const p6c=p6cHarness();
+// restore once → the live card changes → a later render does not roll it back
+p6c.boot();
+p6c.open();
+p6c.cont();
+let once=p6c.snap();
+assert.equal(once.hold,null,'P6F-HOLD-ONCE');
+p6c.set('near');
+p6c.render();
+once=p6c.snap();
+assert.equal(once.checked,true,'P6F-HOLD-ONCE');
+assert.equal(once.next,true,'P6F-HOLD-ONCE');
+assert.equal(once.check,false,'P6F-HOLD-ONCE');
+// restored card → hint → Словарь → back: hint kept, no re-render, answer stays assisted
+p6c.boot();
+p6c.open();
+p6c.cont();
+const r0=p6c.snap().resets;
+p6c.set('hinted',true);
+p6c.show('vocabulary');
+p6c.show('practice');
+once=p6c.snap();
+assert.equal(once.resets,r0,'P6F-HOLD-ONCE');
+assert.equal(once.hinted,true,'P6F-HOLD-ONCE');
+assert.equal(once.hintBox,true,'P6F-HOLD-ONCE');
+assert.equal(p5Rate({result:{correct:true,parts:[true]},hinted:once.hinted,rulePeeked:once.rulePeeked}),F.Rating.Again,'P6F-HOLD-ONCE');
+// leaving the open summary still keeps the snapshot until the card is shown again (P6F-LEAVE path)
+p6c.boot({hinted:true});
+p6c.open();
+p6c.show('vocabulary');
+assert.ok(p6c.snap().hold,'P6F-HOLD-ONCE');
+p6c.show('practice');
+once=p6c.snap();
+assert.equal(once.hold,null,'P6F-HOLD-ONCE');
+assert.equal(once.hinted,true,'P6F-HOLD-ONCE');
+assert.deepEqual(once.events,[],'P6F-HOLD-ONCE');
+// another portion / another place / another trainer with the same cardId never gets the snapshot
+for(const [k,v] of [['epoch',2],['position',2],['must',false]]){
+  p6c.boot({hinted:true,elapsed:3200,queue:['hw1-1-kk','hw1-2-kk','hw1-1-kk']});
+  p6c.open();
+  p6c.set('summary',false);
+  p6c.set(k,v);
+  p6c.render();
+  const other=p6c.snap();
+  assert.equal(other.hold,null,'P6F-HOLD-SCOPE '+k);
+  assert.equal(other.hinted,false,'P6F-HOLD-SCOPE '+k);
+  assert.equal(other.hintBox,false,'P6F-HOLD-SCOPE '+k);
+  assert.equal(other.elapsedMs,0,'P6F-HOLD-SCOPE '+k);
+}
+assert.ok(app.slice(app.indexOf('function nextQuestion(){'),app.indexOf('function homeworkOpts(){')).includes('vocabCardHold=null'),'P6F-HOLD-SCOPE');
+// fully correct → Закончить within 400 ms → Продолжить → auto-advance as in PR-5
+p6c.boot({checked:true});
+p6c.arm();
+p6c.open();
+assert.equal(p6c.snap().pending.length,0,'P6F-AUTO-RESUME');
+p6c.cont();
+const ar=p6c.snap();
+assert.equal(ar.checked,true,'P6F-AUTO-RESUME');
+assert.deepEqual(ar.pending,[400],'P6F-AUTO-RESUME');
+assert.equal(ar.position,0,'P6F-AUTO-RESUME');
+p6c.runPending();
+assert.equal(p6c.snap().position,1,'P6F-AUTO-RESUME');
+assert.equal(p6c.snap().checked,false,'P6F-AUTO-RESUME');
+// no auto-advance was planned (near-miss / Дальше already waiting) → Продолжить plans none
+p6c.boot({checked:true});
+p6c.open();
+p6c.cont();
+assert.deepEqual(p6c.snap().pending,[],'P6F-AUTO-RESUME');
+assert.equal(p6c.snap().position,0,'P6F-AUTO-RESUME');
+// unanswered card → Продолжить never auto-advances
+p6c.boot();
+p6c.open();
+p6c.cont();
+assert.deepEqual(p6c.snap().pending,[],'P6F-AUTO-RESUME');
 
 console.log('VERIFY_VOCAB_TRAINER_V1_OK');

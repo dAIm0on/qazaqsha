@@ -812,8 +812,11 @@
    const fin=$('#vocab-finish');if(fin)fin.hidden=true;
  }
  function continueVocabSummary(){
+   const auto=!!(vocabCardHold&&vocabCardHold.autoAdvance&&vocabHoldLive(vocabCardHold));
    vocabSummary=false;
    render();
+   // PR-5: a fully correct answer moves on by itself; Закончить inside the 400 ms must not lose that.
+   if(auto&&checked&&!advanceTimer)advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
  }
  function endMustToTrainers(){
    vocabSummary=false;vocabNear=null;vocabCardHold=null;vocabSitting=null;vocabPlan=null;vocabRetry=null;vocabClosed=[];
@@ -825,19 +828,24 @@
  }
  function openVocabSummary(){
    if(!isVocabMustTrainer()||!vocabSitting)return;
+   const auto=!!advanceTimer;
    cancelAdvance();
    pauseTimer();
    rememberVocabCard();
+   if(vocabCardHold)vocabCardHold.autoAdvance=auto;
    vocabSummary=true;
    render();
  }
  function rememberVocabCard(){
    const box=$('#hint-box'),fb=$('#feedback'),hintBtn=$('#hint-button'),ruleBtn=$('#rule-button');
-   vocabCardHold={cardId:queue[position]||null,checked:!!checked,hinted:!!hinted,rulePeeked:!!rulePeeked,elapsedMs:elapsed(),hintHtml:box&&!box.hidden?box.innerHTML:'',hintDisabled:!!(hintBtn&&hintBtn.disabled),ruleDisabled:!!(ruleBtn&&ruleBtn.disabled),feedbackHtml:fb&&!fb.hidden?fb.innerHTML:'',feedbackClass:fb&&fb.className||'feedback'};
+   vocabCardHold={cardId:queue[position]||null,queueEpoch,position,checked:!!checked,hinted:!!hinted,rulePeeked:!!rulePeeked,elapsedMs:elapsed(),hintHtml:box&&!box.hidden?box.innerHTML:'',hintDisabled:!!(hintBtn&&hintBtn.disabled),ruleDisabled:!!(ruleBtn&&ruleBtn.disabled),feedbackHtml:fb&&!fb.hidden?fb.innerHTML:'',feedbackClass:fb&&fb.className||'feedback'};
  }
+ // The hold belongs to one showing of one card: same card, same portion, same place, still the must trainer.
+ function vocabHoldLive(hold){return !!hold&&isVocabMustTrainer()&&hold.cardId===(queue[position]||null)&&hold.queueEpoch===queueEpoch&&hold.position===position;}
  function resumeVocabCard(){
    const hold=vocabCardHold;
-   if(!hold||hold.cardId!==(queue[position]||null))return;
+   if(!vocabHoldLive(hold))return;
+   vocabCardHold=null; // one-shot: a later render must not roll the live card back to this snapshot
    checked=!!hold.checked;hinted=!!hold.hinted;rulePeeked=!!hold.rulePeeked;elapsedMs=hold.elapsedMs;
    const box=$('#hint-box');
    if(box&&hold.hintHtml){box.innerHTML=hold.hintHtml;box.hidden=false;}
@@ -1727,7 +1735,7 @@
  }
  function render(){
    if(vocabSummary&&isVocabMustTrainer()){paintVocabSummary();renderStats();return;}
-   if(vocabCardHold&&vocabCardHold.cardId!==(queue[position]||null))vocabCardHold=null;
+   if(vocabCardHold&&!vocabHoldLive(vocabCardHold))vocabCardHold=null;
    retrying=false;
    introOpen=false;pauseTimer();elapsedMs=0;checked=false;hinted=false;rulePeeked=false;lastTextInput=null;renderStats();
    const q=byId.get(queue[position]);
@@ -2251,7 +2259,7 @@
      if(!mustNear)advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
    }
  }
- function nextQuestion(){cancelAdvance();abortTutor();vocabNear=null;draft=null;retrying=false;retryAfterWrong=false;vocabRetry=null;position++;if(isVocabMustTrainer()){const budget=vocabPlan&&vocabPlan.budget||(cfg.vocab&&cfg.vocab.answerBudget)||10;if(window.VocabMust&&window.VocabMust.portionDone(sessionAttempts,budget,position,queue.length)){if(!beginMustPortion(false))position=queue.length;}}else if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}focusAnswer();}
+ function nextQuestion(){cancelAdvance();abortTutor();vocabNear=null;vocabCardHold=null;draft=null;retrying=false;retryAfterWrong=false;vocabRetry=null;position++;if(isVocabMustTrainer()){const budget=vocabPlan&&vocabPlan.budget||(cfg.vocab&&cfg.vocab.answerBudget)||10;if(window.VocabMust&&window.VocabMust.portionDone(sessionAttempts,budget,position,queue.length)){if(!beginMustPortion(false))position=queue.length;}}else if(!['ordered','shuffle','homework','course','phrase','transfer','slice','repair'].includes(mode)&&sessionAttempts>=cfg.session.maxAttempts)position=queue.length;render();if(!document.documentElement.classList.contains('typing-compact')){const ex=$('#exercise');if(ex)ex.scrollIntoView({block:'start',behavior:'auto'});}focusAnswer();}
  function homeworkOpts(){
    const sessionGUnlocked=!!(window.Lesson31Pack?.sessionG?.().length)&&window.Lesson31Pack.sessionG().every(q=>records[q.id]?.seen);
    return {sessionGUnlocked,events:state.events};
