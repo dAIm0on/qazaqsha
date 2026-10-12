@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
 const Nav = require('./navigation.js');
 const Engine = require('./morph-engine.js');
 const {boot} = require('./tools/capture_nav_must_fixtures.js');
@@ -69,7 +70,8 @@ ok('registry: ready routes, homework ids, anchor, unknown, one section');
   assert.equal(packed.keep, 'yes');
   assert.equal(Object.prototype.hasOwnProperty.call(packed, 'queue'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(packed, 'draft'), false);
-  assert.equal(Object.prototype.hasOwnProperty.call(packed, 'nav2'), false);
+  assert.equal(packed.nav2, 1);
+  assert.equal(packed.fs2.id, 'x');
   assert.equal(JSON.stringify(packed).includes('secret'), false);
 }
 ok('history.state keeps foreign fields and omits queues');
@@ -102,27 +104,171 @@ ok('history.state keeps foreign fields and omits queues');
 ok('N-HISTORY-1 one push per external hop; render and a repeat do not push');
 
 {
-  let stopped = 0;
-  const internal = {state: {nav2: 1}, stopImmediatePropagation(){ stopped += 1; }};
-  assert.equal(Nav.onPop(internal), false);
-  assert.equal(stopped, 0);
-  const fs2 = {state: {fs2: {id: 'a', part: 1}}, stopImmediatePropagation(){ stopped += 1; }};
-  assert.equal(Nav.onPop(fs2), false);
-  assert.equal(stopped, 0);
-  const external = {state: {qzNav: {route: '#/library'}}, stopImmediatePropagation(){ stopped += 1; }};
-  assert.equal(Nav.onPop(external), true);
-  assert.equal(stopped, 1);
-  assert.equal(Nav.claimed(external), true);
-  const anchor = {state: null, stopImmediatePropagation(){ stopped += 1; }};
-  const prev = global.location;
-  global.location = {hash: '#main'};
-  assert.equal(Nav.onPop(anchor), true);
-  global.location = prev;
-  assert.equal(Nav.claimed(anchor), true);
-  assert.ok(read('navigation.js').includes("addEventListener('popstate',onPop,true)"), 'capture guard is registered');
-  assert.equal(read('navigation.js').includes('history.pushState=') || read('navigation.js').includes('History.prototype'), false);
+  Nav.resetTrace();
+  const savedLocation = global.location;
+  const savedHistory = global.history;
+  const entries = [{href: '#/morph', state: null}];
+  let pos = 0;
+  let view = 'morph';
+  const morph = {cursor: 0, navBack: []};
+  function morphPush(){
+    morph.navBack.push({cursor: morph.cursor});
+    morph.cursor += 1;
+    global.history.pushState({nav2: 1}, '', '#/morph');
+  }
+  function morphPop(){
+    if (!morph.navBack.length) return false;
+    const prev = morph.navBack.pop();
+    morph.cursor = prev.cursor;
+    return true;
+  }
+  global.location = {hash: '#/morph'};
+  global.history = {
+    get state(){ return entries[pos] && entries[pos].state; },
+    pushState(state, title, href){
+      entries.splice(pos + 1);
+      entries.push({href: href || global.location.hash, state});
+      pos = entries.length - 1;
+      global.location.hash = entries[pos].href;
+    },
+    replaceState(state, title, href){
+      entries[pos] = {href: href || entries[pos].href, state};
+      global.location.hash = entries[pos].href;
+    },
+    back(){
+      if (pos <= 0) return;
+      pos -= 1;
+      global.location.hash = entries[pos].href;
+      const ev = {state: entries[pos].state, stopImmediatePropagation(){}};
+      if (!Nav.onPop(ev)) morphPop();
+    },
+    forward(){
+      if (pos >= entries.length - 1) return;
+      pos += 1;
+      global.location.hash = entries[pos].href;
+      const ev = {state: entries[pos].state, stopImmediatePropagation(){}};
+      if (!Nav.onPop(ev)) morphPop();
+    }
+  };
+  Nav.bind(function(item){ view = item.view; Nav.commit({view: item.view, source: 'history', route: item}); });
+  Nav.commit({view: 'morph', source: 'boot', route: Nav.parse('#/morph').route});
+  morphPush();
+  morphPush();
+  const before = JSON.parse(JSON.stringify(morph));
+  Nav.commit({view: 'today', source: 'user', route: Nav.parse('#/library').route});
+  view = 'today';
+  global.history.back();
+  assert.equal(view, 'morph');
+  assert.deepEqual(morph, before, 'Library -> Back must not consume a MorphNav2 step');
+  global.history.forward();
+  assert.equal(view, 'today');
+  global.history.back();
+  assert.equal(view, 'morph');
+  assert.deepEqual(morph, before, 'Forward -> Library -> Back keeps the same morph cursor/navBack');
+
+  Nav.resetTrace();
+  entries.splice(0, entries.length, {href: '#/morph', state: null});
+  pos = 0;
+  global.location.hash = '#/morph';
+  morph.cursor = 0;
+  morph.navBack = [];
+  view = 'morph';
+  Nav.commit({view: 'morph', source: 'boot', route: Nav.parse('#/morph').route});
+  morphPush();
+  assert.equal(morph.cursor, 1);
+  assert.equal(morph.navBack.length, 1);
+  global.history.back();
+  assert.equal(view, 'morph');
+  assert.equal(morph.cursor, 0, 'first nav2 Back to the shell morph record is owned by MorphNav2');
+  assert.equal(morph.navBack.length, 0);
+  Nav.bind(null);
+  global.location = savedLocation;
+  global.history = savedHistory;
 }
-ok('N-HISTORY-4 capture guard leaves nav2/fs2 and stops an external pop');
+ok('N-HISTORY-4: morph internal x2 -> Library -> Back/Forward preserves cursor/navBack; first nav2 Back stays internal');
+
+
+{
+  const navText = read('navigation.js');
+  assert.ok(navText.includes("addEventListener('popstate',onPop,true)"), 'capture guard is registered');
+  assert.equal(navText.includes('history.pushState=') || navText.includes('History.prototype'), false, 'navigation must not patch History APIs');
+}
+ok('N-HISTORY-4 guard: capture popstate registration stays native and History APIs stay unpatched');
+
+{
+  const html = read('index.html');
+  const scripts = Array.from(html.matchAll(/<script defer src="([^"]+\.js)"><\/script>/g), function(match){ return match[1]; });
+  const navAt = scripts.indexOf('navigation.js');
+  const morphAt = scripts.indexOf('morph-ui.js');
+  assert.ok(navAt >= 0 && morphAt >= 0, 'navigation.js and morph-ui.js are both wired in index.html');
+
+  const morphSrc = read('morph-ui.js');
+  const prefix = "window.addEventListener('popstate',";
+  const listenerStart = morphSrc.indexOf(prefix);
+  const listenerEnd = morphSrc.indexOf("\n});\nwindow.MorphTrainer", listenerStart);
+  assert.ok(listenerStart >= 0 && listenerEnd > listenerStart, 'real morph-ui popstate listener is present');
+  const listenerExpr = morphSrc.slice(listenerStart + prefix.length, listenerEnd + 2);
+
+  const listeners = Object.create(null);
+  const location = {hash: '#/morph'};
+  let historyState = null;
+  let morphBackCalls = 0;
+  const window = {
+    location,
+    document: {getElementById(){ return null; }},
+    history: {
+      get state(){ return historyState; },
+      pushState(state, title, href){ historyState = state; if (href) location.hash = href; },
+      replaceState(state, title, href){ historyState = state; if (href) location.hash = href; },
+      back(){}, forward(){}
+    },
+    addEventListener(type, fn, capture){
+      (listeners[type] || (listeners[type] = [])).push({fn, capture: !!capture});
+    },
+    MorphNav2: {back(){ morphBackCalls += 1; return true; }}
+  };
+  window.window = window;
+  window.globalThis = window;
+  const context = vm.createContext({
+    window, globalThis: window, self: window, history: window.history,
+    URLSearchParams, WeakSet, Set, Object, Array, String, Boolean, Number,
+    JSON, RegExp, Error, TypeError, Math, Date, parseInt, decodeURIComponent,
+    encodeURIComponent, console,
+    fs2Depth: 0, render(){}, saveCursor(){}, showSectionHome(){}
+  });
+
+  for (const name of scripts) {
+    if (name === 'navigation.js') vm.runInContext(read('navigation.js'), context, {filename: 'navigation.js'});
+    if (name === 'morph-ui.js') {
+      const handler = vm.runInContext('(' + listenerExpr + ')', context, {filename: 'morph-ui-popstate.js'});
+      window.addEventListener('popstate', handler, false);
+    }
+  }
+  const nav = window.QazaqNav;
+  assert.ok(nav, 'navigation.js loaded from real index order');
+  nav.commit({view: 'morph', source: 'boot', route: nav.parse('#/morph').route});
+  window.history.pushState({nav2: 1}, '', '#/morph');
+
+  // Chrome dispatches popstate at Window; listeners on that target run in registration order.
+  // A direct hash hop away from the nav2 entry arrives with state=null. Shell must claim it
+  // before the already-existing morph-ui listener can interpret it as MorphNav2.back().
+  location.hash = '#/library';
+  historyState = null;
+  const event = {
+    state: null,
+    stopped: false,
+    stopImmediatePropagation(){ this.stopped = true; }
+  };
+  for (const entry of listeners.popstate || []) {
+    entry.fn(event);
+    if (event.stopped) break;
+  }
+  assert.equal(event.stopped, true, 'external hash pop is claimed by shell navigation');
+  assert.equal(morphBackCalls, 0, 'leaving morph for #/library must not consume MorphNav2.back()');
+  assert.equal(nav.stack().at(-1).href, '#/library');
+  assert.ok(navAt < morphAt, 'navigation.js must register before morph-ui.js on the Window popstate target');
+}
+ok('N-HISTORY-4 browser listener order: real morph-ui popstate cannot consume a step on morph -> #/library');
 
 {
   const navSrc = read('navigation.js');
@@ -146,6 +292,38 @@ ok('N-HISTORY-4 capture guard leaves nav2/fs2 and stops an external pop');
   }
 }
 ok('writers: startLesson and the logo do not push; morph bytes match HEAD');
+
+{
+  const probe = boot();
+  const lesson = probe.window.GrammarPath.lesson('1-1');
+  assert.ok(lesson && lesson.chapters && lesson.chapters.length, '1-1 theory chapter is available');
+  const theory = JSON.parse(read('fixtures/navigation/theory-draft.json'));
+  theory.grammarPath.lessonId = '1-1';
+  theory.grammarPath.phase = 'beat';
+  theory.grammarPath.chapterId = lesson.chapters[0].id;
+  theory.grammarPath.beat = 0;
+  theory.grammarPath.canonShownFor = null;
+  theory.grammarPath.canonVisible = false;
+  const page = boot(JSON.stringify(theory), function(win){ win.location.hash = '#/lesson/theory?lesson=1-1'; });
+  const q = page.window.QazaqNav;
+  const shell = page.window.QazaqShell;
+  assert.equal(page.window.document.body.dataset.view, 'path');
+  const beforePush = q.pushCount;
+  const beforeStack = q.stack().length;
+  let rawPushes = 0;
+  const realPush = page.window.history.pushState.bind(page.window.history);
+  page.window.history.pushState = function(){ rawPushes += 1; return realPush.apply(null, arguments); };
+  const previous = page.window.document.getElementById('path-back');
+  assert.equal(typeof previous.onclick, 'function', 'theory previous-step button is wired');
+  previous.onclick();
+  assert.equal(rawPushes, 0, 'Предыдущий шаг does not write browser history');
+  assert.equal(q.pushCount, beforePush, 'Предыдущий шаг does not add a shell hop');
+  assert.equal(q.stack().length, beforeStack, 'Предыдущий шаг keeps shell stack length');
+  shell.show('today');
+  assert.equal(q.pushCount, beforePush + 1, 'leaving theory is the one external hop');
+  assert.equal(q.stack().length, beforeStack + 1, 'only the pause/leave hop grows shell history');
+}
+ok('N-HISTORY-3: theory previous step is internal; leaving theory is one external history hop');
 
 {
   const page = boot();
@@ -208,6 +386,73 @@ ok('live shell: lesson, lessons, results, Back, Back, Forward; one visible secti
 }
 ok('N-HISTORY-2 and summary-continue: pause returns to lesson; Слова keeps the epoch; #/words');
 
+function coursePracticeSession(lessonId){
+  const session = JSON.parse(read('fixtures/navigation/practice-mid.json'));
+  session.mode = 'course';
+  session.topic = 'all';
+  session.courseBlock = lessonId;
+  session.launchKey = 'course:' + lessonId;
+  session.view = 'practice';
+  session.sessionOrigin = 'today';
+  return session;
+}
+{
+  const session = coursePracticeSession('1-1');
+  const page = boot(JSON.stringify({session}), function(win){ win.location.hash = '#/practice?lesson=1-1'; });
+  const q = page.window.QazaqNav;
+  assert.equal(page.window.QazaqShell.key(), 'course:1-1');
+  page.window.TrainerCatalogBridge.launch('vocab:must');
+  assert.equal(page.window.location.hash, '#/words');
+  assert.equal(page.window.QazaqShell.key(), 'vocab:must');
+  assert.equal(q.goBack(), true);
+  assert.equal(page.window.location.hash, '#/practice?lesson=1-1');
+  assert.equal(page.window.document.body.dataset.view, 'practice');
+  assert.equal(page.window.QazaqShell.key(), 'course:1-1');
+  assert.equal(page.session().courseBlock, '1-1');
+}
+ok('N-HISTORY-SESSION-MATCH: words -> Back restores the practice session owned by the route');
+
+{
+  const live = coursePracticeSession('2-1');
+  const parked = coursePracticeSession('2-2');
+  const seed = {
+    session: live,
+    navigationResume: {
+      version: 1,
+      lastRoute: 'course:2-2',
+      slots: {
+        'course:2-2': {status: 'paused', updatedAt: 1, origin: 'test', snapshot: {kind: 'session', session: parked}}
+      }
+    }
+  };
+  const page = boot(JSON.stringify(seed), function(win){ win.location.hash = '#/practice?lesson=2-2'; });
+  assert.equal(page.window.location.hash, '#/practice?lesson=2-2');
+  assert.equal(page.window.document.body.dataset.view, 'practice');
+  assert.equal(page.window.QazaqShell.key(), 'course:2-2');
+  assert.equal(page.session().courseBlock, '2-2');
+  assert.notEqual(page.window.QazaqShell.key(), 'course:2-1');
+}
+ok('N-ROUTE-SESSION-MISMATCH-COLD: cold lesson route rejects a foreign live queue and restores its parked slot');
+
+{
+  const page = boot();
+  const q = page.window.QazaqNav;
+  const shell = page.window.QazaqShell;
+  shell.show('review');
+  assert.equal(page.window.document.body.dataset.view, 'review');
+  page.window.location.hash = '';
+  assert.equal(q.onPop({state: {qzView: 'today'}, stopImmediatePropagation(){}}), true);
+  assert.equal(page.window.document.body.dataset.view, 'today');
+  assert.equal(page.window.location.hash, '#/lesson');
+  shell.show('review');
+  assert.equal(page.window.document.body.dataset.view, 'review');
+  page.window.location.hash = '';
+  assert.equal(q.onPop({state: {qzView: 'practice'}, stopImmediatePropagation(){}}), true);
+  assert.equal(page.window.document.body.dataset.view, 'today', 'legacy practice without a live queue falls back to its parent');
+  assert.equal(page.window.location.hash, '#/lesson');
+}
+ok('N-HISTORY-LEGACY-QZVIEW: old qzView entries route today and empty practice instead of becoming dead Back entries');
+
 function morphSitting(){
   const session = Engine.createSession({level: 'harmony', mode: 'learn', responseMode: 'choice', seed: 11, limit: 8});
   session.cursor = 4;
@@ -259,7 +504,72 @@ function seedNav2(win, hash){
   assert.equal(shown.length, 1);
   assert.equal(shown[0], 'today-view');
 }
-ok('N-HISTORY-5 and N-HISTORY-6: #main is not a route; explicit URL beats morph; unknown keeps one section');
+ok('N-HISTORY-6: #main is not a route; explicit URL beats morph; unknown keeps one section');
+
+{
+  const mid = JSON.parse(read('fixtures/navigation/practice-mid.json'));
+  let browser = null;
+  const page = boot(JSON.stringify({session: mid}), function(win){
+    const entries = [{href: '', state: null}];
+    let pos = 0;
+    win.location.hash = '';
+    win.history = {
+      get state(){ return entries[pos] ? entries[pos].state : null; },
+      get length(){ return entries.length; },
+      pushState(state, title, href){
+        const url = href || win.location.hash;
+        entries.splice(pos + 1);
+        entries.push({href: url, state});
+        pos = entries.length - 1;
+        win.location.hash = url;
+      },
+      replaceState(state, title, href){
+        const url = href || (entries[pos] && entries[pos].href) || win.location.hash;
+        entries[pos] = {href: url, state};
+        win.location.hash = url;
+      },
+      back(){
+        if (pos <= 0) return;
+        pos -= 1;
+        win.location.hash = entries[pos].href;
+        win.dispatchEvent({type: 'popstate', state: entries[pos].state, stopImmediatePropagation(){}});
+      },
+      forward(){
+        if (pos >= entries.length - 1) return;
+        pos += 1;
+        win.location.hash = entries[pos].href;
+        win.dispatchEvent({type: 'popstate', state: entries[pos].state, stopImmediatePropagation(){}});
+      }
+    };
+    browser = {entries, get pos(){ return pos; }};
+  });
+  assert.equal(page.window.document.body.dataset.view, 'practice');
+  assert.equal(page.window.location.hash, '#/practice');
+  const before = page.session();
+  assert.ok(before && before.queueEpoch, 'practice-mid is live');
+  const main = page.window.document.getElementById('main');
+  main.focus = function(){ page.window.document.activeElement = main; };
+  page.window.history.pushState(null, '', '#main');
+  main.focus();
+  assert.equal(page.window.location.hash, '#main');
+  assert.equal(page.window.document.activeElement, main);
+  page.window.history.back();
+  assert.equal(page.window.location.hash, '#/practice');
+  assert.equal(page.window.document.body.dataset.view, 'practice');
+  let after = page.session();
+  assert.equal(after.queueEpoch, before.queueEpoch);
+  assert.equal(after.position, before.position);
+  assert.deepEqual(after.queue, before.queue);
+  page.window.history.forward();
+  assert.equal(page.window.location.hash, '#main');
+  assert.equal(page.window.document.activeElement, main);
+  after = page.session();
+  assert.equal(after.queueEpoch, before.queueEpoch);
+  assert.equal(after.position, before.position);
+  assert.deepEqual(after.queue, before.queue);
+  assert.equal(browser.entries.length, 2, 'anchor adds one browser entry only');
+}
+ok('N-HISTORY-5: practice -> #main -> Back/Forward keeps queueEpoch, position, queue and main focus');
 
 function flush(){ return new Promise(function(resolve){ setTimeout(resolve, 0); }); }
 function installAsyncHistory(){
@@ -312,6 +622,23 @@ function lessonDupes(hrefs){
   return false;
 }
 
+{
+  const must = JSON.parse(read('fixtures/navigation/must-first-show.json'));
+  const page = boot(JSON.stringify({session: must.session}), function(win){ win.location.hash = '#/words'; });
+  const q = page.window.QazaqNav;
+  assert.equal(page.window.document.body.dataset.view, 'practice');
+  assert.deepEqual(Array.from(q.stack(), function(item){ return item.href; }), ['#/words']);
+  const beforePush = q.pushCount;
+  const pause = q.pauseReturn();
+  assert.equal(pause.how, 'push', 'cold/F5 session with unknown adjacency uses safe push fallback');
+  page.window.document.getElementById('pause-session').onclick();
+  assert.equal(page.window.location.hash, '#/lesson');
+  assert.equal(page.window.document.body.dataset.view, 'today');
+  assert.equal(q.pushCount, beforePush + 1, 'fallback pause is a push, not replace');
+  assert.deepEqual(Array.from(q.stack(), function(item){ return item.href; }), ['#/words', '#/lesson']);
+}
+ok('N-HISTORY-PAUSE-FALLBACK-PUSH: unknown adjacency preserves the session entry by pushing its parent');
+
 (async function(){
   try {
     Nav.resetTrace();
@@ -355,6 +682,29 @@ function lessonDupes(hrefs){
     ok('N-HISTORY-PAUSE-FWD async back/forward keeps #/words at index+1');
 
     Nav.resetTrace();
+    const reloadHist = installAsyncHistory();
+    assert.equal(Nav.commit({view: 'today', source: 'boot', route: Nav.lessonHome()}).pushed, false);
+    assert.equal(Nav.commit({view: 'practice', source: 'user', route: Nav.parse('#/words').route}).pushed, true);
+    assert.equal(global.history.state.qzNav.origin.href, '#/lesson');
+    assert.equal(global.history.state.qzNav.originAdjacent, true);
+    const reloadStack = reloadHist.hrefs().slice();
+    Nav.resetTrace();
+    assert.equal(Nav.commit({view: 'practice', source: 'boot', route: Nav.parse('#/words').route}).pushed, false);
+    assert.deepEqual(Nav.stack().map(function(item){ return item.href; }), ['#/lesson', '#/words']);
+    const pauseAfterReload = Nav.pauseReturn();
+    assert.equal(pauseAfterReload.how, 'back');
+    assert.equal(Nav.goBack(), true);
+    await flush();
+    assert.equal(reloadHist.hrefs()[reloadHist.pos()], '#/lesson');
+    assert.equal(reloadHist.hrefs()[reloadHist.pos() + 1], '#/words');
+    assert.deepEqual(reloadHist.hrefs(), reloadStack);
+    assert.equal(lessonDupes(reloadHist.hrefs()), false);
+    assert.equal(Nav.goForward(), true);
+    await flush();
+    assert.equal(reloadHist.hrefs()[reloadHist.pos()], '#/words');
+    ok('N-HISTORY-PAUSE-F5 reload reconstructs adjacent origin; pause uses Back and Forward keeps #/words');
+
+    Nav.resetTrace();
     const live = installAsyncHistory();
     const note = {hidden: true, textContent: ''};
     global.document = {getElementById(id){ return id === 'route-note' ? note : null; }};
@@ -378,6 +728,7 @@ function lessonDupes(hrefs){
 
     const page = boot();
     const shell = page.window.QazaqShell;
+    const q = page.window.QazaqNav;
     shell.show('personal');
     assert.equal(page.window.location.hash, '#/practices');
     const box = page.window.document.getElementById('pref-letters');
@@ -386,12 +737,27 @@ function lessonDupes(hrefs){
     shell.show('today');
     shell.show('personal');
     assert.equal(page.window.location.hash, '#/practices');
+    assert.ok(page.window.document.getElementById('personal-content').innerHTML.includes('<h2>Тренажёры</h2>'));
     page.window.PersonalTrainers.openTrainer('harmony_letters');
     assert.equal(page.window.location.hash, '#/practices/letters');
+    assert.ok(page.window.document.getElementById('personal-content').innerHTML.includes('Твёрдые / мягкие звуки'));
+    assert.equal(q.goBack(), true);
+    assert.equal(page.window.location.hash, '#/practices');
+    assert.ok(page.window.document.getElementById('personal-content').innerHTML.includes('<h2>Тренажёры</h2>'));
+    assert.equal(q.goForward(), true);
+    assert.equal(page.window.location.hash, '#/practices/letters');
+    assert.ok(page.window.document.getElementById('personal-content').innerHTML.includes('Твёрдые / мягкие звуки'));
     const cold = boot(null, function(win){ win.location.hash = '#/practices/letters'; });
     assert.equal(cold.window.location.hash, '#/practices/letters');
     assert.equal(cold.window.document.body.dataset.view, 'personal');
-    ok('N-ROUTE-PRACTICES-TAB hub stays #/practices; explicit letters keep their address');
+    assert.ok(cold.window.document.getElementById('personal-content').innerHTML.includes('Твёрдые / мягкие звуки'));
+    assert.equal(cold.window.document.getElementById('personal-content').innerHTML.includes('<h2>Тренажёры</h2>'), false);
+    const numbers = boot(null, function(win){ win.location.hash = '#/practices/numbers'; });
+    assert.equal(numbers.window.location.hash, '#/practices/numbers');
+    assert.equal(numbers.window.document.body.dataset.view, 'personal');
+    assert.ok(numbers.window.document.getElementById('personal-content').innerHTML.includes('Лестница чисел'));
+    assert.equal(numbers.window.document.getElementById('personal-content').innerHTML.includes('<h2>Тренажёры</h2>'), false);
+    ok('N-ROUTE-PRACTICES-TAB / F6: hub, cold letters/numbers and Back/Forward render the addressed personal screen');
 
     console.log('verify_navigation_history: ' + passed + ' checks passed');
   } catch (error) {

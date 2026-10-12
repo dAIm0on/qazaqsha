@@ -3955,6 +3955,7 @@ function qazaqAppBoot(bootMirror){
    if(window.QazaqNav&&QazaqNav.pauseReturn){
      const step=QazaqNav.pauseReturn();
      if(step.how==='back'&&QazaqNav.goBack())return;
+     if(step.how==='push'&&step.route){showView(step.view,{source:'user',route:step.route});return;}
      if(step.route){showView(step.view,{source:'render',route:step.route});return;}
    }
    const back=pauseTarget(); // drops a trainerReturn left over from an earlier trainer queue
@@ -4089,15 +4090,54 @@ function qazaqAppBoot(bootMirror){
  }
  const hasMorphResume=!!(state.morphTrainer&&(state.morphTrainer.session||(state.morphTrainer.teaching&&state.morphTrainer.teaching.resume)));
  const resumeView=window.MorphState.resumeSurface(savedSession&&savedSession.view,hasMorphResume,!!validSaved,['practice','homework','learn','path','review']);
+ function routeSessionKey(item){
+   if(!item||!item.session)return null;
+   if(item.sessionKey)return item.sessionKey;
+   const ctx=item.context||{},Nav=window.NavigationState;
+   if(item.name==='practice'&&ctx.lesson)return 'course:'+ctx.lesson;
+   if(item.name==='extra'&&ctx.id&&(ctx.kind==='lesson'||ctx.kind==='voluntary'))return Nav&&Nav.lessonKey?Nav.lessonKey(ctx.id):('lesson:'+ctx.id);
+   if(item.name==='extra'&&ctx.id&&ctx.kind==='numbers')return 'number:'+ctx.id;
+   return null;
+ }
+ function sessionRouteMatchesLive(item,key){
+   if(!liveOpen())return false;
+   const liveKey=currentLaunchKey();
+   if(key)return !!liveKey&&liveKey===key;
+   const ctx=item&&item.context||{};
+   if(item&&item.name==='extra'&&ctx.id){
+     if((ctx.kind==='lesson'||ctx.kind==='voluntary')&&activeLesson===ctx.id)return true;
+     if(ctx.kind==='numbers'&&mode==='numbers'&&(activeLesson===ctx.id||liveKey==='number:'+ctx.id))return true;
+   }
+   return false;
+ }
+ function openSessionRoute(item,source){
+   const Nav=window.NavigationState,key=routeSessionKey(item);
+   if(sessionRouteMatchesLive(item,key)){showView('practice',{source:source,route:item});return 'live';}
+   const parked=Nav&&key?Nav.get(state,key):null;
+   if(parked&&parked.status==='paused'){
+     const restored=restoreParked(key,parked);
+     if(restored==='ok'||restored==='held')return 'parked';
+   }
+   if(item&&item.name==='practice'&&item.context&&item.context.lesson)setHubLesson(item.context.lesson);
+   const parent=QazaqNav.parentOf(item);
+   showView(parent.view,{source:source,route:parent});
+   return 'parent';
+ }
+ function openPersonalRoute(item,source){
+   const personal=window.PersonalTrainers;
+   if(personal){
+     if(item&&item.name==='letters'&&personal.openTrainer){personal.openTrainer('harmony_letters',{source:source});return;}
+     if(item&&item.name==='practices-numbers'&&personal.openTrainer){personal.openTrainer('numbers',{source:source});return;}
+     if(item&&item.name==='practices'&&personal.openCatalog){personal.openCatalog({source:source});return;}
+   }
+   showView('personal',{source:source,route:item});
+ }
  if(window.QazaqNav&&QazaqNav.bind)QazaqNav.bind(function(entry,source){
    window.__qzNavSource=source||'history';
    try{
      const item=entry||{};
-     if(item.name==='words'||item.sessionKey==='vocab:must'){
-       const parked=window.NavigationState&&NavigationState.get(state,'vocab:must');
-       const liveMust=trainerReturn==='vocab:must'&&queue.length>position;
-       if(!liveMust&&parked&&parked.status==='paused'){restoreParked('vocab:must',parked);return;}
-     }
+     if(item.name==='words'||item.name==='practice'||item.name==='extra'){openSessionRoute(item,'history');return;}
+     if(item.name==='practices'||item.name==='letters'||item.name==='practices-numbers'){openPersonalRoute(item,'history');return;}
      if(item.session&&!(queue.length>position)&&!vocabSummary){
        const parent=QazaqNav.parentOf(item);
        showView(parent.view,{source:'history',route:parent});
@@ -4135,13 +4175,7 @@ function qazaqAppBoot(bootMirror){
   if(window.QazaqNav)QazaqNav.notice(false);
   const name=routeItem.name;
   const Nav=window.NavigationState;
-  if(name==='words'){
-   const slot=Nav&&Nav.get(state,'vocab:must');
-   if(slot&&slot.status==='paused'){restoreParked('vocab:must',slot);return;}
-   if(slot&&slot.status==='closed'){const parent=QazaqNav.parentOf(routeItem);showView(parent.view,{route:parent});return;}
-   if(validSaved&&savedSession&&savedSession.mode==='words'&&savedSession.trainerReturn==='vocab:must'&&queue.length>position){showView('practice',{route:routeItem});return;}
-   const parent=QazaqNav.parentOf(routeItem);showView(parent.view,{route:parent});return;
-  }
+  if(name==='words'){openSessionRoute(routeItem,'boot');return;}
   if(name==='exam'||name==='ready'||name==='library'||name==='settings'){showView(routeItem.view,{route:routeItem});return;}
   if(name==='exam-session'||name==='preexam'){
    if(queue.length>position&&(mode==='exam'||String(launchKey||'').indexOf('preexam:')===0)){showView('practice',{route:routeItem});return;}
@@ -4157,10 +4191,8 @@ function qazaqAppBoot(bootMirror){
    if(hwId)hwLesson=hwId;
    showView(hwId?'homework':'today',{route:hwId?QazaqNav.parse('#/ready/homework/'+hwId).route:QazaqNav.parentOf(routeItem)});return;
   }
-  if(name==='practice'||name==='extra'){
-   if(validSaved&&savedSession&&queue.length>position&&(savedSession.view==='practice'||view==='practice')){showView('practice',{route:routeItem});return;}
-   const parent=QazaqNav.parentOf(routeItem);showView(parent.view,{route:parent});return;
-  }
+  if(name==='practice'||name==='extra'){openSessionRoute(routeItem,'boot');return;}
+  if(name==='practices'||name==='letters'||name==='practices-numbers'){openPersonalRoute(routeItem,'boot');return;}
   showView(routeItem.view||'today',{route:routeItem});
  }
  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else{renderStats();if(view==='practice')activateCard();if(['today','review','vocabulary'].includes(view))dashboard.render(view);}save();});

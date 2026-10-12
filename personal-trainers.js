@@ -46,23 +46,25 @@
     if(rec.session.mode==='quick')return 'Быстрый подход · '+Math.min(rec.session.cursor+1,rec.session.queue.length)+' из '+rec.session.queue.length;
     return STAGE_LABELS[rec.session.stage]+' · '+(rec.session.queue.length?Math.min(rec.session.cursor+1,rec.session.queue.length)+' из '+rec.session.queue.length:'готово к старту');
   }
-  function publishPersonal(href){
+  function publishPersonal(href,options){
     if(!(window.QazaqNav&&window.QazaqShell&&window.QazaqShell.show))return false;
     const parsed=window.QazaqNav.parse(href);
     if(!parsed||parsed.kind!=='route')return false;
-    window.QazaqShell.show('personal',{route:parsed.route});
+    const opts={route:parsed.route};
+    if(options&&typeof options.source==='string')opts.source=options.source;
+    window.QazaqShell.show('personal',opts);
     return true;
   }
   function open(){
     screen='catalog';activeId=null;selection=new Set();pairSelection={};
     if(!publishPersonal('#/practices'))render();
   }
-  function openCatalog(){screen='catalog';activeId=null;selection=new Set();pairSelection={};if(!publishPersonal('#/practices'))render();}
-  function openTrainer(id){
+  function openCatalog(options){screen='catalog';activeId=null;selection=new Set();pairSelection={};if(!publishPersonal('#/practices',options))render();}
+  function openTrainer(id,options){
     const item=REGISTRY.find(x=>x.id===id&&x.enabled);if(!item)return;
     activeId=id;screen=item.kind==='numbers'?'numbers':'trainer';selection=new Set();pairSelection={};
     const href=id==='harmony_letters'?'#/practices/letters':(screen==='numbers'?'#/practices/numbers':'#/practices');
-    if(!publishPersonal(href))render();
+    if(!publishPersonal(href,options))render();
   }
   function start(id='harmony_letters',mode='full'){
     activeId=id;screen='trainer';

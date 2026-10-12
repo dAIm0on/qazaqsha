@@ -52,7 +52,7 @@
    if(path==='/lesson')found=lessonHome();
    else if(path==='/lesson/theory')found=route('theory','path',withQuery('#/lesson/theory',ctx,['lesson']),{context:{lesson:ctx.lesson||null}});
    else if(path==='/words')found=route('words','practice','#/words',{session:true,sessionKey:'vocab:must'});
-   else if(path==='/practice')found=route('practice','practice',withQuery('#/practice',ctx,['lesson']),{session:true,context:{lesson:ctx.lesson||null}});
+   else if(path==='/practice')found=route('practice','practice',withQuery('#/practice',ctx,['lesson']),{session:true,context:{lesson:ctx.lesson||null},sessionKey:ctx.lesson?('course:'+ctx.lesson):null});
    else if(path==='/morph')found=route('morph','morph','#/morph');
    else if(path==='/lessons')found=route('lessons','learn','#/lessons');
    else if(path==='/practices/letters')found=route('letters','personal','#/practices/letters');
@@ -161,7 +161,7 @@
  }
  function packState(prev,item,qzView){
    const base={};
-   const drop={nav2:1,fs2:1,queue:1,draft:1,practiceIds:1,answers:1,snapshot:1};
+   const drop={queue:1,draft:1,practiceIds:1,answers:1,snapshot:1};
    if(prev&&typeof prev==='object'){
      Object.keys(prev).forEach(function(key){
        if(drop[key]||key==='qzNav'||key==='qzView')return;
@@ -170,7 +170,7 @@
    }
    const origin=item.origin?slim(item.origin):null;
    base.qzView=qzView||item.view;
-   base.qzNav={version:VERSION,route:item.href,name:item.name,context:item.context||{},origin:origin,sessionKey:item.sessionKey||null};
+   base.qzNav={version:VERSION,route:item.href,name:item.name,context:item.context||{},origin:origin,originAdjacent:!!item.originAdjacent,sessionKey:item.sessionKey||null};
    return base;
  }
 
@@ -190,19 +190,28 @@
    try{root.history[method](state,'',href);}catch(e){try{root.history[method](state,'');}catch(e2){}}
    try{if(root.location&&root.location.hash!==href)root.location.hash=href;}catch(e){}
  }
+ function adjacentOriginFromState(state,item){
+   const qz=state&&state.qzNav;
+   if(!qz||qz.originAdjacent!==true||qz.route!==item.href||!qz.origin||typeof qz.origin.href!=='string')return null;
+   const parsed=parse(qz.origin.href);
+   if(parsed.kind!=='route'||parsed.route.href===item.href)return null;
+   return slim(parsed.route);
+ }
  function commit(info){
    notice(false);
    const source=info&&info.source||'user';
    const parsed=info&&info.route?{kind:'route',route:info.route}:(info&&info.href?parse(info.href):null);
    const item=slim(parsed&&parsed.route?parsed.route:legacyRoute(info&&info.view,info&&info.runtime));
-   const prev=current();
+   const bootOrigin=source==='boot'&&index<0?adjacentOriginFromState(root.history&&root.history.state,item):null;
+   const prev=current()||bootOrigin;
    let origin=prev&&prev.origin?slim(prev.origin):null;
    if(!prev||!sameRoute(prev,item))origin=prev?slim(prev):origin;
    if(item.session&&(!origin||origin.href===item.href))origin=slim(parentOf(item));
    if(!item.session&&origin&&origin.href===item.href)origin=prev&&prev.origin?slim(prev.origin):null;
    item.origin=origin;
-   const state=packState(root.history&&root.history.state,item,item.view);
    const same=!!(prev&&prev.href===item.href);
+   item.originAdjacent=bootOrigin?true:(!same&&prev&&origin&&prev.href===origin.href?true:!!(same&&prev&&prev.originAdjacent));
+   const state=packState(root.history&&root.history.state,item,item.view);
    let href=item.href;
    if(source==='boot'){
      const live=root.location?String(root.location.hash||''):'';
@@ -216,7 +225,8 @@
      write('pushState',state,href);
      return {pushed:true,href:item.href,route:item};
    }
-   if(index<0){entries=[item];index=0;}
+   if(index<0&&bootOrigin){entries=[bootOrigin,item];index=1;}
+   else if(index<0){entries=[item];index=0;}
    else entries[index]=item;
    write('replaceState',state,href);
    return {pushed:false,href:item.href,route:item};
@@ -260,10 +270,40 @@
      return true;
    }
    const state=ev&&ev.state||null;
-   if(state&&(state.nav2||state.fs2)&&!(state.qzNav&&state.qzNav.route))return false;
    const hash=root.location?String(root.location.hash||''):'';
    const parsed=parse(hash);
-   if(parsed.kind==='anchor'){mark(ev);return true;}
+   const href=destinationHref(ev);
+   const cur=current();
+   const prev=index>0?entries[index-1]:null;
+   if(state&&state.qzView&&!state.qzNav){
+     mark(ev);
+     const item=slim(legacyRoute(state.qzView));
+     const prior=current();
+     item.origin=prior&&prior.origin?slim(prior.origin):slim(parentOf(item));
+     if(item.session&&(!item.origin||item.origin.href===item.href))item.origin=slim(parentOf(item));
+     if(prev&&prev.view===item.view){index-=1;entries[index]=item;}
+     else if(index<0){entries=[item];index=0;}
+     else{entries=entries.slice(0,index+1);entries.push(item);index=entries.length-1;}
+     lastApplied=item.href;
+     const packed=packState(state,item,item.view);
+     try{root.history.replaceState(packed,'',item.href);}catch(e){}
+     try{if(root.location&&root.location.hash!==item.href)root.location.hash=item.href;}catch(e){}
+     if(applyFn)applyFn(item,'history');
+     return true;
+   }
+   if(state&&(state.nav2||state.fs2)){
+     if(cur&&prev&&cur.href!==href&&prev.href===href){
+       mark(ev);
+       index-=1;
+       lastApplied=href;
+       if(applyFn)applyFn(current(),'history');
+       return true;
+     }
+     if(!(state.qzNav&&state.qzNav.route)||(cur&&cur.href===href))return false;
+   }
+   if(state&&state.qzNav&&cur&&cur.view==='morph'&&cur.href===href)return false;
+   if(state&&state.qzNav&&cur&&cur.href===href){mark(ev);lastApplied=href;return true;}
+   if(parsed.kind==='anchor'){mark(ev);lastApplied=href;return true;}
    if(parsed.kind==='unknown'){
      mark(ev);
      const lesson=slim(lessonHome());
@@ -281,7 +321,6 @@
      return true;
    }
    mark(ev);
-   const href=destinationHref(ev);
    if(index>0&&entries[index-1]&&entries[index-1].href===href)index-=1;
    else if(entries[index+1]&&entries[index+1].href===href)index+=1;
    else if(parsed.kind==='route'){
@@ -315,7 +354,7 @@
    const prev=index>0?entries[index-1]:null;
    if(prev&&origin&&prev.href===origin.href)return {how:'back'};
    const target=origin?slim(origin):slim(parentOf(cur));
-   return {how:'replace',route:target,view:target.view};
+   return {how:origin?'push':'replace',route:target,view:target.view};
  }
  function isNoopHistory(name){
    const fn=root.history&&root.history[name];
