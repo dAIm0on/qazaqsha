@@ -4144,18 +4144,23 @@ function qazaqAppBoot(bootMirror){
  function sessionRouteMatchesLive(item,key){
    if(!key||!liveOpen())return false;
    const liveKey=currentLaunchKey();
-   return !!liveKey&&liveKey===key;
+   if(liveKey&&liveKey===key)return true;
+   return typeof launchKey==='string'&&launchKey===key;
  }
  function openSessionRoute(item,source){
    const Nav=window.NavigationState,key=routeSessionKey(item);
    if(sessionRouteMatchesLive(item,key)){showView('practice',{source:source,route:item});return 'live';}
    const parked=Nav&&key?Nav.get(state,key):null;
    if(parked&&parked.status==='paused'){
+     if(liveOpen()){
+       const liveKey=currentLaunchKey()||(typeof launchKey==='string'?launchKey:null);
+       if(liveKey&&liveKey!==key&&!parkLive(liveKey,'paused')){noteLaunchBlocked();showView('practice',{source:source});return 'blocked';}
+     }
      const restored=restoreParked(key,parked);
      if(restored==='ok'||restored==='held')return 'parked';
    }
    if(item&&item.name==='practice'&&item.context&&item.context.lesson)setHubLesson(item.context.lesson);
-   const parent=QazaqNav.parentOf(item);
+   const parent=item&&item.name==='exam-session'?QazaqNav.parse('#/ready/exam').route:QazaqNav.parentOf(item);
    showView(parent.view,{source:source,route:parent});
    return 'parent';
  }
