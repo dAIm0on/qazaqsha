@@ -179,6 +179,7 @@
  let pushCount=0;
  let lastApplied='';
  let applying=false;
+ let pendingIndex=null;
  let applyFn=null;
  const claimedFlag=typeof WeakSet==='function'?new WeakSet():null;
 
@@ -190,6 +191,7 @@
    try{if(root.location&&root.location.hash!==href)root.location.hash=href;}catch(e){}
  }
  function commit(info){
+   notice(false);
    const source=info&&info.source||'user';
    const parsed=info&&info.route?{kind:'route',route:info.route}:(info&&info.href?parse(info.href):null);
    const item=slim(parsed&&parsed.route?parsed.route:legacyRoute(info&&info.view,info&&info.runtime));
@@ -240,12 +242,44 @@
    return hash;
  }
  function onPop(ev){
-   if(applying){mark(ev);return true;}
+   if(applying){
+     mark(ev);
+     if(pendingIndex!=null&&entries[pendingIndex])index=pendingIndex;
+     pendingIndex=null;
+     const item=current();
+     applying=false;
+     if(item){
+       lastApplied=item.href;
+       if(applyFn)applyFn(item,'history');
+       else{
+         const packed=packState(ev&&ev.state,item,item.view);
+         try{root.history.replaceState(packed,'',item.href);}catch(e){}
+         try{if(root.location&&root.location.hash!==item.href)root.location.hash=item.href;}catch(e){}
+       }
+     }
+     return true;
+   }
    const state=ev&&ev.state||null;
    if(state&&(state.nav2||state.fs2)&&!(state.qzNav&&state.qzNav.route))return false;
    const hash=root.location?String(root.location.hash||''):'';
    const parsed=parse(hash);
    if(parsed.kind==='anchor'){mark(ev);return true;}
+   if(parsed.kind==='unknown'){
+     mark(ev);
+     const lesson=slim(lessonHome());
+     const prev=current();
+     lesson.origin=prev?slim(prev):null;
+     if(!prev||prev.href!==lesson.href){
+       entries=entries.slice(0,index+1);
+       entries.push(lesson);
+       index=entries.length-1;
+     }else entries[index]=lesson;
+     const packed=packState(state,lesson,lesson.view);
+     write('replaceState',packed,lesson.href);
+     if(applyFn)applyFn(current(),'history');
+     notice(true);
+     return true;
+   }
    mark(ev);
    const href=destinationHref(ev);
    if(index>0&&entries[index-1]&&entries[index-1].href===href)index-=1;
@@ -283,30 +317,45 @@
    const target=origin?slim(origin):slim(parentOf(cur));
    return {how:'replace',route:target,view:target.view};
  }
+ function isNoopHistory(name){
+   const fn=root.history&&root.history[name];
+   if(typeof fn!=='function')return true;
+   let src='';
+   try{src=Function.prototype.toString.call(fn);}catch(e){return false;}
+   src=src.replace(/\s+/g,'');
+   return src===name+'(){}'||src==='function'+name+'(){}'||src==='function(){}'||src==='()=>{}';
+ }
+ function settleSync(item){
+   lastApplied=item.href;
+   try{if(root.location&&root.location.hash!==item.href)root.location.hash=item.href;}catch(e){}
+   if(applyFn)applyFn(item,'history');
+ }
  function goBack(){
    if(index<=0)return false;
-   applying=true;
-   try{
+   if(isNoopHistory('back')){
      index-=1;
-     const item=current();
-     const state=packState(root.history&&root.history.state,item,item.view);
-     try{root.history.back();}catch(e){}
-     write('replaceState',state,item.href);
-     if(applyFn)applyFn(item,'history');
-   }finally{applying=false;}
+     settleSync(current());
+     return true;
+   }
+   applying=true;
+   pendingIndex=index-1;
+   const prevApplied=lastApplied;
+   lastApplied=entries[pendingIndex].href;
+   try{root.history.back();}catch(e){applying=false;pendingIndex=null;lastApplied=prevApplied;return false;}
    return true;
  }
  function goForward(){
    if(index>=entries.length-1)return false;
-   applying=true;
-   try{
+   if(isNoopHistory('forward')){
      index+=1;
-     const item=current();
-     const state=packState(root.history&&root.history.state,item,item.view);
-     try{if(root.history.forward)root.history.forward();}catch(e){}
-     write('replaceState',state,item.href);
-     if(applyFn)applyFn(item,'history');
-   }finally{applying=false;}
+     settleSync(current());
+     return true;
+   }
+   applying=true;
+   pendingIndex=index+1;
+   const prevApplied=lastApplied;
+   lastApplied=entries[pendingIndex].href;
+   try{root.history.forward();}catch(e){applying=false;pendingIndex=null;lastApplied=prevApplied;return false;}
    return true;
  }
  function bind(fn){applyFn=fn;}
@@ -318,9 +367,9 @@
      el.textContent=on?'Такого адреса нет. Открыт урок.':'';
    }catch(e){}
  }
- function resetTrace(){entries=[];index=-1;pushCount=0;lastApplied='';}
+ function resetTrace(){entries=[];index=-1;pushCount=0;lastApplied='';applying=false;pendingIndex=null;}
 
- const api={VERSION:VERSION,SECTIONS:SECTIONS,parse:parse,classify:classify,parentOf:parentOf,sameRoute:sameRoute,legacyRoute:legacyRoute,lessonHome:lessonHome,sectionPlan:sectionPlan,packState:packState,commit:commit,pauseReturn:pauseReturn,onPop:onPop,claimed:claimed,bind:bind,goBack:goBack,goForward:goForward,stack:stack,notice:notice,resetTrace:resetTrace,cleanId:cleanId};
+ const api={VERSION:VERSION,SECTIONS:SECTIONS,parse:parse,classify:classify,parentOf:parentOf,sameRoute:sameRoute,legacyRoute:legacyRoute,lessonHome:lessonHome,sectionPlan:sectionPlan,packState:packState,commit:commit,pauseReturn:pauseReturn,onPop:onPop,onHash:onHash,claimed:claimed,bind:bind,goBack:goBack,goForward:goForward,stack:stack,notice:notice,resetTrace:resetTrace,cleanId:cleanId};
  Object.defineProperty(api,'pushCount',{get:function(){return pushCount;}});
  if(node)module.exports=api;
  if(root&&root.window){

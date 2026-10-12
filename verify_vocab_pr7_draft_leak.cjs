@@ -442,7 +442,7 @@ function adjacentSame(api, ids) {
   console.log('P1-2 table (' + table.length + '):', table.join('; '));
 
   const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
-  assert.match(sw, /qazaq-offline-live-20261012-nav03['"]/, 'sw.js CACHE is nav02f after main is merged in');
+  assert.match(sw, /qazaq-offline-live-20261012-nav03b['"]/, 'sw.js CACHE is nav02f after main is merged in');
   console.log('VERIFY_VOCAB_PR7_DRAFT_LEAK_OK');
 })().catch(err => {
   console.error(err && err.stack ? err.stack : err);

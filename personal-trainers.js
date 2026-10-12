@@ -46,19 +46,30 @@
     if(rec.session.mode==='quick')return 'Быстрый подход · '+Math.min(rec.session.cursor+1,rec.session.queue.length)+' из '+rec.session.queue.length;
     return STAGE_LABELS[rec.session.stage]+' · '+(rec.session.queue.length?Math.min(rec.session.cursor+1,rec.session.queue.length)+' из '+rec.session.queue.length:'готово к старту');
   }
-  function open(){
-    if(window.QazaqShell&&window.QazaqShell.show)window.QazaqShell.show('personal');
-    else render();
+  function publishPersonal(href){
+    if(!(window.QazaqNav&&window.QazaqShell&&window.QazaqShell.show))return false;
+    const parsed=window.QazaqNav.parse(href);
+    if(!parsed||parsed.kind!=='route')return false;
+    window.QazaqShell.show('personal',{route:parsed.route});
+    return true;
   }
-  function openCatalog(){screen='catalog';activeId=null;selection=new Set();pairSelection={};render();}
+  function open(){
+    screen='catalog';activeId=null;selection=new Set();pairSelection={};
+    if(!publishPersonal('#/practices'))render();
+  }
+  function openCatalog(){screen='catalog';activeId=null;selection=new Set();pairSelection={};if(!publishPersonal('#/practices'))render();}
   function openTrainer(id){
     const item=REGISTRY.find(x=>x.id===id&&x.enabled);if(!item)return;
-    activeId=id;screen=item.kind==='numbers'?'numbers':'trainer';selection=new Set();pairSelection={};render();
+    activeId=id;screen=item.kind==='numbers'?'numbers':'trainer';selection=new Set();pairSelection={};
+    const href=id==='harmony_letters'?'#/practices/letters':(screen==='numbers'?'#/practices/numbers':'#/practices');
+    if(!publishPersonal(href))render();
   }
   function start(id='harmony_letters',mode='full'){
     activeId=id;screen='trainer';
     const session=H.createSession(mode);
-    writeSession(id,session);selection=new Set();pairSelection={};render();
+    writeSession(id,session);selection=new Set();pairSelection={};
+    const href=id==='harmony_letters'?'#/practices/letters':'#/practices';
+    if(!publishPersonal(href))render();
   }
   function reset(id='harmony_letters'){clearTrainer(id);start(id,'full');}
   function getRoot(){return document.getElementById('personal-content');}

@@ -1785,7 +1785,7 @@ function qazaqAppBoot(bootMirror){
    // r7 ux60 #1: one writer tags the current history entry. QazaqNav pushes only when the public
    // route changes; the fallback keeps a harness without the registry on the same qzView tag.
    if(window.QazaqNav&&QazaqNav.commit){
-     try{QazaqNav.commit({view:next,source:navSource,route:navOpts.route||null,runtime:{mode:mode,topic:topic,courseBlock:courseBlock,hwLesson:hwLesson,hwPart:hwPart,hwSection:hwSection,vocabRole:vocabRole,trainerReturn:trainerReturn,launchKey:launchKey,activeLesson:activeLesson,grammarLesson:state.grammarPath&&state.grammarPath.lessonId,letters:!!(state.prefs&&state.prefs.letters)}});}catch(e){}
+     try{QazaqNav.commit({view:next,source:navSource,route:navOpts.route||null,runtime:{mode:mode,topic:topic,courseBlock:courseBlock,hwLesson:hwLesson,hwPart:hwPart,hwSection:hwSection,vocabRole:vocabRole,trainerReturn:trainerReturn,launchKey:launchKey,activeLesson:activeLesson,grammarLesson:state.grammarPath&&state.grammarPath.lessonId}});}catch(e){}
    }else if(next!==prevView)try{history.replaceState(Object.assign({},history.state||{},{qzView:next}),'');}catch{}
    /* Immersive hides .bottom-nav. Leaving morph must drop the flag or the menu stays gone. */
    if(next!=='morph')delete document.body.dataset.morphImmersive;
@@ -4093,6 +4093,11 @@ function qazaqAppBoot(bootMirror){
    window.__qzNavSource=source||'history';
    try{
      const item=entry||{};
+     if(item.name==='words'||item.sessionKey==='vocab:must'){
+       const parked=window.NavigationState&&NavigationState.get(state,'vocab:must');
+       const liveMust=trainerReturn==='vocab:must'&&queue.length>position;
+       if(!liveMust&&parked&&parked.status==='paused'){restoreParked('vocab:must',parked);return;}
+     }
      if(item.session&&!(queue.length>position)&&!vocabSummary){
        const parent=QazaqNav.parentOf(item);
        showView(parent.view,{source:'history',route:parent});

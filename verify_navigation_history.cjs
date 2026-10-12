@@ -261,4 +261,141 @@ function seedNav2(win, hash){
 }
 ok('N-HISTORY-5 and N-HISTORY-6: #main is not a route; explicit URL beats morph; unknown keeps one section');
 
-console.log('verify_navigation_history: ' + passed + ' checks passed');
+function flush(){ return new Promise(function(resolve){ setTimeout(resolve, 0); }); }
+function installAsyncHistory(){
+  const entries = [{href: '', state: null}];
+  let pos = 0;
+  const loc = {hash: ''};
+  global.location = loc;
+  global.history = {
+    get state(){ return entries[pos] ? entries[pos].state : null; },
+    get length(){ return entries.length; },
+    pushState(state, title, href){
+      const url = href || loc.hash;
+      entries.splice(pos + 1);
+      entries.push({href: url, state: state});
+      pos = entries.length - 1;
+      loc.hash = url;
+    },
+    replaceState(state, title, href){
+      const url = href || (entries[pos] && entries[pos].href) || loc.hash;
+      entries[pos] = {href: url, state: state};
+      loc.hash = url;
+    },
+    back(){
+      const target = Math.max(0, pos - 1);
+      setTimeout(function(){
+        pos = target;
+        loc.hash = entries[pos].href;
+        Nav.onPop({state: entries[pos].state, stopImmediatePropagation(){}});
+      }, 0);
+    },
+    forward(){
+      const target = Math.min(entries.length - 1, pos + 1);
+      setTimeout(function(){
+        pos = target;
+        loc.hash = entries[pos].href;
+        Nav.onPop({state: entries[pos].state, stopImmediatePropagation(){}});
+      }, 0);
+    }
+  };
+  return {
+    hrefs(){ return entries.map(function(entry){ return entry.href; }); },
+    pos(){ return pos; },
+    length(){ return entries.length; }
+  };
+}
+function lessonDupes(hrefs){
+  for (let i = 1; i < hrefs.length; i += 1) {
+    if (hrefs[i] === '#/lesson' && hrefs[i - 1] === '#/lesson') return true;
+  }
+  return false;
+}
+
+(async function(){
+  try {
+    Nav.resetTrace();
+    const hist = installAsyncHistory();
+    assert.equal(Nav.commit({view: 'today', source: 'boot', route: Nav.lessonHome()}).pushed, false);
+    assert.equal(Nav.commit({view: 'practice', source: 'user', route: Nav.parse('#/words').route}).pushed, true);
+    const beforePause = hist.hrefs().slice();
+    const beforePos = hist.pos();
+    const beforeLen = hist.length();
+    const pushes = Nav.pushCount;
+    console.log('D1-TRACE before pause ' + JSON.stringify(beforePause) + ' pos ' + beforePos);
+    assert.equal(Nav.goBack(), true);
+    assert.deepEqual(hist.hrefs(), beforePause, 'replaceState must not rewrite the words entry in the same tick as back()');
+    assert.equal(hist.pos(), beforePos);
+    await flush();
+    console.log('D1-TRACE after pause ' + JSON.stringify(hist.hrefs()) + ' pos ' + hist.pos());
+    assert.equal(hist.length(), beforeLen, 'pause does not grow history.length');
+    assert.equal(Nav.pushCount, pushes, 'pause pushCount stays 0');
+    assert.equal(hist.hrefs()[hist.pos()], '#/lesson');
+    assert.equal(hist.hrefs()[hist.pos() + 1], '#/words');
+    assert.equal(lessonDupes(hist.hrefs()), false);
+    assert.equal(Nav.goForward(), true);
+    assert.equal(hist.hrefs()[0], '#/lesson', 'forward must not rewrite the lesson entry in the same tick');
+    await flush();
+    assert.equal(hist.hrefs()[hist.pos()], '#/words');
+    assert.equal(hist.hrefs()[hist.pos() - 1], '#/lesson');
+    assert.equal(Nav.goBack(), true);
+    await flush();
+    assert.equal(hist.hrefs()[hist.pos()], '#/lesson');
+    assert.equal(hist.hrefs()[hist.pos() + 1], '#/words');
+    assert.equal(Nav.goForward(), true);
+    await flush();
+    assert.equal(hist.hrefs()[hist.pos()], '#/words');
+    assert.equal(Nav.goBack(), true);
+    await flush();
+    assert.equal(hist.hrefs()[hist.pos()], '#/lesson');
+    assert.equal(hist.hrefs()[hist.pos() + 1], '#/words');
+    assert.equal(lessonDupes(hist.hrefs()), false);
+    assert.equal(hist.length(), beforeLen);
+    assert.equal(Nav.pushCount, pushes);
+    ok('N-HISTORY-PAUSE-FWD async back/forward keeps #/words at index+1');
+
+    Nav.resetTrace();
+    const live = installAsyncHistory();
+    const note = {hidden: true, textContent: ''};
+    global.document = {getElementById(id){ return id === 'route-note' ? note : null; }};
+    Nav.commit({view: 'today', source: 'boot', route: Nav.lessonHome()});
+    Nav.commit({view: 'practice', source: 'user', route: Nav.parse('#/words').route});
+    const stamped = Nav.pushCount;
+    global.history.pushState(null, '', '#/no-such-room');
+    Nav.onPop({state: null, stopImmediatePropagation(){}});
+    Nav.onHash();
+    assert.equal(global.location.hash, '#/lesson');
+    assert.equal(note.hidden, false);
+    assert.equal(note.textContent, 'Такого адреса нет. Открыт урок.');
+    assert.equal(Nav.pushCount, stamped);
+    assert.equal(Nav.stack().pop().href, '#/lesson');
+    assert.equal(live.hrefs()[live.pos()], '#/lesson');
+    assert.equal(live.hrefs().indexOf('#/no-such-room'), -1);
+    assert.equal(live.hrefs()[live.pos() - 1], '#/words');
+    Nav.commit({view: 'today', source: 'user', route: Nav.parse('#/library').route});
+    assert.equal(note.hidden, true, '#route-note hides on the next hop');
+    ok('N-ROUTE-UNKNOWN-LIVE typed unknown hash replaces onto the lesson');
+
+    const page = boot();
+    const shell = page.window.QazaqShell;
+    shell.show('personal');
+    assert.equal(page.window.location.hash, '#/practices');
+    const box = page.window.document.getElementById('pref-letters');
+    box.checked = false;
+    box.onchange();
+    shell.show('today');
+    shell.show('personal');
+    assert.equal(page.window.location.hash, '#/practices');
+    page.window.PersonalTrainers.openTrainer('harmony_letters');
+    assert.equal(page.window.location.hash, '#/practices/letters');
+    const cold = boot(null, function(win){ win.location.hash = '#/practices/letters'; });
+    assert.equal(cold.window.location.hash, '#/practices/letters');
+    assert.equal(cold.window.document.body.dataset.view, 'personal');
+    ok('N-ROUTE-PRACTICES-TAB hub stays #/practices; explicit letters keep their address');
+
+    console.log('verify_navigation_history: ' + passed + ' checks passed');
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+})();
