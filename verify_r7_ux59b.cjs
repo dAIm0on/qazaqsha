@@ -108,10 +108,12 @@ ok('#4 each entry point keeps its own queue: shelves / bank tracks never land in
 // #5 logo history
 {
   const h=slice(app,"const brandLink=document.querySelector('a.brand');"," $('#pause-session').onclick");
-  // ux60 #1: logo is a single pushState; showView keeps the current entry tagged (no replaceState+pushState pair).
-  assert.ok(h.includes("history.pushState({qzView:'today'},'');"),'one entry, same URL');
+  // NAV-03: the logo no longer pushes on its own. showView / navigation.js records one hash entry
+  // (same document, so F5 still resumes and the service worker is untouched). A URL on this slice would be a second writer.
+  assert.ok(!h.includes('history.pushState'),'logo does not push a second entry');
+  assert.ok(h.includes("showView('today')"),'logo opens today through the one writer');
   assert.ok(app.includes("history.replaceState(Object.assign({},history.state||{},{qzView:next}),'');"),'showView tags the current entry');
-  assert.ok(!/pushState\([^)]*,[^)]*,[^)]+\)/.test(h),'no URL argument → F5 / resumeSurface / SW untouched');
+  assert.ok(!/pushState\([^)]*,[^)]*,[^)]+\)/.test(h),'logo passes no URL; the hash route lives in navigation.js');
   assert.ok(h.includes("window.addEventListener('popstate',ev=>{")&&h.includes("if(v==='practice'&&!(queue.length>position))")&&h.includes('showView(v);save();'),'«Назад» returns to the screen, never into an ended session');
 }
 ok('#5 logo adds one history entry (same URL); browser «Назад» returns to the previous screen with its session and draft');

@@ -33,7 +33,7 @@ const PROTECTED = [
   'free-practice-content.js',
   'free-practice-view.js'
 ];
-const ALLOWED_FILE = /^(app\.js|index\.html|navigation-state\.js|progress\.js|sw\.js|verify_chrome_error9_p0\.cjs|verify_lesson33\.cjs|verify_lesson_2_1_path_migrate\.cjs|verify_lesson_v2\.cjs|verify_navigation_contract\.cjs|verify_navigation_state\.cjs|verify_offline_assets\.cjs|verify_personal_trainers\.cjs|verify_r7_2ta\.cjs|verify_r7_2tb\.cjs|verify_r7_51\.cjs|verify_r7_66\.cjs|verify_r7_runtime_progress_migration\.cjs|verify_r7_support_kinds_mastery\.cjs|verify_r7_ux63\.cjs|verify_r7_x123\.cjs|verify_section2_canonical\.cjs|verify_trainer\.cjs|verify_vocab_pr7_draft_leak\.cjs|verify_vocab_trainer_v1\.cjs)$/;
+const ALLOWED_FILE = /^(app\.js|index\.html|navigation\.js|navigation-state\.js|progress\.js|sw\.js|verify_chrome_error9_p0\.cjs|verify_lesson33\.cjs|verify_lesson_2_1_path_migrate\.cjs|verify_lesson_v2\.cjs|verify_navigation_contract\.cjs|verify_navigation_history\.cjs|verify_navigation_state\.cjs|verify_offline_assets\.cjs|verify_personal_trainers\.cjs|verify_r7_2ta\.cjs|verify_r7_2tb\.cjs|verify_r7_51\.cjs|verify_r7_66\.cjs|verify_r7_runtime_progress_migration\.cjs|verify_r7_support_kinds_mastery\.cjs|verify_r7_ux59b\.cjs|verify_r7_ux60\.cjs|verify_r7_ux63\.cjs|verify_r7_x123\.cjs|verify_section2_canonical\.cjs|verify_trainer\.cjs|verify_vocab_pr7_draft_leak\.cjs|verify_vocab_trainer_v1\.cjs)$/;
 
 function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -206,7 +206,7 @@ function registry() {
     ['theory-practice-words-theory', 'path', 'practice then words', 'theory', ['theory-draft.json'], 'NAV-05', 'EXPECTED_LATER'],
     ['words-catalog-back', 'words', 'catalog', 'words', ['must-first-show.json'], 'VOC', 'BASELINE'],
     ['must-boundary-pause', 'must boundary', 'pause', 'same must portion', ['must-boundary.json'], 'VOC', 'BASELINE'],
-    ['summary-continue', 'must summary', 'continue', '#/words', ['must-summary.json'], 'NAV-03', 'EXPECTED_LATER'],
+    ['summary-continue', 'must summary', 'continue', '#/words', ['must-summary.json'], 'NAV-03', 'BASELINE'],
     ['summary-continue-card', 'must summary', 'continue', 'live words session, same card', ['must-summary.json'], 'VOC', 'BASELINE'],
     ['summary-to-trainers', 'must summary', 'trainers', 'personal', ['must-summary.json'], 'NAV-08', 'EXPECTED_LATER'],
     ['reload-three-sessions', 'three open sessions', 'reload', 'each session restored', ['clean.json', 'theory-draft.json', 'practice-mid.json'], 'NAV-02', 'BASELINE'],
@@ -218,12 +218,12 @@ function registry() {
     ['storage-unavailable', 'any', 'qazaq-before-update', 'preventDefault', [], 'NAV-01', 'BASELINE']
   ].map(item => row(...item));
   const history = [
-    ['N-HISTORY-1', 'lesson', 'library then results then Back Back Forward', 'one external entry per hop', ['clean.json'], 'NAV-03', 'EXPECTED_LATER'],
-    ['N-HISTORY-2', 'lesson', 'words, pause, practice, browser Back, Слова', 'must restored from parked, no second launch', ['must-first-show.json', 'practice-mid.json'], 'NAV-03', 'EXPECTED_LATER'],
-    ['N-HISTORY-3', 'lesson theory', 'Предыдущий шаг then pause', 'internal step is not an external history entry', ['theory-draft.json'], 'NAV-03', 'EXPECTED_LATER'],
-    ['N-HISTORY-4', 'lesson morph', 'internal nav2/fs2 then library then Back', 'morph stack survives the external trip', ['clean.json'], 'NAV-03', 'EXPECTED_LATER'],
-    ['N-HISTORY-5', 'practice', 'skip-link #main then browser Back', 'focus moves, queue does not restart', ['practice-mid.json'], 'NAV-03', 'EXPECTED_LATER'],
-    ['N-HISTORY-6', 'cold URL', '#/words with saved morph, #/lesson with saved must', 'explicit route wins, parked data stays', ['must-first-show.json'], 'NAV-03', 'EXPECTED_LATER']
+    ['N-HISTORY-1', 'lesson', 'library then results then Back Back Forward', 'one external entry per hop', ['clean.json'], 'NAV-03', 'BASELINE'],
+    ['N-HISTORY-2', 'lesson', 'words, pause, practice, browser Back, Слова', 'must restored from parked, no second launch', ['must-first-show.json', 'practice-mid.json'], 'NAV-03', 'BASELINE'],
+    ['N-HISTORY-3', 'lesson theory', 'Предыдущий шаг then pause', 'internal step is not an external history entry', ['theory-draft.json'], 'NAV-03', 'BASELINE'],
+    ['N-HISTORY-4', 'lesson morph', 'internal nav2/fs2 then library then Back', 'morph stack survives the external trip', ['clean.json'], 'NAV-03', 'BASELINE'],
+    ['N-HISTORY-5', 'practice', 'skip-link #main then browser Back', 'focus moves, queue does not restart', ['practice-mid.json'], 'NAV-03', 'BASELINE'],
+    ['N-HISTORY-6', 'cold URL', '#/words with saved morph, #/lesson with saved must', 'explicit route wins, parked data stays', ['must-first-show.json'], 'NAV-03', 'BASELINE']
   ].map(item => row(...item));
   const pwa = [
     ['N-PWA-01', 'two tabs', 'update on tab A', 'tab B does not reload', [], 'NAV-01', 'EXPECTED_LATER'],
@@ -296,14 +296,20 @@ assert.equal(byId.get('nav02-import-replace-copy').target, 'chosen copy plus exi
 assert.equal(byId.get('must-wrong-pause-course-must').status, 'EXPECTED_LATER');
 assert.equal(byId.get('must-wrong-pause-course-must').owner, 'NAV-04');
 assert.equal(byId.get('must-wrong-pause-course-must').target, 'course then must');
-assert.equal(byId.get('summary-continue').status, 'EXPECTED_LATER');
+assert.equal(byId.get('summary-continue').status, 'BASELINE');
 assert.equal(byId.get('summary-continue').owner, 'NAV-03');
 assert.equal(byId.get('summary-continue').target, '#/words');
+assert.equal(byId.get('summary-continue').control, 'continue');
 assert.equal(byId.get('must-save-writes-vocab').target, 'non-must omits vocab; must writes vocab');
 assert.equal(byId.get('must-retype-across-learn').target, 'learn, then the same retype');
 assert.equal(byId.get('summary-continue-card').target, 'live words session, same card');
-for (const id of ['N-TAP-03', 'N-TAP-04', 'N-TAP-09', 'N-TAP-11', 'summary-to-trainers', 'N-HISTORY-2', 'N-HISTORY-6']) {
+for (const id of ['N-TAP-03', 'N-TAP-04', 'N-TAP-09', 'N-TAP-11', 'summary-to-trainers']) {
   assert.equal(byId.get(id).status, 'EXPECTED_LATER', id);
+}
+for (let n = 1; n <= 6; n++) {
+  const id = 'N-HISTORY-' + n;
+  assert.equal(byId.get(id).status, 'BASELINE', id);
+  assert.equal(byId.get(id).owner, 'NAV-03', id);
 }
 const counts = {};
 for (const item of contracts) counts[item.status] = (counts[item.status] || 0) + 1;
@@ -488,6 +494,7 @@ function hasVocab(session) {
     if (setup) setup(api);
     api.saveNow();
     const before = api.session();
+    const pushes = api.window.QazaqNav.pushCount;
     api.makeEl('vocab-finish').onclick();
     api.makeEl('vocab-summary-continue').onclick();
     api.saveNow();
@@ -499,7 +506,8 @@ function hasVocab(session) {
     assert.equal(after.view, 'practice');
     assert.equal(after.mode, 'words');
     assert.equal(after.trainerReturn, 'vocab:must');
-    assert.equal(api.window.location.hash, '');
+    assert.equal(api.window.location.hash, '#/words');
+    assert.equal(api.window.QazaqNav.pushCount, pushes);
   }
   await continueFrom(null);
   await continueFrom(api => { api.makeEl('reveal-button').onclick(); });

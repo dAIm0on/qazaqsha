@@ -7,11 +7,14 @@ const slice=(src,from,to)=>{const i=src.indexOf(from);assert.ok(i>=0,'missing '+
 {
   const sv=slice(app,' function showView(next){',' function shellTab(next){');
   assert.ok(sv.includes("history.replaceState(Object.assign({},history.state||{},{qzView:next}),'');"),'showView tags the current history entry');
+  assert.ok(sv.includes('QazaqNav.commit'),'showView is the one history writer');
   const logo=slice(app,"const brandLink=document.querySelector('a.brand');"," $('#pause-session').onclick");
-  assert.ok(logo.includes("history.pushState({qzView:'today'},'');"),'logo pushState');
+  assert.ok(!logo.includes('history.pushState'),'logo does not push a second entry');
+  assert.ok(logo.includes("showView('today')"),'logo opens today');
   assert.ok(!logo.includes('history.replaceState'),'logo no longer replaceState+pushState (that left a no-op Back)');
   const sl=slice(app,' function startLesson(id,step=learningState.steps[id]||0,opts){',' function startContrast(pair){');
-  assert.ok(sl.includes("if(view==='learn')try{history.pushState({qzView:'practice'},'');}catch{}"),'«Сборник» / track from Учёба pushes practice so Back → learn');
+  assert.ok(!sl.includes('history.pushState'),'«Сборник» does not push a second entry');
+  assert.ok(sl.includes("showView('practice')"),'«Сборник» / track from Учёба still opens practice so Back → learn');
   const pop=slice(app,"window.addEventListener('popstate',ev=>{"," $('#pause-session').onclick");
   assert.ok(pop.includes("showView(v);save();")&&pop.includes("showView('learn')"),'popstate restores the screen');
 }

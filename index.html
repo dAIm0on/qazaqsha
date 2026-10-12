@@ -101,6 +101,7 @@
   <script defer src="vocab-must.js"></script>
   <script defer src="navigation-state.js"></script>
   <script defer src="store-idb.js"></script>
+  <script defer src="navigation.js"></script>
   <script defer src="app.js"></script>
   <script defer src="design-ui.js"></script>
   <script defer src="pwa.js"></script>
@@ -121,6 +122,7 @@
 </header>
 <div class="workspace">
   <main id="main" tabindex="-1">
+    <p id="route-note" class="small" hidden></p>
     <section id="today-view" aria-labelledby="today-title"><div class="section-heading"><h1 id="today-title">Сегодня</h1></div><div id="today-content"></div><details class="panel" id="installation-panel"><summary>На телефон и без интернета</summary><p id="offline-status" role="status">Проверяю возможность сохранить приложение…</p><button id="install-app" type="button" class="secondary-button" hidden>Установить на телефон</button><button id="update-app" type="button" class="secondary-button" hidden>Сохранить ответ и обновить приложение</button><p>Android: открой сайт в браузере и выбери «Установить приложение» или «Добавить на главный экран». iPhone: открой сайт в Safari → «Поделиться» → «На экран Домой».</p><p class="small">Сначала открой тренажёр с интернетом и дождись сообщения о сохранении материалов. Прогресс зависит от браузера: перед переходом в установленное приложение скачай progress.json и при необходимости импортируй его. Очистка данных браузера удаляет и офлайн-копию, и прогресс.</p></details></section>
     <section id="review-view" hidden aria-labelledby="review-title"><div class="section-heading"><h1 id="review-title">Мой результат</h1></div><div id="review-content"></div></section>
     <section id="vocabulary-view" hidden aria-labelledby="vocabulary-title"><div class="section-heading"><h1 id="vocabulary-title">Мой словарь</h1><button type="button" class="text-button" data-view="today">К сегодняшнему плану</button></div><div id="vocabulary-content"></div></section>
