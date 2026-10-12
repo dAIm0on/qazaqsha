@@ -4090,25 +4090,61 @@ function qazaqAppBoot(bootMirror){
  }
  const hasMorphResume=!!(state.morphTrainer&&(state.morphTrainer.session||(state.morphTrainer.teaching&&state.morphTrainer.teaching.resume)));
  const resumeView=window.MorphState.resumeSurface(savedSession&&savedSession.view,hasMorphResume,!!validSaved,['practice','homework','learn','path','review']);
+ function routeKeyAccepts(item,key){
+   if(!item||!item.session||!key)return false;
+   const ctx=item.context||{},name=item.name,Nav=window.NavigationState;
+   if(name==='words')return key==='vocab:must';
+   if(name==='practice')return ctx.lesson?key==='course:'+ctx.lesson:true;
+   if(name==='homework-session')return !!ctx.id&&key.indexOf('homework:'+ctx.id+':')===0;
+   if(name==='exam-session')return key.indexOf('exam:')===0;
+   if(name==='preexam')return key.indexOf('preexam:')===0;
+   if(name==='extra'&&ctx.id){
+     if(ctx.kind==='words')return key==='vocab:'+ctx.id;
+     if(ctx.kind==='numbers')return key==='number:'+ctx.id;
+     if(ctx.kind==='lesson'||ctx.kind==='voluntary'){
+       const expected=Nav&&Nav.lessonKey?Nav.lessonKey(ctx.id):('lesson:'+ctx.id);
+       return key===expected;
+     }
+   }
+   return name==='extra';
+ }
+ function routeResumeKey(prefix){
+   const resume=state&&state.navigationResume,slots=resume&&resume.slots;
+   if(!prefix||!slots)return null;
+   const last=resume.lastRoute;
+   if(typeof last==='string'&&last.indexOf(prefix)===0&&slots[last]&&slots[last].status==='paused')return last;
+   let best=null,bestAt=-Infinity;
+   for(const [key,slot] of Object.entries(slots)){
+     if(key.indexOf(prefix)!==0||!slot||slot.status!=='paused')continue;
+     const at=Number(slot.updatedAt)||0;
+     if(best===null||at>bestAt){best=key;bestAt=at;}
+   }
+   return best;
+ }
  function routeSessionKey(item){
    if(!item||!item.session)return null;
-   if(item.sessionKey)return item.sessionKey;
-   const ctx=item.context||{},Nav=window.NavigationState;
+   if(item.sessionKey&&routeKeyAccepts(item,item.sessionKey))return item.sessionKey;
+   const ctx=item.context||{},Nav=window.NavigationState,liveKey=currentLaunchKey();
    if(item.name==='practice'&&ctx.lesson)return 'course:'+ctx.lesson;
    if(item.name==='extra'&&ctx.id&&(ctx.kind==='lesson'||ctx.kind==='voluntary'))return Nav&&Nav.lessonKey?Nav.lessonKey(ctx.id):('lesson:'+ctx.id);
    if(item.name==='extra'&&ctx.id&&ctx.kind==='numbers')return 'number:'+ctx.id;
+   if(item.name==='extra'&&ctx.id&&ctx.kind==='words')return 'vocab:'+ctx.id;
+   if(item.name==='homework-session'&&ctx.id){
+     const prefix='homework:'+ctx.id+':';
+     if(liveKey&&liveKey.indexOf(prefix)===0)return liveKey;
+     return routeResumeKey(prefix);
+   }
+   if(item.name==='exam-session'){
+     if(liveKey&&liveKey.indexOf('exam:')===0)return liveKey;
+     return routeResumeKey('exam:');
+   }
+   if(item.name==='preexam')return 'preexam:3-3';
    return null;
  }
  function sessionRouteMatchesLive(item,key){
-   if(!liveOpen())return false;
+   if(!key||!liveOpen())return false;
    const liveKey=currentLaunchKey();
-   if(key)return !!liveKey&&liveKey===key;
-   const ctx=item&&item.context||{};
-   if(item&&item.name==='extra'&&ctx.id){
-     if((ctx.kind==='lesson'||ctx.kind==='voluntary')&&activeLesson===ctx.id)return true;
-     if(ctx.kind==='numbers'&&mode==='numbers'&&(activeLesson===ctx.id||liveKey==='number:'+ctx.id))return true;
-   }
-   return false;
+   return !!liveKey&&liveKey===key;
  }
  function openSessionRoute(item,source){
    const Nav=window.NavigationState,key=routeSessionKey(item);
@@ -4136,13 +4172,8 @@ function qazaqAppBoot(bootMirror){
    window.__qzNavSource=source||'history';
    try{
      const item=entry||{};
-     if(item.name==='words'||item.name==='practice'||item.name==='extra'){openSessionRoute(item,'history');return;}
+     if(item.session){openSessionRoute(item,'history');return;}
      if(item.name==='practices'||item.name==='letters'||item.name==='practices-numbers'){openPersonalRoute(item,'history');return;}
-     if(item.session&&!(queue.length>position)&&!vocabSummary){
-       const parent=QazaqNav.parentOf(item);
-       showView(parent.view,{source:'history',route:parent});
-       return;
-     }
      showView(item.view||'today',{source:'history',route:item});
    }finally{window.__qzNavSource=null;}
  });
@@ -4174,24 +4205,12 @@ function qazaqAppBoot(bootMirror){
  function openExplicitRoute(routeItem){
   if(window.QazaqNav)QazaqNav.notice(false);
   const name=routeItem.name;
-  const Nav=window.NavigationState;
-  if(name==='words'){openSessionRoute(routeItem,'boot');return;}
+  if(routeItem.session){openSessionRoute(routeItem,'boot');return;}
   if(name==='exam'||name==='ready'||name==='library'||name==='settings'){showView(routeItem.view,{route:routeItem});return;}
-  if(name==='exam-session'||name==='preexam'){
-   if(queue.length>position&&(mode==='exam'||String(launchKey||'').indexOf('preexam:')===0)){showView('practice',{route:routeItem});return;}
-   showView('exam',{route:QazaqNav.parse('#/ready/exam').route});return;
-  }
   if(name==='homework'){
    if(routeItem.context&&routeItem.context.id)hwLesson=routeItem.context.id;
    showView('homework',{route:routeItem});return;
   }
-  if(name==='homework-session'){
-   const hwId=routeItem.context&&routeItem.context.id;
-   if(validSaved&&savedSession&&savedSession.mode==='homework'&&savedSession.hwLesson===hwId&&queue.length>position){showView('practice',{route:routeItem});return;}
-   if(hwId)hwLesson=hwId;
-   showView(hwId?'homework':'today',{route:hwId?QazaqNav.parse('#/ready/homework/'+hwId).route:QazaqNav.parentOf(routeItem)});return;
-  }
-  if(name==='practice'||name==='extra'){openSessionRoute(routeItem,'boot');return;}
   if(name==='practices'||name==='letters'||name==='practices-numbers'){openPersonalRoute(routeItem,'boot');return;}
   showView(routeItem.view||'today',{route:routeItem});
  }
