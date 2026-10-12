@@ -862,6 +862,9 @@ function qazaqAppBoot(bootMirror){
    const auto=!!(vocabCardHold&&vocabCardHold.autoAdvance&&vocabHoldLive(vocabCardHold));
    vocabSummary=false;
    render();
+   // NAV-03: continuing the must summary stays in the sitting. The address becomes #/words
+   // without another history entry and without a second launch.
+   if(window.QazaqNav&&QazaqNav.commit){const words=QazaqNav.parse('#/words');if(words.kind==='route')QazaqNav.commit({view:'practice',source:'render',route:words.route,runtime:{mode:'words',vocabRole:'must',trainerReturn:'vocab:must',launchKey:'vocab:must'}});}
    // PR-5: a fully correct answer moves on by itself; Закончить inside the 400 ms must not lose that.
    if(auto&&checked&&!advanceTimer)advanceTimer=setTimeout(()=>{advanceTimer=null;nextQuestion();},400);
  }
@@ -1712,8 +1715,7 @@ function qazaqAppBoot(bootMirror){
    activeLesson=id;activeStep=step;learningState.lessonId=id;learningState.steps[id]=step;topic=lesson.topic;mode=opts&&opts.voluntary?'voluntary':'lesson';sourceFilter=null;trainerReturn=parkKey.indexOf('number:')===0?parkKey:null;trainerEpoch=null;
    queue=lesson.topic==='numbers'?shuffled(stepIds):stepIds;practiceIds=[...queue];stepEvidence={};queueEpoch=Date.now()+Math.random();
    position=0;variants={};checked=false;resetCounts();render();
-   // r7 ux60 #1: «Сборник» / track opened from Учёба — Back returns to «Выбрать занятие», not to the lesson overview.
-   if(view==='learn')try{history.pushState({qzView:'practice'},'');}catch{}
+   // r7 ux60 #1: «Сборник» / track opened from Учёба — one shell entry, so Back returns to «Выбрать занятие».
    showView('practice');$('#exercise').scrollIntoView({block:'start'});
    }finally{if(owned)endLaunch(gate);}
  }
@@ -1768,6 +1770,8 @@ function qazaqAppBoot(bootMirror){
    startCustom(ids,'voluntary');
  }
  function showView(next){
+   const navOpts=arguments[1]||{};
+   const navSource=navOpts.source||(typeof window!=='undefined'&&window.__qzNavSource)||'user';
    clearLaunchBlocked();
    captureDraft();
    parkPause(next);
@@ -1778,15 +1782,32 @@ function qazaqAppBoot(bootMirror){
    if(next==='practice'&&view!=='practice'&&ORIGIN_VIEWS.includes(view))sessionOrigin=view;
    pauseTimer();if(!leavingSummary&&view==='practice'&&!checked&&['learn','rules','vocabulary','materials','review','exam'].includes(next)){const current=byId.get(queue[position]);if(current)hintEvent(current,'reference');hinted=true;}
    const prevView=view;view=next;document.body.dataset.view=next;
-   // r7 ux60 #1: keep the current history entry tagged with the screen we are on, so browser «Назад»
-   // never hits a stale qzView that equals the current view (first Back did nothing after the logo pushState).
-   if(next!==prevView)try{history.replaceState(Object.assign({},history.state||{},{qzView:next}),'');}catch{}
+   // r7 ux60 #1: one writer tags the current history entry. QazaqNav pushes only when the public
+   // route changes; the fallback keeps a harness without the registry on the same qzView tag.
+   if(window.QazaqNav&&QazaqNav.commit){
+     try{QazaqNav.commit({view:next,source:navSource,route:navOpts.route||null,runtime:{mode:mode,topic:topic,courseBlock:courseBlock,hwLesson:hwLesson,hwPart:hwPart,hwSection:hwSection,vocabRole:vocabRole,trainerReturn:trainerReturn,launchKey:launchKey,activeLesson:activeLesson,grammarLesson:state.grammarPath&&state.grammarPath.lessonId}});}catch(e){}
+   }else if(next!==prevView)try{history.replaceState(Object.assign({},history.state||{},{qzView:next}),'');}catch{}
    /* Immersive hides .bottom-nav. Leaving morph must drop the flag or the menu stays gone. */
    if(next!=='morph')delete document.body.dataset.morphImmersive;
    if(next!=='practice'&&next!=='path'&&next!=='morph')typingFocus=false;
    const gpNow=state.grammarPath||{};
    document.body.classList.toggle('path-immersive',next==='path'&&!!(gpNow.lessonId&&gpNow.phase==='beat'));
-   document.querySelectorAll('main > section').forEach(el=>{el.hidden=el.id!==next+'-view';});
+   const navSections=document.querySelectorAll('main > section');
+   if(window.QazaqNav&&QazaqNav.sectionPlan){
+     const navIds=[];navSections.forEach(el=>navIds.push(el.id));
+     const navShown=QazaqNav.sectionPlan(navIds,next);
+     navSections.forEach(el=>{el.hidden=navShown.indexOf(el.id)<0;});
+   }else navSections.forEach(el=>{el.hidden=el.id!==next+'-view';});
+   try{
+     if(document.activeElement&&document.activeElement.closest){
+       const navSec=document.activeElement.closest('main > section');
+       if(navSec&&navSec.hidden&&document.activeElement.blur)document.activeElement.blur();
+     }
+     if(navSource==='user'&&document.querySelector){
+       const navH=document.querySelector('main > section:not([hidden]) h1');
+       if(navH){navH.setAttribute('tabindex','-1');if(navH.focus)navH.focus({preventScroll:true});}
+     }
+   }catch(e){}
    if(next==='practice')refillCardDraft();
    const tab=shellTab(next);
    $$('[data-view]').forEach(b=>{if(b.dataset.view===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
@@ -3915,14 +3936,13 @@ function qazaqAppBoot(bootMirror){
    const picker=document.getElementById('lesson-picker');if(picker&&picker.open)try{picker.close();}catch{}
    // r7 ux59b #5: one history entry per logo jump, same URL (F5 / resumeSurface / SW untouched): browser «Назад»
    // returns to the screen she left (session and draft are in memory and in the saved state), not off the site.
-   const from=view;
-   // r7 ux60 #1: one new entry only (showView already tagged the screen we leave). No replaceState+pushState pair.
-   if(from&&from!=='today')try{history.pushState({qzView:'today'},'');}catch{}
+   // r7 ux60 #1: the shell records one entry for the logo hop. No second push here.
    showView('today');save();
    try{window.scrollTo({top:0});}catch{}
    const h=document.querySelector('#today-view h1, #today-content h2');if(h){h.setAttribute('tabindex','-1');try{h.focus({preventScroll:true});}catch{}}
  });
  window.addEventListener('popstate',ev=>{
+   if(window.QazaqNav&&QazaqNav.claimed(ev))return;
    const v=ev.state&&ev.state.qzView;if(!v||v===view)return;
    if(v==='practice'&&!(queue.length>position)){ // session over: fall back to Учёба if that is where she came from
      if(sessionOrigin==='learn'||hubLesson()){cancelAdvance();abortTutor();showView('learn');save();}
@@ -3932,6 +3952,12 @@ function qazaqAppBoot(bootMirror){
  });
  $('#pause-session').onclick=()=>{
    cancelAdvance();abortTutor();
+   if(window.QazaqNav&&QazaqNav.pauseReturn){
+     const step=QazaqNav.pauseReturn();
+     if(step.how==='back'&&QazaqNav.goBack())return;
+     if(step.how==='push'&&step.route){showView(step.view,{source:'user',route:step.route});return;}
+     if(step.route){showView(step.view,{source:'render',route:step.route});return;}
+   }
    const back=pauseTarget(); // drops a trainerReturn left over from an earlier trainer queue
    showView(trainerReturn?'personal':back);
  };
@@ -4064,15 +4090,110 @@ function qazaqAppBoot(bootMirror){
  }
  const hasMorphResume=!!(state.morphTrainer&&(state.morphTrainer.session||(state.morphTrainer.teaching&&state.morphTrainer.teaching.resume)));
  const resumeView=window.MorphState.resumeSurface(savedSession&&savedSession.view,hasMorphResume,!!validSaved,['practice','homework','learn','path','review']);
- showView(resumeView);
- if(practiceHold&&practiceHold.kept)showPracticeHold();
- if(window.FreePractice&&window.FreePractice.resumeIfOpen())showView('morph');
- if(window.MorphTrainer&&window.MorphTrainer.restoreReading&&window.MorphTrainer.restoreReading())showView('morph');
- if(view!=='morph'&&savedSession&&savedSession.view==='morph'){
-  let navScreen='',surface='';
-  try{navScreen=(JSON.parse(sessionStorage.getItem('qazaqsha-nav2-v1')||'null')||{}).screen||'';}catch(e){}
-  try{surface=sessionStorage.getItem('qazaqsha-fs2-surface')||'';}catch(e){}
-  if(navScreen||surface==='calc')showView('morph');
+ function routeSessionKey(item){
+   if(!item||!item.session)return null;
+   if(item.sessionKey)return item.sessionKey;
+   const ctx=item.context||{},Nav=window.NavigationState;
+   if(item.name==='practice'&&ctx.lesson)return 'course:'+ctx.lesson;
+   if(item.name==='extra'&&ctx.id&&(ctx.kind==='lesson'||ctx.kind==='voluntary'))return Nav&&Nav.lessonKey?Nav.lessonKey(ctx.id):('lesson:'+ctx.id);
+   if(item.name==='extra'&&ctx.id&&ctx.kind==='numbers')return 'number:'+ctx.id;
+   return null;
+ }
+ function sessionRouteMatchesLive(item,key){
+   if(!liveOpen())return false;
+   const liveKey=currentLaunchKey();
+   if(key)return !!liveKey&&liveKey===key;
+   const ctx=item&&item.context||{};
+   if(item&&item.name==='extra'&&ctx.id){
+     if((ctx.kind==='lesson'||ctx.kind==='voluntary')&&activeLesson===ctx.id)return true;
+     if(ctx.kind==='numbers'&&mode==='numbers'&&(activeLesson===ctx.id||liveKey==='number:'+ctx.id))return true;
+   }
+   return false;
+ }
+ function openSessionRoute(item,source){
+   const Nav=window.NavigationState,key=routeSessionKey(item);
+   if(sessionRouteMatchesLive(item,key)){showView('practice',{source:source,route:item});return 'live';}
+   const parked=Nav&&key?Nav.get(state,key):null;
+   if(parked&&parked.status==='paused'){
+     const restored=restoreParked(key,parked);
+     if(restored==='ok'||restored==='held')return 'parked';
+   }
+   if(item&&item.name==='practice'&&item.context&&item.context.lesson)setHubLesson(item.context.lesson);
+   const parent=QazaqNav.parentOf(item);
+   showView(parent.view,{source:source,route:parent});
+   return 'parent';
+ }
+ function openPersonalRoute(item,source){
+   const personal=window.PersonalTrainers;
+   if(personal){
+     if(item&&item.name==='letters'&&personal.openTrainer){personal.openTrainer('harmony_letters',{source:source});return;}
+     if(item&&item.name==='practices-numbers'&&personal.openTrainer){personal.openTrainer('numbers',{source:source});return;}
+     if(item&&item.name==='practices'&&personal.openCatalog){personal.openCatalog({source:source});return;}
+   }
+   showView('personal',{source:source,route:item});
+ }
+ if(window.QazaqNav&&QazaqNav.bind)QazaqNav.bind(function(entry,source){
+   window.__qzNavSource=source||'history';
+   try{
+     const item=entry||{};
+     if(item.name==='words'||item.name==='practice'||item.name==='extra'){openSessionRoute(item,'history');return;}
+     if(item.name==='practices'||item.name==='letters'||item.name==='practices-numbers'){openPersonalRoute(item,'history');return;}
+     if(item.session&&!(queue.length>position)&&!vocabSummary){
+       const parent=QazaqNav.parentOf(item);
+       showView(parent.view,{source:'history',route:parent});
+       return;
+     }
+     showView(item.view||'today',{source:'history',route:item});
+   }finally{window.__qzNavSource=null;}
+ });
+ const bootNav=window.QazaqNav?QazaqNav.classify(location.hash):{kind:'none'};
+ window.__qzNavSource='boot';
+ try{
+ if(bootNav.kind==='route'){
+  if(bootNav.route.name==='morph'&&window.MorphTrainer&&window.MorphTrainer.restoreReading)window.MorphTrainer.restoreReading();
+  openExplicitRoute(bootNav.route);
+ }else if(bootNav.kind==='unknown'){
+  showView('today',{route:window.QazaqNav.lessonHome()});
+  QazaqNav.notice(true);
+ }else{
+  showView(resumeView);
+  if(practiceHold&&practiceHold.kept)showPracticeHold();
+  if(window.FreePractice&&window.FreePractice.resumeIfOpen())showView('morph');
+  if(window.MorphTrainer&&window.MorphTrainer.restoreReading&&window.MorphTrainer.restoreReading())showView('morph');
+  if(view!=='morph'&&savedSession&&savedSession.view==='morph'){
+   let navScreen='',surface='';
+   try{navScreen=(JSON.parse(sessionStorage.getItem('qazaqsha-nav2-v1')||'null')||{}).screen||'';}catch(e){}
+   try{surface=sessionStorage.getItem('qazaqsha-fs2-surface')||'';}catch(e){}
+   if(navScreen||surface==='calc')showView('morph');
+  }
+  if(bootNav.kind==='anchor'){
+   try{const anchorEl=document.getElementById(bootNav.anchor);if(anchorEl&&anchorEl.focus)anchorEl.focus();}catch(e){}
+  }
+ }
+ }finally{window.__qzNavSource=null;}
+ function openExplicitRoute(routeItem){
+  if(window.QazaqNav)QazaqNav.notice(false);
+  const name=routeItem.name;
+  const Nav=window.NavigationState;
+  if(name==='words'){openSessionRoute(routeItem,'boot');return;}
+  if(name==='exam'||name==='ready'||name==='library'||name==='settings'){showView(routeItem.view,{route:routeItem});return;}
+  if(name==='exam-session'||name==='preexam'){
+   if(queue.length>position&&(mode==='exam'||String(launchKey||'').indexOf('preexam:')===0)){showView('practice',{route:routeItem});return;}
+   showView('exam',{route:QazaqNav.parse('#/ready/exam').route});return;
+  }
+  if(name==='homework'){
+   if(routeItem.context&&routeItem.context.id)hwLesson=routeItem.context.id;
+   showView('homework',{route:routeItem});return;
+  }
+  if(name==='homework-session'){
+   const hwId=routeItem.context&&routeItem.context.id;
+   if(validSaved&&savedSession&&savedSession.mode==='homework'&&savedSession.hwLesson===hwId&&queue.length>position){showView('practice',{route:routeItem});return;}
+   if(hwId)hwLesson=hwId;
+   showView(hwId?'homework':'today',{route:hwId?QazaqNav.parse('#/ready/homework/'+hwId).route:QazaqNav.parentOf(routeItem)});return;
+  }
+  if(name==='practice'||name==='extra'){openSessionRoute(routeItem,'boot');return;}
+  if(name==='practices'||name==='letters'||name==='practices-numbers'){openPersonalRoute(routeItem,'boot');return;}
+  showView(routeItem.view||'today',{route:routeItem});
  }
  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else{renderStats();if(view==='practice')activateCard();if(['today','review','vocabulary'].includes(view))dashboard.render(view);}save();});
  let updateMirrored=false;
