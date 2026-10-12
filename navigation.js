@@ -27,6 +27,22 @@
    const text=params.toString();
    return text?href+'?'+text:href;
  }
+ function extraSessionKey(ctx){
+   const kind=ctx&&ctx.kind,id=ctx&&ctx.id;
+   if(!kind||!id)return null;
+   if(kind==='words')return 'vocab:'+id;
+   if(kind==='numbers')return 'number:'+id;
+   if(kind==='lesson'||kind==='voluntary')return (String(id).indexOf('numbers')===0?'number:':'lesson:')+id;
+   return null;
+ }
+ function sessionKeyFromState(item){
+   if(!item||!item.session||item.sessionKey)return item;
+   const qz=root.history&&root.history.state&&root.history.state.qzNav;
+   if(!qz||qz.route!==item.href)return item;
+   const key=typeof qz.sessionKey==='string'?qz.sessionKey:'';
+   if(/^[a-z0-9:._-]{1,120}$/i.test(key))item.sessionKey=key;
+   return item;
+ }
  function lessonHome(){return route('lesson','today','#/lesson');}
  function practicesHome(){return route('practices','personal','#/practices');}
  function readyHome(){return route('ready','today','#/ready',{hub:true});}
@@ -57,7 +73,7 @@
    else if(path==='/lessons')found=route('lessons','learn','#/lessons');
    else if(path==='/practices/letters')found=route('letters','personal','#/practices/letters');
    else if(path==='/practices/numbers')found=route('practices-numbers','personal','#/practices/numbers');
-   else if(path==='/practices/session')found=route('extra','practice',withQuery('#/practices/session',ctx,['kind','id']),{session:true,context:{kind:ctx.kind||null,id:ctx.id||null}});
+   else if(path==='/practices/session')found=route('extra','practice',withQuery('#/practices/session',ctx,['kind','id']),{session:true,context:{kind:ctx.kind||null,id:ctx.id||null},sessionKey:extraSessionKey(ctx)});
    else if(path==='/practices')found=practicesHome();
    else if(path==='/ready')found=readyHome();
    else if(homework){
@@ -68,7 +84,7 @@
    }
    else if(path==='/ready/exam')found=route('exam','exam','#/ready/exam');
    else if(path==='/ready/exam/session')found=route('exam-session','practice','#/ready/exam/session',{session:true});
-   else if(path==='/ready/preexam')found=route('preexam','practice','#/ready/preexam',{session:true});
+   else if(path==='/ready/preexam')found=route('preexam','practice','#/ready/preexam',{session:true,sessionKey:'preexam:3-3'});
    else if(path==='/library')found=route('library','today','#/library',{hub:true});
    else if(path==='/rules')found=route('rules','rules',withQuery('#/rules',ctx,['lesson','article']),{context:{lesson:ctx.lesson||null,article:ctx.article||null}});
    else if(path==='/dict')found=route('dict','vocabulary',withQuery('#/dict',ctx,['filter','lesson']),{context:{filter:ctx.filter||null,lesson:ctx.lesson||null}});
@@ -79,6 +95,7 @@
    if(found.context){
      Object.keys(found.context).forEach(function(key){if(found.context[key]==null)delete found.context[key];});
    }
+   sessionKeyFromState(found);
    return {kind:'route',route:found};
  }
  function classify(hash){return parse(hash);}

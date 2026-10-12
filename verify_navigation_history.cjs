@@ -51,12 +51,37 @@ assert.equal(Nav.parentOf(Nav.parse('#/words').route).href, '#/lesson');
 assert.equal(Nav.parentOf(Nav.parse('#/lesson/theory').route).href, '#/lesson');
 assert.equal(Nav.parentOf(Nav.parse('#/practices/session?kind=numbers&id=numbers-0').route).href, '#/practices');
 assert.equal(Nav.parentOf(Nav.parse('#/ready/exam/session').route).href, '#/ready');
+assert.equal(Nav.parse('#/practices/session?kind=words&id=used').route.sessionKey, 'vocab:used');
+{
+  const extra = Nav.legacyRoute('practice', {view: 'practice', mode: 'words', topic: 'vocab', trainerReturn: 'vocab:used', launchKey: 'vocab:used'});
+  assert.equal(extra.href, '#/practices/session?kind=words&id=used');
+  assert.equal(Nav.parse(extra.href).route.sessionKey, extra.sessionKey, 'generic extra keeps sessionKey across F5 parse round-trip');
+}
+assert.equal(Nav.parse('#/practices/session?kind=numbers&id=numbers-0').route.sessionKey, 'number:numbers-0');
+assert.equal(Nav.parse('#/ready/preexam').route.sessionKey, 'preexam:3-3');
+{
+  const savedHistory = global.history;
+  global.history = {state: {qzNav: {route: '#/ready/exam/session', sessionKey: 'exam:sounds'}}};
+  assert.equal(Nav.parse('#/ready/exam/session').route.sessionKey, 'exam:sounds', 'F5 keeps exact exam sessionKey from history.state');
+  global.history = {state: {qzNav: {route: '#/ready/homework/2-2/session', sessionKey: 'homework:2-2:words:1'}}};
+  assert.equal(Nav.parse('#/ready/homework/2-2/session').route.sessionKey, 'homework:2-2:words:1', 'F5 keeps exact homework sessionKey from history.state');
+  global.history = savedHistory;
+}
 const ids = Nav.SECTIONS.map(name => name + '-view');
 for (const view of Nav.SECTIONS) assert.deepEqual(Nav.sectionPlan(ids, view), [view + '-view']);
 assert.deepEqual(Nav.sectionPlan(ids, 'library'), ['today-view']);
 assert.equal(Nav.sectionPlan(ids, 'settings').length, 1);
 assert.equal(Nav.sectionPlan([], 'library').length, 0);
 ok('registry: ready routes, homework ids, anchor, unknown, one section');
+
+{
+  const appNav = read('app.js');
+  assert.ok(appNav.includes("if(item.session){openSessionRoute(item,'history');return;}"), 'every history session route uses the owner check');
+  assert.ok(appNav.includes("if(routeItem.session){openSessionRoute(routeItem,'boot');return;}"), 'every boot session route uses the owner check');
+  assert.ok(appNav.includes("if(name==='exam-session')return key.indexOf('exam:')===0;"), 'exam-session accepts exam:* only');
+  assert.ok(appNav.includes("if(name==='preexam')return key.indexOf('preexam:')===0;"), 'preexam accepts preexam:* only');
+}
+ok('F1 session ownership: history and boot share openSessionRoute; exam/preexam key families stay disjoint');
 
 {
   const foreign = {nav2: 1, fs2: {id: 'x'}, queue: ['secret'], draft: {answers: ['a']}, keep: 'yes'};
@@ -366,7 +391,11 @@ ok('live shell: lesson, lessons, results, Back, Back, Forward; one visible secti
   const parked = page.window.QazaqShell.resume().slots['vocab:must'];
   assert.equal(parked && parked.status, 'paused');
   const mid = q.pushCount;
-  shell.show('practice');
+  shell.startCourse('1-1');
+  assert.equal(page.window.document.body.dataset.view, 'practice', 'real course practice opened');
+  assert.equal(page.window.QazaqShell.key(), 'course:1-1', 'N-HISTORY-2 uses a real practice session, not shell.show');
+  assert.equal(page.window.location.hash, '#/practice?lesson=1-1');
+  assert.equal(q.pushCount, mid + 1, 'real practice is one external hop');
   q.goBack();
   assert.equal(page.window.location.hash, '#/lesson');
   assert.notEqual(page.window.location.hash, '#/words');
@@ -433,6 +462,160 @@ ok('N-HISTORY-SESSION-MATCH: words -> Back restores the practice session owned b
   assert.notEqual(page.window.QazaqShell.key(), 'course:2-1');
 }
 ok('N-ROUTE-SESSION-MISMATCH-COLD: cold lesson route rejects a foreign live queue and restores its parked slot');
+
+function ownedSession(key, patch){
+  const session = JSON.parse(read('fixtures/navigation/practice-mid.json'));
+  Object.assign(session, {view: 'practice', launchKey: key, answered: false, position: 0}, patch || {});
+  return session;
+}
+function vocabUsedSession(){
+  const body = JSON.parse(read('fixtures/navigation/must-first-show.json'));
+  const session = JSON.parse(JSON.stringify(body.session));
+  session.launchKey = 'vocab:used';
+  session.trainerReturn = 'vocab:used';
+  session.vocabRole = 'used';
+  delete session.vocab;
+  return session;
+}
+function seedWithParked(live, key, parked){
+  return {
+    session: live,
+    navigationResume: {
+      version: 1,
+      lastRoute: key,
+      slots: {[key]: {status: 'paused', updatedAt: 9, origin: 'test-f1', snapshot: {kind: 'session', session: parked}}}
+    }
+  };
+}
+function popRoute(page, href, sessionKey){
+  const q = page.window.QazaqNav;
+  const parsed = q.parse(href).route;
+  const state = {qzView: parsed.view, qzNav: {version: 1, route: parsed.href, name: parsed.name, context: parsed.context || {}, origin: null, originAdjacent: false, sessionKey: sessionKey || parsed.sessionKey || null}};
+  page.window.history.state = state;
+  page.window.location.hash = parsed.href;
+  assert.equal(q.onPop({state, stopImmediatePropagation(){}}), true, 'history route claimed: ' + href);
+}
+
+{
+  const live = ownedSession('homework:1-1:exercises:0', {mode: 'homework', hwLesson: '1-1', hwPart: 'exercises', hwSection: 0, courseBlock: '1-1'});
+  const target = ownedSession('homework:2-2:exercises:0', {mode: 'homework', hwLesson: '2-2', hwPart: 'exercises', hwSection: 0, courseBlock: '2-2'});
+  const key = target.launchKey;
+  const cold = boot(JSON.stringify(seedWithParked(live, key, target)), function(win){ win.location.hash = '#/ready/homework/2-2/session'; });
+  assert.equal(cold.window.document.body.dataset.view, 'practice', 'cold homework session restores its own parked queue');
+  assert.equal(cold.window.QazaqShell.key(), key);
+  cold.saveNow();
+  assert.equal(cold.session().hwLesson, '2-2');
+
+  const history = boot(JSON.stringify({session: live}));
+  popRoute(history, '#/ready/homework/2-2/session', 'homework:2-2:exercises:0');
+  assert.notEqual(history.window.document.body.dataset.view, 'practice', 'history homework route rejects foreign live homework');
+  assert.equal(history.window.location.hash, '#/ready');
+}
+ok('F1-homework: boot restores matching slot; history rejects a foreign homework key');
+
+{
+  const preexam = ownedSession('preexam:3-3', {mode: 'course', topic: 'sounds', courseBlock: null});
+  const exam = ownedSession('exam:sounds', {mode: 'exam', topic: 'sounds', courseBlock: null});
+  const cold = boot(JSON.stringify(seedWithParked(preexam, exam.launchKey, exam)), function(win){ win.location.hash = '#/ready/exam/session'; });
+  assert.equal(cold.window.document.body.dataset.view, 'practice');
+  assert.equal(cold.window.QazaqShell.key(), 'exam:sounds', 'exam route must not accept preexam:*');
+
+  const history = boot(JSON.stringify({session: preexam}));
+  popRoute(history, '#/ready/exam/session', 'exam:sounds');
+  assert.notEqual(history.window.document.body.dataset.view, 'practice', 'history exam route rejects live preexam when no exam slot exists');
+  assert.equal(history.window.location.hash, '#/ready/exam', 'exam-session fallback is the exam room, as on main');
+}
+ok('F1-exam: exam-session owns exam:* only; preexam:* cannot satisfy it');
+
+{
+  const exam = ownedSession('exam:sounds', {mode: 'exam', topic: 'sounds', courseBlock: null});
+  const preexam = ownedSession('preexam:3-3', {mode: 'course', topic: 'sounds', courseBlock: null});
+  const cold = boot(JSON.stringify(seedWithParked(exam, preexam.launchKey, preexam)), function(win){ win.location.hash = '#/ready/preexam'; });
+  assert.equal(cold.window.document.body.dataset.view, 'practice');
+  assert.equal(cold.window.QazaqShell.key(), 'preexam:3-3', 'preexam route must not accept exam:*');
+
+  const history = boot(JSON.stringify({session: exam}));
+  popRoute(history, '#/ready/preexam', 'preexam:3-3');
+  assert.notEqual(history.window.document.body.dataset.view, 'practice', 'history preexam route rejects live exam when no preexam slot exists');
+  assert.equal(history.window.location.hash, '#/ready');
+}
+ok('F1-preexam: preexam route owns preexam:* only; exam:* cannot satisfy it');
+
+{
+  const used = vocabUsedSession();
+  const href = '#/practices/session?kind=words&id=used';
+  const parsed = Nav.parse(href).route;
+  assert.equal(parsed.sessionKey, 'vocab:used', 'generic extra reconstructs vocab:used from its URL after F5');
+  const cold = boot(JSON.stringify({session: used}), function(win){ win.location.hash = href; });
+  assert.equal(cold.window.document.body.dataset.view, 'practice');
+  assert.equal(cold.window.QazaqShell.key(), 'vocab:used');
+  assert.equal(cold.window.location.hash, href);
+}
+ok('F1-generic-extra: #/practices/session reconstructs sessionKey and keeps the matching live queue after F5');
+
+{
+  // F1-tail QA: real-browser preexam runs with mode 'course' and view not yet 'practice' at boot.
+  const preexam = ownedSession('preexam:3-3', {mode: 'course', topic: 'sounds', courseBlock: null, view: 'today'});
+  const cold = boot(JSON.stringify({session: preexam}), function(win){ win.location.hash = '#/ready/preexam'; });
+  assert.equal(cold.window.document.body.dataset.view, 'practice', 'F5 on #/ready/preexam keeps the live preexam (stamped launchKey)');
+  assert.equal(cold.window.QazaqShell.key(), 'preexam:3-3');
+  assert.equal(cold.window.location.hash, '#/ready/preexam');
+
+  const nav = boot(JSON.stringify({session: preexam}));
+  popRoute(nav, '#/ready', null);
+  popRoute(nav, '#/ready/preexam', 'preexam:3-3');
+  assert.equal(nav.window.document.body.dataset.view, 'practice', 'Forward onto #/ready/preexam reopens the live preexam');
+  assert.equal(nav.window.QazaqShell.key(), 'preexam:3-3');
+  popRoute(nav, '#/ready', null);
+  assert.notEqual(nav.window.document.body.dataset.view, 'practice', 'Back off preexam leaves practice');
+  popRoute(nav, '#/ready/preexam', 'preexam:3-3');
+  assert.equal(nav.window.document.body.dataset.view, 'practice', 'Forward again reopens preexam');
+}
+ok('F1-preexam-live: cold boot and Back/Forward onto #/ready/preexam keep the live preexam');
+
+{
+  const empty = boot(JSON.stringify({}), function(win){ win.location.hash = '#/ready/exam/session'; });
+  assert.equal(empty.window.location.hash, '#/ready/exam', 'exam-session without a session falls back to the exam room');
+  assert.equal(empty.window.document.body.dataset.view, 'exam');
+  const exam = ownedSession('exam:sounds', {mode: 'exam', topic: 'sounds', courseBlock: null});
+  const live = boot(JSON.stringify({session: exam}), function(win){ win.location.hash = '#/ready/exam/session'; });
+  assert.equal(live.window.document.body.dataset.view, 'practice', 'F5 on exam-session keeps the live exam');
+  assert.equal(live.window.QazaqShell.key(), 'exam:sounds');
+}
+ok('F1-exam-F5: live exam survives F5; no session falls back to #/ready/exam');
+
+{
+  // Intentional asymmetry (GPT PR#83 review): do not "simplify" back into one branch.
+  const pre = boot(JSON.stringify({}), function(win){ win.location.hash = '#/ready/preexam'; });
+  assert.equal(pre.window.location.hash, '#/ready', 'preexam empty -> #/ready');
+  const ex = boot(JSON.stringify({}), function(win){ win.location.hash = '#/ready/exam/session'; });
+  assert.equal(ex.window.location.hash, '#/ready/exam', 'exam empty -> #/ready/exam');
+}
+ok('F1-empty-fallback-asymmetry: preexam empty -> #/ready, exam empty -> #/ready/exam');
+
+{
+  const live = ownedSession('homework:1-1:exercises:0', {mode: 'homework', hwLesson: '1-1', hwPart: 'exercises', hwSection: 0, courseBlock: '1-1'});
+  const nav = boot(JSON.stringify({session: live}));
+  popRoute(nav, '#/ready/homework/2-2/session', 'homework:1-1:exercises:0');
+  assert.notEqual(nav.window.document.body.dataset.view, 'practice', 'homework 2-2 route must reject a 1-1 key even if history.state carries it');
+  assert.notEqual(nav.window.QazaqShell.key && nav.window.document.body.dataset.view, 'practice');
+}
+ok('F1-homework-foreign-key: a different lesson homework key in history.state is rejected');
+
+{
+  // Live session must be parked before history restores another parked one (homework -> preexam -> Back -> Forward).
+  const preexam = ownedSession('preexam:3-3', {mode: 'course', topic: 'sounds', courseBlock: null});
+  const hw = ownedSession('homework:1-1:exercises:0', {mode: 'homework', hwLesson: '1-1', hwPart: 'exercises', hwSection: 0, courseBlock: '1-1'});
+  const nav = boot(JSON.stringify(seedWithParked(preexam, hw.launchKey, hw)));
+  popRoute(nav, '#/ready/homework/1-1/session', hw.launchKey);
+  assert.equal(nav.window.QazaqShell.key(), hw.launchKey, 'Back restores parked homework');
+  const slot = nav.window.QazaqShell.resume().slots['preexam:3-3'];
+  assert.ok(slot && slot.status === 'paused', 'live preexam was parked, not dropped');
+  popRoute(nav, '#/ready/preexam', 'preexam:3-3');
+  assert.equal(nav.window.document.body.dataset.view, 'practice');
+  assert.equal(nav.window.QazaqShell.key(), 'preexam:3-3', 'Forward restores the parked preexam');
+}
+ok('F1-park-before-restore: history swap parks the live session; Back/Forward keep both');
 
 {
   const page = boot();
