@@ -585,6 +585,15 @@ ok('F1-preexam-live: cold boot and Back/Forward onto #/ready/preexam keep the li
 ok('F1-exam-F5: live exam survives F5; no session falls back to #/ready/exam');
 
 {
+  // Intentional asymmetry (GPT PR#83 review): do not "simplify" back into one branch.
+  const pre = boot(JSON.stringify({}), function(win){ win.location.hash = '#/ready/preexam'; });
+  assert.equal(pre.window.location.hash, '#/ready', 'preexam empty -> #/ready');
+  const ex = boot(JSON.stringify({}), function(win){ win.location.hash = '#/ready/exam/session'; });
+  assert.equal(ex.window.location.hash, '#/ready/exam', 'exam empty -> #/ready/exam');
+}
+ok('F1-empty-fallback-asymmetry: preexam empty -> #/ready, exam empty -> #/ready/exam');
+
+{
   const live = ownedSession('homework:1-1:exercises:0', {mode: 'homework', hwLesson: '1-1', hwPart: 'exercises', hwSection: 0, courseBlock: '1-1'});
   const nav = boot(JSON.stringify({session: live}));
   popRoute(nav, '#/ready/homework/2-2/session', 'homework:1-1:exercises:0');
